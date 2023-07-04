@@ -351,7 +351,7 @@ theorem substitution_theorem_ind
     unfold Holds
     unfold Function.updateIte
     simp only [eq_comm]
-    congr! 1 <;> {split_ifs <;> rfl }
+    congr! 1 <;> { split_ifs <;> rfl }
   case true_ _ _ | false_ _ _ =>
     unfold Holds
     rfl

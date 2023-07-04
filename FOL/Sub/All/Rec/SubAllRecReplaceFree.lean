@@ -65,12 +65,26 @@ def fastReplaceFreeFun : (VarName → VarName) → Formula → Formula
   | _, true_ => true_
   | _, false_ => false_
   | σ, not_ phi => not_ (fastReplaceFreeFun σ phi)
-  | σ, imp_ phi psi => imp_ (fastReplaceFreeFun σ phi) (fastReplaceFreeFun σ psi)
-  | σ, and_ phi psi => and_ (fastReplaceFreeFun σ phi) (fastReplaceFreeFun σ psi)
-  | σ, or_ phi psi => or_ (fastReplaceFreeFun σ phi) (fastReplaceFreeFun σ psi)
-  | σ, iff_ phi psi => iff_ (fastReplaceFreeFun σ phi) (fastReplaceFreeFun σ psi)
-  | σ, forall_ x phi => forall_ x (fastReplaceFreeFun (Function.updateIte σ x x) phi)
-  | σ, exists_ x phi => exists_ x (fastReplaceFreeFun (Function.updateIte σ x x) phi)
+  | σ, imp_ phi psi =>
+      imp_
+      (fastReplaceFreeFun σ phi)
+      (fastReplaceFreeFun σ psi)
+  | σ, and_ phi psi =>
+      and_
+      (fastReplaceFreeFun σ phi)
+      (fastReplaceFreeFun σ psi)
+  | σ, or_ phi psi =>
+      or_
+      (fastReplaceFreeFun σ phi)
+      (fastReplaceFreeFun σ psi)
+  | σ, iff_ phi psi =>
+      iff_
+      (fastReplaceFreeFun σ phi)
+      (fastReplaceFreeFun σ psi)
+  | σ, forall_ x phi =>
+      forall_ x (fastReplaceFreeFun (Function.updateIte σ x x) phi)
+  | σ, exists_ x phi =>
+      exists_ x (fastReplaceFreeFun (Function.updateIte σ x x) phi)
 
 
 theorem fastReplaceFreeFun_id
@@ -84,20 +98,21 @@ theorem fastReplaceFreeFun_id
   case eq_ x y =>
     unfold fastReplaceFreeFun
     simp
-  case true_ | false_ => rfl
+  case true_ | false_ =>
+    rfl
   case not_ phi phi_ih =>
     unfold fastReplaceFreeFun
-    congr
+    simp only [phi_ih]
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     unfold fastReplaceFreeFun
-    congr
+    simp only [phi_ih, psi_ih]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold fastReplaceFreeFun
-    simp
+    congr!
     simp only [Function.updateIte_id]
     exact phi_ih
 
