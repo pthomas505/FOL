@@ -15,15 +15,15 @@ def replaceFreeFunAux (σ : VarName → VarName) : Finset VarName → Formula �
   | binders, pred_const_ X xs =>
       pred_const_
       X
-      (xs.map fun x : VarName => if x ∈ binders then x else σ x)
+      (xs.map fun x : VarName => if x ∉ binders then σ x else x)
   | binders, pred_var_ X xs =>
       pred_var_
       X
-      (xs.map fun x : VarName => if x ∈ binders then x else σ x)
+      (xs.map fun x : VarName => if x ∉ binders then σ x else x)
   | binders, eq_ x y =>
       eq_
-      (if x ∈ binders then x else σ x)
-      (if y ∈ binders then y else σ y)
+      (if x ∉ binders then σ x else x)
+      (if y ∉ binders then σ y else y)
   | _, true_ => true_
   | _, false_ => false_
   | binders, not_ phi => not_ (replaceFreeFunAux σ binders phi)
