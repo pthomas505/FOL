@@ -94,22 +94,24 @@ theorem fastReplaceFreeFun_id
   induction F
   case pred_const_ X xs | pred_var_ X xs =>
     unfold fastReplaceFreeFun
+    congr!
     simp
   case eq_ x y =>
     unfold fastReplaceFreeFun
-    simp
+    congr!
   case true_ | false_ =>
+    unfold fastReplaceFreeFun
     rfl
   case not_ phi phi_ih =>
     unfold fastReplaceFreeFun
-    simp only [phi_ih]
+    congr!
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     unfold fastReplaceFreeFun
-    simp only [phi_ih, psi_ih]
+    congr!
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold fastReplaceFreeFun
     congr!
