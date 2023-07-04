@@ -1,9 +1,9 @@
-import Fol.Sub.All.Rec.SubAllRecReplaceFree
-import Fol.Semantics
-import Fol.Tactics
+import FOL.Sub.All.Rec.SubAllRecReplaceFree
+import FOL.Semantics
+import FOL.Tactics
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -213,4 +213,4 @@ theorem substitution_fun_valid
 
 --#lint
 
-end Fol
+end FOL

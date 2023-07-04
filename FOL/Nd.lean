@@ -1,13 +1,13 @@
-import Fol.Alpha
-import Fol.Sub.One.Rec.SubOneRecAdmits
-import Fol.PredSub.All.Rec.PredSubAllRec
+import FOL.Alpha
+import FOL.Sub.One.Rec.SubOneRecAdmits
+import FOL.PredSub.All.Rec.PredSubAllRec
 
-import Fol.Tactics
+import FOL.Tactics
 
 import Mathlib.Data.Finset.Basic
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -196,4 +196,4 @@ inductive IsDeduct : Finset Formula → Formula → Prop
 
 --#lint
 
-end Fol
+end FOL

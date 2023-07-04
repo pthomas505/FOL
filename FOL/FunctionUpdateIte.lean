@@ -1,6 +1,6 @@
 import Std.Tactic.Lint.Frontend
 import Mathlib.Tactic
-import Fol.Tactics
+import FOL.Tactics
 
 
 /--

@@ -1,5 +1,5 @@
 import Mathlib.Data.List.Basic
-import Fol.Tactics
+import FOL.Tactics
 
 
 @[simp]

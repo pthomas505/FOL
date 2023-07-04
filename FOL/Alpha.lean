@@ -1,9 +1,9 @@
-import Fol.Sub.One.Rec.SubOneRecReplaceFree
-import Fol.Semantics
-import Fol.Tactics
+import FOL.Sub.One.Rec.SubOneRecReplaceFree
+import FOL.Semantics
+import FOL.Tactics
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -536,4 +536,4 @@ lemma isalphaEqv_Holds
 
 --#lint
 
-end Fol
+end FOL

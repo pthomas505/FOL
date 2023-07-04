@@ -2,7 +2,7 @@ import Std.Tactic.Lint.Frontend
 import Mathlib.Util.CompileInductive
 
 
-namespace Fol
+namespace FOL
 
 
 /--
@@ -138,4 +138,4 @@ def Formula.Exists_ (xs : List VarName) (phi : Formula) : Formula :=
 
 #lint
 
-end Fol
+end FOL

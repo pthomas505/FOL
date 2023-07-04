@@ -1,8 +1,8 @@
-import Fol.Sub.One.Rec.SubOneRecAdmits
-import Fol.Tactics
+import FOL.Sub.One.Rec.SubOneRecAdmits
+import FOL.Tactics
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -415,4 +415,4 @@ theorem substitution_theorem_ind
 
 #lint
 
-end Fol
+end FOL

@@ -1,9 +1,9 @@
-import Fol.FunctionUpdateIte
-import Fol.Sub.One.Rec.SubOneRecReplaceFree
-import Fol.Tactics
+import FOL.FunctionUpdateIte
+import FOL.Sub.One.Rec.SubOneRecReplaceFree
+import FOL.Tactics
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -369,4 +369,4 @@ example
 
 #lint
 
-end Fol
+end FOL

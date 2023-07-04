@@ -1,8 +1,8 @@
-import Fol.Sub.One.Rec.SubOneRecAdmits
-import Fol.Tactics
+import FOL.Sub.One.Rec.SubOneRecAdmits
+import FOL.Tactics
 
 
-namespace Fol
+namespace FOL
 
 namespace Margaris
 
@@ -271,4 +271,4 @@ inductive IsProofAlt : Formula → Prop
 
 end Margaris
 
-end Fol
+end FOL

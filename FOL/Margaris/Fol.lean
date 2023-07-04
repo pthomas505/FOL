@@ -1,7 +1,7 @@
-import Fol.Margaris.Prop
+import FOL.Margaris.Prop
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -1335,5 +1335,5 @@ theorem T_21_8 (P_r P_s : Formula) (r s : VarName) (h1 : IsReplOfVarInFormula r 
 
 #lint
 
-end Fol
+end FOL
 

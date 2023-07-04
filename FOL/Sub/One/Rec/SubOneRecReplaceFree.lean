@@ -1,9 +1,9 @@
-import Fol.List
-import Fol.Binders
-import Fol.Tactics
+import FOL.List
+import FOL.Binders
+import FOL.Tactics
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -465,4 +465,4 @@ theorem not_isFreeIn_fastReplaceFree
 
 #lint
 
-end Fol
+end FOL

@@ -1,7 +1,7 @@
-import Fol.Semantics
+import FOL.Semantics
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -112,4 +112,4 @@ theorem prop_sub_isValid
 
 #lint
 
-end Fol
+end FOL

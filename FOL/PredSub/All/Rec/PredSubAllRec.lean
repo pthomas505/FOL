@@ -1,8 +1,8 @@
-import Fol.Sub.All.Rec.SubAllRecAdmits
-import Fol.Tactics
+import FOL.Sub.All.Rec.SubAllRecAdmits
+import FOL.Tactics
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -223,4 +223,4 @@ theorem predSub_valid
 
 --#lint
 
-end Fol
+end FOL

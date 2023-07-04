@@ -1,9 +1,9 @@
-import Fol.Margaris.Deduct
-import Fol.FunctionUpdateIte
-import Fol.Tactics
+import FOL.Margaris.Deduct
+import FOL.FunctionUpdateIte
+import FOL.Tactics
 
 
-namespace Fol
+namespace FOL
 
 
 open Formula
@@ -939,4 +939,4 @@ theorem prop_complete
 
 --#lint
 
-end Fol
+end FOL

@@ -1,10 +1,10 @@
-import Fol.Formula
-import Fol.Tactics
+import FOL.Formula
+import FOL.Tactics
 
 import Mathlib.Data.Finset.Basic
 
 
-namespace Fol
+namespace FOL
 
 open Formula
 
@@ -371,4 +371,4 @@ theorem isFreeIn_imp_occursIn
 
 #lint
 
-end Fol
+end FOL
