@@ -138,11 +138,12 @@ example
     unfold Function.updateIte
     simp only [eq_comm]
     rfl
-  case true_ | false_ => rfl
+  case true_ | false_ =>
+    rfl
   case not_ phi phi_ih =>
     unfold fastReplaceFreeFun
     unfold fastReplaceFree
-    congr
+    congr!
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
@@ -150,38 +151,24 @@ example
     | iff_ phi psi phi_ih psi_ih =>
     unfold fastReplaceFreeFun
     unfold fastReplaceFree
-    congr
+    congr!
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold fastReplaceFreeFun
     unfold fastReplaceFree
     split_ifs
     case inl c1 =>
       subst c1
-      simp
+      congr!
       simp only [Function.updateIte_idem]
       simp only [Function.updateIte_id]
       apply fastReplaceFreeFun_id
     case inr c1 =>
-      have s1 :
-        Function.updateIte (Function.updateIte (id : VarName → VarName) v t) x x =
-          Function.updateIte id v t
-      funext y
-      unfold Function.updateIte
-      split_ifs
-      case s1.h.inl.inl c2 =>
-        subst c2
-        tauto
-      case s1.h.inl.inr c2 c3 =>
-        subst c2
-        simp only [id.def]
-      case s1.h.inr.inl c2 c3 =>
-        rfl
-      case s1.h.inr.inr c2 c3 =>
-        rfl
-
-      simp only [s1]
-      simp
-      exact phi_ih
+      congr! 1
+      simp only [← phi_ih]
+      congr! 1
+      apply Function.updateIte_comm_id x v t
+      simp only [eq_comm]
+      exact c1
 
 
 theorem fastReplaceFreeFun_same_on_free
@@ -193,11 +180,11 @@ theorem fastReplaceFreeFun_same_on_free
   induction F generalizing σ σ'
   case pred_const_ X xs | pred_var_ X xs =>
     unfold isFreeIn at h1
+
     unfold fastReplaceFreeFun
-    congr 1
+    congr! 1
     simp only [List.map_eq_map_iff]
-    intro x a1
-    exact h1 x a1
+    exact h1
   case eq_ x y =>
     unfold isFreeIn at h1
     unfold fastReplaceFreeFun
@@ -213,8 +200,9 @@ theorem fastReplaceFreeFun_same_on_free
     rfl
   case not_ phi phi_ih =>
     unfold isFreeIn at h1
+
     unfold fastReplaceFreeFun
-    congr 1
+    congr! 1
     exact phi_ih σ σ' h1
   case
       imp_ phi psi phi_ih psi_ih
@@ -222,8 +210,9 @@ theorem fastReplaceFreeFun_same_on_free
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     unfold isFreeIn at h1
+
     unfold fastReplaceFreeFun
-    congr 1
+    congr! 1
     · apply phi_ih
       intro v a1
       apply h1
@@ -236,14 +225,14 @@ theorem fastReplaceFreeFun_same_on_free
       exact a1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold fastReplaceFreeFun
-    congr 1
+    congr! 1
     apply phi_ih
     intro v a1
     unfold Function.updateIte
     split_ifs
-    case e_a.h1.inl c1 =>
+    case _ c1 =>
       rfl
-    case e_a.h1.inr c1 =>
+    case _ c1 =>
       apply h1
       unfold isFreeIn
       constructor
@@ -262,17 +251,17 @@ theorem replaceFreeFunAux_same_on_free
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs =>
     unfold replaceFreeFunAux
-    congr 1
+    congr! 1
     simp only [List.map_eq_map_iff]
     intro x _
     split_ifs
-    case e_a.inl c1 =>
+    case _ c1 =>
       rfl
-    case e_a.inr c1 =>
+    case _ c1 =>
       exact h1 x c1
   case eq_ x y =>
     unfold replaceFreeFunAux
-    congr 1
+    congr! 1
     · split_ifs
       case _ c1 =>
         rfl
@@ -283,10 +272,11 @@ theorem replaceFreeFunAux_same_on_free
         rfl
       case _ c1 =>
         exact h1 y c1
-  case true_ | false_ => rfl
+  case true_ | false_ =>
+    rfl
   case not_ phi phi_ih =>
     unfold replaceFreeFunAux
-    congr 1
+    congr! 1
     exact phi_ih binders h1
   case
       imp_ phi psi phi_ih psi_ih
@@ -294,19 +284,19 @@ theorem replaceFreeFunAux_same_on_free
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     unfold replaceFreeFunAux
-    congr 1
+    congr! 1
     · exact phi_ih binders h1
     · exact psi_ih binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold replaceFreeFunAux
-    congr 1
+    congr! 1
     apply phi_ih
     intro v a1
-    simp only [Finset.mem_union, Finset.mem_singleton] at a1
+    simp at a1
     push_neg at a1
     cases a1
-    case e_a.h1.intro a1_left a1_right =>
-      apply h1 v a1_left
+    case _ a1_left a1_right =>
+      exact h1 v a1_left
 
 
 example
@@ -321,18 +311,18 @@ example
   case pred_const_ X xs | pred_var_ X xs =>
     unfold fastReplaceFreeFun
     unfold replaceFreeFunAux
-    congr 1
+    congr! 1
     simp only [List.map_eq_map_iff]
     intro x _
     split_ifs
-    case e_a.inl c1 =>
+    case _ c1 =>
       exact h1 x c1
-    case e_a.inr c1 =>
+    case _ c1 =>
       rfl
   case eq_ x y =>
     unfold fastReplaceFreeFun
     unfold replaceFreeFunAux
-    congr 1
+    congr! 1
     · split_ifs
       case _ c1 =>
         exact h1 x c1
@@ -343,11 +333,12 @@ example
         exact h1 y c1
       case _ c1 =>
         rfl
-  case true_ | false_ => rfl
+  case true_ | false_ =>
+    rfl
   case not_ phi phi_ih =>
     unfold fastReplaceFreeFun
     unfold replaceFreeFunAux
-    congr
+    congr! 1
     exact phi_ih σ binders h1
   case
       imp_ phi psi phi_ih psi_ih
@@ -356,32 +347,38 @@ example
     | iff_ phi psi phi_ih psi_ih =>
     unfold fastReplaceFreeFun
     unfold replaceFreeFunAux
-    congr
+    congr! 1
     · exact phi_ih σ binders h1
     · exact psi_ih σ binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold fastReplaceFreeFun
     unfold replaceFreeFunAux
-    congr
-    rewrite [replaceFreeFunAux_same_on_free phi σ (Function.updateIte σ x x)]
-    apply phi_ih
-    · intro v a1
-      unfold Function.updateIte
+    congr! 1
+
+    have s1 : (∀ (v : VarName), v ∈ binders ∪ {x} → v = Function.updateIte σ x x v)
+    intros v a1
+    simp at a1
+    unfold Function.updateIte
+    cases a1
+    case _ c1 =>
       split_ifs
-      case e_a.h1.inl c1 =>
-        exact c1
-      case e_a.h1.inr c1 =>
-        simp at a1
-        tauto
-    · simp
-      push_neg
-      intro v a1
-      cases a1
-      case e_a.h1.intro a1_left a1_right =>
-        unfold Function.updateIte
-        split_ifs
-        · contradiction
-        · rfl
+      case _ c2 =>
+        exact c2
+      case _ c2 =>
+        exact h1 v c1
+    case _ c1 =>
+      simp only [if_pos c1]
+      exact c1
+
+    simp only [← phi_ih (Function.updateIte σ x x) (binders ∪ {x}) s1]
+    apply replaceFreeFunAux_same_on_free phi σ (Function.updateIte σ x x) (binders ∪ {x})
+    unfold Function.updateIte
+    intro v a1
+    simp at a1
+    push_neg at a1
+    cases a1
+    case _ a1_left a1_right =>
+      simp only [if_neg a1_right]
 
 
 #lint

@@ -128,6 +128,22 @@ theorem Function.updateIte_id
     rfl
 
 
+theorem Function.updateIte_comm_id
+  {α : Type}
+  [DecidableEq α]
+  (x a b : α)
+  (h1 : ¬ x = a) :
+  Function.updateIte (Function.updateIte id a b) x x =
+    Function.updateIte id a b :=
+  by
+  funext y
+  unfold Function.updateIte
+  simp
+  intro a1
+  subst a1
+  simp only [if_neg h1]
+
+
 theorem Function.updateIte_not_mem_list
   {α β : Type}
   [DecidableEq α]
@@ -188,7 +204,7 @@ theorem Function.updateIte_symm
   (f : α → β)
   (x y : α)
   (d d' : β)
-  (h1 : ¬x = y) :
+  (h1 : ¬ x = y) :
   Function.updateIte (Function.updateIte f x d) y d' =
     Function.updateIte (Function.updateIte f y d') x d :=
   by
