@@ -16,18 +16,23 @@ def admitsFunAux
   | binders, pred_var_ _ xs =>
       ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
   | binders, eq_ x y =>
-      (x ∉ binders → σ x ∉ binders) ∧ (y ∉ binders → σ y ∉ binders)
+      (x ∉ binders → σ x ∉ binders) ∧
+      (y ∉ binders → σ y ∉ binders)
   | _, true_ => True
   | _, false_ => True
   | binders, not_ phi => admitsFunAux σ binders phi
   | binders, imp_ phi psi =>
-      admitsFunAux σ binders phi ∧ admitsFunAux σ binders psi
+      admitsFunAux σ binders phi ∧
+      admitsFunAux σ binders psi
   | binders, and_ phi psi =>
-      admitsFunAux σ binders phi ∧ admitsFunAux σ binders psi
+      admitsFunAux σ binders phi ∧
+      admitsFunAux σ binders psi
   | binders, or_ phi psi =>
-      admitsFunAux σ binders phi ∧ admitsFunAux σ binders psi
+      admitsFunAux σ binders phi ∧
+      admitsFunAux σ binders psi
   | binders, iff_ phi psi =>
-      admitsFunAux σ binders phi ∧ admitsFunAux σ binders psi
+      admitsFunAux σ binders phi ∧
+      admitsFunAux σ binders psi
   | binders, forall_ x phi => admitsFunAux σ (binders ∪ {x}) phi
   | binders, exists_ x phi => admitsFunAux σ (binders ∪ {x}) phi
 
@@ -58,7 +63,7 @@ instance
 
 
 theorem substitution_fun_theorem_aux
-  {D : Type}
+  (D : Type)
   (I : Interpretation D)
   (V V' : VarAssignment D)
   (σ σ' : VarName → VarName)
@@ -73,8 +78,9 @@ theorem substitution_fun_theorem_aux
   induction F generalizing binders V V' σ σ'
   case pred_const_ X xs | pred_var_ X xs =>
     unfold admitsFunAux at h1
+
     unfold fastReplaceFreeFun
-    simp only [Holds]
+    unfold Holds
     congr! 1
     simp
     simp only [List.map_eq_map_iff]
@@ -88,67 +94,71 @@ theorem substitution_fun_theorem_aux
       exact h1 v a1 c1
   case eq_ x y =>
     unfold admitsFunAux at h1
+
     unfold fastReplaceFreeFun
-    simp only [Holds]
+    unfold Holds
     cases h1
     case intro h1_left h1_right =>
-    congr! 1
-    · apply h2
-      by_cases c1 : x ∈ binders
-      · left
-        exact c1
-      · right
-        simp only [h3 x c1]
-        exact h1_left c1
-    · apply h2
-      by_cases c1 : y ∈ binders
-      · left
-        exact c1
-      · right
-        simp only [h3 y c1]
-        exact h1_right c1
+      congr! 1
+      · apply h2
+        by_cases c1 : x ∈ binders
+        · left
+          exact c1
+        · right
+          simp only [h3 x c1]
+          exact h1_left c1
+      · apply h2
+        by_cases c1 : y ∈ binders
+        · left
+          exact c1
+        · right
+          simp only [h3 y c1]
+          exact h1_right c1
   case true_ | false_ =>
     unfold fastReplaceFreeFun
-    simp only [Holds]
+    unfold Holds
+    rfl
   case not_ phi phi_ih =>
     unfold admitsFunAux at h1
+
     unfold fastReplaceFreeFun
-    simp only [Holds]
+    unfold Holds
     congr! 1
-    apply phi_ih V V' σ σ' binders h1 h2 h2' h3
+    exact phi_ih V V' σ σ' binders h1 h2 h2' h3
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     unfold admitsFunAux at h1
+
+    unfold fastReplaceFreeFun
+    unfold Holds
     cases h1
     case intro h1_left h1_right =>
-      simp only [Holds]
       congr! 1
       · exact phi_ih V V' σ σ' binders h1_left h2 h2' h3
       · exact psi_ih V V' σ σ' binders h1_right h2 h2' h3
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold admitsFunAux at h1
+
     unfold fastReplaceFreeFun
-    simp only [Holds]
+    unfold Holds
     first | apply forall_congr' | apply exists_congr
     intro d
-    apply
-      phi_ih (Function.updateIte V x d) (Function.updateIte V' x d) σ
-        (Function.updateIte σ' x x) (binders ∪ {x}) h1
+    apply phi_ih (Function.updateIte V x d) (Function.updateIte V' x d) σ (Function.updateIte σ' x x) (binders ∪ {x}) h1
     · intro v a1
       unfold Function.updateIte at a1
       simp at a1
       push_neg at a1
       unfold Function.updateIte
       split_ifs
-      case h.h2.inl.inl c1 c2 =>
+      case _ c1 c2 =>
         rfl
-      case h.h2.inl.inr c1 c2 =>
+      case _ c1 c2 =>
         subst c1
         tauto
-      case h.h2.inr.inl c1 c2 =>
+      case _ c1 c2 =>
         simp only [if_neg c1] at a1
         cases a1
         case inl c3 =>
@@ -160,17 +170,17 @@ theorem substitution_fun_theorem_aux
             contradiction
         case inr c3 =>
           tauto
-      case h.h2.inr.inr c1 c2 =>
+      case _ c1 c2 =>
         apply h2
         simp only [if_neg c1] at a1
         tauto
     · intro v a1
-      simp only [Finset.mem_union, Finset.mem_singleton] at a1
+      simp at a1
       unfold Function.updateIte
       split_ifs
-      case h.h2'.inl c1 =>
+      case _ c1 =>
         exact c1
-      case h.h2'.inr c1 =>
+      case _ c1 =>
         tauto
     · intro v a1
       simp at a1
@@ -183,7 +193,7 @@ theorem substitution_fun_theorem_aux
 
 
 theorem substitution_fun_theorem
-  {D : Type}
+  (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
   (σ : VarName → VarName)
@@ -192,7 +202,7 @@ theorem substitution_fun_theorem
   Holds D I (V ∘ σ) F ↔
     Holds D I V (fastReplaceFreeFun σ F) :=
   by
-  apply substitution_fun_theorem_aux I (V ∘ σ) V σ σ ∅ F h1
+  apply substitution_fun_theorem_aux D I (V ∘ σ) V σ σ ∅ F h1
   · simp
   · simp
   · simp
@@ -206,10 +216,12 @@ theorem substitution_fun_valid
   (fastReplaceFreeFun σ F).IsValid :=
   by
   unfold IsValid at h2
+
   unfold IsValid
   intro D I V
-  rw [← substitution_fun_theorem I V σ F h1]
+  simp only [← substitution_fun_theorem D I V σ F h1]
   exact h2 D I (V ∘ σ)
+
 
 --#lint
 
