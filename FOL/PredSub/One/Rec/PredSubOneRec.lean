@@ -125,46 +125,53 @@ theorem pred_sub_single_aux
 
         cases h1
         case intro h1_left h1_right =>
-          obtain s1 := substitution_fun_theorem D I V (Function.updateListIte id zs xs) H h1_left
+          have s1 :
+            Holds D I (V ∘ Function.updateListIte id zs xs) H ↔
+              Holds D I V (fastReplaceFreeFun (Function.updateListIte id zs xs) H) :=
+            by
+            exact substitution_fun_theorem D I V (Function.updateListIte id zs xs) H h1_left
+
           simp only [Function.updateListIte_comp] at s1
-          simp only [Function.comp.right_id] at s1
+          simp at s1
+
           have s2 :
-            Holds D I (Function.updateListIte V zs (List.map V xs)) H ↔
-              Holds D I (Function.updateListIte V' zs (List.map V xs)) H :=
+            Holds D I (Function.updateListIte V zs (List.map V xs)) H ↔ Holds D I (Function.updateListIte V' zs (List.map V xs)) H :=
             by
             apply Holds_coincide_Var
             intro v a1
             by_cases c2 : v ∈ zs
-            · specialize h2 v
-              apply Function.updateListIte_mem_eq_len V V' v zs (List.map V xs) c2
+            · apply Function.updateListIte_mem_eq_len V V' v zs (List.map V xs) c2
               cases c1
               case pos.intro c1_left c1_right =>
-                simp only [List.length_map]
+                simp
                 symm
                 exact c1_right
             · by_cases c3 : v ∈ binders
               · specialize h1_right v c3 a1
                 contradiction
-              · specialize h2 v c3
-                apply Function.updateListIte_mem'
-                exact h2
+              · apply Function.updateListIte_mem'
+                exact h2 v c3
+
           simp only [s2] at s1
           split_ifs
           exact s1
       case inr c1 =>
           split_ifs
           rfl
-  case eq_ =>
+  case eq_ x y =>
     unfold replacePred
-    simp only [Holds]
+    unfold Holds
+    rfl
   case true_ | false_ =>
     unfold replacePred
-    simp only [Holds]
+    unfold Holds
+    rfl
   case not_ phi phi_ih =>
     unfold admitsPredAux at h1
+
     unfold replacePred
-    simp only [Holds]
-    apply not_congr
+    unfold Holds
+    congr! 1
     exact phi_ih V binders h1 h2
   case
       imp_ phi psi phi_ih psi_ih
@@ -172,13 +179,14 @@ theorem pred_sub_single_aux
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     unfold admitsPredAux at h1
+
+    unfold replacePred
+    unfold Holds
     cases h1
     case intro h1_left h1_right =>
-    unfold replacePred
-    simp only [Holds]
-    congr! 1
-    · exact phi_ih V binders h1_left h2
-    · exact psi_ih V binders h1_right h2
+      congr! 1
+      · exact phi_ih V binders h1_left h2
+      · exact psi_ih V binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold admitsPredAux at h1
     unfold replacePred
