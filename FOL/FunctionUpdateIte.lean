@@ -156,11 +156,12 @@ theorem Function.updateIte_not_mem_list
   l.map (Function.updateIte f a b) = l.map f :=
   by
   induction l
-  case nil => simp
+  case nil =>
+    simp
   case cons l_hd l_tl l_ih =>
     simp at h1
     push_neg at h1
-    dsimp at h1
+
     cases h1
     case intro h1_left h1_right =>
       simp
@@ -177,14 +178,16 @@ theorem Function.updateIte_not_mem_set
   (a : α)
   (b : β)
   (h1 : a ∉ S) :
-  Finset.image (Function.updateIte f a b) S = Finset.image f S :=
+  Finset.image (Function.updateIte f a b) S =
+    Finset.image f S :=
   by
   induction S using Finset.induction_on
-  case empty => simp
+  case empty =>
+    simp
   case insert S_a S_S _ S_ih =>
     simp at h1
     push_neg at h1
-    dsimp at h1
+
     cases h1
     case intro h1_left h1_right =>
     simp
@@ -302,6 +305,7 @@ theorem Function.updateListIte_mem_eq_len
     contradiction
   case cons xs_hd xs_tl xs_ih =>
     simp at h1
+
     cases ys
     case nil =>
       contradiction
