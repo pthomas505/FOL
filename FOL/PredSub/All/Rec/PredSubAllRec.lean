@@ -118,10 +118,12 @@ theorem predSub_aux
   induction F generalizing binders V
   case pred_const_ X xs =>
     unfold replacePredFun
-    simp only [Holds]
+    unfold Holds
+    simp
   case pred_var_ X xs =>
     unfold admitsPredFunAux at h1
     simp at h1
+
     cases h1
     case intro h1_left h1_right =>
       cases h1_right
@@ -130,7 +132,8 @@ theorem predSub_aux
         substitution_fun_theorem D I V (Function.updateListIte id (τ X xs.length).fst xs)
           (τ X xs.length).snd h1_left
         simp only [Function.updateListIte_comp] at s1
-        simp only [Function.comp.right_id] at s1
+        simp at s1
+
         have s2 :
           Holds D I (Function.updateListIte V (τ X xs.length).fst (List.map V xs))
             (τ X xs.length).snd ↔
@@ -141,7 +144,7 @@ theorem predSub_aux
           intro v a1
           by_cases c1 : v ∈ (τ X xs.length).fst
           · apply Function.updateListIte_mem_eq_len V V' v (τ X xs.length).fst (List.map V xs) c1
-            simp only [List.length_map]
+            simp
             symm
             exact h1_right_right
           · by_cases c2 : v ∈ binders
@@ -152,24 +155,25 @@ theorem predSub_aux
               exact h2
         simp only [s2] at s1
         clear s2
+
         simp only [Holds]
-        simp only [replacePredFun]
+        unfold replacePredFun
         simp
         simp only [if_pos h1_right_right]
         exact s1
   case eq_ x y =>
     unfold replacePredFun
-    simp only [Holds]
-  case true_ =>
+    unfold Holds
+    rfl
+  case true_ | false_ =>
     unfold replacePredFun
-    simp only [Holds]
-  case false_ =>
-    unfold replacePredFun
-    simp only [Holds]
+    unfold Holds
+    rfl
   case not_ phi phi_ih =>
     unfold admitsPredFunAux at h1
+
     unfold replacePredFun
-    simp only [Holds]
+    unfold Holds
     congr! 1
     exact phi_ih V binders h1 h2
   case
@@ -178,17 +182,20 @@ theorem predSub_aux
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     unfold admitsPredFunAux at h1
+
+    unfold replacePredFun
+    unfold Holds
+
     cases h1
     case intro h1_left h1_right =>
-      unfold replacePredFun
-      simp only [Holds]
       congr! 1
       · exact phi_ih V binders h1_left h2
       · exact psi_ih V binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold admitsPredFunAux at h1
+
     unfold replacePredFun
-    simp only [Holds]
+    unfold Holds
     first | apply forall_congr' | apply exists_congr
     intro d
     apply phi_ih (Function.updateIte V x d) (binders ∪ {x}) h1
