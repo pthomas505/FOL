@@ -42,7 +42,9 @@ def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formu
   | exists_ x phi => exists_ x (replacePredFun τ phi)
 
 
-def admitsPredFunAux (τ : PredName → ℕ → List VarName × Formula) : Finset VarName → Formula → Prop
+def admitsPredFunAux
+  (τ : PredName → ℕ → List VarName × Formula) :
+  Finset VarName → Formula → Prop
   | _, pred_const_ _ _ => True
   | binders, pred_var_ X xs =>
     admitsFun (Function.updateListIte id (τ X xs.length).fst xs) (τ X xs.length).snd ∧
@@ -52,10 +54,18 @@ def admitsPredFunAux (τ : PredName → ℕ → List VarName × Formula) : Finse
   | _, false_ => True
   | _, eq_ _ _ => True
   | binders, not_ phi => admitsPredFunAux τ binders phi
-  | binders, imp_ phi psi => admitsPredFunAux τ binders phi ∧ admitsPredFunAux τ binders psi
-  | binders, and_ phi psi => admitsPredFunAux τ binders phi ∧ admitsPredFunAux τ binders psi
-  | binders, or_ phi psi => admitsPredFunAux τ binders phi ∧ admitsPredFunAux τ binders psi
-  | binders, iff_ phi psi => admitsPredFunAux τ binders phi ∧ admitsPredFunAux τ binders psi
+  | binders, imp_ phi psi =>
+      admitsPredFunAux τ binders phi ∧
+      admitsPredFunAux τ binders psi
+  | binders, and_ phi psi =>
+      admitsPredFunAux τ binders phi ∧
+      admitsPredFunAux τ binders psi
+  | binders, or_ phi psi =>
+      admitsPredFunAux τ binders phi ∧
+      admitsPredFunAux τ binders psi
+  | binders, iff_ phi psi =>
+      admitsPredFunAux τ binders phi ∧
+      admitsPredFunAux τ binders psi
   | binders, forall_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
   | binders, exists_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
 
