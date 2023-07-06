@@ -15,17 +15,29 @@ open Formula
 def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formula → Formula
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
-    if xs.length = (τ X xs.length).fst.length
-    then fastReplaceFreeFun (Function.updateListIte id (τ X xs.length).fst xs) (τ X xs.length).snd
-    else pred_var_ X xs
+      if xs.length = (τ X xs.length).fst.length
+      then fastReplaceFreeFun (Function.updateListIte id (τ X xs.length).fst xs) (τ X xs.length).snd
+      else pred_var_ X xs
   | eq_ x y => eq_ x y
   | true_ => true_
   | false_ => false_
   | not_ phi => not_ (replacePredFun τ phi)
-  | imp_ phi psi => imp_ (replacePredFun τ phi) (replacePredFun τ psi)
-  | and_ phi psi => and_ (replacePredFun τ phi) (replacePredFun τ psi)
-  | or_ phi psi => or_ (replacePredFun τ phi) (replacePredFun τ psi)
-  | iff_ phi psi => iff_ (replacePredFun τ phi) (replacePredFun τ psi)
+  | imp_ phi psi =>
+      imp_
+      (replacePredFun τ phi)
+      (replacePredFun τ psi)
+  | and_ phi psi =>
+      and_
+      (replacePredFun τ phi)
+      (replacePredFun τ psi)
+  | or_ phi psi =>
+      or_
+      (replacePredFun τ phi)
+      (replacePredFun τ psi)
+  | iff_ phi psi =>
+      iff_
+      (replacePredFun τ phi)
+      (replacePredFun τ psi)
   | forall_ x phi => forall_ x (replacePredFun τ phi)
   | exists_ x phi => exists_ x (replacePredFun τ phi)
 
