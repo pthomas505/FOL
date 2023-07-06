@@ -189,19 +189,20 @@ theorem pred_sub_single_aux
       · exact psi_ih V binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold admitsPredAux at h1
+
     unfold replacePred
-    simp only [Holds]
+    unfold Holds
     first | apply forall_congr' | apply exists_congr
     intro d
     apply phi_ih (Function.updateIte V x d) (binders ∪ {x}) h1
     intro v a1
     unfold Function.updateIte
-    simp only [Finset.mem_union, Finset.mem_singleton] at a1
+    simp at a1
     push_neg at a1
     cases a1
     case h.intro a1_left a1_right =>
-    simp only [if_neg a1_right]
-    exact h2 v a1_left
+      simp only [if_neg a1_right]
+      exact h2 v a1_left
 
 
 theorem pred_sub_single_valid
@@ -213,10 +214,11 @@ theorem pred_sub_single_valid
   (h2 : phi.IsValid) : (replacePred P zs H phi).IsValid :=
   by
   unfold IsValid at h2
+
   unfold IsValid
   intro D I V
   obtain s1 := pred_sub_single_aux D I V V phi P zs H ∅ h1
-  simp only [eq_self_iff_true, forall_const] at s1
+  simp at s1
   simp only [← s1]
   apply h2
 
