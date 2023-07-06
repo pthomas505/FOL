@@ -14,7 +14,9 @@ open Formula
 def replacePropFun (τ : PredName → PredName) : Formula → Formula
   | pred_const_ P ts => pred_const_ P ts
   | pred_var_ P ts =>
-    ite (ts = List.nil) (pred_var_ (τ P) List.nil) (pred_var_ P ts)
+      if ts = List.nil
+      then pred_var_ (τ P) List.nil
+      else pred_var_ P ts
   | eq_ x y => eq_ x y
   | true_ => true_
   | false_ => false_
@@ -28,9 +30,14 @@ def replacePropFun (τ : PredName → PredName) : Formula → Formula
 
 
 instance {xs : List α} : Decidable (xs = []) :=
-  match xs with
-  | [] => isTrue rfl
-  | y :: ys => isFalse (by intro; injections)
+  by
+  cases xs
+  case nil =>
+    simp
+    exact instDecidableTrue
+  case cons hd tl =>
+    simp
+    exact instDecidableFalse
 
 
 theorem prop_sub_aux
@@ -54,7 +61,8 @@ theorem prop_sub_aux
   induction F generalizing V
   case pred_const_ X xs =>
     unfold replacePropFun
-    simp only [Holds]
+    unfold Holds
+    simp
   case pred_var_ X xs =>
       unfold replacePropFun
       split_ifs
@@ -70,13 +78,15 @@ theorem prop_sub_aux
         simp only [if_neg c1]
   case eq_ x y =>
     unfold replacePropFun
-    simp only [Holds]
+    unfold Holds
+    rfl
   case true_ | false_ =>
     unfold replacePropFun
-    simp only [Holds]
+    unfold Holds
+    rfl
   case not_ phi phi_ih =>
     unfold replacePropFun
-    simp only [Holds]
+    unfold Holds
     congr! 1
     apply phi_ih
   case
@@ -85,13 +95,13 @@ theorem prop_sub_aux
   | or_ phi psi phi_ih psi_ih
   | iff_ phi psi phi_ih psi_ih =>
     unfold replacePropFun
-    simp only [Holds]
+    unfold Holds
     congr! 1
     · apply phi_ih
     · apply psi_ih
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold replacePropFun
-    simp only [Holds]
+    unfold Holds
     first | apply forall_congr' | apply exists_congr
     intros d
     apply phi_ih
@@ -104,6 +114,7 @@ theorem prop_sub_isValid
   (replacePropFun τ phi).IsValid :=
   by
   unfold IsValid at h1
+
   unfold IsValid
   intro D I V
   simp only [prop_sub_aux D I V τ phi]
