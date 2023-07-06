@@ -10,7 +10,11 @@ open Formula
 
   IsPredSub A P zs H B := The formula A is said to be transformed into the formula B by a substitution of H* for P z₁ ... zₙ, abbreviated: Sub A (P zⁿ / H*) B, iff B is obtained from A upon replacing in A each occurrence of a derivative of the name form P z₁ ... zₙ by the corresponding derivative of the substituend H*, provided that: (i) P does not occur in a component formula (∀ x A₁) of A if x is a parameter of H*, and (ii) the name variable zₖ, k = 1, ..., n, is not free in a component formula (∀ x H) of H* if P t₁ ... tₙ occurs in A with x occurring in tₖ. If conditions (i) and (ii) are not satisfied, then the indicated substitution for predicate variables is left undefined.
 -/
-inductive IsPredSub (P : PredName) (zs : List VarName) (H : Formula) : Formula → Formula → Prop
+inductive IsPredSub
+  (P : PredName)
+  (zs : List VarName)
+  (H : Formula) :
+  Formula → Formula → Prop
 
   | pred_const_
     (X : PredName)
@@ -129,26 +133,26 @@ theorem isPredSub_theorem
   (h2 : ∀ (Q : PredName) (ds : List D),
     Q = P ∧ ds.length = zs.length →
       (Holds D I (Function.updateListIte V zs ds) H ↔ J.pred_var_ P ds))
-  (h3 : ∀ (Q : PredName) (ds : List D),
+  (h3_const : I.pred_const_ = J.pred_const_)
+  (h3_var : ∀ (Q : PredName) (ds : List D),
     ¬ (Q = P ∧ ds.length = zs.length) →
-      (I.pred_var_ Q ds ↔ J.pred_var_ Q ds))
-  (h4 : I.pred_const_ = J.pred_const_) :
+      (I.pred_var_ Q ds ↔ J.pred_var_ Q ds)) :
   Holds D I V B ↔ Holds D J V A :=
   by
   induction h1 generalizing V
   case pred_const_ h1_X h1_ts =>
-    simp only [Holds]
-    simp only [h4]
+    unfold Holds
+    simp only [h3_const]
   case pred_not_occurs_in h1_X h1_ts h1_1 =>
     simp at h1_1
     apply Holds_coincide_PredVar
-    · exact h4
+    · exact h3_const
     · intro X ds a1
       simp at a1
       cases a1
       case intro a1_left a1_right =>
         subst a1_left
-        apply h3
+        apply h3_var
         simp
         intro a2
         subst a2
@@ -158,21 +162,27 @@ theorem isPredSub_theorem
         exact Eq.trans a1_right contra
   case pred_occurs_in h1_X h1_ts h1_1 h1_2 =>
     obtain s1 := substitution_fun_theorem D I V (Function.updateListIte id zs h1_ts) H h1_2
+
     obtain s2 := Function.updateListIte_comp id V zs h1_ts
+
     simp only [s2] at s1
     simp at s1
-    simp only [Holds]
+
     specialize h2 h1_X (List.map V h1_ts)
     simp only [s1] at h2
+
+    simp only [Holds]
     apply h2
     simp
     exact h1_1
   case eq_ h1_x h1_y =>
-    simp only [Holds]
+    unfold Holds
+    rfl
   case true_ | false_ =>
-    simp only [Holds]
+    unfold Holds
+    rfl
   case not_ h1_phi h1_phi' _ h1_ih =>
-    simp only [Holds]
+    unfold Holds
     congr! 1
     exact h1_ih V h2
   case
@@ -180,14 +190,14 @@ theorem isPredSub_theorem
   | and_ h1_phi h1_psi h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | or_ h1_phi h1_psi h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | iff_ h1_phi h1_psi h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2 =>
-    simp only [Holds]
+    unfold Holds
     congr! 1
     · exact h1_ih_1 V h2
     · exact h1_ih_2 V h2
   case
     forall_ h1_x h1_phi h1_phi' h1_1 _ h1_ih
   | exists_ h1_x h1_phi h1_phi' h1_1 _ h1_ih =>
-    simp only [Holds]
+    unfold Holds
     first | apply forall_congr' | apply exists_congr
     intro d
     apply h1_ih
@@ -216,6 +226,7 @@ theorem isPredSub_valid
   (h2 : phi.IsValid) : phi'.IsValid :=
   by
   unfold IsValid at h2
+
   unfold IsValid
   intro D I V
   let J : Interpretation D :=
@@ -235,9 +246,9 @@ theorem isPredSub_valid
       case h2.intro a1_left a1_right =>
       simp
       simp only [if_pos a1_right]
+    · simp
     · intro Q ds a1
       simp only [if_neg a1]
-    · simp
   simp only [s2]
   apply h2
 
