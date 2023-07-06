@@ -893,11 +893,11 @@ theorem propCompleteAux
     exact h2
   case insert U Δ_U Δ_U_1 Δ_U_2 =>
     apply Δ_U_2
-    · simp only [Finset.insert_subset] at h1 
+    · simp only [Finset.insert_subset_iff] at h1
       cases h1
       case intro h1_left h1_right =>
         exact h1_right
-    · simp only [Finset.insert_subset] at h1 
+    · simp only [Finset.insert_subset_iff] at h1
 
       simp at h2 
 
