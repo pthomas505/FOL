@@ -105,7 +105,7 @@ theorem predSub_aux
       cases h1_right
       case intro h1_right_left h1_right_right =>
         obtain s1 :=
-        substitution_fun_theorem I V (Function.updateListIte id (τ X xs.length).fst xs)
+        substitution_fun_theorem D I V (Function.updateListIte id (τ X xs.length).fst xs)
           (τ X xs.length).snd h1_left
         simp only [Function.updateListIte_comp] at s1
         simp only [Function.comp.right_id] at s1

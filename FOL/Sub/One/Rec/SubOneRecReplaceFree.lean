@@ -119,6 +119,8 @@ theorem replaceFreeAux_mem_binders
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs =>
     unfold replaceFreeAux
+    congr!
+    simp only [List.map_eq_self_iff]
     simp
     intro x _ a2 a3
     subst a2
@@ -242,6 +244,8 @@ theorem fastReplaceFree_self
   case pred_const_ X xs | pred_var_ X xs =>
     unfold fastReplaceFree
     simp
+    simp only [List.map_eq_self_iff]
+    simp
   case eq_ x y =>
     unfold fastReplaceFree
     simp
@@ -275,6 +279,8 @@ theorem not_free_in_fastReplaceFree_self
     unfold isFreeIn at h1
 
     unfold fastReplaceFree
+    simp
+    simp only [List.map_eq_self_iff]
     simp
     intro x a1 a2
     subst a2
@@ -335,6 +341,8 @@ theorem fastReplaceFree_inverse
 
     simp only [fastReplaceFree]
     congr!
+    simp
+    simp only [List.map_eq_self_iff]
     simp
     intro x a1
     by_cases c1 : v = x

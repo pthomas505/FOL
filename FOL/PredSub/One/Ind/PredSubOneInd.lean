@@ -157,7 +157,7 @@ theorem isPredSub_theorem
         apply h1_1
         exact Eq.trans a1_right contra
   case pred_occurs_in h1_X h1_ts h1_1 h1_2 =>
-    obtain s1 := substitution_fun_theorem I V (Function.updateListIte id zs h1_ts) H h1_2
+    obtain s1 := substitution_fun_theorem D I V (Function.updateListIte id zs h1_ts) H h1_2
     obtain s2 := Function.updateListIte_comp id V zs h1_ts
     simp only [s2] at s1
     simp at s1

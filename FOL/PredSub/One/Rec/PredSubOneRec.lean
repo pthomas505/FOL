@@ -96,7 +96,7 @@ theorem pred_sub_single_aux
         case intro h1_left h1_right =>
           unfold admitsFun at h1_left
 
-          obtain s1 := substitution_fun_theorem I V (Function.updateListIte id zs xs) H h1_left
+          obtain s1 := substitution_fun_theorem D I V (Function.updateListIte id zs xs) H h1_left
           simp only [Function.updateListIte_comp] at s1
           simp only [Function.comp.right_id] at s1
           have s2 :

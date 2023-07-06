@@ -2,7 +2,6 @@ import Mathlib.Data.List.Basic
 import FOL.Tactics
 
 
-@[simp]
 theorem List.map_eq_self_iff
   {α : Type}
   {f : α → α}
