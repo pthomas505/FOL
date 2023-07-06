@@ -156,20 +156,10 @@ theorem substitution_fun_theorem_aux
       case _ c1 c2 =>
         rfl
       case _ c1 c2 =>
-        subst c1
-        tauto
+        contradiction
       case _ c1 c2 =>
-        simp only [if_neg c1] at a1
-        cases a1
-        case inl c3 =>
-          cases c3
-          case inl c3 =>
-            subst c2
-            tauto
-          case inr c3 =>
-            contradiction
-        case inr c3 =>
-          tauto
+        subst c2
+        tauto
       case _ c1 c2 =>
         apply h2
         simp only [if_neg c1] at a1
