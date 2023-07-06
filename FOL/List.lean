@@ -28,7 +28,8 @@ theorem list_zipWith_of_map
     List.map (fun x : α => g x (f x)) l :=
   by
   induction l
-  case nil => simp
+  case nil =>
+    simp
   case cons hd tl ih =>
     simp
     exact ih
