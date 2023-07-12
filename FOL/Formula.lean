@@ -46,6 +46,26 @@ instance : Repr PredName :=
 
 
 /--
+  The type of definition names.
+-/
+inductive DefName : Type
+  | mk : String → DefName
+  deriving Inhabited, DecidableEq
+
+/--
+  The string representation of definition names.
+-/
+def DefName.toString : DefName → String
+  | DefName.mk X => X
+
+instance : ToString DefName :=
+  { toString := fun X => X.toString }
+
+instance : Repr DefName :=
+  { reprPrec := fun X _ => X.toString.toFormat }
+
+
+/--
   The type of formulas.
 -/
 inductive Formula : Type
@@ -61,6 +81,7 @@ inductive Formula : Type
   | iff_ : Formula → Formula → Formula
   | forall_ : VarName → Formula → Formula
   | exists_ : VarName → Formula → Formula
+  | def_ : DefName → List VarName → Formula
   deriving Inhabited, DecidableEq
 
 compile_inductive% Formula
@@ -83,6 +104,7 @@ def Formula.toString : Formula → String
   | iff_ phi psi => s! "({phi.toString} ↔ {psi.toString})"
   | forall_ x phi => s! "(∀ {x.toString}. {phi.toString})"
   | exists_ x phi => s! "(∃ {x.toString}. {phi.toString})"
+  | def_ X xs => s! "def ({X.toString} {xs.toString})"
 
 
 instance : ToString Formula :=

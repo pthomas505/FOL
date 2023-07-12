@@ -429,4 +429,27 @@ theorem Function.updateListIte_updateIte
         apply l1_ih
 
 
+theorem Function.updateListIte_fun_coincide_mem_eq_len
+  {α β : Type}
+  [DecidableEq α]
+  (f g : α → β)
+  (xs ys : List α)
+  (x : α)
+  (h1 : ∀ (v : α), v ∈ ys → f v = g v)
+  (h2 : x ∈ xs)
+  (h3 : xs.length = ys.length):
+  Function.updateListIte f xs (List.map f ys) x =
+    Function.updateListIte g xs (List.map g ys) x :=
+  by
+  have s1 : List.map f ys = List.map g ys
+  simp only [List.map_eq_map_iff]
+  exact h1
+
+  simp only [s1]
+  apply Function.updateListIte_mem_eq_len
+  · exact h2
+  · simp
+    exact h3
+
+
 #lint

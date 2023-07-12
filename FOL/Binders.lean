@@ -1,8 +1,6 @@
 import FOL.Formula
 import FOL.Tactics
 
-import Mathlib.Data.Finset.Basic
-
 
 namespace FOL
 
@@ -32,6 +30,7 @@ def Formula.varSet : Formula → Finset VarName
   | iff_ phi psi => phi.varSet ∪ psi.varSet
   | forall_ x phi => phi.varSet ∪ {x}
   | exists_ x phi => phi.varSet ∪ {x}
+  | def_ _ xs => xs.toFinset
 
 
 /--
@@ -50,6 +49,7 @@ def occursIn (v : VarName) : Formula → Prop
   | iff_ phi psi => occursIn v phi ∨ occursIn v psi
   | forall_ x phi => v = x ∨ occursIn v phi
   | exists_ x phi => v = x ∨ occursIn v phi
+  | def_ _ xs => v ∈ xs
 
 
 instance (v : VarName) (F : Formula) : Decidable (occursIn v F) :=
@@ -76,6 +76,7 @@ def Formula.boundVarSet : Formula → Finset VarName
   | iff_ phi psi => phi.boundVarSet ∪ psi.boundVarSet
   | forall_ x phi => phi.boundVarSet ∪ {x}
   | exists_ x phi => phi.boundVarSet ∪ {x}
+  | def_ _ _ => ∅
 
 
 /--
@@ -94,6 +95,7 @@ def isBoundIn (v : VarName) : Formula → Prop
   | iff_ phi psi => isBoundIn v phi ∨ isBoundIn v psi
   | forall_ x phi => v = x ∨ isBoundIn v phi
   | exists_ x phi => v = x ∨ isBoundIn v phi
+  | def_ _ _ => False
 
 
 instance (v : VarName) (F : Formula) : Decidable (isBoundIn v F) :=
@@ -120,6 +122,7 @@ def Formula.freeVarSet : Formula → Finset VarName
   | iff_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
   | forall_ x phi => phi.freeVarSet \ {x}
   | exists_ x phi => phi.freeVarSet \ {x}
+  | def_ _ xs => xs.toFinset
 
 
 /--
@@ -138,6 +141,7 @@ def isFreeIn (v : VarName) : Formula → Prop
   | iff_ phi psi => isFreeIn v phi ∨ isFreeIn v psi
   | forall_ x phi => ¬ v = x ∧ isFreeIn v phi
   | exists_ x phi => ¬ v = x ∧ isFreeIn v phi
+  | def_ _ xs => v ∈ xs
 
 
 instance (v : VarName) (F : Formula) : Decidable (isFreeIn v F) :=
@@ -164,6 +168,7 @@ def predVarOccursIn (P : PredName) (n : ℕ) : Formula → Prop
   | iff_ phi psi => predVarOccursIn P n phi ∨ predVarOccursIn P n psi
   | forall_ _ phi => predVarOccursIn P n phi
   | exists_ _ phi => predVarOccursIn P n phi
+  | def_ _ _ => False
 
 
 instance (P : PredName) (n : ℕ) (F : Formula) : Decidable (predVarOccursIn P n F) :=
@@ -209,6 +214,10 @@ theorem occursIn_iff_mem_varSet
     simp
     simp only [phi_ih]
     tauto
+  case def_ X xs =>
+    unfold occursIn
+    unfold Formula.varSet
+    simp
 
 
 theorem isBoundIn_iff_mem_boundVarSet
@@ -248,6 +257,10 @@ theorem isBoundIn_iff_mem_boundVarSet
     simp
     simp only [phi_ih]
     tauto
+  case def_ X xs =>
+    unfold isBoundIn
+    unfold Formula.boundVarSet
+    simp
 
 
 theorem isFreeIn_iff_mem_freeVarSet
@@ -285,6 +298,10 @@ theorem isFreeIn_iff_mem_freeVarSet
     simp
     simp only [phi_ih]
     tauto
+  case def_ X xs =>
+    unfold isFreeIn
+    unfold Formula.freeVarSet
+    simp
 
 
 theorem isBoundIn_imp_occursIn
@@ -325,6 +342,10 @@ theorem isBoundIn_imp_occursIn
 
     unfold occursIn
     tauto
+  case def_ X xs =>
+    unfold isBoundIn at h1
+
+    contradiction
 
 
 theorem isFreeIn_imp_occursIn
@@ -367,6 +388,11 @@ theorem isFreeIn_imp_occursIn
 
     unfold occursIn
     tauto
+  case def_ X xs =>
+    unfold isFreeIn at h1
+
+    unfold occursIn
+    exact h1
 
 
 #lint

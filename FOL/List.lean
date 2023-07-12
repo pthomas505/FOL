@@ -1,4 +1,3 @@
-import Mathlib.Data.List.Basic
 import FOL.Tactics
 
 
