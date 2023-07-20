@@ -179,7 +179,7 @@ theorem Holds_coincide_Var
       simp only [isFreeIn_iff_mem_freeVarSet v hd.q] at a1
       
       have s2 : v ∈ List.toFinset hd.args
-      apply Finset.mem_of_subset hd.nf a1
+      apply Finset.mem_of_subset hd.h1 a1
 
       apply Function.updateListIte_fun_coincide_mem_eq_len V V' hd.args xs v h1
       · simp only [List.mem_toFinset] at s2
@@ -268,8 +268,9 @@ theorem Holds_coincide_PredVar
     case inl c1 =>
       apply ih
       intro P ds a1
-      apply h2
-      sorry
+      simp only [predVarOccursIn_iff_mem_predVarSet P ds.length] at a1
+      simp only [hd.h2] at a1
+      simp at a1
     case inr c1 =>
       apply ih
       intro P ds a1

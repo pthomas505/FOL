@@ -13,7 +13,8 @@ structure Definition : Type :=
 (args : List VarName)
 (q : Formula)
 (nodup : args.Nodup)
-(nf : q.freeVarSet ⊆ args.toFinset)
+(h1 : q.freeVarSet ⊆ args.toFinset)
+(h2 : q.predVarSet = ∅)
 deriving DecidableEq
 
 

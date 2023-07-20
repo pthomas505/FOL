@@ -52,6 +52,10 @@ def replaceFreeAux (v t : VarName) : Finset VarName → Formula → Formula
       (replaceFreeAux v t binders psi)
   | binders, forall_ x phi => forall_ x (replaceFreeAux v t (binders ∪ {x}) phi)
   | binders, exists_ x phi => exists_ x (replaceFreeAux v t (binders ∪ {x}) phi)
+  | binders, def_ X xs =>
+      def_
+      X
+      (xs.map fun x : VarName => if v = x ∧ x ∉ binders then t else x)
 
 /--
   replaceFree v t P :=
@@ -105,6 +109,10 @@ def fastReplaceFree (v t : VarName) : Formula → Formula
       if v = x
       then exists_ x phi  -- v is not free in (exists_ x phi)
       else exists_ x (fastReplaceFree v t phi)
+  | def_ X xs =>
+      def_
+      X
+      (xs.map fun x : VarName => if v = x then t else x)
 
 
 -- replaceFree = fastReplaceFree
@@ -117,7 +125,7 @@ theorem replaceFreeAux_mem_binders
   replaceFreeAux v t binders F = F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold replaceFreeAux
     congr!
     simp only [List.map_eq_self_iff]
@@ -166,7 +174,7 @@ theorem replaceFreeAux_eq_fastReplaceFree
     fastReplaceFree v t F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold replaceFreeAux
     unfold fastReplaceFree
     congr!
@@ -241,7 +249,7 @@ theorem fastReplaceFree_self
   fastReplaceFree v v F = F :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastReplaceFree
     simp
     simp only [List.map_eq_self_iff]
@@ -275,7 +283,7 @@ theorem not_free_in_fastReplaceFree_self
   fastReplaceFree v t F = F :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold isFreeIn at h1
 
     unfold fastReplaceFree
@@ -336,7 +344,7 @@ theorem fastReplaceFree_inverse
   fastReplaceFree t v (fastReplaceFree v t F) = F :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold occursIn at h1
 
     simp only [fastReplaceFree]
@@ -415,7 +423,7 @@ theorem not_isFreeIn_fastReplaceFree
   ¬ isFreeIn v (fastReplaceFree v t F) :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastReplaceFree
     unfold isFreeIn
     push_neg

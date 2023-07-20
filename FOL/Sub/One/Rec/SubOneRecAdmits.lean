@@ -40,6 +40,9 @@ def admitsAux (v u : VarName) : Finset VarName → Formula → Prop
       admitsAux v u binders phi ∧ admitsAux v u binders psi
   | binders, forall_ x phi => admitsAux v u (binders ∪ {x}) phi
   | binders, exists_ x phi => admitsAux v u (binders ∪ {x}) phi
+  | binders, def_ _ xs =>
+      v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of v in P
+        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
 
 
 instance
@@ -100,6 +103,9 @@ def fastAdmitsAux (v u : VarName) : Finset VarName → Formula → Prop
       fastAdmitsAux v u binders phi ∧ fastAdmitsAux v u binders psi
   | binders, forall_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
   | binders, exists_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
+  | binders, def_ _ xs =>
+      v ∈ xs → -- if there is a free occurrence of v in P
+        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
 
 
 instance
@@ -152,6 +158,7 @@ inductive BoolFormula : Type
   | iff_ : BoolFormula → BoolFormula → BoolFormula
   | forall_ : Bool → BoolFormula → BoolFormula
   | exists_ : Bool → BoolFormula → BoolFormula
+  | def_ : DefName → List Bool → BoolFormula
   deriving Inhabited, DecidableEq
 
 
@@ -163,7 +170,7 @@ def toIsBoundAux : Finset VarName → Formula → BoolFormula
       BoolFormula.pred_const_ X (xs.map fun v : VarName => v ∈ binders)
 
   | binders, pred_var_ X xs =>
-      BoolFormula.pred_const_ X (xs.map fun v : VarName => v ∈ binders)
+      BoolFormula.pred_var_ X (xs.map fun v : VarName => v ∈ binders)
 
   | binders, eq_ x y =>
       BoolFormula.eq_ (x ∈ binders) (y ∈ binders)
@@ -192,6 +199,9 @@ def toIsBoundAux : Finset VarName → Formula → BoolFormula
   | binders, exists_ x phi =>
       BoolFormula.forall_ True (toIsBoundAux (binders ∪ {x}) phi)
 
+  | binders, def_ X xs =>
+      BoolFormula.def_ X (xs.map fun v : VarName => v ∈ binders)
+
 /--
   Creates a BoolFormula from a formula. Each bound occurence of a variable in the formula is mapped to true in the bool formula. Each free occurence of a variable in the formula is mapped to false in the bool formula.
 -/
@@ -210,7 +220,7 @@ theorem admitsAux_imp_fastAdmitsAux
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold admitsAux at h2
     simp at h2
 
@@ -270,7 +280,7 @@ theorem mem_binders_imp_admitsAux
   admitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold admitsAux
     simp
     intro _ a2
@@ -311,7 +321,7 @@ theorem fastAdmitsAux_imp_admitsAux
   admitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastAdmitsAux at h1
 
     unfold admitsAux
@@ -384,7 +394,7 @@ theorem fastAdmitsAux_self
   fastAdmitsAux v v binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastAdmitsAux
     intro _
     exact h1
@@ -440,7 +450,7 @@ theorem not_isFreeIn_imp_fastAdmitsAux
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold isFreeIn at h1
 
     unfold fastAdmitsAux
@@ -507,7 +517,7 @@ theorem not_isBoundIn_imp_fastAdmitsAux
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastAdmitsAux
     intros _
     exact h2
@@ -574,7 +584,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
   fastAdmitsAux t v binders (fastReplaceFree v t F) :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastReplaceFree
     unfold fastAdmitsAux
     intro _
@@ -657,7 +667,7 @@ theorem replaceFreeAux_fastAdmitsAux
   fastAdmitsAux t v binders (replaceFreeAux v t binders F) :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold occursIn at h1
 
     unfold replaceFreeAux
@@ -751,7 +761,7 @@ theorem fastAdmitsAux_add_binders
   fastAdmitsAux v u (S ∪ T) F :=
   by
   induction F generalizing S
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastAdmitsAux at h1
 
     unfold fastAdmitsAux
@@ -804,7 +814,7 @@ theorem fastAdmitsAux_del_binders
   fastAdmitsAux v u S F :=
   by
   induction F generalizing S
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastAdmitsAux at h1
     simp at h1
 
@@ -851,7 +861,7 @@ theorem fastAdmitsAux_isFreeIn
   u ∉ binders :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastAdmitsAux at h1
 
     unfold isFreeIn at h2
@@ -928,7 +938,7 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
     toIsBoundAux binders (fastReplaceFree v u F) :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     induction xs
     case nil =>
       unfold fastReplaceFree
@@ -1016,7 +1026,7 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     induction xs
     case nil =>
       unfold fastAdmitsAux
@@ -1127,7 +1137,7 @@ theorem admitsAux_self
   (binders : Finset VarName) :
   admitsAux v v binders F := by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold admitsAux
     simp
   case eq_ x y =>
@@ -1169,7 +1179,7 @@ theorem not_isFreeIn_imp_admitsAux
   admitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold isFreeIn at h1
 
     unfold admitsAux
@@ -1236,7 +1246,7 @@ theorem not_isBoundIn_imp_admitsAux
   admitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold admitsAux
     simp
     intro _ _
@@ -1300,7 +1310,7 @@ theorem replaceFreeAux_admitsAux
   admitsAux t v binders (replaceFreeAux v t binders F) :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold occursIn at h1
 
     unfold replaceFreeAux
@@ -1404,7 +1414,7 @@ theorem admitsAux_add_binders
   admitsAux v u (S ∪ T) F :=
   by
   induction F generalizing S
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold admitsAux at h1
     simp at h1
 
@@ -1456,7 +1466,7 @@ theorem admitsAux_del_binders
   admitsAux v u S F :=
   by
   induction F generalizing S
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold admitsAux at h1
     simp at h1
 
@@ -1509,7 +1519,7 @@ theorem admitsAux_isFreeIn
   u ∉ binders :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold admitsAux at h1
     simp at h1
 
@@ -1568,120 +1578,172 @@ theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
   (V V' : VarAssignment D)
+  (E : Env)
   (v t : VarName)
   (binders : Finset VarName)
   (F : Formula)
   (h1 : fastAdmitsAux v t binders F)
   (h2 : ∀ v : VarName, ¬ v ∈ binders → V' v = V v) :
-  Holds D I (Function.updateIte V v (V' t)) F ↔
-    Holds D I V (fastReplaceFree v t F) :=
+  Holds D I (Function.updateIte V v (V' t)) E F ↔
+    Holds D I V E (fastReplaceFree v t F) :=
   by
-  induction F generalizing binders V
-  case pred_const_ X xs | pred_var_ X xs =>
-    unfold fastAdmitsAux at h1
+  induction E generalizing F binders V
+  all_goals
+    induction F generalizing binders V
+    case pred_const_ X xs | pred_var_ X xs =>
+      unfold fastAdmitsAux at h1
 
-    unfold fastReplaceFree
-    unfold Holds
-    unfold Function.updateIte
-    congr! 1
-    simp
-    simp only [List.map_eq_map_iff]
-    intro x a1
-    simp only [eq_comm]
-    simp
-    split_ifs
-    case _ c1 =>
-      subst c1
-      tauto
-    case _ c1 =>
-      rfl
-  case eq_ x y =>
-    unfold fastAdmitsAux at h1
-
-    unfold fastReplaceFree
-    unfold Holds
-    unfold Function.updateIte
-    simp only [eq_comm]
-    congr! 1
-    all_goals
+      unfold fastReplaceFree
+      simp only [Holds]
+      unfold Function.updateIte
+      congr! 1
+      simp
+      simp only [List.map_eq_map_iff]
+      intro x a1
+      simp only [eq_comm]
+      simp
       split_ifs
       case _ c1 =>
         subst c1
         tauto
       case _ c1 =>
         rfl
-  case true_ | false_ =>
-    unfold fastReplaceFree
-    unfold Holds
-    rfl
-  case not_ phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    case eq_ x y =>
+      unfold fastAdmitsAux at h1
 
-    unfold fastReplaceFree
-    unfold Holds
-    congr! 1
-    exact phi_ih V binders h1 h2
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    unfold fastAdmitsAux at h1
-
-    unfold fastReplaceFree
-    unfold Holds
-    cases h1
-    case intro h1_left h1_right =>
-    congr! 1
-    · exact phi_ih V binders h1_left h2
-    · exact psi_ih V binders h1_right h2
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastAdmitsAux at h1
-
-    unfold fastReplaceFree
-    split_ifs
-    case _ c1 =>
-      subst c1
+      unfold fastReplaceFree
       unfold Holds
-      first | apply forall_congr' | apply exists_congr
-      intro d
-      congr! 1
-      funext x
       unfold Function.updateIte
-      split_ifs <;> rfl
-    case _ c1 =>
-      unfold Holds
-      first | apply forall_congr' | apply exists_congr
-      intro d
-      cases h1
-      case inl h1 =>
-        contradiction
-      case inr h1 =>
-        simp only [Function.updateIte_comm V v x d (V' t) c1]
-        apply phi_ih (Function.updateIte V x d) (binders ∪ {x}) h1
-        unfold Function.updateIte
-        simp
-        push_neg
-        intros v' a1
-        cases a1
-        case intro a1_left a1_right =>
-          simp only [if_neg a1_right]
+      simp only [eq_comm]
+      congr! 1
+      all_goals
+        split_ifs
+        case _ c1 =>
+          subst c1
           tauto
+        case _ c1 =>
+          rfl
+    case true_ | false_ =>
+      unfold fastReplaceFree
+      simp only [Holds]
+    case not_ phi phi_ih =>
+      unfold fastAdmitsAux at h1
+
+      unfold fastReplaceFree
+      simp only [Holds]
+      congr! 1
+      exact phi_ih V binders h1 h2
+    case
+        imp_ phi psi phi_ih psi_ih
+      | and_ phi psi phi_ih psi_ih
+      | or_ phi psi phi_ih psi_ih
+      | iff_ phi psi phi_ih psi_ih =>
+      unfold fastAdmitsAux at h1
+
+      unfold fastReplaceFree
+      simp only [Holds]
+      cases h1
+      case intro h1_left h1_right =>
+      congr! 1
+      · exact phi_ih V binders h1_left h2
+      · exact psi_ih V binders h1_right h2
+    case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+      unfold fastAdmitsAux at h1
+
+      unfold fastReplaceFree
+      split_ifs
+      case _ c1 =>
+        subst c1
+        simp only [Holds]
+        first | apply forall_congr' | apply exists_congr
+        intro d
+        congr! 1
+        funext x
+        unfold Function.updateIte
+        split_ifs <;> rfl
+      case _ c1 =>
+        simp only [Holds]
+        first | apply forall_congr' | apply exists_congr
+        intro d
+        cases h1
+        case inl h1 =>
+          contradiction
+        case inr h1 =>
+          simp only [Function.updateIte_comm V v x d (V' t) c1]
+          apply phi_ih (Function.updateIte V x d) (binders ∪ {x}) h1
+          unfold Function.updateIte
+          simp
+          push_neg
+          intros v' a1
+          cases a1
+          case intro a1_left a1_right =>
+            simp only [if_neg a1_right]
+            tauto
+
+  case nil.def_ X xs =>
+    unfold fastReplaceFree
+    simp only [Holds]
+
+  case cons.def_ hd tl ih X xs =>
+      unfold fastAdmitsAux at h1
+
+      unfold fastReplaceFree
+      simp only [Holds]
+      unfold Function.updateIte
+      congr! 1
+      case _ =>
+        simp
+      case _ c1 =>
+        apply Holds_coincide_Var
+        intro v' a1
+        simp
+
+        have s1 : (List.map (fun a => if a = v then V' t else V a) xs) = (List.map (V ∘ fun x => if v = x then t else x) xs)
+        {
+        simp only [List.map_eq_map_iff]
+        intro x a2
+        simp only [eq_comm]
+        simp
+        split_ifs
+        case _ c2 =>
+          apply h2
+          subst c2
+          exact h1 a2
+        case _ c2 =>
+          rfl
+        }
+        simp only [s1]
+        apply Function.updateListIte_mem_eq_len
+        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          simp only [← List.mem_toFinset]
+          apply Finset.mem_of_subset hd.h1 a1
+        · simp at c1
+          cases c1
+          case intro c1_left c1_right =>
+            simp
+            simp only [eq_comm]
+            exact c1_right
+      case _ _ =>
+        apply ih V binders
+        · unfold fastAdmitsAux
+          exact h1
+        · exact h2
 
 
 theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
+  (E : Env)
   (v t : VarName)
   (F : Formula)
   (h1 : fastAdmits v t F) :
-  Holds D I (Function.updateIte V v (V t)) F ↔
-    Holds D I V (fastReplaceFree v t F) :=
+  Holds D I (Function.updateIte V v (V t)) E F ↔
+    Holds D I V E (fastReplaceFree v t F) :=
   by
   unfold fastAdmits at h1
 
-  apply substitution_theorem_aux D I V V v t ∅ F h1
+  apply substitution_theorem_aux D I V V E v t ∅ F h1
   simp
 
 
@@ -1695,11 +1757,11 @@ theorem substitution_is_valid
   unfold IsValid at h2
 
   unfold IsValid
-  intro D I V
-  simp only [← substitution_theorem D I V v t F h1]
+  intro D I V E
+  simp only [← substitution_theorem D I V E v t F h1]
   apply h2
 
 
-#lint
+--#lint
 
 end FOL
