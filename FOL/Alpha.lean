@@ -84,115 +84,166 @@ theorem replace_empty_Holds
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
+  (E : Env)
   (u v : VarName)
   (F : Formula)
   (a : D)
   (h1 : ¬ isFreeIn v F)
   (h2 : ¬ isBoundIn v F) :
-  Holds D I (Function.updateIte V u a) F ↔
-    Holds D I (Function.updateIte V v a) (fastReplaceFree u v F) :=
+  Holds D I (Function.updateIte V u a) E F ↔
+    Holds D I (Function.updateIte V v a) E (fastReplaceFree u v F) :=
   by
-  induction F generalizing V
-  case pred_const_ X xs | pred_var_ X xs =>
-    unfold isFreeIn at h1
+  induction E generalizing F V
+  all_goals
+    induction F generalizing V
+    case pred_const_ X xs | pred_var_ X xs =>
+      unfold isFreeIn at h1
 
-    unfold fastReplaceFree
-    unfold Holds
-    congr! 1
-    simp
-    simp only [List.map_eq_map_iff]
-    intro x a1
-    simp
-    unfold Function.updateIte
-    simp only [eq_comm]
-    split_ifs
-    case _ c1 c2 =>
-      rfl
-    case _ c1 c2 =>
-      contradiction
-    case _ c1 c2 =>
-      subst c2
-      contradiction
-    case _ c1 c2 =>
-      rfl
-  case eq_ x y =>
-    unfold isFreeIn at h1
+      unfold fastReplaceFree
+      simp only [Holds]
+      congr! 1
+      simp
+      simp only [List.map_eq_map_iff]
+      intro x a1
+      simp
+      unfold Function.updateIte
+      simp only [eq_comm]
+      split_ifs
+      case _ c1 c2 =>
+        rfl
+      case _ c1 c2 =>
+        contradiction
+      case _ c1 c2 =>
+        subst c2
+        contradiction
+      case _ c1 c2 =>
+        rfl
+    case eq_ x y =>
+      unfold isFreeIn at h1
 
-    unfold fastReplaceFree
-    unfold Holds
-    congr! 1
-    · unfold Function.updateIte
-      split_ifs <;> tauto
-    · unfold Function.updateIte
-      split_ifs <;> tauto
-  case true_ | false_ =>
-    unfold fastReplaceFree
-    unfold Holds
-    rfl
-  case not_ phi phi_ih =>
-    unfold isFreeIn at h1
+      unfold fastReplaceFree
+      simp only [Holds]
+      congr! 1
+      · unfold Function.updateIte
+        split_ifs <;> tauto
+      · unfold Function.updateIte
+        split_ifs <;> tauto
+    case true_ | false_ =>
+      unfold fastReplaceFree
+      simp only [Holds]
+    case not_ phi phi_ih =>
+      unfold isFreeIn at h1
 
-    unfold isBoundIn at h2
+      unfold isBoundIn at h2
 
-    unfold fastReplaceFree
-    unfold Holds
-    congr! 1
-    exact phi_ih V h1 h2
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    unfold isFreeIn at h1
-    push_neg at h1
+      unfold fastReplaceFree
+      simp only [Holds]
+      congr! 1
+      exact phi_ih V h1 h2
+    case
+        imp_ phi psi phi_ih psi_ih
+      | and_ phi psi phi_ih psi_ih
+      | or_ phi psi phi_ih psi_ih
+      | iff_ phi psi phi_ih psi_ih =>
+      unfold isFreeIn at h1
+      push_neg at h1
 
-    unfold isBoundIn at h2
-    push_neg at h2
+      unfold isBoundIn at h2
+      push_neg at h2
 
-    cases h1
-    case intro h1_left h1_right =>
+      cases h1
+      case intro h1_left h1_right =>
+        cases h2
+        case intro h2_left h2_right =>
+          unfold fastReplaceFree
+          simp only [Holds]
+          congr! 1
+          · exact phi_ih V h1_left h2_left
+          · exact psi_ih V h1_right h2_right
+    case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+      unfold isFreeIn at h1
+      push_neg at h1
+
+      unfold isBoundIn at h2
+      push_neg at h2
+
       cases h2
       case intro h2_left h2_right =>
         unfold fastReplaceFree
-        unfold Holds
-        congr! 1
-        · exact phi_ih V h1_left h2_left
-        · exact psi_ih V h1_right h2_right
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold isFreeIn at h1
-    push_neg at h1
-
-    unfold isBoundIn at h2
-    push_neg at h2
-
-    cases h2
-    case intro h2_left h2_right =>
+        split_ifs
+        case inl c1 =>
+          subst c1
+          apply Holds_coincide_Var
+          intro x a1
+          unfold isFreeIn at a1
+          cases a1
+          case h1.intro a1_left a1_right =>
+            unfold Function.updateIte
+            simp only [if_neg a1_left]
+            split_ifs
+            case inl c2 =>
+              subst c2
+              tauto
+            case inr c2 =>
+              rfl
+        case inr c1 =>
+          simp only [Holds]
+          first | apply forall_congr' | apply exists_congr
+          intro d
+          simp only [Function.updateIte_comm V v x d a h2_left]
+          simp only [Function.updateIte_comm V u x d a c1]
+          apply phi_ih
+          · exact h1 h2_left
+          · exact h2_right
+  case nil.def_ X xs =>
+    unfold fastReplaceFree
+    simp only [Holds]
+  case cons.def_ hd tl ih X xs =>
       unfold fastReplaceFree
-      split_ifs
-      case inl c1 =>
-        subst c1
+      simp only [Holds]
+      unfold Function.updateIte
+      congr! 1
+      case _ =>
+        simp
+      case _ c1 =>
+        unfold isFreeIn at h1
+
         apply Holds_coincide_Var
-        intro x a1
-        unfold isFreeIn at a1
-        cases a1
-        case h1.intro a1_left a1_right =>
-          unfold Function.updateIte
-          simp only [if_neg a1_left]
-          split_ifs
-          case inl c2 =>
-            subst c2
-            tauto
-          case inr c2 =>
-            rfl
-      case inr c1 =>
-        unfold Holds
-        first | apply forall_congr' | apply exists_congr
-        intro d
-        simp only [Function.updateIte_comm V v x d a h2_left]
-        simp only [Function.updateIte_comm V u x d a c1]
-        apply phi_ih
-        · exact h1 h2_left
-        · exact h2_right
+        intro v' a1
+        simp
+
+        have s1 : (List.map ((fun a_1 => if a_1 = v then a else V a_1) ∘ fun x => if u = x then v else x) xs) = (List.map (fun a_1 => if a_1 = u then a else V a_1) xs)
+        {
+        simp only [List.map_eq_map_iff]
+        intro x a2
+        simp only [eq_comm]
+        simp
+        split_ifs
+        case _ =>
+          rfl
+        case _ =>
+          contradiction
+        case _ c1 c2 =>
+          subst c2
+          contradiction
+        case _ =>
+          rfl
+        }
+        simp only [s1]
+        apply Function.updateListIte_mem_eq_len
+        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          simp only [← List.mem_toFinset]
+          apply Finset.mem_of_subset hd.h1 a1
+        · simp at c1
+          cases c1
+          case intro c1_left c1_right =>
+            simp
+            simp only [eq_comm]
+            exact c1_right
+      case _ =>
+        apply ih
+        · exact h1
+        · exact h2
 
 
 theorem Holds_iff_alphaEqv_Holds
