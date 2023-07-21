@@ -47,6 +47,10 @@ def replaceFreeFunAux (σ : VarName → VarName) : Finset VarName → Formula �
       forall_ x (replaceFreeFunAux σ (binders ∪ {x}) phi)
   | binders, exists_ x phi =>
       exists_ x (replaceFreeFunAux σ (binders ∪ {x}) phi)
+  | binders, def_ X xs =>
+      def_
+      X
+      (xs.map fun x : VarName => if x ∉ binders then σ x else x)
 
 /--
   replaceFreeFun σ F := The simultaneous replacement of each free occurence of any variable v in the formula F by σ v.
@@ -85,6 +89,7 @@ def fastReplaceFreeFun : (VarName → VarName) → Formula → Formula
       forall_ x (fastReplaceFreeFun (Function.updateIte σ x x) phi)
   | σ, exists_ x phi =>
       exists_ x (fastReplaceFreeFun (Function.updateIte σ x x) phi)
+  | σ, def_ X xs => def_ X (xs.map σ)
 
 
 theorem fastReplaceFreeFun_id
@@ -92,7 +97,7 @@ theorem fastReplaceFreeFun_id
   fastReplaceFreeFun id F = F :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastReplaceFreeFun
     congr!
     simp
@@ -126,7 +131,7 @@ example
     fastReplaceFree v t F :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastReplaceFreeFun
     unfold fastReplaceFree
     unfold Function.updateIte
@@ -178,7 +183,7 @@ theorem fastReplaceFreeFun_same_on_free
   fastReplaceFreeFun σ F = fastReplaceFreeFun σ' F :=
   by
   induction F generalizing σ σ'
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold isFreeIn at h1
 
     unfold fastReplaceFreeFun
@@ -249,7 +254,7 @@ theorem replaceFreeFunAux_same_on_free
     replaceFreeFunAux σ' binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold replaceFreeFunAux
     congr! 1
     simp only [List.map_eq_map_iff]
@@ -308,7 +313,7 @@ example
     fastReplaceFreeFun σ F :=
   by
   induction F generalizing binders σ
-  case pred_const_ X xs | pred_var_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastReplaceFreeFun
     unfold replaceFreeFunAux
     congr! 1
