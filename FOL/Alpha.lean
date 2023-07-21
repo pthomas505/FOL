@@ -431,7 +431,7 @@ theorem aux_1
 
     subst h2
     rfl
-  case cons h1_l h1_x h1_x' h1_V h1_V' h1_d _ h1_ih =>
+  case cons h1_l h1_x h1_y h1_V h1_V' h1_d _ h1_ih =>
     unfold isAlphaEqvVar at h2
     simp at h2
 
@@ -556,8 +556,8 @@ lemma isAlphaEqv_Holds_aux
         · exact psi_ih V V' psi' binders h1 h2_right
 
     case
-      forall_.forall_ x phi phi_ih x' phi'
-    | exists_.exists_ x phi phi_ih x' phi' =>
+      forall_.forall_ x phi phi_ih y phi'
+    | exists_.exists_ x phi phi_ih y phi' =>
         unfold isAlphaEqvAux at h2
 
         simp only [Holds]
@@ -569,7 +569,7 @@ lemma isAlphaEqv_Holds_aux
           · apply AlphaEqvVarAssignment.cons
             apply AlphaEqvVarAssignment.nil
           · exact h2
-        case cons h1_l h1_x h1_x' h1_V h1_V' h1_d h1_1 _ =>
+        case cons h1_binders h1_x h1_y h1_V h1_V' h1_d h1_1 _ =>
           apply phi_ih
           · apply AlphaEqvVarAssignment.cons
             apply AlphaEqvVarAssignment.cons
