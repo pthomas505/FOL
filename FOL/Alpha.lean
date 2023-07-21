@@ -579,31 +579,31 @@ lemma isAlphaEqv_Holds_aux
   case nil.def_.def_ =>
     simp only [Holds]
   case cons.def_.def_ hd tl ih X xs Y ys =>
-      unfold isAlphaEqvAux at h2
+    unfold isAlphaEqvAux at h2
 
-      simp only [Holds]
-      split_ifs
-      case _ c1 c2 =>
-        cases h2
-        case intro h2_left h2_right =>
-          apply Holds_coincide_Var
-          intro v a1
-          simp only [aux_2 D binders xs ys V V' h1 h2_right]
-          apply Function.updateListIte_mem_eq_len
-          · simp only [isFreeIn_iff_mem_freeVarSet] at a1
-            simp only [← List.mem_toFinset]
-            apply Finset.mem_of_subset hd.h1 a1
-          · simp
-            simp only [eq_comm]
-            cases c2
-            case intro c2_left c2_right =>
-              exact c2_right
-      case _ c1 c2 =>
-        sorry
-      case _ c1 c2 =>
-        sorry
-      case _ c1 c2 =>
-        exact ih V V' (def_ X xs) (def_ Y ys) binders h1 h2
+    simp only [Holds]
+    split_ifs
+    case _ c1 c2 =>
+      cases h2
+      case intro h2_left h2_right =>
+        apply Holds_coincide_Var
+        intro v a1
+        simp only [aux_2 D binders xs ys V V' h1 h2_right]
+        apply Function.updateListIte_mem_eq_len
+        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          simp only [← List.mem_toFinset]
+          apply Finset.mem_of_subset hd.h1 a1
+        · simp
+          simp only [eq_comm]
+          cases c2
+          case intro c2_left c2_right =>
+            exact c2_right
+    case _ c1 c2 =>
+      sorry
+    case _ c1 c2 =>
+      sorry
+    case _ c1 c2 =>
+      exact ih V V' (def_ X xs) (def_ Y ys) binders h1 h2
 
 
 lemma isalphaEqv_Holds
