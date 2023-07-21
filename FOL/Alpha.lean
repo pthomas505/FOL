@@ -450,8 +450,8 @@ theorem aux_1
 
 theorem aux_2
   (D : Type)
-  (xs ys : List VarName)
   (binders : List (VarName × VarName))
+  (xs ys : List VarName)
   (V V' : VarAssignment D)
   (h1 : AlphaEqvVarAssignment D binders V V')
   (h2 : isAlphaEqvVarList binders xs ys) :
@@ -492,100 +492,101 @@ lemma isAlphaEqv_Holds_aux
   (V V' : VarAssignment D)
   (E : Env)
   (F F' : Formula)
-  (l : List (VarName × VarName))
-  (h1 : isAlphaEqvAux l F F')
-  (h2 : AlphaEqvVarAssignment D l V V') :
+  (binders : List (VarName × VarName))
+  (h1 : AlphaEqvVarAssignment D binders V V')
+  (h2 : isAlphaEqvAux binders F F') :
   Holds D I V E F ↔ Holds D I V' E F' :=
   by
-  induction E generalizing F F' l V V'
+  induction E generalizing F F' binders V V'
   all_goals
-    induction F generalizing F' l V V'
+    induction F generalizing F' binders V V'
     all_goals
       cases F'
 
     any_goals
-      unfold isAlphaEqvAux at h1
+      unfold isAlphaEqvAux at h2
       contradiction
 
     case
       pred_const_.pred_const_ X xs Y ys
     | pred_var_.pred_var_ X xs Y ys =>
-      unfold isAlphaEqvAux at h1
+      unfold isAlphaEqvAux at h2
 
-      cases h1
-      case intro h1_left h1_right =>
+      cases h2
+      case intro h2_left h2_right =>
         simp only [Holds]
-        subst h1_left
+        subst h2_left
         congr! 1
-        exact aux_2 D xs ys l V V' h2 h1_right
+        exact aux_2 D binders xs ys V V' h1 h2_right
 
     case eq_.eq_ x x' y y' =>
-      unfold isAlphaEqvAux at h1
+      unfold isAlphaEqvAux at h2
 
-      cases h1
-      case intro h1_left h1_right =>
+      cases h2
+      case intro h2_left h2_right =>
         simp only [Holds]
         congr! 1
-        · exact aux_1 D l x y V V' h2 h1_left
-        · exact aux_1 D l x' y' V V' h2 h1_right
+        · exact aux_1 D binders x y V V' h1 h2_left
+        · exact aux_1 D binders x' y' V V' h1 h2_right
 
     case true_.true_ | false_.false_ =>
       simp only [Holds]
 
     case not_.not_ phi phi_ih phi' =>
-      unfold isAlphaEqvAux at h1
+      unfold isAlphaEqvAux at h2
 
       simp only [Holds]
       congr! 1
-      exact phi_ih V V' phi' l h1 h2
+      exact phi_ih V V' phi' binders h1 h2
 
     case
       imp_.imp_ phi psi phi_ih psi_ih phi' psi'
     | and_.and_ phi psi phi_ih psi_ih phi' psi'
     | or_.or_ phi psi phi_ih psi_ih phi' psi'
     | iff_.iff_ phi psi phi_ih psi_ih phi' psi' =>
-      unfold isAlphaEqvAux at h1
+      unfold isAlphaEqvAux at h2
 
-      cases h1
-      case intro h1_left h1_right =>
-      simp only [Holds]
-      congr! 1
-      · exact phi_ih V V' phi' l h1_left h2
-      · exact psi_ih V V' psi' l h1_right h2
+      cases h2
+      case intro h2_left h2_right =>
+        simp only [Holds]
+        congr! 1
+        · exact phi_ih V V' phi' binders h1 h2_left
+        · exact psi_ih V V' psi' binders h1 h2_right
 
     case
       forall_.forall_ x phi phi_ih x' phi'
     | exists_.exists_ x phi phi_ih x' phi' =>
-        unfold isAlphaEqvAux at h1
+        unfold isAlphaEqvAux at h2
 
         simp only [Holds]
         first | apply forall_congr' | apply exists_congr
         intro d
-        induction h2
-        case nil h2_V =>
+        induction h1
+        case nil h1_V =>
           apply phi_ih
-          · exact h1
           · apply AlphaEqvVarAssignment.cons
             apply AlphaEqvVarAssignment.nil
-        case cons h2_l h2_x h2_x' h2_V h2_V' h2_d h2_1 _ =>
+          · exact h2
+        case cons h1_l h1_x h1_x' h1_V h1_V' h1_d h1_1 _ =>
           apply phi_ih
-          · exact h1
           · apply AlphaEqvVarAssignment.cons
             apply AlphaEqvVarAssignment.cons
-            exact h2_1
+            exact h1_1
+          · exact h2
+
   case nil.def_.def_ =>
     simp only [Holds]
   case cons.def_.def_ hd tl ih X xs Y ys =>
-      unfold isAlphaEqvAux at h1
+      unfold isAlphaEqvAux at h2
 
       simp only [Holds]
       split_ifs
       case _ c1 c2 =>
-        cases h1
-        case intro h1_left h1_right =>
+        cases h2
+        case intro h2_left h2_right =>
           apply Holds_coincide_Var
           intro v a1
-          simp only [aux_2 D xs ys l V V' h2 h1_right]
+          simp only [aux_2 D binders xs ys V V' h1 h2_right]
           apply Function.updateListIte_mem_eq_len
           · simp only [isFreeIn_iff_mem_freeVarSet] at a1
             simp only [← List.mem_toFinset]
@@ -600,7 +601,7 @@ lemma isAlphaEqv_Holds_aux
       case _ c1 c2 =>
         sorry
       case _ c1 c2 =>
-        exact ih V V' (def_ X xs) (def_ Y ys) l h1 h2
+        exact ih V V' (def_ X xs) (def_ Y ys) binders h1 h2
 
 
 lemma isalphaEqv_Holds
@@ -614,7 +615,7 @@ lemma isalphaEqv_Holds
   by
   unfold isAlphaEqv at h1
 
-  exact isAlphaEqv_Holds_aux D I V V E F F' [] h1 AlphaEqvVarAssignment.nil
+  exact isAlphaEqv_Holds_aux D I V V E F F' [] AlphaEqvVarAssignment.nil h1
 
 
 --#lint
