@@ -488,6 +488,36 @@ theorem aux_2
           exact h2_right
 
 
+lemma isAlphaEqvVarList_length
+  (binders : List (VarName × VarName))
+  (xs ys : List VarName)
+  (h1 : isAlphaEqvVarList binders xs ys) :
+  xs.length = ys.length :=
+  by
+  induction xs generalizing ys
+  case nil =>
+    cases ys
+    case nil =>
+      rfl
+    case cons ys_hd ys_tl =>
+      unfold isAlphaEqvVarList at h1
+
+      contradiction
+  case cons xs_hd xs_tl xs_ih =>
+    cases ys
+    case nil =>
+      unfold isAlphaEqvVarList at h1
+
+      contradiction
+    case cons ys_hd ys_tl =>
+      unfold isAlphaEqvVarList at h1
+
+      simp
+      cases h1
+      case intro h1_left h1_right =>
+        exact xs_ih ys_tl h1_right
+
+
 lemma isAlphaEqv_Holds_aux
   (D : Type)
   (I : Interpretation D)
@@ -599,9 +629,17 @@ lemma isAlphaEqv_Holds_aux
           case intro c2_left c2_right =>
             exact c2_right
     case _ c1 c2 =>
-      sorry
+      cases h2
+      case intro h2_left h2_right =>
+        simp only [isAlphaEqvVarList_length binders xs ys h2_right] at c1
+        subst h2_left
+        contradiction
     case _ c1 c2 =>
-      sorry
+      cases h2
+      case intro h2_left h2_right =>
+        simp only [← isAlphaEqvVarList_length binders xs ys h2_right] at c2
+        subst h2_left
+        contradiction
     case _ c1 c2 =>
       exact ih V V' (def_ X xs) (def_ Y ys) binders h1 h2
 
