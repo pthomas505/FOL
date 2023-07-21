@@ -214,21 +214,22 @@ theorem replace_empty_Holds
 
         have s1 : (List.map ((fun a_1 => if a_1 = v then a else V a_1) ∘ fun x => if u = x then v else x) xs) = (List.map (fun a_1 => if a_1 = u then a else V a_1) xs)
         {
-        simp only [List.map_eq_map_iff]
-        intro x a2
-        simp only [eq_comm]
-        simp
-        split_ifs
-        case _ =>
-          rfl
-        case _ =>
-          contradiction
-        case _ c1 c2 =>
-          subst c2
-          contradiction
-        case _ =>
-          rfl
+          simp only [List.map_eq_map_iff]
+          intro x a2
+          simp only [eq_comm]
+          simp
+          split_ifs
+          case _ =>
+            rfl
+          case _ =>
+            contradiction
+          case _ c1 c2 =>
+            subst c2
+            contradiction
+          case _ =>
+            rfl
         }
+
         simp only [s1]
         apply Function.updateListIte_mem_eq_len
         · simp only [isFreeIn_iff_mem_freeVarSet] at a1
@@ -279,7 +280,8 @@ theorem Holds_iff_alphaEqv_Holds
     first | apply forall_congr' | apply exists_congr
     intro d
     exact h1_ih (Function.updateIte V h1_x d)
-  case refl_ h1 => rfl
+  case refl_ h1 =>
+    rfl
   case symm_ h1_phi h1_phi' _ h1_ih =>
     symm
     exact h1_ih V
