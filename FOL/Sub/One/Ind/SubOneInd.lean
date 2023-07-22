@@ -112,6 +112,13 @@ inductive IsFreeSub : Formula → VarName → VarName → Formula → Prop
     IsFreeSub phi v t phi' →
     IsFreeSub (exists_ x phi) v t (exists_ x phi')
 
+  | def_
+    (X : DefName)
+    (xs : List VarName)
+    (v t : VarName) :
+    IsFreeSub (def_ X xs) v t (def_ X (xs.map fun x : VarName =>
+      if v = x then t else x))
+
 
 theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
   (F F' : Formula)
@@ -186,6 +193,9 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
           first | apply IsFreeSub.forall_not_free_in | apply IsFreeSub.exists_not_free_in
           unfold isFreeIn
           tauto
+  case def_ X xs =>
+    unfold fastReplaceFree
+    apply IsFreeSub.def_
 
 
 theorem isFreeSub_imp_fastAdmitsAux
@@ -244,6 +254,10 @@ theorem isFreeSub_imp_fastAdmitsAux
     apply h1_1_ih
     simp
     tauto
+  case def_ h1_1_X h1_1_xs h1_1_v h1_1_t =>
+    unfold fastAdmitsAux
+    intro _
+    exact h2
 
 
 theorem isFreeSub_imp_fastReplaceFree
@@ -299,6 +313,9 @@ theorem isFreeSub_imp_fastReplaceFree
       simp only [if_neg h1_1_left]
       subst h1_ih
       rfl
+  case def_ h1_X h1_xs h1_v h1_t =>
+    unfold fastReplaceFree
+    rfl
 
 
 example
@@ -325,15 +342,16 @@ theorem substitution_theorem_ind
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
+  (E : Env)
   (v t : VarName)
   (F F' : Formula)
   (h1 : IsFreeSub F v t F') :
-  Holds D I (Function.updateIte V v (V t)) F ↔
-    Holds D I V F' :=
+  Holds D I (Function.updateIte V v (V t)) E F ↔
+    Holds D I V E F' :=
   by
   induction h1 generalizing V
   case pred_const_ h1_X h1_xs h1_v h1_t | pred_var_ h1_X h1_xs h1_v h1_t =>
-    unfold Holds
+    simp only [Holds]
     congr! 1
     simp
     simp only [List.map_eq_map_iff]
@@ -348,15 +366,14 @@ theorem substitution_theorem_ind
       simp
       simp only [if_neg c1]
   case eq_ h1_x h1_y h1_v h1_t =>
-    unfold Holds
+    simp only [Holds]
     unfold Function.updateIte
     simp only [eq_comm]
     congr! 1 <;> { split_ifs <;> rfl }
   case true_ _ _ | false_ _ _ =>
-    unfold Holds
-    rfl
+    simp only [Holds]
   case not_ h1_phi h1_v h1_t h1_phi' _ h1_ih =>
-    unfold Holds
+    simp only [Holds]
     congr! 1
     apply h1_ih
   case
@@ -364,7 +381,7 @@ theorem substitution_theorem_ind
   | and_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | or_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | iff_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2 =>
-    unfold Holds
+    simp only [Holds]
     congr! 1
     · apply h1_ih_1
     · apply h1_ih_2
@@ -374,7 +391,7 @@ theorem substitution_theorem_ind
     unfold isFreeIn at h1_1
     simp at h1_1
 
-    unfold Holds
+    simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     apply Holds_coincide_Var
@@ -394,7 +411,7 @@ theorem substitution_theorem_ind
   | exists_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 h1_2 _ h1_ih =>
     unfold isFreeIn at h1_1
 
-    unfold Holds
+    simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     specialize h1_ih (Function.updateIte V h1_x d)
@@ -411,6 +428,47 @@ theorem substitution_theorem_ind
         contradiction
     case _ | _ | _ =>
       rfl
+  case def_ h1_X h1_xs h1_v h1_t =>
+    induction E
+    case nil =>
+      simp only [Holds]
+    case cons hd tl ih =>
+      simp only [Holds]
+      split_ifs
+      case _ c1 c2 =>
+        simp
+        apply Holds_coincide_Var
+        intro v' a1
+        have s1 : List.map (Function.updateIte V h1_v (V h1_t)) h1_xs = List.map (V ∘ fun x => if h1_v = x then h1_t else x) h1_xs
+        simp only [List.map_eq_map_iff]
+        intro x _
+        unfold Function.updateIte
+        simp only [eq_comm]
+        simp
+        split_ifs
+        case _ c3 =>
+          simp only [if_pos c3]
+        case _ c3 =>
+          simp only [if_neg c3]
+
+        simp only [s1]
+        apply Function.updateListIte_mem_eq_len
+        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          simp only [← List.mem_toFinset]
+          apply Finset.mem_of_subset hd.h1 a1
+        · cases c1
+          case intro c1_left c1_right =>
+            simp
+            simp only [eq_comm]
+            exact c1_right
+      case _ c1 c2 =>
+        simp only [List.length_map] at c2
+        contradiction
+      case _ c1 c2 =>
+        simp at c2
+        contradiction
+      case _ c1 c2 =>
+        exact ih
 
 
 #lint
