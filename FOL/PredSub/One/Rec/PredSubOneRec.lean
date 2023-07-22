@@ -45,6 +45,7 @@ def replacePred
       (replacePred P zs H psi)
   | forall_ x phi => forall_ x (replacePred P zs H phi)
   | exists_ x phi => exists_ x (replacePred P zs H phi)
+  | def_ X xs => def_ X xs
 
 
 def admitsPredAux
@@ -83,12 +84,14 @@ def admitsPredAux
       admitsPredAux P zs H binders psi
   | binders, forall_ x phi => admitsPredAux P zs H (binders ∪ {x}) phi
   | binders, exists_ x phi => admitsPredAux P zs H (binders ∪ {x}) phi
+  | _, def_ _ _ => True
 
 
 theorem pred_sub_single_aux
   (D : Type)
   (I : Interpretation D)
   (V V' : VarAssignment D)
+  (E : Env)
   (F : Formula)
   (P : PredName)
   (zs : List VarName)
@@ -102,16 +105,15 @@ theorem pred_sub_single_aux
       I.pred_const_,
       fun (Q : PredName) (ds : List D) =>
         if Q = P ∧ ds.length = zs.length
-        then Holds D I (Function.updateListIte V' zs ds) H
+        then Holds D I (Function.updateListIte V' zs ds) E H
         else I.pred_var_ Q ds
     ⟩
-    V F ↔ Holds D I V (replacePred P zs H F) :=
+    V E F ↔ Holds D I V E (replacePred P zs H F) :=
   by
   induction F generalizing binders V
   case pred_const_ X xs =>
     unfold replacePred
-    unfold Holds
-    simp
+    simp only [Holds]
   case pred_var_ X xs =>
       unfold admitsPredAux at h1
 
@@ -126,16 +128,16 @@ theorem pred_sub_single_aux
         cases h1
         case intro h1_left h1_right =>
           have s1 :
-            Holds D I (V ∘ Function.updateListIte id zs xs) H ↔
-              Holds D I V (fastReplaceFreeFun (Function.updateListIte id zs xs) H) :=
+            Holds D I (V ∘ Function.updateListIte id zs xs) E H ↔
+              Holds D I V E (fastReplaceFreeFun (Function.updateListIte id zs xs) H) :=
             by
-            exact substitution_fun_theorem D I V (Function.updateListIte id zs xs) H h1_left
+            exact substitution_fun_theorem D I V E (Function.updateListIte id zs xs) H h1_left
 
           simp only [Function.updateListIte_comp] at s1
           simp at s1
 
           have s2 :
-            Holds D I (Function.updateListIte V zs (List.map V xs)) H ↔ Holds D I (Function.updateListIte V' zs (List.map V xs)) H :=
+            Holds D I (Function.updateListIte V zs (List.map V xs)) E H ↔ Holds D I (Function.updateListIte V' zs (List.map V xs)) E H :=
             by
             apply Holds_coincide_Var
             intro v a1
@@ -157,20 +159,18 @@ theorem pred_sub_single_aux
           exact s1
       case inr c1 =>
           split_ifs
-          rfl
+          simp only [Holds]
   case eq_ x y =>
     unfold replacePred
-    unfold Holds
-    rfl
+    simp only [Holds]
   case true_ | false_ =>
     unfold replacePred
-    unfold Holds
-    rfl
+    simp only [Holds]
   case not_ phi phi_ih =>
     unfold admitsPredAux at h1
 
     unfold replacePred
-    unfold Holds
+    simp only [Holds]
     congr! 1
     exact phi_ih V binders h1 h2
   case
@@ -181,7 +181,7 @@ theorem pred_sub_single_aux
     unfold admitsPredAux at h1
 
     unfold replacePred
-    unfold Holds
+    simp only [Holds]
     cases h1
     case intro h1_left h1_right =>
       congr! 1
@@ -191,7 +191,7 @@ theorem pred_sub_single_aux
     unfold admitsPredAux at h1
 
     unfold replacePred
-    unfold Holds
+    simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     apply phi_ih (Function.updateIte V x d) (binders ∪ {x}) h1
@@ -216,8 +216,8 @@ theorem pred_sub_single_valid
   unfold IsValid at h2
 
   unfold IsValid
-  intro D I V
-  obtain s1 := pred_sub_single_aux D I V V phi P zs H ∅ h1
+  intro D I V E
+  obtain s1 := pred_sub_single_aux D I V V E phi P zs H ∅ h1
   simp at s1
   simp only [← s1]
   apply h2
@@ -226,4 +226,3 @@ theorem pred_sub_single_valid
 --#lint
 
 end FOL
-
