@@ -27,6 +27,7 @@ def Formula.IsPrime : Formula → Prop
   | iff_ _ _ => False
   | forall_ _ _ => True
   | exists_ _ _ => True
+  | def_ _ _ => True
 
 
 def Formula.primeSet : Formula → Finset Formula
@@ -42,6 +43,7 @@ def Formula.primeSet : Formula → Finset Formula
   | iff_ phi psi => phi.primeSet ∪ psi.primeSet
   | forall_ x phi => {forall_ x phi}
   | exists_ x phi => {exists_ x phi}
+  | def_ X xs => {def_ X xs}
 
 
 def Formula.substPrime (σ : Formula → Formula) : Formula → Formula
@@ -57,6 +59,7 @@ def Formula.substPrime (σ : Formula → Formula) : Formula → Formula
   | iff_ phi psi => iff_ (phi.substPrime σ) (psi.substPrime σ)
   | forall_ x phi => σ (forall_ x phi)
   | exists_ x phi => σ (exists_ x phi)
+  | def_ X xs => σ (def_ X xs)
 
 
 def VarBoolAssignment := Formula → Bool
@@ -76,6 +79,7 @@ def Formula.evalPrime (V : VarBoolAssignment) : Formula → Prop
   | iff_ phi psi => Formula.evalPrime V phi ↔ Formula.evalPrime V psi
   | forall_ x phi => V (forall_ x phi)
   | exists_ x phi => V (exists_ x phi)
+  | def_ X xs => V (def_ X xs)
 
 
 instance
@@ -113,7 +117,7 @@ theorem evalPrime_prime
     unfold Formula.IsPrime at h1
 
     contradiction
-  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ =>
+  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     rfl
 
 
@@ -124,7 +128,7 @@ example
   F.evalPrime V ↔ F.evalPrime V' :=
   by
   induction F
-  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ =>
+  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     unfold Formula.primeSet at h1 
 
     unfold Formula.evalPrime
@@ -170,7 +174,7 @@ theorem evalPrime_substPrime_eq_evalPrime_evalPrime
     F.evalPrime fun H : Formula => (σ H).evalPrime V :=
   by
   induction F
-  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ =>
+  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     unfold Formula.substPrime
     simp only [Formula.evalPrime]
     simp
@@ -655,6 +659,11 @@ theorem mem_primeSet_isPrime
     simp at h1
     subst h1
     simp only [Formula.IsPrime]
+  case def_ =>
+    simp only [Formula.primeSet] at h1 
+    simp at h1
+    subst h1
+    simp only [Formula.IsPrime]
 
 
 theorem L_15_7
@@ -769,6 +778,17 @@ theorem L_15_7
     simp
     apply Exists.intro F
     tauto
+  case def_ X xs =>
+    let F := def_ X xs
+    unfold Formula.primeSet at h1 
+    simp at h1 
+
+    unfold evalPrimeFfToNot
+    unfold Formula.evalPrime
+    apply IsDeduct.assume_
+    simp
+    apply Exists.intro F
+    tauto
   case eq_ | false_ | and_ | or_ | iff_ | exists_ =>
     sorry
 
@@ -798,7 +818,7 @@ theorem evalPrimeFfToNot_of_function_updateIte_true
     Function.updateIte (evalPrimeFfToNot V) F' F F :=
   by
   induction F
-  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ =>
+  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     unfold Function.updateIte
     unfold evalPrimeFfToNot
     unfold Formula.evalPrime
@@ -816,7 +836,7 @@ theorem evalPrimeFfToNot_of_function_updateIte_false
     Function.updateIte (evalPrimeFfToNot V) F' F.not_ F :=
   by
   induction F
-  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ =>
+  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     unfold Function.updateIte
     unfold evalPrimeFfToNot
     unfold Formula.evalPrime
