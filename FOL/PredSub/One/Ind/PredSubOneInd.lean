@@ -119,11 +119,17 @@ inductive IsPredSub
     IsPredSub P zs H phi phi' →
     IsPredSub P zs H (exists_ x phi) (exists_ x phi')
 
+  | def_
+    (X : DefName)
+    (xs : List VarName) :
+    IsPredSub P zs H (def_ X xs) (def_ X xs)
+
 
 theorem isPredSub_theorem
   (D : Type)
   (I J : Interpretation D)
   (V : VarAssignment D)
+  (E : Env)
   (A : Formula)
   (P : PredName)
   (zs : List VarName)
@@ -132,16 +138,16 @@ theorem isPredSub_theorem
   (h1 : IsPredSub P zs H A B)
   (h2 : ∀ (Q : PredName) (ds : List D),
     Q = P ∧ ds.length = zs.length →
-      (Holds D I (Function.updateListIte V zs ds) H ↔ J.pred_var_ P ds))
+      (Holds D I (Function.updateListIte V zs ds) E H ↔ J.pred_var_ P ds))
   (h3_const : I.pred_const_ = J.pred_const_)
   (h3_var : ∀ (Q : PredName) (ds : List D),
     ¬ (Q = P ∧ ds.length = zs.length) →
       (I.pred_var_ Q ds ↔ J.pred_var_ Q ds)) :
-  Holds D I V B ↔ Holds D J V A :=
+  Holds D I V E B ↔ Holds D J V E A :=
   by
   induction h1 generalizing V
   case pred_const_ h1_X h1_ts =>
-    unfold Holds
+    simp only [Holds]
     simp only [h3_const]
   case pred_not_occurs_in h1_X h1_ts h1_1 =>
     simp at h1_1
@@ -159,9 +165,12 @@ theorem isPredSub_theorem
         simp at h1_1
         intro contra
         apply h1_1
-        exact Eq.trans a1_right contra
+        trans List.length ds
+        · simp only [eq_comm]
+          exact a1_right
+        · exact contra
   case pred_occurs_in h1_X h1_ts h1_1 h1_2 =>
-    obtain s1 := substitution_fun_theorem D I V (Function.updateListIte id zs h1_ts) H h1_2
+    obtain s1 := substitution_fun_theorem D I V E (Function.updateListIte id zs h1_ts) H h1_2
 
     obtain s2 := Function.updateListIte_comp id V zs h1_ts
 
@@ -176,13 +185,11 @@ theorem isPredSub_theorem
     simp
     exact h1_1
   case eq_ h1_x h1_y =>
-    unfold Holds
-    rfl
+    simp only [Holds]
   case true_ | false_ =>
-    unfold Holds
-    rfl
+    simp only [Holds]
   case not_ h1_phi h1_phi' _ h1_ih =>
-    unfold Holds
+    simp only [Holds]
     congr! 1
     exact h1_ih V h2
   case
@@ -190,22 +197,22 @@ theorem isPredSub_theorem
   | and_ h1_phi h1_psi h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | or_ h1_phi h1_psi h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | iff_ h1_phi h1_psi h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2 =>
-    unfold Holds
+    simp only [Holds]
     congr! 1
     · exact h1_ih_1 V h2
     · exact h1_ih_2 V h2
   case
     forall_ h1_x h1_phi h1_phi' h1_1 _ h1_ih
   | exists_ h1_x h1_phi h1_phi' h1_1 _ h1_ih =>
-    unfold Holds
+    simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     apply h1_ih
     intro Q ds a1
     specialize h2 Q ds a1
     have s1 :
-      Holds D I (Function.updateListIte (Function.updateIte V h1_x d) zs ds) H ↔
-        Holds D I (Function.updateListIte V zs ds) H :=
+      Holds D I (Function.updateListIte (Function.updateIte V h1_x d) zs ds) E H ↔
+        Holds D I (Function.updateListIte V zs ds) E H :=
       by
       apply Holds_coincide_Var
       intro v a1
@@ -215,6 +222,24 @@ theorem isPredSub_theorem
       contradiction
     simp only [h2] at s1
     exact s1
+  case def_ X xs =>
+    cases E
+    case nil =>
+      simp only [Holds]
+    case cons hd tl =>
+      simp only [Holds]
+      split_ifs
+      case _ c1 =>
+        apply Holds_coincide_PredVar
+        · exact h3_const
+        · simp only [predVarOccursIn_iff_mem_predVarSet]
+          simp only [hd.h2]
+          simp
+      case _ c1 =>
+        apply Holds_coincide_PredVar
+        · exact h3_const
+        · unfold predVarOccursIn
+          simp
 
 
 theorem isPredSub_valid
@@ -228,17 +253,17 @@ theorem isPredSub_valid
   unfold IsValid at h2
 
   unfold IsValid
-  intro D I V
+  intro D I V E
   let J : Interpretation D :=
     { nonempty := I.nonempty
       pred_const_ := I.pred_const_
       pred_var_ := fun (Q : PredName) (ds : List D) =>
         if (Q = P ∧ ds.length = zs.length)
-        then Holds D I (Function.updateListIte V zs ds) H
+        then Holds D I (Function.updateListIte V zs ds) E H
         else I.pred_var_ Q ds }
-  obtain s1 := isPredSub_theorem D I J V phi P zs H phi' h1
+  obtain s1 := isPredSub_theorem D I J V E phi P zs H phi' h1
   simp only [Interpretation.pred_var_] at s1
-  have s2 : Holds D I V phi' ↔ Holds D J V phi :=
+  have s2 : Holds D I V E phi' ↔ Holds D J V E phi :=
     by
     apply s1
     · intro Q ds a1
