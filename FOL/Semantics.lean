@@ -277,6 +277,87 @@ theorem Holds_coincide_PredVar
       unfold predVarOccursIn at a1
       contradiction
 
+
+lemma Holds_coincide_Env
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (E E' : Env)
+  (F : Formula)
+  (h1 : ∃ (E1 : Env), E' = E1 ++ E)
+  (h2 : F.all_def_in_env E)
+  (h3 : E'.nodup_) :
+  Holds D I V E' F ↔ Holds D I V E F :=
+  by
+  induction F generalizing V
+  any_goals
+    unfold all_def_in_env at h2
+
+    simp only [Holds]
+  case not_ phi phi_ih =>
+    congr! 1
+    exact phi_ih V h2
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    cases h2
+    case intro h2_left h2_right =>
+      congr! 1
+      · exact phi_ih V h2_left
+      · exact psi_ih V h2_right
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    first | apply forall_congr' | apply exists_congr
+    intro d
+    apply phi_ih
+    exact h2
+  case def_ X xs =>
+    apply Exists.elim h1
+    intro E1 h1_1
+    clear h1
+
+    unfold all_def_in_env at h2
+    apply Exists.elim h2
+    intro a h2_1
+    clear h2
+
+    unfold Env.nodup_ at h3
+
+    subst h1_1
+
+    induction E1
+    case nil =>
+      simp
+    case cons E1_hd E1_tl E1_ih =>
+      simp at h3
+
+      cases h2_1
+      case intro h2_1_left h2_1_right =>
+        cases h2_1_right
+        case intro h2_1_right_left h2_1_right_right =>
+          cases h3
+          case intro h3_left h3_right =>
+            simp
+            simp only [Holds]
+            split_ifs
+            case _ c1 =>
+              cases c1
+              case intro c1_left c1_right =>
+                exfalso
+                apply h3_left a
+                · right
+                  exact h2_1_left
+                · subst c1_left
+                  exact h2_1_right_left
+                · trans List.length xs
+                  · simp only [eq_comm]
+                    exact c1_right
+                  · exact h2_1_right_right
+            case _ c1 =>
+              exact E1_ih h3_right
+
+
 --#lint
 
 end FOL
