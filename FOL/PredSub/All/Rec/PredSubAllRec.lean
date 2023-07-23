@@ -40,6 +40,7 @@ def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formu
       (replacePredFun τ psi)
   | forall_ x phi => forall_ x (replacePredFun τ phi)
   | exists_ x phi => exists_ x (replacePredFun τ phi)
+  | def_ X xs => def_ X xs
 
 
 def admitsPredFunAux
@@ -68,7 +69,7 @@ def admitsPredFunAux
       admitsPredFunAux τ binders psi
   | binders, forall_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
   | binders, exists_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
-
+  | _, def_ _ _ => True
 
 instance
   (τ : PredName → ℕ → List VarName × Formula)
@@ -99,6 +100,7 @@ theorem predSub_aux
   (D : Type)
   (I : Interpretation D)
   (V V' : VarAssignment D)
+  (E : Env)
   (τ : PredName → ℕ → List VarName × Formula)
   (binders : Finset VarName)
   (F : Formula)
@@ -110,16 +112,15 @@ theorem predSub_aux
       I.pred_const_,
       fun (X : PredName) (ds : List D) =>
         if ds.length = (τ X ds.length).fst.length
-        then Holds D I (Function.updateListIte V' (τ X ds.length).fst ds) (τ X ds.length).snd
+        then Holds D I (Function.updateListIte V' (τ X ds.length).fst ds) E (τ X ds.length).snd
         else I.pred_var_ X ds
       ⟩ 
-      V F ↔ Holds D I V (replacePredFun τ F) :=
+      V E F ↔ Holds D I V E (replacePredFun τ F) :=
   by
   induction F generalizing binders V
   case pred_const_ X xs =>
     unfold replacePredFun
-    unfold Holds
-    simp
+    simp only [Holds]
   case pred_var_ X xs =>
     unfold admitsPredFunAux at h1
     simp at h1
@@ -129,15 +130,15 @@ theorem predSub_aux
       cases h1_right
       case intro h1_right_left h1_right_right =>
         obtain s1 :=
-        substitution_fun_theorem D I V (Function.updateListIte id (τ X xs.length).fst xs)
+        substitution_fun_theorem D I V E (Function.updateListIte id (τ X xs.length).fst xs)
           (τ X xs.length).snd h1_left
         simp only [Function.updateListIte_comp] at s1
         simp at s1
 
         have s2 :
-          Holds D I (Function.updateListIte V (τ X xs.length).fst (List.map V xs))
+          Holds D I (Function.updateListIte V (τ X xs.length).fst (List.map V xs)) E
             (τ X xs.length).snd ↔
-          Holds D I (Function.updateListIte V' (τ X xs.length).fst (List.map V xs))
+          Holds D I (Function.updateListIte V' (τ X xs.length).fst (List.map V xs)) E
             (τ X xs.length).snd :=
         by
           apply Holds_coincide_Var
@@ -163,17 +164,15 @@ theorem predSub_aux
         exact s1
   case eq_ x y =>
     unfold replacePredFun
-    unfold Holds
-    rfl
+    simp only [Holds]
   case true_ | false_ =>
     unfold replacePredFun
-    unfold Holds
-    rfl
+    simp only [Holds]
   case not_ phi phi_ih =>
     unfold admitsPredFunAux at h1
 
     unfold replacePredFun
-    unfold Holds
+    simp only [Holds]
     congr! 1
     exact phi_ih V binders h1 h2
   case
@@ -184,7 +183,7 @@ theorem predSub_aux
     unfold admitsPredFunAux at h1
 
     unfold replacePredFun
-    unfold Holds
+    simp only [Holds]
 
     cases h1
     case intro h1_left h1_right =>
@@ -195,7 +194,7 @@ theorem predSub_aux
     unfold admitsPredFunAux at h1
 
     unfold replacePredFun
-    unfold Holds
+    simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     apply phi_ih (Function.updateIte V x d) (binders ∪ {x}) h1
@@ -213,6 +212,7 @@ theorem predSub
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
+  (E : Env)
   (τ : PredName → ℕ → List VarName × Formula)
   (F : Formula)
   (h1 : admitsPredFun τ F) :
@@ -222,12 +222,12 @@ theorem predSub
       I.pred_const_,
       fun (X : PredName) (ds : List D) =>
         if ds.length = (τ X ds.length).fst.length
-        then Holds D I (Function.updateListIte V (τ X ds.length).fst ds) (τ X ds.length).snd
+        then Holds D I (Function.updateListIte V (τ X ds.length).fst ds) E (τ X ds.length).snd
         else I.pred_var_ X ds
       ⟩ 
-      V F ↔ Holds D I V (replacePredFun τ F) :=
+      V E F ↔ Holds D I V E (replacePredFun τ F) :=
   by
-  apply predSub_aux D I V V τ ∅ F
+  apply predSub_aux D I V V E τ ∅ F
   · unfold admitsPredFun at h1
     exact h1
   · intro X _
@@ -244,8 +244,8 @@ theorem predSub_valid
   unfold IsValid at h2
 
   unfold IsValid
-  intro D I V
-  obtain s1 := predSub D I V τ phi h1
+  intro D I V E
+  obtain s1 := predSub D I V E τ phi h1
   simp only [← s1]
   apply h2
 
