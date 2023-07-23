@@ -206,6 +206,26 @@ theorem predSub_aux
     case h.intro a1_left a1_right =>
       simp only [if_neg a1_right]
       exact h2 v a1_left
+  case def_ X xs =>
+    cases E
+    case nil =>
+      unfold replacePredFun
+      simp only [Holds]
+    case cons hd tl =>
+      unfold replacePredFun
+      simp only [Holds]
+      split_ifs
+      case _ c1 =>
+        apply Holds_coincide_PredVar
+        · simp
+        · simp only [predVarOccursIn_iff_mem_predVarSet]
+          simp only [hd.h2]
+          simp
+      case _ c1 =>
+        apply Holds_coincide_PredVar
+        · simp
+        · unfold predVarOccursIn
+          simp
 
 
 theorem predSub
