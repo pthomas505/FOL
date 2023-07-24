@@ -32,6 +32,21 @@ inductive IsPropAxiom : Formula → Prop
   (phi psi : Formula) :
   IsPropAxiom (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
 
+  | def_false_ :
+  IsPropAxiom (false_.iff_ (not_ true_))
+
+  | def_and_
+  (phi psi : Formula) :
+  IsPropAxiom ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+
+  | def_or_
+  (phi psi : Formula) :
+  IsPropAxiom ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+
+  | def_iff_
+  (phi psi : Formula) :
+  IsPropAxiom (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+
 
 /--
   IsPropDeduct Δ F := True if and only if there is a deduction of F from Δ in classical propositional logic.

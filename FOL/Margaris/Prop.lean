@@ -551,7 +551,42 @@ theorem eval_imp
   (P Q : Formula)
   (V : VarBoolAssignment) :
   Formula.evalPrime V (imp_ P Q) ↔
-    Formula.evalPrime V P → Formula.evalPrime V Q :=
+    (Formula.evalPrime V P → Formula.evalPrime V Q) :=
+  by
+  simp only [Formula.evalPrime]
+
+
+theorem eval_false
+  (V : VarBoolAssignment) :
+  Formula.evalPrime V false_ ↔
+    False :=
+  by
+  simp only [Formula.evalPrime]
+
+
+theorem eval_and
+  (P Q : Formula)
+  (V : VarBoolAssignment) :
+  Formula.evalPrime V (and_ P Q) ↔
+    (Formula.evalPrime V P ∧ Formula.evalPrime V Q) :=
+  by
+  simp only [Formula.evalPrime]
+
+
+theorem eval_or
+  (P Q : Formula)
+  (V : VarBoolAssignment) :
+  Formula.evalPrime V (or_ P Q) ↔
+    (Formula.evalPrime V P ∨ Formula.evalPrime V Q) :=
+  by
+  simp only [Formula.evalPrime]
+
+
+theorem eval_iff
+  (P Q : Formula)
+  (V : VarBoolAssignment) :
+  Formula.evalPrime V (iff_ P Q) ↔
+    (Formula.evalPrime V P ↔ Formula.evalPrime V Q) :=
   by
   simp only [Formula.evalPrime]
 
@@ -603,6 +638,38 @@ theorem is_tauto_mp
   tauto
 
 
+theorem is_tauto_def_false :
+  (false_.iff_ (not_ true_)).IsTautoPrime :=
+  by
+  unfold Formula.IsTautoPrime
+  simp only [eval_not, eval_iff]
+  tauto
+
+theorem is_tauto_def_and
+  (P Q : Formula) :
+  ((P.and_ Q).iff_ (not_ (P.imp_ (not_ Q)))).IsTautoPrime :=
+  by
+  unfold Formula.IsTautoPrime
+  simp only [eval_and, eval_not, eval_imp, eval_iff]
+  tauto
+
+theorem is_tauto_def_or
+  (P Q : Formula) :
+  ((P.or_ Q).iff_ ((not_ P).imp_ Q)).IsTautoPrime :=
+  by
+  unfold Formula.IsTautoPrime
+  simp only [eval_or, eval_not, eval_imp, eval_iff]
+  tauto
+
+theorem is_tauto_def_iff
+  (P Q : Formula) :
+  (not_ (((P.iff_ Q).imp_ (not_ ((P.imp_ Q).imp_ (not_ (Q.imp_ P))))).imp_ (not_ ((not_ ((P.imp_ Q).imp_ (not_ (Q.imp_ P)))).imp_ (P.iff_ Q))))).IsTautoPrime :=
+  by
+  unfold Formula.IsTautoPrime
+  simp only [eval_iff, eval_not, eval_imp]
+  tauto
+
+
 /-
   Proof of the soundness of classical propositional logic.
 -/
@@ -618,6 +685,10 @@ example
     case prop_1_ h1_1_phi h1_1_psi => exact is_tauto_prop_1 h1_1_phi h1_1_psi
     case prop_2_ h1_1_phi h1_1_psi h1_1_chi => exact is_tauto_prop_2 h1_1_phi h1_1_psi h1_1_chi
     case prop_3_ h1_1_phi h1_1_psi => exact is_tauto_prop_3 h1_1_phi h1_1_psi
+    case def_false_ => exact is_tauto_def_false
+    case def_and_ h1_1_phi h1_1_psi => exact is_tauto_def_and h1_1_phi h1_1_psi
+    case def_or_ h1_1_phi h1_1_psi => exact is_tauto_def_or h1_1_phi h1_1_psi
+    case def_iff_ h1_1_phi h1_1_psi => exact is_tauto_def_iff h1_1_phi h1_1_psi
   case assume_ h1_phi h1_1 =>
     simp at h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1 h1_ih_2 =>
