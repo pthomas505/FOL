@@ -57,24 +57,105 @@ def Function.updateListIte'
 -/
 
 
+lemma Function.left_id_left_inverse
+  {α β : Type}
+  (f : α → β)
+  (g : β → α)
+  (h1 : g ∘ f = id) :
+  Function.LeftInverse g f :=
+  by
+  unfold Function.LeftInverse
+  intro x
+  exact congrFun h1 x
+
+
+lemma Function.right_id_right_inverse
+  {α β : Type}
+  (f : α → β)
+  (g : β → α)
+  (h1 : f ∘ g = id) :
+  Function.RightInverse g f :=
+  by
+  unfold Function.RightInverse
+  exact Function.left_id_left_inverse g f h1
+
+
 -- Function.updateIte
 
-theorem Function.updateIte_comp
-  {α α' β : Type}
+
+theorem Function.updateIte_comp_left
+  {α β γ : Type}
   [DecidableEq α]
-  (f : α' → β)
-  (g : α → α')
-  (i : α)
-  (v : α') :
-  f ∘ Function.updateIte g i v =
-    Function.updateIte (f ∘ g) i (f v) :=
+  (f : β → γ)
+  (g : α → β)
+  (a : α)
+  (b : β) :
+  f ∘ (Function.updateIte g a b) =
+    Function.updateIte (f ∘ g) a (f b) :=
   by
   funext x
-  simp
   unfold Function.updateIte
+  simp
   split_ifs
   · rfl
-  · simp
+  · rfl
+
+
+theorem Function.updateIte_comp_right
+  {α β γ : Type}
+  [DecidableEq α]
+  [DecidableEq β]
+  (f : α → β)
+  (finv : β → α)
+  (g : β → γ)
+  (a : β)
+  (b : γ)
+  (h1 : finv ∘ f = id)
+  (h2 : f ∘ finv = id) :
+  (Function.updateIte g a b) ∘ f =
+    Function.updateIte (g ∘ f) (finv a) b :=
+  by
+  funext x
+  unfold Function.updateIte
+  simp
+  congr!
+  constructor
+  · intro a1
+    simp only [← a1]
+    obtain s1 := Function.left_id_left_inverse f finv h1
+    unfold Function.LeftInverse at s1
+    simp only [s1 x]
+  · intro a1
+    simp only [a1]
+    obtain s1 := Function.right_id_right_inverse f finv h2
+    unfold Function.RightInverse at s1
+    unfold Function.LeftInverse at s1
+    exact s1 a
+
+
+theorem Function.updateIte_comp_right_injective
+  {α β γ : Type}
+  [DecidableEq α]
+  [DecidableEq β]
+  (f : α → β)
+  (g : β → γ)
+  (a : α)
+  (b : γ)
+  (h1 : Function.Injective f) :
+  (Function.updateIte g (f a) b) ∘ f =
+    Function.updateIte (g ∘ f) a b :=
+  by
+  unfold Function.Injective at h1
+
+  funext x
+  unfold Function.updateIte
+  simp
+  congr!
+  constructor
+  · apply h1
+  · intro a1
+    subst a1
+    rfl
 
 
 theorem Function.updateIte_comm
@@ -256,7 +337,7 @@ theorem Function.updateListIte_comp
       simp
       unfold Function.updateListIte
       simp only [← xs_ih]
-      apply Function.updateIte_comp
+      apply Function.updateIte_comp_left
 
 
 theorem Function.updateListIte_mem'
