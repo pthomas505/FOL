@@ -924,57 +924,117 @@ def Formula.exists_ (x : VarName) (phi : Formula) : Formula :=
   Δ is a list of hypotheses.
 -/
 inductive IsProof (E : Env) : List (VarName × MetaVarName) → List Formula → Formula → Prop
-  |
-  hyp (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi : Formula) :
-    phi.IsMetaVarOrAllDefInEnv E → phi ∈ Δ → is_proof Γ Δ phi
-  |
-  mp (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi psi : Formula) :
-    is_proof Γ Δ phi → is_proof Γ Δ (phi.imp_ psi) → is_proof Γ Δ psi
-  |
-  prop_1 (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi psi : Formula) :
-    phi.IsMetaVarOrAllDefInEnv E → psi.IsMetaVarOrAllDefInEnv E → is_proof Γ Δ (phi.imp_ (psi.imp_ phi))
-  |
-  prop_2 (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi psi χ : Formula) :
-    phi.IsMetaVarOrAllDefInEnv E →
-      psi.IsMetaVarOrAllDefInEnv E →
-        χ.IsMetaVarOrAllDefInEnv E →
-          is_proof Γ Δ ((phi.imp_ (psi.imp_ χ)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ χ)))
-  |
-  prop_3 (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi psi : Formula) :
-    phi.IsMetaVarOrAllDefInEnv E →
-      psi.IsMetaVarOrAllDefInEnv E → is_proof Γ Δ (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
-  |
-  gen (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi : Formula) (x : VarName) :
-    is_proof Γ Δ phi → is_proof Γ Δ (forall_ x phi)
-  |
-  pred_1 (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi psi : Formula) (x : VarName) :
-    phi.IsMetaVarOrAllDefInEnv E →
-      psi.IsMetaVarOrAllDefInEnv E →
-        is_proof Γ Δ ((forall_ x (phi.imp_ psi)).imp_ ((forall_ x phi).imp_ (forall_ x psi)))
-  |
-  pred_2 (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi : Formula) (x : VarName) :
-    phi.IsMetaVarOrAllDefInEnv E → notFree Γ x phi → is_proof Γ Δ (phi.imp_ (forall_ x phi))
-  |
-  eq_1 (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (x y : VarName) :
-    y ≠ x → is_proof Γ Δ (exists_ x (eq_ x y))
-  |
-  eq_2 (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (x y z : VarName) :
-    is_proof Γ Δ ((eq_ x y).imp_ ((eq_ x z).imp_ (eq_ y z)))/-
-| eq_3 (Γ : list (var_name × meta_var_name)) (Δ : list Formula)
-  (n : ℕ) (name : pred_name) (xs ys : fin n → var_name) :
-  is_proof Γ Δ (eq_sub_pred n name xs ys)
--/
 
-  |
-  thm (Γ Γ' : List (VarName × MetaVarName)) (Δ Δ' : List Formula) (phi : Formula) (σ : Instantiation)
+  | hyp
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (phi : Formula) :
+    phi.IsMetaVarOrAllDefInEnv E →
+    phi ∈ Δ →
+    IsProof E Γ Δ phi
+
+  | mp
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (phi psi : Formula) :
+    IsProof E Γ Δ phi →
+    IsProof E Γ Δ (phi.imp_ psi) →
+    IsProof E Γ Δ psi
+
+  | prop_1
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (phi psi : Formula) :
+    phi.IsMetaVarOrAllDefInEnv E →
+    psi.IsMetaVarOrAllDefInEnv E →
+    IsProof E Γ Δ (phi.imp_ (psi.imp_ phi))
+
+  | prop_2
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (phi psi chi : Formula) :
+    phi.IsMetaVarOrAllDefInEnv E →
+    psi.IsMetaVarOrAllDefInEnv E →
+    chi.IsMetaVarOrAllDefInEnv E →
+    IsProof E Γ Δ ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi)))
+
+  | prop_3
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (phi psi : Formula) :
+    phi.IsMetaVarOrAllDefInEnv E →
+    psi.IsMetaVarOrAllDefInEnv E →
+    IsProof E Γ Δ (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
+
+  | gen
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (phi : Formula)
+    (x : VarName) :
+    IsProof E Γ Δ phi →
+    IsProof E Γ Δ (forall_ x phi)
+
+  | pred_1
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (phi psi : Formula)
+    (x : VarName) :
+    phi.IsMetaVarOrAllDefInEnv E →
+    psi.IsMetaVarOrAllDefInEnv E →
+    IsProof E Γ Δ ((forall_ x (phi.imp_ psi)).imp_ ((forall_ x phi).imp_ (forall_ x psi)))
+
+  | pred_2
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (phi : Formula)
+    (x : VarName) :
+    phi.IsMetaVarOrAllDefInEnv E →
+    notFree Γ x phi →
+    IsProof E Γ Δ (phi.imp_ (forall_ x phi))
+
+  | eq_1
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (x y : VarName) :
+    ¬ y = x →
+    IsProof E Γ Δ (exists_ x (eq_ x y))
+
+  | eq_2
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (x y z : VarName) :
+    IsProof E Γ Δ ((eq_ x y).imp_ ((eq_ x z).imp_ (eq_ y z)))
+
+  | eq_3
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (n : ℕ)
+    (name : PredName)
+    (xs ys : Fin n → VarName) :
+    IsProof E Γ Δ (eqSubPred name n xs ys)
+
+  | thm
+    (Γ Γ' : List (VarName × MetaVarName))
+    (Δ Δ' : List Formula)
+    (phi : Formula)
+    (σ : Instantiation)
     (τ : MetaInstantiation) :
-    (∀ X : MetaVarName, X ∈ phi.metaVarSet → (τ X).IsMetaVarOrAllDefInEnv E) →
-      (∀ (x : VarName) (X : MetaVarName), (x, X) ∈ Γ → notFree Γ' (σ.1 x) (τ X)) →
-        (∀ psi : Formula, psi ∈ Δ → is_proof Γ' Δ' (psi.subst σ τ)) →
-          is_proof Γ Δ phi → is_proof Γ' Δ' (phi.subst σ τ)
-  |
-  conv (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi phi' : Formula) :
-    phi'.IsMetaVarOrAllDefInEnv E → is_proof Γ Δ phi → IsConv E phi phi' → is_proof Γ Δ phi'
+    (∀ X : MetaVarName, X ∈ phi.metaVarSet →
+    (τ X).IsMetaVarOrAllDefInEnv E) →
+    (∀ (x : VarName) (X : MetaVarName), (x, X) ∈ Γ → notFree Γ' (σ.1 x) (τ X)) →
+    (∀ psi : Formula, psi ∈ Δ → IsProof E Γ' Δ' (psi.sub σ τ)) →
+    IsProof E Γ Δ phi →
+    IsProof E Γ' Δ' (phi.sub σ τ)
+
+  | conv
+    (Γ : List (VarName × MetaVarName))
+    (Δ : List Formula)
+    (phi phi' : Formula) :
+    phi'.IsMetaVarOrAllDefInEnv E →
+    IsProof E Γ Δ phi →
+    IsConv E phi phi' →
+    IsProof E Γ Δ phi'
+
 
 -- Semantics
 def PredInterpretation (D : Type) : Type :=
@@ -1793,7 +1853,7 @@ theorem lem_3 (E : Env) (Γ : List (VarName × MetaVarName)) (Δ : List Formula)
       first
       | constructor
       | assumption
-  case prop_2 h1_Γ h1_Δ h1_phi h1_psi h1_χ h1_1 h1_2
+  case prop_2 h1_Γ h1_Δ h1_phi h1_psi h1_chi h1_1 h1_2
     h1_3 =>
     unfold Formula.is_meta_var_or_all_def_in_env at *
     repeat'
@@ -1966,7 +2026,7 @@ theorem holds_isProof {D : Type} (P : PredInterpretation D) (M : MetaValuation D
     simp only [holds_imp]
     intro V a1 a2
     exact a1
-  case prop_2 h1_Γ h1_Δ h1_phi h1_psi h1_χ h1_1 h1_2 h1_3 M nf
+  case prop_2 h1_Γ h1_Δ h1_phi h1_psi h1_chi h1_1 h1_2 h1_3 M nf
     hyp =>
     simp only [holds_imp]
     intro V a1 a2 a3
