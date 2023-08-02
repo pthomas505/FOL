@@ -1113,56 +1113,133 @@ def Holds
 
 
 /-
-These lemmas demonstrate that the pair of mutually recursive definitions
-is equivalent to the version that Lean is unable to determine is decreasing.
+These lemmas demonstrate that the pair of mutually recursive definitions is equivalent to the version that Lean is unable to determine is decreasing.
 -/
+
 @[simp]
-theorem holds_meta_var {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (X : MetaVarName) (V : Valuation D) : Holds D P M E (meta_var_ X) V ↔ M X V := by
+theorem holds_meta_var
+  {D : Type}
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (X : MetaVarName)
+  (V : Valuation D) :
+  Holds D P M E (meta_var_ X) V ↔ M X V :=
+  by
   cases E <;> rfl
 
-@[simp]
-theorem holds_false {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (V : Valuation D) : Holds D P M E false_ V ↔ False := by cases E <;> rfl
 
 @[simp]
-theorem holds_pred {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (name : PredName) (args : List VarName) (V : Valuation D) :
-    Holds D P M E (pred_ Name args) V ↔ P Name (List.map V args) := by cases E <;> rfl
-
-@[simp]
-theorem holds_not {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (phi : Formula) (V : Valuation D) : Holds D P M E (not_ phi) V ↔ ¬Holds D P M E phi V := by
+theorem holds_pred
+  {D : Type}
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (name : PredName)
+  (args : List VarName)
+  (V : Valuation D) :
+  Holds D P M E (pred_ name args) V ↔ P name (List.map V args) :=
+  by
   cases E <;> rfl
 
-@[simp]
-theorem holds_imp {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (phi psi : Formula) (V : Valuation D) :
-    Holds D P M E (imp_ phi psi) V ↔ Holds D P M E phi V → Holds D P M E psi V := by cases E <;> rfl
 
 @[simp]
-theorem holds_eq {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (x y : VarName) (V : Valuation D) : Holds D P M E (eq_ x y) V ↔ V x = V y := by cases E <;> rfl
-
-@[simp]
-theorem holds_forall {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (phi : Formula) (x : VarName) (V : Valuation D) :
-    Holds D P M E (forall_ x phi) V ↔ ∀ a : D, Holds D P M E phi (Function.update V x a) := by
+theorem holds_eq
+  {D : Type}
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (x y : VarName)
+  (V : Valuation D) :
+  Holds D P M E (eq_ x y) V ↔ V x = V y :=
+  by
   cases E <;> rfl
 
-@[simp]
-theorem holds_nil_def {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (name : DefName)
-    (args : List VarName) (V : Valuation D) : Holds D P M [] (def_ Name args) V ↔ False := by rfl
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 @[simp]
-theorem holds_not_nil_def {D : Type} (P : PredInterpretation D) (M : MetaValuation D)
-    (d : Definition_) (E : Env) (name : DefName) (args : List VarName) (V : Valuation D) :
-    Holds D P M (d::E) (def_ Name args) V ↔
-      if Name = d.Name ∧ args.length = d.args.length then
-        Holds D P M E d.q (Function.updateList V (List.zip d.args (List.map V args)))
-      else Holds D P M E (def_ Name args) V :=
-  by unfold holds; unfold holds'; simp only [Option.elim']
+theorem holds_true
+  {D : Type}
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (V : Valuation D) :
+  Holds D P M E true_ V ↔ True :=
+  by
+  cases E <;> rfl
+
+
+@[simp]
+theorem holds_not
+  {D : Type}
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (phi : Formula)
+  (V : Valuation D) :
+  Holds D P M E (not_ phi) V ↔ ¬ Holds D P M E phi V :=
+  by
+  cases E <;> rfl
+
+
+@[simp]
+theorem holds_imp
+  {D : Type}
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (phi psi : Formula)
+  (V : Valuation D) :
+  Holds D P M E (imp_ phi psi) V ↔ Holds D P M E phi V → Holds D P M E psi V :=
+  by
+  cases E <;> rfl
+
+
+@[simp]
+theorem holds_forall
+  {D : Type}
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (phi : Formula)
+  (x : VarName)
+  (V : Valuation D) :
+  Holds D P M E (forall_ x phi) V ↔ ∀ a : D, Holds D P M E phi (Function.updateIte V x a) :=
+  by
+  cases E <;> rfl
+
+
+@[simp]
+theorem holds_nil_def
+  {D : Type}
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (name : DefName)
+  (args : List VarName)
+  (V : Valuation D) :
+  Holds D P M [] (def_ Name args) V ↔ False :=
+  by
+  rfl
+
+
+@[simp]
+theorem holds_not_nil_def
+  {D : Type}
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (d : Definition_)
+  (E : Env)
+  (name : DefName)
+  (args : List VarName)
+  (V : Valuation D) :
+  Holds D P M (d::E) (def_ name args) V ↔
+    if name = d.name ∧ args.length = d.args.length
+    then Holds D P M E d.q (Function.updateListIte V d.args (List.map V args))
+    else Holds D P M E (def_ name args) V :=
+  by
+  simp only [Holds]
+  unfold Holds'
+  simp only [Option.elim']
+
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
