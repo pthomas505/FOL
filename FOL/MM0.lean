@@ -896,27 +896,33 @@ inductive IsConv (E : Env) : Formula → Formula → Prop
     IsConv E (def_ d.name (d.args.map σ.1)) (d.q.sub σ meta_var_)
 
 
-def true_ : Formula :=
-  not_ false_
+def Formula.false_ : Formula :=
+  not_ true_
 
-def and_ (phi psi : Formula) : Formula :=
+def Formula.and_ (phi psi : Formula) : Formula :=
   not_ (phi.imp_ psi.not_)
 
-open Matrix
 
-def and : ∀ (n : ℕ) (phi : Fin n → Formula), Formula
-  | 0, phi => true_
-  | n + 1, phi => and_ (vecHead phi) (And n (vecTail phi))
+def Formula.And_ (l : List Formula) : Formula :=
+  List.foldr Formula.and_ true_ l
 
-def eqSubPred (n : ℕ) (name : PredName) (xs ys : Fin n → VarName) : Formula :=
-  (and n fun i : Fin n => eq_ (xs i) (ys i)).imp_
-    ((pred_ Name (List.ofFn xs)).imp_ (pred_ Name (List.ofFn ys)))
+def eqSubPred
+  (name : PredName)
+  (n : ℕ)
+  (xs ys : Fin n → VarName) :
+  Formula :=
+  (And_ (List.ofFn fun i : Fin n => eq_ (xs i) (ys i))).imp_
+    ((pred_ name (List.ofFn xs)).imp_ (pred_ name (List.ofFn ys)))
 
-def exists_ (x : VarName) (phi : Formula) : Formula :=
+def Formula.exists_ (x : VarName) (phi : Formula) : Formula :=
   not_ (forall_ x (not_ phi))
 
--- (v, X) ∈ Γ if and only if v is not free in meta_var_ X.
--- Δ is a list of hypotheses.
+
+/-
+  (v, X) ∈ Γ if and only if v is not free in X.
+
+  Δ is a list of hypotheses.
+-/
 inductive IsProof (E : Env) : List (VarName × MetaVarName) → List Formula → Formula → Prop
   |
   hyp (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi : Formula) :
