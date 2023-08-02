@@ -1,6 +1,8 @@
 import Mathlib.Logic.Function.Basic
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Util.CompileInductive
+
+import FOL.FunctionUpdateIte
 import FOL.Tactics
 
 
@@ -1037,6 +1039,7 @@ inductive IsProof (E : Env) : List (VarName × MetaVarName) → List Formula →
 
 
 -- Semantics
+
 def PredInterpretation (D : Type) : Type :=
   PredName → List D → Prop
 
@@ -1065,32 +1068,49 @@ def holds
     then holds E d.q (function.update_list V (list.zip d.args (list.map V args)))
     else holds E (def_ name args) V
 -/
+
 /-
 Lean is unable to determine that the above definition of holds is decreasing,
 so it needs to be broken into this pair of mutually recursive definitions.
 -/
-def Holds' (D : Type) (P : PredInterpretation D) (M : MetaValuation D)
-    (holds : Formula → Valuation D → Prop) (d : Option Definition_) : Formula → Valuation D → Prop
+def Holds'
+  (D : Type)
+  (P : PredInterpretation D)
+  (M : MetaValuation D)
+  (Holds : Formula → Valuation D → Prop)
+  (d : Option Definition_) :
+  Formula → Valuation D → Prop
+
   | meta_var_ X, V => M X V
-  | false_, _ => False
-  | pred_ Name args, V => P Name (List.map V args)
-  | not_ phi, V => ¬holds' phi V
-  | imp_ phi psi, V => holds' phi V → holds' psi V
+
+  | pred_ X xs, V => P X (List.map V xs)
+
   | eq_ x y, V => V x = V y
-  | forall_ x phi, V => ∀ a : D, holds' phi (Function.update V x a)
-  | def_ Name args, V =>
+
+  | true_, _ => True
+
+  | not_ phi, V => ¬ Holds' D P M Holds d phi V
+
+  | imp_ phi psi, V => Holds' D P M Holds d phi V → Holds' D P M Holds d psi V
+
+  | forall_ x phi, V => ∀ a : D, Holds' D P M Holds d phi (Function.updateIte V x a)
+
+  | def_ X xs, V =>
     Option.elim' False
       (fun d : Definition_ =>
-        if Name = d.Name ∧ args.length = d.args.length then
-          holds d.q (Function.updateList V (List.zip d.args (List.map V args)))
-        else holds (def_ Name args) V)
+        if X = d.name ∧ xs.length = d.args.length
+        then Holds d.q (Function.updateListIte V d.args (List.map V xs))
+        else Holds (def_ X xs) V)
       d
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-def Holds (D : Type) (P : PredInterpretation D) (M : MetaValuation D) :
-    Env → Formula → Valuation D → Prop
+def Holds
+  (D : Type)
+  (P : PredInterpretation D)
+  (M : MetaValuation D) :
+  Env → Formula → Valuation D → Prop
   | [] => Holds' D P M (fun _ _ => False) Option.none
-  | d::E => Holds' D P M (holds E) (Option.some d)
+  | d :: E => Holds' D P M (Holds D P M E) (Option.some d)
+
 
 /-
 These lemmas demonstrate that the pair of mutually recursive definitions
