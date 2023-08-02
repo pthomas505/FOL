@@ -825,24 +825,36 @@ theorem IsMetaVarOrAllDefInEnv_ext
           · exact c1
           · exact h2_1_right
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-theorem def_in_env_imp_isMetaVarOrAllDefInEnv (E : Env) (d : Definition_) (h1 : E.WF) (h2 : d ∈ E) :
-    d.q.IsMetaVarOrAllDefInEnv E := by
+
+theorem def_in_env_imp_isMetaVarOrAllDefInEnv
+  (E : Env)
+  (d : Definition_)
+  (h1 : E.WellFormed)
+  (h2 : d ∈ E) :
+  d.q.IsMetaVarOrAllDefInEnv E :=
+  by
   induction E
   case nil =>
-    simp only [List.not_mem_nil] at h2 
-    contradiction
+    simp at h2
   case cons hd tl ih =>
-    unfold env.well_formed at h1 
+    unfold Env.WellFormed at h1
+
+    simp at h2
+
     cases h1
-    cases h1_right
-    apply is_meta_var_or_all_def_in_env_ext tl (hd::tl)
-    · apply Exists.intro [hd]
-      simp only [List.singleton_append]
-    · cases h2
-      · rw [h2]
-        exact h1_right_left
-      · exact ih h1_right_right h2
+    case intro h1_left h1_right =>
+      cases h1_right
+      case intro h1_right_left h1_right_right =>
+        apply IsMetaVarOrAllDefInEnv_ext tl (hd :: tl)
+        · apply Exists.intro [hd]
+          simp
+        · cases h2
+          case _ c1 =>
+            subst c1
+            exact h1_right_left
+          case _ c1 =>
+            exact ih h1_right_right c1
+
 
 inductive IsConv (E : Env) : Formula → Formula → Prop
   | conv_refl (phi : Formula) : is_conv phi phi
