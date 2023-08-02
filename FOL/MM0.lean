@@ -857,15 +857,44 @@ theorem def_in_env_imp_isMetaVarOrAllDefInEnv
 
 
 inductive IsConv (E : Env) : Formula → Formula → Prop
-  | conv_refl (phi : Formula) : is_conv phi phi
-  | conv_symm (phi phi' : Formula) : is_conv phi phi' → is_conv phi' phi
-  | conv_trans (phi phi' phi'' : Formula) : is_conv phi phi' → is_conv phi' phi'' → is_conv phi phi''
-  | conv_not (phi phi' : Formula) : is_conv phi phi' → is_conv (not_ phi) (not_ phi')
-  | conv_imp (phi phi' psi psi' : Formula) : is_conv phi phi' → is_conv psi psi' → is_conv (imp_ phi psi) (imp_ phi' psi')
-  | conv_forall (x : VarName) (phi phi' : Formula) : is_conv phi phi' → is_conv (forall_ x phi) (forall_ x phi')
-  |
-  conv_unfold (d : Definition_) (σ : Instantiation) :
-    d ∈ E → is_conv (def_ d.Name (d.args.map σ.1)) (d.q.subst σ meta_var_)
+  | conv_refl
+    (phi : Formula) :
+    IsConv E phi phi
+
+  | conv_symm
+    (phi phi' : Formula) :
+    IsConv E phi phi' →
+    IsConv E phi' phi
+
+  | conv_trans
+    (phi phi' phi'' : Formula) :
+    IsConv E phi phi' →
+    IsConv E phi' phi'' →
+    IsConv E phi phi''
+
+  | conv_not
+    (phi phi' : Formula) :
+    IsConv E phi phi' →
+    IsConv E (not_ phi) (not_ phi')
+
+  | conv_imp
+    (phi phi' psi psi' : Formula) :
+    IsConv E phi phi' →
+    IsConv E psi psi' →
+    IsConv E (imp_ phi psi) (imp_ phi' psi')
+
+  | conv_forall
+    (x : VarName)
+    (phi phi' : Formula) :
+    IsConv E phi phi' →
+    IsConv E (forall_ x phi) (forall_ x phi')
+
+  | conv_unfold
+    (d : Definition_)
+    (σ : Instantiation) :
+    d ∈ E →
+    IsConv E (def_ d.name (d.args.map σ.1)) (d.q.sub σ meta_var_)
+
 
 def true_ : Formula :=
   not_ false_
