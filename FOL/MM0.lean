@@ -1096,63 +1096,61 @@ termination_by _ E phi => (E.length, phi)
 
 
 theorem Holds_coincide_Var
-  {D : Type}
-  (P : PredInterpretation D)
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : Valuation D)
   (M : MetaValuation D)
   (E : Env)
-  (V1 V2 : Valuation D)
-  (vs : List VarName)
   (F : Formula)
-  (h1 : F.NoMetaVarAndAllFreeInList vs)
-  (h2 : ∀ v : VarName, v ∈ vs → V1 v = V2 v) :
-  Holds D P M E F V1 ↔ Holds D P M E F V2 :=
+  (vs : List VarName)
+  (h1 : NoMetaVarAndAllFreeInList vs F)
+  (h2 : ∀ v : VarName, v ∈ vs → V v = V' v) :
+  Holds D I V M E F ↔ Holds D I V' M E F :=
   by
-  induction E generalizing vs F V1 V2
+  induction E generalizing F vs V V'
   all_goals
-    induction F generalizing vs V1 V2
+    induction F generalizing vs V V'
     case meta_var_ X =>
-      unfold Formula.NoMetaVarAndAllFreeInList at h1
+      unfold NoMetaVarAndAllFreeInList at h1
 
       contradiction
     case pred_ X xs =>
-      unfold Formula.NoMetaVarAndAllFreeInList at h1
+      unfold NoMetaVarAndAllFreeInList at h1
 
-      simp only [holds_pred]
+      simp only [Holds]
       congr! 1
       simp only [List.map_eq_map_iff]
-      intro x a1
-      apply h2
-      exact h1 a1
+      tauto
     case eq_ x y =>
-      unfold Formula.NoMetaVarAndAllFreeInList at h1
+      unfold NoMetaVarAndAllFreeInList at h1
 
       cases h1
       case intro h1_left h1_right =>
-        simp only [holds_eq]
+        simp only [Holds]
         congr! 1
         · exact h2 x h1_left
         · exact h2 y h1_right
     case true_ =>
-      simp only [holds_true]
+      simp only [Holds]
     case not_ phi phi_ih =>
-      unfold Formula.NoMetaVarAndAllFreeInList at h1
+      unfold NoMetaVarAndAllFreeInList at h1
 
-      simp only [holds_not]
+      simp only [Holds]
       congr! 1
-      exact phi_ih V1 V2 vs h1 h2
+      exact phi_ih V V' vs h1 h2
     case imp_ phi psi phi_ih psi_ih =>
-      unfold Formula.NoMetaVarAndAllFreeInList at h1
+      unfold NoMetaVarAndAllFreeInList at h1
 
-      simp only [holds_imp]
+      simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
         congr! 1
-        · exact phi_ih V1 V2 vs h1_left h2
-        · exact psi_ih V1 V2 vs h1_right h2
+        · exact phi_ih V V' vs h1_left h2
+        · exact psi_ih V V' vs h1_right h2
     case forall_ x phi phi_ih =>
-      unfold Formula.NoMetaVarAndAllFreeInList at h1
+      unfold NoMetaVarAndAllFreeInList at h1
 
-      simp only [holds_forall]
+      simp only [Holds]
       apply forall_congr'
       intro a
       apply phi_ih
@@ -1167,24 +1165,22 @@ theorem Holds_coincide_Var
           tauto
 
   case nil.def_ X xs =>
-    unfold Formula.NoMetaVarAndAllFreeInList at h1
-
-    simp only [holds_nil_def]
+    simp only [Holds]
 
   case cons.def_ E_hd E_tl E_ih X xs =>
-    unfold Formula.NoMetaVarAndAllFreeInList at h1
+    unfold NoMetaVarAndAllFreeInList at h1
 
-    simp only [holds_not_nil_def]
+    simp only [Holds]
     split_ifs
     case _ c1 =>
-      apply E_ih (Function.updateListIte V1 E_hd.args (List.map V1 xs)) (Function.updateListIte V2 E_hd.args (List.map V2 xs)) E_hd.args E_hd.q E_hd.nf
+      apply E_ih (Function.updateListIte V E_hd.args (List.map V xs)) (Function.updateListIte V' E_hd.args (List.map V' xs)) E_hd.F E_hd.args E_hd.nf
       intro v a1
       apply Function.updateListIte_fun_coincide_mem_eq_len
       · tauto
       · exact a1
       · tauto
     case _ c1 =>
-      apply E_ih V1 V2 vs
+      apply E_ih V V' (def_ X xs) vs
       · unfold NoMetaVarAndAllFreeInList
         exact h1
       · exact h2
