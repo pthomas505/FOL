@@ -1255,13 +1255,20 @@ theorem Holds_coincide_MetaVar
       simp
 
 
-theorem holds_metaValuation_ext_no_meta_var {D : Type} (P : PredInterpretation D)
-    (M1 M2 : MetaValuation D) (E : Env) (V : Valuation D) (phi : Formula) (h1 : phi.metaVarSet = ∅) :
-    Holds D P M1 E phi V ↔ Holds D P M2 E phi V :=
+theorem Holds_coincide_MetaVar_no_MetaVar
+  (D : Type)
+  (I : Interpretation D)
+  (V : Valuation D)
+  (M M' : MetaValuation D)
+  (E : Env)
+  (F : Formula)
+  (h1 : F.metaVarSet = ∅) :
+  Holds D I V M E F ↔ Holds D I V M' E F :=
   by
-  apply holds_meta_valuation_ext
-  rw [h1]
-  simp only [Finset.not_mem_empty, IsEmpty.forall_iff, forall_forall_const, imp_true_iff]
+  apply Holds_coincide_MetaVar
+  simp only [h1]
+  simp
+
 
 theorem holds_def_imp_ex_def {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
     (V : Valuation D) (name : VarName) (args : List VarName)
