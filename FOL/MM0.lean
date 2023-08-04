@@ -1270,31 +1270,41 @@ theorem Holds_coincide_MetaVar_no_MetaVar
   simp
 
 
-theorem holds_def_imp_ex_def {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (V : Valuation D) (name : VarName) (args : List VarName)
-    (h1 : Holds D P M E (def_ Name args) V) :
-    ∃ d : Definition_, d ∈ E ∧ Name = d.Name ∧ args.length = d.args.length :=
+theorem Holds_Def_Imp_Exists_Def
+  (D : Type)
+  (I : Interpretation D)
+  (V : Valuation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (name : DefName)
+  (args : List VarName)
+  (h1 : Holds D I V M E (def_ name args)) :
+  ∃ d : Definition_, d ∈ E ∧ name = d.name ∧ args.length = d.args.length :=
   by
   induction E
   case nil =>
-    simp only [holds_nil_def] at h1 
-    contradiction
+    simp only [Holds] at h1
   case cons E_hd E_tl E_ih =>
-    simp only [holds_not_nil_def] at h1 
-    split_ifs at h1 
-    · apply Exists.intro E_hd
-      simp only [List.mem_cons, eq_self_iff_true, true_or_iff, true_and_iff]
-      exact h
-    · specialize E_ih h1
+    simp only [Holds] at h1
+
+    split_ifs at h1
+    case _ c1 =>
+      apply Exists.intro E_hd
+      simp
+      exact c1
+    case _ c1 =>
+      specialize E_ih h1
       apply Exists.elim E_ih
       intro d E_ih_1
       cases E_ih_1
-      apply Exists.intro d
-      constructor
-      · simp only [List.mem_cons]
-        apply Or.intro_right
-        exact E_ih_1_left
-      · exact E_ih_1_right
+      case intro E_ih_1_left E_ih_1_right =>
+        apply Exists.intro d
+        constructor
+        · simp
+          right
+          exact E_ih_1_left
+        · exact E_ih_1_right
+
 
 example {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E E' : Env) (name : VarName)
     (args : List VarName) (V : Valuation D) (h1 : ∃ E1 : Env, E' = E1 ++ E) (h2 : E'.Nodup_)
