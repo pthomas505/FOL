@@ -1186,103 +1186,74 @@ theorem Holds_coincide_Var
       · exact h2
 
 
-theorem holds_metaValuation_ext {D : Type} (P : PredInterpretation D) (M1 M2 : MetaValuation D)
-    (E : Env) (V : Valuation D) (phi : Formula)
-    (h1 : ∀ (V' : Valuation D) (X : MetaVarName), X ∈ phi.metaVarSet → (M1 X V' ↔ M2 X V')) :
-    Holds D P M1 E phi V ↔ Holds D P M2 E phi V :=
+theorem Holds_coincide_MetaVar
+  (D : Type)
+  (I : Interpretation D)
+  (V : Valuation D)
+  (M M' : MetaValuation D)
+  (E : Env)
+  (F : Formula)
+  (h1 : ∀ (V' : Valuation D) (X : MetaVarName), X ∈ F.metaVarSet → (M X V' ↔ M' X V')) :
+    Holds D I V M E F ↔ Holds D I V M' E F :=
   by
-  induction E generalizing phi M1 M2 V
-  case nil phi M1 M2 V h1 =>
-    induction phi generalizing M1 M2 V
-    case meta_var_ X M1 M2 V h1 =>
-      unfold Formula.metaVarSet at h1 
-      simp only [Finset.mem_singleton] at h1 
-      simp only [holds_meta_var]
-      apply h1 V X
-      rfl
-    case false_ M1 M2 V h1 => simp only [holds_false]
-    case pred_ name args M1 M2 V h1 => simp only [holds_pred]
-    case not_ phi phi_ih M1 M2 V h1 =>
-      unfold Formula.metaVarSet at h1 
-      simp only [holds_not]
-      apply not_congr
-      exact phi_ih M1 M2 V h1
-    case imp_ phi psi phi_ih psi_ih M1 M2 V
-      h1 =>
-      unfold Formula.metaVarSet at h1 
-      simp only [Finset.mem_union] at h1 
-      simp only [holds_imp]
-      apply imp_congr
+  induction E generalizing F V M M'
+  all_goals
+    induction F generalizing V M M'
+    case meta_var_ X =>
+      unfold Formula.metaVarSet at h1
+      simp at h1
+
+      simp only [Holds]
+      exact h1 V
+    case pred_ X xs =>
+      simp only [Holds]
+    case eq_ x y =>
+      simp only [Holds]
+    case true_ =>
+      simp only [Holds]
+    case not_ phi phi_ih =>
+      unfold Formula.metaVarSet at h1
+
+      simp only [Holds]
+      congr! 1
+      exact phi_ih V M M' h1
+    case imp_ phi psi phi_ih psi_ih =>
+      unfold Formula.metaVarSet at h1
+      simp at h1
+
+      simp only [Holds]
+      congr! 1
       · apply phi_ih
         intro V' X a1
         apply h1
-        apply Or.intro_left
+        left
         exact a1
       · apply psi_ih
         intro V' X a1
         apply h1
-        apply Or.intro_right
+        right
         exact a1
-    case eq_ x y M1 M2 V h1 => simp only [holds_eq]
-    case forall_ x phi phi_ih M1 M2 V
-      h1 =>
-      unfold Formula.metaVarSet at h1 
-      simp only [holds_forall]
+    case forall_ x phi phi_ih =>
+      unfold Formula.metaVarSet at h1
+
+      simp only [Holds]
       apply forall_congr'
       intro a
-      exact phi_ih M1 M2 (Function.update V x a) h1
-    case def_ name args M1 M2 V h1 => simp only [holds_nil_def]
-  case cons E_hd E_tl E_ih phi M1 M2 V
-    h1 =>
-    induction phi generalizing M1 M2 V
-    case meta_var_ X M1 M2 V h1 =>
-      unfold Formula.metaVarSet at h1 
-      simp only [Finset.mem_singleton] at h1 
-      simp only [holds_meta_var]
-      apply h1 V X
-      rfl
-    case false_ M1 M2 V h1 => simp only [holds_false]
-    case pred_ name args M1 M2 V h1 => simp only [holds_pred]
-    case not_ phi phi_ih M1 M2 V h1 =>
-      unfold Formula.metaVarSet at h1 
-      simp only [holds_not]
-      apply not_congr
-      exact phi_ih M1 M2 V h1
-    case imp_ phi psi phi_ih psi_ih M1 M2 V
-      h1 =>
-      unfold Formula.metaVarSet at h1 
-      simp only [Finset.mem_union] at h1 
-      simp only [holds_imp]
-      apply imp_congr
-      · apply phi_ih
-        intro V' X a1
-        apply h1
-        apply Or.intro_left
-        exact a1
-      · apply psi_ih
-        intro V' X a1
-        apply h1
-        apply Or.intro_right
-        exact a1
-    case eq_ x y M1 M2 V h1 => simp only [holds_eq]
-    case forall_ x phi phi_ih M1 M2 V
-      h1 =>
-      unfold Formula.metaVarSet at h1 
-      simp only [holds_forall]
-      apply forall_congr'
-      intro a
-      exact phi_ih M1 M2 (Function.update V x a) h1
-    case def_ name args M1 M2 V h1 =>
-      simp only [holds_not_nil_def]
-      split_ifs
-      · have s1 : E_hd.q.meta_var_set = ∅ :=
-          no_meta_var_imp_meta_var_set_is_empty E_hd.q E_hd.args E_hd.nf
-        apply E_ih
-        rw [s1]
-        simp only [Finset.not_mem_empty, IsEmpty.forall_iff, forall_forall_const, imp_true_iff]
-      · apply E_ih
-        unfold Formula.metaVarSet
-        simp only [Finset.not_mem_empty, IsEmpty.forall_iff, forall_forall_const, imp_true_iff]
+      exact phi_ih (Function.updateIte V x a) M M' h1
+
+  case nil.def_ X xs =>
+    simp only [Holds]
+
+  case cons.def_ E_hd E_tl E_ih X xs =>
+    simp only [Holds]
+    split_ifs
+    · apply E_ih
+      simp only [no_meta_var_imp_metaVarSet_is_empty E_hd.F E_hd.args E_hd.nf]
+      simp
+    · apply E_ih
+      unfold Formula.metaVarSet
+      simp
+
 
 theorem holds_metaValuation_ext_no_meta_var {D : Type} (P : PredInterpretation D)
     (M1 M2 : MetaValuation D) (E : Env) (V : Valuation D) (phi : Formula) (h1 : phi.metaVarSet = ∅) :
