@@ -226,6 +226,24 @@ theorem Function.updateIte_comm_id
   simp only [if_neg h1]
 
 
+theorem Function.updateIte_coincide
+  {α β : Type}
+  [DecidableEq α]
+  (f g : α → β)
+  (x : α)
+  (h1 : ∀ y : α, ¬ y = x → f y = g y) :
+  Function.updateIte f x (g x) = g :=
+  by
+  funext y
+  unfold Function.updateIte
+  split_ifs
+  case _ c1 =>
+    subst c1
+    rfl
+  case _ c1 =>
+    exact h1 y c1
+
+
 theorem Function.updateIte_not_mem_list
   {α β : Type}
   [DecidableEq α]

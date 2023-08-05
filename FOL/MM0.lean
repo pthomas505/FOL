@@ -1564,27 +1564,44 @@ theorem Holds_Sub
 
 
 /-
-  Changing v does not cause the value of phi to change.
+  Changing v does not cause the value of F to change.
 -/
-def IsnotFree (D : Type) (P : PredInterpretation D) (M : MetaValuation D) (E : Env) (v : VarName)
-    (phi : Formula) : Prop :=
-  ∀ (V : Valuation D) (a : D), Holds D P M E phi V ↔ Holds D P M E phi (Function.update V v a)
+def IsNotFree
+  (D : Type)
+  (I : Interpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (F : Formula)
+  (v : VarName) :
+  Prop :=
+  ∀ (V : Valuation D) (d : D),
+    Holds D I V M E F ↔
+      Holds D I (Function.updateIte V v d) M E F
 
-example {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env) (v : VarName)
-    (phi : Formula) :
-    IsnotFree D P M E v phi ↔
-      ∀ V V' : Valuation D,
-        (∀ y : VarName, ¬y = v → V y = V' y) → (Holds D P M E phi V ↔ Holds D P M E phi V') :=
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (F : Formula)
+  (v : VarName) :
+  IsNotFree D I M E F v ↔
+    ∀ V V' : Valuation D,
+      (∀ y : VarName, ¬ y = v → V y = V' y) →
+        (Holds D I V M E F ↔ Holds D I V' M E F) :=
   by
-  unfold is_notFree
+  unfold IsNotFree
   constructor
   · intro a1 V V' a2
-    rw [← aux_3 V V' v a2]
-    exact a1 V (V' v)
-  · intro a1 V a
+    simp only [a1 V (V' v)]
+    simp only [Function.updateIte_coincide V V' v a2]
+  · intro a1 V d
     apply a1
     intro a' a2
-    simp only [Function.update_noteq a2]
+    unfold Function.updateIte
+    simp only [if_neg a2]
+
 
 theorem notFree_imp_isnotFree {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
     (Γ : List (VarName × MetaVarName)) (v : VarName) (phi : Formula) (h1 : notFree Γ v phi)
