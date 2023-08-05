@@ -1448,101 +1448,120 @@ theorem Holds_coincide_Env
               exact E1_ih h3_right
 
 
-theorem holds_subst {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (σ : Instantiation) (σ' : VarName → VarName) (τ : MetaInstantiation) (phi : Formula)
-    (V : Valuation D) (h1 : phi.IsMetaVarOrAllDefInEnv E) (h2 : σ.1 ∘ σ' = id ∧ σ' ∘ σ.1 = id) :
-    Holds D P (fun (X' : MetaVarName) (V' : Valuation D) => Holds D P M E (τ X') (V' ∘ σ')) E phi
-        (V ∘ σ.1) ↔
-      Holds D P M E (phi.subst σ τ) V :=
+theorem Holds_Sub
+  (D : Type)
+  (I : Interpretation D)
+  (V : Valuation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (σ : Instantiation)
+  (σ' : VarName → VarName)
+  (τ : MetaInstantiation)
+  (F : Formula)
+  (h1 : IsMetaVarOrAllDefInEnv E F)
+  (h2 : σ.1 ∘ σ' = id ∧ σ' ∘ σ.1 = id) :
+  Holds D I (V ∘ σ.1) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (τ X')) E F ↔
+    Holds D I V M E (Sub σ τ F) :=
   by
-  induction phi generalizing V
-  case meta_var_ X V =>
+  induction F generalizing V
+  case meta_var_ X =>
     cases h2
-    unfold Formula.subst
-    simp only [holds_meta_var]
-    rw [Function.comp.assoc]
-    rw [h2_left]
-    rw [Function.comp.right_id]
-  case pred_ name args V =>
-    unfold Formula.subst
-    simp only [holds_pred, List.map_map]
-  case false_ V =>
-    unfold Formula.subst
-    simp only [holds_false]
-  case not_ phi phi_ih V =>
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
-    unfold Formula.subst
-    simp only [holds_not]
-    apply not_congr
-    exact phi_ih h1 V
-  case imp_ phi psi phi_ih psi_ih
-    V =>
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
+    case intro h2_left h2_right =>
+      unfold Sub
+      simp only [Holds]
+      simp only [Function.comp.assoc]
+      simp only [h2_left]
+      simp only [Function.comp.right_id]
+  case pred_ X xs =>
+    unfold Sub
+    simp only [Holds]
+    simp
+  case eq_ x y =>
+    unfold Sub
+    simp only [Holds]
+    simp
+  case true_ =>
+    unfold Sub
+    simp only [Holds]
+  case not_ phi phi_ih =>
+    unfold IsMetaVarOrAllDefInEnv at h1
+
+    unfold Sub
+    simp only [Holds]
+    congr! 1
+    exact phi_ih V h1
+  case imp_ phi psi phi_ih psi_ih =>
+    unfold IsMetaVarOrAllDefInEnv at h1
+
     cases h1
-    unfold Formula.subst
-    simp only [holds_imp]
-    apply imp_congr
-    · exact phi_ih h1_left V
-    · exact psi_ih h1_right V
-  case eq_ x y V =>
-    unfold Formula.subst
-    simp only [holds_eq]
-  case forall_ x phi phi_ih
-    V =>
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
+    case intro h1_left h1_right =>
+      unfold Sub
+      simp only [Holds]
+      congr! 1
+      · exact phi_ih V h1_left
+      · exact psi_ih V h1_right
+  case forall_ x phi phi_ih =>
+    unfold IsMetaVarOrAllDefInEnv at h1
+
     cases h2
-    unfold Formula.subst
-    simp only [holds_forall]
-    apply forall_congr'
-    intro a
-    rw [← aux_1 V σ.val σ' x a h2_right]
-    exact phi_ih h1 (Function.update V (σ.val x) a)
-  case def_ name args V =>
+    case intro h2_left h2_right =>
+      unfold Sub
+      simp only [Holds]
+      apply forall_congr'
+      intro a
+
+      have s1 : Function.updateIte V (σ.val x) a ∘ σ.val = Function.updateIte (V ∘ σ.val) x a
+      apply Function.updateIte_comp_right_injective
+      apply Instantiation.Injective
+
+      simp only [← s1]
+
+      exact phi_ih (Function.updateIte V (σ.val x) a) h1
+
+  case def_ X xs =>
     induction E
     case nil =>
-      unfold Formula.is_meta_var_or_all_def_in_env at h1 
-      simp only [List.not_mem_nil, false_and_iff, exists_false] at h1 
-      contradiction
-    case cons E_hd E_tl
-      E_ih =>
-      have s1 : E_hd.q.meta_var_set = ∅ :=
-        no_meta_var_imp_meta_var_set_is_empty E_hd.q E_hd.args E_hd.nf
-      unfold Formula.subst
-      simp only [holds_meta_var, holds_not_nil_def, List.length_map, List.map_map]
+      unfold IsMetaVarOrAllDefInEnv at h1
+      simp at h1
+    case cons E_hd E_tl E_ih =>
+      unfold IsMetaVarOrAllDefInEnv at E_ih
+
+      have s1 : E_hd.F.metaVarSet = ∅ :=
+        no_meta_var_imp_metaVarSet_is_empty E_hd.F E_hd.args E_hd.nf
+
+      unfold Sub
+      simp only [Holds]
+      simp
+
       split_ifs
-      · cases h
-        rw [holds_valuation_ext P M E_tl
-            (Function.updateList V (E_hd.args.zip (List.map (V ∘ σ.val) args)))
-            (Function.updateList (V ∘ σ.val) (E_hd.args.zip (List.map (V ∘ σ.val) args))) E_hd.q
-            E_hd.args E_hd.nf]
-        · apply holds_meta_valuation_ext
-          rw [s1]
-          simp only [Finset.not_mem_empty, IsEmpty.forall_iff, forall_forall_const, imp_true_iff]
-        · intro v a1
-          apply Function.updateList_zip_map_mem_ext
-          · rw [h_right]
+      case _ c1 =>
+        cases c1
+        case intro c1_left c1_right =>
+          have s2 : Holds D I (Function.updateListIte (V ∘ σ.val) E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F ↔ Holds D I (Function.updateListIte V E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F
+          apply Holds_coincide_Var D I (Function.updateListIte (V ∘ σ.val) E_hd.args (List.map (V ∘ σ.val) xs)) (Function.updateListIte V E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
+          intro v a1
+          apply Function.updateListIte_mem_eq_len
           · exact a1
-      · unfold Formula.is_meta_var_or_all_def_in_env at h1 
-        apply Exists.elim h1
-        intro d h1_1
-        clear h1
-        cases h1_1
-        simp only [List.mem_cons] at h1_1_left 
-        cases h1_1_left
-        · rw [← h1_1_left] at h 
-          exfalso
-          apply h
-          exact h1_1_right
-        · unfold Formula.subst at E_ih 
-          rw [← E_ih]
-          apply holds_meta_valuation_ext
+          · simp
+            simp only [c1_right]
+
+          simp only [← s2]
+          apply Holds_coincide_MetaVar_no_MetaVar
+          exact s1
+      case _ c1 =>
+        unfold IsMetaVarOrAllDefInEnv at h1
+        simp at h1
+
+        cases h1
+        case inl c2 =>
+          contradiction
+        case inr c2 =>
+          unfold Sub at E_ih
+          simp only [← E_ih c2]
+          apply Holds_coincide_MetaVar
           unfold Formula.metaVarSet
-          simp only [Finset.not_mem_empty, IsEmpty.forall_iff, forall_forall_const, imp_true_iff]
-          unfold Formula.is_meta_var_or_all_def_in_env
-          apply Exists.intro d
-          constructor
-          · exact h1_1_left
-          · exact h1_1_right
+          simp
+
 
 /-
   Changing v does not cause the value of phi to change.
