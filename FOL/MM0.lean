@@ -1270,7 +1270,7 @@ theorem Holds_coincide_MetaVar_no_MetaVar
   simp
 
 
-theorem Holds_Def_Imp_Exists_Def
+theorem Def_Holds_Imp_Exists_Def
   (D : Type)
   (I : Interpretation D)
   (V : Valuation D)
@@ -1306,41 +1306,61 @@ theorem Holds_Def_Imp_Exists_Def
         · exact E_ih_1_right
 
 
-example {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E E' : Env) (name : VarName)
-    (args : List VarName) (V : Valuation D) (h1 : ∃ E1 : Env, E' = E1 ++ E) (h2 : E'.Nodup_)
-    (h3 : Holds D P M E (def_ Name args) V) : Holds D P M E' (def_ Name args) V :=
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : Valuation D)
+  (M : MetaValuation D)
+  (E E' : Env)
+  (name : DefName)
+  (args : List VarName)
+  (h1 : ∃ E1 : Env, E' = E1 ++ E)
+  (h2 : E'.Nodup)
+  (h3 : Holds D I V M E (def_ name args)) :
+  Holds D I V M E' (def_ name args) :=
   by
   apply Exists.elim h1
   intro E1 h1_1
   clear h1
-  unfold env.nodup_ at h2 
+
+  unfold Env.Nodup at h2
+
   subst h1_1
   induction E1
   case nil =>
-    simp only [List.nil_append]
+    simp
     exact h3
-  case cons E1_hd E1_tl
-    E1_ih =>
-    simp only [List.cons_append, List.pairwise_cons, List.mem_append] at h2 
+  case cons E1_hd E1_tl E1_ih =>
+    simp at h2
+
     cases h2
-    specialize E1_ih h2_right
-    simp only [List.cons_append, holds_not_nil_def]
-    split_ifs
-    · have s1 : ∃ d : definition_, d ∈ E1_tl ++ E ∧ Name = d.Name ∧ args.length = d.args.length :=
-        holds_def_imp_ex_def P M (E1_tl ++ E) V Name args E1_ih
-      apply Exists.elim s1
-      intro d s1_1
-      cases s1_1
-      simp only [List.mem_append] at s1_1_left 
-      cases s1_1_right
-      cases h
-      exfalso
-      apply h2_left d s1_1_left
-      · rw [← h_left]
-        exact s1_1_right_left
-      · rw [← h_right]
-        exact s1_1_right_right
-    · exact E1_ih
+    case intro h2_left h2_right =>
+      specialize E1_ih h2_right
+      simp
+      simp only [Holds]
+      split_ifs
+      case _ c1 =>
+        have s1 : ∃ d : Definition_, d ∈ E1_tl ++ E ∧ name = d.name ∧ args.length = d.args.length :=
+        Def_Holds_Imp_Exists_Def D I V M (E1_tl ++ E) name args E1_ih
+
+        apply Exists.elim s1
+        intro d s1_1
+        cases s1_1
+        case intro s1_1_left s1_1_right =>
+          simp at s1_1_left
+          cases s1_1_right
+          case intro s1_1_right_left s1_1_right_right =>
+            cases c1
+            case intro c1_left c1_right =>
+              exfalso
+              apply h2_left d s1_1_left
+              · simp only [← c1_left]
+                exact s1_1_right_left
+              · simp only [← c1_right]
+                exact s1_1_right_right
+      case _ c1 =>
+        exact E1_ih
+
 
 theorem holds_env_ext {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E E' : Env)
     (phi : Formula) (V : Valuation D) (h1 : ∃ E1 : Env, E' = E1 ++ E)
