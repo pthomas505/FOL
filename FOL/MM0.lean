@@ -1045,7 +1045,7 @@ inductive IsProof
     (∀ X : MetaVarName, X ∈ phi.metaVarSet →
     IsMetaVarOrAllDefInEnv E (τ X)) →
     (∀ (x : VarName) (X : MetaVarName), (x, X) ∈ Γ → notFree Γ' (σ.1 x) (τ X)) →
-    (∀ psi : Formula, psi ∈ Δ → IsProof E Γ' Δ' (Sub σ τ phi)) →
+    (∀ psi : Formula, psi ∈ Δ → IsProof E Γ' Δ' (Sub σ τ psi)) →
     IsProof E Γ Δ phi →
     IsProof E Γ' Δ' (Sub σ τ phi)
 
@@ -2060,112 +2060,108 @@ theorem holds_conv
     exact Function.updateListIte_map_mem V (V ∘ σ.val) d.args v a2
 
 
-theorem holds_isProof {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi : Formula) (h1 : IsProof E Γ Δ phi)
-    (h2 : E.WF)
-    (nf : ∀ (v : VarName) (X : MetaVarName), (v, X) ∈ Γ → IsnotFree D P M E v (meta_var_ X))
-    (hyp : ∀ (psi : Formula) (V : Valuation D), psi ∈ Δ → Holds D P M E psi V) :
-    ∀ V : Valuation D, Holds D P M E phi V :=
+theorem holds_isProof
+  (D : Type)
+  (I : Interpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (Γ : List (VarName × MetaVarName))
+  (Δ : List Formula)
+  (F : Formula)
+  (h1 : IsProof E Γ Δ F)
+  (h2 : E.WellFormed)
+  (nf : ∀ (v : VarName) (X : MetaVarName), (v, X) ∈ Γ → IsNotFree D I M E (meta_var_ X) v)
+  (hyp : ∀ (F : Formula) (V : Valuation D), F ∈ Δ → Holds D I V M E F) :
+    ∀ V : Valuation D, Holds D I V M E F :=
   by
   induction h1 generalizing M
-  case hyp h1_Γ h1_Δ h1_phi h1_1 h1_2 M nf hyp =>
+  case hyp h1_Γ h1_Δ h1_phi h1_1 h1_2 =>
     intro V
     exact hyp h1_phi V h1_2
-  case mp h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 h1_ih_1 h1_ih_2 M nf
-    hyp =>
-    simp only [holds_imp] at h1_ih_2 
+  case mp h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 h1_ih_1 h1_ih_2 =>
+    simp only [Holds] at h1_ih_2 
     intro V
     exact h1_ih_2 M nf hyp V (h1_ih_1 M nf hyp V)
-  case prop_1 h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 M nf
-    hyp =>
-    simp only [holds_imp]
+  case prop_1 h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 =>
+    simp only [Holds]
     intro V a1 a2
     exact a1
-  case prop_2 h1_Γ h1_Δ h1_phi h1_psi h1_chi h1_1 h1_2 h1_3 M nf
-    hyp =>
-    simp only [holds_imp]
+  case prop_2 h1_Γ h1_Δ h1_phi h1_psi h1_chi h1_1 h1_2 h1_3 =>
+    simp only [Holds]
     intro V a1 a2 a3
-    exact a1 a3 (a2 a3)
-  case prop_3 h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 M nf
-    hyp =>
-    simp only [holds_imp, holds_not]
+    apply a1 a3
+    exact a2 a3
+  case prop_3 h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 =>
+    simp only [Holds]
     intro V a1 a2
     by_contra contra
     exact a1 contra a2
-  case gen h1_Γ h1_Δ h1_phi h1_x h1_1 h1_ih M nf
-    hyp =>
-    simp only [holds_forall]
-    intro V a
-    exact h1_ih M nf hyp (Function.update V h1_x a)
-  case pred_1 h1_Γ h1_Δ h1_phi h1_psi h1_x h1_1 h1_2 M nf
-    hyp =>
-    simp only [holds_imp, holds_forall]
-    intro V a1 a2 a
-    exact a1 a (a2 a)
-  case pred_2 h1_Γ h1_Δ h1_phi h1_x h1_1 h1_2 M nf
-    hyp =>
-    have s1 : is_notFree D P M E h1_x h1_phi :=
-      notFree_imp_is_notFree P M E h1_Γ h1_x h1_phi h1_2 (nf h1_x)
-    simp only [holds_imp, holds_forall]
+  case gen h1_Γ h1_Δ h1_phi h1_x h1_1 h1_ih =>
+    simp only [Holds]
+    intro V d
+    exact h1_ih M nf hyp (Function.updateIte V h1_x d)
+  case pred_1 h1_Γ h1_Δ h1_phi h1_psi h1_x h1_1 h1_2 =>
+    simp only [Holds]
+    intro V a1 a2 d
+    apply a1 d
+    exact a2 d
+  case pred_2 h1_Γ h1_Δ h1_phi h1_x h1_1 h1_2 =>
+    have s1 : IsNotFree D I M E h1_phi h1_x
+    apply NotFree_Imp_IsNotFree D I M E h1_phi h1_Γ h1_x h1_2
+    exact nf h1_x
+
+    simp only [Holds]
     intro V a1 a
-    unfold is_notFree at s1 
-    rw [← s1 V a]
+    unfold IsNotFree at s1
+    simp only [← s1 V a]
     exact a1
-  case eq_1 h1_Γ h1_Δ h1_x h1_y h1_1 M nf
-    hyp =>
+  case eq_1 h1_Γ h1_Δ h1_x h1_y h1_1 =>
     unfold exists_
-    simp only [holds_not, holds_forall, holds_eq, Function.update_same, not_forall,
-      Classical.not_not]
+    simp only [Holds]
+    simp
     intro V
     apply Exists.intro (V h1_y)
-    symm
-    exact Function.update_noteq h1_1 (V h1_y) V
-  case eq_2 h1_Γ h1_Δ h1_x h1_y h1_z M nf
-    hyp =>
-    simp only [holds_imp, holds_eq]
+    unfold Function.updateIte
+    simp
+  case eq_2 h1_Γ h1_Δ h1_x h1_y h1_z =>
+    simp only [Holds]
     intro V a1 a2
     trans V h1_x
-    · symm
-      exact a1
+    · simp only [a1]
     · exact a2
-  /-
-    case mm0.is_proof.eq_3 : h1_Γ h1_Δ h1_n h1_name h1_xs h1_ys M nf hyp
-    { admit },
-  -/
-  case thm h1_Γ h1_Γ' h1_Δ h1_Δ' h1_phi h1_σ h1_τ h1_1 h1_2 h1_3 h1_4 h1_ih_1 h1_ih_2 M nf
-    hyp =>
+  case eq_3 h1_Γ h1_Δ h1_n h1_name h1_xs h1_ys =>
+    sorry
+  case thm h1_Γ h1_Γ' h1_Δ h1_Δ' h1_phi h1_σ h1_τ h1_1 h1_2 h1_3 h1_4 h1_ih_1 h1_ih_2 =>
     obtain ⟨σ', a1⟩ := h1_σ.2
-    dsimp only at h1_ih_1 
-    have s1 : Formula.is_meta_var_or_all_def_in_env E h1_phi := lem_3 E h1_Γ h1_Δ h1_phi h1_4
+
+    have s1 : IsMetaVarOrAllDefInEnv E h1_phi := lem_3 E h1_Γ h1_Δ h1_phi h1_4
+
     intro V
-    rw [← holds_subst P M E h1_σ σ' h1_τ h1_phi V s1 a1]
+    simp only [← Holds_Sub D I V M E h1_σ σ' h1_τ h1_phi s1 a1]
     apply h1_ih_2
     · intro v X a2
-      exact lem_1 P M E h1_Γ h1_Γ' h1_σ σ' h1_τ a1 nf h1_2 v X a2
+      exact lem_1 D I M E h1_Γ h1_Γ' h1_σ σ' h1_τ a1 nf h1_2 v X a2
     · intro psi V' a2
-      have s2 : Formula.is_meta_var_or_all_def_in_env E psi
+      have s2 : IsMetaVarOrAllDefInEnv E psi
       apply lem_2_b E h1_σ h1_τ
-      apply lem_3 E h1_Γ' h1_Δ' (Formula.subst h1_σ h1_τ psi)
+      apply lem_3 E h1_Γ' h1_Δ' (Sub h1_σ h1_τ psi)
       exact h1_3 psi a2
-      have s3 :
-        ∀ V'' : Valuation D,
-          holds D P
-            (fun (X' : meta_var_name) (V' : Valuation D) => holds D P M E (h1_τ X') (V' ∘ σ')) E psi
-            (V'' ∘ h1_σ.val)
+
+      have s3 : ∀ V'' : Valuation D, Holds D I (V'' ∘ h1_σ.val) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (h1_τ X')) E psi
       intro V''
-      rw [holds_subst P M E h1_σ σ' h1_τ psi V'' s2 a1]
+      simp only [Holds_Sub D I V'' M E h1_σ σ' h1_τ psi s2 a1]
       exact h1_ih_1 psi a2 M nf hyp V''
+
       specialize s3 (V' ∘ σ')
-      rw [Function.comp.assoc] at s3 
-      rw [a1.right] at s3 
-      simp only [Function.comp.right_id] at s3 
+      simp only [Function.comp.assoc] at s3
+      simp only [a1.right] at s3
+      simp only [Function.comp.right_id] at s3
       exact s3
-  case conv h1_Γ h1_Δ h1_phi h1_phi' h1_1 h1_2 h1_3 h1_ih M nf
-    hyp =>
+  case conv h1_Γ h1_Δ h1_phi h1_phi' h1_1 h1_2 h1_3 h1_ih =>
     intro V
-    have s1 : holds D P M E h1_phi V := h1_ih M nf hyp V
-    rw [← holds_conv P M E h1_phi h1_phi' V h2 h1_3]
+    have s1 : Holds D I V M E h1_phi := h1_ih M nf hyp V
+
+    simp only [← holds_conv D I V M E h1_phi h1_phi' h2 h1_3]
     exact s1
 
-end Mm0
-
+end MM0
