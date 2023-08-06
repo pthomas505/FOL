@@ -2002,55 +2002,63 @@ theorem lem_4
             exact s1
 
 
-theorem holds_conv {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (phi phi' : Formula) (V : Valuation D) (h1 : E.WF) (h2 : IsConv E phi phi') :
-    Holds D P M E phi V ↔ Holds D P M E phi' V :=
+theorem holds_conv
+  (D : Type)
+  (I : Interpretation D)
+  (V : Valuation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (F F' : Formula)
+  (h1 : E.WellFormed)
+  (h2 : IsConv E F F') :
+  Holds D I V M E F ↔ Holds D I V M E F' :=
   by
   induction h2 generalizing V
-  case conv_refl h2 V => rfl
-  case conv_symm h2_phi h2_phi' h2_1 h2_ih V =>
+  case conv_refl h2_phi =>
+    rfl
+  case conv_symm h2_phi h2_phi' _ h2_ih =>
     symm
     exact h2_ih V
-  case conv_trans h2_phi h2_phi' h2_phi'' h2_1 h2_2 h2_ih_1 h2_ih_2
-    V =>
-    trans holds D P M E h2_phi' V
+  case conv_trans h2_phi h2_phi' h2_phi'' _ _ h2_ih_1 h2_ih_2 =>
+    trans Holds D I V M E h2_phi'
     exact h2_ih_1 V
     exact h2_ih_2 V
-  case conv_not h2_phi h2_phi' h2_1 h2_ih V =>
-    simp only [holds_not]
-    apply not_congr
+  case conv_not h2_phi h2_phi' _ h2_ih =>
+    simp only [Holds]
+    congr! 1
     exact h2_ih V
-  case conv_imp h2_phi h2_phi' h2_psi h2_psi' h2_1 h2_2 h2_ih_1 h2_ih_2
-    V =>
-    simp only [holds_imp]
-    apply imp_congr
+  case conv_imp h2_phi h2_phi' h2_psi h2_psi' _ _ h2_ih_1 h2_ih_2 =>
+    simp only [Holds]
+    congr! 1
     · exact h2_ih_1 V
     · exact h2_ih_2 V
-  case conv_forall h2_x h2_phi h2_phi' h2_1 h2_ih
-    V =>
-    simp only [holds_forall]
+  case conv_forall h2_x h2_phi h2_phi' _ h2_ih =>
+    simp only [Holds]
     apply forall_congr'
     intro a
-    exact h2_ih (Function.update V h2_x a)
-  case conv_unfold d σ h2 V =>
+    exact h2_ih (Function.updateIte V h2_x a)
+  case conv_unfold d σ h2 =>
     obtain ⟨σ', a1⟩ := σ.2
-    have s1 : Formula.is_meta_var_or_all_def_in_env E d.q :=
-      def_in_env_imp_is_meta_var_or_all_def_in_env E d h1 h2
-    rw [← holds_subst P M E σ σ' meta_var_ d.q V s1 a1]
+    have s1 : IsMetaVarOrAllDefInEnv E d.F := def_in_Env_imp_isMetaVarOrAllDefInEnv E d h1 h2
+
+    simp only [← Holds_Sub D I V M E σ σ' meta_var_ d.F s1 a1]
+    clear s1
+
     have s2 : d.name = d.name ∧ (List.map σ.val d.args).length = d.args.length
-    simp only [eq_self_iff_true, List.length_map, and_self_iff]
-    rw [← lem_4 P M E d d.name (List.map σ.val d.args) V h1 h2 s2]
-    have s3 : d.q.meta_var_set = ∅ := no_meta_var_imp_meta_var_set_is_empty d.q d.args d.nf
-    rw [holds_meta_valuation_ext_no_meta_var P
-        (fun (X' : meta_var_name) (V' : Valuation D) => holds D P M E (meta_var_ X') (V' ∘ σ')) M E
-        (V ∘ σ.val) d.q s3]
-    apply
-      holds_valuation_ext P M E
-        (Function.updateList V (d.args.zip (List.map V (List.map σ.val d.args)))) (V ∘ σ.val) d.q
-        d.args d.nf
+    simp
+    simp only [← lem_4 D I V M E d d.name (List.map σ.val d.args) h1 h2 s2]
+    clear s2
+
+    have s3 : d.F.metaVarSet = ∅ := no_meta_var_imp_metaVarSet_is_empty d.F d.args d.nf
+
+    simp only [Holds_coincide_MetaVar_no_MetaVar D I (V ∘ σ.val) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (meta_var_ X')) M E d.F s3]
+    clear s3
+
+    apply Holds_coincide_Var D I (Function.updateListIte V d.args (List.map V (List.map σ.val d.args))) (V ∘ σ.val) M E d.F d.args d.nf
     intro v a2
-    simp only [List.map_map, Function.comp_apply]
-    exact Function.updateList_zip_map_mem V (V ∘ σ.val) d.args v a2
+    simp
+    exact Function.updateListIte_map_mem V (V ∘ σ.val) d.args v a2
+
 
 theorem holds_isProof {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
     (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi : Formula) (h1 : IsProof E Γ Δ phi)
