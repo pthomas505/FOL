@@ -1934,59 +1934,73 @@ theorem lem_3
   case conv h1_Γ h1_Δ h1_phi h1_phi' h1_1 h1_2 h1_3 h1_ih =>
     exact h1_1
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-theorem lem_4 {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (d : Definition_) (name : VarName) (args : List VarName) (V : Valuation D) (h1 : E.WF)
-    (h2 : d ∈ E) (h3 : Name = d.Name ∧ args.length = d.args.length) :
-    Holds D P M E d.q (Function.updateList V (List.zip d.args (List.map V args))) ↔
-      Holds D P M E (def_ Name args) V :=
+
+theorem lem_4
+  (D : Type)
+  (I : Interpretation D)
+  (V : Valuation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (d : Definition_)
+  (name : DefName)
+  (args : List VarName)
+  (h1 : E.WellFormed)
+  (h2 : d ∈ E)
+  (h3 : name = d.name ∧ args.length = d.args.length) :
+  Holds D I (Function.updateListIte V d.args (List.map V args)) M E d.F ↔ Holds D I V M E (def_ name args) :=
   by
   induction E
   case nil =>
-    simp only [List.not_mem_nil] at h2 
-    contradiction
-  case cons hd tl
-    ih =>
-    have s1 : env.nodup_ (hd::tl) := env_well_formed_imp_nodup (hd::tl) h1
-    unfold env.well_formed at h1 
-    cases h1
-    cases h1_right
-    simp only [List.mem_cons] at h2 
-    have s2 : ∃ E1 : env, (hd::tl) = E1 ++ tl
+    simp at h2
+  case cons hd tl ih =>
+    have s1 : Env.Nodup (hd :: tl) := WellFormed_Env_Nodup (hd :: tl) h1
+
+    have s2 : ∃ E1 : Env, (hd :: tl) = E1 ++ tl
     apply Exists.intro [hd]
-    simp only [List.singleton_append, eq_self_iff_true, and_self_iff]
-    simp only [holds_not_nil_def]
-    split_ifs
-    · cases h2
-      · rw [h2]
-        exact
-          holds_env_ext P M tl (hd::tl) hd.q (Function.updateList V (hd.args.zip (List.map V args)))
-            s2 h1_right_left s1
-      · cases h
-        cases h3
-        have s3 : hd.name = d.name
-        rw [← h_left]
-        exact h3_left
-        have s4 : hd.args.length = d.args.length
-        rw [← h_right]
-        exact h3_right
-        exfalso
-        exact h1_left d h2 s3 s4
-    · cases h2
-      · simp only [not_and] at h 
-        rw [← h2] at h 
-        cases h3
-        exfalso
-        exact h h3_left h3_right
-      · specialize ih h1_right_right h2
-        rw [← ih]
-        exact
-          holds_env_ext P M tl (hd::tl) d.q (Function.updateList V (d.args.zip (List.map V args)))
-            s2 (def_in_env_imp_is_meta_var_or_all_def_in_env tl d h1_right_right h2) s1
+    simp
+
+    unfold Env.WellFormed at h1
+
+    simp at h2
+
+    cases h1
+    case intro h1_left h1_right =>
+      cases h1_right
+      case intro h1_right_left h1_right_right =>
+        simp only [Holds]
+        split_ifs
+        case _ c1 =>
+          cases h2
+          case inl c2 =>
+            subst c2
+            exact Holds_coincide_Env D I (Function.updateListIte V d.args (List.map V args)) M tl (d :: tl) d.F s2 h1_right_left s1
+          case inr c2 =>
+            cases h3
+            case intro h3_left h3_right =>
+              cases c1
+              case intro c1_left c1_right =>
+                exfalso
+                apply h1_left d c2
+                · simp only [← c1_left]
+                  exact h3_left
+                · simp only [← c1_right]
+                  exact h3_right
+        case _ c1 =>
+          cases h2
+          case inl c2 =>
+            subst c2
+            simp at c1
+            cases h3
+            case intro h3_left h3_right =>
+              exfalso
+              exact c1 h3_left h3_right
+          case inr c2 =>
+            specialize ih h1_right_right c2
+            simp only [← ih]
+            apply Holds_coincide_Env D I (Function.updateListIte V d.args (List.map V args)) M tl (hd :: tl) d.F s2
+            apply def_in_Env_imp_isMetaVarOrAllDefInEnv tl d h1_right_right c2
+            exact s1
+
 
 theorem holds_conv {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
     (phi phi' : Formula) (V : Valuation D) (h1 : E.WF) (h2 : IsConv E phi phi') :
