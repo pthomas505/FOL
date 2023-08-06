@@ -138,17 +138,17 @@ instance
 
 
 /--
-  Formula.MetaVarSet F := The set of all of the meta variables that have an occurrence in the formula F.
+  Formula.metaVarSet F := The set of all of the meta variables that have an occurrence in the formula F.
 -/
-def Formula.MetaVarSet :
+def Formula.metaVarSet :
   Formula → Finset MetaVarName
   | meta_var_ X => {X}
   | pred_ _ _ => ∅
   | eq_ _ _ => ∅
   | true_ => ∅
-  | not_ phi => phi.MetaVarSet
-  | imp_ phi psi => phi.MetaVarSet ∪ psi.MetaVarSet
-  | forall_ _ phi => phi.MetaVarSet
+  | not_ phi => phi.metaVarSet
+  | imp_ phi psi => phi.metaVarSet ∪ psi.metaVarSet
+  | forall_ _ phi => phi.metaVarSet
   | def_ _ _ => ∅
 
 
@@ -227,7 +227,7 @@ def sub
   | def_ X xs => def_ X (xs.map σ.1)
 
 
-structure Definition_ : Type :=
+structure Definition : Type :=
   name : DefName
   args : List VarName
   F : Formula
@@ -236,10 +236,10 @@ structure Definition_ : Type :=
   deriving DecidableEq
 
 
-abbrev Env : Type := List Definition_
+abbrev Env : Type := List Definition
 
 def Env.Nodup : Env → Prop :=
-  List.Pairwise fun d1 d2 : Definition_ =>
+  List.Pairwise fun d1 d2 : Definition =>
     d1.name = d2.name → d1.args.length = d2.args.length → False
 
 
@@ -259,7 +259,7 @@ def IsMetaVarOrAllDefInEnv
     IsMetaVarOrAllDefInEnv E psi
   | forall_ _ phi => IsMetaVarOrAllDefInEnv E phi
   | def_ X xs =>
-      ∃ d : Definition_,
+      ∃ d : Definition,
         d ∈ E ∧
         X = d.name ∧
         xs.length = d.args.length
@@ -268,7 +268,7 @@ def IsMetaVarOrAllDefInEnv
 def Env.WellFormed : Env → Prop
   | List.nil => True
   | d :: E =>
-    (∀ d' : Definition_, d' ∈ E →
+    (∀ d' : Definition, d' ∈ E →
       d.name = d'.name → d.args.length = d'.args.length → False) ∧
         IsMetaVarOrAllDefInEnv E d.F ∧ Env.WellFormed E
 
@@ -307,7 +307,7 @@ inductive IsConv (E : Env) : Formula → Formula → Prop
     IsConv E (forall_ x phi) (forall_ x phi')
 
   | conv_unfold
-    (d : Definition_)
+    (d : Definition)
     (σ : Instantiation) :
     d ∈ E →
     IsConv E (def_ d.name (d.args.map σ.1)) (sub σ meta_var_ d.F)
@@ -444,7 +444,7 @@ inductive IsProof
     (phi : Formula)
     (σ : Instantiation)
     (τ : MetaInstantiation) :
-    (∀ X : MetaVarName, X ∈ phi.MetaVarSet →
+    (∀ X : MetaVarName, X ∈ phi.metaVarSet →
     IsMetaVarOrAllDefInEnv E (τ X)) →
     (∀ (x : VarName) (X : MetaVarName), (x, X) ∈ Γ → NotFree Γ' (σ.1 x) (τ X)) →
     (∀ psi : Formula, psi ∈ Δ → IsProof E Γ' Δ' (sub σ τ psi)) →
@@ -643,7 +643,7 @@ theorem no_meta_var_imp_meta_var_set_is_empty
   (F : Formula)
   (vs : List VarName)
   (h1 : NoMetaVarAndAllFreeInList vs F) :
-  F.MetaVarSet = ∅ :=
+  F.metaVarSet = ∅ :=
   by
   induction F generalizing vs
   case meta_var_ X =>
@@ -659,12 +659,12 @@ theorem no_meta_var_imp_meta_var_set_is_empty
   case not_ phi phi_ih =>
     unfold NoMetaVarAndAllFreeInList at h1
 
-    unfold Formula.MetaVarSet
+    unfold Formula.metaVarSet
     exact phi_ih vs h1
   case imp_ phi psi phi_ih psi_ih =>
     unfold NoMetaVarAndAllFreeInList at h1
 
-    unfold Formula.MetaVarSet
+    unfold Formula.metaVarSet
     cases h1
     case intro h1_left h1_right =>
       simp only [phi_ih vs h1_left]
@@ -672,7 +672,7 @@ theorem no_meta_var_imp_meta_var_set_is_empty
   case forall_ x phi phi_ih =>
     unfold NoMetaVarAndAllFreeInList at h1
 
-    unfold Formula.MetaVarSet
+    unfold Formula.metaVarSet
     exact phi_ih (x :: vs) h1
   case def_ X xs =>
     rfl
@@ -773,12 +773,12 @@ theorem Sub_no_metaVar
   (F : Formula)
   (σ : Instantiation)
   (τ : MetaInstantiation)
-  (h1 : F.MetaVarSet = ∅) :
-  (sub σ τ F).MetaVarSet = ∅ :=
+  (h1 : F.metaVarSet = ∅) :
+  (sub σ τ F).metaVarSet = ∅ :=
   by
   induction F
   case meta_var_ X =>
-    unfold Formula.MetaVarSet at h1
+    unfold Formula.metaVarSet at h1
     simp at h1
   case pred_ X xs =>
     rfl
@@ -787,17 +787,17 @@ theorem Sub_no_metaVar
   case true_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold Formula.MetaVarSet at h1
+    unfold Formula.metaVarSet at h1
 
     unfold sub
-    unfold Formula.MetaVarSet
+    unfold Formula.metaVarSet
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
-    unfold Formula.MetaVarSet at h1
+    unfold Formula.metaVarSet at h1
     simp only [Finset.union_eq_empty_iff] at h1
 
     unfold sub
-    unfold Formula.MetaVarSet
+    unfold Formula.metaVarSet
     cases h1
     case intro h1_left h1_right =>
       simp only [Finset.union_eq_empty_iff]
@@ -805,10 +805,10 @@ theorem Sub_no_metaVar
       · exact phi_ih h1_left
       · exact psi_ih h1_right
   case forall_ x phi phi_ih =>
-    unfold Formula.MetaVarSet at h1
+    unfold Formula.metaVarSet at h1
 
     unfold sub
-    unfold Formula.MetaVarSet
+    unfold Formula.metaVarSet
     exact phi_ih h1
   case def_ X xs =>
     rfl
@@ -818,12 +818,12 @@ theorem no_meta_var_sub
   (F : Formula)
   (σ : Instantiation)
   (τ τ' : MetaInstantiation)
-  (h1 : F.MetaVarSet = ∅) :
+  (h1 : F.metaVarSet = ∅) :
   sub σ τ F = sub σ τ' F :=
   by
   induction F
   case meta_var_ X =>
-    unfold Formula.MetaVarSet at h1
+    unfold Formula.metaVarSet at h1
     simp at h1
   case pred_ X xs =>
     rfl
@@ -832,13 +832,13 @@ theorem no_meta_var_sub
   case true_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold Formula.MetaVarSet at h1
+    unfold Formula.metaVarSet at h1
 
     unfold sub
     congr! 1
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
-    unfold Formula.MetaVarSet at h1 
+    unfold Formula.metaVarSet at h1 
     simp only [Finset.union_eq_empty_iff] at h1
 
     unfold sub
@@ -848,7 +848,7 @@ theorem no_meta_var_sub
     · exact phi_ih h1_left
     · exact psi_ih h1_right
   case forall_ x phi phi_ih =>
-    unfold Formula.MetaVarSet at h1
+    unfold Formula.metaVarSet at h1
 
     unfold sub
     congr! 1
@@ -1080,7 +1080,7 @@ theorem Concat_IsMetaVarOrAllDefInEnv
 
 theorem def_in_Env_imp_isMetaVarOrAllDefInEnv
   (E : Env)
-  (d : Definition_)
+  (d : Definition)
   (h1 : E.WellFormed)
   (h2 : d ∈ E) :
   IsMetaVarOrAllDefInEnv E d.F :=
@@ -1208,14 +1208,14 @@ theorem Holds_coincide_MetaVar
   (M M' : MetaValuation D)
   (E : Env)
   (F : Formula)
-  (h1 : ∀ (V' : Valuation D) (X : MetaVarName), X ∈ F.MetaVarSet → (M X V' ↔ M' X V')) :
+  (h1 : ∀ (V' : Valuation D) (X : MetaVarName), X ∈ F.metaVarSet → (M X V' ↔ M' X V')) :
     Holds D I V M E F ↔ Holds D I V M' E F :=
   by
   induction E generalizing F V M M'
   all_goals
     induction F generalizing V M M'
     case meta_var_ X =>
-      unfold Formula.MetaVarSet at h1
+      unfold Formula.metaVarSet at h1
       simp at h1
 
       simp only [Holds]
@@ -1227,13 +1227,13 @@ theorem Holds_coincide_MetaVar
     case true_ =>
       simp only [Holds]
     case not_ phi phi_ih =>
-      unfold Formula.MetaVarSet at h1
+      unfold Formula.metaVarSet at h1
 
       simp only [Holds]
       congr! 1
       exact phi_ih V M M' h1
     case imp_ phi psi phi_ih psi_ih =>
-      unfold Formula.MetaVarSet at h1
+      unfold Formula.metaVarSet at h1
       simp at h1
 
       simp only [Holds]
@@ -1249,7 +1249,7 @@ theorem Holds_coincide_MetaVar
         right
         exact a1
     case forall_ x phi phi_ih =>
-      unfold Formula.MetaVarSet at h1
+      unfold Formula.metaVarSet at h1
 
       simp only [Holds]
       apply forall_congr'
@@ -1266,7 +1266,7 @@ theorem Holds_coincide_MetaVar
       simp only [no_meta_var_imp_meta_var_set_is_empty E_hd.F E_hd.args E_hd.nf]
       simp
     · apply E_ih
-      unfold Formula.MetaVarSet
+      unfold Formula.metaVarSet
       simp
 
 
@@ -1277,7 +1277,7 @@ theorem Holds_coincide_MetaVar_no_MetaVar
   (M M' : MetaValuation D)
   (E : Env)
   (F : Formula)
-  (h1 : F.MetaVarSet = ∅) :
+  (h1 : F.metaVarSet = ∅) :
   Holds D I V M E F ↔ Holds D I V M' E F :=
   by
   apply Holds_coincide_MetaVar
@@ -1294,7 +1294,7 @@ theorem Def_Holds_Imp_Exists_Def
   (name : DefName)
   (args : List VarName)
   (h1 : Holds D I V M E (def_ name args)) :
-  ∃ d : Definition_, d ∈ E ∧ name = d.name ∧ args.length = d.args.length :=
+  ∃ d : Definition, d ∈ E ∧ name = d.name ∧ args.length = d.args.length :=
   by
   induction E
   case nil =>
@@ -1355,7 +1355,7 @@ example
       simp only [Holds]
       split_ifs
       case _ c1 =>
-        have s1 : ∃ d : Definition_, d ∈ E1_tl ++ E ∧ name = d.name ∧ args.length = d.args.length :=
+        have s1 : ∃ d : Definition, d ∈ E1_tl ++ E ∧ name = d.name ∧ args.length = d.args.length :=
         Def_Holds_Imp_Exists_Def D I V M (E1_tl ++ E) name args E1_ih
 
         apply Exists.elim s1
@@ -1541,7 +1541,7 @@ theorem Holds_Sub
     case cons E_hd E_tl E_ih =>
       unfold IsMetaVarOrAllDefInEnv at E_ih
 
-      have s1 : E_hd.F.MetaVarSet = ∅ :=
+      have s1 : E_hd.F.metaVarSet = ∅ :=
         no_meta_var_imp_meta_var_set_is_empty E_hd.F E_hd.args E_hd.nf
 
       unfold sub
@@ -1574,7 +1574,7 @@ theorem Holds_Sub
           unfold sub at E_ih
           simp only [← E_ih c2]
           apply Holds_coincide_MetaVar
-          unfold Formula.MetaVarSet
+          unfold Formula.metaVarSet
           simp
 
 
@@ -1773,12 +1773,12 @@ theorem lem_2_a
   (τ : MetaInstantiation)
   (F : Formula)
   (h1 : IsMetaVarOrAllDefInEnv E F)
-  (h2 : ∀ X : MetaVarName, X ∈ F.MetaVarSet → IsMetaVarOrAllDefInEnv E (τ X)) :
+  (h2 : ∀ X : MetaVarName, X ∈ F.metaVarSet → IsMetaVarOrAllDefInEnv E (τ X)) :
   IsMetaVarOrAllDefInEnv E (sub σ τ F) :=
   by
   induction F
   case meta_var_ X =>
-    unfold Formula.MetaVarSet at h2
+    unfold Formula.metaVarSet at h2
     simp at h2
 
     unfold sub
@@ -1798,7 +1798,7 @@ theorem lem_2_a
   case not_ phi phi_ih =>
     unfold IsMetaVarOrAllDefInEnv at h1
 
-    unfold Formula.MetaVarSet at h2
+    unfold Formula.metaVarSet at h2
 
     unfold sub
     unfold IsMetaVarOrAllDefInEnv
@@ -1806,7 +1806,7 @@ theorem lem_2_a
   case imp_ phi psi phi_ih psi_ih =>
     unfold IsMetaVarOrAllDefInEnv at h1
 
-    unfold Formula.MetaVarSet at h2
+    unfold Formula.metaVarSet at h2
     simp at h2
 
     unfold sub
@@ -1827,7 +1827,7 @@ theorem lem_2_a
   case forall_ x phi phi_ih =>
     unfold IsMetaVarOrAllDefInEnv at h1
 
-    unfold Formula.MetaVarSet at h2
+    unfold Formula.metaVarSet at h2
 
     unfold sub
     unfold IsMetaVarOrAllDefInEnv
@@ -1942,7 +1942,7 @@ theorem lem_4
   (V : Valuation D)
   (M : MetaValuation D)
   (E : Env)
-  (d : Definition_)
+  (d : Definition)
   (name : DefName)
   (args : List VarName)
   (h1 : E.WellFormed)
@@ -2050,7 +2050,7 @@ theorem holds_conv
     simp only [← lem_4 D I V M E d d.name (List.map σ.val d.args) h1 h2 s2]
     clear s2
 
-    have s3 : d.F.MetaVarSet = ∅ := no_meta_var_imp_meta_var_set_is_empty d.F d.args d.nf
+    have s3 : d.F.metaVarSet = ∅ := no_meta_var_imp_meta_var_set_is_empty d.F d.args d.nf
 
     simp only [Holds_coincide_MetaVar_no_MetaVar D I (V ∘ σ.val) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (meta_var_ X')) M E d.F s3]
     clear s3
