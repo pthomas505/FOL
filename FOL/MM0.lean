@@ -1840,38 +1840,57 @@ theorem lem_2_a
     exact h1
 
 
-theorem lem_2_b (E : Env) (σ : Instantiation) (τ : MetaInstantiation) (phi : Formula)
-    (h1 : (phi.subst σ τ).IsMetaVarOrAllDefInEnv E) : phi.IsMetaVarOrAllDefInEnv E :=
+theorem lem_2_b
+  (E : Env)
+  (σ : Instantiation)
+  (τ : MetaInstantiation)
+  (F : Formula)
+  (h1 : IsMetaVarOrAllDefInEnv E (Sub σ τ F)) :
+  IsMetaVarOrAllDefInEnv E F :=
   by
-  induction phi
-  case meta_var_ X => unfold Formula.subst at h1 
-  case false_ => unfold Formula.is_meta_var_or_all_def_in_env
-  case pred_ name args => unfold Formula.subst at h1 
+  induction F
+  case meta_var_ X =>
+    unfold IsMetaVarOrAllDefInEnv
+    simp only
+  case pred_ X xs =>
+    unfold IsMetaVarOrAllDefInEnv
+    simp only
+  case eq_ x y =>
+    unfold IsMetaVarOrAllDefInEnv
+    simp only
+  case true_ =>
+    unfold IsMetaVarOrAllDefInEnv
+    simp only
   case not_ phi phi_ih =>
-    unfold Formula.subst at h1 
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
-    unfold Formula.is_meta_var_or_all_def_in_env
+    unfold Sub at h1
+    unfold IsMetaVarOrAllDefInEnv at h1
+
+    unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
-    unfold Formula.subst at h1 
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
+    unfold Sub at h1
+    unfold IsMetaVarOrAllDefInEnv at h1
+
+    unfold IsMetaVarOrAllDefInEnv
     cases h1
-    unfold Formula.is_meta_var_or_all_def_in_env
+    case intro h1_left h1_right =>
     constructor
     · exact phi_ih h1_left
     · exact psi_ih h1_right
-  case eq_ x y => unfold Formula.subst at h1 
   case forall_ x phi phi_ih =>
-    unfold Formula.subst at h1 
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
-    unfold Formula.is_meta_var_or_all_def_in_env
+    unfold Sub at h1
+    unfold IsMetaVarOrAllDefInEnv at h1
+
+    unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1
-  case def_ name args =>
-    unfold Formula.subst at h1 
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
-    simp only [List.length_map] at h1 
-    unfold Formula.is_meta_var_or_all_def_in_env
+  case def_ X xs =>
+    unfold Sub at h1
+    unfold IsMetaVarOrAllDefInEnv at h1
+    simp at h1
+
+    unfold IsMetaVarOrAllDefInEnv
     exact h1
+
 
 theorem lem_3 (E : Env) (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi : Formula)
     (h1 : IsProof E Γ Δ phi) : phi.IsMetaVarOrAllDefInEnv E :=
