@@ -678,7 +678,7 @@ theorem no_meta_var_imp_meta_var_set_is_empty
     rfl
 
 
-theorem Instantiation.HasLeftRightInverse
+theorem Instantiation.has_left_right_inverse
   (σ : Instantiation) :
   ∃ σ_inv : Instantiation, σ.1 ∘ σ_inv.1 = id ∧ σ_inv.1 ∘ σ.1 = id :=
   by
@@ -702,7 +702,7 @@ theorem Instantiation.HasLeftRightInverse
     · exact a1_right
 
 
-theorem Instantiation.Injective
+theorem Instantiation.is_injective
   (σ : Instantiation) :
   Function.Injective σ.1 :=
   by
@@ -713,7 +713,7 @@ theorem Instantiation.Injective
     exact Function.LeftInverse.injective s1
 
 
-theorem Instantiation.Surjective
+theorem Instantiation.is_surjective
   (σ : Instantiation) :
   Function.Surjective σ.1 :=
   by
@@ -724,17 +724,17 @@ theorem Instantiation.Surjective
     exact Function.RightInverse.surjective s1
 
 
-theorem Instantiation.Bijective
+theorem Instantiation.is_bijective
   (σ : Instantiation) :
   Function.Bijective σ.1 :=
   by
   unfold Function.Bijective
   constructor
-  · exact Instantiation.Injective σ
-  · exact Instantiation.Surjective σ
+  · exact Instantiation.is_injective σ
+  · exact Instantiation.is_surjective σ
 
 
-theorem Sub_Instantiation_comp
+theorem sub_of_sub_is_sub_of_instantiation_comp
   (F : Formula)
   (σ σ' : Instantiation) :
   sub σ Formula.meta_var_ (sub σ' Formula.meta_var_ F) =
@@ -769,7 +769,7 @@ theorem Sub_Instantiation_comp
     simp
 
 
-theorem Sub_no_metaVar
+theorem sub_preserves_empty_meta_var_set
   (F : Formula)
   (σ : Instantiation)
   (τ : MetaInstantiation)
@@ -814,7 +814,7 @@ theorem Sub_no_metaVar
     rfl
 
 
-theorem no_meta_var_sub
+theorem no_meta_var_imp_meta_instantiation_irrelevance_in_sub
   (F : Formula)
   (σ : Instantiation)
   (τ τ' : MetaInstantiation)
@@ -857,7 +857,7 @@ theorem no_meta_var_sub
     rfl
 
 
-theorem NoMetaVarAndAllFreeInList_Sub
+theorem no_meta_var_and_all_free_in_list_map_sub
   (F : Formula)
   (vs : List VarName)
   (σ : Instantiation)
@@ -917,7 +917,7 @@ theorem NoMetaVarAndAllFreeInList_Sub
     exact List.map_subset σ.val h1
 
 
-theorem Sub_IsMetaVarOrAllDefInEnv
+theorem sub_meta_id_preserves_is_meta_var_or_all_def_in_env
   (F : Formula)
   (E : Env)
   (σ : Instantiation)
@@ -972,9 +972,7 @@ theorem Sub_IsMetaVarOrAllDefInEnv
     exact h1
 
 
-
-
-theorem WellFormed_Env_Nodup
+theorem well_formed_env_has_no_dup
   (E : Env)
   (h1 : E.WellFormed) :
   E.Nodup :=
@@ -999,7 +997,7 @@ theorem WellFormed_Env_Nodup
         · exact ih h1_right_right
 
 
-theorem Concat_IsMetaVarOrAllDefInEnv
+theorem concat_env_preserves_is_meta_var_or_all_def_in_env
   (E E' : Env)
   (F : Formula)
   (h1 : ∃ E1 : Env, E' = E1 ++ E)
@@ -1078,7 +1076,7 @@ theorem Concat_IsMetaVarOrAllDefInEnv
           · exact h2_1_right
 
 
-theorem def_in_Env_imp_isMetaVarOrAllDefInEnv
+theorem def_in_well_formed_env_is_meta_var_or_all_def_in_env
   (E : Env)
   (d : Definition)
   (h1 : E.WellFormed)
@@ -1097,7 +1095,7 @@ theorem def_in_Env_imp_isMetaVarOrAllDefInEnv
     case intro h1_left h1_right =>
       cases h1_right
       case intro h1_right_left h1_right_right =>
-        apply Concat_IsMetaVarOrAllDefInEnv tl (hd :: tl)
+        apply concat_env_preserves_is_meta_var_or_all_def_in_env tl (hd :: tl)
         · apply Exists.intro [hd]
           simp
         · cases h2
@@ -1108,9 +1106,7 @@ theorem def_in_Env_imp_isMetaVarOrAllDefInEnv
             exact ih h1_right_right c1
 
 
-
-
-theorem Holds_coincide_Var
+theorem holds_coincide_var
   (D : Type)
   (I : Interpretation D)
   (V V' : Valuation D)
@@ -1201,7 +1197,7 @@ theorem Holds_coincide_Var
       · exact h2
 
 
-theorem Holds_coincide_MetaVar
+theorem holds_coincide_meta_var
   (D : Type)
   (I : Interpretation D)
   (V : Valuation D)
@@ -1270,7 +1266,7 @@ theorem Holds_coincide_MetaVar
       simp
 
 
-theorem Holds_coincide_MetaVar_no_MetaVar
+theorem holds_coincide_meta_var_no_meta_var
   (D : Type)
   (I : Interpretation D)
   (V : Valuation D)
@@ -1280,12 +1276,12 @@ theorem Holds_coincide_MetaVar_no_MetaVar
   (h1 : F.metaVarSet = ∅) :
   Holds D I V M E F ↔ Holds D I V M' E F :=
   by
-  apply Holds_coincide_MetaVar
+  apply holds_coincide_meta_var
   simp only [h1]
   simp
 
 
-theorem Def_Holds_Imp_Exists_Def
+theorem def_holds_imp_def_in_env
   (D : Type)
   (I : Interpretation D)
   (V : Valuation D)
@@ -1356,7 +1352,7 @@ example
       split_ifs
       case _ c1 =>
         have s1 : ∃ d : Definition, d ∈ E1_tl ++ E ∧ name = d.name ∧ args.length = d.args.length :=
-        Def_Holds_Imp_Exists_Def D I V M (E1_tl ++ E) name args E1_ih
+        def_holds_imp_def_in_env D I V M (E1_tl ++ E) name args E1_ih
 
         apply Exists.elim s1
         intro d s1_1
@@ -1377,7 +1373,7 @@ example
         exact E1_ih
 
 
-theorem Holds_coincide_Env
+theorem holds_coincide_env
   (D : Type)
   (I : Interpretation D)
   (V : Valuation D)
@@ -1463,7 +1459,7 @@ theorem Holds_coincide_Env
               exact E1_ih h3_right
 
 
-theorem Holds_Sub
+theorem holds_sub
   (D : Type)
   (I : Interpretation D)
   (V : Valuation D)
@@ -1527,7 +1523,7 @@ theorem Holds_Sub
 
       have s1 : Function.updateIte V (σ.val x) a ∘ σ.val = Function.updateIte (V ∘ σ.val) x a
       apply Function.updateIte_comp_right_injective
-      apply Instantiation.Injective
+      apply Instantiation.is_injective
 
       simp only [← s1]
 
@@ -1553,7 +1549,7 @@ theorem Holds_Sub
         cases c1
         case intro c1_left c1_right =>
           have s2 : Holds D I (Function.updateListIte (V ∘ σ.val) E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F ↔ Holds D I (Function.updateListIte V E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F
-          apply Holds_coincide_Var D I (Function.updateListIte (V ∘ σ.val) E_hd.args (List.map (V ∘ σ.val) xs)) (Function.updateListIte V E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
+          apply holds_coincide_var D I (Function.updateListIte (V ∘ σ.val) E_hd.args (List.map (V ∘ σ.val) xs)) (Function.updateListIte V E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
           intro v a1
           apply Function.updateListIte_mem_eq_len
           · exact a1
@@ -1561,7 +1557,7 @@ theorem Holds_Sub
             simp only [c1_right]
 
           simp only [← s2]
-          apply Holds_coincide_MetaVar_no_MetaVar
+          apply holds_coincide_meta_var_no_meta_var
           exact s1
       case _ c1 =>
         unfold IsMetaVarOrAllDefInEnv at h1
@@ -1573,11 +1569,9 @@ theorem Holds_Sub
         case inr c2 =>
           unfold sub at E_ih
           simp only [← E_ih c2]
-          apply Holds_coincide_MetaVar
+          apply holds_coincide_meta_var
           unfold Formula.metaVarSet
           simp
-
-
 
 
 example
@@ -1604,7 +1598,7 @@ example
     simp only [if_neg a2]
 
 
-theorem NotFree_Imp_IsNotFree
+theorem not_free_imp_is_not_free
   (D : Type)
   (I : Interpretation D)
   (M : MetaValuation D)
@@ -1724,7 +1718,7 @@ theorem NotFree_Imp_IsNotFree
 
       split_ifs
       case _ c1 =>
-        apply Holds_coincide_Var D I (Function.updateListIte V E_hd.args (List.map V xs)) (Function.updateListIte (Function.updateIte V v a) E_hd.args (List.map (Function.updateIte V v a) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
+        apply holds_coincide_var D I (Function.updateListIte V E_hd.args (List.map V xs)) (Function.updateListIte (Function.updateIte V v a) E_hd.args (List.map (Function.updateIte V v a) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
         · intro v' a1
           apply Function.updateListIte_map_updateIte V (Function.updateIte V v a)
           · intro y a2 contra
@@ -1761,7 +1755,7 @@ theorem lem_1
   cases h1
   case intro h1_left h1_right =>
     simp only [Function.updateIte_comp_right σ' σ.1 V v d h1_left h1_right]
-    apply NotFree_Imp_IsNotFree D I M E (τ X) Γ' (σ.1 v)
+    apply not_free_imp_is_not_free D I M E (τ X) Γ' (σ.1 v)
     · exact h3 v X a1
     · intro X' a2
       exact h2 (σ.1 v) X' a2
@@ -1893,7 +1887,7 @@ theorem lem_2_b
     exact h1
 
 
-theorem lem_3
+theorem is_proof_imp_is_meta_var_or_all_def_in_env
   (E : Env)
   (Γ : List (VarName × MetaVarName))
   (Δ : List Formula)
@@ -1954,7 +1948,7 @@ theorem lem_4
   case nil =>
     simp at h2
   case cons hd tl ih =>
-    have s1 : Env.Nodup (hd :: tl) := WellFormed_Env_Nodup (hd :: tl) h1
+    have s1 : Env.Nodup (hd :: tl) := well_formed_env_has_no_dup (hd :: tl) h1
 
     have s2 : ∃ E1 : Env, (hd :: tl) = E1 ++ tl
     apply Exists.intro [hd]
@@ -1974,7 +1968,7 @@ theorem lem_4
           cases h2
           case inl c2 =>
             subst c2
-            exact Holds_coincide_Env D I (Function.updateListIte V d.args (List.map V args)) M tl (d :: tl) d.F s2 h1_right_left s1
+            exact holds_coincide_env D I (Function.updateListIte V d.args (List.map V args)) M tl (d :: tl) d.F s2 h1_right_left s1
           case inr c2 =>
             cases h3
             case intro h3_left h3_right =>
@@ -1998,8 +1992,8 @@ theorem lem_4
           case inr c2 =>
             specialize ih h1_right_right c2
             simp only [← ih]
-            apply Holds_coincide_Env D I (Function.updateListIte V d.args (List.map V args)) M tl (hd :: tl) d.F s2
-            apply def_in_Env_imp_isMetaVarOrAllDefInEnv tl d h1_right_right c2
+            apply holds_coincide_env D I (Function.updateListIte V d.args (List.map V args)) M tl (hd :: tl) d.F s2
+            apply def_in_well_formed_env_is_meta_var_or_all_def_in_env tl d h1_right_right c2
             exact s1
 
 
@@ -2040,9 +2034,9 @@ theorem holds_conv
     exact h2_ih (Function.updateIte V h2_x a)
   case conv_unfold d σ h2 =>
     obtain ⟨σ', a1⟩ := σ.2
-    have s1 : IsMetaVarOrAllDefInEnv E d.F := def_in_Env_imp_isMetaVarOrAllDefInEnv E d h1 h2
+    have s1 : IsMetaVarOrAllDefInEnv E d.F := def_in_well_formed_env_is_meta_var_or_all_def_in_env E d h1 h2
 
-    simp only [← Holds_Sub D I V M E σ σ' meta_var_ d.F s1 a1]
+    simp only [← holds_sub D I V M E σ σ' meta_var_ d.F s1 a1]
     clear s1
 
     have s2 : d.name = d.name ∧ (List.map σ.val d.args).length = d.args.length
@@ -2052,16 +2046,16 @@ theorem holds_conv
 
     have s3 : d.F.metaVarSet = ∅ := no_meta_var_imp_meta_var_set_is_empty d.F d.args d.nf
 
-    simp only [Holds_coincide_MetaVar_no_MetaVar D I (V ∘ σ.val) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (meta_var_ X')) M E d.F s3]
+    simp only [holds_coincide_meta_var_no_meta_var D I (V ∘ σ.val) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (meta_var_ X')) M E d.F s3]
     clear s3
 
-    apply Holds_coincide_Var D I (Function.updateListIte V d.args (List.map V (List.map σ.val d.args))) (V ∘ σ.val) M E d.F d.args d.nf
+    apply holds_coincide_var D I (Function.updateListIte V d.args (List.map V (List.map σ.val d.args))) (V ∘ σ.val) M E d.F d.args d.nf
     intro v a2
     simp
     exact Function.updateListIte_map_mem V (V ∘ σ.val) d.args v a2
 
 
-theorem holds_isProof
+theorem holds_is_proof
   (D : Type)
   (I : Interpretation D)
   (M : MetaValuation D)
@@ -2108,7 +2102,7 @@ theorem holds_isProof
     exact a2 d
   case pred_2 h1_Γ h1_Δ h1_phi h1_x h1_1 h1_2 =>
     have s1 : IsNotFree D I M E h1_phi h1_x
-    apply NotFree_Imp_IsNotFree D I M E h1_phi h1_Γ h1_x h1_2
+    apply not_free_imp_is_not_free D I M E h1_phi h1_Γ h1_x h1_2
     exact nf h1_x
 
     simp only [Holds]
@@ -2135,22 +2129,22 @@ theorem holds_isProof
   case thm h1_Γ h1_Γ' h1_Δ h1_Δ' h1_phi h1_σ h1_τ h1_1 h1_2 h1_3 h1_4 h1_ih_1 h1_ih_2 =>
     obtain ⟨σ', a1⟩ := h1_σ.2
 
-    have s1 : IsMetaVarOrAllDefInEnv E h1_phi := lem_3 E h1_Γ h1_Δ h1_phi h1_4
+    have s1 : IsMetaVarOrAllDefInEnv E h1_phi := is_proof_imp_is_meta_var_or_all_def_in_env E h1_Γ h1_Δ h1_phi h1_4
 
     intro V
-    simp only [← Holds_Sub D I V M E h1_σ σ' h1_τ h1_phi s1 a1]
+    simp only [← holds_sub D I V M E h1_σ σ' h1_τ h1_phi s1 a1]
     apply h1_ih_2
     · intro v X a2
       exact lem_1 D I M E h1_Γ h1_Γ' h1_σ σ' h1_τ a1 nf h1_2 v X a2
     · intro psi V' a2
       have s2 : IsMetaVarOrAllDefInEnv E psi
       apply lem_2_b E h1_σ h1_τ
-      apply lem_3 E h1_Γ' h1_Δ' (sub h1_σ h1_τ psi)
+      apply is_proof_imp_is_meta_var_or_all_def_in_env E h1_Γ' h1_Δ' (sub h1_σ h1_τ psi)
       exact h1_3 psi a2
 
       have s3 : ∀ V'' : Valuation D, Holds D I (V'' ∘ h1_σ.val) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (h1_τ X')) E psi
       intro V''
-      simp only [Holds_Sub D I V'' M E h1_σ σ' h1_τ psi s2 a1]
+      simp only [holds_sub D I V'' M E h1_σ σ' h1_τ psi s2 a1]
       exact h1_ih_1 psi a2 M nf hyp V''
 
       specialize s3 (V' ∘ σ')
