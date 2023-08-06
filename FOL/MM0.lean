@@ -38,13 +38,13 @@ inductive MetaVarName : Type
   The string representation of meta variable names.
 -/
 def MetaVarName.toString : MetaVarName → String
-  | MetaVarName.mk x => x
+  | MetaVarName.mk X => X
 
 instance : ToString MetaVarName :=
-  { toString := fun x => x.toString }
+  { toString := fun X => X.toString }
 
 instance : Repr MetaVarName :=
-  { reprPrec := fun x _ => x.toString.toFormat }
+  { reprPrec := fun X _ => X.toString.toFormat }
 
 
 /--
