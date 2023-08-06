@@ -162,7 +162,8 @@ def NoMetaVarAndAllFreeInList
   | pred_ _ xs => xs ⊆ vs
   | eq_ x y => x ∈ vs ∧ y ∈ vs
   | true_ => True
-  | not_ phi => NoMetaVarAndAllFreeInList vs phi
+  | not_ phi =>
+      NoMetaVarAndAllFreeInList vs phi
   | imp_ phi psi =>
       NoMetaVarAndAllFreeInList vs phi ∧
       NoMetaVarAndAllFreeInList vs psi
@@ -212,7 +213,7 @@ def Instantiation.comp
 def MetaInstantiation : Type := MetaVarName → Formula
 
 
-def Sub
+def sub
   (σ : Instantiation)
   (τ : MetaInstantiation) :
   Formula → Formula
@@ -220,9 +221,9 @@ def Sub
   | pred_ X xs => pred_ X (xs.map σ.1)
   | eq_ x y => eq_ (σ.1 x) (σ.1 y)
   | true_ => true_
-  | not_ phi => not_ (Sub σ τ phi)
-  | imp_ phi psi => imp_ (Sub σ τ phi) (Sub σ τ psi)
-  | forall_ x phi => forall_ (σ.1 x) (Sub σ τ phi)
+  | not_ phi => not_ (sub σ τ phi)
+  | imp_ phi psi => imp_ (sub σ τ phi) (sub σ τ psi)
+  | forall_ x phi => forall_ (σ.1 x) (sub σ τ phi)
   | def_ X xs => def_ X (xs.map σ.1)
 
 
@@ -309,7 +310,7 @@ inductive IsConv (E : Env) : Formula → Formula → Prop
     (d : Definition_)
     (σ : Instantiation) :
     d ∈ E →
-    IsConv E (def_ d.name (d.args.map σ.1)) (Sub σ meta_var_ d.F)
+    IsConv E (def_ d.name (d.args.map σ.1)) (sub σ meta_var_ d.F)
 
 
 def Formula.false_ : Formula := not_ true_
@@ -446,9 +447,9 @@ inductive IsProof
     (∀ X : MetaVarName, X ∈ phi.MetaVarSet →
     IsMetaVarOrAllDefInEnv E (τ X)) →
     (∀ (x : VarName) (X : MetaVarName), (x, X) ∈ Γ → NotFree Γ' (σ.1 x) (τ X)) →
-    (∀ psi : Formula, psi ∈ Δ → IsProof E Γ' Δ' (Sub σ τ psi)) →
+    (∀ psi : Formula, psi ∈ Δ → IsProof E Γ' Δ' (sub σ τ psi)) →
     IsProof E Γ Δ phi →
-    IsProof E Γ' Δ' (Sub σ τ phi)
+    IsProof E Γ' Δ' (sub σ τ phi)
 
   | conv
     (Γ : List (VarName × MetaVarName))
@@ -736,14 +737,14 @@ theorem Instantiation.Bijective
 theorem Sub_Instantiation_comp
   (F : Formula)
   (σ σ' : Instantiation) :
-  Sub σ Formula.meta_var_ (Sub σ' Formula.meta_var_ F) =
-    Sub (Instantiation.comp σ σ') Formula.meta_var_ F :=
+  sub σ Formula.meta_var_ (sub σ' Formula.meta_var_ F) =
+    sub (Instantiation.comp σ σ') Formula.meta_var_ F :=
   by
   induction F
   case meta_var_ X =>
     rfl
   case pred_ X xs =>
-    simp only [Sub]
+    simp only [sub]
     unfold Instantiation.comp
     simp
   case eq_ x y =>
@@ -751,19 +752,19 @@ theorem Sub_Instantiation_comp
   case true_ =>
     rfl
   case not_ phi phi_ih =>
-    simp only [Sub]
+    simp only [sub]
     unfold Instantiation.comp
     congr! 1
   case imp_ phi psi phi_ih psi_ih =>
-    simp only [Sub]
+    simp only [sub]
     unfold Instantiation.comp
     congr! 1
   case forall_ x phi phi_ih =>
-    simp only [Sub]
+    simp only [sub]
     unfold Instantiation.comp
     congr! 1
   case def_ X xs =>
-    simp only [Sub]
+    simp only [sub]
     unfold Instantiation.comp
     simp
 
@@ -773,7 +774,7 @@ theorem Sub_no_metaVar
   (σ : Instantiation)
   (τ : MetaInstantiation)
   (h1 : F.MetaVarSet = ∅) :
-  (Sub σ τ F).MetaVarSet = ∅ :=
+  (sub σ τ F).MetaVarSet = ∅ :=
   by
   induction F
   case meta_var_ X =>
@@ -788,14 +789,14 @@ theorem Sub_no_metaVar
   case not_ phi phi_ih =>
     unfold Formula.MetaVarSet at h1
 
-    unfold Sub
+    unfold sub
     unfold Formula.MetaVarSet
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
     unfold Formula.MetaVarSet at h1
     simp only [Finset.union_eq_empty_iff] at h1
 
-    unfold Sub
+    unfold sub
     unfold Formula.MetaVarSet
     cases h1
     case intro h1_left h1_right =>
@@ -806,7 +807,7 @@ theorem Sub_no_metaVar
   case forall_ x phi phi_ih =>
     unfold Formula.MetaVarSet at h1
 
-    unfold Sub
+    unfold sub
     unfold Formula.MetaVarSet
     exact phi_ih h1
   case def_ X xs =>
@@ -818,7 +819,7 @@ theorem no_meta_var_sub
   (σ : Instantiation)
   (τ τ' : MetaInstantiation)
   (h1 : F.MetaVarSet = ∅) :
-  Sub σ τ F = Sub σ τ' F :=
+  sub σ τ F = sub σ τ' F :=
   by
   induction F
   case meta_var_ X =>
@@ -833,14 +834,14 @@ theorem no_meta_var_sub
   case not_ phi phi_ih =>
     unfold Formula.MetaVarSet at h1
 
-    unfold Sub
+    unfold sub
     congr! 1
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
     unfold Formula.MetaVarSet at h1 
     simp only [Finset.union_eq_empty_iff] at h1
 
-    unfold Sub
+    unfold sub
     cases h1
     case intro h1_left h1_right =>
     congr! 1
@@ -849,7 +850,7 @@ theorem no_meta_var_sub
   case forall_ x phi phi_ih =>
     unfold Formula.MetaVarSet at h1
 
-    unfold Sub
+    unfold sub
     congr! 1
     exact phi_ih h1
   case def_ X xs =>
@@ -862,7 +863,7 @@ theorem NoMetaVarAndAllFreeInList_Sub
   (σ : Instantiation)
   (τ : MetaInstantiation)
   (h1 : NoMetaVarAndAllFreeInList vs F) :
-  NoMetaVarAndAllFreeInList (vs.map σ.1) (Sub σ τ F) :=
+  NoMetaVarAndAllFreeInList (vs.map σ.1) (sub σ τ F) :=
   by
   induction F generalizing vs
   case meta_var_ X =>
@@ -870,23 +871,23 @@ theorem NoMetaVarAndAllFreeInList_Sub
 
     contradiction
   case pred_ X xs =>
-    unfold Sub
+    unfold sub
     unfold NoMetaVarAndAllFreeInList
     exact List.map_subset σ.1 h1
   case true_ =>
-    unfold Sub
+    unfold sub
     unfold NoMetaVarAndAllFreeInList
     simp
   case not_ phi phi_ih =>
     unfold NoMetaVarAndAllFreeInList at h1
 
-    unfold Sub
+    unfold sub
     unfold NoMetaVarAndAllFreeInList
     exact phi_ih vs h1
   case imp_ phi psi phi_ih psi_ih =>
     unfold NoMetaVarAndAllFreeInList at h1
 
-    unfold Sub
+    unfold sub
     unfold NoMetaVarAndAllFreeInList
     cases h1
     case intro h1_left h1_right =>
@@ -896,7 +897,7 @@ theorem NoMetaVarAndAllFreeInList_Sub
   case eq_ x y =>
     unfold NoMetaVarAndAllFreeInList at h1
 
-    unfold Sub
+    unfold sub
     unfold NoMetaVarAndAllFreeInList
     cases h1
     case intro h1_left h1_right =>
@@ -906,12 +907,12 @@ theorem NoMetaVarAndAllFreeInList_Sub
   case forall_ x phi phi_ih =>
     unfold NoMetaVarAndAllFreeInList at h1
 
-    unfold Sub
+    unfold sub
     unfold NoMetaVarAndAllFreeInList
     simp only [← List.map_cons]
     exact phi_ih (x :: vs) h1
   case def_ X xs =>
-    unfold Sub
+    unfold sub
     unfold NoMetaVarAndAllFreeInList
     exact List.map_subset σ.val h1
 
@@ -921,35 +922,35 @@ theorem Sub_IsMetaVarOrAllDefInEnv
   (E : Env)
   (σ : Instantiation)
   (h1 : IsMetaVarOrAllDefInEnv E F) :
-  IsMetaVarOrAllDefInEnv E (Sub σ Formula.meta_var_ F) :=
+  IsMetaVarOrAllDefInEnv E (sub σ Formula.meta_var_ F) :=
   by
   induction F
   case meta_var_ X =>
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     simp only
   case pred_ X xs =>
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     simp only
   case eq_ x y =>
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     simp only
   case true_ =>
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     simp only
   case not_ phi phi_ih =>
     unfold IsMetaVarOrAllDefInEnv at h1
 
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
     unfold IsMetaVarOrAllDefInEnv at h1
 
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     cases h1
     case intro h1_left h1_right =>
@@ -959,13 +960,13 @@ theorem Sub_IsMetaVarOrAllDefInEnv
   case forall_ x phi phi_ih =>
     unfold IsMetaVarOrAllDefInEnv at h1
 
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1
   case def_ X xs =>
     unfold IsMetaVarOrAllDefInEnv at h1
 
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     simp
     exact h1
@@ -1475,32 +1476,32 @@ theorem Holds_Sub
   (h1 : IsMetaVarOrAllDefInEnv E F)
   (h2 : σ.1 ∘ σ' = id ∧ σ' ∘ σ.1 = id) :
   Holds D I (V ∘ σ.1) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (τ X')) E F ↔
-    Holds D I V M E (Sub σ τ F) :=
+    Holds D I V M E (sub σ τ F) :=
   by
   induction F generalizing V
   case meta_var_ X =>
     cases h2
     case intro h2_left h2_right =>
-      unfold Sub
+      unfold sub
       simp only [Holds]
       simp only [Function.comp.assoc]
       simp only [h2_left]
       simp only [Function.comp.right_id]
   case pred_ X xs =>
-    unfold Sub
+    unfold sub
     simp only [Holds]
     simp
   case eq_ x y =>
-    unfold Sub
+    unfold sub
     simp only [Holds]
     simp
   case true_ =>
-    unfold Sub
+    unfold sub
     simp only [Holds]
   case not_ phi phi_ih =>
     unfold IsMetaVarOrAllDefInEnv at h1
 
-    unfold Sub
+    unfold sub
     simp only [Holds]
     congr! 1
     exact phi_ih V h1
@@ -1509,7 +1510,7 @@ theorem Holds_Sub
 
     cases h1
     case intro h1_left h1_right =>
-      unfold Sub
+      unfold sub
       simp only [Holds]
       congr! 1
       · exact phi_ih V h1_left
@@ -1519,7 +1520,7 @@ theorem Holds_Sub
 
     cases h2
     case intro h2_left h2_right =>
-      unfold Sub
+      unfold sub
       simp only [Holds]
       apply forall_congr'
       intro a
@@ -1543,7 +1544,7 @@ theorem Holds_Sub
       have s1 : E_hd.F.MetaVarSet = ∅ :=
         no_meta_var_imp_meta_var_set_is_empty E_hd.F E_hd.args E_hd.nf
 
-      unfold Sub
+      unfold sub
       simp only [Holds]
       simp
 
@@ -1570,7 +1571,7 @@ theorem Holds_Sub
         case inl c2 =>
           contradiction
         case inr c2 =>
-          unfold Sub at E_ih
+          unfold sub at E_ih
           simp only [← E_ih c2]
           apply Holds_coincide_MetaVar
           unfold Formula.MetaVarSet
@@ -1773,25 +1774,25 @@ theorem lem_2_a
   (F : Formula)
   (h1 : IsMetaVarOrAllDefInEnv E F)
   (h2 : ∀ X : MetaVarName, X ∈ F.MetaVarSet → IsMetaVarOrAllDefInEnv E (τ X)) :
-  IsMetaVarOrAllDefInEnv E (Sub σ τ F) :=
+  IsMetaVarOrAllDefInEnv E (sub σ τ F) :=
   by
   induction F
   case meta_var_ X =>
     unfold Formula.MetaVarSet at h2
     simp at h2
 
-    unfold Sub
+    unfold sub
     exact h2
   case pred_ X xs =>
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     simp only
   case eq_ x y =>
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     simp only
   case true_ =>
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     simp only
   case not_ phi phi_ih =>
@@ -1799,7 +1800,7 @@ theorem lem_2_a
 
     unfold Formula.MetaVarSet at h2
 
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1 h2
   case imp_ phi psi phi_ih psi_ih =>
@@ -1808,7 +1809,7 @@ theorem lem_2_a
     unfold Formula.MetaVarSet at h2
     simp at h2
 
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     cases h1
     case intro h1_left h1_right =>
@@ -1828,13 +1829,13 @@ theorem lem_2_a
 
     unfold Formula.MetaVarSet at h2
 
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1 h2
   case def_ X xs =>
     unfold IsMetaVarOrAllDefInEnv at h1
 
-    unfold Sub
+    unfold sub
     unfold IsMetaVarOrAllDefInEnv
     simp
     exact h1
@@ -1845,7 +1846,7 @@ theorem lem_2_b
   (σ : Instantiation)
   (τ : MetaInstantiation)
   (F : Formula)
-  (h1 : IsMetaVarOrAllDefInEnv E (Sub σ τ F)) :
+  (h1 : IsMetaVarOrAllDefInEnv E (sub σ τ F)) :
   IsMetaVarOrAllDefInEnv E F :=
   by
   induction F
@@ -1862,13 +1863,13 @@ theorem lem_2_b
     unfold IsMetaVarOrAllDefInEnv
     simp only
   case not_ phi phi_ih =>
-    unfold Sub at h1
+    unfold sub at h1
     unfold IsMetaVarOrAllDefInEnv at h1
 
     unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
-    unfold Sub at h1
+    unfold sub at h1
     unfold IsMetaVarOrAllDefInEnv at h1
 
     unfold IsMetaVarOrAllDefInEnv
@@ -1878,13 +1879,13 @@ theorem lem_2_b
     · exact phi_ih h1_left
     · exact psi_ih h1_right
   case forall_ x phi phi_ih =>
-    unfold Sub at h1
+    unfold sub at h1
     unfold IsMetaVarOrAllDefInEnv at h1
 
     unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1
   case def_ X xs =>
-    unfold Sub at h1
+    unfold sub at h1
     unfold IsMetaVarOrAllDefInEnv at h1
     simp at h1
 
@@ -2144,7 +2145,7 @@ theorem holds_isProof
     · intro psi V' a2
       have s2 : IsMetaVarOrAllDefInEnv E psi
       apply lem_2_b E h1_σ h1_τ
-      apply lem_3 E h1_Γ' h1_Δ' (Sub h1_σ h1_τ psi)
+      apply lem_3 E h1_Γ' h1_Δ' (sub h1_σ h1_τ psi)
       exact h1_3 psi a2
 
       have s3 : ∀ V'' : Valuation D, Holds D I (V'' ∘ h1_σ.val) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (h1_τ X')) E psi
