@@ -1892,70 +1892,47 @@ theorem lem_2_b
     exact h1
 
 
-theorem lem_3 (E : Env) (Γ : List (VarName × MetaVarName)) (Δ : List Formula) (phi : Formula)
-    (h1 : IsProof E Γ Δ phi) : phi.IsMetaVarOrAllDefInEnv E :=
+theorem lem_3
+  (E : Env)
+  (Γ : List (VarName × MetaVarName))
+  (Δ : List Formula)
+  (F : Formula)
+  (h1 : IsProof E Γ Δ F) :
+  IsMetaVarOrAllDefInEnv E F :=
   by
   induction h1
-  case hyp h1_Γ h1_Δ h1_phi h1_1 h1_2 => exact h1_1
-  case mp h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 h1_ih_1
-    h1_ih_2 =>
-    unfold Formula.is_meta_var_or_all_def_in_env at h1_ih_2 
+  case hyp h1_Γ h1_Δ h1_phi h1_1 h1_2 =>
+    exact h1_1
+  case mp h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 h1_ih_1 h1_ih_2 =>
+    unfold IsMetaVarOrAllDefInEnv at h1_ih_2
+
     cases h1_ih_2
-    exact h1_ih_2_right
-  case prop_1 h1_Γ h1_Δ h1_phi h1_psi h1_1
-    h1_2 =>
-    unfold Formula.is_meta_var_or_all_def_in_env at *
-    repeat'
-      first
-      | constructor
-      | assumption
-  case prop_2 h1_Γ h1_Δ h1_phi h1_psi h1_chi h1_1 h1_2
-    h1_3 =>
-    unfold Formula.is_meta_var_or_all_def_in_env at *
-    repeat'
-      first
-      | constructor
-      | assumption
-  case prop_3 h1_Γ h1_Δ h1_phi h1_psi h1_1
-    h1_2 =>
-    unfold Formula.is_meta_var_or_all_def_in_env at *
-    repeat'
-      first
-      | constructor
-      | assumption
-  case gen h1_Γ h1_Δ h1_phi h1_x h1_1
-    h1_ih =>
-    unfold Formula.is_meta_var_or_all_def_in_env at *
-    repeat'
-      first
-      | constructor
-      | assumption
-  case pred_1 h1_Γ h1_Δ h1_phi h1_psi h1_x h1_1
-    h1_2 =>
-    unfold Formula.is_meta_var_or_all_def_in_env at *
-    repeat'
-      first
-      | constructor
-      | assumption
-  case pred_2 h1_Γ h1_Δ h1_phi h1_x h1_1
-    h1_2 =>
-    unfold Formula.is_meta_var_or_all_def_in_env at *
-    repeat'
-      first
-      | constructor
-      | assumption
-  case eq_1 h1_Γ h1_Δ h1_x h1_y h1_1 => unfold exists_
-  case eq_2 h1_Γ h1_Δ h1_x h1_y
-    h1_z =>
-    unfold Formula.is_meta_var_or_all_def_in_env
-    simp only [and_self_iff]
-  /-
-    case mm0.is_proof.eq_3 : h1_Γ h1_Δ h1_n h1_name h1_xs h1_ys
-    { admit },
-  -/
+    case intro h1_ih_2_left h1_ih_2_right =>
+      exact h1_ih_2_right
+  case prop_1 h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 =>
+    repeat first | constructor | assumption
+  case prop_2 h1_Γ h1_Δ h1_phi h1_psi h1_chi h1_1 h1_2 h1_3 =>
+    repeat first | constructor | assumption
+  case prop_3 h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 =>
+    repeat first | constructor | assumption
+  case gen h1_Γ h1_Δ h1_phi h1_x h1_1 h1_ih =>
+    repeat first | constructor | assumption
+  case pred_1 h1_Γ h1_Δ h1_phi h1_psi h1_x h1_1 h1_2 =>
+    repeat first | constructor | assumption
+  case pred_2 h1_Γ h1_Δ h1_phi h1_x h1_1 h1_2 =>
+    repeat first | constructor | assumption
+  case eq_1 h1_Γ h1_Δ h1_x h1_y h1_1 =>
+    unfold exists_
+    repeat first | constructor | assumption
+  case eq_2 h1_Γ h1_Δ h1_x h1_y h1_z =>
+    unfold IsMetaVarOrAllDefInEnv
+    repeat first | constructor | assumption
+  case eq_3 h1_Γ h1_Δ h1_n h1_name h1_xs h1_ys =>
+    sorry
   case thm h1_Γ h1_Γ' h1_Δ h1_Δ' h1_phi h1_σ h1_τ h1_1 h1_2 h1_3 h1_4 h1_ih_1 h1_ih_2 =>
     exact lem_2_a E h1_σ h1_τ h1_phi h1_ih_2 h1_1
-  case conv h1_Γ h1_Δ h1_phi h1_phi' h1_1 h1_2 h1_3 h1_ih => exact h1_1
+  case conv h1_Γ h1_Δ h1_phi h1_phi' h1_1 h1_2 h1_3 h1_ih =>
+    exact h1_1
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
