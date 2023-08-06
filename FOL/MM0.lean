@@ -1737,26 +1737,34 @@ theorem NotFree_Imp_IsNotFree
         exact E_ih h2 V a
 
 
-theorem lem_1 {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (Γ Γ' : List (VarName × MetaVarName)) (σ : Instantiation) (σ' : VarName → VarName)
-    (τ : MetaInstantiation) (h1 : σ.1 ∘ σ' = id ∧ σ' ∘ σ.1 = id)
-    (h2 : ∀ (v : VarName) (X : MetaVarName), (v, X) ∈ Γ' → IsnotFree D P M E v (meta_var_ X))
-    (h3 : ∀ (v : VarName) (X : MetaVarName), (v, X) ∈ Γ → notFree Γ' (σ.1 v) (τ X)) :
-    ∀ (v : VarName) (X : MetaVarName),
-      (v, X) ∈ Γ →
-        IsnotFree D P (fun (X : MetaVarName) (V' : Valuation D) => Holds D P M E (τ X) (V' ∘ σ')) E
-          v (meta_var_ X) :=
+theorem lem_1
+  (D : Type)
+  (I : Interpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (Γ Γ' : List (VarName × MetaVarName))
+  (σ : Instantiation)
+  (σ' : VarName → VarName)
+  (τ : MetaInstantiation)
+  (h1 : σ.1 ∘ σ' = id ∧ σ' ∘ σ.1 = id)
+  (h2 : ∀ (v : VarName) (X : MetaVarName), (v, X) ∈ Γ' → IsNotFree D I M E (meta_var_ X) v)
+  (h3 : ∀ (v : VarName) (X : MetaVarName), (v, X) ∈ Γ → notFree Γ' (σ.1 v) (τ X)) :
+  ∀ (v : VarName) (X : MetaVarName),
+    (v, X) ∈ Γ →
+      IsNotFree D I (fun (X : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (τ X)) E (meta_var_ X) v :=
   by
-  cases h1
   intro v X a1
-  unfold is_notFree
-  simp only [holds_meta_var]
-  intro V a
-  rw [aux_2 V σ' σ.1 v a h1_left h1_right]
-  apply notFree_imp_is_notFree P M E Γ'
-  · exact h3 v X a1
-  · intro X' a2
-    exact h2 (σ.1 v) X' a2
+  unfold IsNotFree
+  simp only [Holds]
+  intro V d
+  cases h1
+  case intro h1_left h1_right =>
+    simp only [Function.updateIte_comp_right σ' σ.1 V v d h1_left h1_right]
+    apply NotFree_Imp_IsNotFree D I M E (τ X) Γ' (σ.1 v)
+    · exact h3 v X a1
+    · intro X' a2
+      exact h2 (σ.1 v) X' a2
+
 
 theorem lem_2_a (E : Env) (σ : Instantiation) (τ : MetaInstantiation) (phi : Formula)
     (h1 : phi.IsMetaVarOrAllDefInEnv E)
