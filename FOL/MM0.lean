@@ -1,9 +1,7 @@
-import Mathlib.Logic.Function.Basic
-import Mathlib.Data.Fin.VecNotation
-import Mathlib.Util.CompileInductive
-
 import FOL.FunctionUpdateIte
 import FOL.Tactics
+
+import Mathlib.Util.CompileInductive
 
 
 namespace MM0
