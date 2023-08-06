@@ -1603,97 +1603,139 @@ example
     simp only [if_neg a2]
 
 
-theorem notFree_imp_isnotFree {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
-    (Γ : List (VarName × MetaVarName)) (v : VarName) (phi : Formula) (h1 : notFree Γ v phi)
-    (h2 : ∀ X : MetaVarName, (v, X) ∈ Γ → IsnotFree D P M E v (meta_var_ X)) :
-    IsnotFree D P M E v phi := by
-  induction phi
+theorem NotFree_Imp_IsNotFree
+  (D : Type)
+  (I : Interpretation D)
+  (M : MetaValuation D)
+  (E : Env)
+  (F : Formula)
+  (Γ : List (VarName × MetaVarName))
+  (v : VarName)
+  (h1 : notFree Γ v F)
+  (h2 : ∀ X : MetaVarName, (v, X) ∈ Γ → IsNotFree D I M E (meta_var_ X) v) :
+  IsNotFree D I M E F v :=
+  by
+  induction F
   case meta_var_ X =>
-    unfold notFree at h1 
+    unfold notFree at h1
+
     exact h2 X h1
-  case false_ =>
-    unfold is_notFree
-    simp only [holds_false, iff_self_iff, forall₂_true_iff]
-  case pred_ name args =>
-    unfold notFree at h1 
-    unfold is_notFree at *
-    simp only [holds_pred]
-    intro V a
-    have s1 : List.map (Function.update V v a) args = List.map V args
+  case pred_ X xs =>
+    unfold notFree at h1
+
+    unfold IsNotFree
+    simp only [Holds]
+    intro V d
+    congr! 1
     apply List.map_congr
     intro x a1
-    have s2 : ¬x = v
+
+    have s1 : ¬ x = v
     intro contra
-    apply h1
-    rw [← contra]
-    exact a1
-    simp only [Function.update_noteq s2]
-    rw [s1]
-  case not_ phi phi_ih =>
-    unfold notFree at h1 
-    unfold is_notFree at *
-    simp only [holds_not]
-    intro V a
-    apply not_congr
-    exact phi_ih h1 V a
-  case imp_ phi psi phi_ih psi_ih =>
-    unfold notFree at h1 
-    cases h1
-    unfold is_notFree at *
-    simp only [holds_imp]
-    intro V a
-    apply imp_congr
-    · exact phi_ih h1_left V a
-    · exact psi_ih h1_right V a
+    subst contra
+    contradiction
+
+    unfold Function.updateIte
+    simp only [if_neg s1]
   case eq_ x y =>
-    unfold notFree at h1 
+    unfold notFree at h1
+
+    unfold IsNotFree
+    simp only [Holds]
+    intro V d
     cases h1
-    unfold is_notFree at *
-    simp only [holds_eq]
-    intro V a
-    simp only [Function.update_noteq h1_left, Function.update_noteq h1_right]
+    case intro h1_left h1_right =>
+      simp only [Function.updateIte]
+      simp only [if_neg h1_left]
+      simp only [if_neg h1_right]
+  case true_ =>
+    unfold IsNotFree
+    intro V d
+    simp only [Holds]
+  case not_ phi phi_ih =>
+    unfold notFree at h1
+
+    unfold IsNotFree at phi_ih
+
+    unfold IsNotFree
+    intro V d
+    simp only [Holds]
+    congr! 1
+    exact phi_ih h1 V d
+  case imp_ phi psi phi_ih psi_ih =>
+    unfold notFree at h1
+
+    unfold IsNotFree at phi_ih
+    unfold IsNotFree at psi_ih
+
+    unfold IsNotFree
+    intro V d
+    simp only [Holds]
+    cases h1
+    case intro h1_left h1_right =>
+      congr! 1
+      · exact phi_ih h1_left V d
+      · exact psi_ih h1_right V d
   case forall_ x phi phi_ih =>
-    unfold notFree at h1 
-    unfold is_notFree at *
-    simp only [holds_forall]
-    intro V a
+    unfold notFree at h1
+
+    unfold IsNotFree at phi_ih
+
+    unfold IsNotFree
+    intro V d
+    simp only [Holds]
     apply forall_congr'
-    intro a'
-    cases h1
-    · rw [h1]
-      simp only [Function.update_idem]
-    · by_cases c1 : v = x
-      · rw [c1]
-        simp only [Function.update_idem]
-      · simp only [Function.update_comm c1]
-        exact phi_ih h1 (Function.update V x a') a
-  case def_ name args =>
+    intro d'
+    by_cases c1 : x = v
+    · cases h1
+      case _ c2 =>
+        subst c1
+        simp only [Function.updateIte_idem]
+      case _ c2 =>
+        subst c1
+        simp only [Function.updateIte_idem]
+    · cases h1
+      case _ c2 =>
+        contradiction
+      case _ c2 =>
+        simp only [← Function.updateIte_comm V x v d d' c1]
+        exact phi_ih c2 (Function.updateIte V x d') d
+  case def_ X xs =>
     induction E
     case nil =>
-      intro V a
-      simp only [holds_nil_def]
+      unfold IsNotFree
+      intro V d
+      simp only [Holds]
     case cons E_hd E_tl E_ih =>
-      unfold is_notFree at *
-      simp only [holds_not_nil_def, holds_meta_var] at *
+      unfold notFree at h1
+
+      unfold IsNotFree at h2
+      simp only [Holds] at h2
+      simp only [Function.updateIte] at h2
+
+      unfold IsNotFree at E_ih
+      simp only [Holds] at E_ih
+
+      unfold IsNotFree
+      simp only [Holds]
+
       intro V a
+
       split_ifs
-      · apply
-          holds_valuation_ext P M E_tl (Function.updateList V (E_hd.args.zip (List.map V args)))
-            (Function.updateList (Function.update V v a)
-              (E_hd.args.zip (List.map (Function.update V v a) args)))
-            E_hd.q E_hd.args E_hd.nf
+      case _ c1 =>
+        apply Holds_coincide_Var D I (Function.updateListIte V E_hd.args (List.map V xs)) (Function.updateListIte (Function.updateIte V v a) E_hd.args (List.map (Function.updateIte V v a) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
         · intro v' a1
-          symm
-          apply Function.updateList_update V (Function.update V v a)
-          · unfold notFree at h1 
-            intro y a2 contra
-            apply h1
-            rw [← contra]
-            exact a2
-          · cases h
-            rw [h_right]
+          apply Function.updateListIte_map_updateIte V (Function.updateIte V v a)
+          · intro y a2 contra
+            subst contra
+            contradiction
+          · cases c1
+            case intro c1_left c1_right =>
+            simp only [c1_right]
           · exact a1
-      · exact E_ih h2 V a
+      case _ c1 =>
+        exact E_ih h2 V a
+
 
 theorem lem_1 {D : Type} (P : PredInterpretation D) (M : MetaValuation D) (E : Env)
     (Γ Γ' : List (VarName × MetaVarName)) (σ : Instantiation) (σ' : VarName → VarName)

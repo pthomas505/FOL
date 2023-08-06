@@ -551,4 +551,80 @@ theorem Function.updateListIte_fun_coincide_mem_eq_len
     exact h3
 
 
+theorem Function.updateListIte_map_mem_ext
+  {α β : Type}
+  [DecidableEq α]
+  (l1 l2 : List α)
+  (f g h h' : α → β)
+  (x : α)
+  (h1 : ∀ y : α, y ∈ l2 → h y = h' y)
+  (h2 : l1.length = l2.length)
+  (h3 : x ∈ l1) :
+  Function.updateListIte f l1 (List.map h l2) x =
+      Function.updateListIte g l1 (List.map h' l2) x :=
+  by
+  have s1 : List.map h l2 = List.map h' l2
+  simp only [List.map_eq_map_iff]
+  exact h1
+
+  simp only [s1]
+  apply Function.updateListIte_mem_eq_len
+  · exact h3
+  · simp
+    exact h2
+
+
+theorem Function.updateListIte_map_mem
+  {α β : Type}
+  [DecidableEq α]
+  (f g : α → β)
+  (l : List α)
+  (x : α)
+  (h1 : x ∈ l) :
+  Function.updateListIte f l (List.map g l) x = g x :=
+  by
+  induction l
+  case nil =>
+    simp at h1
+  case cons hd tl ih =>
+    simp at h1 
+
+    simp
+    unfold Function.updateListIte
+    unfold Function.updateIte
+    split_ifs
+    case _ c1 =>
+      subst c1
+      rfl
+    case _ c1 =>
+      tauto
+
+
+theorem Function.updateListIte_map_updateIte
+  {α β : Type}
+  [DecidableEq α]
+  (f g : α → β)
+  (l1 l2 : List α)
+  (v : α)
+  (a : β)
+  (x : α)
+  (h1 : ∀ y : α, y ∈ l2 → ¬ y = v)
+  (h2 : l1.length = l2.length)
+  (h3 : x ∈ l1) :
+  Function.updateListIte f l1 (List.map f l2) x =
+  Function.updateListIte g l1 (List.map (Function.updateIte f v a) l2) x :=
+  by
+  have s1 : ∀ y : α, y ∈ l2 → f y =Function.updateIte f v a y
+  intro y a1
+  unfold Function.updateIte
+  split_ifs
+  case _ c1 =>
+    specialize h1 y a1
+    contradiction
+  case _ c2 =>
+    rfl
+
+  exact Function.updateListIte_map_mem_ext l1 l2 f g f (Function.updateIte f v a) x s1 h2 h3
+
+
 #lint
