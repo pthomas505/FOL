@@ -1766,57 +1766,79 @@ theorem lem_1
       exact h2 (σ.1 v) X' a2
 
 
-theorem lem_2_a (E : Env) (σ : Instantiation) (τ : MetaInstantiation) (phi : Formula)
-    (h1 : phi.IsMetaVarOrAllDefInEnv E)
-    (h2 : ∀ X : MetaVarName, X ∈ phi.metaVarSet → (τ X).IsMetaVarOrAllDefInEnv E) :
-    (phi.subst σ τ).IsMetaVarOrAllDefInEnv E :=
+theorem lem_2_a
+  (E : Env)
+  (σ : Instantiation)
+  (τ : MetaInstantiation)
+  (F : Formula)
+  (h1 : IsMetaVarOrAllDefInEnv E F)
+  (h2 : ∀ X : MetaVarName, X ∈ F.metaVarSet → IsMetaVarOrAllDefInEnv E (τ X)) :
+  IsMetaVarOrAllDefInEnv E (Sub σ τ F) :=
   by
-  induction phi
+  induction F
   case meta_var_ X =>
-    unfold Formula.metaVarSet at h2 
-    simp only [Finset.mem_singleton, forall_eq] at h2 
-    unfold Formula.subst
+    unfold Formula.metaVarSet at h2
+    simp at h2
+
+    unfold Sub
     exact h2
-  case false_ => unfold Formula.subst
-  case pred_ name args => unfold Formula.subst
+  case pred_ X xs =>
+    unfold Sub
+    unfold IsMetaVarOrAllDefInEnv
+    simp only
+  case eq_ x y =>
+    unfold Sub
+    unfold IsMetaVarOrAllDefInEnv
+    simp only
+  case true_ =>
+    unfold Sub
+    unfold IsMetaVarOrAllDefInEnv
+    simp only
   case not_ phi phi_ih =>
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
-    unfold Formula.metaVarSet at h2 
-    unfold Formula.subst
-    unfold Formula.is_meta_var_or_all_def_in_env
+    unfold IsMetaVarOrAllDefInEnv at h1
+
+    unfold Formula.metaVarSet at h2
+
+    unfold Sub
+    unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1 h2
-  case imp_ phi psi phi_ih
-    psi_ih =>
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
+  case imp_ phi psi phi_ih psi_ih =>
+    unfold IsMetaVarOrAllDefInEnv at h1
+
+    unfold Formula.metaVarSet at h2
+    simp at h2
+
+    unfold Sub
+    unfold IsMetaVarOrAllDefInEnv
     cases h1
-    unfold Formula.metaVarSet at h2 
-    simp only [Finset.mem_union] at h2 
-    unfold Formula.subst
-    unfold Formula.is_meta_var_or_all_def_in_env
-    constructor
-    · apply phi_ih h1_left
-      intro X a1
-      apply h2
-      apply Or.intro_left
-      exact a1
-    · apply psi_ih h1_right
-      intro X a1
-      apply h2
-      apply Or.intro_right
-      exact a1
-  case eq_ x y => unfold Formula.subst
+    case intro h1_left h1_right =>
+      constructor
+      · apply phi_ih h1_left
+        intro X a1
+        apply h2
+        left
+        exact a1
+      · apply psi_ih h1_right
+        intro X a1
+        apply h2
+        right
+        exact a1
   case forall_ x phi phi_ih =>
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
-    unfold Formula.metaVarSet at h2 
-    unfold Formula.subst
-    unfold Formula.is_meta_var_or_all_def_in_env
+    unfold IsMetaVarOrAllDefInEnv at h1
+
+    unfold Formula.metaVarSet at h2
+
+    unfold Sub
+    unfold IsMetaVarOrAllDefInEnv
     exact phi_ih h1 h2
-  case def_ name args =>
-    unfold Formula.is_meta_var_or_all_def_in_env at h1 
-    unfold Formula.subst
-    unfold Formula.is_meta_var_or_all_def_in_env
-    simp only [List.length_map]
+  case def_ X xs =>
+    unfold IsMetaVarOrAllDefInEnv at h1
+
+    unfold Sub
+    unfold IsMetaVarOrAllDefInEnv
+    simp
     exact h1
+
 
 theorem lem_2_b (E : Env) (σ : Instantiation) (τ : MetaInstantiation) (phi : Formula)
     (h1 : (phi.subst σ τ).IsMetaVarOrAllDefInEnv E) : phi.IsMetaVarOrAllDefInEnv E :=
