@@ -2165,3 +2165,5 @@ theorem holds_isProof
     exact s1
 
 end MM0
+
+--#lint
