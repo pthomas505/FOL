@@ -155,10 +155,10 @@ instance (v : VarName) (F : Formula) : Decidable (isFreeIn v F) :=
 /--
   Formula.predVarSet F := The set of all of the predicate variables that have an occurrence in the formula F.
 -/
-def Formula.predVarSet : Formula → Finset (PredName × ℕ) 
+def Formula.predVarSet : Formula → Finset (PredName × ℕ)
   | pred_const_ _ _ => ∅
   | pred_var_ X xs => {(X, xs.length)}
-  | eq_ _ _ => ∅ 
+  | eq_ _ _ => ∅
   | true_ => ∅
   | false_ => ∅
   | not_ phi => phi.predVarSet

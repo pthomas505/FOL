@@ -49,5 +49,13 @@ def Formula.all_def_in_env (E : Env) : Formula → Prop
   ∃ (d : Definition), d ∈ E ∧ X = d.name ∧ xs.length = d.args.length
 
 
+instance (E : Env) (F : Formula) : Decidable (F.all_def_in_env E) :=
+  by
+  induction F
+  all_goals
+    unfold Formula.all_def_in_env
+    infer_instance
+
+
 def Env.nodup_ : Env → Prop :=
   List.Pairwise (fun (d1 d2 : Definition) => d1.name = d2.name → d1.args.length = d2.args.length → False)

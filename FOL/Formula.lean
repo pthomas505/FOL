@@ -8,15 +8,8 @@ namespace FOL
 /--
   The type of variable names.
 -/
-inductive VarName : Type
-  | mk : String → VarName
+structure VarName extends String
   deriving Inhabited, DecidableEq
-
-/--
-  The string representation of variable names.
--/
-def VarName.toString : VarName → String
-  | VarName.mk x => x
 
 instance : ToString VarName :=
   { toString := fun x => x.toString }
@@ -28,15 +21,8 @@ instance : Repr VarName :=
 /--
   The type of predicate names.
 -/
-inductive PredName : Type
-  | mk : String → PredName
+structure PredName extends String
   deriving Inhabited, DecidableEq
-
-/--
-  The string representation of predicate names.
--/
-def PredName.toString : PredName → String
-  | PredName.mk X => X
 
 instance : ToString PredName :=
   { toString := fun X => X.toString }
@@ -48,15 +34,8 @@ instance : Repr PredName :=
 /--
   The type of definition names.
 -/
-inductive DefName : Type
-  | mk : String → DefName
+structure DefName extends String
   deriving Inhabited, DecidableEq
-
-/--
-  The string representation of definition names.
--/
-def DefName.toString : DefName → String
-  | DefName.mk X => X
 
 instance : ToString DefName :=
   { toString := fun X => X.toString }
@@ -92,9 +71,9 @@ open Formula
   The string representation of formulas.
 -/
 def Formula.toString : Formula → String
-  | pred_const_ X xs => s! "({X.toString} {xs.toString})"
-  | pred_var_ X xs => s! "({X.toString} {xs.toString})"
-  | eq_ x y => s! "({x.toString} = {y.toString})"
+  | pred_const_ X xs => s! "({X} {xs})"
+  | pred_var_ X xs => s! "({X} {xs})"
+  | eq_ x y => s! "({x} = {y})"
   | true_ => "T"
   | false_ => "F"
   | not_ phi => s! "(¬ {phi.toString})"
@@ -102,9 +81,9 @@ def Formula.toString : Formula → String
   | and_ phi psi => s! "({phi.toString} ∧ {psi.toString})"
   | or_ phi psi => s! "({phi.toString} ∨ {psi.toString})"
   | iff_ phi psi => s! "({phi.toString} ↔ {psi.toString})"
-  | forall_ x phi => s! "(∀ {x.toString}. {phi.toString})"
-  | exists_ x phi => s! "(∃ {x.toString}. {phi.toString})"
-  | def_ X xs => s! "def ({X.toString} {xs.toString})"
+  | forall_ x phi => s! "(∀ {x}. {phi.toString})"
+  | exists_ x phi => s! "(∃ {x}. {phi.toString})"
+  | def_ X xs => s! "def ({X} {xs})"
 
 
 instance : ToString Formula :=
