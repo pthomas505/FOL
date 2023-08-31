@@ -54,22 +54,22 @@ instance : Repr labeledJudgement :=
 
 
 inductive Step : Type
+| structural_1 : Formula → String → Step
+| assumption : Formula → Step
 | ax_1 : List Formula → Formula → Formula → Step
 | ax_2 : List Formula → Formula → Formula → Formula → Step
 | ax_3 : List Formula → Formula → Formula → Step
 | mp : String → String → Step
-| assumption : Formula → Step
-| structural_1 : Formula → String → Step
 
 open Step
 
 def Step.toString : Step → String
+| structural_1 H label => s! "structural_1 {H} {label}"
+| assumption H => s! "assumption {H}"
 | ax_1 delta phi psi => s! "ax_1 {delta} {phi} {psi}"
 | ax_2 delta phi psi chi => s! "ax_2 {delta} {phi} {psi} {chi}"
 | ax_3 delta phi psi => s! "ax_3 {delta} {phi} {psi}"
 | mp major_label minor_label => s! "mp {major_label} {minor_label}"
-| assumption H => s! "assumption {H}"
-| structural_1 H label => s! "structural_1 {H} {label}"
 
 instance : ToString Step :=
   { toString := fun x => x.toString }
@@ -111,16 +111,22 @@ def Context.find
   Except String Judgement :=
   if let Option.some val := gamma.find? (fun val => val.label = label)
   then Except.ok val.judgement
-  else Except.error s!"not found in context: {label}"
-
-def returnTypeError
-  {α : Type}
-  (expected got : String) :
-  Except String α :=
-  Except.error s!"type error, expected {expected}, got {got}"
+  else Except.error s!"{label} not found in context."
 
 
 def checkStep (gamma : Context) : Step → Except String Judgement
+
+| structural_1 H label => do
+  let judgement ← gamma.find label
+  Except.ok {
+    assumptions := H :: judgement.assumptions
+    conclusion := judgement.conclusion
+  }
+
+| assumption H =>
+  Except.ok {
+    assumptions := [H]
+    conclusion := H }
 
 | ax_1 delta phi psi =>
     Except.ok {
@@ -153,18 +159,6 @@ def checkStep (gamma : Context) : Step → Except String Judgement
     else Except.error s! "major judgement : {major_label} : {major}{eol}The conclusion of the major judgement must be an implication."
   else Except.error s! "major judgement : {major_label} : {major}{eol}minor judgement : {minor_label} : {minor}{eol}The assumptions of the minor judgement must match the assumptions of the major judgement."
 
-| assumption H =>
-  Except.ok {
-    assumptions := [H]
-    conclusion := H }
-
-| structural_1 H label => do
-  let judgement ← gamma.find label
-  Except.ok {
-    assumptions := H :: judgement.assumptions
-    conclusion := judgement.conclusion
-  }
-
 
 def checkStepListAux
   (gamma : Context) :
@@ -195,7 +189,9 @@ def unfoldExcept : Except String Context → String
 
       ⟨ "s2", (ax_1 [] (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ⟩,
 
-      ⟨ "s3", (mp "s1" "s2") ⟩
+      ⟨ "s3", (mp "s1" "s2") ⟩,
+
+      ⟨ "s4", (assumption (Formula.var_ "H")) ⟩
     ]
   )
 )
