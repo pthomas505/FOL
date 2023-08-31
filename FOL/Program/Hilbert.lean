@@ -5,6 +5,7 @@ set_option autoImplicit false
 
 abbrev eol := '\n'
 
+
 inductive Formula : Type
 | var_ : String → Formula
 | not_ : Formula → Formula
@@ -55,7 +56,7 @@ instance : Repr labeledJudgement :=
 
 inductive Step : Type
 | structural_1 : Formula → String → Step
-| assumption : Formula → Step
+| assume : Formula → Step
 | ax_1 : List Formula → Formula → Formula → Step
 | ax_2 : List Formula → Formula → Formula → Formula → Step
 | ax_3 : List Formula → Formula → Formula → Step
@@ -65,7 +66,7 @@ open Step
 
 def Step.toString : Step → String
 | structural_1 H label => s! "structural_1 {H} {label}"
-| assumption H => s! "assumption {H}"
+| assume H => s! "assume {H}"
 | ax_1 delta phi psi => s! "ax_1 {delta} {phi} {psi}"
 | ax_2 delta phi psi chi => s! "ax_2 {delta} {phi} {psi} {chi}"
 | ax_3 delta phi psi => s! "ax_3 {delta} {phi} {psi}"
@@ -123,7 +124,7 @@ def checkStep (gamma : Context) : Step → Except String Judgement
     conclusion := judgement.conclusion
   }
 
-| assumption H =>
+| assume H =>
   Except.ok {
     assumptions := [H]
     conclusion := H }
