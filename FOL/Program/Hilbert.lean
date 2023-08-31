@@ -55,21 +55,21 @@ instance : Repr labeledJudgement :=
 
 
 inductive Step : Type
-| structural_1 : Formula → String → Step
-| assume : Formula → Step
-| ax_1 : List Formula → Formula → Formula → Step
-| ax_2 : List Formula → Formula → Formula → Formula → Step
-| ax_3 : List Formula → Formula → Formula → Step
+| add_assumptions : List Formula → String → Step
+| assumption : List Formula → Formula → Step
+| ax_1 : Formula → Formula → Step
+| ax_2 : Formula → Formula → Formula → Step
+| ax_3 : Formula → Formula → Step
 | mp : String → String → Step
 
 open Step
 
 def Step.toString : Step → String
-| structural_1 H label => s! "structural_1 {H} {label}"
-| assume H => s! "assume {H}"
-| ax_1 delta phi psi => s! "ax_1 {delta} {phi} {psi}"
-| ax_2 delta phi psi chi => s! "ax_2 {delta} {phi} {psi} {chi}"
-| ax_3 delta phi psi => s! "ax_3 {delta} {phi} {psi}"
+| add_assumptions delta label => s! "add_assumptions {delta} {label}"
+| assumption delta phi => s! "assumption {delta} {phi}"
+| ax_1 phi psi => s! "ax_1 {phi} {psi}"
+| ax_2 phi psi chi => s! "ax_2 {phi} {psi} {chi}"
+| ax_3 phi psi => s! "ax_3 {phi} {psi}"
 | mp major_label minor_label => s! "mp {major_label} {minor_label}"
 
 instance : ToString Step :=
@@ -117,31 +117,34 @@ def Context.find
 
 def checkStep (gamma : Context) : Step → Except String Judgement
 
-| structural_1 H label => do
+| add_assumptions delta label => do
   let judgement ← gamma.find label
   Except.ok {
-    assumptions := H :: judgement.assumptions
+    assumptions := delta ++ judgement.assumptions
     conclusion := judgement.conclusion
   }
 
-| assume H =>
-  Except.ok {
-    assumptions := [H]
-    conclusion := H }
-
-| ax_1 delta phi psi =>
+| assumption delta phi =>
+  if phi ∈ delta
+  then
     Except.ok {
       assumptions := delta
+      conclusion := phi }
+  else Except.error s! "{phi} must be an element of {delta}."
+
+| ax_1 phi psi =>
+    Except.ok {
+      assumptions := []
       conclusion := (phi.imp_ (psi.imp_ phi)) }
 
-| ax_2 delta phi psi chi =>
+| ax_2 phi psi chi =>
     Except.ok {
-      assumptions := delta
+      assumptions := []
       conclusion := ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi))) }
 
-| ax_3 delta phi psi =>
+| ax_3 phi psi =>
     Except.ok {
-      assumptions := delta
+      assumptions := []
       conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
 | mp major_label minor_label => do
@@ -186,13 +189,13 @@ def unfoldExcept : Except String Context → String
 #eval IO.print (
   unfoldExcept (
     checkStepList [
-      ⟨ "s1", (ax_2 [] (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ⟩,
+      ⟨ "s1", (ax_2 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ⟩,
 
-      ⟨ "s2", (ax_1 [] (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ⟩,
+      ⟨ "s2", (ax_1 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ⟩,
 
       ⟨ "s3", (mp "s1" "s2") ⟩,
 
-      ⟨ "s4", (ax_1 [] (Formula.var_ "P") (Formula.var_ "P")) ⟩,
+      ⟨ "s4", (ax_1 (Formula.var_ "P") (Formula.var_ "P")) ⟩,
 
       ⟨ "s5", (mp "s3" "s4") ⟩ 
     ]
