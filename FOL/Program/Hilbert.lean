@@ -191,7 +191,9 @@ def unfoldExcept : Except String Context → String
 
       ⟨ "s3", (mp "s1" "s2") ⟩,
 
-      ⟨ "s4", (assumption (Formula.var_ "H")) ⟩
+      ⟨ "s4", (ax_1 [] (Formula.var_ "P") (Formula.var_ "P")) ⟩,
+
+      ⟨ "s5", (mp "s3" "s4") ⟩ 
     ]
   )
 )
