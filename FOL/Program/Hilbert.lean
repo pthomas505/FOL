@@ -26,17 +26,17 @@ instance : Repr Formula :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
-inductive DerivationStep : Type
-  | thin : String → List Formula → DerivationStep
-  | assume : Formula → DerivationStep
-  | prop_1 : Formula → Formula → DerivationStep
-  | prop_2 : Formula → Formula → Formula → DerivationStep
-  | prop_3 : Formula → Formula → DerivationStep
-  | mp : String → String → DerivationStep
+inductive Step : Type
+  | thin : String → List Formula → Step
+  | assume : Formula → Step
+  | prop_1 : Formula → Formula → Step
+  | prop_2 : Formula → Formula → Formula → Step
+  | prop_3 : Formula → Formula → Step
+  | mp : String → String → Step
 
-open DerivationStep
+open Step
 
-def DerivationStep.toString : DerivationStep → String
+def Step.toString : Step → String
   | thin label hypotheses => s! "thin {label} {hypotheses}"
   | assume hypothesis => s! "assume {hypothesis}"
   | prop_1 phi psi => s! "prop_1 {phi} {psi}"
@@ -44,24 +44,24 @@ def DerivationStep.toString : DerivationStep → String
   | prop_3 phi psi => s! "prop_3 {phi} {psi}"
   | mp major_label minor_label => s! "mp {major_label} {minor_label}"
 
-instance : ToString DerivationStep :=
+instance : ToString Step :=
   { toString := fun x => x.toString }
 
-instance : Repr DerivationStep :=
+instance : Repr Step :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
-structure labeledDerivationStep : Type :=
+structure labeledStep : Type :=
   (label : String)
-  (step : DerivationStep)
+  (step : Step)
 
-def labeledDerivationStep.toString (x : labeledDerivationStep) : String :=
+def labeledStep.toString (x : labeledStep) : String :=
   s! "{x.label} : {x.step}"
 
-instance : ToString labeledDerivationStep :=
+instance : ToString labeledStep :=
   { toString := fun x => x.toString }
 
-instance : Repr labeledDerivationStep :=
+instance : Repr labeledStep :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
@@ -118,7 +118,7 @@ def Context.find
 def checkDerivationStep
   (globalContext : Context)
   (localContext : Context) :
-  DerivationStep → Except String Statement
+  Step → Except String Statement
 
   | thin label hypotheses => do
     let statement ← localContext.find label
@@ -161,18 +161,18 @@ def checkDerivationStep
         }
         else Except.error s! "major premise : {major_label} : {major}{LF}minor premise : {minor_label} : {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
       else Except.error s! "major premise : {major_label} : {major}{LF}The conclusion of the major premise must be an implication."
-    else Except.error s! "major premise : {major_label} : {major}{LF}minor premise : {minor_label} : {minor}{LF}The assumptions of the minor premise must match the assumptions of the major premise."
+    else Except.error s! "major premise : {major_label} : {major}{LF}minor premise : {minor_label} : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
 
 
-def checkDerivationStepListAux
+def checkStepListAux
   (globalContext : Context)
   (localContext : Context) :
-  List labeledDerivationStep → Except String Context
+  List labeledStep → Except String Context
   | [] => Except.ok localContext
   | hd :: tl =>
     match checkDerivationStep globalContext localContext hd.step with
     | Except.ok statement =>
-        checkDerivationStepListAux
+        checkStepListAux
           globalContext
           (
             {
@@ -183,11 +183,11 @@ def checkDerivationStepListAux
           tl
     | Except.error message => Except.error s! "Global Context{LF}{globalContext}{LF}-----{LF}Local Context{localContext}{LF}-----{LF}Error{LF}{hd}{LF}{message}"
 
-def checkDerivationStepList
+def checkStepList
   (globalContext : Context)
-  (xs : List labeledDerivationStep) :
+  (xs : List labeledStep) :
   Except String Context :=
-  checkDerivationStepListAux globalContext [] xs
+  checkStepListAux globalContext [] xs
 
 
 def ExceptToString : Except String Context → String
@@ -197,7 +197,7 @@ def ExceptToString : Except String Context → String
 
 #eval IO.print (
   ExceptToString (
-    checkDerivationStepList [] [
+    checkStepList [] [
       ⟨ "s1", (prop_2 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ⟩,
 
       ⟨ "s2", (prop_1 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ⟩,
