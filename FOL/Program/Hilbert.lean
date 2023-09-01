@@ -170,7 +170,7 @@ def checkDerivationStepListAux
   List labeledDerivationStep → Except String Context
   | [] => Except.ok local_context
   | hd :: tl =>
-    match checkDerivationStep global_context local_context  hd.step with
+    match checkDerivationStep global_context local_context hd.step with
     | Except.ok judgement =>
         checkDerivationStepListAux
           global_context
@@ -185,9 +185,9 @@ def checkDerivationStepListAux
 
 def checkDerivationStepList
   (global_context : Context)
-  (proof : List labeledDerivationStep) :
+  (xs : List labeledDerivationStep) :
   Except String Context :=
-  checkDerivationStepListAux global_context [] proof
+  checkDerivationStepListAux global_context [] xs
 
 
 def ExceptToString : Except String Context → String
