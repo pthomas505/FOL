@@ -115,7 +115,7 @@ def Context.find
   else Except.error s!"{label} not found in context."
 
 
-def checkDerivationStep
+def checkStep
   (globalContext : Context)
   (localContext : Context) :
   Step → Except String Statement
@@ -170,7 +170,7 @@ def checkStepListAux
   List labeledStep → Except String Context
   | [] => Except.ok localContext
   | hd :: tl =>
-    match checkDerivationStep globalContext localContext hd.step with
+    match checkStep globalContext localContext hd.step with
     | Except.ok statement =>
         checkStepListAux
           globalContext
