@@ -106,9 +106,9 @@ def compileStepListToSequentListAux
 
 def compileStepListToSequentList
   (globalContext : List Sequent)
-  (xs : List Step) :
+  (steps : List Step) :
   Option (List Sequent) :=
-  compileStepListToSequentListAux globalContext [] xs
+  compileStepListToSequentListAux globalContext [] steps
 
 
 structure Proof : Type :=
@@ -117,13 +117,13 @@ structure Proof : Type :=
 
 def checkProof
   (globalContext : List Sequent)
-  (x : Proof) :
+  (proof : Proof) :
   Bool :=
-  if let Option.some sequent_list := compileStepListToSequentList globalContext x.steps
+  if let Option.some sequent_list := compileStepListToSequentList globalContext proof.steps
   then
     if let Option.some sequent := sequent_list.getLast?
     then
-      if sequent = x.assertion
+      if sequent = proof.assertion
       then true
       else false
     else false
@@ -140,6 +140,6 @@ def compileProofListToSequentListAux
     else Option.none
 
 def compileProofListToSequentList
-  (xs : List Proof) :
+  (proofs : List Proof) :
   Option (List Sequent) :=
-  compileProofListToSequentListAux [] xs
+  compileProofListToSequentListAux [] proofs
