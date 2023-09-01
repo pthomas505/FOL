@@ -29,7 +29,7 @@ inductive Justification : Type
 open Justification
 
 
-def compileJustification
+def compileJustificationToSequent
   (globalContext : List Sequent)
   (localContext : List Sequent) :
   Justification → Option Sequent
@@ -86,7 +86,7 @@ def checkStep
   (localContext : List Sequent)
   (step : Step) :
   Bool :=
-  if let Option.some sequent := compileJustification globalContext localContext step.justification
+  if let Option.some sequent := compileJustificationToSequent globalContext localContext step.justification
   then
     if sequent = step.assertion
     then true
@@ -94,21 +94,21 @@ def checkStep
   else false
 
 
-def compileStepListAux
+def compileStepListToSequentListAux
   (globalContext : List Sequent)
   (localContext : List Sequent) :
   List Step → Option (List Sequent)
   | [] => Option.some localContext
   | hd :: tl =>
     if checkStep globalContext localContext hd
-    then compileStepListAux globalContext (localContext ++ [hd.assertion]) tl
+    then compileStepListToSequentListAux globalContext (localContext ++ [hd.assertion]) tl
     else Option.none
 
-def compileStepList
+def compileStepListToSequentList
   (globalContext : List Sequent)
   (xs : List Step) :
   Option (List Sequent) :=
-  compileStepListAux globalContext [] xs
+  compileStepListToSequentListAux globalContext [] xs
 
 
 structure Proof : Type :=
@@ -119,7 +119,7 @@ def checkProof
   (globalContext : List Sequent)
   (x : Proof) :
   Bool :=
-  if let Option.some sequent_list := compileStepList globalContext x.steps
+  if let Option.some sequent_list := compileStepListToSequentList globalContext x.steps
   then
     if let Option.some sequent := sequent_list.getLast?
     then
@@ -130,17 +130,16 @@ def checkProof
   else false
 
 
-def compileProofListAux
+def compileProofListToSequentListAux
   (globalContext : List Sequent) :
   List Proof → Option (List Sequent)
   | [] => globalContext
   | hd :: tl =>
     if checkProof globalContext hd
-    then compileProofListAux (globalContext ++ [hd.assertion]) tl
+    then compileProofListToSequentListAux (globalContext ++ [hd.assertion]) tl
     else Option.none
 
-def compileProofList
+def compileProofListToSequentList
   (xs : List Proof) :
   Option (List Sequent) :=
-  compileProofListAux [] xs
-
+  compileProofListToSequentListAux [] xs
