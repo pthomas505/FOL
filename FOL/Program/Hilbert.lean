@@ -65,12 +65,12 @@ inductive Step : Type
 open Step
 
 def Step.toString : Step → String
-| thin delta label => s! "thin {delta} {label}"
+| thin delta local_label => s! "thin {delta} {local_label}"
 | assume phi => s! "assume {phi}"
 | prop_1 phi psi => s! "prop_1 {phi} {psi}"
 | prop_2 phi psi chi => s! "prop_2 {phi} {psi} {chi}"
 | prop_3 phi psi => s! "prop_3 {phi} {psi}"
-| mp major_label minor_label => s! "mp {major_label} {minor_label}"
+| mp local_major_label local_minor_label => s! "mp {local_major_label} {local_minor_label}"
 
 instance : ToString Step :=
   { toString := fun x => x.toString }
@@ -117,8 +117,8 @@ def Context.find
 
 def checkStep (local_context : Context) : Step → Except String Judgement
 
-| thin delta label => do
-  let judgement ← local_context.find label
+| thin delta local_label => do
+  let judgement ← local_context.find local_label
   Except.ok {
     assumptions := delta ++ judgement.assumptions
     conclusion := judgement.conclusion
@@ -144,9 +144,9 @@ def checkStep (local_context : Context) : Step → Except String Judgement
       assumptions := []
       conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
-| mp major_label minor_label => do
-  let major ← local_context.find major_label
-  let minor ← local_context.find minor_label
+| mp local_major_label local_minor_label => do
+  let major ← local_context.find local_major_label
+  let minor ← local_context.find local_minor_label
   if major.assumptions.toFinset = minor.assumptions.toFinset
   then
     if let imp_ major_conclusion_antecedent major_conclusion_consequent := major.conclusion
@@ -156,9 +156,9 @@ def checkStep (local_context : Context) : Step → Except String Judgement
         assumptions := major.assumptions
         conclusion := major_conclusion_consequent
       }
-      else Except.error s! "major judgement : {major_label} : {major}{LF}minor judgement : {minor_label} : {minor}{LF}The conclusion of the minor judgement must match the antecedent of the conclusion of the major judgement."
-    else Except.error s! "major judgement : {major_label} : {major}{LF}The conclusion of the major judgement must be an implication."
-  else Except.error s! "major judgement : {major_label} : {major}{LF}minor judgement : {minor_label} : {minor}{LF}The assumptions of the minor judgement must match the assumptions of the major judgement."
+      else Except.error s! "major judgement : {local_major_label} : {major}{LF}minor judgement : {local_minor_label} : {minor}{LF}The conclusion of the minor judgement must match the antecedent of the conclusion of the major judgement."
+    else Except.error s! "major judgement : {local_major_label} : {major}{LF}The conclusion of the major judgement must be an implication."
+  else Except.error s! "major judgement : {local_major_label} : {major}{LF}minor judgement : {local_minor_label} : {minor}{LF}The assumptions of the minor judgement must match the assumptions of the major judgement."
 
 
 def checkStepListAux
