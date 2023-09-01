@@ -26,17 +26,17 @@ instance : Repr Formula :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
-inductive Step : Type
-  | thin : String → List Formula → Step
-  | assume : Formula → Step
-  | prop_1 : Formula → Formula → Step
-  | prop_2 : Formula → Formula → Formula → Step
-  | prop_3 : Formula → Formula → Step
-  | mp : String → String → Step
+inductive ArgumentStep : Type
+  | thin : String → List Formula → ArgumentStep
+  | assume : Formula → ArgumentStep
+  | prop_1 : Formula → Formula → ArgumentStep
+  | prop_2 : Formula → Formula → Formula → ArgumentStep
+  | prop_3 : Formula → Formula → ArgumentStep
+  | mp : String → String → ArgumentStep
 
-open Step
+open ArgumentStep
 
-def Step.toString : Step → String
+def ArgumentStep.toString : ArgumentStep → String
   | thin label hypotheses => s! "thin {label} {hypotheses}"
   | assume hypothesis => s! "assume {hypothesis}"
   | prop_1 phi psi => s! "prop_1 {phi} {psi}"
@@ -44,24 +44,24 @@ def Step.toString : Step → String
   | prop_3 phi psi => s! "prop_3 {phi} {psi}"
   | mp major_label minor_label => s! "mp {major_label} {minor_label}"
 
-instance : ToString Step :=
+instance : ToString ArgumentStep :=
   { toString := fun x => x.toString }
 
-instance : Repr Step :=
+instance : Repr ArgumentStep :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
-structure labeledStep : Type :=
+structure labeledArgumentStep : Type :=
   (label : String)
-  (step : Step)
+  (step : ArgumentStep)
 
-def labeledStep.toString (x : labeledStep) : String :=
+def labeledArgumentStep.toString (x : labeledArgumentStep) : String :=
   s! "{x.label} : {x.step}"
 
-instance : ToString labeledStep :=
+instance : ToString labeledArgumentStep :=
   { toString := fun x => x.toString }
 
-instance : Repr labeledStep :=
+instance : Repr labeledArgumentStep :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
@@ -115,10 +115,10 @@ def Context.find
   else Except.error s!"{label} not found in context."
 
 
-def checkStep
+def checkArgumentStep
   (globalContext : Context)
   (localContext : Context) :
-  Step → Except String Statement
+  ArgumentStep → Except String Statement
 
   | thin label hypotheses => do
     let statement ← localContext.find label
@@ -164,15 +164,22 @@ def checkStep
     else Except.error s! "major premise : {major_label} : {major}{LF}minor premise : {minor_label} : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
 
 
-def checkStepListAux
+def Argument : Type := List labeledArgumentStep
+
+structure labeledArgument : Type :=
+  (label : String)
+  (argument : Argument)
+
+
+def checkArgumentAux
   (globalContext : Context)
   (localContext : Context) :
-  List labeledStep → Except String Context
+  Argument → Except String Context
   | [] => Except.ok localContext
   | hd :: tl =>
-    match checkStep globalContext localContext hd.step with
+    match checkArgumentStep globalContext localContext hd.step with
     | Except.ok statement =>
-        checkStepListAux
+        checkArgumentAux
           globalContext
           (
             {
@@ -183,11 +190,37 @@ def checkStepListAux
           tl
     | Except.error message => Except.error s! "Global Context{LF}{globalContext}{LF}-----{LF}Local Context{localContext}{LF}-----{LF}Error{LF}{hd}{LF}{message}"
 
-def checkStepList
+def checkArgument
   (globalContext : Context)
-  (xs : List labeledStep) :
+  (xs : List labeledArgumentStep) :
   Except String Context :=
-  checkStepListAux globalContext [] xs
+  checkArgumentAux globalContext [] xs
+
+def checkArgumentListAux
+  (globalContext : Context) :
+  List labeledArgument →
+  Except String Context
+  | [] => Except.ok globalContext
+  | hd :: tl =>
+    match checkArgument globalContext hd.argument with
+    | Except.ok localContext =>
+      if let Option.some labeled_statement := localContext.head?
+      then checkArgumentListAux
+        (
+          {
+            label := hd.label
+            statement := labeled_statement.statement
+          } :: globalContext
+        )
+        tl
+      else checkArgumentListAux globalContext tl
+    | Except.error message => Except.error s! "{hd.label}{LF}{message}"
+
+
+def checkArgumentList
+  (xs : List labeledArgument) :
+  Except String Context :=
+  checkArgumentListAux [] xs
 
 
 def ExceptToString : Except String Context → String
@@ -195,18 +228,23 @@ def ExceptToString : Except String Context → String
   | Except.error E => E
 
 
-#eval IO.print (
-  ExceptToString (
-    checkStepList [] [
-      ⟨ "s1", (prop_2 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ⟩,
+#eval checkArgumentList []
 
-      ⟨ "s2", (prop_1 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ⟩,
 
-      ⟨ "s3", (mp "s1" "s2") ⟩,
-
-      ⟨ "s4", (prop_1 (Formula.var_ "P") (Formula.var_ "P")) ⟩,
-
-      ⟨ "s5", (mp "s3" "s4") ⟩ 
+#eval IO.print
+(
+  ExceptToString
+  (
+    checkArgumentList
+    [
+      ⟨ "id", [
+          ⟨ "s1", (prop_2 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ⟩,
+          ⟨ "s2", (prop_1 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ⟩,
+          ⟨ "s3", (mp "s1" "s2") ⟩,
+          ⟨ "s4", (prop_1 (Formula.var_ "P") (Formula.var_ "P")) ⟩,
+          ⟨ "s5", (mp "s3" "s4") ⟩ 
+        ]
+      ⟩
     ]
   )
 )
