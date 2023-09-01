@@ -55,8 +55,8 @@ instance : Repr labeledJudgement :=
 
 
 inductive Step : Type
-| add_assumptions : List Formula → String → Step
-| add_use_assumption : Formula → Step
+| thin : List Formula → String → Step
+| assume : Formula → Step
 | prop_1 : Formula → Formula → Step
 | prop_2 : Formula → Formula → Formula → Step
 | prop_3 : Formula → Formula → Step
@@ -65,8 +65,8 @@ inductive Step : Type
 open Step
 
 def Step.toString : Step → String
-| add_assumptions delta label => s! "add_assumptions {delta} {label}"
-| add_use_assumption phi => s! "add_use_assumption {phi}"
+| thin delta label => s! "thin {delta} {label}"
+| assume phi => s! "assume {phi}"
 | prop_1 phi psi => s! "prop_1 {phi} {psi}"
 | prop_2 phi psi chi => s! "prop_2 {phi} {psi} {chi}"
 | prop_3 phi psi => s! "prop_3 {phi} {psi}"
@@ -117,14 +117,14 @@ def Context.find
 
 def checkStep (gamma : Context) : Step → Except String Judgement
 
-| add_assumptions delta label => do
+| thin delta label => do
   let judgement ← gamma.find label
   Except.ok {
     assumptions := delta ++ judgement.assumptions
     conclusion := judgement.conclusion
   }
 
-| add_use_assumption phi =>
+| assume phi =>
   Except.ok {
     assumptions := [phi]
     conclusion := phi }
