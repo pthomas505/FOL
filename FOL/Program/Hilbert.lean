@@ -115,10 +115,10 @@ def Context.find
   else Except.error s!"{label} not found in context."
 
 
-def checkStep (gamma : Context) : Step → Except String Judgement
+def checkStep (local_context : Context) : Step → Except String Judgement
 
 | thin delta label => do
-  let judgement ← gamma.find label
+  let judgement ← local_context.find label
   Except.ok {
     assumptions := delta ++ judgement.assumptions
     conclusion := judgement.conclusion
@@ -145,8 +145,8 @@ def checkStep (gamma : Context) : Step → Except String Judgement
       conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
 | mp major_label minor_label => do
-  let major ← gamma.find major_label
-  let minor ← gamma.find minor_label
+  let major ← local_context.find major_label
+  let minor ← local_context.find minor_label
   if major.assumptions.toFinset = minor.assumptions.toFinset
   then
     if let imp_ major_conclusion_antecedent major_conclusion_consequent := major.conclusion
@@ -162,15 +162,15 @@ def checkStep (gamma : Context) : Step → Except String Judgement
 
 
 def checkStepListAux
-  (gamma : Context) :
+  (local_context : Context) :
   List labeledStep → Except String Context
-| [] => Except.ok gamma
+| [] => Except.ok local_context
 | hd :: tl =>
-  match checkStep gamma hd.step with
+  match checkStep local_context hd.step with
   | Except.ok judgement => checkStepListAux (
     { label := hd.label
-      judgement := judgement } :: gamma) tl
-  | Except.error message => Except.error s! "Error{LF}{gamma}{LF}-----{LF}{hd}{LF}{message}"
+      judgement := judgement } :: local_context) tl
+  | Except.error message => Except.error s! "Error{LF}{local_context}{LF}-----{LF}{hd}{LF}{message}"
 
 def checkStepList
   (xs : List labeledStep) :
@@ -179,7 +179,7 @@ def checkStepList
 
 
 def unfoldExcept : Except String Context → String
-| Except.ok gamma => gamma.toString
+| Except.ok local_context => local_context.toString
 | Except.error E => E
 
 
