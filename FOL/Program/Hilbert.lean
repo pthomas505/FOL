@@ -27,7 +27,7 @@ instance : Repr Formula :=
 
 
 inductive DerivationStep : Type
-  | thin : List Formula → String → DerivationStep
+  | thin : String → List Formula → DerivationStep
   | assume : Formula → DerivationStep
   | prop_1 : Formula → Formula → DerivationStep
   | prop_2 : Formula → Formula → Formula → DerivationStep
@@ -37,12 +37,12 @@ inductive DerivationStep : Type
 open DerivationStep
 
 def DerivationStep.toString : DerivationStep → String
-  | thin delta local_label => s! "thin {delta} {local_label}"
-  | assume phi => s! "assume {phi}"
+  | thin label hypotheses => s! "thin {label} {hypotheses}"
+  | assume hypothesis => s! "assume {hypothesis}"
   | prop_1 phi psi => s! "prop_1 {phi} {psi}"
   | prop_2 phi psi chi => s! "prop_2 {phi} {psi} {chi}"
   | prop_3 phi psi => s! "prop_3 {phi} {psi}"
-  | mp local_major_label local_minor_label => s! "mp {local_major_label} {local_minor_label}"
+  | mp major_label minor_label => s! "mp {major_label} {minor_label}"
 
 instance : ToString DerivationStep :=
   { toString := fun x => x.toString }
@@ -65,35 +65,35 @@ instance : Repr labeledDerivationStep :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
-structure Judgement : Type :=
-  (assumptions : List Formula)
+structure Statement : Type :=
+  (hypotheses : List Formula)
   (conclusion : Formula)
 
-def Judgement.toString (x : Judgement) : String :=
-  s! "{x.assumptions} ⊢ {x.conclusion}"
+def Statement.toString (x : Statement) : String :=
+  s! "{x.hypotheses} ⊢ {x.conclusion}"
 
-instance : ToString Judgement :=
+instance : ToString Statement :=
   { toString := fun x => x.toString }
 
-instance : Repr Judgement :=
+instance : Repr Statement :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
-structure labeledJudgement : Type :=
+structure labeledStatement : Type :=
   (label : String)
-  (judgement : Judgement)
+  (statement : Statement)
 
-def labeledJudgement.toString (x : labeledJudgement) : String :=
-  s! "{x.label} : {x.judgement}"
+def labeledStatement.toString (x : labeledStatement) : String :=
+  s! "{x.label} : {x.statement}"
 
-instance : ToString labeledJudgement :=
+instance : ToString labeledStatement :=
   { toString := fun x => x.toString }
 
-instance : Repr labeledJudgement :=
+instance : Repr labeledStatement :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
-def Context : Type := List labeledJudgement
+def Context : Type := List labeledStatement
 
 def Context.toString : Context → String
   | [] => ""
@@ -109,89 +109,89 @@ instance : Repr Context :=
 def Context.find
   (context : Context)
   (label : String) :
-  Except String Judgement :=
+  Except String Statement :=
   if let Option.some val := context.find? (fun val => val.label = label)
-  then Except.ok val.judgement
+  then Except.ok val.statement
   else Except.error s!"{label} not found in context."
 
 
 def checkDerivationStep
-  (global_context : Context)
-  (local_context : Context) :
-  DerivationStep → Except String Judgement
+  (globalContext : Context)
+  (localContext : Context) :
+  DerivationStep → Except String Statement
 
-  | thin delta local_label => do
-    let judgement ← local_context.find local_label
+  | thin label hypotheses => do
+    let statement ← localContext.find label
     Except.ok {
-      assumptions := delta ++ judgement.assumptions
-      conclusion := judgement.conclusion
+      hypotheses := hypotheses ++ statement.hypotheses
+      conclusion := statement.conclusion
     }
 
-  | assume phi =>
+  | assume hypothesis =>
     Except.ok {
-      assumptions := [phi]
-      conclusion := phi }
+      hypotheses := [hypothesis]
+      conclusion := hypothesis }
 
   | prop_1 phi psi =>
       Except.ok {
-        assumptions := []
+        hypotheses := []
         conclusion := (phi.imp_ (psi.imp_ phi)) }
 
   | prop_2 phi psi chi =>
       Except.ok {
-        assumptions := []
+        hypotheses := []
         conclusion := ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi))) }
 
   | prop_3 phi psi =>
       Except.ok {
-        assumptions := []
+        hypotheses := []
         conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
-  | mp local_major_label local_minor_label => do
-    let major ← local_context.find local_major_label
-    let minor ← local_context.find local_minor_label
-    if major.assumptions.toFinset = minor.assumptions.toFinset
+  | mp major_label minor_label => do
+    let major ← localContext.find major_label
+    let minor ← localContext.find minor_label
+    if major.hypotheses.toFinset = minor.hypotheses.toFinset
     then
       if let imp_ major_conclusion_antecedent major_conclusion_consequent := major.conclusion
       then
         if minor.conclusion = major_conclusion_antecedent
         then Except.ok {
-          assumptions := major.assumptions
+          hypotheses := major.hypotheses
           conclusion := major_conclusion_consequent
         }
-        else Except.error s! "major judgement : {local_major_label} : {major}{LF}minor judgement : {local_minor_label} : {minor}{LF}The conclusion of the minor judgement must match the antecedent of the conclusion of the major judgement."
-      else Except.error s! "major judgement : {local_major_label} : {major}{LF}The conclusion of the major judgement must be an implication."
-    else Except.error s! "major judgement : {local_major_label} : {major}{LF}minor judgement : {local_minor_label} : {minor}{LF}The assumptions of the minor judgement must match the assumptions of the major judgement."
+        else Except.error s! "major premise : {major_label} : {major}{LF}minor premise : {minor_label} : {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
+      else Except.error s! "major premise : {major_label} : {major}{LF}The conclusion of the major premise must be an implication."
+    else Except.error s! "major premise : {major_label} : {major}{LF}minor premise : {minor_label} : {minor}{LF}The assumptions of the minor premise must match the assumptions of the major premise."
 
 
 def checkDerivationStepListAux
-  (global_context : Context)
-  (local_context : Context) :
+  (globalContext : Context)
+  (localContext : Context) :
   List labeledDerivationStep → Except String Context
-  | [] => Except.ok local_context
+  | [] => Except.ok localContext
   | hd :: tl =>
-    match checkDerivationStep global_context local_context hd.step with
-    | Except.ok judgement =>
+    match checkDerivationStep globalContext localContext hd.step with
+    | Except.ok statement =>
         checkDerivationStepListAux
-          global_context
+          globalContext
           (
             {
               label := hd.label
-              judgement := judgement
-            } :: local_context
+              statement := statement
+            } :: localContext
           )
           tl
-    | Except.error message => Except.error s! "Global Context{LF}{global_context}{LF}-----{LF}Local Context{local_context}{LF}-----{LF}Error{LF}{hd}{LF}{message}"
+    | Except.error message => Except.error s! "Global Context{LF}{globalContext}{LF}-----{LF}Local Context{localContext}{LF}-----{LF}Error{LF}{hd}{LF}{message}"
 
 def checkDerivationStepList
-  (global_context : Context)
+  (globalContext : Context)
   (xs : List labeledDerivationStep) :
   Except String Context :=
-  checkDerivationStepListAux global_context [] xs
+  checkDerivationStepListAux globalContext [] xs
 
 
 def ExceptToString : Except String Context → String
-  | Except.ok local_context => local_context.toString
+  | Except.ok localContext => localContext.toString
   | Except.error E => E
 
 
