@@ -6,6 +6,11 @@ set_option autoImplicit false
 def LF : Char := Char.ofNat 10
 
 
+def List.allEqual {α} [BEq α] : List α → Bool
+  | [] => true
+  | a :: l => l.all (a == ·)
+
+
 inductive Formula : Type
   | var_ : String → Formula
   | true_ : Formula
@@ -89,7 +94,7 @@ inductive Justification : Type
   | def_and : Formula → Formula → Justification
   | def_or : Formula → Formula → Justification
   | def_iff : Formula → Formula → Justification
-  | thm : String → Justification
+  | thm : String → List String → Justification
   | sub : String → List (String × String) → Justification
 
 open Justification
@@ -106,7 +111,7 @@ def Justification.toString : Justification → String
   | def_and phi psi => s! "def_and {phi} {psi}"
   | def_or phi psi => s! "def_or {phi} {psi}"
   | def_iff phi psi => s! "def_iff {phi} {psi}"
-  | thm label => s! "thm {label}"
+  | thm proof_label step_labels => s! "thm {proof_label} {step_labels}"
   | sub label pairs => s! "sub {label} {pairs}"
 
 instance : ToString Justification :=
@@ -157,6 +162,12 @@ def LocalContext.find
   if let Option.some x := context.find? label
   then Except.ok x
   else Except.error s! "{label} not found in local context."
+
+def LocalContext.findList
+  (context : LocalContext)
+  (label_list : List String) :
+  Except String (List Step) :=
+  label_list.mapM (LocalContext.find context)
 
 
 def justificationToSequent
@@ -221,9 +232,25 @@ def justificationToSequent
       hypotheses := []
       conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi))))) }
 
-  | thm label => do
-      let proof ← globalContext.find label
-      Except.ok proof.assertion
+  | thm proof_label step_labels => do
+      let proof ← globalContext.find proof_label 
+      let steps ← localContext.findList step_labels
+      let steps_assertions := steps.map Step.assertion
+      let steps_hypotheses := steps_assertions.map Sequent.hypotheses
+      let steps_conclusions := steps_assertions.map Sequent.conclusion
+      if steps_hypotheses.allEqual
+      then
+        if steps_conclusions = proof.assertion.hypotheses
+        then
+          if let Option.some hd := steps_hypotheses.head?
+          then Except.ok {
+            hypotheses := hd
+            conclusion := proof.assertion.conclusion }
+          else Except.ok {
+            hypotheses := []
+            conclusion := proof.assertion.conclusion }
+        else Except.error "The step conclusions must match the proof hypotheses."
+      else Except.error "The hypotheses of each step must be the same for all steps."
 
   | sub label pairs => do
       let step ← localContext.find label
@@ -302,7 +329,8 @@ def createProofList
       ( "s5", (mp "s3" "s4") )
     ]
   ),
-  ( "id'", [ ("s1", (thm "id")), ("s2", sub "s1" [("P", "Q")]) ] ),
+  ( "id'", [ ("s1", (thm "id" [])), ("s2", sub "s1" [("P", "Q")]) ] ),
   ( "meh", [ ("s1", (assume (Formula.var_ "P"))) ] ),
-  ( "blah", [ ("s1", (def_and (Formula.var_ "P") (Formula.var_ "Q"))) ] )
+  ( "blah", [ ("s1", (def_and (Formula.var_ "P") (Formula.var_ "Q"))) ] ),
+  ( "bleh", [ ("s1", (assume (Formula.var_ "P"))), ("s2", (thm "meh" ["s1"])) ] )
 ]
