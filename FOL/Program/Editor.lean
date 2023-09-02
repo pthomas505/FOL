@@ -300,5 +300,6 @@ def createProofList
     ]
   ),
   ( "id'", [ ("s1", (thm "id")), ("s2", sub "s1" [("P", "Q")]) ] ),
-  ( "meh", [ ("s1", (assume (Formula.var_ "P"))) ] )
+  ( "meh", [ ("s1", (assume (Formula.var_ "P"))) ] ),
+  ( "blah", [ ("s1", (def_and (Formula.var_ "P") (Formula.var_ "Q"))) ] )
 ]
