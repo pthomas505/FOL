@@ -42,6 +42,7 @@ inductive Justification : Type
   | prop_2 : Formula → Formula → Formula → Justification
   | prop_3 : Formula → Formula → Justification
   | mp : String → String → Justification
+  | thm : String → Justification
 
 open Justification
 
@@ -52,6 +53,7 @@ def Justification.toString : Justification → String
   | prop_2 phi psi chi => s! "prop_2 {phi} {psi} {chi}"
   | prop_3 phi psi => s! "prop_3 {phi} {psi}"
   | mp major_label minor_label => s! "mp {major_label} {minor_label}"
+  | thm label => s! "thm {label}"
 
 instance : ToString Justification :=
   { toString := fun x => x.toString }
@@ -81,29 +83,41 @@ instance : ToString Proof :=
   { toString := fun x => x.toString }
 
 
-def Context.find
-  (context : List Step)
+abbrev GlobalContext : Type := List Proof
+
+abbrev LocalContext : Type := List Step
+
+def GlobalContext.find
+  (context : GlobalContext)
+  (label : String) :
+  Except String Proof :=
+  if let Option.some x := context.find? (fun x => x.label = label)
+  then Except.ok x
+  else Except.error s! "{label} not found in global context."
+
+def LocalContext.find
+  (context : LocalContext)
   (label : String) :
   Except String Step :=
   if let Option.some x := context.find? (fun x => x.label = label)
   then Except.ok x
-  else Except.error s! "{label} not found in context."
+  else Except.error s! "{label} not found in local context."
 
-def Context.getLast
-  (context : List Step) :
+def LocalContext.getLast
+  (context : LocalContext) :
   Except String Step :=
   if let Option.some x := context.getLast?
   then Except.ok x
-  else Except.error s! "Context is empty."
+  else Except.error s! "The local context is empty."
 
 
 def justificationToSequent
-  (globalContext : List Proof)
-  (localContext : List Step) :
+  (globalContext : GlobalContext)
+  (localContext : LocalContext) :
   Justification → Except String Sequent
 
   | thin label hypotheses => do
-    let step ← Context.find localContext label
+    let step ← localContext.find label
     Except.ok {
       hypotheses := step.assertion.hypotheses ++ hypotheses
       conclusion := step.assertion.conclusion }
@@ -129,8 +143,8 @@ def justificationToSequent
       conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
   | mp major_label minor_label => do
-    let major ← Context.find localContext major_label
-    let minor ← Context.find localContext minor_label
+    let major ← localContext.find major_label
+    let minor ← localContext.find minor_label
     if major.assertion.hypotheses.toFinset = minor.assertion.hypotheses.toFinset
     then
       if let imp_ major_conclusion_antecedent major_conclusion_consequent := major.assertion.conclusion
@@ -143,10 +157,13 @@ def justificationToSequent
       else Except.error s! "major premise : {major}{LF}The conclusion of the major premise must be an implication."
     else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
 
+  | thm label => do
+    let proof ← globalContext.find label
+    Except.ok proof.assertion
 
 def createStep
-  (globalContext : List Proof)
-  (localContext : List Step)
+  (globalContext : GlobalContext)
+  (localContext : LocalContext)
   (label : String)
   (justification : Justification) :
   Except String Step := do
@@ -155,8 +172,8 @@ def createStep
 
 
 def createStepListAux
-  (globalContext : List Proof)
-  (localContext : List Step) :
+  (globalContext : GlobalContext)
+  (localContext : LocalContext) :
   List (String × Justification) → Except String (List Step)
   | [] => Except.ok localContext
   | (label, justification) :: tl => do
@@ -164,19 +181,19 @@ def createStepListAux
     createStepListAux globalContext (localContext ++ [step]) tl
 
 def createStepList
-  (globalContext : List Proof)
+  (globalContext : GlobalContext)
   (tactic_list : List (String × Justification)) :
   Except String (List Step) :=
   createStepListAux globalContext [] tactic_list
 
 
 def createProof
-  (globalContext : List Proof)
+  (globalContext : GlobalContext)
   (label : String)
   (tactic_list : List (String × Justification)) :
   Except String Proof := do
   let step_list ← createStepList globalContext tactic_list
-  let step ← Context.getLast step_list
+  let step ← LocalContext.getLast step_list
   Except.ok {
     label := label
     assertion := step.assertion
@@ -184,7 +201,7 @@ def createProof
 
 
 def createProofListAux
-  (globalContext : List Proof) :
+  (globalContext : GlobalContext) :
   List (String × (List (String × Justification))) → Except String (List Proof)
   | [] => Except.ok globalContext
   | hd :: tl => do
@@ -195,11 +212,6 @@ def createProofList
   (tactic_list_list : List (String × (List (String × Justification)))) :
   Except String (List Proof) :=
   createProofListAux [] tactic_list_list
-
-
-def ExceptToString : Except String (List Proof) → String
-  | Except.ok proofs => s! "{proofs}"
-  | Except.error message => message
 
 
 #eval createProofList []
