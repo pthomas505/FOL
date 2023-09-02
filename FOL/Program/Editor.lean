@@ -8,16 +8,26 @@ def LF : Char := Char.ofNat 10
 
 inductive Formula : Type
   | var_ : String → Formula
+  | true_ : Formula
+  | false_ : Formula
   | not_ : Formula → Formula
   | imp_ : Formula → Formula → Formula
+  | and_ : Formula → Formula → Formula
+  | or_ : Formula → Formula → Formula
+  | iff_ : Formula → Formula → Formula
   deriving Inhabited, DecidableEq
 
 open Formula
 
 def Formula.toString : Formula → String
   | var_ phi => phi
+  | true_ => "T"
+  | false_ => "F"
   | not_ phi => s! "¬ {phi.toString}"
   | imp_ phi psi => s! "({phi.toString} → {psi.toString})"
+  | and_ phi psi => s! "({phi.toString} ∧ {psi.toString})"
+  | or_ phi psi => s! "({phi.toString} ∨ {psi.toString})"
+  | iff_ phi psi => s! "({phi.toString} ↔ {psi.toString})"
 
 instance : ToString Formula :=
   { toString := fun x => x.toString }
@@ -58,8 +68,13 @@ def propSub
   (σ : String → String) :
   Formula → Formula
   | var_ v => var_ (σ v)
+  | true_ => true_
+  | false_ => false_
   | not_ phi => not_ (propSub σ phi)
   | imp_ phi psi => imp_ (propSub σ phi) (propSub σ psi)
+  | and_ phi psi => and_ (propSub σ phi) (propSub σ psi)
+  | or_ phi psi => or_ (propSub σ phi) (propSub σ psi)
+  | iff_ phi psi => iff_ (propSub σ phi) (propSub σ psi)
 
 
 inductive Justification : Type
@@ -69,6 +84,10 @@ inductive Justification : Type
   | prop_2 : Formula → Formula → Formula → Justification
   | prop_3 : Formula → Formula → Justification
   | mp : String → String → Justification
+  | def_false : Justification
+  | def_and : Formula → Formula → Justification
+  | def_or : Formula → Formula → Justification
+  | def_iff : Formula → Formula → Justification
   | thm : String → Justification
   | sub : String → List (String × String) → Justification
 
@@ -81,6 +100,10 @@ def Justification.toString : Justification → String
   | prop_2 phi psi chi => s! "prop_2 {phi} {psi} {chi}"
   | prop_3 phi psi => s! "prop_3 {phi} {psi}"
   | mp major_label minor_label => s! "mp {major_label} {minor_label}"
+  | def_false => s! "def_false"
+  | def_and phi psi => s! "def_and {phi} {psi}"
+  | def_or phi psi => s! "def_or {phi} {psi}"
+  | def_iff phi psi => s! "def_iff {phi} {psi}"
   | thm label => s! "thm {label}"
   | sub label pairs => s! "sub {label} {pairs}"
 
@@ -185,6 +208,26 @@ def justificationToSequent
         else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
       else Except.error s! "major premise : {major}{LF}The conclusion of the major premise must be an implication."
     else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
+
+  | def_false => Except.ok {
+      hypotheses := []
+      conclusion := false_.iff_ (not_ true_)
+    }
+
+  | def_and phi psi => Except.ok {
+      hypotheses := []
+      conclusion := ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+    }
+
+  | def_or phi psi => Except.ok {
+      hypotheses := []
+      conclusion := ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+    }
+
+  | def_iff phi psi => Except.ok {
+      hypotheses := []
+      conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+    }
 
   | thm label => do
     let proof ← globalContext.find label
