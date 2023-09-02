@@ -17,25 +17,38 @@ structure Sequent : Type :=
   (conclusion : Formula)
   deriving Inhabited, DecidableEq
 
+structure LabeledSequent : Type :=
+  (label : String)
+  (sequent : Sequent)
+
 
 inductive Justification : Type
-  | thin : ℕ → List Formula → Justification
+  | thin : String → List Formula → Justification
   | assume : Formula → Justification
   | prop_1 : Formula → Formula → Justification
   | prop_2 : Formula → Formula → Formula → Justification
   | prop_3 : Formula → Formula → Justification
-  | mp : ℕ → ℕ → Justification
+  | mp : String → String → Justification
 
 open Justification
 
 
+def Context.find
+  (context : List LabeledSequent)
+  (label : String) :
+  Option Sequent :=
+  if let Option.some val := context.find? (fun val => val.label = label)
+  then Option.some val.sequent
+  else Option.none
+
+
 def compileJustificationToSequent
-  (globalContext : List Sequent)
-  (localContext : List Sequent) :
+  (globalContext : List LabeledSequent)
+  (localContext : List LabeledSequent) :
   Justification → Option Sequent
 
-  | thin index hypotheses => do
-    let sequent ← localContext.get? index
+  | thin label hypotheses => do
+    let sequent ← Context.find localContext label
     Option.some {
       hypotheses := sequent.hypotheses ++ hypotheses
       conclusion := sequent.conclusion }
@@ -61,9 +74,9 @@ def compileJustificationToSequent
       conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
     }
 
-  | mp major_index minor_index => do
-    let major ← localContext.get? major_index
-    let minor ← localContext.get? minor_index
+  | mp major_label minor_label => do
+    let major ← Context.find localContext major_label
+    let minor ← Context.find localContext minor_label
     if major.hypotheses.toFinset = minor.hypotheses.toFinset
     then
       if let imp_ major_conclusion_antecedent major_conclusion_consequent := major.conclusion
@@ -81,9 +94,14 @@ structure Step : Type :=
   (assertion : Sequent)
   (justification : Justification)
 
+structure LabeledStep : Type :=
+  (label : String)
+  (step : Step)
+
+
 def checkStep
-  (globalContext : List Sequent)
-  (localContext : List Sequent)
+  (globalContext : List LabeledSequent)
+  (localContext : List LabeledSequent)
   (step : Step) :
   Bool :=
   if let Option.some sequent := compileJustificationToSequent globalContext localContext step.justification
@@ -94,52 +112,56 @@ def checkStep
   else false
 
 
-def compileStepListToSequentListAux
-  (globalContext : List Sequent)
-  (localContext : List Sequent) :
-  List Step → Option (List Sequent)
+def compileLabeledStepListToLabledSequentListAux
+  (globalContext : List LabeledSequent)
+  (localContext : List LabeledSequent) :
+  List LabeledStep → Option (List LabeledSequent)
   | [] => Option.some localContext
   | hd :: tl =>
-    if checkStep globalContext localContext hd
-    then compileStepListToSequentListAux globalContext (localContext ++ [hd.assertion]) tl
+    if checkStep globalContext localContext hd.step
+    then compileLabeledStepListToLabledSequentListAux globalContext (localContext ++ [{label := hd.label, sequent := hd.step.assertion}]) tl
     else Option.none
 
-def compileStepListToSequentList
-  (globalContext : List Sequent)
-  (steps : List Step) :
-  Option (List Sequent) :=
-  compileStepListToSequentListAux globalContext [] steps
+def compileLabeledStepListToLabeledSequentList
+  (globalContext : List LabeledSequent)
+  (steps : List LabeledStep) :
+  Option (List LabeledSequent) :=
+  compileLabeledStepListToLabledSequentListAux globalContext [] steps
 
 
 structure Proof : Type :=
   (assertion : Sequent)
-  (steps : List Step)
+  (steps : List LabeledStep)
+
+structure LabeledProof : Type :=
+  (label : String)
+  (proof : Proof)
 
 def checkProof
-  (globalContext : List Sequent)
+  (globalContext : List LabeledSequent)
   (proof : Proof) :
   Bool :=
-  if let Option.some sequent_list := compileStepListToSequentList globalContext proof.steps
+  if let Option.some xs := compileLabeledStepListToLabeledSequentList globalContext proof.steps
   then
-    if let Option.some sequent := sequent_list.getLast?
+    if let Option.some labeledSequent := xs.getLast?
     then
-      if sequent = proof.assertion
+      if labeledSequent.sequent = proof.assertion
       then true
       else false
     else false
   else false
 
 
-def compileProofListToSequentListAux
-  (globalContext : List Sequent) :
-  List Proof → Option (List Sequent)
+def compileLabeledProofListToLabledSequentListAux
+  (globalContext : List LabeledSequent) :
+  List LabeledProof → Option (List LabeledSequent)
   | [] => globalContext
   | hd :: tl =>
-    if checkProof globalContext hd
-    then compileProofListToSequentListAux (globalContext ++ [hd.assertion]) tl
+    if checkProof globalContext hd.proof
+    then compileLabeledProofListToLabledSequentListAux (globalContext ++ [{label := hd.label, sequent := hd.proof.assertion}]) tl
     else Option.none
 
-def compileProofListToSequentList
-  (proofs : List Proof) :
-  Option (List Sequent) :=
-  compileProofListToSequentListAux [] proofs
+def compileLabeledProofListToLabledSequentList
+  (proofs : List LabeledProof) :
+  Option (List LabeledSequent) :=
+  compileLabeledProofListToLabledSequentListAux [] proofs
