@@ -169,77 +169,69 @@ def justificationToSequent
   Justification → Except String Sequent
 
   | thin label hypotheses => do
-    let step ← localContext.find label
-    Except.ok {
-      hypotheses := step.assertion.hypotheses ++ hypotheses
-      conclusion := step.assertion.conclusion }
+      let step ← localContext.find label
+      Except.ok {
+        hypotheses := step.assertion.hypotheses ++ hypotheses
+        conclusion := step.assertion.conclusion }
 
-  | assume phi =>
-    Except.ok {
+  | assume phi => Except.ok {
       hypotheses := [phi],
       conclusion := phi }
 
-  | prop_1 phi psi =>
-    Except.ok {
+  | prop_1 phi psi => Except.ok {
       hypotheses := [],
       conclusion := (phi.imp_ (psi.imp_ phi)) }
 
-  | prop_2 phi psi chi =>
-    Except.ok {
+  | prop_2 phi psi chi => Except.ok {
       hypotheses := []
       conclusion := ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi))) }
 
-  | prop_3 phi psi =>
-    Except.ok {
+  | prop_3 phi psi => Except.ok {
       hypotheses := []
       conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
   | mp major_label minor_label => do
-    let major ← localContext.find major_label
-    let minor ← localContext.find minor_label
-    if major.assertion.hypotheses.toFinset = minor.assertion.hypotheses.toFinset
-    then
-      if let imp_ major_conclusion_antecedent major_conclusion_consequent := major.assertion.conclusion
+      let major ← localContext.find major_label
+      let minor ← localContext.find minor_label
+      if major.assertion.hypotheses.toFinset = minor.assertion.hypotheses.toFinset
       then
-        if minor.assertion.conclusion = major_conclusion_antecedent
-        then Except.ok {
-          hypotheses := major.assertion.hypotheses
-          conclusion := major_conclusion_consequent }
-        else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
-      else Except.error s! "major premise : {major}{LF}The conclusion of the major premise must be an implication."
-    else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
+        if let imp_ major_conclusion_antecedent major_conclusion_consequent := major.assertion.conclusion
+        then
+          if minor.assertion.conclusion = major_conclusion_antecedent
+          then Except.ok {
+            hypotheses := major.assertion.hypotheses
+            conclusion := major_conclusion_consequent }
+          else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
+        else Except.error s! "major premise : {major}{LF}The conclusion of the major premise must be an implication."
+      else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
 
   | def_false => Except.ok {
       hypotheses := []
-      conclusion := false_.iff_ (not_ true_)
-    }
+      conclusion := false_.iff_ (not_ true_) }
 
   | def_and phi psi => Except.ok {
       hypotheses := []
-      conclusion := ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
-    }
+      conclusion := ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi)))) }
 
   | def_or phi psi => Except.ok {
       hypotheses := []
-      conclusion := ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
-    }
+      conclusion := ((phi.or_ psi).iff_ ((not_ phi).imp_ psi)) }
 
   | def_iff phi psi => Except.ok {
       hypotheses := []
-      conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
-    }
+      conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi))))) }
 
   | thm label => do
-    let proof ← globalContext.find label
-    Except.ok proof.assertion
+      let proof ← globalContext.find label
+      Except.ok proof.assertion
 
   | sub label pairs => do
-    let step ← localContext.find label
-    let (xs, ys) := List.unzip pairs
-    Except.ok {
-      hypotheses := step.assertion.hypotheses.map (propSub (Function.updateListIte id xs ys))
-      conclusion := propSub (Function.updateListIte id xs ys) step.assertion.conclusion
-    }
+      let step ← localContext.find label
+      let (xs, ys) := List.unzip pairs
+      Except.ok {
+        hypotheses := step.assertion.hypotheses.map (propSub (Function.updateListIte id xs ys))
+        conclusion := propSub (Function.updateListIte id xs ys) step.assertion.conclusion
+      }
 
 
 def createStep
