@@ -126,7 +126,7 @@ instance : ToString Step :=
 structure Proof : Type :=
   (label : String)
   (assertion : Sequent)
-  (steps : List Step)
+  (steps : Array Step)
 
 def Proof.toString (x : Proof) : String :=
   s! "{x.label} : {x.assertion} : {x.steps}"
@@ -135,33 +135,26 @@ instance : ToString Proof :=
   { toString := fun x => x.toString }
 
 
-abbrev GlobalContext : Type := List Proof
+abbrev GlobalContext : Type := Std.HashMap String Proof
 
 def GlobalContext.find
   (context : GlobalContext)
   (label : String) :
   Except String Proof :=
-  if let Option.some x := context.find? (fun x => x.label = label)
+  if let Option.some x := context.find? label
   then Except.ok x
   else Except.error s! "{label} not found in global context."
 
 
-abbrev LocalContext : Type := List Step
+abbrev LocalContext : Type := Std.HashMap String Step
 
 def LocalContext.find
   (context : LocalContext)
   (label : String) :
   Except String Step :=
-  if let Option.some x := context.find? (fun x => x.label = label)
+  if let Option.some x := context.find? label
   then Except.ok x
   else Except.error s! "{label} not found in local context."
-
-def LocalContext.getLast
-  (context : LocalContext) :
-  Except String Step :=
-  if let Option.some x := context.getLast?
-  then Except.ok x
-  else Except.error s! "The local context is empty."
 
 
 def justificationToSequent
@@ -202,9 +195,9 @@ def justificationToSequent
           then Except.ok {
             hypotheses := major.assertion.hypotheses
             conclusion := major_conclusion_consequent }
-          else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
-        else Except.error s! "major premise : {major}{LF}The conclusion of the major premise must be an implication."
-      else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
+          else Except.error s! "mp: major premise: {major}{LF}minor premise: {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
+        else Except.error s! "mp: major premise: {major}{LF}The conclusion of the major premise must be an implication."
+      else Except.error s! "mp: major premise: {major}{LF}minor premise : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
 
   | def_false => Except.ok {
       hypotheses := []
@@ -247,18 +240,20 @@ def createStep
 
 def createStepListAux
   (globalContext : GlobalContext)
-  (localContext : LocalContext) :
-  List (String × Justification) → Except String (List Step)
-  | [] => Except.ok localContext
+  (localContext : LocalContext)
+  (acc : Array Step) :
+  List (String × Justification) → Except String (Array Step)
+  | [] => Except.ok acc
   | (label, justification) :: tl => do
     let step ← createStep globalContext localContext label justification
-    createStepListAux globalContext (localContext ++ [step]) tl
+      |>.mapError fun msg => s!"step {label}: {msg}"
+    createStepListAux globalContext (localContext.insert label step) (acc.push step) tl
 
 def createStepList
   (globalContext : GlobalContext)
   (tactic_list : List (String × Justification)) :
-  Except String (List Step) :=
-  createStepListAux globalContext [] tactic_list
+  Except String (Array Step) :=
+  createStepListAux globalContext {} #[] tactic_list
 
 
 def createProof
@@ -267,7 +262,7 @@ def createProof
   (tactic_list : List (String × Justification)) :
   Except String Proof := do
   let step_list ← createStepList globalContext tactic_list
-  let last_step ← LocalContext.getLast step_list
+  let some last_step := step_list.back? | .error "The step list is empty."
   Except.ok {
     label := label
     assertion := last_step.assertion
@@ -275,17 +270,19 @@ def createProof
 
 
 def createProofListAux
-  (globalContext : GlobalContext) :
-  List (String × (List (String × Justification))) → Except String (List Proof)
-  | [] => Except.ok globalContext
+  (globalContext : GlobalContext)
+  (acc : Array Proof) :
+  List (String × (List (String × Justification))) → Except String (Array Proof)
+  | [] => Except.ok acc
   | hd :: tl => do
   let proof ← createProof globalContext hd.fst hd.snd
-  createProofListAux (globalContext ++ [proof]) tl
+    |>.mapError fun msg => s! "proof {hd.fst}: {msg}"
+  createProofListAux (globalContext.insert hd.fst proof) (acc.push proof) tl
 
 def createProofList
   (tactic_list_list : List (String × (List (String × Justification)))) :
-  Except String (List Proof) :=
-  createProofListAux [] tactic_list_list
+  Except String (Array Proof) :=
+  createProofListAux {} #[] tactic_list_list
 
 
 #eval createProofList []
