@@ -195,9 +195,9 @@ def justificationToSequent
           then Except.ok {
             hypotheses := major.assertion.hypotheses
             conclusion := major_conclusion_consequent }
-          else Except.error s! "mp :{LF}major premise : {major}{LF}minor premise : {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
-        else Except.error s! "mp :{LF}major premise : {major}{LF}The conclusion of the major premise must be an implication."
-      else Except.error s! "mp :{LF}major premise : {major}{LF}minor premise : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
+          else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
+        else Except.error s! "major premise : {major}{LF}The conclusion of the major premise must be an implication."
+      else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
 
   | def_false => Except.ok {
       hypotheses := []
@@ -246,7 +246,7 @@ def createStepListAux
   | [] => Except.ok acc
   | (label, justification) :: tl => do
     let step ← createStep globalContext localContext label justification
-      |>.mapError fun msg => s! "step : {label}{LF}{msg}"
+      |>.mapError fun msg => s! "step : {label} : {justification}{LF}{msg}"
     createStepListAux globalContext (localContext.insert label step) (acc.push step) tl
 
 def createStepList
