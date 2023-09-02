@@ -137,8 +137,6 @@ instance : ToString Proof :=
 
 abbrev GlobalContext : Type := List Proof
 
-abbrev LocalContext : Type := List Step
-
 def GlobalContext.find
   (context : GlobalContext)
   (label : String) :
@@ -146,6 +144,9 @@ def GlobalContext.find
   if let Option.some x := context.find? (fun x => x.label = label)
   then Except.ok x
   else Except.error s! "{label} not found in global context."
+
+
+abbrev LocalContext : Type := List Step
 
 def LocalContext.find
   (context : LocalContext)
