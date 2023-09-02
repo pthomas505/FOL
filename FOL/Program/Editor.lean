@@ -267,10 +267,10 @@ def createProof
   (tactic_list : List (String × Justification)) :
   Except String Proof := do
   let step_list ← createStepList globalContext tactic_list
-  let step ← LocalContext.getLast step_list
+  let last_step ← LocalContext.getLast step_list
   Except.ok {
     label := label
-    assertion := step.assertion
+    assertion := last_step.assertion
     steps := step_list }
 
 
