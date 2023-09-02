@@ -201,22 +201,16 @@ def ExceptToString : Except String (List Proof) → String
   | Except.ok proofs => s! "{proofs}"
   | Except.error message => message
 
-#eval IO.print (ExceptToString (createProofList []))
 
-#eval IO.print
-(
-  ExceptToString
-  (
-    createProofList
-    [
-      ( "id", [
-          ( "s1", (prop_2 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ),
-          ( "s2", (prop_1 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ),
-          ( "s3", (mp "s1" "s2") ),
-          ( "s4", (prop_1 (Formula.var_ "P") (Formula.var_ "P")) ),
-          ( "s5", (mp "s3" "s4") )
-        ]
-      )
+#eval createProofList []
+
+#eval createProofList [
+  ( "id", [
+      ( "s1", (prop_2 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ),
+      ( "s2", (prop_1 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ),
+      ( "s3", (mp "s1" "s2") ),
+      ( "s4", (prop_1 (Formula.var_ "P") (Formula.var_ "P")) ),
+      ( "s5", (mp "s3" "s4") )
     ]
   )
-)
+]
