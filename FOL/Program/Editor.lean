@@ -80,6 +80,7 @@ def propSub
 inductive Justification : Type
   | thin : String → List Formula → Justification
   | assume : Formula → Justification
+  | prop_true : Justification
   | prop_1 : Formula → Formula → Justification
   | prop_2 : Formula → Formula → Formula → Justification
   | prop_3 : Formula → Formula → Justification
@@ -96,6 +97,7 @@ open Justification
 def Justification.toString : Justification → String
   | thin label hypotheses => s! "thin {label} {hypotheses}"
   | assume hypothesis => s! "assume {hypothesis}"
+  | prop_true => "prop_true"
   | prop_1 phi psi => s! "prop_1 {phi} {psi}"
   | prop_2 phi psi chi => s! "prop_2 {phi} {psi} {chi}"
   | prop_3 phi psi => s! "prop_3 {phi} {psi}"
@@ -171,6 +173,10 @@ def justificationToSequent
   | assume phi => Except.ok {
       hypotheses := [phi],
       conclusion := phi }
+
+  | prop_true => Except.ok {
+      hypotheses := [],
+      conclusion := true_ }
 
   | prop_1 phi psi => Except.ok {
       hypotheses := [],
