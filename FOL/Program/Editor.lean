@@ -35,6 +35,33 @@ instance : ToString Sequent :=
   { toString := fun x => x.toString }
 
 
+def Function.updateIte
+  {α β : Type}
+  [DecidableEq α]
+  (f : α → β)
+  (a' : α)
+  (b : β)
+  (a : α) :
+  β :=
+  if a = a' then b else f a
+
+def Function.updateListIte
+  {α β : Type}
+  [DecidableEq α]
+  (f : α → β) :
+  List α → List β → α → β
+  | x::xs, y::ys => Function.updateIte (Function.updateListIte f xs ys) x y
+  | _, _ => f
+
+
+def propSub
+  (σ : String → String) :
+  Formula → Formula
+  | var_ v => var_ (σ v)
+  | not_ phi => not_ (propSub σ phi)
+  | imp_ phi psi => imp_ (propSub σ phi) (propSub σ psi)
+
+
 inductive Justification : Type
   | thin : String → List Formula → Justification
   | assume : Formula → Justification
@@ -43,6 +70,7 @@ inductive Justification : Type
   | prop_3 : Formula → Formula → Justification
   | mp : String → String → Justification
   | thm : String → Justification
+  | sub : String → List (String × String) → Justification
 
 open Justification
 
@@ -54,6 +82,7 @@ def Justification.toString : Justification → String
   | prop_3 phi psi => s! "prop_3 {phi} {psi}"
   | mp major_label minor_label => s! "mp {major_label} {minor_label}"
   | thm label => s! "thm {label}"
+  | sub label pairs => s! "sub {label} {pairs}"
 
 instance : ToString Justification :=
   { toString := fun x => x.toString }
@@ -77,7 +106,7 @@ structure Proof : Type :=
   (steps : List Step)
 
 def Proof.toString (x : Proof) : String :=
-  s! "{x.label} {x.assertion}"
+  s! "{x.label} : {x.assertion} : {x.steps}"
 
 instance : ToString Proof :=
   { toString := fun x => x.toString }
@@ -161,6 +190,15 @@ def justificationToSequent
     let proof ← globalContext.find label
     Except.ok proof.assertion
 
+  | sub label pairs => do
+    let step ← localContext.find label
+    let (xs, ys) := List.unzip pairs
+    Except.ok {
+      hypotheses := step.assertion.hypotheses.map (propSub (Function.updateListIte id xs ys))
+      conclusion := propSub (Function.updateListIte id xs ys) step.assertion.conclusion
+    }
+
+
 def createStep
   (globalContext : GlobalContext)
   (localContext : LocalContext)
@@ -225,6 +263,6 @@ def createProofList
       ( "s5", (mp "s3" "s4") )
     ]
   ),
-  ( "id", [ ("s1", (thm "id")), ("s2", (thin "s1" [(Formula.var_ "R")])) ] ),
+  ( "id'", [ ("s1", (thm "id")), ("s2", sub "s1" [("P", "Q")]) ] ),
   ( "meh", [ ("s1", (assume (Formula.var_ "P"))) ] )
 ]
