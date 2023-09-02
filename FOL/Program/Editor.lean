@@ -224,5 +224,7 @@ def createProofList
       ( "s4", (prop_1 (Formula.var_ "P") (Formula.var_ "P")) ),
       ( "s5", (mp "s3" "s4") )
     ]
-  )
+  ),
+  ( "id", [ ("s1", (thm "id")), ("s2", (thin "s1" [(Formula.var_ "R")])) ] ),
+  ( "meh", [ ("s1", (assume (Formula.var_ "P"))) ] )
 ]
