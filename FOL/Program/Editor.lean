@@ -6,11 +6,6 @@ set_option autoImplicit false
 def LF : Char := Char.ofNat 10
 
 
-def List.allEqual {α} [BEq α] : List α → Bool
-  | [] => true
-  | a :: l => l.all (a == ·)
-
-
 inductive Formula : Type
   | var_ : String → Formula
   | true_ : Formula
@@ -83,36 +78,36 @@ def propSub
 
 
 inductive Justification : Type
-  | thin : String → List Formula → Justification
-  | assume : Formula → Justification
-  | prop_true : Justification
-  | prop_1 : Formula → Formula → Justification
-  | prop_2 : Formula → Formula → Formula → Justification
-  | prop_3 : Formula → Formula → Justification
-  | mp : String → String → Justification
-  | def_false : Justification
-  | def_and : Formula → Formula → Justification
-  | def_or : Formula → Formula → Justification
-  | def_iff : Formula → Formula → Justification
-  | thm : String → List String → Justification
-  | sub : String → List (String × String) → Justification
+  | thin_ : String → List Formula → Justification
+  | assume_ : Formula → Justification
+  | prop_true_ : Justification
+  | prop_1_ : Formula → Formula → Justification
+  | prop_2_ : Formula → Formula → Formula → Justification
+  | prop_3_ : Formula → Formula → Justification
+  | mp_ : String → String → Justification
+  | def_false_ : Justification
+  | def_and_ : Formula → Formula → Justification
+  | def_or_ : Formula → Formula → Justification
+  | def_iff_ : Formula → Formula → Justification
+  | global_ : String → List String → Justification
+  | sub_ : String → List (String × String) → Justification
 
 open Justification
 
 def Justification.toString : Justification → String
-  | thin label hypotheses => s! "thin {label} {hypotheses}"
-  | assume hypothesis => s! "assume {hypothesis}"
-  | prop_true => "prop_true"
-  | prop_1 phi psi => s! "prop_1 {phi} {psi}"
-  | prop_2 phi psi chi => s! "prop_2 {phi} {psi} {chi}"
-  | prop_3 phi psi => s! "prop_3 {phi} {psi}"
-  | mp major_label minor_label => s! "mp {major_label} {minor_label}"
-  | def_false => s! "def_false"
-  | def_and phi psi => s! "def_and {phi} {psi}"
-  | def_or phi psi => s! "def_or {phi} {psi}"
-  | def_iff phi psi => s! "def_iff {phi} {psi}"
-  | thm thm_label step_labels => s! "{thm_label} {step_labels}"
-  | sub label pairs => s! "sub {label} {pairs}"
+  | thin_ label hypotheses => s! "thin {label} {hypotheses}"
+  | assume_ hypothesis => s! "assume {hypothesis}"
+  | prop_true_ => "prop_true"
+  | prop_1_ phi psi => s! "prop_1 {phi} {psi}"
+  | prop_2_ phi psi chi => s! "prop_2 {phi} {psi} {chi}"
+  | prop_3_ phi psi => s! "prop_3 {phi} {psi}"
+  | mp_ _ _ => s! "mp major_step_label minor_step_label"
+  | def_false_ => s! "def_false"
+  | def_and_ phi psi => s! "def_and {phi} {psi}"
+  | def_or_ phi psi => s! "def_or {phi} {psi}"
+  | def_iff_ phi psi => s! "def_iff {phi} {psi}"
+  | global_ _ _ => s! "global global_proof_label local_steps_labels"
+  | sub_ label pairs => s! "sub {label} {pairs}"
 
 instance : ToString Justification :=
   { toString := fun x => x.toString }
@@ -175,84 +170,84 @@ def justificationToSequent
   (localContext : LocalContext) :
   Justification → Except String Sequent
 
-  | thin label hypotheses => do
+  | thin_ label hypotheses => do
       let step ← localContext.find label
       Except.ok {
         hypotheses := step.assertion.hypotheses ++ hypotheses
         conclusion := step.assertion.conclusion }
 
-  | assume phi => Except.ok {
+  | assume_ phi => Except.ok {
       hypotheses := [phi],
       conclusion := phi }
 
-  | prop_true => Except.ok {
+  | prop_true_ => Except.ok {
       hypotheses := [],
       conclusion := true_ }
 
-  | prop_1 phi psi => Except.ok {
+  | prop_1_ phi psi => Except.ok {
       hypotheses := [],
       conclusion := (phi.imp_ (psi.imp_ phi)) }
 
-  | prop_2 phi psi chi => Except.ok {
+  | prop_2_ phi psi chi => Except.ok {
       hypotheses := []
       conclusion := ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi))) }
 
-  | prop_3 phi psi => Except.ok {
+  | prop_3_ phi psi => Except.ok {
       hypotheses := []
       conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
-  | mp major_label minor_label => do
-      let major ← localContext.find major_label
-      let minor ← localContext.find minor_label
-      if major.assertion.hypotheses.toFinset = minor.assertion.hypotheses.toFinset
+  | mp_ major_step_label minor_step_label => do
+      let major_step ← localContext.find major_step_label
+      let minor_step ← localContext.find minor_step_label
+      if major_step.assertion.hypotheses.toFinset = minor_step.assertion.hypotheses.toFinset
       then
-        if let imp_ major_conclusion_antecedent major_conclusion_consequent := major.assertion.conclusion
+        if let imp_ major_step_assertion_conclusion_antecedent major_step_assertion_conclusion_consequent := major_step.assertion.conclusion
         then
-          if minor.assertion.conclusion = major_conclusion_antecedent
+          if minor_step.assertion.conclusion = major_step_assertion_conclusion_antecedent
           then Except.ok {
-            hypotheses := major.assertion.hypotheses
-            conclusion := major_conclusion_consequent }
-          else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The conclusion of the minor premise must match the antecedent of the conclusion of the major premise."
-        else Except.error s! "major premise : {major}{LF}The conclusion of the major premise must be an implication."
-      else Except.error s! "major premise : {major}{LF}minor premise : {minor}{LF}The hypotheses of the minor premise must match the hypotheses of the major premise."
+            hypotheses := major_step.assertion.hypotheses
+            conclusion := major_step_assertion_conclusion_consequent }
+          else Except.error s! "major step : {major_step_label} : {major_step.assertion}{LF}minor step : {minor_step_label} : {minor_step.assertion}{LF}The conclusion of the minor step must match the antecedent of the conclusion of the major step."
+        else Except.error s! "major step assertion : {major_step_label} : {major_step.assertion}{LF}The conclusion of the major step must be an implication."
+      else Except.error s! "major : {major_step_label} : {major_step.assertion}{LF}minor : {minor_step_label} : {minor_step.assertion}{LF}The hypotheses of the minor step must match the hypotheses of the major step."
 
-  | def_false => Except.ok {
+  | def_false_ => Except.ok {
       hypotheses := []
       conclusion := false_.iff_ (not_ true_) }
 
-  | def_and phi psi => Except.ok {
+  | def_and_ phi psi => Except.ok {
       hypotheses := []
       conclusion := ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi)))) }
 
-  | def_or phi psi => Except.ok {
+  | def_or_ phi psi => Except.ok {
       hypotheses := []
       conclusion := ((phi.or_ psi).iff_ ((not_ phi).imp_ psi)) }
 
-  | def_iff phi psi => Except.ok {
+  | def_iff_ phi psi => Except.ok {
       hypotheses := []
       conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi))))) }
 
-  | thm thm_label step_labels => do
-      let thm ← globalContext.find thm_label
-      let steps ← localContext.findList step_labels
-      let steps_assertions := steps.map Step.assertion
-      let steps_hypotheses := steps_assertions.map Sequent.hypotheses
-      let steps_conclusions := steps_assertions.map Sequent.conclusion
-      if steps_conclusions = thm.assertion.hypotheses
+  | global_ global_proof_label local_steps_labels => do
+      let global_proof ← globalContext.find global_proof_label
+      let local_steps ← localContext.findList local_steps_labels
+      let local_steps_assertions := local_steps.map Step.assertion
+      let local_steps_assertions_hypotheses := local_steps_assertions.map Sequent.hypotheses
+      let local_steps_assertions_conclusions := local_steps_assertions.map Sequent.conclusion
+      if local_steps_assertions_conclusions = global_proof.assertion.hypotheses
       then
-        if let hd :: tl := steps_hypotheses
+        if let hd :: tl := local_steps_assertions_hypotheses
         then
           if tl.all (hd == ·)
           then Except.ok {
             hypotheses := hd
-            conclusion := thm.assertion.conclusion }
-          else Except.error s! "{thm_label} : {thm.assertion}{LF}{step_labels} : {steps_assertions}{LF}The hypotheses of steps must be the same."
+            conclusion := global_proof.assertion.conclusion }
+          else Except.error s! "local steps : {local_steps_labels} : {local_steps_assertions}{LF}The hypotheses of the local steps must be the same."
         else Except.ok {
             hypotheses := []
-            conclusion := thm.assertion.conclusion }
-      else Except.error s! "{thm_label} : {thm.assertion}{LF}{step_labels} : {steps_assertions}{LF}The assertations of the steps must match the hypotheses of the theorem."
+            conclusion := global_proof.assertion.conclusion }
+      else Except.error s! "global proof : {global_proof_label} : {global_proof.assertion}{LF}local steps : {local_steps_labels} : {local_steps_assertions}{LF}The conclusions of the local steps must match the hypotheses of the global proof."
 
-  | sub label pairs => do
+  | sub_ label pairs => do
       let step ← localContext.find label
       let (xs, ys) := List.unzip pairs
       Except.ok {
@@ -279,7 +274,7 @@ def createStepListAux
   | [] => Except.ok acc
   | (label, justification) :: tl => do
     let step ← createStep globalContext localContext label justification
-      |>.mapError fun msg => s! "step : {label}{LF}justification : {justification}{LF}{msg}"
+      |>.mapError fun msg => s! "step label : {label}{LF}tactic : {justification}{LF}{msg}"
     createStepListAux globalContext (localContext.insert label step) (acc.push step) tl
 
 def createStepList
@@ -309,7 +304,7 @@ def createProofListAux
   | [] => Except.ok acc
   | hd :: tl => do
   let proof ← createProof globalContext hd.fst hd.snd
-    |>.mapError fun msg => s! "proof : {hd.fst}{LF}{msg}"
+    |>.mapError fun msg => s! "proof label : {hd.fst}{LF}{msg}"
   createProofListAux (globalContext.insert hd.fst proof) (acc.push proof) tl
 
 def createProofList
@@ -322,15 +317,15 @@ def createProofList
 
 #eval createProofList [
   ( "id", [
-      ( "s1", (prop_2 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ),
-      ( "s2", (prop_1 (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ),
-      ( "s3", (mp "s1" "s2") ),
-      ( "s4", (prop_1 (Formula.var_ "P") (Formula.var_ "P")) ),
-      ( "s5", (mp "s3" "s4") )
+      ( "s1", (prop_2_ (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ),
+      ( "s2", (prop_1_ (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ),
+      ( "s3", (mp_ "s1" "s2") ),
+      ( "s4", (prop_1_ (Formula.var_ "P") (Formula.var_ "P")) ),
+      ( "s5", (mp_ "s3" "s4") )
     ]
   ),
-  ( "id'", [ ("s1", (thm "id" [])), ("s2", sub "s1" [("P", "Q")]) ] ),
-  ( "meh", [ ("s1", (assume (Formula.var_ "P"))) ] ),
-  ( "blah", [ ("s1", (def_and (Formula.var_ "P") (Formula.var_ "Q"))) ] ),
-  ( "bleh", [ ("s1", (assume (Formula.var_ "P"))), ("s2", (assume (Formula.var_ "Q"))), ("s3", (thm "meh" ["s2"])) ] )
+  ( "id'", [ ("s1", (global_ "id" [])), ("s2", sub_ "s1" [("P", "Q")]) ] ),
+  ( "meh", [ ("s1", (assume_ (Formula.var_ "P"))) ] ),
+  ( "blah", [ ("s1", (def_and_ (Formula.var_ "P") (Formula.var_ "Q"))) ] ),
+  ( "bleh", [ ("s1", (assume_ (Formula.var_ "P"))), ("s2", (assume_ (Formula.var_ "Q"))), ("s3", (global_ "meh" ["s1"])) ] )
 ]
