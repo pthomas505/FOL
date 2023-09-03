@@ -111,7 +111,7 @@ def Justification.toString : Justification → String
   | def_and phi psi => s! "def_and {phi} {psi}"
   | def_or phi psi => s! "def_or {phi} {psi}"
   | def_iff phi psi => s! "def_iff {phi} {psi}"
-  | thm proof_label step_labels => s! "thm {proof_label} {step_labels}"
+  | thm thm_label step_labels => s! "{thm_label} {step_labels}"
   | sub label pairs => s! "sub {label} {pairs}"
 
 instance : ToString Justification :=
@@ -232,25 +232,25 @@ def justificationToSequent
       hypotheses := []
       conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi))))) }
 
-  | thm proof_label step_labels => do
-      let proof ← globalContext.find proof_label 
+  | thm thm_label step_labels => do
+      let thm ← globalContext.find thm_label
       let steps ← localContext.findList step_labels
       let steps_assertions := steps.map Step.assertion
       let steps_hypotheses := steps_assertions.map Sequent.hypotheses
       let steps_conclusions := steps_assertions.map Sequent.conclusion
-      if steps_hypotheses.allEqual
+      if steps_conclusions = thm.assertion.hypotheses
       then
-        if steps_conclusions = proof.assertion.hypotheses
+        if let hd :: tl := steps_hypotheses
         then
-          if let Option.some hd := steps_hypotheses.head?
+          if tl.all (hd == ·)
           then Except.ok {
             hypotheses := hd
-            conclusion := proof.assertion.conclusion }
-          else Except.ok {
+            conclusion := thm.assertion.conclusion }
+          else Except.error s! "{thm_label} : {thm.assertion}{LF}{step_labels} : {steps_assertions}{LF}The hypotheses of steps must be the same."
+        else Except.ok {
             hypotheses := []
-            conclusion := proof.assertion.conclusion }
-        else Except.error "The step conclusions must match the proof hypotheses."
-      else Except.error "The hypotheses of each step must be the same for all steps."
+            conclusion := thm.assertion.conclusion }
+      else Except.error s! "{thm_label} : {thm.assertion}{LF}{step_labels} : {steps_assertions}{LF}The assertations of the steps must match the hypotheses of the theorem."
 
   | sub label pairs => do
       let step ← localContext.find label
@@ -279,7 +279,7 @@ def createStepListAux
   | [] => Except.ok acc
   | (label, justification) :: tl => do
     let step ← createStep globalContext localContext label justification
-      |>.mapError fun msg => s! "step : {label} : {justification}{LF}{msg}"
+      |>.mapError fun msg => s! "step : {label}{LF}justification : {justification}{LF}{msg}"
     createStepListAux globalContext (localContext.insert label step) (acc.push step) tl
 
 def createStepList
@@ -332,5 +332,5 @@ def createProofList
   ( "id'", [ ("s1", (thm "id" [])), ("s2", sub "s1" [("P", "Q")]) ] ),
   ( "meh", [ ("s1", (assume (Formula.var_ "P"))) ] ),
   ( "blah", [ ("s1", (def_and (Formula.var_ "P") (Formula.var_ "Q"))) ] ),
-  ( "bleh", [ ("s1", (assume (Formula.var_ "P"))), ("s2", (thm "meh" ["s1"])) ] )
+  ( "bleh", [ ("s1", (assume (Formula.var_ "P"))), ("s2", (assume (Formula.var_ "Q"))), ("s3", (thm "meh" ["s2"])) ] )
 ]
