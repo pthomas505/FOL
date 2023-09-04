@@ -290,4 +290,4 @@ def parse_tactic_list :
   pure (hd :: tl.toList)
 
 
-#eval createStepList {} (Option.get! (parse_tactic_list.run "1. prop_true; 2. prop_true"))
+#eval createStepList {} (Option.get! (parse_tactic_list.run "1. prop_2 P() (P() -> P()) P(); 2. prop_1 P() (P() -> P()); 3. mp 1 2; 4. prop_1 P() P(); 5. mp 3 4"))

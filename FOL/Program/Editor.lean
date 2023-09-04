@@ -101,7 +101,7 @@ def Justification.toString : Justification → String
   | prop_1_ phi psi => s! "prop_1 {phi} {psi}"
   | prop_2_ phi psi chi => s! "prop_2 {phi} {psi} {chi}"
   | prop_3_ phi psi => s! "prop_3 {phi} {psi}"
-  | mp_ _ _ => s! "mp major_step_label minor_step_label"
+  | mp_ major minor => s! "mp {major} {minor}"
   | def_false_ => s! "def_false"
   | def_and_ phi psi => s! "def_and {phi} {psi}"
   | def_or_ phi psi => s! "def_or {phi} {psi}"
