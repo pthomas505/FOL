@@ -101,12 +101,12 @@ def Justification.toString : Justification → String
   | prop_1_ phi psi => s! "prop_1 {phi} {psi}"
   | prop_2_ phi psi chi => s! "prop_2 {phi} {psi} {chi}"
   | prop_3_ phi psi => s! "prop_3 {phi} {psi}"
-  | mp_ major minor => s! "mp {major} {minor}"
+  | mp_ major_step_label minor_step_label => s! "mp {major_step_label} {minor_step_label}"
   | def_false_ => s! "def_false"
   | def_and_ phi psi => s! "def_and {phi} {psi}"
   | def_or_ phi psi => s! "def_or {phi} {psi}"
   | def_iff_ phi psi => s! "def_iff {phi} {psi}"
-  | global_ _ _ => s! "global global_proof_label local_steps_labels"
+  | global_ global_proof_label local_steps_labels => s! "global {global_proof_label} {local_steps_labels}"
   | sub_ label pairs => s! "sub {label} {pairs}"
 
 instance : ToString Justification :=
@@ -130,14 +130,12 @@ structure Proof : Type :=
   (assertion : Sequent)
   (steps : Array Step)
 
-
 def List.toLFString
   {α : Type}
   [ToString α] :
   List α → String
   | [] => ""
   | hd :: tl => toString hd ++ LF.toString ++ List.toLFString tl
-
 
 def Proof.toString (x : Proof) : String :=
   s! "{x.label} : {x.assertion}{LF}{x.steps.data.toLFString}"
@@ -283,22 +281,22 @@ def createStepListAux
   | [] => Except.ok acc
   | (label, justification) :: tl => do
     let step ← createStep globalContext localContext label justification
-      |>.mapError fun msg => s! "step label : {label}{LF}tactic : {justification}{LF}{msg}"
+      |>.mapError fun msg => s! "step label : {label}{LF}justification : {justification}{LF}{msg}"
     createStepListAux globalContext (localContext.insert label step) (acc.push step) tl
 
 def createStepList
   (globalContext : GlobalContext)
-  (tactic_list : List (String × Justification)) :
+  (justification_list : List (String × Justification)) :
   Except String (Array Step) :=
-  createStepListAux globalContext {} #[] tactic_list
+  createStepListAux globalContext {} #[] justification_list
 
 
 def createProof
   (globalContext : GlobalContext)
   (label : String)
-  (tactic_list : List (String × Justification)) :
+  (justification_list : List (String × Justification)) :
   Except String Proof := do
-  let step_list ← createStepList globalContext tactic_list
+  let step_list ← createStepList globalContext justification_list
   let Option.some last_step := step_list.back? | Except.error "The step list is empty."
   Except.ok {
     label := label
@@ -317,9 +315,9 @@ def createProofListAux
   createProofListAux (globalContext.insert hd.fst proof) (acc.push proof) tl
 
 def createProofList
-  (tactic_list_list : List (String × (List (String × Justification)))) :
+  (justification_list_list : List (String × (List (String × Justification)))) :
   Except String (Array Proof) :=
-  createProofListAux {} #[] tactic_list_list
+  createProofListAux {} #[] justification_list_list
 
 
 #eval createProofList []
