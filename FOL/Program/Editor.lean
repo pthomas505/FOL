@@ -257,9 +257,10 @@ def justificationToSequent
   | sub_ label pairs => do
       let step ← localContext.find label
       let (xs, ys) := List.unzip pairs
+      let σ := propSub (Function.updateListIte id xs ys)
       Except.ok {
-        hypotheses := step.assertion.hypotheses.map (propSub (Function.updateListIte id xs ys))
-        conclusion := propSub (Function.updateListIte id xs ys) step.assertion.conclusion
+        hypotheses := step.assertion.hypotheses.map σ
+        conclusion := σ step.assertion.conclusion
       }
 
 
