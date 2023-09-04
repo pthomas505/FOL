@@ -290,4 +290,21 @@ def parse_tactic_list :
   pure (hd :: tl.toList)
 
 
-#eval createStepList {} (Option.get! (parse_tactic_list.run "1. prop_2 P() (P() -> P()) P(); 2. prop_1 P() (P() -> P()); 3. mp 1 2; 4. prop_1 P() P(); 5. mp 3 4"))
+def parse_labeled_tactic_list :
+  Parser (String × (List (String × Justification))) := do
+  let label ← parseLabel
+  parseChar '.'
+  parseChar ' '
+  let tactic_list ← parse_tactic_list
+  pure (label, tactic_list)
+
+
+def parseProof
+  (s : String) :
+  Except String Proof :=
+  if let Option.some labeled_tactic_list := parse_labeled_tactic_list.run s
+  then createProof {} labeled_tactic_list.fst labeled_tactic_list.snd
+  else Except.error "Parsing error"
+
+
+#eval parseProof "id. 1. prop_2 P() (P() -> P()) P(); 2. prop_1 P() (P() -> P()); 3. mp 1 2; 4. prop_1 P() P(); 5. mp 3 4"

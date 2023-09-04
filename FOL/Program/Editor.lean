@@ -130,8 +130,17 @@ structure Proof : Type :=
   (assertion : Sequent)
   (steps : Array Step)
 
+
+def List.toLFString
+  {α : Type}
+  [ToString α] :
+  List α → String
+  | [] => ""
+  | hd :: tl => toString hd ++ LF.toString ++ List.toLFString tl
+
+
 def Proof.toString (x : Proof) : String :=
-  s! "{x.label} : {x.assertion} : {x.steps}"
+  s! "{x.label} : {x.assertion}{LF}{x.steps.data.toLFString}"
 
 instance : ToString Proof :=
   { toString := fun x => x.toString }
@@ -323,9 +332,5 @@ def createProofList
       ( "s4", (prop_1_ (Formula.var_ "P") (Formula.var_ "P")) ),
       ( "s5", (mp_ "s3" "s4") )
     ]
-  ),
-  ( "id'", [ ("s1", (global_ "id" [])), ("s2", sub_ "s1" [("P", "Q")]) ] ),
-  ( "meh", [ ("s1", (assume_ (Formula.var_ "P"))) ] ),
-  ( "blah", [ ("s1", (def_and_ (Formula.var_ "P") (Formula.var_ "Q"))) ] ),
-  ( "bleh", [ ("s1", (assume_ (Formula.var_ "P"))), ("s2", (assume_ (Formula.var_ "Q"))), ("s3", (global_ "meh" ["s1"])) ] )
+  )
 ]
