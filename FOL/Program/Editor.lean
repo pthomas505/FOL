@@ -215,8 +215,8 @@ def justificationToSequent
             hypotheses := major_step.assertion.hypotheses
             conclusion := major_step_assertion_conclusion_consequent }
           else Except.error s! "major step : {major_step_label} : {major_step.assertion}{LF}minor step : {minor_step_label} : {minor_step.assertion}{LF}The conclusion of the minor step must match the antecedent of the conclusion of the major step."
-        else Except.error s! "major step assertion : {major_step_label} : {major_step.assertion}{LF}The conclusion of the major step must be an implication."
-      else Except.error s! "major : {major_step_label} : {major_step.assertion}{LF}minor : {minor_step_label} : {minor_step.assertion}{LF}The hypotheses of the minor step must match the hypotheses of the major step."
+        else Except.error s! "major step : {major_step_label} : {major_step.assertion}{LF}The conclusion of the major step must be an implication."
+      else Except.error s! "major step : {major_step_label} : {major_step.assertion}{LF}minor step : {minor_step_label} : {minor_step.assertion}{LF}The hypotheses of the minor step must match the hypotheses of the major step."
 
   | def_false_ => Except.ok {
       hypotheses := []
