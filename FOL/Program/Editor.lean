@@ -119,7 +119,7 @@ structure Step : Type :=
   (justification : Justification)
 
 def Step.toString (x : Step) : String :=
-  s! "{x.label} : {x.assertion} : {x.justification}"
+  s! "{x.label}. {x.assertion} : {x.justification}"
 
 instance : ToString Step :=
   { toString := fun x => x.toString }
