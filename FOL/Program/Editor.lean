@@ -287,17 +287,17 @@ def createStepListAux
 
 def createStepList
   (globalContext : GlobalContext)
-  (justification_list : List (String × Justification)) :
+  (instructions : List (String × Justification)) :
   Except String (Array Step) :=
-  createStepListAux globalContext {} #[] justification_list
+  createStepListAux globalContext {} #[] instructions
 
 
 def createProof
   (globalContext : GlobalContext)
   (label : String)
-  (justification_list : List (String × Justification)) :
+  (instructions : List (String × Justification)) :
   Except String Proof := do
-  let step_list ← createStepList globalContext justification_list
+  let step_list ← createStepList globalContext instructions
   let Option.some last_step := step_list.back? | Except.error "The step list is empty."
   Except.ok {
     label := label
@@ -316,9 +316,9 @@ def createProofListAux
   createProofListAux (globalContext.insert hd.fst proof) (acc.push proof) tl
 
 def createProofList
-  (justification_list_list : List (String × (List (String × Justification)))) :
+  (instructions : List (String × (List (String × Justification)))) :
   Except String (Array Proof) :=
-  createProofListAux {} #[] justification_list_list
+  createProofListAux {} #[] instructions
 
 
 #eval createProofList []
