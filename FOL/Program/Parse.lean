@@ -1,22 +1,17 @@
-import Mathlib.Control.Basic
 import Std.Data.String.Basic
+import Mathlib.Control.Basic
 
 import FOL.Program.Editor
 
 
-/-
-space = ' '
-left_paren = '('
-right_paren = ')'
-ident = [a-z A-Z _] [a-z A-Z 0-9 _ ']+
-formula_ = pred | eq | true | not | imp | forall
-pred = ident (left_paren ident (space ident)* right_paren)?
-eq = left_paren ident space 'eq' space ident right_paren
-true = 'true'
-not = left_paren 'not' space formula right_paren
-imp = left_paren formula space 'imp' space formula right_paren
-forall = left_paren 'forall' space ident space formula right_paren
--/
+def isAlpha (c : Char) : Bool :=
+  ('a' ≤ c && c ≤ 'z') || ('A' ≤ c && c ≤ 'Z')
+
+def isDigit (c : Char) : Bool :=
+  '0' ≤ c && c ≤ '9'
+
+def isAlphaOrDigit (c : Char) : Bool :=
+  isAlpha c || isDigit c
 
 
 abbrev Parser := ReaderT String <| StateT String.Pos Option
@@ -29,31 +24,28 @@ def Parser.run
   (·.1) <$> p s 0
 
 
--- match or fail
-def parseChar
-  (c : Char) :
-  Parser Unit :=
-  fun (s : String) (pos : String.Pos) =>
-  guard (pos < s.endPos && s.get pos == c) *> pure ((), s.next pos)
-
-
--- match or fail
-def parseEOF :
+def matchEOF :
   Parser Unit :=
   fun (s : String) (pos : String.Pos) =>
   guard (pos == s.endPos) *> pure ((), pos)
 
 
--- match or fail
-def parseString
-  (tk : String) :
+def matchExactChar
+  (c : Char) :
+  Parser Unit :=
+  fun (s : String) (pos : String.Pos) =>
+  guard (pos < s.endPos && s.get pos == c) *> pure ((), s.next pos)
+
+def matchExactString
+  (token : String) :
   Parser Unit :=
   fun s pos => do
-  let s ← Substring.dropPrefix? ⟨s, pos, s.endPos⟩ tk.toSubstring
+  let s ← Substring.dropPrefix? ⟨s, pos, s.endPos⟩ token.toSubstring
   pure ((), s.startPos)
 
 
-def takeChar
+-- one
+def takeCharIf
   (f : Char → Bool) :
   Parser Char :=
   fun (s : String) (pos : String.Pos) =>
@@ -85,7 +77,7 @@ def takeWhile1
   else pure s
 
 
--- Runs the given parser repeatedly until it fails.
+-- Runs a single parser repeatedly until it fails.
 partial def many
   {α : Type}
   (p : Parser α) :
@@ -96,214 +88,183 @@ partial def many
     | some a => go (acc.push a)
   go #[]
 
+-----
 
-def isAlpha (c : Char) : Bool :=
-  ('a' ≤ c && c ≤ 'z') || ('A' ≤ c && c ≤ 'Z')
-
-def isDigit (c : Char) : Bool :=
-  '0' ≤ c && c ≤ '9'
-
-def isAlphaOrDigit (c : Char) : Bool :=
-  isAlpha c || isDigit c
-
-def isIdentChar (c : Char) : Bool :=
-  isAlphaOrDigit c || c == '_' || c == '\''
-
-
-def parseIdent :
+def takeIdent :
   Parser String := do
-  let hd ← takeChar isAlpha
-  let tl ← takeWhile isIdentChar
+  let hd ← takeCharIf isAlpha
+  let tl ← takeWhile (fun c : Char => isAlphaOrDigit c || c == '_' || c = '\'')
   pure (hd.toString ++ tl)
 
-def parseIdentList :
+def takeIdentList :
   Parser (List String) := do
-    parseChar '('
-    let x ← parseIdent
-    let xs ← many (parseChar ' ' *> parseIdent)
-    parseChar ')'
-    pure (x :: xs.toList)
+    {
+      matchExactString "()";
+      pure []
+    } <|> do
+    {
+      matchExactChar '(';
+      let hd ← takeIdent;
+      let tl ← many (matchExactString ", " *> takeIdent);
+      matchExactChar ')';
+      pure (hd :: tl.toList)
+    }
 
+def takePred : Parser Formula := do
+  let X ← takeIdent
+  let xs ← takeIdentList
+  pure (Formula.pred_var_ X xs)
 
-/-
-partial def parsePred : Parser Formula := do
-  let X ← parseIdent
-  let xs ← parseIdentList
-  parseEOF
-  pure (Formula.pred_ X xs)
-
-#eval parsePred.run "P(a b)"
--/
-
-
-def parseVar : Parser Formula := do
-  let X ← parseIdent
-  parseChar '('
-  parseChar ')'
-  pure (Formula.var_ X)
-
-def parseTrue : Parser Formula := do
-  parseChar 'T'
+def takeTrue : Parser Formula := do
+  matchExactChar 'T'
   pure (Formula.true_)
 
-def parseFalse : Parser Formula := do
-  parseChar 'F'
+def takeFalse : Parser Formula := do
+  matchExactChar 'F'
   pure (Formula.false_)
 
 mutual
-  partial def parseFormula :
+  partial def takeFormula :
     Parser Formula :=
-    parseVar <|>
-    parseTrue <|>
-    parseFalse <|>
-    parseNot <|>
-    parseImp
+    takePred <|>
+    takeTrue <|>
+    takeFalse <|>
+    takeNot <|>
+    takeImp
 
-  partial def parseNot : Parser Formula := do
-    parseString "~ "
-    let phi ← parseFormula
+  partial def takeNot : Parser Formula := do
+    matchExactString "~ "
+    let phi ← takeFormula
     pure (Formula.not_ phi)
 
-  partial def parseImp : Parser Formula := do
-    parseChar '('
-    let phi ← parseFormula
-    parseString " -> "
-    let psi ← parseFormula
-    parseChar ')'
+  partial def takeImp : Parser Formula := do
+    matchExactChar '('
+    let phi ← takeFormula
+    matchExactString " -> "
+    let psi ← takeFormula
+    matchExactChar ')'
     pure (Formula.imp_ phi psi)
 end
 
-#eval parseFormula.run "(~ P() -> ~ Q())"
 
-
-def parseLabel :
+def takeLabel :
   Parser String :=
-  takeWhile1 isIdentChar
+  takeWhile1 (fun c : Char => isAlphaOrDigit c || c == '_' || c = '\'')
 
 
-def parseNilList
-  (α : Type) :
-  Parser (List α) := do
-  parseString "[]"
-  pure []
-
-def parseConsList
-  (α : Type)
-  (p : Parser α) :
-  Parser (List α) := do
-  parseChar '['
-  let hd ← p
-  let tl ← many (parseString ", " *> p)
-  parseChar ']'
-  pure (hd :: tl.toList)
-
-def parseFormulaList :
-  Parser (List Formula) :=
-  parseNilList Formula <|> parseConsList Formula parseFormula
+def takeFormulaList :
+  Parser (List Formula) := do
+    {
+      matchExactString "[]";
+      pure []
+    } <|> do
+    {
+      matchExactChar '[';
+      let hd ← takeFormula;
+      let tl ← many (matchExactString ", " *> takeFormula);
+      matchExactChar ']';
+      pure (hd :: tl.toList)
+    }
 
 
-#eval parseFormulaList.run "[P(), Q(), ~ P()]"
-
-def parse_thin :
+def takeThin :
   Parser Justification := do
-  parseString "thin"
-  parseChar ' '
-  let label ← parseLabel
-  parseChar ' '
-  let xs ← parseFormulaList
+  matchExactString "thin"
+  matchExactChar ' '
+  let label ← takeLabel
+  matchExactChar ' '
+  let xs ← takeFormulaList
   pure (Justification.thin_ label xs)
 
-def parse_assume :
+def takeAssume :
   Parser Justification := do
-  parseString "assume"
-  parseChar ' '
-  let x ← parseFormula
+  matchExactString "assume"
+  matchExactChar ' '
+  let x ← takeFormula
   pure (Justification.assume_ x)
 
-def parse_prop_true :
+def takePropTrue :
   Parser Justification := do
-  parseString "prop_true"
+  matchExactString "prop_true"
   pure Justification.prop_true_
 
-def parse_prop_1 :
+def takeProp1 :
   Parser Justification := do
-  parseString "prop_1"
-  parseChar ' '
-  let phi ← parseFormula
-  parseChar ' '
-  let psi ← parseFormula
+  matchExactString "prop_1"
+  matchExactChar ' '
+  let phi ← takeFormula
+  matchExactChar ' '
+  let psi ← takeFormula
   pure (Justification.prop_1_ phi psi)
 
-def parse_prop_2 :
+def takeProp2 :
   Parser Justification := do
-  parseString "prop_2"
-  parseChar ' '
-  let phi ← parseFormula
-  parseChar ' '
-  let psi ← parseFormula
-  parseChar ' '
-  let chi ← parseFormula
+  matchExactString "prop_2"
+  matchExactChar ' '
+  let phi ← takeFormula
+  matchExactChar ' '
+  let psi ← takeFormula
+  matchExactChar ' '
+  let chi ← takeFormula
   pure (Justification.prop_2_ phi psi chi)
 
-def parse_prop_3 :
+def takeProp3 :
   Parser Justification := do
-  parseString "prop_3"
-  parseChar ' '
-  let phi ← parseFormula
-  parseChar ' '
-  let psi ← parseFormula
+  matchExactString "prop_3"
+  matchExactChar ' '
+  let phi ← takeFormula
+  matchExactChar ' '
+  let psi ← takeFormula
   pure (Justification.prop_3_ phi psi)
 
-def parse_mp :
+def takeMP :
   Parser Justification := do
-  parseString "mp"
-  parseChar ' '
-  let major_step_label ← parseLabel
-  parseChar ' '
-  let minor_step_label ← parseLabel
+  matchExactString "mp"
+  matchExactChar ' '
+  let major_step_label ← takeLabel
+  matchExactChar ' '
+  let minor_step_label ← takeLabel
   pure (Justification.mp_ major_step_label minor_step_label)
 
-def parseTactic :
+def takeJustification :
   Parser Justification :=
-  parse_thin <|>
-  parse_assume <|>
-  parse_prop_true <|>
-  parse_prop_1 <|>
-  parse_prop_2 <|>
-  parse_prop_3 <|>
-  parse_mp
+  takeThin <|>
+  takeAssume <|>
+  takePropTrue <|>
+  takeProp1 <|>
+  takeProp2 <|>
+  takeProp3 <|>
+  takeMP
 
-
-def parse_tactic :
+def takeLabeledJustification :
   Parser (String × Justification) := do
-  let label ← parseLabel
-  parseChar '.'
-  parseChar ' '
-  let tactic ← parseTactic
-  pure (label, tactic)
+  let label ← takeLabel
+  matchExactChar '.'
+  matchExactChar ' '
+  let justification ← takeJustification
+  pure (label, justification)
 
-
-def parse_tactic_list :
+def takeLabeledJustificationList :
   Parser (List (String × Justification)) := do
-  let hd ← parse_tactic 
-  let tl ← many (parseString "; " *> parse_tactic)
+  let hd ← takeLabeledJustification
+  let tl ← many (matchExactString "; " *> takeLabeledJustification)
   pure (hd :: tl.toList)
 
 
-def parse_labeled_tactic_list :
+def takeLabeledLabeledJustificationList :
   Parser (String × (List (String × Justification))) := do
-  let label ← parseLabel
-  parseChar '.'
-  parseChar ' '
-  let tactic_list ← parse_tactic_list
-  pure (label, tactic_list)
+  let label ← takeLabel
+  matchExactChar '.'
+  matchExactChar ' '
+  let labeled_justification_list ← takeLabeledJustificationList
+  pure (label, labeled_justification_list)
 
 
 def parseProof
   (s : String) :
   Except String Proof :=
-  if let Option.some labeled_tactic_list := parse_labeled_tactic_list.run s
-  then createProof {} labeled_tactic_list.fst labeled_tactic_list.snd
+  if let Option.some labeled_labeled_justification_list := takeLabeledLabeledJustificationList.run s
+  then createProof {} labeled_labeled_justification_list.fst labeled_labeled_justification_list.snd
   else Except.error "Parsing error"
 
 

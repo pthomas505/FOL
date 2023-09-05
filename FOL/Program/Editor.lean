@@ -7,7 +7,7 @@ def LF : Char := Char.ofNat 10
 
 
 inductive Formula : Type
-  | var_ : String → Formula
+  | pred_var_ : String → List String → Formula
   | true_ : Formula
   | false_ : Formula
   | not_ : Formula → Formula
@@ -20,7 +20,7 @@ inductive Formula : Type
 open Formula
 
 def Formula.toString : Formula → String
-  | var_ phi => phi
+  | pred_var_ X xs => s! "{X}{xs}"
   | true_ => "T"
   | false_ => "F"
   | not_ phi => s! "¬ {phi.toString}"
@@ -67,7 +67,7 @@ def Function.updateListIte
 def propSub
   (σ : String → String) :
   Formula → Formula
-  | var_ v => var_ (σ v)
+  | pred_var_ X xs => pred_var_ (σ (X)) xs
   | true_ => true_
   | false_ => false_
   | not_ phi => not_ (propSub σ phi)
@@ -325,10 +325,10 @@ def createProofList
 
 #eval createProofList [
   ( "id", [
-      ( "s1", (prop_2_ (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P")) (Formula.var_ "P")) ),
-      ( "s2", (prop_1_ (Formula.var_ "P") (Formula.imp_ (Formula.var_ "P") (Formula.var_ "P"))) ),
+      ( "s1", (prop_2_ (Formula.pred_var_ "P" []) (Formula.imp_ (Formula.pred_var_ "P" []) (Formula.pred_var_ "P" [])) (Formula.pred_var_ "P" [])) ),
+      ( "s2", (prop_1_ (Formula.pred_var_ "P" []) (Formula.imp_ (Formula.pred_var_ "P" []) (Formula.pred_var_ "P" []))) ),
       ( "s3", (mp_ "s1" "s2") ),
-      ( "s4", (prop_1_ (Formula.var_ "P") (Formula.var_ "P")) ),
+      ( "s4", (prop_1_ (Formula.pred_var_ "P" []) (Formula.pred_var_ "P" [])) ),
       ( "s5", (mp_ "s3" "s4") )
     ]
   )
