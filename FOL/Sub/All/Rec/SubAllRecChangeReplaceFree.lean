@@ -43,15 +43,8 @@ def variant
     simp only [s1]
     simp
     obtain s2 := list_str_max_len_mem s l h
-    simp only [le_iff_lt_or_eq] at s2
-    cases s2
-    case inl c1 =>   
-      have s3 := c1.le
-      refine Iff.mpr (tsub_lt_tsub_iff_right s3) ?_
-      simp
-    case inr c1 =>
-      simp only [c1]
-      simp
+    refine Iff.mpr (tsub_lt_tsub_iff_right s2) ?_
+    simp
   variant (s ++ c.toString) c l
   else s
   termination_by variant s _ l => List.str_max_len l + 1 - s.length
