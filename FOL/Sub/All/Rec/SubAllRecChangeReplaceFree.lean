@@ -34,7 +34,8 @@ def variant
   (l : List String) :=
   if h : s ∈ l
   then
-  have : List.str_max_len l + 1 - (String.length s + String.length (Char.toString c)) < List.str_max_len l + 1 - String.length s := by
+  have : List.str_max_len l + 1 - (String.length s + String.length (Char.toString c)) < List.str_max_len l + 1 - String.length s :=
+    by
     have s1 : (Char.toString c).length = 1
     simp only [String.length]
     unfold Char.toString
@@ -54,7 +55,6 @@ def variant
   variant (s ++ c.toString) c l
   else s
   termination_by variant s _ l => List.str_max_len l + 1 - s.length
-
 
 
 #eval variant "a" '+' ["a+", "a"]
