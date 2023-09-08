@@ -260,12 +260,23 @@ def takeLabeledLabeledJustificationList :
   pure (label, labeled_justification_list)
 
 
-def parseProof
+def takeLabeledLabeledJustificationListList :
+  Parser (List (String × (List (String × Justification)))) := do
+  let hd ← takeLabeledLabeledJustificationList
+  matchExactChar LF
+  let tl ← many (matchExactChar LF *> takeLabeledLabeledJustificationList)
+  pure (hd :: tl.toList)
+
+
+def checkProofList
   (s : String) :
-  Except String Proof :=
-  if let Option.some labeled_labeled_justification_list := takeLabeledLabeledJustificationList.run s
-  then createProof {} labeled_labeled_justification_list.fst labeled_labeled_justification_list.snd
+  Except String (Array Proof) :=
+  if let Option.some labeled_labeled_justification_list_list := takeLabeledLabeledJustificationListList.run s
+  then createProofList labeled_labeled_justification_list_list
   else Except.error "Parsing error"
 
 
-#eval parseProof "id. 1. prop_2 P() (P() -> P()) P(); 2. prop_1 P() (P() -> P()); 3. mp 1 2; 4. prop_1 P() P(); 5. mp 3 4"
+#eval checkProofList "id. 1. prop_2 P() (P() -> P()) P(); 2. prop_1 P() (P() -> P()); 3. mp 1 2; 4. prop_1 P() P(); 5. mp 3 4
+
+id. 1. prop_2 P() (P() -> P()) P(); 2. prop_1 P() (P() -> P()); 3. mp 1 2; 4. prop_1 P() P(); 5. mp 3 4
+"
