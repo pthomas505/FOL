@@ -46,9 +46,9 @@ def variant
   VarName :=
   if h : s ∈ l
   then
-  have : finset_var_name_max_len l + 1 - (s.length + String.length (Char.toString c)) < finset_var_name_max_len l + 1 - s.length :=
+  have : finset_var_name_max_len l + 1 - (s.length + c.toString.length) < finset_var_name_max_len l + 1 - s.length :=
     by
-    have s1 : (Char.toString c).length = 1
+    have s1 : c.toString.length = 1
     rfl
 
     simp only [s1]
@@ -68,9 +68,9 @@ lemma variant_spec
   ¬ variant s c l ∈ l :=
   if h : s ∈ l
   then
-  have : finset_var_name_max_len l + 1 - (s.length + String.length (Char.toString c)) < finset_var_name_max_len l + 1 - s.length :=
+  have : finset_var_name_max_len l + 1 - (s.length + c.toString.length) < finset_var_name_max_len l + 1 - s.length :=
     by
-    have s1 : (Char.toString c).length = 1
+    have s1 : c.toString.length = 1
     rfl
 
     simp only [s1]
