@@ -12,7 +12,7 @@ open Formula
 
 def finset_var_name_max_len :
   Finset VarName → ℕ :=
-  Finset.fold (fun x x_1 => max x x_1) 0 (String.length ∘ VarName.toString)
+  Finset.fold (fun (m n : ℕ) => max m n) 0 (String.length ∘ VarName.toString)
 
 
 lemma finset_var_name_max_len_mem
