@@ -1,6 +1,8 @@
 import FOL.Formula
 import FOL.Binders
 import FOL.FunctionUpdateIte
+import FOL.Semantics
+import FOL.Tactics
 
 import Mathlib.Data.String.Lemmas
 
@@ -120,3 +122,18 @@ def subVariant
     else x
   exists_ x' (subVariant (Function.updateIte σ x x') c phi)
 | def_ X xs => def_ X (xs.map σ)
+
+
+example
+  (σ : VarName → VarName)
+  (c : Char)
+  (F : Formula)
+  (x : VarName)
+  (h1 : ∀ τ : VarName → VarName, (subVariant τ c F).freeVarSet =
+    F.freeVarSet.image τ) :
+  let x' :=
+      if ∃ (y : VarName), y ∈ F.freeVarSet \ {x} ∧ x = σ y 
+      then variant x c (subVariant (Function.updateIte σ x x) c F).freeVarSet
+      else x
+  x' ∉ (F.freeVarSet \ {x}).image σ :=
+  by sorry
