@@ -16,12 +16,12 @@ def finset_var_name_max_len :
 
 
 lemma finset_var_name_max_len_mem
-  (s : VarName)
-  (l : Finset VarName)
-  (h1 : s ∈ l) :
-  s.length <= finset_var_name_max_len l :=
+  (x : VarName)
+  (xs : Finset VarName)
+  (h1 : x ∈ xs) :
+  x.length <= finset_var_name_max_len xs :=
   by
-  induction l using Finset.induction_on
+  induction xs using Finset.induction_on
   case empty =>
     simp at h1
   case insert hd tl a1 ih =>
@@ -40,55 +40,55 @@ lemma finset_var_name_max_len_mem
 
 
 def variant
-  (s : VarName)
+  (x : VarName)
   (c : Char)
-  (l : Finset VarName) :
+  (xs : Finset VarName) :
   VarName :=
-  if h : s ∈ l
+  if h : x ∈ xs
   then
-  have : finset_var_name_max_len l + 1 - (s.length + c.toString.length) < finset_var_name_max_len l + 1 - s.length :=
+  have : finset_var_name_max_len xs + 1 - (x.length + c.toString.length) < finset_var_name_max_len xs + 1 - x.length :=
     by
     have s1 : c.toString.length = 1
     rfl
 
     simp only [s1]
     simp
-    obtain s2 := finset_var_name_max_len_mem s l h
+    obtain s2 := finset_var_name_max_len_mem x xs h
     simp only [tsub_lt_tsub_iff_right s2]
     simp
-  variant (VarName.mk (s.toString ++ c.toString)) c l
-  else s
-  termination_by variant s _ l => finset_var_name_max_len l + 1 - s.length
+  variant (VarName.mk (x.toString ++ c.toString)) c xs
+  else x
+  termination_by variant x _ xs => finset_var_name_max_len xs + 1 - x.length
 
 
-lemma variant_spec
-  (s : VarName)
+lemma variant_not_mem
+  (x : VarName)
   (c : Char)
-  (l : Finset VarName) :
-  ¬ variant s c l ∈ l :=
-  if h : s ∈ l
+  (xs : Finset VarName) :
+  variant x c xs ∉ xs :=
+  if h : x ∈ xs
   then
-  have : finset_var_name_max_len l + 1 - (s.length + c.toString.length) < finset_var_name_max_len l + 1 - s.length :=
+  have : finset_var_name_max_len xs + 1 - (x.length + c.toString.length) < finset_var_name_max_len xs + 1 - x.length :=
     by
     have s1 : c.toString.length = 1
     rfl
 
     simp only [s1]
     simp
-    obtain s2 := finset_var_name_max_len_mem s l h
+    obtain s2 := finset_var_name_max_len_mem x xs h
     simp only [tsub_lt_tsub_iff_right s2]
     simp
   by
     unfold variant
     simp
     simp only [if_pos h]
-    apply variant_spec
+    apply variant_not_mem
   else by
     unfold variant
     simp
     simp [if_neg h]
     exact h
-  termination_by variant_spec s _ l => finset_var_name_max_len l + 1 - s.length
+  termination_by variant_not_mem x _ xs => finset_var_name_max_len xs + 1 - x.length
 
 
 def subVariant
