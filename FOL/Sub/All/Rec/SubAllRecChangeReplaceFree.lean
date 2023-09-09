@@ -111,13 +111,13 @@ def subVariant
 | iff_ phi psi => iff_ (subVariant σ c phi) (subVariant σ c psi)
 | forall_ x phi =>
   let x' : VarName :=
-    if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ x = σ y
+    if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
     then variant x c ((subVariant (Function.updateIte σ x x) c phi).freeVarSet)
     else x
   forall_ x' (subVariant (Function.updateIte σ x x') c phi)
 | exists_ x phi =>
   let x' : VarName :=
-    if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ x = σ y
+    if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
     then variant x c ((subVariant (Function.updateIte σ x x) c phi).freeVarSet)
     else x
   exists_ x' (subVariant (Function.updateIte σ x x') c phi)
@@ -132,8 +132,41 @@ example
   (h1 : ∀ τ : VarName → VarName, (subVariant τ c F).freeVarSet =
     F.freeVarSet.image τ) :
   let x' :=
-      if ∃ (y : VarName), y ∈ F.freeVarSet \ {x} ∧ x = σ y 
+      if ∃ (y : VarName), y ∈ F.freeVarSet \ {x} ∧ σ y = x
       then variant x c (subVariant (Function.updateIte σ x x) c F).freeVarSet
       else x
   x' ∉ (F.freeVarSet \ {x}).image σ :=
-  by sorry
+  by
+  have s1 : (F.freeVarSet \ {x}).image σ ⊆ (subVariant (Function.updateIte σ x x) c F).freeVarSet
+  calc
+        (F.freeVarSet \ {x}).image σ
+
+    _ = (F.freeVarSet \ {x}).image (Function.updateIte σ x x) :=
+      by
+      apply Finset.image_congr
+      unfold Set.EqOn
+      intro y a1
+      unfold Function.updateIte
+      simp at a1
+      cases a1
+      case _ a1_left a1_right =>
+        simp only [if_neg a1_right]
+
+    _ ⊆ F.freeVarSet.image (Function.updateIte σ x x) :=
+      by
+      apply Finset.image_subset_image
+      exact Finset.sdiff_subset (freeVarSet F) {x}
+
+    _ = (subVariant (Function.updateIte σ x x) c F).freeVarSet :=
+      by
+      symm
+      exact h1 (Function.updateIte σ x x)
+
+  split
+  case inl c1 =>
+    obtain s2 := variant_not_mem x c (freeVarSet (subVariant (Function.updateIte σ x x) c F))
+    exact Finset.not_mem_mono s1 s2
+  case inr c1 =>
+    simp at c1
+    simp
+    exact c1
