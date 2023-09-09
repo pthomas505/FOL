@@ -216,6 +216,36 @@ def FinsetVarNameVariant
   termination_by FinsetVarNameVariant s _ l => Finset.var_name_max_len l + 1 - s.length
 
 
+lemma variant_spec''
+  (s : VarName)
+  (c : Char)
+  (l : Finset VarName) :
+  ¬ FinsetVarNameVariant s c l ∈ l :=
+  if h : s ∈ l
+  then
+  have : Finset.var_name_max_len l + 1 - (s.length + String.length (Char.toString c)) < Finset.var_name_max_len l + 1 - s.length :=
+    by
+    have s1 : (Char.toString c).length = 1
+    rfl
+
+    simp only [s1]
+    simp
+    obtain s2 := finset_var_name_max_len_mem s l h
+    simp only [tsub_lt_tsub_iff_right s2]
+    simp
+  by
+    unfold FinsetVarNameVariant
+    simp
+    simp only [if_pos h]
+    apply variant_spec''
+  else by
+    unfold FinsetVarNameVariant
+    simp
+    simp [if_neg h]
+    exact h
+  termination_by variant_spec'' s _ l => Finset.var_name_max_len l + 1 - s.length
+
+
 def subVariant
   (σ : VarName → VarName)
   (c : Char) :
