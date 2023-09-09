@@ -26,6 +26,7 @@ lemma finset_var_name_max_len_mem
     simp at h1
   case insert hd tl a1 ih =>
     simp at h1
+
     cases h1
     case inl c1 =>
       subst c1
@@ -33,6 +34,7 @@ lemma finset_var_name_max_len_mem
       simp
     case inr c1 =>
       unfold finset_var_name_max_len at ih
+
       unfold finset_var_name_max_len
       simp
       right
