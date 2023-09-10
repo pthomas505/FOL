@@ -124,17 +124,16 @@ def subVariant
 | def_ X xs => def_ X (xs.map σ)
 
 
-example
+lemma thm_1
   (σ : VarName → VarName)
   (c : Char)
   (F : Formula)
   (x : VarName)
-  (h1 : ∀ τ : VarName → VarName, (subVariant τ c F).freeVarSet =
-    F.freeVarSet.image τ) :
+  (h1 : ∀ τ : VarName → VarName, (subVariant τ c F).freeVarSet = F.freeVarSet.image τ) :
   let x' :=
-      if ∃ (y : VarName), y ∈ F.freeVarSet \ {x} ∧ σ y = x
-      then variant x c (subVariant (Function.updateIte σ x x) c F).freeVarSet
-      else x
+    if ∃ (y : VarName), y ∈ F.freeVarSet \ {x} ∧ σ y = x
+    then variant x c (subVariant (Function.updateIte σ x x) c F).freeVarSet
+    else x
   x' ∉ (F.freeVarSet \ {x}).image σ :=
   by
   have s1 : (F.freeVarSet \ {x}).image σ ⊆ (subVariant (Function.updateIte σ x x) c F).freeVarSet
@@ -170,3 +169,85 @@ example
     simp at c1
     simp
     exact c1
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (σ : α → α)
+  (S : Finset α)
+  (x x' : α) :
+  (S \ {x}).image (Function.updateIte σ x x') =
+    (S \ {x}).image σ :=
+  by
+  apply Finset.image_congr
+  unfold Set.EqOn
+  intro y a1
+  simp at a1
+  unfold Function.updateIte
+  cases a1
+  case _ a1_left a1_right =>
+    simp only [if_neg a1_right]
+
+example
+  (σ : VarName → VarName)
+  (F : Formula)
+  (x x' : VarName) :
+  ((F.freeVarSet \ {x}).image (fun (y : VarName) => ((Function.updateIte σ x x') y))) \ {x'} = ((F.freeVarSet \ {x}).image (fun (y : VarName) => (σ y))) \ {x'} :=
+  by
+  congr! 1
+  apply Finset.image_congr
+  unfold Set.EqOn
+  intro y a1
+  simp at a1
+  unfold Function.updateIte
+  cases a1
+  case _ a1_left a1_right =>
+    simp only [if_neg a1_right]
+
+
+theorem thm_2
+  (σ : VarName → VarName)
+  (c : Char)
+  (F : Formula) :
+  (subVariant σ c F).freeVarSet = F.freeVarSet.image σ :=
+  by
+  induction F generalizing σ
+  case pred_const_ X xs =>
+    unfold subVariant
+    unfold freeVarSet
+    apply Finset.ext
+    intro a
+    simp
+  case forall_ x phi phi_ih =>
+    unfold subVariant
+    unfold freeVarSet
+    sorry
+
+
+
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (E : Env)
+  (σ : VarName → VarName)
+  (c : Char)
+  (F : Formula) :
+  Holds D I (V ∘ σ) E F ↔
+    Holds D I V E (subVariant σ c F) :=
+  by
+  induction F generalizing V σ
+  case pred_const_ X xs =>
+    unfold subVariant
+    simp only [Holds]
+    simp
+  case forall_ x phi phi_ih =>
+    obtain s1 := thm_1
+    unfold subVariant
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [<- phi_ih]
+    sorry
