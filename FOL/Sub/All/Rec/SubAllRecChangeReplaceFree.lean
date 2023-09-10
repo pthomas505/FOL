@@ -228,20 +228,39 @@ lemma lem_3
     simp only [if_neg a1_right]
 
 
-theorem thm_7
+theorem lem_4
   (σ : VarName → VarName)
   (c : Char)
   (F : Formula) :
   (sub σ c F).freeVarSet = F.freeVarSet.image σ :=
   by
   induction F generalizing σ
-  case pred_const_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
     unfold sub
     unfold freeVarSet
     apply Finset.ext
     intro a
     simp
-  case forall_ x phi phi_ih =>
+  case true_ | false_ =>
+    unfold sub
+    unfold freeVarSet
+    simp
+  case not_ phi phi_ih =>
+    unfold sub
+    unfold freeVarSet
+    exact phi_ih σ
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    unfold sub
+    unfold freeVarSet
+    simp only [Finset.image_union]
+    congr!
+    · exact phi_ih σ
+    · exact psi_ih σ
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     let x' : VarName :=
     if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
     then variant x c ((sub (Function.updateIte σ x x) c phi).freeVarSet)
