@@ -288,3 +288,17 @@ theorem lem_4
       by
       apply Finset.sdiff_singleton_eq_self
       exact lem_1 σ c phi x phi_ih
+
+
+theorem substitution_fun_theorem
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (E : Env)
+  (σ : VarName → VarName)
+  (c : Char)
+  (F : Formula) :
+  Holds D I V E (sub σ c F) ↔
+    Holds D I (V ∘ σ) E F :=
+  by
+  induction F generalizing σ V
