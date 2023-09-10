@@ -95,7 +95,7 @@ lemma variant_not_mem
   termination_by variant_not_mem x _ xs => finset_var_name_max_len xs + 1 - x.length
 
 
-def subVariant
+def sub
   (σ : VarName → VarName)
   (c : Char) :
   Formula → Formula
@@ -104,39 +104,39 @@ def subVariant
 | eq_ x y => eq_ (σ x) (σ y)
 | true_ => true_
 | false_ => false_
-| not_ phi => not_ (subVariant σ c phi)
-| imp_ phi psi => imp_ (subVariant σ c phi) (subVariant σ c psi)
-| and_ phi psi => and_ (subVariant σ c phi) (subVariant σ c psi)
-| or_ phi psi => or_ (subVariant σ c phi) (subVariant σ c psi)
-| iff_ phi psi => iff_ (subVariant σ c phi) (subVariant σ c psi)
+| not_ phi => not_ (sub σ c phi)
+| imp_ phi psi => imp_ (sub σ c phi) (sub σ c psi)
+| and_ phi psi => and_ (sub σ c phi) (sub σ c psi)
+| or_ phi psi => or_ (sub σ c phi) (sub σ c psi)
+| iff_ phi psi => iff_ (sub σ c phi) (sub σ c psi)
 | forall_ x phi =>
   let x' : VarName :=
     if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then variant x c ((subVariant (Function.updateIte σ x x) c phi).freeVarSet)
+    then variant x c ((sub (Function.updateIte σ x x) c phi).freeVarSet)
     else x
-  forall_ x' (subVariant (Function.updateIte σ x x') c phi)
+  forall_ x' (sub (Function.updateIte σ x x') c phi)
 | exists_ x phi =>
   let x' : VarName :=
     if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then variant x c ((subVariant (Function.updateIte σ x x) c phi).freeVarSet)
+    then variant x c ((sub (Function.updateIte σ x x) c phi).freeVarSet)
     else x
-  exists_ x' (subVariant (Function.updateIte σ x x') c phi)
+  exists_ x' (sub (Function.updateIte σ x x') c phi)
 | def_ X xs => def_ X (xs.map σ)
 
 
-lemma thm_1
+lemma lem_1
   (σ : VarName → VarName)
   (c : Char)
   (F : Formula)
   (x : VarName)
-  (h1 : ∀ τ : VarName → VarName, (subVariant τ c F).freeVarSet = F.freeVarSet.image τ) :
+  (h1 : ∀ τ : VarName → VarName, (sub τ c F).freeVarSet = F.freeVarSet.image τ) :
   let x' :=
     if ∃ (y : VarName), y ∈ F.freeVarSet \ {x} ∧ σ y = x
-    then variant x c (subVariant (Function.updateIte σ x x) c F).freeVarSet
+    then variant x c (sub (Function.updateIte σ x x) c F).freeVarSet
     else x
   x' ∉ (F.freeVarSet \ {x}).image σ :=
   by
-  have s1 : (F.freeVarSet \ {x}).image σ ⊆ (subVariant (Function.updateIte σ x x) c F).freeVarSet
+  have s1 : (F.freeVarSet \ {x}).image σ ⊆ (sub (Function.updateIte σ x x) c F).freeVarSet
   calc
         (F.freeVarSet \ {x}).image σ
 
@@ -156,14 +156,14 @@ lemma thm_1
       apply Finset.image_subset_image
       exact Finset.sdiff_subset (freeVarSet F) {x}
 
-    _ = (subVariant (Function.updateIte σ x x) c F).freeVarSet :=
+    _ = (sub (Function.updateIte σ x x) c F).freeVarSet :=
       by
       symm
       exact h1 (Function.updateIte σ x x)
 
   split
   case inl c1 =>
-    obtain s2 := variant_not_mem x c (freeVarSet (subVariant (Function.updateIte σ x x) c F))
+    obtain s2 := variant_not_mem x c (freeVarSet (sub (Function.updateIte σ x x) c F))
     exact Finset.not_mem_mono s1 s2
   case inr c1 =>
     simp at c1
@@ -171,83 +171,101 @@ lemma thm_1
     exact c1
 
 
-example
-  {α : Type}
+lemma lem_2
+  {α β : Type}
   [DecidableEq α]
-  (σ : α → α)
+  [DecidableEq β]
   (S : Finset α)
-  (x x' : α) :
-  (S \ {x}).image (Function.updateIte σ x x') =
-    (S \ {x}).image σ :=
+  (x : α)
+  (x' : β)
+  (f : α → β)
+  (h1 : f x = x') :
+  (Finset.image f S) \ {x'} =
+  (Finset.image f (S \ {x})) \ {x'} :=
+  by
+  subst h1
+  apply Finset.ext
+  intro a
+  simp
+  intro a1
+  constructor
+  · intro a2
+    apply Exists.elim a2
+    intro b a3
+    apply Exists.intro b
+    cases a3
+    case _ a3_left a3_right =>
+      subst a3_right
+      tauto
+  · intro a2
+    apply Exists.elim a2
+    intro b a3
+    apply Exists.intro b
+    cases a3
+    case _ a3_left a3_right =>
+      subst a3_right
+      tauto
+
+
+lemma lem_3
+  {α β : Type}
+  [DecidableEq α]
+  [DecidableEq β]
+  (S : Finset α)
+  (x : α)
+  (x' : β)
+  (f : α → β) :
+  ((S \ {x}).image (Function.updateIte f x x')) =
+  ((S \ {x}).image f) :=
   by
   apply Finset.image_congr
   unfold Set.EqOn
-  intro y a1
+  intro a a1
   simp at a1
   unfold Function.updateIte
   cases a1
   case _ a1_left a1_right =>
     simp only [if_neg a1_right]
 
-example
-  (σ : VarName → VarName)
-  (F : Formula)
-  (x x' : VarName) :
-  ((F.freeVarSet \ {x}).image (fun (y : VarName) => ((Function.updateIte σ x x') y))) \ {x'} = ((F.freeVarSet \ {x}).image (fun (y : VarName) => (σ y))) \ {x'} :=
-  by
-  congr! 1
-  apply Finset.image_congr
-  unfold Set.EqOn
-  intro y a1
-  simp at a1
-  unfold Function.updateIte
-  cases a1
-  case _ a1_left a1_right =>
-    simp only [if_neg a1_right]
 
-
-theorem thm_2
+theorem thm_7
   (σ : VarName → VarName)
   (c : Char)
   (F : Formula) :
-  (subVariant σ c F).freeVarSet = F.freeVarSet.image σ :=
+  (sub σ c F).freeVarSet = F.freeVarSet.image σ :=
   by
   induction F generalizing σ
   case pred_const_ X xs =>
-    unfold subVariant
+    unfold sub
     unfold freeVarSet
     apply Finset.ext
     intro a
     simp
   case forall_ x phi phi_ih =>
-    unfold subVariant
-    unfold freeVarSet
-    sorry
+    let x' : VarName :=
+    if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
+    then variant x c ((sub (Function.updateIte σ x x) c phi).freeVarSet)
+    else x
+    calc
+        (sub σ c (forall_ x phi)).freeVarSet
+    _ = (forall_ x' (sub (Function.updateIte σ x x') c phi)).freeVarSet := by simp only [sub]
 
+    _ = (sub (Function.updateIte σ x x') c phi).freeVarSet \ {x'} := by simp only [freeVarSet]
 
+    _ = (phi.freeVarSet.image (Function.updateIte σ x x')) \ {x'} := by simp only [phi_ih (Function.updateIte σ x x')]
 
+    _ = ((phi.freeVarSet \ {x}).image (Function.updateIte σ x x')) \ {x'} :=
+      by
+      apply lem_2
+      unfold Function.updateIte
+      simp
 
-example
-  (D : Type)
-  (I : Interpretation D)
-  (V : VarAssignment D)
-  (E : Env)
-  (σ : VarName → VarName)
-  (c : Char)
-  (F : Formula) :
-  Holds D I (V ∘ σ) E F ↔
-    Holds D I V E (subVariant σ c F) :=
-  by
-  induction F generalizing V σ
-  case pred_const_ X xs =>
-    unfold subVariant
-    simp only [Holds]
-    simp
-  case forall_ x phi phi_ih =>
-    obtain s1 := thm_1
-    unfold subVariant
-    simp only [Holds]
-    apply forall_congr'
-    intro d
-    simp only [<- phi_ih]
-    sorry
+    _ = ((phi.freeVarSet \ {x}).image σ) \ {x'} :=
+      by
+      congr! 1
+      apply lem_3
+
+    _ = (phi.freeVarSet \ {x}).image σ :=
+      by
+      apply Finset.sdiff_singleton_eq_self
+      exact lem_1 σ c phi x phi_ih
