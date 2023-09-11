@@ -302,3 +302,52 @@ theorem substitution_fun_theorem
     Holds D I (V ∘ σ) E F :=
   by
   induction F generalizing σ V
+  case pred_const_ X xs =>
+    unfold sub
+    simp only [Holds]
+    simp
+  case forall_ x phi phi_ih =>
+    let x' :=
+      if ∃ y ∈ phi.freeVarSet \ {x}, σ y = x
+      then variant x c (sub (Function.updateIte σ x x) c phi).freeVarSet
+      else x
+    have s1 : ∀ (a : D) (z : VarName), z ∈ phi.freeVarSet → ((Function.updateIte V x' a) ∘ (Function.updateIte σ x x')) z = (Function.updateIte (V ∘ σ) x a) z
+    intro a z h1
+    by_cases h2 : z = x
+    case pos =>
+      subst h2
+      unfold Function.updateIte
+      simp
+    case neg =>
+      have s2 : z ∈ phi.freeVarSet \ {x}
+      simp
+      tauto
+
+      have s3 : x' ∉ (phi.freeVarSet \ {x}).image σ
+      apply lem_1
+      intro τ
+      exact lem_4 τ c phi
+
+      have s4 : σ z ∈ (phi.freeVarSet \ {x}).image σ
+      apply Finset.mem_image_of_mem
+      exact s2
+
+      have s5 : ¬ x' = σ z
+      intro contra
+      apply s3
+      simp only [contra]
+      exact s4
+
+      have s6 : ∀ (x : VarName), x = σ z → ¬ x = x'
+      intro y a1
+      subst a1
+      tauto
+
+      calc
+          ((Function.updateIte V x' a) ∘ (Function.updateIte σ x x')) z
+      _ = (Function.updateIte V x' a) ((Function.updateIte σ x x') z) := by simp
+      _ = (Function.updateIte V x' a) z :=
+          by
+          unfold Function.updateIte
+          simp only [if_neg h2]
+          sorry
