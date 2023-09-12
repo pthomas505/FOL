@@ -302,15 +302,34 @@ theorem substitution_fun_theorem
     Holds D I (V ∘ σ) E F :=
   by
   induction F generalizing σ V
-  case pred_const_ X xs =>
+  case pred_const_ X xs | pred_var_ X xs | eq_ x y =>
     unfold sub
     simp only [Holds]
     simp
+  case true_ | false_ =>
+    unfold sub
+    simp only [Holds]
+  case not_ phi phi_ih =>
+    unfold sub
+    simp only [Holds]
+    congr! 1
+    exact phi_ih V σ
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    unfold sub
+    simp only [Holds]
+    congr! 1
+    · exact phi_ih V σ
+    · exact psi_ih V σ
   case forall_ x phi phi_ih =>
     let x' :=
       if ∃ y ∈ phi.freeVarSet \ {x}, σ y = x
       then variant x c (sub (Function.updateIte σ x x) c phi).freeVarSet
       else x
+
     have s1 : ∀ (a : D) (z : VarName), z ∈ phi.freeVarSet → ((Function.updateIte V x' a) ∘ (Function.updateIte σ x x')) z = (Function.updateIte (V ∘ σ) x a) z
     intro a z h1
     by_cases h2 : z = x
@@ -319,10 +338,6 @@ theorem substitution_fun_theorem
       unfold Function.updateIte
       simp
     case neg =>
-      have s2 : z ∈ phi.freeVarSet \ {x}
-      simp
-      tauto
-
       have s3 : x' ∉ (phi.freeVarSet \ {x}).image σ
       apply lem_1
       intro τ
@@ -330,24 +345,44 @@ theorem substitution_fun_theorem
 
       have s4 : σ z ∈ (phi.freeVarSet \ {x}).image σ
       apply Finset.mem_image_of_mem
-      exact s2
-
-      have s5 : ¬ x' = σ z
-      intro contra
-      apply s3
-      simp only [contra]
-      exact s4
-
-      have s6 : ∀ (x : VarName), x = σ z → ¬ x = x'
-      intro y a1
-      subst a1
+      simp
       tauto
 
-      calc
-          ((Function.updateIte V x' a) ∘ (Function.updateIte σ x x')) z
-      _ = (Function.updateIte V x' a) ((Function.updateIte σ x x') z) := by simp
-      _ = (Function.updateIte V x' a) z :=
-          by
-          unfold Function.updateIte
-          simp only [if_neg h2]
-          sorry
+      have s5 : ¬ σ z = x'
+      intro contra
+      apply s3
+      simp only [<- contra]
+      exact s4
+
+      unfold Function.updateIte
+      simp (config := {zeta := false})
+      simp (config := {zeta := false}) only [if_neg h2]
+      split_ifs
+      case inl c1 =>
+        tauto
+      case inr c1 =>
+        rfl
+
+    calc
+        Holds D I V E (sub σ c (forall_ x phi))
+    _ ↔ Holds D I V E (forall_ x' (sub (Function.updateIte σ x x') c phi)) :=
+        by simp only [sub]
+    _ ↔ ∀ (a : D), Holds D I (Function.updateIte V x' a) E (sub (Function.updateIte σ x x') c phi) :=
+        by simp only [Holds]
+    _ ↔ (∀ (a : D), (Holds D I ((Function.updateIte V x' a) ∘ (Function.updateIte σ x x')) E phi)) :=
+        by
+        apply forall_congr'
+        intro a
+        apply phi_ih
+    _ ↔ (∀ (a : D), Holds D I (Function.updateIte (V ∘ σ) x a) E phi) :=
+        by
+        apply forall_congr'
+        intro a
+        apply Holds_coincide_Var
+        intro v a1
+        apply s1
+        simp only [← isFreeIn_iff_mem_freeVarSet]
+        exact a1
+    _ ↔ Holds D I (V ∘ σ) E (forall_ x phi) :=
+        by
+        simp only [Holds]
