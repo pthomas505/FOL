@@ -324,7 +324,7 @@ theorem substitution_fun_theorem
     congr! 1
     · exact phi_ih V σ
     · exact psi_ih V σ
-  case forall_ x phi phi_ih =>
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     let x' :=
       if ∃ y ∈ phi.freeVarSet \ {x}, σ y = x
       then variant x c (sub (Function.updateIte σ x x) c phi).freeVarSet
@@ -363,29 +363,16 @@ theorem substitution_fun_theorem
       case inr c1 =>
         rfl
 
-    calc
-        Holds D I V E (sub σ c (forall_ x phi))
-    _ ↔ Holds D I V E (forall_ x' (sub (Function.updateIte σ x x') c phi)) :=
-        by simp only [sub]
-    _ ↔ ∀ (a : D), Holds D I (Function.updateIte V x' a) E (sub (Function.updateIte σ x x') c phi) :=
-        by simp only [Holds]
-    _ ↔ (∀ (a : D), (Holds D I ((Function.updateIte V x' a) ∘ (Function.updateIte σ x x')) E phi)) :=
-        by
-        apply forall_congr'
-        intro a
-        apply phi_ih
-    _ ↔ (∀ (a : D), Holds D I (Function.updateIte (V ∘ σ) x a) E phi) :=
-        by
-        apply forall_congr'
-        intro a
-        apply Holds_coincide_Var
-        intro v a1
-        apply s1
-        simp only [← isFreeIn_iff_mem_freeVarSet]
-        exact a1
-    _ ↔ Holds D I (V ∘ σ) E (forall_ x phi) :=
-        by
-        simp only [Holds]
+    simp only [sub]
+    simp only [Holds]
+    first | apply forall_congr' | apply exists_congr
+    intro a
+    simp only [phi_ih]
+    apply Holds_coincide_Var
+    intro v a1
+    apply s1
+    simp only [isFreeIn_iff_mem_freeVarSet] at a1
+    exact a1
 
   case def_ X xs =>
     induction E
