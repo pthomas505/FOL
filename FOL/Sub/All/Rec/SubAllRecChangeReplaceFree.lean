@@ -400,3 +400,18 @@ theorem substitution_fun_theorem
           apply Finset.mem_of_subset E_hd.h1 a1
       case inr c1 =>
         exact E_ih
+
+
+theorem sub_valid
+  (σ : VarName → VarName)
+  (c : Char)
+  (phi : Formula)
+  (h1 : IsValid phi) :
+  IsValid (sub σ c phi) :=
+  by
+  unfold IsValid at h1
+
+  unfold IsValid
+  intros D I V E
+  simp only [substitution_fun_theorem]
+  apply h1
