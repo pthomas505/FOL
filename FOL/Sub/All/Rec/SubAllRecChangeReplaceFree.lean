@@ -386,3 +386,30 @@ theorem substitution_fun_theorem
     _ ↔ Holds D I (V ∘ σ) E (forall_ x phi) :=
         by
         simp only [Holds]
+
+  case def_ X xs =>
+    induction E
+    case nil =>
+      unfold sub
+      simp only [Holds]
+    case cons E_hd E_tl E_ih =>
+      unfold sub at E_ih
+
+      unfold sub
+      simp only [Holds]
+      simp
+      split_ifs
+      case inl c1 =>
+        apply Holds_coincide_Var
+        intro v a1
+        apply Function.updateListIte_map_mem_ext
+        · simp
+        · cases c1
+          case _ c1_left c1_right =>
+            symm
+            exact c1_right
+        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          simp only [← List.mem_toFinset]
+          apply Finset.mem_of_subset E_hd.h1 a1
+      case inr c1 =>
+        exact E_ih
