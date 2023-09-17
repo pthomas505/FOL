@@ -15,8 +15,10 @@ open Formula
 def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formula → Formula
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
-      if xs.length = (τ X xs.length).fst.length
-      then fastReplaceFreeFun (Function.updateListIte id (τ X xs.length).fst xs) (τ X xs.length).snd
+      let zs := (τ X xs.length).fst
+      let H := (τ X xs.length).snd
+      if xs.length = zs.length
+      then fastReplaceFreeFun (Function.updateListIte id zs xs) H
       else pred_var_ X xs
   | eq_ x y => eq_ x y
   | true_ => true_
@@ -48,9 +50,9 @@ def admitsPredFunAux
   Finset VarName → Formula → Prop
   | _, pred_const_ _ _ => True
   | binders, pred_var_ X xs =>
-    admitsFun (Function.updateListIte id (τ X xs.length).fst xs) (τ X xs.length).snd ∧
-      (∀ x : VarName, x ∈ binders → ¬ (isFreeIn x (τ X xs.length).snd ∧ x ∉ (τ X xs.length).fst)) ∧
-        xs.length = (τ X xs.length).fst.length
+    let zs := (τ X xs.length).fst
+    let H := (τ X xs.length).snd
+    admitsFun (Function.updateListIte id zs xs) H ∧ (∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)) ∧ xs.length = zs.length
   | _, true_ => True
   | _, false_ => True
   | _, eq_ _ _ => True
@@ -237,14 +239,16 @@ theorem predSub
   (F : Formula)
   (h1 : admitsPredFun τ F) :
   Holds D
-    ⟨ 
+    ⟨
       I.nonempty,
       I.pred_const_,
       fun (X : PredName) (ds : List D) =>
-        if ds.length = (τ X ds.length).fst.length
-        then Holds D I (Function.updateListIte V (τ X ds.length).fst ds) E (τ X ds.length).snd
+        let zs := (τ X ds.length).fst
+        let H := (τ X ds.length).snd
+        if ds.length = zs.length
+        then Holds D I (Function.updateListIte V zs ds) E H
         else I.pred_var_ X ds
-      ⟩ 
+      ⟩
       V E F ↔ Holds D I V E (replacePredFun τ F) :=
   by
   apply predSub_aux D I V V E τ ∅ F
