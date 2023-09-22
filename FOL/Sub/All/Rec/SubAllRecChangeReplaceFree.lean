@@ -504,7 +504,7 @@ theorem predSub_aux
   (binders : Finset VarName)
   (F : Formula)
   (h1 : admitsPredFunAux τ binders F)
-  (h2 : ∀ x : VarName, x ∉ binders → V x = V' x) :
+  (h2 : ∀ x : VarName, x ∉ binders → V' x = V x) :
   Holds D
     ⟨
       I.nonempty,
@@ -534,45 +534,39 @@ theorem predSub_aux
     unfold replacePredFun
     simp only [Holds]
     simp
-    split_ifs at h1
-    case inl c1 =>
-      cases h1
-      case inl c2 =>
-        split_ifs
-        simp only [Holds]
-      case inr c2 =>
-        split_ifs
-        case inl c3 =>
-          let opt := τ X xs.length
-          let val := Option.get opt c1
-          let zs := val.fst
-          let H := val.snd
-          obtain s1 := substitution_fun_theorem D I V E (Function.updateListIte id zs xs) c H
-          simp only [Function.updateListIte_comp] at s1
-          simp at s1
+    split_ifs
+    case _ c1 c2 =>
+      let opt := τ X xs.length
+      let val := Option.get opt c1
+      let zs := val.fst
+      let H := val.snd
+      obtain s1 := substitution_fun_theorem D I V E (Function.updateListIte id zs xs) c H
+      simp only [Function.updateListIte_comp] at s1
+      simp at s1
+      simp only [s1]
 
-          have s2 : Holds D I (Function.updateListIte V zs (List.map V xs)) E H ↔ Holds D I (Function.updateListIte V' zs (List.map V xs)) E H
-          {
-            apply Holds_coincide_Var
-            intro v a1
-            by_cases s2_c1 : v ∈ zs
-            · apply Function.updateListIte_mem_eq_len V V' v zs (List.map V xs) s2_c1
-              simp
-              simp only [← c3]
-            · by_cases s2_c2 : v ∈ binders
-              · specialize c2 v s2_c2 a1
-                contradiction
-              · specialize h2 v s2_c2
-                apply Function.updateListIte_mem'
-                exact h2
-          }
-          simp only [s2] at s1
-          simp only [s1]
-        case inr c3 =>
-          simp only [Holds]
-    case inr c1 =>
-      split_ifs
+      apply Holds_coincide_Var
+      intro v a1
+      by_cases c3 : v ∈ zs
+      · apply Function.updateListIte_mem_eq_len V' V v zs (List.map V xs) c3
+        simp
+        simp only [← c2]
+      · simp only [Function.updateListIte_not_mem V v zs (List.map V xs) c3]
+        simp only [Function.updateListIte_not_mem V' v zs (List.map V xs) c3]
+        apply h2
+        split_ifs at h1
+        cases h1
+        case _ h1_c1 =>
+          contradiction
+        case _ h1_c1 =>
+          intro contra
+          specialize h1_c1 v contra a1
+          contradiction
+    case _ c1 c2 =>
       simp only [Holds]
+    case _ c1 =>
+      simp only [Holds]
+
   case eq_ x y =>
     unfold replacePredFun
     simp only [Holds]
@@ -812,4 +806,6 @@ example
     case _ c1 =>
       simp only [Holds]
 
+  case forall_ x phi phi_ih =>
+    sorry
   all_goals sorry;
