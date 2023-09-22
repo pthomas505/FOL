@@ -639,25 +639,6 @@ theorem predSub_aux
           simp
 
 
-def Formula.predVarSet' : Formula → Finset (PredName × List VarName)
-  | pred_const_ _ _ => ∅
-  | pred_var_ X xs => {(X, xs)}
-  | eq_ _ _ => ∅
-  | true_ => ∅
-  | false_ => ∅
-  | not_ phi => phi.predVarSet'
-  | imp_ phi psi => phi.predVarSet' ∪ psi.predVarSet'
-  | and_ phi psi => phi.predVarSet' ∪ psi.predVarSet'
-  | or_ phi psi => phi.predVarSet' ∪ psi.predVarSet'
-  | iff_ phi psi => phi.predVarSet' ∪ psi.predVarSet'
-  | forall_ _ phi => phi.predVarSet'
-  | exists_ _ phi => phi.predVarSet'
-  | def_ _ _ => ∅
-
-
-instance {α} (S : Finset α) : Decidable (∃ a, a ∈ S) := inferInstanceAs (Decidable S.Nonempty)
-
-
 def Formula.length : Formula → ℕ
   | pred_const_ _ _ => 0
   | pred_var_ _ _ => 0
@@ -704,8 +685,15 @@ lemma sub_formula_length_same
     unfold Formula.length
     simp
 
-/-
-def subPred
+
+def predVarFreeVarSet
+  (τ : PredName → ℕ → Option (List VarName × Formula)) :=
+  fun (p, n) =>
+  match τ p n with
+  | none => {}
+  | some (zs, H) => H.freeVarSet \ zs.toFinset
+
+def subPredAux
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula)) :
   Formula → Formula
@@ -724,42 +712,80 @@ def subPred
   | eq_ x y => eq_ x y
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (subPred c τ phi)
+  | not_ phi =>
+    have : length phi < length (not_ phi) := by simp only [Formula.length]; simp
+    not_ (subPredAux c τ phi)
   | imp_ phi psi =>
-      imp_
-      (subPred c τ phi)
-      (subPred c τ psi)
+      have : length phi < length (imp_ phi psi) := by simp only [Formula.length]; apply Nat.lt_add_right; simp;
+      have : length psi < length (imp_ phi psi) := by simp only [Formula.length]; simp;
+      imp_ (subPredAux c τ phi) (subPredAux c τ psi)
   | and_ phi psi =>
-      and_
-      (subPred c τ phi)
-      (subPred c τ psi)
+      have : length phi < length (and_ phi psi) := by simp only [Formula.length]; apply Nat.lt_add_right; simp;
+      have : length psi < length (and_ phi psi) := by simp only [Formula.length]; simp;
+      and_ (subPredAux c τ phi) (subPredAux c τ psi)
   | or_ phi psi =>
-      or_
-      (subPred c τ phi)
-      (subPred c τ psi)
+      have : length phi < length (or_ phi psi) := by simp only [Formula.length]; apply Nat.lt_add_right; simp;
+      have : length psi < length (or_ phi psi) := by simp only [Formula.length]; simp;
+      or_ (subPredAux c τ phi) (subPredAux c τ psi)
   | iff_ phi psi =>
-      iff_
-      (subPred c τ phi)
-      (subPred c τ psi)
+      have : length phi < length (iff_ phi psi) := by simp only [Formula.length]; apply Nat.lt_add_right; simp;
+      have : length psi < length (iff_ phi psi) := by simp only [Formula.length]; simp;
+      iff_ (subPredAux c τ phi) (subPredAux c τ psi)
   | forall_ x phi =>
+      have : length (sub (Function.updateIte id x (if x ∈ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ) then variant x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)) else x)) c phi) < length (forall_ x phi) := by simp only [Formula.length]; simp only [sub_formula_length_same]; simp;
+      let vs : Finset VarName := Finset.biUnion phi.predVarSet (predVarFreeVarSet τ)
       let x' : VarName :=
-        if h1 : ∃ y : (PredName × ℕ), y ∈ phi.predVarSet
-        then
-          let opt := (τ y.fst y.snd)
-          if h2 : Option.isSome opt
-          then
-            let val := Option.get opt h2
-            let zs := val.fst
-            let H := val.snd
-            if y.snd = zs.length
-            then
-              if ¬ (isFreeIn x H ∧ x ∉ zs)
-              then x
-              else variant x c (subPred c τ phi).freeVarSet
-            else x
-          else x
+        if x ∈ vs
+        then variant x c vs
         else x
-      forall_ x' (sub (Function.updateIte id x x') c (subPred c τ phi))
-  | exists_ x phi => exists_ x (subPred c τ phi)
+      forall_ x' (subPredAux c τ (sub (Function.updateIte id x x') c phi))
+  | exists_ x phi =>
+      have : length (sub (Function.updateIte id x (if x ∈ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ) then variant x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)) else x)) c phi) < length (forall_ x phi) := by simp only [Formula.length]; simp only [sub_formula_length_same]; simp;
+      let vs : Finset VarName := Finset.biUnion phi.predVarSet (predVarFreeVarSet τ)
+      let x' : VarName :=
+        if x ∈ vs
+        then variant x c vs
+        else x
+      exists_ x' (subPredAux c τ (sub (Function.updateIte id x x') c phi))
   | def_ X xs => def_ X xs
--/
+  termination_by subPredAux c τ F => F.length
+
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : VarAssignment D)
+  (E : Env)
+  (σ : VarName → VarName)
+  (c : Char)
+  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (F : Formula)
+  (h1 : ∀ x : VarName, V x = V' x) :
+  Holds D
+    ⟨
+      I.nonempty,
+      I.pred_const_,
+      fun (X : PredName) (ds : List D) =>
+      let opt := τ X ds.length
+      if h : Option.isSome opt
+      then
+        let val := Option.get opt h
+        let zs := val.fst
+        let H := val.snd
+        if ds.length = zs.length
+        then Holds D I (Function.updateListIte V' zs ds) E H
+        else I.pred_var_ X ds
+      else I.pred_var_ X ds
+    ⟩ 
+    V E F ↔ Holds D I V E (subPredAux c τ F) :=
+  by
+  induction F generalizing V
+  case pred_const_ X xs =>
+    unfold subPredAux
+    simp only [Holds]
+  case pred_var_ X xs =>
+    unfold subPredAux
+    simp only [Holds]
+    simp
+    sorry
+  all_goals sorry;
