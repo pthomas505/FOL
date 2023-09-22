@@ -760,7 +760,7 @@ example
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (F : Formula)
-  (h1 : ∀ x : VarName, V x = V' x) :
+  (h1 : ∀ x : VarName, V' x = V x) :
   Holds D
     ⟨
       I.nonempty,
@@ -787,5 +787,29 @@ example
     unfold subPredAux
     simp only [Holds]
     simp
-    sorry
+    split_ifs
+    case _ c1 c2 =>
+      let opt := τ X xs.length
+      let val := Option.get opt c1
+      let zs := val.fst
+      let H := val.snd
+      obtain s1 := substitution_fun_theorem D I V E (Function.updateListIte id zs xs) c H
+      simp only [Function.updateListIte_comp] at s1
+      simp at s1
+      simp only [s1]
+
+      apply Holds_coincide_Var
+      intro v a1
+      by_cases c3 : v ∈ zs
+      · apply Function.updateListIte_mem_eq_len V' V v zs (List.map V xs) c3
+        simp
+        simp only [← c2]
+      · simp only [Function.updateListIte_not_mem V v zs (List.map V xs) c3]
+        simp only [Function.updateListIte_not_mem V' v zs (List.map V xs) c3]
+        apply h1
+    case _ c1 c2 =>
+      simp only [Holds]
+    case _ c1 =>
+      simp only [Holds]
+
   all_goals sorry;
