@@ -4,6 +4,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 namespace Margaris
 
 open Formula
@@ -285,5 +287,3 @@ inductive IsProofAlt : Formula → Prop
 #lint
 
 end Margaris
-
-end FOL

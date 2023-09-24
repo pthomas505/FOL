@@ -3,6 +3,8 @@ import FOL.Semantics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -200,5 +202,3 @@ theorem prop_sub_isValid
 
 
 #lint
-
-end FOL

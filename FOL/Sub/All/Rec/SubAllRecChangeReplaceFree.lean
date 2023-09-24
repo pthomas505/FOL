@@ -9,6 +9,8 @@ import Mathlib.Data.String.Lemmas
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -734,11 +736,17 @@ def subPredAux
         else x
       forall_ x' (subPredAux c τ (sub (Function.updateIte id x x') c phi))
   | exists_ x phi =>
-      have : length (sub (Function.updateIte id x (if x ∈ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ) then variant x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)) else x)) c phi) < length (forall_ x phi) := by simp only [Formula.length]; simp only [sub_formula_length_same]; simp;
+      have : length (sub
+      (Function.updateIte id x
+        (if x ∈ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ) then
+          variant x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ) ∪ freeVarSet phi \ {x})
+        else x))
+      c phi) <
+  length (exists_ x phi) := by simp only [Formula.length]; simp only [sub_formula_length_same]; simp;
       let vs : Finset VarName := Finset.biUnion phi.predVarSet (predVarFreeVarSet τ)
       let x' : VarName :=
         if x ∈ vs
-        then variant x c vs
+        then variant x c (vs ∪ (phi.freeVarSet \ {x}))
         else x
       exists_ x' (subPredAux c τ (sub (Function.updateIte id x x') c phi))
   | def_ X xs => def_ X xs
@@ -807,5 +815,91 @@ example
       simp only [Holds]
 
   case forall_ x phi phi_ih =>
-    sorry
+    unfold subPredAux
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    split_ifs
+    case _ c1 =>
+      sorry
+    case _ c2 =>
+      obtain s1 := substitution_fun_theorem D I (Function.updateIte V x d) E (Function.updateIte id x x) c phi
+      sorry
   all_goals sorry;
+
+
+
+
+def replaceVarOption
+  (σ : VarName → VarName)
+  (binders : Finset VarName)
+  (v : VarName) :
+  Option VarName :=
+  if v ∉ binders
+  then
+    if σ v ∉ binders
+    then Option.some (σ v)
+    else Option.none
+  else v
+
+def subOption
+  (σ : VarName → VarName) :
+  Finset VarName → Formula → Option Formula
+  | binders, pred_const_ X xs => do
+      let xs' ← xs.mapM (replaceVarOption σ binders)
+      pred_const_ X xs'
+  | binders, pred_var_ X xs => do
+      let xs' ← xs.mapM (replaceVarOption σ binders)
+      pred_var_ X xs'
+  | binders, eq_ x y => do
+      let x' ← replaceVarOption σ binders x
+      let y' ← replaceVarOption σ binders y
+      eq_ x' y'
+  | _, true_ => true_
+  | _, false_ => false_
+  | binders, not_ phi => do
+      let phi' ← subOption σ binders phi
+      not_ phi'
+  | binders, imp_ phi psi => do
+      let phi' ← subOption σ binders phi
+      let psi' ← subOption σ binders psi
+      imp_ phi' psi'
+  | binders, and_ phi psi => do
+      let phi' ← subOption σ binders phi
+      let psi' ← subOption σ binders psi
+      and_ phi' psi'
+  | binders, or_ phi psi => do
+      let phi' ← subOption σ binders phi
+      let psi' ← subOption σ binders psi
+      or_ phi' psi'
+  | binders, iff_ phi psi => do
+      let phi' ← subOption σ binders phi
+      let psi' ← subOption σ binders psi
+      iff_ phi' psi'
+  | binders, forall_ x phi => do
+      let phi' ← subOption σ (binders ∪ {x}) phi
+      forall_ x phi'
+  | binders, exists_ x phi => do
+      let phi' ← subOption σ (binders ∪ {x}) phi
+      exists_ x phi'
+  | binders, def_ X xs => do
+      let xs' ← xs.mapM (replaceVarOption σ binders)
+      def_ X xs'
+
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : VarAssignment D)
+  (E : Env)
+  (σ σ' : VarName → VarName)
+  (binders : Finset VarName)
+  (F : Formula)
+  (h1 : Option.isSome (subOption σ' binders F))
+  (h2 : ∀ v : VarName, v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
+  (h2' : ∀ v : VarName, v ∈ binders → v = σ' v)
+  (h3 : ∀ v : VarName, v ∉ binders → σ' v = σ v) :
+  let opt := subOption σ' binders F
+  Holds D I V E F ↔ Holds D I V' E (Option.get opt h1) :=
+  by
+    sorry

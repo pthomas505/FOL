@@ -3,6 +3,8 @@ import FOL.Margaris.Prop
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 open Margaris
@@ -1334,6 +1336,3 @@ theorem T_21_8 (P_r P_s : Formula) (r s : VarName) (h1 : IsReplOfVarInFormula r 
         simp only [Set.mem_singleton]
 
 #lint
-
-end FOL
-

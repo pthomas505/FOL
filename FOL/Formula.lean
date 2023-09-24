@@ -44,6 +44,8 @@ instance : Repr DefName :=
   { reprPrec := fun X _ => X.toString.toFormat }
 
 
+namespace NV
+
 /--
   The type of formulas.
 -/
@@ -138,5 +140,3 @@ def Formula.Exists_ (xs : List VarName) (phi : Formula) : Formula :=
 
 
 #lint
-
-end FOL

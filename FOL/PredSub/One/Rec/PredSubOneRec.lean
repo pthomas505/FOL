@@ -4,6 +4,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -302,5 +304,3 @@ theorem pred_sub_single_valid
 
 
 --#lint
-
-end FOL

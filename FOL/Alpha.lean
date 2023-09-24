@@ -5,6 +5,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -659,5 +661,3 @@ lemma isalphaEqv_Holds
 
 
 --#lint
-
-end FOL

@@ -4,6 +4,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -459,5 +461,3 @@ theorem isFreeIn_imp_occursIn
 
 
 #lint
-
-end FOL

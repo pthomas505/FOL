@@ -5,6 +5,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -1763,5 +1765,3 @@ theorem substitution_is_valid
 
 
 --#lint
-
-end FOL

@@ -5,6 +5,7 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
 
 open Formula
 
@@ -1029,5 +1030,3 @@ theorem prop_complete
 
 
 --#lint
-
-end FOL

@@ -5,6 +5,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -387,5 +389,3 @@ example
 
 
 #lint
-
-end FOL

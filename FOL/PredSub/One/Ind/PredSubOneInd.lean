@@ -3,6 +3,8 @@ import FOL.Sub.All.Rec.SubAllRecAdmits
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 /--
@@ -279,5 +281,3 @@ theorem isPredSub_valid
 
 
 #lint
-
-end FOL

@@ -4,6 +4,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -472,5 +474,3 @@ theorem substitution_theorem_ind
 
 
 #lint
-
-end FOL

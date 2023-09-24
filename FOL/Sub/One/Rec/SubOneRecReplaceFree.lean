@@ -5,6 +5,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -480,5 +482,3 @@ theorem not_isFreeIn_fastReplaceFree
 
 
 #lint
-
-end FOL

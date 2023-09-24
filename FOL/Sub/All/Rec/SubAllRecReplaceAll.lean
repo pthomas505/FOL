@@ -4,6 +4,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -102,6 +104,3 @@ example
 
       case _ c1 =>
         apply E_ih
-
-
-end FOL

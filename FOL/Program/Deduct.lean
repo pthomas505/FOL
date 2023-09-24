@@ -361,7 +361,6 @@ instance
 def admitsPredFun (τ : PredName → ℕ → List VarName × Formula) (F : Formula) : Prop :=
   admitsPredFunAux τ ∅ F
 
-
 instance
   (τ : PredName → ℕ → List VarName × Formula)
   (F : Formula) :
@@ -409,6 +408,58 @@ instance (E : Env) (F : Formula) : Decidable (F.all_def_in_env E) :=
   all_goals
     unfold Formula.all_def_in_env
     infer_instance
+
+
+def admitsUnfoldDef
+  (d : Definition) :
+  Formula → Prop
+| pred_const_ _ _ => True
+| pred_var_ _ _ => True
+| eq_ _ _ => True
+| true_ => True
+| false_ => True
+| not_ phi => admitsUnfoldDef d phi
+| imp_ phi psi => (admitsUnfoldDef d phi) ∧ (admitsUnfoldDef d psi)
+| and_ phi psi => (admitsUnfoldDef d phi) ∧ (admitsUnfoldDef d psi)
+| or_ phi psi => (admitsUnfoldDef d phi) ∧ (admitsUnfoldDef d psi)
+| iff_ phi psi => (admitsUnfoldDef d phi) ∧ (admitsUnfoldDef d psi)
+| forall_ _ phi => admitsUnfoldDef d phi
+| exists_ _ phi => admitsUnfoldDef d phi
+| def_ X xs =>
+    if X = d.name ∧ xs.length = d.args.length
+    then admitsFun (Function.updateListIte id d.args xs) d.F
+    else True
+
+instance
+  (d : Definition)
+  (F : Formula) :
+  Decidable (admitsUnfoldDef d F) :=
+  by
+  induction F
+  all_goals
+    unfold admitsUnfoldDef
+    infer_instance
+
+
+def unfoldDef
+  (d : Definition) :
+  Formula → Formula
+| pred_const_ X xs => pred_const_ X xs
+| pred_var_ X xs => pred_var_ X xs
+| eq_ x y => eq_ x y
+| true_ => true_
+| false_ => false_
+| not_ phi => not_ (unfoldDef d phi)
+| imp_ phi psi => imp_ (unfoldDef d phi) (unfoldDef d psi)
+| and_ phi psi => and_ (unfoldDef d phi) (unfoldDef d psi)
+| or_ phi psi => or_ (unfoldDef d phi) (unfoldDef d psi)
+| iff_ phi psi => iff_ (unfoldDef d phi) (unfoldDef d psi)
+| forall_ x phi => forall_ x (unfoldDef d phi)
+| exists_ x phi => exists_ x (unfoldDef d phi)
+| def_ X xs =>
+    if X = d.name ∧ xs.length = d.args.length
+    then fastReplaceFreeFun (Function.updateListIte id d.args xs) d.F
+    else def_ X xs
 
 
 /--
@@ -474,6 +525,13 @@ inductive IsConv (E : Env) : Formula → Formula → Prop
     (σ : Instantiation) :
     d ∈ E →
     IsConv E (def_ d.name (d.args.map σ.1)) (replaceAllVar σ.1 d.F)
+
+  | conv_unfold'
+    (d : Definition)
+    (σ : VarName → VarName) :
+    d ∈ E →
+    admitsFun σ d.F →
+    IsConv E (def_ d.name (d.args.map σ)) (fastReplaceFreeFun σ d.F)
 
 
 inductive IsDeduct : Env → List Formula → Formula → Prop
@@ -696,7 +754,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     (phi psi : Formula) :
     IsDeduct E Δ (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
-  | define_
+  | add_def_
     (E : Env)
     (Δ : List Formula)
     (phi : Formula)
@@ -709,13 +767,15 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     IsDeduct E Δ phi →
     IsDeduct (d :: E) Δ phi
 
-  | conv_
+  | unfold_def_
     (E : Env)
     (Δ : List Formula)
-    (phi phi' : Formula) :
+    (phi : Formula)
+    (d : Definition) :
+    d ∈ E →
+    admitsUnfoldDef d phi →
     IsDeduct E Δ phi →
-    IsConv E phi phi' →
-    IsDeduct E Δ phi'
+    IsDeduct E Δ (unfoldDef d phi)
 
   | pred_sub_
     (E : Env)

@@ -4,6 +4,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -275,5 +277,3 @@ theorem predSub_valid
 
 
 --#lint
-
-end FOL

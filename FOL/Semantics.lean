@@ -6,6 +6,8 @@ import FOL.Tactics
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -359,5 +361,3 @@ lemma Holds_coincide_Env
 
 
 --#lint
-
-end FOL

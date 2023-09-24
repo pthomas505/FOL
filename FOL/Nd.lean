@@ -9,6 +9,8 @@ import Mathlib.Data.Finset.Basic
 
 namespace FOL
 
+namespace NV
+
 open Formula
 
 
@@ -195,5 +197,3 @@ inductive IsDeduct : Finset Formula → Formula → Prop
 
 
 --#lint
-
-end FOL
