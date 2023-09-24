@@ -7,12 +7,6 @@ import Mathlib.Util.CompileInductive
 set_option autoImplicit false
 
 
-/--
-The notation for the type of natural numbers.
--/
-notation "ℕ" => Nat
-
-
 namespace FOL
 
 
@@ -160,7 +154,7 @@ namespace LN
 -/
 inductive Term
 | F : VarName → Term
-| B : ℕ → Term
+| B : Nat → Term
   deriving Inhabited, DecidableEq
 
 open Term
@@ -233,7 +227,7 @@ end LN
   The conversion of named variables to locally nameless terms.
 -/
 def NVVarToLNTerm
-  (env : Std.HashMap VarName ℕ)
+  (env : Std.HashMap VarName Nat)
   (x : VarName) :
   LN.Term :=
   let opt := env.find? x
@@ -247,7 +241,7 @@ def NVVarToLNTerm
   Helper function for NVToLN.
 -/
 def NVToLNAux
-  (env : Std.HashMap VarName ℕ) :
+  (env : Std.HashMap VarName Nat) :
   NV.Formula → LN.Formula
 | NV.Formula.pred_const_ X xs => LN.Formula.pred_const_ X (xs.map (NVVarToLNTerm env))
 | NV.Formula.pred_var_ X xs => LN.Formula.pred_var_ X (xs.map (NVVarToLNTerm env))
