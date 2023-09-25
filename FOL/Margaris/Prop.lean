@@ -773,9 +773,27 @@ theorem L_15_7
     simp
     apply Exists.intro F
     tauto
+  case eq_ x y =>
+    let F := eq_ x y
+    unfold Formula.primeSet at h1 
+    simp at h1
+
+    unfold evalPrimeFfToNot
+    unfold Formula.evalPrime
+    apply IsDeduct.assume_
+    simp
+    apply Exists.intro F
+    tauto
   case true_ =>
     apply IsDeduct.axiom_
     apply IsAxiom.prop_true_
+  case false_ =>
+    unfold Formula.primeSet at h1 
+    simp at h1
+
+    unfold evalPrimeFfToNot
+    unfold Formula.evalPrime
+    sorry
   case not_ phi phi_ih =>
     simp only [Formula.primeSet] at h1
 
@@ -861,7 +879,7 @@ theorem L_15_7
     simp
     apply Exists.intro F
     tauto
-  case eq_ | false_ | and_ | or_ | iff_ | exists_ =>
+  case and_ | or_ | iff_ | exists_ =>
     sorry
 
 

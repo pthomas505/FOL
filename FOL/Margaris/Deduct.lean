@@ -31,23 +31,23 @@ inductive IsPropAxiom : Formula → Prop
 
   -- ⊢ (¬ phi → ¬ psi) → (psi → phi)
   | prop_3_
-  (phi psi : Formula) :
-  IsPropAxiom (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
+    (phi psi : Formula) :
+    IsPropAxiom (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
 
   | def_false_ :
-  IsPropAxiom (false_.iff_ (not_ true_))
+    IsPropAxiom (false_.iff_ (not_ true_))
 
   | def_and_
-  (phi psi : Formula) :
-  IsPropAxiom ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+    (phi psi : Formula) :
+    IsPropAxiom ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
 
   | def_or_
-  (phi psi : Formula) :
-  IsPropAxiom ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+    (phi psi : Formula) :
+    IsPropAxiom ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
 
   | def_iff_
-  (phi psi : Formula) :
-  IsPropAxiom (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+    (phi psi : Formula) :
+    IsPropAxiom (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
 
 /--
@@ -158,6 +158,26 @@ inductive IsAxiom : Formula → Prop
     (phi : Formula) :
     IsAxiom phi →
     IsAxiom (forall_ v phi)
+
+  | def_false_ :
+    IsAxiom (false_.iff_ (not_ true_))
+
+  | def_and_
+    (phi psi : Formula) :
+    IsAxiom ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+
+  | def_or_
+    (phi psi : Formula) :
+    IsAxiom ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+
+  | def_iff_
+    (phi psi : Formula) :
+    IsAxiom (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+
+  | def_exists_
+    (v : VarName)
+    (phi : Formula) :
+    IsAxiom ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
 /--
   IsDeduct Δ F := True if and only if there is a deduction of F from Δ in classical first order logic.
@@ -284,6 +304,24 @@ inductive IsProofAlt : Formula → Prop
     IsProofAlt phi →
     IsProofAlt psi
 
-#lint
+  | def_false_ :
+    IsProofAlt (false_.iff_ (not_ true_))
 
-end Margaris
+  | def_and_
+    (phi psi : Formula) :
+    IsProofAlt ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+
+  | def_or_
+    (phi psi : Formula) :
+    IsProofAlt ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+
+  | def_iff_
+    (phi psi : Formula) :
+    IsProofAlt (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+
+  | def_exists_
+    (v : VarName)
+    (phi : Formula) :
+    IsProofAlt ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
+
+#lint

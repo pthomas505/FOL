@@ -15,19 +15,23 @@ def ProofEquiv (P Q : Formula) : Prop :=
 
 
 /--
-IsReplOfVarInListFun u v l_u l_v := True if and only if l_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in l_u by occurrences of v.
+  IsReplOfVarInListFun u v l_u l_v := True if and only if l_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in l_u by occurrences of v.
 -/
-def IsReplOfVarInListFun (u v : VarName) : List VarName → List VarName → Prop
+def IsReplOfVarInListFun
+  (u v : VarName) :
+  List VarName → List VarName → Prop
   | [], [] => True
-  | hd_u::tl_u, hd_v::tl_v =>
-      (hd_u = hd_v ∨ hd_u = u ∧ hd_v = v) ∧ IsReplOfVarInListFun u v tl_u tl_v
+  | hd_u :: tl_u, hd_v :: tl_v =>
+    (hd_u = hd_v ∨ hd_u = u ∧ hd_v = v) ∧ IsReplOfVarInListFun u v tl_u tl_v
   | _, _ => False
 
 
 /--
-IsReplOfVarInFormulaFun u v P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in P_u by occurrences of v.
+  IsReplOfVarInFormulaFun u v P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in P_u by occurrences of v.
 -/
-def IsReplOfVarInFormulaFun (u v : VarName) : Formula → Formula → Prop
+def IsReplOfVarInFormulaFun
+  (u v : VarName) :
+  Formula → Formula → Prop
   | pred_var_ name_u args_u, pred_var_ name_v args_v =>
       name_u = name_v ∧ IsReplOfVarInListFun u v args_u args_v
   | pred_const_ name_u args_u, pred_const_ name_v args_v =>
@@ -57,10 +61,11 @@ def IsReplOfVarInFormulaFun (u v : VarName) : Formula → Formula → Prop
 
 
 /--
-IsReplOfVarInFormula u v P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in P_u by occurrences of v.
+  IsReplOfVarInFormula u v P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in P_u by occurrences of v.
 -/
-inductive IsReplOfVarInFormula (u v : VarName) : Formula → Formula → Prop
-
+inductive IsReplOfVarInFormula
+  (u v : VarName) :
+  Formula → Formula → Prop
   | pred_const_
     (name : PredName)
     (n : ℕ)
@@ -134,9 +139,11 @@ inductive IsReplOfVarInFormula (u v : VarName) : Formula → Formula → Prop
 
 
 /--
-is_repl_of_formula_in_formula_fun U V P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of U in P_u by occurrences of V.
+  is_repl_of_formula_in_formula_fun U V P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of U in P_u by occurrences of V.
 -/
-def IsReplOfFormulaInFormulaFun (U V : Formula) : Formula → Formula → Prop
+def IsReplOfFormulaInFormulaFun
+  (U V : Formula) :
+  Formula → Formula → Prop
   | not_ P_u, not_ P_v => IsReplOfFormulaInFormulaFun U V P_u P_v
   | imp_ P_u Q_u, imp_ P_v Q_v =>
     IsReplOfFormulaInFormulaFun U V P_u P_v ∧ IsReplOfFormulaInFormulaFun U V Q_u Q_v
@@ -152,9 +159,11 @@ def IsReplOfFormulaInFormulaFun (U V : Formula) : Formula → Formula → Prop
 
 
 /--
-IsReplOfFormulaInFormula U V P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of U in P_u by occurrences of V.
+  IsReplOfFormulaInFormula U V P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of U in P_u by occurrences of V.
 -/
-inductive IsReplOfFormulaInFormula (U V : Formula) : Formula → Formula → Prop
+inductive IsReplOfFormulaInFormula
+  (U V : Formula) :
+  Formula → Formula → Prop
 
     -- not replacing an occurrence
   | same_
@@ -215,7 +224,10 @@ inductive IsReplOfFormulaInFormula (U V : Formula) : Formula → Formula → Pro
     IsReplOfFormulaInFormula U V (exists_ x P_u) (exists_ x P_v)
 
 
-def Similar (P_u P_v : Formula) (u v : VarName) : Prop :=
+def Similar
+  (P_u P_v : Formula)
+  (u v : VarName) :
+  Prop :=
   ¬isFreeIn v P_u ∧
     ¬isFreeIn u P_v ∧
       fastAdmits u v P_u ∧
@@ -255,11 +267,15 @@ theorem specId
 
 alias specId ← forall_elim_id
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-theorem T_17_3 (P : Formula) (v t : VarName) (h1 : fastAdmits v t P) :
-    IsProof ((fastReplaceFree v t P).imp_ (exists_ v P)) :=
+
+theorem T_17_3
+  (P : Formula)
+  (v t : VarName)
+  (h1 : fastAdmits v t P) :
+  IsProof ((fastReplaceFree v t P).imp_ (exists_ v P)) :=
   by
-  unfold fastAdmits at h1 
+  unfold fastAdmits at h1
+
   unfold Formula.exists_
   unfold is_proof
   apply IsDeduct.mp_ ((forall_ v P.not_).imp_ (fastReplaceFree v t P).not_)
