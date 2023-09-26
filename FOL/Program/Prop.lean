@@ -197,7 +197,7 @@ instance : ToString Rule :=
 structure Sequent : Type :=
   (hypotheses : List Formula)
   (conclusion : Formula)
-  deriving Inhabited, DecidableEq
+  deriving DecidableEq
 
 def Sequent.toString (x : Sequent) : String :=
   s! "{x.hypotheses} ⊢ {x.conclusion}"
@@ -205,10 +205,20 @@ def Sequent.toString (x : Sequent) : String :=
 instance : ToString Sequent :=
   { toString := fun x => x.toString }
 
+structure Sequent' : Type :=
+  (val : Sequent)
+  (prop : IsDeduct val.hypotheses val.conclusion)
+
+def Sequent'.toString (x : Sequent') : String :=
+  s! "{x.val.hypotheses} ⊢ {x.val.conclusion}"
+
+instance : ToString Sequent' :=
+  { toString := fun x => x.toString }
+
 
 structure Step : Type :=
   (label : String)
-  (assertion : Sequent)
+  (assertion : Sequent')
   (rule : Rule)
 
 def Step.toString (x : Step) : String :=
@@ -228,7 +238,7 @@ def List.toLFString
 
 structure Proof : Type :=
   (label : String)
-  (assertion : Sequent)
+  (assertion : Sequent')
   (step_list : Array Step)
 
 def Proof.toString (x : Proof) : String :=
@@ -265,48 +275,85 @@ def LocalContext.find
 def ruleToSequent
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
-  Rule → Except String Sequent
+  Rule → Except String Sequent'
 
   | struct_1_ Δ H phi label => do
       let found ← localContext.find label
-      let expected : Sequent := {
+      let expected_val : Sequent := {
         hypotheses := Δ
         conclusion := phi }
 
-      if found.assertion = expected
-      then Except.ok {
+      let return_val : Sequent := {
         hypotheses := H :: Δ
         conclusion := phi }
-      else Except.error s! "Expected :{LF}{expected}{LF}Found :{LF}{found.assertion}"
+
+      if h : found.assertion.val = expected_val
+      then Except.ok {
+        val := return_val
+        prop := by {
+          apply IsDeduct.struct_1_
+          obtain s1 := found.assertion.prop
+          simp only [h] at s1
+          exact s1
+        }
+      }
+      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | struct_2_ Δ H phi label => do
       let found ← localContext.find label
-      let expected : Sequent := {
+      let expected_val : Sequent := {
         hypotheses := H :: H :: Δ
         conclusion := phi }
 
-      if found.assertion = expected
-      then Except.ok {
+      let return_val : Sequent := {
         hypotheses := H :: Δ
         conclusion := phi }
-      else Except.error s! "Expected :{LF}{expected}{LF}Found :{LF}{found.assertion}"
+
+      if h : found.assertion.val = expected_val
+      then Except.ok {
+        val := return_val
+        prop := by {
+          apply IsDeduct.struct_2_
+          obtain s1 := found.assertion.prop
+          simp only [h] at s1
+          exact s1
+        }
+      }
+      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | struct_3_ Δ_1 Δ_2 H_1 H_2 phi label => do
       let found ← localContext.find label
-      let expected : Sequent := {
+      let expected_val : Sequent := {
         hypotheses := Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2
         conclusion := phi }
 
-      if found.assertion = expected
-      then Except.ok {
+      let return_val : Sequent := {
         hypotheses := Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2
         conclusion := phi }
-      else Except.error s! "Expected :{LF}{expected}{LF}Found :{LF}{found.assertion}"
 
-  | assume_ phi => Except.ok {
-      hypotheses := [phi]
-      conclusion := phi }
+      if h : found.assertion.val = expected_val
+      then Except.ok {
+        val := return_val
+        prop := by {
+          apply IsDeduct.struct_3_
+          obtain s1 := found.assertion.prop
+          simp only [h] at s1
+          exact s1
+        }
+      }
+      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
+  | assume_ phi =>
+      let return_val : Sequent := {
+        hypotheses := [phi]
+        conclusion := phi }
+
+      Except.ok {
+        val := return_val
+        prop := by {
+          apply IsDeduct.assume_
+        }
+      }
   | prop_0_ => Except.ok {
       hypotheses := []
       conclusion := true_ }
