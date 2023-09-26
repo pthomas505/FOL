@@ -154,39 +154,26 @@ inductive IsDeduct : List Formula → Formula → Prop
     IsDeduct Δ (H.imp_ phi)
 
 
-structure Sequent : Type :=
-  (hypotheses : List Formula)
-  (conclusion : Formula)
-  deriving Inhabited, DecidableEq
+inductive Rule : Type
+  | struct_1_ : List Formula → Formula → Formula → String → Rule
+  | struct_2_ : List Formula → Formula → Formula → String → Rule
+  | struct_3_ : List Formula → List Formula → Formula → Formula → Formula → String → Rule
+  | assume_ : Formula → Rule
+  | prop_0_ : Rule
+  | prop_1_ : Formula → Formula → Rule
+  | prop_2_ : Formula → Formula → Formula → Rule
+  | prop_3_ : Formula → Formula → Rule
+  | mp_ : List Formula → Formula → Formula → String → String → Rule
+  | def_false_ : Rule
+  | def_and_ : Formula → Formula → Rule
+  | def_or_ : Formula → Formula → Rule
+  | def_iff_ : Formula → Formula → Rule
+  | dt_ : List Formula → Formula → Formula → String → Rule
+  | thm_ : String → Rule
 
-def Sequent.toString (x : Sequent) : String :=
-  s! "{x.hypotheses} ⊢ {x.conclusion}"
+open Rule
 
-instance : ToString Sequent :=
-  { toString := fun x => x.toString }
-
-
-inductive Justification : Type
-  | struct_1_ : List Formula → Formula → Formula → String → Justification
-  | struct_2_ : List Formula → Formula → Formula → String → Justification
-  | struct_3_ : List Formula → List Formula → Formula → Formula → Formula → String → Justification
-  | assume_ : Formula → Justification
-  | prop_0_ : Justification
-  | prop_1_ : Formula → Formula → Justification
-  | prop_2_ : Formula → Formula → Formula → Justification
-  | prop_3_ : Formula → Formula → Justification
-  | mp_ : List Formula → Formula → Formula → String → String → Justification
-  | def_false_ : Justification
-  | def_and_ : Formula → Formula → Justification
-  | def_or_ : Formula → Formula → Justification
-  | def_iff_ : Formula → Formula → Justification
-  | dt_ : List Formula → Formula → Formula → String → Justification
-  | thm_ : String → Justification
-
-
-open Justification
-
-def Justification.toString : Justification → String
+def Rule.toString : Rule → String
   | struct_1_ Δ H phi label => s! "struct_1_ {Δ} {H} {phi} {label}"
   | struct_2_ Δ H phi label => s! "struct_2_ {Δ} {H} {phi} {label}"
   | struct_3_ Δ_1 Δ_2 H_1 H_2 phi label => s! "struct_3_ {Δ_1} {Δ_2} {H_1} {H_2} {phi} {label}"
@@ -203,27 +190,33 @@ def Justification.toString : Justification → String
   | dt_ Δ H phi label => s! "dt_ {Δ} {H} {phi} {label}"
   | thm_ label => s! "thm_ {label}"
 
+instance : ToString Rule :=
+  { toString := fun x => x.toString }
 
-instance : ToString Justification :=
+
+structure Sequent : Type :=
+  (hypotheses : List Formula)
+  (conclusion : Formula)
+  deriving Inhabited, DecidableEq
+
+def Sequent.toString (x : Sequent) : String :=
+  s! "{x.hypotheses} ⊢ {x.conclusion}"
+
+instance : ToString Sequent :=
   { toString := fun x => x.toString }
 
 
 structure Step : Type :=
   (label : String)
   (assertion : Sequent)
-  (justification : Justification)
+  (rule : Rule)
 
 def Step.toString (x : Step) : String :=
-  s! "{x.label}. {x.assertion} : {x.justification}"
+  s! "{x.label}. {x.assertion} : {x.rule}"
 
 instance : ToString Step :=
   { toString := fun x => x.toString }
 
-
-structure Proof : Type :=
-  (label : String)
-  (assertion : Sequent)
-  (steps : Array Step)
 
 def List.toLFString
   {α : Type}
@@ -232,8 +225,14 @@ def List.toLFString
   | [] => ""
   | hd :: tl => toString hd ++ LF.toString ++ List.toLFString tl
 
+
+structure Proof : Type :=
+  (label : String)
+  (assertion : Sequent)
+  (step_list : Array Step)
+
 def Proof.toString (x : Proof) : String :=
-  s! "{x.label} : {x.assertion}{LF}{x.steps.data.toLFString}"
+  s! "{x.label} : {x.assertion}{LF}{x.step_list.data.toLFString}"
 
 instance : ToString Proof :=
   { toString := fun x => x.toString }
@@ -263,46 +262,46 @@ def LocalContext.find
   else Except.error s! "{label} not found in local context."
 
 
-def justificationToSequent
+def ruleToSequent
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
-  Justification → Except String Sequent
+  Rule → Except String Sequent
 
   | struct_1_ Δ H phi label => do
-      let step ← localContext.find label
+      let found ← localContext.find label
       let expected : Sequent := {
         hypotheses := Δ
         conclusion := phi }
 
-      if step.assertion = expected
+      if found.assertion = expected
       then Except.ok {
         hypotheses := H :: Δ
         conclusion := phi }
-      else Except.error "TBD"
+      else Except.error s! "Expected :{LF}{expected}{LF}Found :{LF}{found.assertion}"
 
   | struct_2_ Δ H phi label => do
-      let step ← localContext.find label
+      let found ← localContext.find label
       let expected : Sequent := {
         hypotheses := H :: H :: Δ
         conclusion := phi }
 
-      if step.assertion = expected
+      if found.assertion = expected
       then Except.ok {
         hypotheses := H :: Δ
         conclusion := phi }
-      else Except.error "TBD"
+      else Except.error s! "Expected :{LF}{expected}{LF}Found :{LF}{found.assertion}"
 
   | struct_3_ Δ_1 Δ_2 H_1 H_2 phi label => do
-      let step ← localContext.find label
+      let found ← localContext.find label
       let expected : Sequent := {
         hypotheses := Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2
         conclusion := phi }
 
-      if step.assertion = expected
+      if found.assertion = expected
       then Except.ok {
         hypotheses := Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2
         conclusion := phi }
-      else Except.error "TBD"
+      else Except.error s! "Expected :{LF}{expected}{LF}Found :{LF}{found.assertion}"
 
   | assume_ phi => Except.ok {
       hypotheses := [phi]
@@ -325,8 +324,8 @@ def justificationToSequent
       conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
   | mp_ Δ phi psi label_1 label_2 => do
-      let step_1 ← localContext.find label_1
-      let step_2 ← localContext.find label_2
+      let found_1 ← localContext.find label_1
+      let found_2 ← localContext.find label_2
 
       let expected_1 : Sequent := {
         hypotheses := Δ
@@ -336,11 +335,14 @@ def justificationToSequent
         hypotheses := Δ
         conclusion := phi }
 
-      if step_1.assertion = expected_1 ∧ step_2.assertion = expected_2
-      then Except.ok {
-        hypotheses := Δ
-        conclusion := psi }
-      else Except.error "TBD"
+      if found_1.assertion = expected_1
+      then
+        if found_2.assertion = expected_2
+        then Except.ok {
+          hypotheses := Δ
+          conclusion := psi }
+        else Except.error s! "Expected :{LF}{expected_2}{LF}Found :{LF}{found_2.assertion}"
+      else Except.error s! "Expected :{LF}{expected_1}{LF}Found :{LF}{found_1.assertion}"
 
   | def_false_ => Except.ok {
       hypotheses := []
@@ -359,16 +361,16 @@ def justificationToSequent
       conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi))))) }
 
   | dt_ Δ H phi label => do
-    let step ← localContext.find label
+    let found ← localContext.find label
     let expected : Sequent := {
       hypotheses := H :: Δ
       conclusion := phi }
 
-    if step.assertion = expected
+    if found.assertion = expected
     then Except.ok {
       hypotheses := Δ
       conclusion := H.imp_ phi }
-    else Except.error "TBD"
+    else Except.error s! "Expected :{LF}{expected}{LF}Found :{LF}{found.assertion}"
 
   | thm_ label => do
     let step ← globalContext.find label
@@ -379,54 +381,57 @@ def createStep
   (globalContext : GlobalContext)
   (localContext : LocalContext)
   (label : String)
-  (justification : Justification) :
+  (rule : Rule) :
   Except String Step := do
-  let sequent ← justificationToSequent globalContext localContext justification
-  Except.ok { label := label, assertion := sequent, justification := justification }
+  let sequent ← ruleToSequent globalContext localContext rule
+  Except.ok {
+    label := label
+    assertion := sequent
+    rule := rule }
 
 
 def createStepListAux
   (globalContext : GlobalContext)
   (localContext : LocalContext)
-  (acc : Array Step) :
-  List (String × Justification) → Except String (Array Step)
-  | [] => Except.ok acc
-  | (label, justification) :: tl => do
-    let step ← createStep globalContext localContext label justification
-      |>.mapError fun msg => s! "step label : {label}{LF}justification : {justification}{LF}{msg}"
-    createStepListAux globalContext (localContext.insert label step) (acc.push step) tl
+  (step_list : Array Step) :
+  List (String × Rule) → Except String (Array Step)
+  | [] => Except.ok step_list
+  | (label, rule) :: tl => do
+    let step ← createStep globalContext localContext label rule
+      |>.mapError fun message => s! "step label : {label}{LF}rule : {rule}{LF}{message}"
+    createStepListAux globalContext (localContext.insert label step) (step_list.push step) tl
 
 def createStepList
   (globalContext : GlobalContext)
-  (instructions : List (String × Justification)) :
+  (labeled_rule_list : List (String × Rule)) :
   Except String (Array Step) :=
-  createStepListAux globalContext {} #[] instructions
+  createStepListAux globalContext {} #[] labeled_rule_list
 
 
 def createProof
   (globalContext : GlobalContext)
   (label : String)
-  (instructions : List (String × Justification)) :
+  (instruction_list : List (String × Rule)) :
   Except String Proof := do
-  let step_list ← createStepList globalContext instructions
+  let step_list ← createStepList globalContext instruction_list
   let Option.some last_step := step_list.back? | Except.error "The step list is empty."
   Except.ok {
     label := label
     assertion := last_step.assertion
-    steps := step_list }
+    step_list := step_list }
 
 
 def createProofListAux
   (globalContext : GlobalContext)
-  (acc : Array Proof) :
-  List (String × (List (String × Justification))) → Except String (Array Proof)
-  | [] => Except.ok acc
+  (proof_list : Array Proof) :
+  List (String × (List (String × Rule))) → Except String (Array Proof)
+  | [] => Except.ok proof_list
   | hd :: tl => do
   let proof ← createProof globalContext hd.fst hd.snd
     |>.mapError fun msg => s! "proof label : {hd.fst}{LF}{msg}"
-  createProofListAux (globalContext.insert hd.fst proof) (acc.push proof) tl
+  createProofListAux (globalContext.insert hd.fst proof) (proof_list.push proof) tl
 
 def createProofList
-  (instructions : List (String × (List (String × Justification)))) :
+  (instruction_list : List (String × (List (String × Rule)))) :
   Except String (Array Proof) :=
-  createProofListAux {} #[] instructions
+  createProofListAux {} #[] instruction_list
