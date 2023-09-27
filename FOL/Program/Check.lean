@@ -1,4 +1,4 @@
-import Mathlib.Data.Finset.Basic
+import Std
 import Mathlib.Util.CompileInductive
 
 
