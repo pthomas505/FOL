@@ -205,26 +205,39 @@ def Sequent.toString (x : Sequent) : String :=
 instance : ToString Sequent :=
   { toString := fun x => x.toString }
 
-structure Sequent' : Type :=
+
+structure checkedSequent : Type :=
   (val : Sequent)
   (prop : IsDeduct val.hypotheses val.conclusion)
 
-def Sequent'.toString (x : Sequent') : String :=
-  s! "{x.val.hypotheses} ⊢ {x.val.conclusion}"
+def checkedSequent.toString (x : checkedSequent) : String :=
+  x.val.toString
 
-instance : ToString Sequent' :=
+instance : ToString checkedSequent :=
   { toString := fun x => x.toString }
 
 
 structure Step : Type :=
   (label : String)
-  (assertion : Sequent')
+  (assertion : Sequent)
   (rule : Rule)
 
 def Step.toString (x : Step) : String :=
   s! "{x.label}. {x.assertion} : {x.rule}"
 
 instance : ToString Step :=
+  { toString := fun x => x.toString }
+
+
+structure checkedStep : Type :=
+  (label : String)
+  (assertion : checkedSequent)
+  (rule : Rule)
+
+def checkedStep.toString (x : checkedStep) : String :=
+  s! "{x.label}. {x.assertion} : {x.rule}"
+
+instance : ToString checkedStep :=
   { toString := fun x => x.toString }
 
 
@@ -238,44 +251,56 @@ def List.toLFString
 
 structure Proof : Type :=
   (label : String)
-  (assertion : Sequent')
-  (step_list : Array Step)
+  (assertion : Sequent)
+  (step_list : List Step)
 
 def Proof.toString (x : Proof) : String :=
-  s! "{x.label} : {x.assertion}{LF}{x.step_list.data.toLFString}"
+  s! "{x.label} : {x.assertion}{LF}{x.step_list.toLFString}"
 
 instance : ToString Proof :=
   { toString := fun x => x.toString }
 
 
-abbrev GlobalContext : Type := Std.HashMap String Proof
+structure checkedProof : Type :=
+  (label : String)
+  (assertion : checkedSequent)
+  (step_list : Array checkedStep)
+
+def checkedProof.toString (x : checkedProof) : String :=
+  s! "{x.label} : {x.assertion}{LF}{x.step_list.data.toLFString}"
+
+instance : ToString checkedProof :=
+  { toString := fun x => x.toString }
+
+
+abbrev GlobalContext : Type := Std.HashMap String checkedProof
 
 def GlobalContext.find
   (context : GlobalContext)
   (label : String) :
-  Except String Proof :=
+  Except String checkedProof :=
   let opt := context.find? label
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
   else Except.error s! "{label} not found in global context."
 
 
-abbrev LocalContext : Type := Std.HashMap String Step
+abbrev LocalContext : Type := Std.HashMap String checkedStep
 
 def LocalContext.find
   (context : LocalContext)
   (label : String) :
-  Except String Step :=
+  Except String checkedStep :=
   let opt := context.find? label
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
   else Except.error s! "{label} not found in local context."
 
 
-def ruleToSequent
+def checkRule
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
-  Rule → Except String Sequent'
+  Rule → Except String checkedSequent
 
   | struct_1_ Δ H phi label => do
       let found ← localContext.find label
@@ -498,82 +523,69 @@ def ruleToSequent
     Except.ok step.assertion
 -/
 
-def createStep
+def checkStep
   (globalContext : GlobalContext)
   (localContext : LocalContext)
-  (label : String)
-  (rule : Rule) :
-  Except String Step := do
-  let sequent ← ruleToSequent globalContext localContext rule
-  Except.ok {
-    label := label
-    assertion := sequent
-    rule := rule }
+  (step : Step) :
+  Except String checkedStep := do
+  let checkedSequent ← checkRule globalContext localContext step.rule
+  if step.assertion = checkedSequent.val
+  then Except.ok {
+    label := step.label
+    assertion := checkedSequent
+    rule := step.rule }
+  else Except.error "The rule does not match the assertion."
 
 
-def createStepListAux
+def checkStepListAux
   (globalContext : GlobalContext)
   (localContext : LocalContext)
-  (step_list : Array Step) :
-  List (String × Rule) → Except String (Array Step)
-  | [] => Except.ok step_list
-  | (label, rule) :: tl => do
-    let step ← createStep globalContext localContext label rule
-      |>.mapError fun message => s! "step label : {label}{LF}rule : {rule}{LF}{message}"
-    createStepListAux globalContext (localContext.insert label step) (step_list.push step) tl
-
-def createStepList
-  (globalContext : GlobalContext)
-  (labeled_rule_list : List (String × Rule)) :
-  Except String (Array Step) :=
-  createStepListAux globalContext {} #[] labeled_rule_list
-
-
-def createProof
-  (globalContext : GlobalContext)
-  (label : String)
-  (instruction_list : List (String × Rule)) :
-  Except String Proof := do
-  let step_list ← createStepList globalContext instruction_list
-  let Option.some last_step := step_list.back? | Except.error "The step list is empty."
-  Except.ok {
-    label := label
-    assertion := last_step.assertion
-    step_list := step_list }
-
-
-def createProofListAux
-  (globalContext : GlobalContext)
-  (proof_list : Array Proof) :
-  List (String × (List (String × Rule))) → Except String (Array Proof)
-  | [] => Except.ok proof_list
+  (acc : Array checkedStep) :
+  List Step → Except String (Array checkedStep)
+  | [] => Except.ok acc
   | hd :: tl => do
-  let proof ← createProof globalContext hd.fst hd.snd
-    |>.mapError fun msg => s! "proof label : {hd.fst}{LF}{msg}"
-  createProofListAux (globalContext.insert hd.fst proof) (proof_list.push proof) tl
-
-def createProofList
-  (instruction_list : List (String × (List (String × Rule)))) :
-  Except String (Array Proof) :=
-  createProofListAux {} #[] instruction_list
+    let checkedStep ← checkStep globalContext localContext hd
+      |>.mapError fun message => s! "step label : {hd.label}{LF}rule : {hd.rule}{LF}{message}"
+    checkStepListAux globalContext (localContext.insert checkedStep.label checkedStep) (acc.push checkedStep) tl
 
 
-def struct_1_tactic
-  (localContext : LocalContext)
-  (label : String)
-  (H : Formula) :
-  Except String Rule := do
-  let step ← localContext.find label
-  let Δ := step.assertion.val.hypotheses
-  let phi := step.assertion.val.conclusion
-  Except.ok (Rule.struct_1_ Δ H phi label)
+def checkStepList
+  (globalContext : GlobalContext)
+  (stepList : List Step) :
+  Except String (Array checkedStep) :=
+  checkStepListAux globalContext {} #[] stepList
 
-def struct_1_list_tactic
-  (localContext : LocalContext)
-  (label : String) :
-  List Formula → Except String (List Rule)
-  | [] => Except.ok []
+
+def checkProof
+  (globalContext : GlobalContext)
+  (proof : Proof) :
+  Except String checkedProof := do
+  let checkedStepList ← checkStepList globalContext proof.step_list
+  let opt := checkedStepList.back?
+  if h : Option.isSome opt
+  then
+    let lastStep := Option.get opt h
+    if lastStep.assertion.val = proof.assertion
+    then Except.ok {
+      label := proof.label
+      assertion := lastStep.assertion
+      step_list := checkedStepList }
+    else Except.error "The last step does not match the assertion."
+  else Except.error "The proof has no steps."
+
+
+def checkProofListAux
+  (globalContext : GlobalContext)
+  (acc : Array checkedProof) :
+  List Proof → Except String (Array checkedProof)
+  | [] => Except.ok acc
   | hd :: tl => do
-    let rule ← struct_1_tactic localContext label hd
-    let rule_list ← struct_1_list_tactic localContext label tl
-    Except.ok (rule :: rule_list)
+  let checkedProof ← checkProof globalContext hd
+    |>.mapError fun message => s! "proof label : {hd.label}{LF}{message}"
+  checkProofListAux (globalContext.insert hd.label checkedProof) (acc.push checkedProof) tl
+
+
+def checkProofList
+  (proofList : List Proof) :
+  Except String (Array checkedProof) :=
+  checkProofListAux {} #[] proofList
