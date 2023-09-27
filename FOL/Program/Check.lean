@@ -197,7 +197,7 @@ instance : ToString Rule :=
 structure Sequent : Type :=
   (hypotheses : List Formula)
   (conclusion : Formula)
-  deriving DecidableEq
+  deriving Inhabited, DecidableEq
 
 def Sequent.toString (x : Sequent) : String :=
   s! "{x.hypotheses} ⊢ {x.conclusion}"
@@ -209,12 +209,6 @@ instance : ToString Sequent :=
 structure checkedSequent : Type :=
   (val : Sequent)
   (prop : IsDeduct val.hypotheses val.conclusion)
-
-def checkedSequent.toString (x : checkedSequent) : String :=
-  x.val.toString
-
-instance : ToString checkedSequent :=
-  { toString := fun x => x.toString }
 
 
 structure Step : Type :=
@@ -233,12 +227,6 @@ structure checkedStep : Type :=
   (label : String)
   (assertion : checkedSequent)
   (rule : Rule)
-
-def checkedStep.toString (x : checkedStep) : String :=
-  s! "{x.label}. {x.assertion} : {x.rule}"
-
-instance : ToString checkedStep :=
-  { toString := fun x => x.toString }
 
 
 def List.toLFString
@@ -265,12 +253,6 @@ structure checkedProof : Type :=
   (label : String)
   (assertion : checkedSequent)
   (step_list : Array checkedStep)
-
-def checkedProof.toString (x : checkedProof) : String :=
-  s! "{x.label} : {x.assertion}{LF}{x.step_list.data.toLFString}"
-
-instance : ToString checkedProof :=
-  { toString := fun x => x.toString }
 
 
 abbrev GlobalContext : Type := Std.HashMap String checkedProof
@@ -452,8 +434,8 @@ def checkRule
               exact s2
           }
         }
-        else Except.error s! "Expected :{LF}{expected_val_2}{LF}Found :{LF}{found_2.assertion}"
-      else Except.error s! "Expected :{LF}{expected_val_1}{LF}Found :{LF}{found_1.assertion}"
+        else Except.error s! "Expected :{LF}{expected_val_2}{LF}Found :{LF}{found_2.assertion.val}"
+      else Except.error s! "Expected :{LF}{expected_val_1}{LF}Found :{LF}{found_1.assertion.val}"
 
   | def_false_ =>
       let return_val : Sequent := {
@@ -516,7 +498,7 @@ def checkRule
         exact s1
       }
     }
-    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion}"
+    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 /-
   | thm_ label => do
     let step ← globalContext.find label
