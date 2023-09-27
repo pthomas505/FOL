@@ -400,11 +400,11 @@ def ruleToSequent
       let found_1 ← localContext.find label_1
       let found_2 ← localContext.find label_2
 
-      let expected_1 : Sequent := {
+      let expected_val_1 : Sequent := {
         hypotheses := Δ
         conclusion := phi.imp_ psi }
 
-      let expected_2 : Sequent := {
+      let expected_val_2 : Sequent := {
         hypotheses := Δ
         conclusion := phi }
 
@@ -412,9 +412,9 @@ def ruleToSequent
           hypotheses := Δ
           conclusion := psi }
 
-      if h1 : found_1.assertion.val = expected_1
+      if h1 : found_1.assertion.val = expected_val_1
       then
-        if h2 : found_2.assertion.val = expected_2
+        if h2 : found_2.assertion.val = expected_val_2
         then Except.ok {
           val := return_val
           prop := by {
@@ -427,8 +427,8 @@ def ruleToSequent
               exact s2
           }
         }
-        else Except.error s! "Expected :{LF}{expected_2}{LF}Found :{LF}{found_2.assertion}"
-      else Except.error s! "Expected :{LF}{expected_1}{LF}Found :{LF}{found_1.assertion}"
+        else Except.error s! "Expected :{LF}{expected_val_2}{LF}Found :{LF}{found_2.assertion}"
+      else Except.error s! "Expected :{LF}{expected_val_1}{LF}Found :{LF}{found_1.assertion}"
 
   | def_false_ =>
       let return_val : Sequent := {
@@ -473,7 +473,7 @@ def ruleToSequent
   | dt_ Δ H phi label => do
     let found ← localContext.find label
 
-    let expected : Sequent := {
+    let expected_val : Sequent := {
       hypotheses := H :: Δ
       conclusion := phi }
 
@@ -481,7 +481,7 @@ def ruleToSequent
       hypotheses := Δ
       conclusion := H.imp_ phi }
 
-    if h : found.assertion.val = expected
+    if h : found.assertion.val = expected_val
     then Except.ok {
       val := return_val
       prop := by {
@@ -491,7 +491,7 @@ def ruleToSequent
         exact s1
       }
     }
-    else Except.error s! "Expected :{LF}{expected}{LF}Found :{LF}{found.assertion}"
+    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion}"
 
   | thm_ label => do
     let step ← globalContext.find label
