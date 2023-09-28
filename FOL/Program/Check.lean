@@ -509,11 +509,11 @@ def checkStep
   (step : Step) :
   Except String checkedStep := do
   let checkedSequent ← checkRule globalContext localContext step.rule
-  if step.assertion = checkedSequent.val
+  if checkedSequent.val = step.assertion
   then Except.ok {
     label := step.label
     assertion := checkedSequent }
-  else Except.error "The rule does not match the assertion."
+  else Except.error s! "Step assertion :{LF}{step.assertion}{LF}Rule assertion :{LF}{checkedSequent.val}"
 
 
 def checkStepListAux
@@ -546,7 +546,7 @@ def checkProof
   then Except.ok {
     label := proof.label
     assertion := lastCheckedStep.assertion }
-  else Except.error "The last step does not match the assertion."
+  else Except.error s! "Proof assertion :{LF}{proof.assertion}{LF}Last step assertion :{LF}{lastCheckedStep.assertion.val}"
 
 
 def checkProofListAux
