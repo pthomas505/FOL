@@ -226,7 +226,6 @@ instance : ToString Step :=
 structure checkedStep : Type :=
   (label : String)
   (assertion : checkedSequent)
-  (rule : Rule)
 
 
 def List.toLFString
@@ -252,7 +251,6 @@ instance : ToString Proof :=
 structure checkedProof : Type :=
   (label : String)
   (assertion : checkedSequent)
-  (step_list : Array checkedStep)
 
 
 abbrev GlobalContext : Type := Std.HashMap String checkedProof
@@ -514,60 +512,53 @@ def checkStep
   if step.assertion = checkedSequent.val
   then Except.ok {
     label := step.label
-    assertion := checkedSequent
-    rule := step.rule }
+    assertion := checkedSequent }
   else Except.error "The rule does not match the assertion."
 
 
 def checkStepListAux
   (globalContext : GlobalContext)
-  (localContext : LocalContext)
-  (acc : Array checkedStep) :
-  List Step → Except String (Array checkedStep)
-  | [] => Except.ok acc
+  (localContext : LocalContext) :
+  List Step → Except String checkedStep
+  | [] => Except.error "The step list has no steps."
+  | [last] => do
+    let checkedStep ← checkStep globalContext localContext last
+      |>.mapError fun message => s! "step label : {last.label}{LF}rule : {last.rule}{LF}{message}"
+    Except.ok checkedStep
   | hd :: tl => do
     let checkedStep ← checkStep globalContext localContext hd
       |>.mapError fun message => s! "step label : {hd.label}{LF}rule : {hd.rule}{LF}{message}"
-    checkStepListAux globalContext (localContext.insert checkedStep.label checkedStep) (acc.push checkedStep) tl
-
+    checkStepListAux globalContext (localContext.insert checkedStep.label checkedStep) tl
 
 def checkStepList
   (globalContext : GlobalContext)
   (stepList : List Step) :
-  Except String (Array checkedStep) :=
-  checkStepListAux globalContext {} #[] stepList
+  Except String checkedStep :=
+  checkStepListAux globalContext {} stepList
 
 
 def checkProof
   (globalContext : GlobalContext)
   (proof : Proof) :
   Except String checkedProof := do
-  let checkedStepList ← checkStepList globalContext proof.step_list
-  let opt := checkedStepList.back?
-  if h : Option.isSome opt
-  then
-    let lastStep := Option.get opt h
-    if lastStep.assertion.val = proof.assertion
-    then Except.ok {
-      label := proof.label
-      assertion := lastStep.assertion
-      step_list := checkedStepList }
-    else Except.error "The last step does not match the assertion."
-  else Except.error "The proof has no steps."
+  let lastCheckedStep ← checkStepList globalContext proof.step_list
+  if lastCheckedStep.assertion.val = proof.assertion
+  then Except.ok {
+    label := proof.label
+    assertion := lastCheckedStep.assertion }
+  else Except.error "The last step does not match the assertion."
 
 
 def checkProofListAux
-  (globalContext : GlobalContext)
-  (acc : Array checkedProof) :
-  List Proof → Except String (Array checkedProof)
-  | [] => Except.ok acc
+  (globalContext : GlobalContext):
+  List Proof → Except String Unit
+  | [] => Except.ok Unit.unit
   | hd :: tl => do
   let checkedProof ← checkProof globalContext hd
     |>.mapError fun message => s! "proof label : {hd.label}{LF}{message}"
-  checkProofListAux (globalContext.insert hd.label checkedProof) (acc.push checkedProof) tl
-
+  checkProofListAux (globalContext.insert checkedProof.label checkedProof) tl
 
 def checkProofList
   (proofList : List Proof) :
-  Except String (Array checkedProof) :=
-  checkProofListAux {} #[] proofList
+  Except String Unit :=
+  checkProofListAux {} proofList
