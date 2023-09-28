@@ -169,7 +169,7 @@ inductive Rule : Type
   | def_or_ : Formula → Formula → Rule
   | def_iff_ : Formula → Formula → Rule
   | dt_ : List Formula → Formula → Formula → String → Rule
-  --| thm_ : String → Rule
+  | thm_ : String → Rule
 
 open Rule
 
@@ -188,7 +188,7 @@ def Rule.toString : Rule → String
   | def_or_ phi psi => s! "def_or_ {phi} {psi}"
   | def_iff_ phi psi => s! "def_iff_ {phi} {psi}"
   | dt_ Δ H phi label => s! "dt_ {Δ} {H} {phi} {label}"
-  --| thm_ label => s! "thm_ {label}"
+  | thm_ label => s! "thm_ {label}"
 
 instance : ToString Rule :=
   { toString := fun x => x.toString }
@@ -497,11 +497,11 @@ def checkRule
       }
     }
     else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
-/-
+
   | thm_ label => do
     let step ← globalContext.find label
     Except.ok step.assertion
--/
+
 
 def checkStep
   (globalContext : GlobalContext)
