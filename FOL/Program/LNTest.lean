@@ -77,7 +77,7 @@ inductive Formula : Type
   | true_ : Formula
   | not_ : Formula → Formula
   | imp_ : Formula → Formula → Formula
-  | forall_ : Formula → Formula
+  | forall_ : String → Formula → Formula
   deriving Inhabited, DecidableEq
 
 compile_inductive% Formula
@@ -93,11 +93,29 @@ def Formula.toString : Formula → String
   | true_ => "T"
   | not_ phi => s! "(¬ {phi.toString})"
   | imp_ phi psi => s! "({phi.toString} → {psi.toString})"
-  | forall_ phi => s! "(∀ {phi.toString})"
+  | forall_ x phi => s! "(∀ {x}. {phi.toString})"
 
 
 instance : ToString Formula :=
   { toString := fun F => F.toString }
+
+
+def Var.freeVarSet : Var → Finset String
+  | F x => {x}
+  | B _ => {}
+
+
+/--
+  Formula.freeVarSet F := The set of all of the variables that have a free occurrence in the formula F.
+-/
+def Formula.freeVarSet : Formula → Finset String
+  | pred_const_ _ xs => xs.toFinset.biUnion Var.freeVarSet
+  | pred_var_ _ xs => xs.toFinset.biUnion Var.freeVarSet
+  | true_ => {}
+  | not_ phi => phi.freeVarSet
+  | imp_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
+  | forall_ _ phi => phi.freeVarSet
+
 
 end LN
 
@@ -129,7 +147,7 @@ def NVToLNAux
 | NV.Formula.imp_ phi psi => LN.Formula.imp_ (NVToLNAux context phi) (NVToLNAux context psi)
 | NV.Formula.forall_ x phi =>
     let context' := (Std.HashMap.mapVal (fun _ val => val + 1) context).insert x 0
-    LN.Formula.forall_ (NVToLNAux context' phi)
+    LN.Formula.forall_ x (NVToLNAux context' phi)
 
 /--
   The conversion of named variable formulas to locally nameless formulas.
@@ -179,7 +197,6 @@ def variant
   String :=
   if h : x ∈ xs
   then
-
   have : finset_string_max_len xs - String.length x < finset_string_max_len xs + 1 - String.length x :=
     by
     obtain s1 := finset_string_max_len_mem x xs h
@@ -216,12 +233,44 @@ lemma variant_not_mem
 
 
 def LNVarToNVVar
+  (outer : ℕ) 
   (context : Std.HashMap ℕ String) :
   LN.Var → Option String
   | LN.Var.F x => Option.some x
-  | LN.Var.B n => context.find? n
+  | LN.Var.B n => context.find? (outer - n - 1)
+
 
 def LNToNVAux
+  (c : Char)
+  (outer : ℕ) 
   (context : Std.HashMap ℕ String) :
-  LN.Formula → NV.Formula
-  | LN.Formula.pred_const_ X xs => sorry
+  LN.Formula → Option NV.Formula
+  | LN.Formula.pred_const_ X xs => do
+      let xs' ← xs.mapM (LNVarToNVVar outer context)
+      Option.some (NV.Formula.pred_const_ X xs')
+  | LN.Formula.pred_var_ X xs => do
+      let xs' ← xs.mapM (LNVarToNVVar outer context)
+      Option.some (NV.Formula.pred_var_ X xs')
+  | LN.Formula.true_ => Option.some NV.Formula.true_
+  | LN.Formula.not_ phi => do
+      let phi' ← LNToNVAux c outer context phi
+      Option.some (NV.Formula.not_ phi')
+  | LN.Formula.imp_ phi psi => do
+      let phi' ← LNToNVAux c outer context phi
+      let psi' ← LNToNVAux c outer context psi
+      Option.some (NV.Formula.imp_ phi' psi')
+  | LN.Formula.forall_ x phi => do
+      let x' := variant x c phi.freeVarSet
+      let phi' ← LNToNVAux c (outer + 1) (context.insert outer x') phi
+      Option.some (NV.Formula.forall_ x' phi')
+
+
+def LNToNV
+  (c : Char)
+  (F : LN.Formula) :
+  Option NV.Formula :=
+  LNToNVAux c 0 {} F
+
+#eval (NVToLN (NV.Formula.forall_ "z" (NV.Formula.forall_ "y" (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
+
+#eval LNToNV '+' (NVToLN (NV.Formula.forall_ "z" (NV.Formula.forall_ "y" (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
