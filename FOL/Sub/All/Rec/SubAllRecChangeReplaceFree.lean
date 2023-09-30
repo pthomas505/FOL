@@ -555,7 +555,7 @@ theorem predSub_aux
           specialize h1_c1 v contra a1
           contradiction
         case _ h1_c1 =>
-          sorry
+          contradiction
     case _ c1 c2 =>
       simp only [Holds]
     case _ c1 =>
