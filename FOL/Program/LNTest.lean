@@ -234,7 +234,7 @@ lemma variant_not_mem
 
 def LNVarToNVVar
   (outer : ℕ) 
-  (context : Std.HashMap ℕ String) :
+  (context : Std.HashMap Int String) :
   LN.Var → Option String
   | LN.Var.F x => Option.some x
   | LN.Var.B n => context.find? (outer - n - 1)
@@ -243,7 +243,7 @@ def LNVarToNVVar
 def LNToNVAux
   (c : Char)
   (outer : ℕ) 
-  (context : Std.HashMap ℕ String) :
+  (context : Std.HashMap Int String) :
   LN.Formula → Option NV.Formula
   | LN.Formula.pred_const_ X xs => do
       let xs' ← xs.mapM (LNVarToNVVar outer context)
@@ -280,3 +280,5 @@ def LNToNV
 #eval LNToNV '+' (LN.Formula.forall_ "z" (LN.Formula.forall_ "x" (LN.Formula.forall_ "y" (LN.Formula.pred_var_ "X" [(LN.Var.F "z"), (LN.Var.B 0), (LN.Var.F "y")]))))
 
 #eval LNToNV '+' (LN.Formula.forall_ "y" (LN.Formula.forall_ "x" (LN.Formula.forall_ "y++" (LN.Formula.pred_var_ "X" [(LN.Var.B 2), (LN.Var.B 0), (LN.Var.F "y")]))))
+
+#eval LNToNV '+' (LN.Formula.forall_ "x" (LN.Formula.pred_var_ "X" [(LN.Var.B 5)]))
