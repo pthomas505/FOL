@@ -159,6 +159,39 @@ def NVToLN (F : NV.Formula) : LN.Formula :=
 #eval NVToLN (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"]))
 
 
+def NVVarToLNVar'
+  (outer : ℕ)
+  (context : Std.HashMap String ℕ)
+  (x : String) :
+  LN.Var :=
+  let opt := context.find? x
+  if h : Option.isSome opt
+  then
+    let n := Option.get opt h
+    LN.Var.B (outer - n)
+  else LN.Var.F x
+
+def NVToLNAux'
+  (outer : ℕ)
+  (context : Std.HashMap String Nat) :
+  NV.Formula → LN.Formula
+| NV.Formula.pred_const_ X xs => LN.Formula.pred_const_ X (xs.map (NVVarToLNVar' outer context))
+| NV.Formula.pred_var_ X xs => LN.Formula.pred_var_ X (xs.map (NVVarToLNVar' outer context))
+| NV.Formula.true_ => LN.Formula.true_
+| NV.Formula.not_ phi => LN.Formula.not_ (NVToLNAux' outer context phi)
+| NV.Formula.imp_ phi psi => LN.Formula.imp_ (NVToLNAux' outer context phi) (NVToLNAux' outer context psi)
+| NV.Formula.forall_ x phi =>
+    let context' := context.insert x (outer + 1)
+    LN.Formula.forall_ x (NVToLNAux' (outer + 1) context' phi)
+
+def NVToLN' (F : NV.Formula) : LN.Formula :=
+  NVToLNAux' 0 {} F
+
+#eval NVToLN' (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"]))
+
+#eval (NVToLN' (NV.Formula.forall_ "z" (NV.Formula.forall_ "y" (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
+
+
 def finset_string_max_len :
   Finset String → ℕ :=
   Finset.fold (fun (m n : ℕ) => max m n) 0 String.length
@@ -233,16 +266,16 @@ lemma variant_not_mem
 
 
 def LNVarToNVVar
-  (outer : ℕ) 
+  (outer : ℕ)
   (context : Std.HashMap Int String) :
   LN.Var → Option String
   | LN.Var.F x => Option.some x
-  | LN.Var.B n => context.find? (outer - n - 1)
+  | LN.Var.B n => context.find? (outer - n)
 
 
 def LNToNVAux
   (c : Char)
-  (outer : ℕ) 
+  (outer : ℕ)
   (context : Std.HashMap Int String) :
   LN.Formula → Option NV.Formula
   | LN.Formula.pred_const_ X xs => do
@@ -261,7 +294,7 @@ def LNToNVAux
       Option.some (NV.Formula.imp_ phi' psi')
   | LN.Formula.forall_ x phi => do
       let x' := variant x c phi.freeVarSet
-      let phi' ← LNToNVAux c (outer + 1) (context.insert outer x') phi
+      let phi' ← LNToNVAux c (outer + 1) (context.insert (outer + 1) x') phi
       Option.some (NV.Formula.forall_ x' phi')
 
 
@@ -273,7 +306,7 @@ def LNToNV
 
 #eval (NVToLN (NV.Formula.forall_ "z" (NV.Formula.forall_ "y" (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
 
-#eval (LNToNV '+' (NVToLN (NV.Formula.forall_ "x" (NV.Formula.forall_ "y" (NV.Formula.forall_ "z" (NV.Formula.pred_var_ "X" ["x", "y", "z"]))))))
+#eval (LNToNV '+' (NVToLN' (NV.Formula.forall_ "x" (NV.Formula.forall_ "y" (NV.Formula.forall_ "z" (NV.Formula.pred_var_ "X" ["x", "y", "z"]))))))
 
 #eval LNToNV '+' (NVToLN (NV.Formula.forall_ "z" (NV.Formula.forall_ "x" (NV.Formula.forall_ "y" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
 
@@ -282,3 +315,10 @@ def LNToNV
 #eval LNToNV '+' (LN.Formula.forall_ "y" (LN.Formula.forall_ "x" (LN.Formula.forall_ "y++" (LN.Formula.pred_var_ "X" [(LN.Var.B 2), (LN.Var.B 0), (LN.Var.F "y")]))))
 
 #eval LNToNV '+' (LN.Formula.forall_ "x" (LN.Formula.pred_var_ "X" [(LN.Var.B 5)]))
+
+example
+  (F : NV.Formula)
+  (c : Char) :
+  LNToNV c (NVToLN F) = F :=
+  by
+  induction F
