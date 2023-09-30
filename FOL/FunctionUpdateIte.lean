@@ -416,9 +416,9 @@ theorem Function.updateListIte_mem_eq_len
         simp only [if_pos h1]
       case inr h1 =>
         split_ifs
-        case inl =>
+        case pos =>
           rfl
-        case inr c1 =>
+        case neg c1 =>
           simp at h2
           exact xs_ih ys_tl h1 h2
 
@@ -451,9 +451,9 @@ theorem Function.updateListIte_mem
       unfold Function.updateListIte
       unfold Function.updateIte
       split_ifs
-      case inl =>
+      case pos =>
         rfl
-      case inr c1 =>
+      case neg c1 =>
         cases h1
         case inl c2 =>
           contradiction
@@ -484,10 +484,10 @@ theorem Function.updateListIte_not_mem
       unfold Function.updateListIte
       unfold Function.updateIte
       split_ifs
-      case inl c1 =>
+      case pos c1 =>
         subst c1
         simp at h1
-      case inr c1 =>
+      case neg c1 =>
         simp at h1
         push_neg at h1
         cases h1
@@ -522,9 +522,9 @@ theorem Function.updateListIte_updateIte
       unfold Function.updateListIte
       unfold Function.updateIte
       split_ifs
-      case inl c1 =>
+      case pos c1 =>
         rfl
-      case inr c1 =>
+      case neg c1 =>
         apply l1_ih
 
 

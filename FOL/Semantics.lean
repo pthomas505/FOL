@@ -175,7 +175,7 @@ theorem Holds_coincide_Var
 
     simp only [Holds]
     split_ifs
-    case inl c1 =>
+    case pos c1 =>
       apply ih
       intro v a1
       simp only [isFreeIn_iff_mem_freeVarSet v hd.q] at a1
@@ -190,7 +190,7 @@ theorem Holds_coincide_Var
         case _ c1_left c1_right =>
           simp only [eq_comm]
           exact c1_right
-    case inr c1 =>
+    case neg c1 =>
       apply ih
       unfold isFreeIn
       exact h1
@@ -267,13 +267,13 @@ theorem Holds_coincide_PredVar
   case cons.def_ hd tl ih X xs =>
     simp only [Holds]
     split_ifs
-    case inl c1 =>
+    case pos c1 =>
       apply ih
       intro P ds a1
       simp only [predVarOccursIn_iff_mem_predVarSet P ds.length] at a1
       simp only [hd.h2] at a1
       simp at a1
-    case inr c1 =>
+    case neg c1 =>
       apply ih
       intro P ds a1
       unfold predVarOccursIn at a1

@@ -122,12 +122,12 @@ theorem prop_sub_aux
     case pred_var_ X xs =>
         unfold replacePropFun
         split_ifs
-        case inl c1 =>
+        case pos c1 =>
           simp only [Holds]
           unfold Interpretation.pred_var_
           simp
           simp only [if_pos c1]
-        case inr c1 =>
+        case neg c1 =>
           simp only [Holds]
           unfold Interpretation.pred_var_
           simp

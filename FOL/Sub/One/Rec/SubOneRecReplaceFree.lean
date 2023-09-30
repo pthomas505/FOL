@@ -221,13 +221,13 @@ theorem replaceFreeAux_eq_fastReplaceFree
     unfold replaceFreeAux
     unfold fastReplaceFree
     split_ifs
-    case inl c1 =>
+    case pos c1 =>
       congr!
       apply replaceFreeAux_mem_binders
       simp
       right
       exact c1
-    case inr c1 =>
+    case neg c1 =>
       congr! 1
       apply phi_ih
       simp
@@ -404,14 +404,14 @@ theorem fastReplaceFree_inverse
     case intro h1_left h1_right =>
       simp only [fastReplaceFree]
       split_ifs
-      case inl c1 =>
+      case pos c1 =>
         unfold fastReplaceFree
         simp only [if_neg h1_left]
         congr!
         apply not_free_in_fastReplaceFree_self
         contrapose! h1_right
         exact isFreeIn_imp_occursIn t phi h1_right
-      case inr c1 =>
+      case neg c1 =>
         unfold fastReplaceFree
         simp only [if_neg h1_left]
         congr!
@@ -432,9 +432,9 @@ theorem not_isFreeIn_fastReplaceFree
     simp
     intro x _
     split_ifs
-    case inl c1 =>
+    case pos c1 =>
       tauto
-    case inr c1 =>
+    case neg c1 =>
       tauto
   case eq_ x y =>
     unfold fastReplaceFree
@@ -443,9 +443,9 @@ theorem not_isFreeIn_fastReplaceFree
     constructor
     case left | right =>
       split_ifs
-      case inl c1 =>
+      case pos c1 =>
         exact h1
-      case inr c1 =>
+      case neg c1 =>
         exact c1
   case true_ | false_ =>
     unfold fastReplaceFree
@@ -469,12 +469,12 @@ theorem not_isFreeIn_fastReplaceFree
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold fastReplaceFree
     split_ifs
-    case inl c1 =>
+    case pos c1 =>
       unfold isFreeIn
       simp
       intro a1
       contradiction
-    case inr c1 =>
+    case neg c1 =>
       unfold isFreeIn
       simp
       intro _

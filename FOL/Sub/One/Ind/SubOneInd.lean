@@ -165,18 +165,18 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
     cases h1
     case inl h1 =>
       split_ifs
-      case inl c1 | inr c1 =>
+      case pos c1 | neg c1 =>
         first | apply IsFreeSub.forall_not_free_in | apply IsFreeSub.exists_not_free_in
         subst h1
         unfold isFreeIn
         simp
     case inr h1 =>
       split_ifs
-      case inl c1 =>
+      case pos c1 =>
         first | apply IsFreeSub.forall_not_free_in | apply IsFreeSub.exists_not_free_in
         unfold isFreeIn
         tauto
-      case inr c1 =>
+      case neg c1 =>
         by_cases c2 : isFreeIn v phi
         · first | apply IsFreeSub.forall_free_in | apply IsFreeSub.exists_free_in
           unfold isFreeIn
@@ -298,9 +298,9 @@ theorem isFreeSub_imp_fastReplaceFree
 
     unfold fastReplaceFree
     split_ifs
-    case inl c1 =>
+    case pos c1 =>
       rfl
-    case inr c1 =>
+    case neg c1 =>
       congr!
       apply not_free_in_fastReplaceFree_self
       exact h1_1 c1
@@ -406,7 +406,7 @@ theorem substitution_theorem_ind
       subst c2
       specialize h1_1 c1
       contradiction
-    case h.h1.inr.inr c1 c2 =>
+    case _ c1 c2 =>
       rfl
   case
     forall_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 h1_2 _ h1_ih

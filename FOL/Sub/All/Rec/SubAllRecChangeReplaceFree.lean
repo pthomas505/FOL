@@ -52,16 +52,11 @@ def variant
   VarName :=
   if h : x ∈ xs
   then
-  have : finset_var_name_max_len xs + 1 - (x.length + c.toString.length) < finset_var_name_max_len xs + 1 - x.length :=
-    by
-    have s1 : c.toString.length = 1
-    rfl
-
-    simp only [s1]
-    simp
-    obtain s2 := finset_var_name_max_len_mem x xs h
-    simp only [tsub_lt_tsub_iff_right s2]
-    simp
+    have : finset_var_name_max_len xs - String.length x.toString < finset_var_name_max_len xs + 1 - String.length x.toString :=
+      by
+      obtain s1 := finset_var_name_max_len_mem x xs h
+      simp only [tsub_lt_tsub_iff_right s1]
+      simp
   variant (VarName.mk (x.toString ++ c.toString)) c xs
   else x
   termination_by variant x _ xs => finset_var_name_max_len xs + 1 - x.length
@@ -74,15 +69,10 @@ lemma variant_not_mem
   variant x c xs ∉ xs :=
   if h : x ∈ xs
   then
-  have : finset_var_name_max_len xs + 1 - (x.length + c.toString.length) < finset_var_name_max_len xs + 1 - x.length :=
+  have : finset_var_name_max_len xs - String.length x.toString < finset_var_name_max_len xs + 1 - String.length x.toString :=
     by
-    have s1 : c.toString.length = 1
-    rfl
-
-    simp only [s1]
-    simp
-    obtain s2 := finset_var_name_max_len_mem x xs h
-    simp only [tsub_lt_tsub_iff_right s2]
+    obtain s1 := finset_var_name_max_len_mem x xs h
+    simp only [tsub_lt_tsub_iff_right s1]
     simp
   by
     unfold variant
@@ -360,9 +350,9 @@ theorem substitution_fun_theorem
       simp (config := {zeta := false})
       simp (config := {zeta := false}) only [if_neg h2]
       split_ifs
-      case inl c1 =>
+      case pos c1 =>
         tauto
-      case inr c1 =>
+      case neg c1 =>
         rfl
 
     simp only [sub]
@@ -388,7 +378,7 @@ theorem substitution_fun_theorem
       simp only [Holds]
       simp
       split_ifs
-      case inl c1 =>
+      case pos c1 =>
         apply Holds_coincide_Var
         intro v a1
         apply Function.updateListIte_map_mem_ext
@@ -400,7 +390,7 @@ theorem substitution_fun_theorem
         · simp only [isFreeIn_iff_mem_freeVarSet] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset E_hd.h1 a1
-      case inr c1 =>
+      case neg c1 =>
         exact E_ih
 
 
@@ -564,6 +554,8 @@ theorem predSub_aux
           intro contra
           specialize h1_c1 v contra a1
           contradiction
+        case _ h1_c1 =>
+          sorry
     case _ c1 c2 =>
       simp only [Holds]
     case _ c1 =>

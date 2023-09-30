@@ -179,7 +179,7 @@ theorem pred_sub_single_aux
         simp only [Holds]
         simp
         split_ifs at h1
-        case inl c1 =>
+        case pos c1 =>
           unfold admitsFun at h1
           simp at h1
 
@@ -214,9 +214,15 @@ theorem pred_sub_single_aux
 
             simp only [s2] at s1
             split_ifs
-            exact s1
-        case inr c1 =>
-            split_ifs
+            case pos c2 =>
+              exact s1
+            case neg _ =>
+              exact s1
+        case neg c1 =>
+          split_ifs
+          case pos c2 =>
+            contradiction
+          case neg c2 =>
             simp only [Holds]
     case eq_ x y =>
       unfold replacePred

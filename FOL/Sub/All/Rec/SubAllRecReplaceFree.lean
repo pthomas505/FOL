@@ -163,13 +163,13 @@ example
     unfold fastReplaceFreeFun
     unfold fastReplaceFree
     split_ifs
-    case inl c1 =>
+    case pos c1 =>
       subst c1
       congr!
       simp only [Function.updateIte_idem]
       simp only [Function.updateIte_id]
       apply fastReplaceFreeFun_id
-    case inr c1 =>
+    case neg c1 =>
       congr! 1
       simp only [← phi_ih]
       congr! 1

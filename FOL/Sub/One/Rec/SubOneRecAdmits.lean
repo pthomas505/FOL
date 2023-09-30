@@ -629,7 +629,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
     cases h1
     case intro h1_left h1_right =>
       split_ifs
-      case inl c1 =>
+      case pos c1 =>
         unfold fastAdmitsAux
         subst c1
         right
@@ -638,7 +638,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
         apply h1_right
         apply isFreeIn_imp_occursIn
         exact contra
-      case inr c1 =>
+      case neg c1 =>
         unfold fastAdmitsAux
         right
         apply phi_ih (binders ∪ {x}) h1_right
@@ -959,10 +959,10 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
       simp
       constructor
       · split_ifs
-        case inl c1 =>
+        case pos c1 =>
           subst c1
           tauto
-        case inr c1 =>
+        case neg c1 =>
           rfl
       · tauto
   case eq_ x y =>
@@ -974,10 +974,10 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
     constructor
     case left | right =>
       split_ifs
-      case inl c1 =>
+      case pos c1 =>
         subst c1
         tauto
-      case inr c1 =>
+      case neg c1 =>
         rfl
   case true_ | false_ =>
     rfl
@@ -1007,9 +1007,9 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
 
     unfold fastReplaceFree
     split_ifs
-    case inl c1 =>
+    case pos c1 =>
       rfl
-    case inr c1 =>
+    case neg c1 =>
       unfold toIsBoundAux
       simp
       apply phi_ih
@@ -1103,10 +1103,10 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
 
     unfold fastAdmitsAux
     split_ifs at h2
-    case inl c1 =>
+    case pos c1 =>
       left
       exact c1
-    case inr c1 =>
+    case neg c1 =>
       right
       apply phi_ih
       · simp

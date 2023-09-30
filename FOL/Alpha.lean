@@ -173,7 +173,7 @@ theorem replace_empty_Holds
       case intro h2_left h2_right =>
         unfold fastReplaceFree
         split_ifs
-        case inl c1 =>
+        case pos c1 =>
           subst c1
           apply Holds_coincide_Var
           intro x a1
@@ -183,12 +183,12 @@ theorem replace_empty_Holds
             unfold Function.updateIte
             simp only [if_neg a1_left]
             split_ifs
-            case inl c2 =>
+            case pos c2 =>
               subst c2
               tauto
-            case inr c2 =>
+            case neg c2 =>
               rfl
-        case inr c1 =>
+        case neg c1 =>
           simp only [Holds]
           first | apply forall_congr' | apply exists_congr
           intro d
