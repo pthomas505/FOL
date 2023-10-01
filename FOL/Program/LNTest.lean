@@ -102,7 +102,7 @@ instance : ToString Formula :=
 
 def Var.freeVarSet : Var → Finset String
   | F x => {x}
-  | B _ => {}
+  | B _ => ∅
 
 
 /--
@@ -111,7 +111,7 @@ def Var.freeVarSet : Var → Finset String
 def Formula.freeVarSet : Formula → Finset String
   | pred_const_ _ xs => xs.toFinset.biUnion Var.freeVarSet
   | pred_var_ _ xs => xs.toFinset.biUnion Var.freeVarSet
-  | true_ => {}
+  | true_ => ∅
   | not_ phi => phi.freeVarSet
   | imp_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
   | forall_ _ phi => phi.freeVarSet
@@ -138,7 +138,7 @@ def NVVarToLNVar
   Helper function for NVToLN.
 -/
 def NVToLNAux
-  (context : Std.HashMap String Nat) :
+  (context : Std.HashMap String ℕ) :
   NV.Formula → LN.Formula
 | NV.Formula.pred_const_ X xs => LN.Formula.pred_const_ X (xs.map (NVVarToLNVar context))
 | NV.Formula.pred_var_ X xs => LN.Formula.pred_var_ X (xs.map (NVVarToLNVar context))
@@ -173,7 +173,7 @@ def NVVarToLNVar'
 
 def NVToLNAux'
   (outer : ℕ)
-  (context : Std.HashMap String Nat) :
+  (context : Std.HashMap String ℕ) :
   NV.Formula → LN.Formula
 | NV.Formula.pred_const_ X xs => LN.Formula.pred_const_ X (xs.map (NVVarToLNVar' outer context))
 | NV.Formula.pred_var_ X xs => LN.Formula.pred_var_ X (xs.map (NVVarToLNVar' outer context))
@@ -185,7 +185,7 @@ def NVToLNAux'
     LN.Formula.forall_ x (NVToLNAux' (outer + 1) context' phi)
 
 def NVToLN' (F : NV.Formula) : LN.Formula :=
-  NVToLNAux' 0 {} F
+  NVToLNAux' 0 ∅ F
 
 #eval NVToLN' (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"]))
 
@@ -223,7 +223,7 @@ lemma finset_string_max_len_mem
       exact ih c1
 
 
-def variant
+def fresh
   (x : String)
   (c : Char)
   (xs : Finset String) :
@@ -235,16 +235,16 @@ def variant
     obtain s1 := finset_string_max_len_mem x xs h
     simp only [tsub_lt_tsub_iff_right s1]
     simp
-  variant (x ++ c.toString) c xs
+  fresh (x ++ c.toString) c xs
   else x
-  termination_by variant x _ xs => finset_string_max_len xs + 1 - x.length
+  termination_by fresh x _ xs => finset_string_max_len xs + 1 - x.length
 
 
-lemma variant_not_mem
+lemma fresh_not_mem
   (x : String)
   (c : Char)
   (xs : Finset String) :
-  variant x c xs ∉ xs :=
+  fresh x c xs ∉ xs :=
   if h : x ∈ xs
   then
   have : finset_string_max_len xs - String.length x < finset_string_max_len xs + 1 - String.length x :=
@@ -253,21 +253,21 @@ lemma variant_not_mem
     simp only [tsub_lt_tsub_iff_right s1]
     simp
   by
-    unfold variant
+    unfold fresh
     simp
     simp only [if_pos h]
-    apply variant_not_mem
+    apply fresh_not_mem
   else by
-    unfold variant
+    unfold fresh
     simp
     simp [if_neg h]
     exact h
-  termination_by variant_not_mem x _ xs => finset_string_max_len xs + 1 - x.length
+  termination_by fresh_not_mem x _ xs => finset_string_max_len xs + 1 - x.length
 
 
 def LNVarToNVVar
   (outer : ℕ)
-  (context : Std.HashMap Int String) :
+  (context : Std.HashMap ℤ String) :
   LN.Var → Option String
   | LN.Var.F x => Option.some x
   | LN.Var.B n => context.find? (outer - n)
@@ -276,7 +276,7 @@ def LNVarToNVVar
 def LNToNVAux
   (c : Char)
   (outer : ℕ)
-  (context : Std.HashMap Int String) :
+  (context : Std.HashMap ℤ String) :
   LN.Formula → Option NV.Formula
   | LN.Formula.pred_const_ X xs => do
       let xs' ← xs.mapM (LNVarToNVVar outer context)
@@ -293,7 +293,7 @@ def LNToNVAux
       let psi' ← LNToNVAux c outer context psi
       Option.some (NV.Formula.imp_ phi' psi')
   | LN.Formula.forall_ x phi => do
-      let x' := variant x c phi.freeVarSet
+      let x' := fresh x c phi.freeVarSet
       let phi' ← LNToNVAux c (outer + 1) (context.insert (outer + 1) x') phi
       Option.some (NV.Formula.forall_ x' phi')
 
@@ -302,7 +302,7 @@ def LNToNV
   (c : Char)
   (F : LN.Formula) :
   Option NV.Formula :=
-  LNToNVAux c 0 {} F
+  LNToNVAux c 0 ∅ F
 
 #eval (NVToLN (NV.Formula.forall_ "z" (NV.Formula.forall_ "y" (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
 
@@ -318,7 +318,10 @@ def LNToNV
 
 example
   (F : NV.Formula)
+  (outer_1 : ℕ)
+  (outer_2 : ℕ)
+  (context_1 : Std.HashMap String ℕ)
+  (context_2 : Std.HashMap ℤ String)
   (c : Char) :
-  LNToNV c (NVToLN F) = F :=
-  by
-  induction F
+  LNToNVAux c outer_2 context_2 (NVToLNAux' outer_1 context_1 F) = Option.some F :=
+  by sorry
