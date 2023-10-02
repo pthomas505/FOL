@@ -3,6 +3,8 @@ import Std.Data.HashMap.Basic
 
 import Mathlib.Data.String.Lemmas
 import Mathlib.Util.CompileInductive
+
+import FOL.List
 import FOL.Tactics
 
 set_option autoImplicit false
@@ -46,7 +48,7 @@ end NV
 namespace LN
 
 /--
-  The type of variables.
+  The type of locally nameless variables.
 -/
 inductive Var
 | F : String → Var
@@ -58,7 +60,7 @@ compile_inductive% Var
 open Var
 
 /--
-  The string representation of variables.
+  The string representation of locally nameless variables.
 -/
 def Var.toString : Var → String
   | F x => x
@@ -69,7 +71,7 @@ instance : ToString Var :=
 
 
 /--
-  The type of formulas.
+  The type of locally nameless formulas.
 -/
 inductive Formula : Type
   | pred_const_ : String → List Var → Formula
@@ -85,7 +87,7 @@ compile_inductive% Formula
 open Formula
 
 /--
-  The string representation of formulas.
+  The string representation of locally nameless formulas.
 -/
 def Formula.toString : Formula → String
   | pred_const_ X xs => s! "({X} {xs})"
@@ -115,6 +117,129 @@ def Formula.freeVarSet : Formula → Finset String
   | not_ phi => phi.freeVarSet
   | imp_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
   | forall_ _ phi => phi.freeVarSet
+
+
+def openVar
+  (k : ℕ)
+  (v : String) :
+  Var → Var
+  | F x => F x
+  | B n => if k = n then F v else B n
+
+def openFormulaAux
+  (k : ℕ)
+  (v : String) :
+  Formula → Formula
+  | pred_const_ X xs => pred_const_ X (xs.map (openVar k v))
+  | pred_var_ X xs => pred_var_ X (xs.map (openVar k v))
+  | true_ => true_
+  | not_ phi => not_ (openFormulaAux k v phi)
+  | imp_ phi psi => imp_ (openFormulaAux k v phi) (openFormulaAux k v psi)
+  | forall_ x phi => forall_ x (openFormulaAux (k + 1) v phi)
+
+def openFormula
+  (v : String)
+  (F : Formula) :
+  Formula :=
+  openFormulaAux 0 v F
+
+
+def closeVar
+  (k : ℕ)
+  (v : String) :
+  Var → Var
+  | F x => if v = x then B k else F x
+  | B n => B n
+
+def closeFormulaAux
+  (k : ℕ)
+  (v : String) :
+  Formula → Formula
+  | pred_const_ X xs => pred_const_ X (xs.map (closeVar k v))
+  | pred_var_ X xs => pred_var_ X (xs.map (closeVar k v))
+  | true_ => true_
+  | not_ phi => not_ (closeFormulaAux k v phi)
+  | imp_ phi psi => imp_ (closeFormulaAux k v phi) (closeFormulaAux k v psi)
+  | forall_ x phi => forall_ x (closeFormulaAux (k + 1) v phi)
+
+def closeFormula
+  (v : String)
+  (F : Formula) :
+  Formula :=
+  closeFormulaAux 0 v F
+
+
+lemma CloseVarOpenVarComp
+  (x : Var)
+  (v : String)
+  (k : ℕ)
+  (h1 : v ∉ Var.freeVarSet x) :
+  (closeVar k v ∘ openVar k v) x = x :=
+  by
+  cases x
+  case F x =>
+    simp only [Var.freeVarSet] at h1
+    simp at h1
+
+    simp
+    simp only [openVar]
+    simp only [closeVar]
+    simp only [if_neg h1]
+  case B n =>
+    simp
+    simp only [openVar]
+    split_ifs
+    case _ c1 =>
+      simp only [closeVar]
+      simp
+      exact c1
+    case _ c1 =>
+      simp only [closeVar]
+
+example
+  (F : Formula)
+  (k : ℕ)
+  (v : String)
+  (h1 : v ∉ F.freeVarSet) :
+  closeFormulaAux k v (openFormulaAux k v F) = F :=
+  by
+  induction F generalizing k
+  case pred_const_ X xs | pred_var_ X xs =>
+    unfold Formula.freeVarSet at h1
+    simp at h1
+
+    unfold openFormulaAux
+    unfold closeFormulaAux
+    simp
+    simp only [List.map_eq_self_iff]
+    intro x a1
+    apply CloseVarOpenVarComp
+    exact h1 x a1
+  case true_ =>
+    rfl
+  case not_ phi phi_ih =>
+    unfold Formula.freeVarSet at h1
+
+    unfold openFormulaAux
+    unfold closeFormulaAux
+    simp only [phi_ih k h1]
+  case imp_ phi psi phi_ih psi_ih =>
+    unfold Formula.freeVarSet at h1
+    simp at h1
+    push_neg at h1
+
+    unfold openFormulaAux
+    unfold closeFormulaAux
+    cases h1
+    case _ h1_left h1_right =>
+      simp only [phi_ih k h1_left]
+      simp only [psi_ih k h1_right]
+  case forall_ x phi phi_ih =>
+    unfold Formula.freeVarSet at h1
+
+    unfold openFormulaAux
+    unfold closeFormulaAux
+    simp only [phi_ih (k + 1) h1]
 
 
 end LN
@@ -190,6 +315,15 @@ def NVToLN' (F : NV.Formula) : LN.Formula :=
 #eval NVToLN' (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"]))
 
 #eval (NVToLN' (NV.Formula.forall_ "z" (NV.Formula.forall_ "y" (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
+
+
+#eval LN.openFormula "z" (NVToLN' (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "z"])))
+
+#eval LN.closeFormula "z" (NVToLN' (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "z"])))
+
+#eval LN.closeFormula "z" (NVToLN' (NV.Formula.pred_var_ "X" ["x", "z"]))
+
+#eval LN.closeFormula "z" (LN.openFormula "z" (NVToLN' (NV.Formula.pred_var_ "X" ["x", "z"])))
 
 
 def finset_string_max_len :
