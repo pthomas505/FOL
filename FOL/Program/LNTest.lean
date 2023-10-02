@@ -242,6 +242,42 @@ example
     simp only [phi_ih (k + 1) h1]
 
 
+def Var.isFree : Var → Prop
+  | F _ => True
+  | B _ => False
+
+inductive lc : Formula → Prop
+  | pred_const_
+    (X : String)
+    (xs : List Var) :
+    (∀ (x : Var), x ∈ xs → x.isFree) →
+    lc (pred_const_ X xs)
+
+  | pred_var_
+    (X : String)
+    (xs : List Var) :
+    (∀ (x : Var), x ∈ xs → x.isFree) →
+    lc (pred_var_ X xs)
+
+  | not_
+    (phi : Formula) :
+    lc phi →
+    lc (not_ phi)
+
+  | imp_
+    (phi psi : Formula) :
+    lc phi →
+    lc psi →
+    lc (imp_ phi psi)
+
+  | forall_
+    (x : String)
+    (phi : Formula)
+    (L : Finset String) :
+    (∀ (v : String), v ∉ L → lc (openFormula v phi)) →
+    lc (forall_ x phi)
+
+
 end LN
 
 /--
