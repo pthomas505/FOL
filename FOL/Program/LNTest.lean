@@ -291,16 +291,12 @@ def Formula.lc_at
   (k : ℕ) :
   Formula → Prop
   | pred_const_ _ xs => ∀ (x : Var), x ∈ xs → (x.lc_at k)
-
   | pred_var_ _ xs => ∀ (x : Var), x ∈ xs → (x.lc_at k)
-
   | true_ => True
-
   | not_ phi => phi.lc_at k
-
   | imp_ phi psi => (phi.lc_at k) ∧ (psi.lc_at k)
-
   | forall_ _ phi => phi.lc_at (k + 1)
+
 
 
 end LN
