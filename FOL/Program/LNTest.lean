@@ -246,7 +246,7 @@ def Var.isFree : Var → Prop
   | F _ => True
   | B _ => False
 
-inductive lc : Formula → Prop
+inductive Formula.lc : Formula → Prop
   | pred_const_
     (X : String)
     (xs : List Var) :
@@ -258,6 +258,9 @@ inductive lc : Formula → Prop
     (xs : List Var) :
     (∀ (x : Var), x ∈ xs → x.isFree) →
     lc (pred_var_ X xs)
+
+  | true_ :
+    lc true_
 
   | not_
     (phi : Formula) :
@@ -276,6 +279,28 @@ inductive lc : Formula → Prop
     (L : Finset String) :
     (∀ (v : String), v ∉ L → lc (openFormula v phi)) →
     lc (forall_ x phi)
+
+
+def Var.lc_at
+  (k : ℕ) :
+  Var → Prop
+  | F _ => True
+  | B n => n < k
+
+def Formula.lc_at
+  (k : ℕ) :
+  Formula → Prop
+  | pred_const_ _ xs => ∀ (x : Var), x ∈ xs → (x.lc_at k)
+
+  | pred_var_ _ xs => ∀ (x : Var), x ∈ xs → (x.lc_at k)
+
+  | true_ => True
+
+  | not_ phi => phi.lc_at k
+
+  | imp_ phi psi => (phi.lc_at k) ∧ (psi.lc_at k)
+
+  | forall_ _ phi => phi.lc_at (k + 1)
 
 
 end LN
