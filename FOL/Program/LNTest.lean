@@ -232,14 +232,16 @@ example
     unfold closeFormulaAux
     cases h1
     case _ h1_left h1_right =>
-      simp only [phi_ih k h1_left]
-      simp only [psi_ih k h1_right]
+      congr
+      · exact phi_ih k h1_left
+      · exact psi_ih k h1_right
   case forall_ x phi phi_ih =>
     unfold Formula.freeVarSet at h1
 
     unfold openFormulaAux
     unfold closeFormulaAux
-    simp only [phi_ih (k + 1) h1]
+    congr
+    exact phi_ih (k + 1) h1
 
 
 def Var.isFree : Var → Prop
@@ -297,6 +299,80 @@ def Formula.lc_at
   | forall_ _ phi => phi.lc_at (k + 1)
 
 
+lemma OpenVarCloseVarComp
+  (x : Var)
+  (v : String)
+  (k : ℕ)
+  (h1 : Var.lc_at k x) :
+  (openVar k v ∘ closeVar k v) x = x :=
+  by
+  cases x
+  case F x =>
+    simp
+    simp only [closeVar]
+    split_ifs
+    case pos c1 =>
+      subst c1
+      simp only [openVar]
+      simp
+    case neg c1 =>
+      simp only [openVar]
+  case B n =>
+    simp only [Var.lc_at] at h1
+
+    simp
+    simp only [closeVar]
+    simp only [openVar]
+    split_ifs
+    case pos c1 =>
+      subst c1
+      simp at h1
+    case neg c1 =>
+      rfl
+
+example
+  (F : Formula)
+  (k : ℕ)
+  (v : String)
+  (h1 : Formula.lc_at k F) :
+  openFormulaAux k v (closeFormulaAux k v F) = F :=
+  by
+  induction F generalizing k
+  case pred_const_ X xs | pred_var_ X xs =>
+    unfold Formula.lc_at at h1
+
+    unfold closeFormulaAux
+    unfold openFormulaAux
+    simp
+    simp only [List.map_eq_self_iff]
+    intro x a1
+    apply OpenVarCloseVarComp
+    exact h1 x a1
+  case true_ =>
+    rfl
+  case not_ phi phi_ih =>
+    unfold Formula.lc_at at h1
+
+    unfold closeFormulaAux
+    unfold openFormulaAux
+    simp only [phi_ih k h1]
+  case imp_ phi psi phi_ih psi_ih =>
+    unfold Formula.lc_at at h1
+
+    unfold closeFormulaAux
+    unfold openFormulaAux
+    cases h1
+    case _ h1_left h1_right =>
+      congr
+      · exact phi_ih k h1_left
+      · exact psi_ih k h1_right
+  case forall_ x phi phi_ih =>
+    simp only [closeFormulaAux]
+    simp only [openFormulaAux]
+    congr
+    exact phi_ih (k + 1) h1
+
+
 lemma Var.lc_at_succ
   (x : Var)
   (k : ℕ)
@@ -313,6 +389,42 @@ lemma Var.lc_at_succ
     transitivity k
     · exact h1
     · simp
+
+lemma Formula.lc_at_succ
+  (F : Formula)
+  (k : ℕ)
+  (h1 : Formula.lc_at k F) :
+  Formula.lc_at (k + 1) F :=
+  by
+  induction F generalizing k
+  case pred_const_ X xs | pred_var_ X xs =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.lc_at]
+    intro x a1
+    apply Var.lc_at_succ
+    exact h1 x a1
+  case true_ =>
+    simp only [Formula.lc_at]
+  case not_ phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.lc_at]
+    exact phi_ih k h1
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.lc_at]
+    cases h1
+    case _ h1_left h1_right =>
+      constructor
+      · exact phi_ih k h1_left
+      · exact psi_ih k h1_right
+  case forall_ x phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.lc_at]
+    exact phi_ih (k + 1) h1
 
 
 lemma lc_at_openFormula_succ
