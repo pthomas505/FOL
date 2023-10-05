@@ -222,6 +222,13 @@ def Var.lc_at
   | F _ => True
   | B n => n < k
 
+instance (k : ℕ) (V : Var) : Decidable (Var.lc_at k V) :=
+  by
+  cases V
+  all_goals
+    simp only [lc_at]
+    infer_instance
+
 def Formula.lc_at
   (k : ℕ) :
   Formula → Prop
@@ -231,6 +238,16 @@ def Formula.lc_at
   | not_ phi => phi.lc_at k
   | imp_ phi psi => (phi.lc_at k) ∧ (psi.lc_at k)
   | forall_ _ phi => phi.lc_at (k + 1)
+
+instance (k : ℕ) (F : Formula) : Decidable (Formula.lc_at k F) :=
+  by
+  induction F generalizing k
+  all_goals
+    unfold Formula.lc_at
+    infer_instance
+
+#eval Formula.lc_at 0 (forall_ "x" (pred_const_ "X" [B 0]))
+#eval Formula.lc_at 0 (forall_ "x" (pred_const_ "X" [B 1]))
 
 
 lemma CloseVarOpenVarComp
