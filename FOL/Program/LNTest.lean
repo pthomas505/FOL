@@ -211,10 +211,49 @@ inductive Formula.lc : Formula → Prop
 
   | forall_
     (x : String)
-    (phi : Formula) :
-    (∀ (v : String), lc (openFormula v phi)) →
+    (phi : Formula)
+    (L : Finset String) :
+    (∀ (v : String), v ∉ L → lc (openFormula v phi)) →
     lc (forall_ x phi)
 
+example
+  (F : Formula)
+  (y : String)
+  (h1 : Formula.lc (forall_ y F)) :
+  ∃ (L : Finset String), ∀ (v : String), v ∉ L → Formula.lc (openFormula v F) :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    cases h1
+    case _ L c1 =>
+    apply Exists.intro L
+    exact c1
+  case forall_ x phi phi_ih =>
+    cases h1
+    case _ L c1 =>
+      apply Exists.intro L
+      exact c1
+  all_goals
+    sorry
+
+example
+  (F : Formula)
+  (y : String)
+  (h1 : ∃ (L : Finset String), ∀ (v : String), v ∉ L → Formula.lc (openFormula v F)) :
+  Formula.lc (forall_ y F) :=
+  by
+  apply Exists.elim h1
+  intro L a1
+  clear h1
+  induction F
+  case pred_const_ X xs =>
+    apply lc.forall_
+    exact a1
+  case forall_ x phi phi_ih =>
+    apply lc.forall_
+    exact a1
+  all_goals
+    sorry
 
 def Var.lc_at
   (k : ℕ) :
@@ -595,12 +634,15 @@ example
     simp only [phi_ih_2]
     simp only [psi_ih_2]
 
-  case forall_ x phi ih_1 ih_2 =>
+  case forall_ x phi L ih_1 ih_2 =>
     unfold openFormula at ih_2
 
     unfold Formula.lc_at
+    obtain s1 := Infinite.exists_not_mem_finset L
+    apply Exists.elim s1
+    intro v a1
     apply lc_at_openFormula
-    apply ih_2 Inhabited.default
+    apply ih_2 v a1
 
 
 example
@@ -623,8 +665,8 @@ example
       contradiction
   case forall_ x phi phi_ih =>
     unfold Formula.lc_at at h1
-    apply lc.forall_ x phi
-    intro v
+    have s1 : ∃ (L : Finset String), ∀ (v : String), v ∉ L → Formula.lc (openFormula v phi)
+    sorry
     sorry
 
   all_goals
