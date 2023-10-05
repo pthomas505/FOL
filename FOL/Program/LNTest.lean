@@ -13,7 +13,7 @@ set_option autoImplicit false
 namespace NV
 
 /--
-  The type of formulas.
+  The type of named variable formulas.
 -/
 inductive Formula : Type
   | pred_const_ : String → List String → Formula
@@ -29,7 +29,7 @@ compile_inductive% Formula
 open Formula
 
 /--
-  The string representation of formulas.
+  The string representation of named variable formulas.
 -/
 def Formula.toString : Formula → String
   | pred_const_ X xs => s! "({X} {xs})"
@@ -119,6 +119,9 @@ def Formula.freeVarSet : Formula → Finset String
   | forall_ _ phi => phi.freeVarSet
 
 
+/--
+  Helper function for openFormulaAux.
+-/
 def openVar
   (k : ℕ)
   (v : String) :
@@ -126,6 +129,9 @@ def openVar
   | F x => F x
   | B n => if k = n then F v else B n
 
+/--
+  Helper function for openFormula.
+-/
 def openFormulaAux
   (k : ℕ)
   (v : String) :
@@ -137,6 +143,9 @@ def openFormulaAux
   | imp_ phi psi => imp_ (openFormulaAux k v phi) (openFormulaAux k v psi)
   | forall_ x phi => forall_ x (openFormulaAux (k + 1) v phi)
 
+/--
+  openFormula v F := Replaces each of the bound variables in the formula F that indexes one more than the outermost binder by a free variable named v.
+-/
 def openFormula
   (v : String)
   (F : Formula) :
@@ -167,6 +176,61 @@ def closeFormula
   (F : Formula) :
   Formula :=
   closeFormulaAux 0 v F
+
+
+def Var.isFree : Var → Prop
+  | F _ => True
+  | B _ => False
+
+inductive Formula.lc : Formula → Prop
+  | pred_const_
+    (X : String)
+    (xs : List Var) :
+    (∀ (x : Var), x ∈ xs → x.isFree) →
+    lc (pred_const_ X xs)
+
+  | pred_var_
+    (X : String)
+    (xs : List Var) :
+    (∀ (x : Var), x ∈ xs → x.isFree) →
+    lc (pred_var_ X xs)
+
+  | true_ :
+    lc true_
+
+  | not_
+    (phi : Formula) :
+    lc phi →
+    lc (not_ phi)
+
+  | imp_
+    (phi psi : Formula) :
+    lc phi →
+    lc psi →
+    lc (imp_ phi psi)
+
+  | forall_
+    (x : String)
+    (phi : Formula) :
+    (∀ (v : String), lc (openFormula v phi)) →
+    lc (forall_ x phi)
+
+
+def Var.lc_at
+  (k : ℕ) :
+  Var → Prop
+  | F _ => True
+  | B n => n < k
+
+def Formula.lc_at
+  (k : ℕ) :
+  Formula → Prop
+  | pred_const_ _ xs => ∀ (x : Var), x ∈ xs → (x.lc_at k)
+  | pred_var_ _ xs => ∀ (x : Var), x ∈ xs → (x.lc_at k)
+  | true_ => True
+  | not_ phi => phi.lc_at k
+  | imp_ phi psi => (phi.lc_at k) ∧ (psi.lc_at k)
+  | forall_ _ phi => phi.lc_at (k + 1)
 
 
 lemma CloseVarOpenVarComp
@@ -242,61 +306,6 @@ example
     unfold closeFormulaAux
     congr
     exact phi_ih (k + 1) h1
-
-
-def Var.isFree : Var → Prop
-  | F _ => True
-  | B _ => False
-
-inductive Formula.lc : Formula → Prop
-  | pred_const_
-    (X : String)
-    (xs : List Var) :
-    (∀ (x : Var), x ∈ xs → x.isFree) →
-    lc (pred_const_ X xs)
-
-  | pred_var_
-    (X : String)
-    (xs : List Var) :
-    (∀ (x : Var), x ∈ xs → x.isFree) →
-    lc (pred_var_ X xs)
-
-  | true_ :
-    lc true_
-
-  | not_
-    (phi : Formula) :
-    lc phi →
-    lc (not_ phi)
-
-  | imp_
-    (phi psi : Formula) :
-    lc phi →
-    lc psi →
-    lc (imp_ phi psi)
-
-  | forall_
-    (x : String)
-    (phi : Formula) :
-    (∀ (L : Finset String) (v : String), v ∉ L → lc (openFormula v phi)) →
-    lc (forall_ x phi)
-
-
-def Var.lc_at
-  (k : ℕ) :
-  Var → Prop
-  | F _ => True
-  | B n => n < k
-
-def Formula.lc_at
-  (k : ℕ) :
-  Formula → Prop
-  | pred_const_ _ xs => ∀ (x : Var), x ∈ xs → (x.lc_at k)
-  | pred_var_ _ xs => ∀ (x : Var), x ∈ xs → (x.lc_at k)
-  | true_ => True
-  | not_ phi => phi.lc_at k
-  | imp_ phi psi => (phi.lc_at k) ∧ (psi.lc_at k)
-  | forall_ _ phi => phi.lc_at (k + 1)
 
 
 lemma OpenVarCloseVarComp
@@ -574,8 +583,7 @@ example
 
     unfold Formula.lc_at
     apply lc_at_openFormula
-    apply ih_2 ∅ Inhabited.default
-    simp
+    apply ih_2 Inhabited.default
 
 
 example
@@ -598,9 +606,8 @@ example
       contradiction
   case forall_ x phi phi_ih =>
     unfold Formula.lc_at at h1
-    apply lc.forall_
-    intro L v a1
-    simp only [openFormula]
+    apply lc.forall_ x phi
+    intro v
     sorry
 
   all_goals
@@ -609,47 +616,11 @@ example
 
 end LN
 
+
 /--
   The conversion of named variables to locally nameless variables.
 -/
 def NVVarToLNVar
-  (context : Std.HashMap String ℕ)
-  (x : String) :
-  LN.Var :=
-  let opt := context.find? x
-  if h : Option.isSome opt
-  then
-    let i := Option.get opt h
-    LN.Var.B i
-  else LN.Var.F x
-
-
-/--
-  Helper function for NVToLN.
--/
-def NVToLNAux
-  (context : Std.HashMap String ℕ) :
-  NV.Formula → LN.Formula
-| NV.Formula.pred_const_ X xs => LN.Formula.pred_const_ X (xs.map (NVVarToLNVar context))
-| NV.Formula.pred_var_ X xs => LN.Formula.pred_var_ X (xs.map (NVVarToLNVar context))
-| NV.Formula.true_ => LN.Formula.true_
-| NV.Formula.not_ phi => LN.Formula.not_ (NVToLNAux context phi)
-| NV.Formula.imp_ phi psi => LN.Formula.imp_ (NVToLNAux context phi) (NVToLNAux context psi)
-| NV.Formula.forall_ x phi =>
-    let context' := (Std.HashMap.mapVal (fun _ val => val + 1) context).insert x 0
-    LN.Formula.forall_ x (NVToLNAux context' phi)
-
-/--
-  The conversion of named variable formulas to locally nameless formulas.
--/
-def NVToLN (F : NV.Formula) : LN.Formula :=
-  NVToLNAux {} F
-
-
-#eval NVToLN (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"]))
-
-
-def NVVarToLNVar'
   (outer : ℕ)
   (context : Std.HashMap String ℕ)
   (x : String) :
@@ -661,34 +632,27 @@ def NVVarToLNVar'
     LN.Var.B (outer - n)
   else LN.Var.F x
 
-def NVToLNAux'
+/--
+  Helper function for NVToLN.
+-/
+def NVToLNAux
   (outer : ℕ)
   (context : Std.HashMap String ℕ) :
   NV.Formula → LN.Formula
-| NV.Formula.pred_const_ X xs => LN.Formula.pred_const_ X (xs.map (NVVarToLNVar' outer context))
-| NV.Formula.pred_var_ X xs => LN.Formula.pred_var_ X (xs.map (NVVarToLNVar' outer context))
+| NV.Formula.pred_const_ X xs => LN.Formula.pred_const_ X (xs.map (NVVarToLNVar outer context))
+| NV.Formula.pred_var_ X xs => LN.Formula.pred_var_ X (xs.map (NVVarToLNVar outer context))
 | NV.Formula.true_ => LN.Formula.true_
-| NV.Formula.not_ phi => LN.Formula.not_ (NVToLNAux' outer context phi)
-| NV.Formula.imp_ phi psi => LN.Formula.imp_ (NVToLNAux' outer context phi) (NVToLNAux' outer context psi)
+| NV.Formula.not_ phi => LN.Formula.not_ (NVToLNAux outer context phi)
+| NV.Formula.imp_ phi psi => LN.Formula.imp_ (NVToLNAux outer context phi) (NVToLNAux outer context psi)
 | NV.Formula.forall_ x phi =>
     let context' := context.insert x (outer + 1)
-    LN.Formula.forall_ x (NVToLNAux' (outer + 1) context' phi)
+    LN.Formula.forall_ x (NVToLNAux (outer + 1) context' phi)
 
-def NVToLN' (F : NV.Formula) : LN.Formula :=
-  NVToLNAux' 0 ∅ F
-
-#eval NVToLN' (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"]))
-
-#eval (NVToLN' (NV.Formula.forall_ "z" (NV.Formula.forall_ "y" (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
-
-
-#eval LN.openFormula "z" (NVToLN' (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "z"])))
-
-#eval LN.closeFormula "z" (NVToLN' (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "z"])))
-
-#eval LN.closeFormula "z" (NVToLN' (NV.Formula.pred_var_ "X" ["x", "z"]))
-
-#eval LN.closeFormula "z" (LN.openFormula "z" (NVToLN' (NV.Formula.pred_var_ "X" ["x", "z"])))
+/--
+  The conversion of named variable formulas to locally nameless formulas.
+-/
+def NVToLN (F : NV.Formula) : LN.Formula :=
+  NVToLNAux 0 ∅ F
 
 
 def finset_string_max_len :
@@ -803,17 +767,41 @@ def LNToNV
   Option NV.Formula :=
   LNToNVAux c 0 ∅ F
 
+
+#eval NVToLN (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"]))
+
+#eval LNToNV '+' (LN.closeFormula "z" (LN.openFormula "z" (NVToLN (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"])))))
+
+#eval LNToNV '+' (LN.openFormula "z" (LN.closeFormula "z" (NVToLN (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"])))))
+
+
+#eval NVToLN (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y"]))
+
 #eval (NVToLN (NV.Formula.forall_ "z" (NV.Formula.forall_ "y" (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
 
-#eval (LNToNV '+' (NVToLN' (NV.Formula.forall_ "x" (NV.Formula.forall_ "y" (NV.Formula.forall_ "z" (NV.Formula.pred_var_ "X" ["x", "y", "z"]))))))
+
+#eval LNToNV '+' (LN.openFormula "z" (NVToLN (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "z"]))))
+
+#eval LN.openFormula "z" (NVToLN (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "z"])))
+
+#eval LN.closeFormula "z" (NVToLN (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "z"])))
+
+#eval LN.closeFormula "z" (NVToLN (NV.Formula.pred_var_ "X" ["x", "z"]))
+
+#eval LN.closeFormula "z" (LN.openFormula "z" (NVToLN (NV.Formula.pred_var_ "X" ["x", "z"])))
+
+#eval (NVToLN (NV.Formula.forall_ "z" (NV.Formula.forall_ "y" (NV.Formula.forall_ "x" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
+
+#eval (LNToNV '+' (NVToLN (NV.Formula.forall_ "x" (NV.Formula.forall_ "y" (NV.Formula.forall_ "z" (NV.Formula.pred_var_ "X" ["x", "y", "z"]))))))
 
 #eval LNToNV '+' (NVToLN (NV.Formula.forall_ "z" (NV.Formula.forall_ "x" (NV.Formula.forall_ "y" (NV.Formula.pred_var_ "X" ["x", "y", "z"])))))
 
-#eval LNToNV '+' (LN.Formula.forall_ "z" (LN.Formula.forall_ "x" (LN.Formula.forall_ "y" (LN.Formula.pred_var_ "X" [(LN.Var.F "z"), (LN.Var.B 0), (LN.Var.F "y")]))))
+#eval LNToNV '+' (LN.Formula.forall_ "z" (LN.Formula.forall_ "x" (LN.Formula.forall_ "y" (LN.Formula.pred_var_ "X" [(LN.Var.F "z"), (LN.Var.B 1), (LN.Var.F "y")]))))
 
-#eval LNToNV '+' (LN.Formula.forall_ "y" (LN.Formula.forall_ "x" (LN.Formula.forall_ "y++" (LN.Formula.pred_var_ "X" [(LN.Var.B 2), (LN.Var.B 0), (LN.Var.F "y")]))))
+#eval LNToNV '+' (LN.Formula.forall_ "y" (LN.Formula.forall_ "x" (LN.Formula.forall_ "y++" (LN.Formula.pred_var_ "X" [(LN.Var.B 3), (LN.Var.B 2), (LN.Var.F "y")]))))
 
 #eval LNToNV '+' (LN.Formula.forall_ "x" (LN.Formula.pred_var_ "X" [(LN.Var.B 5)]))
+
 
 example
   (F : NV.Formula)
@@ -822,5 +810,5 @@ example
   (context_1 : Std.HashMap String ℕ)
   (context_2 : Std.HashMap ℤ String)
   (c : Char) :
-  LNToNVAux c outer_2 context_2 (NVToLNAux' outer_1 context_1 F) = Option.some F :=
+  LNToNVAux c outer_2 context_2 (NVToLNAux outer_1 context_1 F) = Option.some F :=
   by sorry
