@@ -351,6 +351,7 @@ lemma OpenVarCloseVarComp
       rfl
 
 
+-- 3.2 CLOSE_OPEN_VAR
 example
   (F : Formula)
   (k : ℕ)
@@ -398,6 +399,7 @@ example
     congr
     exact phi_ih (k + 1) h1
 
+-- 3.2 OPEN_CLOSE_VAR
 example
   (F : Formula)
   (k : ℕ)
