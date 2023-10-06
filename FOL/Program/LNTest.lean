@@ -665,7 +665,8 @@ example
       contradiction
   case forall_ x phi phi_ih =>
     unfold Formula.lc_at at h1
-    have s1 : ∃ (L : Finset String), ∀ (v : String), v ∉ L → Formula.lc (openFormula v phi)
+    apply lc.forall_ x phi
+    intro v a1
     sorry
     sorry
 
