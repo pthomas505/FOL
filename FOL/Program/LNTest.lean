@@ -707,7 +707,6 @@ example
     intro v a1
     obtain s1 := LCForallImpLCOpenFormula phi x v 0 h1
     unfold openFormula
-    
     sorry
     sorry
 
