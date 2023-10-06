@@ -716,6 +716,159 @@ example
     sorry
 
 
+-- added
+
+inductive Formula.lc' : Formula → Prop
+  | pred_const_
+    (X : String)
+    (xs : List Var) :
+    (∀ (x : Var), x ∈ xs → x.isFree) →
+    lc' (pred_const_ X xs)
+
+  | pred_var_
+    (X : String)
+    (xs : List Var) :
+    (∀ (x : Var), x ∈ xs → x.isFree) →
+    lc' (pred_var_ X xs)
+
+  | true_ :
+    lc' true_
+
+  | not_
+    (phi : Formula) :
+    lc' phi →
+    lc' (not_ phi)
+
+  | imp_
+    (phi psi : Formula) :
+    lc' phi →
+    lc' psi →
+    lc' (imp_ phi psi)
+
+  | forall_
+    (x : String)
+    (phi : Formula)
+    (v : String) :
+    lc' (openFormula v phi) →
+    lc' (forall_ x phi)
+
+lemma blah
+  (F : Formula)
+  (u : String)
+  (h1 : lc' (forall_ u F)) :
+  ∃ (v : String), lc' (openFormula v F) :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    cases h1
+    case _ v a1 =>
+      exact Exists.intro v a1
+  case forall_ x phi phi_ih =>
+    cases h1
+    case _ v a1 =>
+      exact Exists.intro v a1
+  all_goals
+    sorry
+
+lemma blah'
+  (F : Formula)
+  (u : String)
+  (h1 : ∃ (v : String), lc' (openFormula v F)) :
+  lc' (forall_ u F) :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    apply Exists.elim h1
+    intro a a1
+    apply lc'.forall_ _ _ a
+    exact a1
+  case forall_ x phi phi_ih =>
+    apply Exists.elim h1
+    intro a a1
+    apply lc'.forall_ _ _ a
+    exact a1
+
+  all_goals
+    sorry
+
+lemma meh
+  (F : Formula)
+  (u : String)
+  (v : String)
+  (h1 : (openFormulaAux 0 v F).lc_at 0) :
+  lc' (forall_ u F) :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    simp only [Formula.lc_at] at h1
+    apply lc'.forall_
+    simp only [openFormula]
+    simp only [openFormulaAux]
+    apply lc'.pred_const_
+    intro x a1
+    cases x
+    case _ x =>
+      simp only [isFree]
+    case _ n =>
+      specialize h1 (B n) a1
+      simp only [Var.lc_at] at h1
+      simp at h1
+  all_goals
+    sorry
+
+example
+  (F : Formula)
+  (h1 : F.lc_at 0) :
+  F.lc' :=
+  by
+  induction F
+  case pred_const_ X xs | pred_var_ X xs =>
+    unfold Formula.lc_at at h1
+
+    first | apply lc'.pred_const_ | apply lc'.pred_var_
+    intro x a1
+    cases x
+    case a.F x =>
+      simp only [Var.isFree]
+    case a.B n =>
+      specialize h1 (B n) a1
+      simp only [Var.lc_at] at h1
+      contradiction
+  case forall_ x phi phi_ih =>
+    obtain s1 := LCForallImpLCOpenFormula phi x Inhabited.default 0 h1
+    obtain s2 := meh phi x
+    obtain s3 := blah' phi x
+    obtain s4 := blah phi x
+    apply s2 default
+    apply LCForallImpLCOpenFormula
+    apply h1
+
+  all_goals
+    sorry
+
+example
+  (F : Formula)
+  (h1 : F.lc') :
+  F.lc_at 0 :=
+  by
+  induction h1
+  case pred_const_ X xs ih_1 =>
+    unfold Formula.lc_at
+    intro x a1
+    cases x
+    case F x =>
+      simp only [Var.lc_at]
+    case B n =>
+      specialize ih_1 (B n) a1
+      simp only [isFree] at ih_1
+  case forall_ x phi v ih_1 ih_2 =>
+    apply LCOpenFormulaImpLCForall
+    unfold openFormula at ih_2
+    exact ih_2
+
+  all_goals
+    sorry
+
 end LN
 
 
