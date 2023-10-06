@@ -612,6 +612,29 @@ lemma LCOpenFormulaImpLCForall
     intro x a1
     specialize h1 x a1
     exact LCOpenVarImpLCSucc v k x h1
+  case true_ =>
+    simp only [Formula.lc_at]
+  case not_ phi phi_ih =>
+    unfold openFormulaAux at h1
+    unfold Formula.lc_at at h1
+
+    simp only [Formula.lc_at] at phi_ih
+
+    simp only [Formula.lc_at]
+    exact phi_ih k h1
+  case imp_ phi psi phi_ih psi_ih =>
+    unfold openFormulaAux at h1
+    unfold Formula.lc_at at h1
+
+    simp only [Formula.lc_at] at phi_ih
+    simp only [Formula.lc_at] at psi_ih
+
+    simp only [Formula.lc_at]
+    cases h1
+    case _ h1_left h1_right =>
+      constructor
+      · exact phi_ih k h1_left
+      · exact psi_ih k h1_right
   case forall_ x phi phi_ih =>
     unfold openFormulaAux at h1
     unfold Formula.lc_at at h1
@@ -620,9 +643,6 @@ lemma LCOpenFormulaImpLCForall
 
     simp only [Formula.lc_at]
     exact phi_ih (k + 1) h1
-
-  all_goals
-    sorry
 
 
 example
