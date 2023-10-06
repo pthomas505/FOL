@@ -548,7 +548,7 @@ lemma LCForallImpLCOpenFormula
   (v : String)
   (k : ℕ)
   (h1 : Formula.lc_at k (forall_ u F)) :
-  Formula.lc_at k (openFormulaAux k v F):=
+  Formula.lc_at k (openFormulaAux k v F) :=
   by
   induction F generalizing k
   case pred_const_ X xs | pred_var_ X xs =>
