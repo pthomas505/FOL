@@ -47,6 +47,8 @@ end NV
 
 namespace LN
 
+-- If a bound variable has an index of 0 then it is bound by the first binder to its left.
+
 /--
   The type of locally nameless variables.
 -/
@@ -255,6 +257,7 @@ example
   all_goals
     sorry
 
+
 def Var.lc_at
   (k : ℕ) :
   Var → Prop
@@ -316,6 +319,38 @@ lemma CloseVarOpenVarComp
     case _ c1 =>
       simp only [closeVar]
 
+lemma OpenVarCloseVarComp
+  (x : Var)
+  (v : String)
+  (k : ℕ)
+  (h1 : Var.lc_at k x) :
+  (openVar k v ∘ closeVar k v) x = x :=
+  by
+  cases x
+  case F x =>
+    simp
+    simp only [closeVar]
+    split_ifs
+    case pos c1 =>
+      subst c1
+      simp only [openVar]
+      simp
+    case neg c1 =>
+      simp only [openVar]
+  case B n =>
+    simp only [Var.lc_at] at h1
+
+    simp
+    simp only [closeVar]
+    simp only [openVar]
+    split_ifs
+    case pos c1 =>
+      subst c1
+      simp at h1
+    case neg c1 =>
+      rfl
+
+
 example
   (F : Formula)
   (k : ℕ)
@@ -362,38 +397,6 @@ example
     unfold closeFormulaAux
     congr
     exact phi_ih (k + 1) h1
-
-
-lemma OpenVarCloseVarComp
-  (x : Var)
-  (v : String)
-  (k : ℕ)
-  (h1 : Var.lc_at k x) :
-  (openVar k v ∘ closeVar k v) x = x :=
-  by
-  cases x
-  case F x =>
-    simp
-    simp only [closeVar]
-    split_ifs
-    case pos c1 =>
-      subst c1
-      simp only [openVar]
-      simp
-    case neg c1 =>
-      simp only [openVar]
-  case B n =>
-    simp only [Var.lc_at] at h1
-
-    simp
-    simp only [closeVar]
-    simp only [openVar]
-    split_ifs
-    case pos c1 =>
-      subst c1
-      simp at h1
-    case neg c1 =>
-      rfl
 
 example
   (F : Formula)
@@ -492,117 +495,113 @@ lemma Formula.lc_at_succ
     exact phi_ih (k + 1) h1
 
 
-lemma lc_at_openFormula_succ
-  (F : Formula)
+lemma LCSuccImpLCOpenVar
   (v : String)
   (k : ℕ)
-  (h1 : Formula.lc_at k F) :
-  Formula.lc_at (k + 1) (openFormulaAux k v F) :=
+  (x : Var)
+  (h1 : Var.lc_at (k + 1) x) :
+  Var.lc_at k (openVar k v x) :=
+  by
+  cases x
+  case F x =>
+    simp only [openVar]
+    simp only [Var.lc_at]
+  case B n =>
+    simp only [openVar]
+    split
+    case inl c1 =>
+      simp only [Var.lc_at]
+    case inr c1 =>
+      simp only [Var.lc_at] at h1
+      simp only [Var.lc_at]
+      refine lt_of_le_of_ne' ?_ c1
+      exact Nat.lt_succ.mp h1
+
+
+lemma LCOpenVarImpLCSucc
+  (v : String)
+  (k : ℕ)
+  (x : Var)
+  (h1 : Var.lc_at k (openVar k v x)) :
+  Var.lc_at (k + 1) x :=
+  by
+  cases x
+  case F x =>
+    simp only [Var.lc_at]
+  case B n =>
+    simp only [Var.lc_at]
+    simp only [openVar] at h1
+    split at h1
+    case inl c1 =>
+      subst c1
+      simp
+    case inr c1 =>
+      simp only [Var.lc_at] at h1
+      trans k
+      · exact h1
+      · simp
+
+
+lemma LCForallImpLCOpenFormula
+  (F : Formula)
+  (u : String)
+  (v : String)
+  (k : ℕ)
+  (h1 : Formula.lc_at k (forall_ u F)) :
+  Formula.lc_at k (openFormulaAux k v F):=
   by
   induction F generalizing k
-  case pred_const_ X xs | pred_var_ X xs =>
-    unfold Formula.lc_at at h1
+  case pred_const_ X xs =>
+    simp only [Formula.lc_at] at h1
 
     unfold openFormulaAux
     unfold Formula.lc_at
+    simp
     intro x a1
-    simp at a1
-    apply Exists.elim a1
-    intro x' a1'
-    cases a1'
-    case _ a1'_left a1'_right =>
-      subst a1'_right
-      cases x'
-      case F x' =>
-        simp only [openVar]
-        simp only [Var.lc_at]
-      case B n =>
-        simp only [openVar]
-        split_ifs
-        case pos c1 =>
-          simp only [Var.lc_at]
-        case neg c1 =>
-          specialize h1 (B n) a1'_left
-          apply Var.lc_at_succ
-          exact h1
-  case true_ =>
-    unfold openFormulaAux
-    unfold Formula.lc_at
-    simp only
-  case not_ phi phi_ih =>
-    unfold Formula.lc_at at h1
-
-    unfold openFormulaAux
-    unfold Formula.lc_at
-    exact phi_ih k h1
-  case imp_ phi psi phi_ih psi_ih =>
-    unfold Formula.lc_at at h1
-
-    unfold openFormulaAux
-    unfold Formula.lc_at
-    cases h1
-    case _ h1_left h1_right =>
-      simp only [phi_ih k h1_left]
-      simp only [psi_ih k h1_right]
+    specialize h1 x a1
+    exact LCSuccImpLCOpenVar v k x h1
   case forall_ x phi phi_ih =>
-    unfold Formula.lc_at at h1
+    simp only [Formula.lc_at] at h1
 
-    unfold openFormulaAux
-    unfold Formula.lc_at
+    simp only [Formula.lc_at] at phi_ih
+
+    simp only [openFormulaAux]
+    simp only [Formula.lc_at]
     exact phi_ih (k + 1) h1
 
+  all_goals
+    sorry
 
-lemma lc_at_openFormula
+
+lemma LCOpenFormulaImpLCForall
   (F : Formula)
+  (u : String)
   (v : String)
   (k : ℕ)
   (h1 : Formula.lc_at k (openFormulaAux k v F)) :
-  Formula.lc_at (k + 1) F :=
+  Formula.lc_at k (forall_ u F) :=
   by
   induction F generalizing k
   case pred_const_ X xs | pred_var_ X xs =>
     unfold openFormulaAux at h1
     unfold Formula.lc_at at h1
+    simp at h1
 
-    unfold Formula.lc_at
-    intro x a1
-    cases x
-    case F x =>
-      simp only [Var.lc_at]
-    case B n =>
-      by_cases c1 : k = n
-      · subst c1
-        simp only [Var.lc_at]
-        simp
-      · apply Var.lc_at_succ
-        apply h1
-        simp
-        apply Exists.intro (B n)
-        constructor
-        · exact a1
-        · simp only [openVar]
-          simp only [if_neg c1]
-  case true_ =>
     simp only [Formula.lc_at]
-  case not_ phi phi_ih =>
-    simp only [Formula.lc_at] at h1
-
-    unfold Formula.lc_at
-    exact phi_ih k h1
-  case imp_ phi psi phi_ih psi_ih =>
-    simp only [Formula.lc_at] at h1
-
-    unfold Formula.lc_at
-    cases h1
-    case _ h1_left h1_right =>
-      simp only [phi_ih k h1_left]
-      simp only [psi_ih k h1_right]
+    intro x a1
+    specialize h1 x a1
+    exact LCOpenVarImpLCSucc v k x h1
   case forall_ x phi phi_ih =>
     unfold openFormulaAux at h1
     unfold Formula.lc_at at h1
 
-    unfold Formula.lc_at
+    simp only [Formula.lc_at] at phi_ih
+
+    simp only [Formula.lc_at]
     exact phi_ih (k + 1) h1
+
+  all_goals
+    sorry
 
 
 example
@@ -634,14 +633,13 @@ example
     simp only [phi_ih_2]
     simp only [psi_ih_2]
 
-  case forall_ x phi L ih_1 ih_2 =>
+  case forall_ x phi L _ ih_2 =>
     unfold openFormula at ih_2
 
-    unfold Formula.lc_at
     obtain s1 := Infinite.exists_not_mem_finset L
     apply Exists.elim s1
     intro v a1
-    apply lc_at_openFormula
+    apply LCOpenFormulaImpLCForall
     apply ih_2 v a1
 
 
