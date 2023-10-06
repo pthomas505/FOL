@@ -184,6 +184,42 @@ def Var.isFree : Var → Prop
   | F _ => True
   | B _ => False
 
+
+inductive Formula.lc' : Formula → Prop
+  | pred_const_
+    (X : String)
+    (xs : List Var) :
+    (∀ (x : Var), x ∈ xs → x.isFree) →
+    lc' (pred_const_ X xs)
+
+  | pred_var_
+    (X : String)
+    (xs : List Var) :
+    (∀ (x : Var), x ∈ xs → x.isFree) →
+    lc' (pred_var_ X xs)
+
+  | true_ :
+    lc' true_
+
+  | not_
+    (phi : Formula) :
+    lc' phi →
+    lc' (not_ phi)
+
+  | imp_
+    (phi psi : Formula) :
+    lc' phi →
+    lc' psi →
+    lc' (imp_ phi psi)
+
+  | forall_
+    (x : String)
+    (phi : Formula)
+    (v : String) :
+    lc' (openFormula v phi) →
+    lc' (forall_ x phi)
+
+
 inductive Formula.lc : Formula → Prop
   | pred_const_
     (X : String)
@@ -217,45 +253,6 @@ inductive Formula.lc : Formula → Prop
     (L : Finset String) :
     (∀ (v : String), v ∉ L → lc (openFormula v phi)) →
     lc (forall_ x phi)
-
-example
-  (F : Formula)
-  (y : String)
-  (h1 : Formula.lc (forall_ y F)) :
-  ∃ (L : Finset String), ∀ (v : String), v ∉ L → Formula.lc (openFormula v F) :=
-  by
-  induction F
-  case pred_const_ X xs =>
-    cases h1
-    case _ L c1 =>
-    apply Exists.intro L
-    exact c1
-  case forall_ x phi phi_ih =>
-    cases h1
-    case _ L c1 =>
-      apply Exists.intro L
-      exact c1
-  all_goals
-    sorry
-
-example
-  (F : Formula)
-  (y : String)
-  (h1 : ∃ (L : Finset String), ∀ (v : String), v ∉ L → Formula.lc (openFormula v F)) :
-  Formula.lc (forall_ y F) :=
-  by
-  apply Exists.elim h1
-  intro L a1
-  clear h1
-  induction F
-  case pred_const_ X xs =>
-    apply lc.forall_
-    exact a1
-  case forall_ x phi phi_ih =>
-    apply lc.forall_
-    exact a1
-  all_goals
-    sorry
 
 
 def Var.lc_at
@@ -497,7 +494,7 @@ lemma Formula.lc_at_succ
     exact phi_ih (k + 1) h1
 
 
-lemma LCSuccImpLCOpenVar
+lemma LCAtSuccImpLCAtOpenVar
   (v : String)
   (k : ℕ)
   (x : Var)
@@ -520,7 +517,7 @@ lemma LCSuccImpLCOpenVar
       exact Nat.lt_succ.mp h1
 
 
-lemma LCOpenVarImpLCSucc
+lemma LCAtOpenVarImpLCAtSucc
   (v : String)
   (k : ℕ)
   (x : Var)
@@ -544,12 +541,12 @@ lemma LCOpenVarImpLCSucc
       · simp
 
 
-lemma LCForallImpLCOpenFormula
+lemma LCAtForallImpLCAtOpenFormula
   (F : Formula)
-  (u : String)
+  (y : String)
   (v : String)
   (k : ℕ)
-  (h1 : Formula.lc_at k (forall_ u F)) :
+  (h1 : Formula.lc_at k (forall_ y F)) :
   Formula.lc_at k (openFormulaAux k v F) :=
   by
   induction F generalizing k
@@ -561,7 +558,7 @@ lemma LCForallImpLCOpenFormula
     simp
     intro x a1
     specialize h1 x a1
-    exact LCSuccImpLCOpenVar v k x h1
+    exact LCAtSuccImpLCAtOpenVar v k x h1
   case true_ =>
     simp only [openFormulaAux]
     simp only [Formula.lc_at]
@@ -596,13 +593,13 @@ lemma LCForallImpLCOpenFormula
     exact phi_ih (k + 1) h1
 
 
-lemma LCOpenFormulaImpLCForall
+lemma LCAtOpenFormulaImpLCAtForall
   (F : Formula)
-  (u : String)
+  (y : String)
   (v : String)
   (k : ℕ)
   (h1 : Formula.lc_at k (openFormulaAux k v F)) :
-  Formula.lc_at k (forall_ u F) :=
+  Formula.lc_at k (forall_ y F) :=
   by
   induction F generalizing k
   case pred_const_ X xs | pred_var_ X xs =>
@@ -613,7 +610,7 @@ lemma LCOpenFormulaImpLCForall
     simp only [Formula.lc_at]
     intro x a1
     specialize h1 x a1
-    exact LCOpenVarImpLCSucc v k x h1
+    exact LCAtOpenVarImpLCAtSucc v k x h1
   case true_ =>
     simp only [Formula.lc_at]
   case not_ phi phi_ih =>
@@ -645,6 +642,86 @@ lemma LCOpenFormulaImpLCForall
 
     simp only [Formula.lc_at]
     exact phi_ih (k + 1) h1
+
+
+lemma LCPrimeForallImpLCPrimeOpenFormula
+  (F : Formula)
+  (y : String)
+  (h1 : lc' (forall_ y F)) :
+  ∃ (v : String), lc' (openFormula v F) :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    cases h1
+    case _ v a1 =>
+      exact Exists.intro v a1
+  case forall_ x phi phi_ih =>
+    cases h1
+    case _ v a1 =>
+      exact Exists.intro v a1
+  all_goals
+    sorry
+
+lemma LCPrimeOpenFormulaImpLCPrimeForall
+  (F : Formula)
+  (y : String)
+  (h1 : ∃ (v : String), lc' (openFormula v F)) :
+  lc' (forall_ y F) :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    apply Exists.elim h1
+    intro a a1
+    apply lc'.forall_ _ _ a
+    exact a1
+  case forall_ x phi phi_ih =>
+    apply Exists.elim h1
+    intro a a1
+    apply lc'.forall_ _ _ a
+    exact a1
+
+  all_goals
+    sorry
+
+
+lemma LCForallImpLCOpenFormula
+  (F : Formula)
+  (y : String)
+  (h1 : Formula.lc (forall_ y F)) :
+  ∃ (L : Finset String), ∀ (v : String), v ∉ L → Formula.lc (openFormula v F) :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    cases h1
+    case _ L c1 =>
+    apply Exists.intro L
+    exact c1
+  case forall_ x phi phi_ih =>
+    cases h1
+    case _ L c1 =>
+      apply Exists.intro L
+      exact c1
+  all_goals
+    sorry
+
+lemma LCOpenFormulaImpLCForall
+  (F : Formula)
+  (y : String)
+  (h1 : ∃ (L : Finset String), ∀ (v : String), v ∉ L → Formula.lc (openFormula v F)) :
+  Formula.lc (forall_ y F) :=
+  by
+  apply Exists.elim h1
+  intro L a1
+  clear h1
+  induction F
+  case pred_const_ X xs =>
+    apply lc.forall_
+    exact a1
+  case forall_ x phi phi_ih =>
+    apply lc.forall_
+    exact a1
+  all_goals
+    sorry
 
 
 example
@@ -682,7 +759,7 @@ example
     obtain s1 := Infinite.exists_not_mem_finset L
     apply Exists.elim s1
     intro v a1
-    apply LCOpenFormulaImpLCForall
+    apply LCAtOpenFormulaImpLCAtForall
     apply ih_2 v a1
 
 
@@ -707,7 +784,7 @@ example
   case forall_ x phi phi_ih =>
     apply lc.forall_ x phi
     intro v a1
-    obtain s1 := LCForallImpLCOpenFormula phi x v 0 h1
+    obtain s1 := LCAtForallImpLCAtOpenFormula phi x v 0 h1
     unfold openFormula
     sorry
     sorry
@@ -716,82 +793,7 @@ example
     sorry
 
 
--- added
-
-inductive Formula.lc' : Formula → Prop
-  | pred_const_
-    (X : String)
-    (xs : List Var) :
-    (∀ (x : Var), x ∈ xs → x.isFree) →
-    lc' (pred_const_ X xs)
-
-  | pred_var_
-    (X : String)
-    (xs : List Var) :
-    (∀ (x : Var), x ∈ xs → x.isFree) →
-    lc' (pred_var_ X xs)
-
-  | true_ :
-    lc' true_
-
-  | not_
-    (phi : Formula) :
-    lc' phi →
-    lc' (not_ phi)
-
-  | imp_
-    (phi psi : Formula) :
-    lc' phi →
-    lc' psi →
-    lc' (imp_ phi psi)
-
-  | forall_
-    (x : String)
-    (phi : Formula)
-    (v : String) :
-    lc' (openFormula v phi) →
-    lc' (forall_ x phi)
-
-lemma blah
-  (F : Formula)
-  (u : String)
-  (h1 : lc' (forall_ u F)) :
-  ∃ (v : String), lc' (openFormula v F) :=
-  by
-  induction F
-  case pred_const_ X xs =>
-    cases h1
-    case _ v a1 =>
-      exact Exists.intro v a1
-  case forall_ x phi phi_ih =>
-    cases h1
-    case _ v a1 =>
-      exact Exists.intro v a1
-  all_goals
-    sorry
-
-lemma blah'
-  (F : Formula)
-  (u : String)
-  (h1 : ∃ (v : String), lc' (openFormula v F)) :
-  lc' (forall_ u F) :=
-  by
-  induction F
-  case pred_const_ X xs =>
-    apply Exists.elim h1
-    intro a a1
-    apply lc'.forall_ _ _ a
-    exact a1
-  case forall_ x phi phi_ih =>
-    apply Exists.elim h1
-    intro a a1
-    apply lc'.forall_ _ _ a
-    exact a1
-
-  all_goals
-    sorry
-
-lemma meh
+lemma LCAtOpenFormulaImpLCPrimeForall
   (F : Formula)
   (u : String)
   (v : String)
@@ -835,12 +837,9 @@ example
       simp only [Var.lc_at] at h1
       contradiction
   case forall_ x phi phi_ih =>
-    obtain s1 := LCForallImpLCOpenFormula phi x Inhabited.default 0 h1
-    obtain s2 := meh phi x
-    obtain s3 := blah' phi x
-    obtain s4 := blah phi x
-    apply s2 default
-    apply LCForallImpLCOpenFormula
+    obtain s1 := LCAtOpenFormulaImpLCPrimeForall phi x
+    apply s1 default
+    apply LCAtForallImpLCAtOpenFormula
     apply h1
 
   all_goals
@@ -862,7 +861,7 @@ example
       specialize ih_1 (B n) a1
       simp only [isFree] at ih_1
   case forall_ x phi v ih_1 ih_2 =>
-    apply LCOpenFormulaImpLCForall
+    apply LCAtOpenFormulaImpLCAtForall
     unfold openFormula at ih_2
     exact ih_2
 
