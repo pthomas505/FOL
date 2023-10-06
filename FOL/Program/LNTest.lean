@@ -703,9 +703,11 @@ example
       simp only [Var.lc_at] at h1
       contradiction
   case forall_ x phi phi_ih =>
-    unfold Formula.lc_at at h1
     apply lc.forall_ x phi
     intro v a1
+    obtain s1 := LCForallImpLCOpenFormula phi x v 0 h1
+    unfold openFormula
+    
     sorry
     sorry
 
