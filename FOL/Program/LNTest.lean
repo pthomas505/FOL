@@ -146,7 +146,7 @@ def openFormulaAux
   | forall_ x phi => forall_ x (openFormulaAux (k + 1) v phi)
 
 /--
-  openFormula v F := Replaces each of the bound variables in the formula F that indexes one more than the outermost binder by a free variable named v.
+  openFormula v F := Each of the bound variables in the formula F that indexes one more than the outermost binder is replaced by a free variable named v.
 -/
 def openFormula
   (v : String)
@@ -815,6 +815,10 @@ lemma LCAtOpenFormulaImpLCPrimeForall
       specialize h1 (B n) a1
       simp only [Var.lc_at] at h1
       simp at h1
+  case forall_ x phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+    sorry
+
   all_goals
     sorry
 
