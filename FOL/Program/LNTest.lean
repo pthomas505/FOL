@@ -289,6 +289,91 @@ instance (k : ℕ) (F : Formula) : Decidable (Formula.lc_at k F) :=
 #eval Formula.lc_at 0 (forall_ "x" (pred_const_ "X" [B 1]))
 
 
+def Formula.body (F : Formula) : Prop :=
+  ∃ (L : Finset String), ∀ (v : String), v ∉ L → Formula.lc (openFormula v F)
+
+
+lemma BodyImpLCForall
+  (F : Formula)
+  (y : String)
+  (h1 : Formula.body F) :
+  Formula.lc (forall_ y F) :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    simp only [body] at h1
+    apply Exists.elim h1
+    intro L a1
+
+    apply Formula.lc.forall_
+    exact a1
+  case forall_ x phi phi_ih =>
+    simp only [body] at h1
+    apply Exists.elim h1
+    intro L a1
+
+    apply Formula.lc.forall_
+    exact a1
+  all_goals
+    sorry
+
+
+lemma LCForallImpBody
+  (F : Formula)
+  (y : String)
+  (h1 : Formula.lc (forall_ y F)) :
+  Formula.body F :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    cases h1
+    case _ L a1 =>
+      simp only [body]
+      apply Exists.intro L
+      exact a1
+  case forall_ x phi phi_ih =>
+    cases h1
+    case _ L a1 =>
+      simp only [body]
+      apply Exists.intro L
+      exact a1
+  all_goals
+    sorry
+
+
+lemma LCForallIffBody
+  (F : Formula)
+  (y : String) :
+  Formula.body F ↔ Formula.lc (forall_ y F) :=
+  by
+  constructor
+  · apply BodyImpLCForall
+  · apply LCForallImpBody
+
+
+lemma OpenFormulaLC
+  (F : Formula)
+  (v : String)
+  (h1 : Formula.body F) :
+  Formula.lc (openFormula v F) :=
+  by
+  induction F
+  case pred_const_ X xs =>
+    simp only [body] at h1
+    apply Exists.elim h1
+    intro L a1
+    apply a1
+    sorry
+  case forall_ x phi phi_ih =>
+    simp only [body] at h1
+    apply Exists.elim h1
+    intro L a1
+    apply a1
+    sorry
+  all_goals
+    sorry
+
+
 lemma CloseVarOpenVarComp
   (x : Var)
   (v : String)
@@ -757,7 +842,7 @@ lemma LCAtOpenFormulaImpLCAtForall
     simp only [Formula.lc_at]
     exact phi_ih (k + 1) h1
 
-
+/-
 lemma LCPrimeForallImpLCPrimeOpenFormula
   (F : Formula)
   (y : String)
@@ -836,7 +921,7 @@ lemma LCOpenFormulaImpLCForall
     exact a1
   all_goals
     sorry
-
+-/
 
 example
   (F : Formula)
