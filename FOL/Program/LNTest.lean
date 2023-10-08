@@ -396,6 +396,7 @@ example
     congr
     exact phi_ih (k + 1) h1
 
+
 -- 3.2 OPEN_CLOSE_VAR
 example
   (F : Formula)
@@ -438,6 +439,44 @@ example
     simp only [openFormulaAux]
     congr
     exact phi_ih (k + 1) h1
+
+
+lemma OpenVarLeftInvOn
+  (v : String)
+  (k : ℕ) :
+  Set.LeftInvOn (closeVar k v) (openVar k v) {x | v ∉ x.freeVarSet} :=
+  by
+  simp only [Set.LeftInvOn]
+  simp
+  intro x a1
+  exact CloseVarOpenVarComp x v k a1
+
+lemma CloseVarLeftInvOn
+  (v : String)
+  (k : ℕ) :
+  Set.LeftInvOn (openVar k v) (closeVar k v) {x | Var.lc_at k x} :=
+  by
+  simp only [Set.LeftInvOn]
+  simp
+  intro x a1
+  exact OpenVarCloseVarComp x v k a1
+
+
+lemma OpenVarInjOn
+  (v : String)
+  (k : ℕ) :
+  Set.InjOn (openVar k v) {x | v ∉ x.freeVarSet} :=
+  by
+  apply Set.LeftInvOn.injOn
+  apply OpenVarLeftInvOn
+
+lemma CloseVarInjOn
+  (v : String)
+  (k : ℕ) :
+  Set.InjOn (closeVar k v) {x | Var.lc_at k x} :=
+  by
+  apply Set.LeftInvOn.injOn
+  apply CloseVarLeftInvOn
 
 
 lemma Var.lc_at_succ
