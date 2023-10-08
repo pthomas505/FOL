@@ -520,6 +520,23 @@ lemma CloseFormulaLeftInvOn
   exact a1
 
 
+lemma OpenFormulaInjOn
+  (v : String)
+  (k : ℕ) :
+  Set.InjOn (openFormulaAux k v) {F | v ∉ F.freeVarSet} :=
+  by
+  apply Set.LeftInvOn.injOn
+  apply OpenFormulaLeftInvOn
+
+lemma CloseFormulaInjOn
+  (v : String)
+  (k : ℕ) :
+  Set.InjOn (closeFormulaAux k v) {F | Formula.lc_at k F} :=
+  by
+  apply Set.LeftInvOn.injOn
+  apply CloseFormulaLeftInvOn
+
+
 lemma Var.lc_at_succ
   (x : Var)
   (k : ℕ)
