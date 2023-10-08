@@ -537,6 +537,23 @@ lemma CloseFormulaInjOn
   apply CloseFormulaLeftInvOn
 
 
+example
+  (F G : Formula)
+  (v : String)
+  (k : ℕ)
+  (h1 : v ∉ F.freeVarSet)
+  (h2 : v ∉ G.freeVarSet)
+  (h3 : openFormulaAux k v F = openFormulaAux k v G) :
+  F = G :=
+  by
+  apply OpenFormulaInjOn
+  · simp
+    exact h1
+  · simp
+    exact h2
+  · exact h3
+
+
 lemma Var.lc_at_succ
   (x : Var)
   (k : ℕ)
