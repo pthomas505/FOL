@@ -348,19 +348,19 @@ lemma OpenVarCloseVarComp
       rfl
 
 
--- 3.2 CLOSE_OPEN_VAR
-example
+lemma CloseFormulaOpenFormulaComp
   (F : Formula)
   (k : ℕ)
   (v : String)
   (h1 : v ∉ F.freeVarSet) :
-  closeFormulaAux k v (openFormulaAux k v F) = F :=
+  (closeFormulaAux k v ∘ openFormulaAux k v) F = F :=
   by
   induction F generalizing k
   case pred_const_ X xs | pred_var_ X xs =>
     unfold Formula.freeVarSet at h1
     simp at h1
 
+    simp
     unfold openFormulaAux
     unfold closeFormulaAux
     simp
@@ -373,6 +373,9 @@ example
   case not_ phi phi_ih =>
     unfold Formula.freeVarSet at h1
 
+    simp at phi_ih
+
+    simp
     unfold openFormulaAux
     unfold closeFormulaAux
     simp only [phi_ih k h1]
@@ -381,6 +384,9 @@ example
     simp at h1
     push_neg at h1
 
+    simp at phi_ih
+
+    simp
     unfold openFormulaAux
     unfold closeFormulaAux
     cases h1
@@ -391,24 +397,27 @@ example
   case forall_ x phi phi_ih =>
     unfold Formula.freeVarSet at h1
 
+    simp at phi_ih
+
+    simp
     unfold openFormulaAux
     unfold closeFormulaAux
     congr
     exact phi_ih (k + 1) h1
 
 
--- 3.2 OPEN_CLOSE_VAR
-example
+lemma OpenFormulaCloseFormulaComp
   (F : Formula)
   (k : ℕ)
   (v : String)
   (h1 : Formula.lc_at k F) :
-  openFormulaAux k v (closeFormulaAux k v F) = F :=
+  (openFormulaAux k v ∘ closeFormulaAux k v) F = F :=
   by
   induction F generalizing k
   case pred_const_ X xs | pred_var_ X xs =>
     unfold Formula.lc_at at h1
 
+    simp
     unfold closeFormulaAux
     unfold openFormulaAux
     simp
@@ -421,12 +430,18 @@ example
   case not_ phi phi_ih =>
     unfold Formula.lc_at at h1
 
+    simp at phi_ih
+
+    simp
     unfold closeFormulaAux
     unfold openFormulaAux
     simp only [phi_ih k h1]
   case imp_ phi psi phi_ih psi_ih =>
     unfold Formula.lc_at at h1
 
+    simp at phi_ih
+
+    simp
     unfold closeFormulaAux
     unfold openFormulaAux
     cases h1
@@ -435,6 +450,9 @@ example
       · exact phi_ih k h1_left
       · exact psi_ih k h1_right
   case forall_ x phi phi_ih =>
+    simp at phi_ih
+
+    simp
     simp only [closeFormulaAux]
     simp only [openFormulaAux]
     congr
@@ -477,6 +495,29 @@ lemma CloseVarInjOn
   by
   apply Set.LeftInvOn.injOn
   apply CloseVarLeftInvOn
+
+
+lemma OpenFormulaLeftInvOn
+  (v : String)
+  (k : ℕ) :
+  Set.LeftInvOn (closeFormulaAux k v) (openFormulaAux k v) {F | v ∉ F.freeVarSet} :=
+  by
+  simp only [Set.LeftInvOn]
+  simp
+  intro F a1
+  apply CloseFormulaOpenFormulaComp
+  exact a1
+
+lemma CloseFormulaLeftInvOn
+  (v : String)
+  (k : ℕ) :
+  Set.LeftInvOn (openFormulaAux k v) (closeFormulaAux k v) {F | Formula.lc_at k F} :=
+  by
+  simp only [Set.LeftInvOn]
+  simp
+  intro F a1
+  apply OpenFormulaCloseFormulaComp
+  exact a1
 
 
 lemma Var.lc_at_succ
