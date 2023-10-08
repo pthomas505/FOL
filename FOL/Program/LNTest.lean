@@ -952,7 +952,7 @@ example
   F.lc_at 0 :=
   by
   induction h1
-  case pred_const_ X xs ih_1 =>
+  case pred_const_ X xs ih_1 | pred_var_ X xs ih_1 =>
     unfold Formula.lc_at
     intro x a1
     cases x
@@ -961,13 +961,20 @@ example
     case B n =>
       specialize ih_1 (B n) a1
       simp only [isFree] at ih_1
-  case forall_ x phi v ih_1 ih_2 =>
+  case true_ =>
+    simp only [Formula.lc_at]
+  case not_ phi phi_ih ih =>
+    simp only [Formula.lc_at]
+    exact ih
+  case imp_ phi psi phi_ih psi_ih ih_1 ih_2 =>
+    simp only [Formula.lc_at]
+    constructor
+    · exact ih_1
+    · exact ih_2
+  case forall_ x phi v _ ih_2 =>
     apply LCAtOpenFormulaImpLCAtForall
     unfold openFormula at ih_2
     exact ih_2
-
-  all_goals
-    sorry
 
 end LN
 
