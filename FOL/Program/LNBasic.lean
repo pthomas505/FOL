@@ -541,6 +541,29 @@ lemma OpenVarFreeVar
       simp
 
 
+lemma CloseVarFreeVar
+  (v : Var)
+  (x : String)
+  (k : ℕ) :
+  (closeVar k x v).freeVarSet ⊆ v.freeVarSet \ {x} :=
+  by
+  cases v
+  case F a =>
+    simp only [closeVar]
+    split
+    case _ c1 =>
+      simp only [Var.freeVarSet]
+      simp
+    case _ c1 =>
+      simp only [Var.freeVarSet]
+      simp
+      exact ne_comm.mp c1
+  case B n =>
+    simp only [closeVar]
+    simp only [Var.freeVarSet]
+    simp
+
+
 lemma Var.lc_at_succ
   (v : Var)
   (k : ℕ)
