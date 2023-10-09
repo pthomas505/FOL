@@ -519,6 +519,28 @@ lemma LCForallIffBody
   · apply LCForallImpBody
 
 
+lemma OpenVarFreeVar
+  (v : Var)
+  (x : String)
+  (k : ℕ) :
+  (openVar k x v).freeVarSet ⊆ v.freeVarSet ∪ {x} :=
+  by
+  cases v
+  case F a =>
+    simp only [openVar]
+    simp only [Var.freeVarSet]
+    simp
+  case B n =>
+    simp only [openVar]
+    split
+    case _ c1 =>
+      simp only [Var.freeVarSet]
+      simp
+    case _ c1 =>
+      simp only [Var.freeVarSet]
+      simp
+
+
 lemma Var.lc_at_succ
   (v : Var)
   (k : ℕ)
