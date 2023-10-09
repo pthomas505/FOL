@@ -279,31 +279,6 @@ lemma LCForallIffBody
   · apply LCForallImpBody
 
 
-lemma OpenFormulaLC
-  (F : Formula)
-  (x : String)
-  (h1 : Formula.body F) :
-  Formula.lc (openFormula x F) :=
-  by
-  induction F
-  case pred_ X xs =>
-    simp only [body] at h1
-
-    apply Exists.elim h1
-    intro L a1
-    apply a1
-    sorry
-  case forall_ phi phi_ih =>
-    simp only [body] at h1
-
-    apply Exists.elim h1
-    intro L a1
-    apply a1
-    sorry
-  all_goals
-    sorry
-
-
 lemma CloseVarOpenVarComp
   (v : Var)
   (x : String)
