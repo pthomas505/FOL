@@ -224,61 +224,6 @@ def Formula.body (F : Formula) : Prop :=
   ∃ (L : Finset String), ∀ (x : String), x ∉ L → Formula.lc (openFormula x F)
 
 
-lemma BodyImpLCForall
-  (F : Formula)
-  (h1 : Formula.body F) :
-  Formula.lc (forall_ F) :=
-  by
-  induction F
-  case pred_ X xs =>
-    simp only [body] at h1
-
-    apply Exists.elim h1
-    intro L a1
-    apply Formula.lc.forall_
-    exact a1
-  case forall_ phi phi_ih =>
-    simp only [body] at h1
-
-    apply Exists.elim h1
-    intro L a1
-    apply Formula.lc.forall_
-    exact a1
-  all_goals
-    sorry
-
-
-lemma LCForallImpBody
-  (F : Formula)
-  (h1 : Formula.lc (forall_ F)) :
-  Formula.body F :=
-  by
-  induction F
-  case pred_ X xs =>
-    cases h1
-    case _ L a1 =>
-      simp only [body]
-      apply Exists.intro L
-      exact a1
-  case forall_ phi phi_ih =>
-    cases h1
-    case _ L a1 =>
-      simp only [body]
-      apply Exists.intro L
-      exact a1
-  all_goals
-    sorry
-
-
-lemma LCForallIffBody
-  (F : Formula) :
-  Formula.body F ↔ Formula.lc (forall_ F) :=
-  by
-  constructor
-  · apply BodyImpLCForall
-  · apply LCForallImpBody
-
-
 lemma CloseVarOpenVarComp
   (v : Var)
   (x : String)
@@ -538,6 +483,40 @@ example
   · simp
     exact h2
   · exact h3
+
+
+lemma BodyImpLCForall
+  (F : Formula)
+  (h1 : Formula.body F) :
+  Formula.lc (forall_ F) :=
+  by
+    simp only [body] at h1
+    apply Exists.elim h1
+    intro L a1
+
+    apply Formula.lc.forall_
+    exact a1
+
+
+lemma LCForallImpBody
+  (F : Formula)
+  (h1 : Formula.lc (forall_ F)) :
+  Formula.body F :=
+  by
+    cases h1
+    case _ L a1 =>
+      simp only [body]
+      apply Exists.intro L
+      exact a1
+
+
+lemma LCForallIffBody
+  (F : Formula) :
+  Formula.body F ↔ Formula.lc (forall_ F) :=
+  by
+  constructor
+  · apply BodyImpLCForall
+  · apply LCForallImpBody
 
 
 lemma Var.lc_at_succ
