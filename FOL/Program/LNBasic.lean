@@ -224,6 +224,10 @@ def Formula.body (F : Formula) : Prop :=
   ∃ (L : Finset String), ∀ (x : String), x ∉ L → Formula.lc (openFormula x F)
 
 
+def Formula.closed (F : Formula) : Prop :=
+  F.freeVarSet = ∅
+
+
 lemma CloseVarOpenVarComp
   (v : Var)
   (x : String)
