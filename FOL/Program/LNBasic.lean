@@ -598,6 +598,41 @@ lemma OpenFormulaFreeVar
     apply phi_ih
 
 
+lemma CloseFormulaFreeVar
+  (F : Formula)
+  (x : String)
+  (k : ℕ) :
+  (closeFormulaAux k x F).freeVarSet ⊆ F.freeVarSet \ {x} :=
+  by
+  induction F generalizing k
+  case pred_ X xs =>
+    simp only [closeFormulaAux]
+    simp only [Formula.freeVarSet]
+    simp
+    intro v a1
+    trans (v.freeVarSet \ {x})
+    · exact CloseVarFreeVar v x k
+    · apply Finset.sdiff_subset_sdiff
+      · apply Finset.subset_biUnion_of_mem
+        simp
+        exact a1
+      · simp
+  case not_ phi phi_ih =>
+    simp only [closeFormulaAux]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    specialize phi_ih k
+    specialize psi_ih k
+    simp only [closeFormulaAux]
+    simp only [Formula.freeVarSet]
+    sorry
+  case forall_ phi phi_ih =>
+    simp only [closeFormulaAux]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+
+
 lemma Var.lc_at_succ
   (v : Var)
   (k : ℕ)
