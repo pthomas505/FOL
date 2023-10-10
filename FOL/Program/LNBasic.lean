@@ -648,6 +648,56 @@ lemma CloseFormulaFreeVar
     apply phi_ih
 
 
+lemma SubOpenVar
+  (v : Var)
+  (σ : String → String)
+  (x : String)
+  (k : ℕ)
+  (h1 : σ x = x) :
+  Var.sub σ (openVar k x v) = openVar k x (Var.sub σ v) :=
+  by
+  cases v
+  case F a =>
+    simp only [openVar]
+    simp only [Var.sub]
+  case B n =>
+    simp only [openVar]
+    split
+    case _ c1 =>
+      simp only [Var.sub]
+      simp only [if_pos c1]
+      simp
+      exact h1
+    case _ c1 =>
+      simp only [Var.sub]
+      simp only [if_neg c1]
+
+
+lemma SubCloseVar
+  (v : Var)
+  (σ : String → String)
+  (x : String)
+  (k : ℕ)
+  (h1 : σ x = x)
+  (h2 : ∀ (y : String), ¬ x = σ y) :
+  Var.sub σ (closeVar k x v) = closeVar k x (Var.sub σ v) :=
+  by
+  cases v
+  case F a =>
+    simp only [closeVar]
+    by_cases c1 : x = a
+    · subst c1
+      simp only [Var.sub]
+      simp only [h1]
+      simp
+    · simp only [if_neg c1]
+      simp only [Var.sub]
+      simp only [if_neg (h2 a)]
+  case B n =>
+    simp only [closeVar]
+    simp only [Var.sub]
+
+
 lemma Var.lc_at_succ
   (v : Var)
   (k : ℕ)
