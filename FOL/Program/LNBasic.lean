@@ -228,6 +228,17 @@ def Formula.closed (F : Formula) : Prop :=
   F.freeVarSet = ∅
 
 
+def Var.sub (x : String) (v : Var) : Var → Var
+  | F a => if x = a then v else F a
+  | B n => B n
+
+def Formula.sub (x : String) (v : Var) : Formula → Formula
+  | pred_ X xs => pred_ X (xs.map (Var.sub x v))
+  | not_ phi => not_ (phi.sub x v)
+  | imp_ phi psi => imp_ (phi.sub x v) (psi.sub x v)
+  | forall_ phi => forall_ (phi.sub x v)
+
+
 lemma CloseVarOpenVarComp
   (v : Var)
   (x : String)
