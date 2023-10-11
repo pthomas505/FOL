@@ -244,32 +244,27 @@ structure Interpretation (D : Type) : Type :=
   (nonempty : Nonempty D)
   (pred_ : String → (List D → Prop))
 
-structure VarAssignment (D : Type) : Type :=
-  (F : String → D)
-  (B : List D)
+def VarAssignment (D : Type) : Type := Var → D
 
-def VarUpdate
+def shift
   (D : Type)
-  (V : VarAssignment D) :
-  Var → Option D
-  | F x => Option.some (V.F x)
-  | B n => V.B.get? n
+  (V : VarAssignment D)
+  (d : D) :
+  VarAssignment D
+  | F x => V (F x)
+  | B 0 => d
+  | B (n + 1) => V (B n)
 
 def Holds
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D) : Formula → Prop
-  | pred_ X xs =>
-      let xs' := List.allSome (xs.map (VarUpdate D V))
-      if h : Option.isSome xs'
-      then I.pred_ X (Option.get xs' h)
-      else False
+  (V : VarAssignment D) :
+  Formula → Prop
+  | pred_ X xs => I.pred_ X (xs.map V)
   | not_ phi => ¬ Holds D I V phi
   | imp_ phi psi => Holds D I V phi → Holds D I V psi
   | forall_ phi =>
-      ∀ d : D, Holds D I {
-        F := V.F
-        B := d :: V.B } phi
+      ∀ d : D, Holds D I (shift D V d) phi
 
 
 lemma CloseVarOpenVarComp
@@ -1150,7 +1145,7 @@ theorem HoldsIffSubHolds
   (F : Formula)
   (σ : String → String)
   (k : ℕ) :
-  Holds D I V F ↔ Holds D I V' (sub σ F) :=
+  Holds D I V F ↔ Holds D I V (sub σ F) :=
   by
   induction F
   case pred_ X xs =>
@@ -1158,7 +1153,6 @@ theorem HoldsIffSubHolds
     simp only [Holds]
     simp
     congr! 1
-    sorry
     sorry
   all_goals
     sorry
