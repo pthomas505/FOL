@@ -241,7 +241,7 @@ def Formula.sub (σ : String → String) : Formula → Formula
 
 
 structure Interpretation (D : Type) : Type :=
-  (nonempty : Nonempty D)
+  (nonempty_ : Nonempty D)
   (pred_ : String → (List D → Prop))
 
 def VarAssignment (D : Type) : Type := Var → D
