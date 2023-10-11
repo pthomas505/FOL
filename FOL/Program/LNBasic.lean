@@ -244,26 +244,32 @@ structure Interpretation (D : Type) : Type :=
   (nonempty : Nonempty D)
   (pred_ : String → (List D → Prop))
 
-def VarAssignment (D : Type) : Type := Var → D
+structure VarAssignment (D : Type) : Type :=
+  (F : String → D)
+  (B : List D)
 
-def HoldsAux
-  (k : ℕ)
+def VarUpdate
   (D : Type)
-  (I : Interpretation D)
-  (V : VarAssignment D) : Formula → Prop
-  | pred_ X xs => I.pred_ X (xs.map V)
-  | not_ phi => ¬ HoldsAux k D I V phi
-  | imp_ phi psi => HoldsAux k D I V phi → HoldsAux k D I V psi
-  | forall_ phi =>
-      ∀ d : D, HoldsAux (k + 1) D I (Function.updateIte V (B k) d) phi
+  (V : VarAssignment D) :
+  Var → Option D
+  | F x => Option.some (V.F x)
+  | B n => V.B.get? n
 
 def Holds
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D)
-  (F : Formula) :
-  Prop :=
-  HoldsAux 0 D I V F
+  (V : VarAssignment D) : Formula → Prop
+  | pred_ X xs =>
+      let xs' := List.allSome (xs.map (VarUpdate D V))
+      if h : Option.isSome xs'
+      then I.pred_ X (Option.get xs' h)
+      else False
+  | not_ phi => ¬ Holds D I V phi
+  | imp_ phi psi => Holds D I V phi → Holds D I V psi
+  | forall_ phi =>
+      ∀ d : D, Holds D I {
+        F := V.F
+        B := d :: V.B } phi
 
 
 lemma CloseVarOpenVarComp
@@ -1135,3 +1141,24 @@ example
     simp only [openFormula] at ih_2
 
     apply LCAtOpenFormulaImpLCAtForall phi x 0 ih_2
+
+
+theorem HoldsIffSubHolds
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : VarAssignment D)
+  (F : Formula)
+  (σ : String → String)
+  (k : ℕ) :
+  Holds D I V F ↔ Holds D I V' (sub σ F) :=
+  by
+  induction F
+  case pred_ X xs =>
+    simp only [Formula.sub]
+    simp only [Holds]
+    simp
+    congr! 1
+    sorry
+    sorry
+  all_goals
+    sorry
