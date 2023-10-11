@@ -698,6 +698,40 @@ lemma SubCloseVar
     simp only [Var.sub]
 
 
+lemma SubOpenFormula
+  (F : Formula)
+  (σ : String → String)
+  (x : String)
+  (k : ℕ)
+  (h1 : σ x = x) :
+  Formula.sub σ (openFormulaAux k x F) = openFormulaAux k x (Formula.sub σ F) :=
+  by
+  induction F generalizing k
+  case pred_ X xs =>
+    simp only [openFormulaAux]
+    simp only [Formula.sub]
+    simp
+    simp only [List.map_eq_map_iff]
+    intro v _
+    exact SubOpenVar v σ x k h1
+  case not_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Formula.sub]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [openFormulaAux]
+    simp only [Formula.sub]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Formula.sub]
+    congr! 1
+    apply phi_ih
+
+
 lemma Var.lc_at_succ
   (v : Var)
   (k : ℕ)
