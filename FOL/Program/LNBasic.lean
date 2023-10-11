@@ -138,6 +138,10 @@ def Var.isFree : Var → Prop
   | F _ => True
   | B _ => False
 
+def Var.isBound : Var → Prop
+  | F _ => False
+  | B _ => True
+
 
 inductive Formula.lc' : Formula → Prop
   | pred_
@@ -1144,8 +1148,10 @@ theorem HoldsIffSubHolds
   (V V' : VarAssignment D)
   (F : Formula)
   (σ : String → String)
-  (k : ℕ) :
-  Holds D I V F ↔ Holds D I V (sub σ F) :=
+  (h1 : ∀ v : Var, (v.isBound ∨ (Var.sub σ v).isFree) → V v = V' (Var.sub σ v))
+  (h2 : ∀ v : Var, v.isBound → v = Var.sub σ v)
+  (h3 : ∀ v : Var, v.isFree → Var.sub σ v = Var.sub σ v) :
+  Holds D I V F ↔ Holds D I V' (sub σ F) :=
   by
   induction F
   case pred_ X xs =>
@@ -1153,6 +1159,17 @@ theorem HoldsIffSubHolds
     simp only [Holds]
     simp
     congr! 1
-    sorry
+    simp only [List.map_eq_map_iff]
+    intro v a1
+    simp
+    apply h1
+    cases v
+    case _ a =>
+      right
+      simp only [Var.sub]
+      simp only [Var.isFree]
+    case _ n =>
+      left
+      simp only [isBound]
   all_goals
     sorry
