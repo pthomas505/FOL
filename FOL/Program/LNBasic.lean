@@ -4,6 +4,7 @@ import Std.Data.HashMap.Basic
 import Mathlib.Data.String.Lemmas
 import Mathlib.Util.CompileInductive
 
+import FOL.FunctionUpdateIte
 import FOL.List
 import FOL.Tactics
 
@@ -237,6 +238,32 @@ def Formula.sub (σ : String → String) : Formula → Formula
   | not_ phi => not_ (phi.sub σ)
   | imp_ phi psi => imp_ (phi.sub σ) (psi.sub σ)
   | forall_ phi => forall_ (phi.sub σ)
+
+
+structure Interpretation (D : Type) : Type :=
+  (nonempty : Nonempty D)
+  (pred_ : String → (List D → Prop))
+
+def VarAssignment (D : Type) : Type := Var → D
+
+def HoldsAux
+  (k : ℕ)
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D) : Formula → Prop
+  | pred_ X xs => I.pred_ X (xs.map V)
+  | not_ phi => ¬ HoldsAux k D I V phi
+  | imp_ phi psi => HoldsAux k D I V phi → HoldsAux k D I V psi
+  | forall_ phi =>
+      ∀ d : D, HoldsAux (k + 1) D I (Function.updateIte V (B k) d) phi
+
+def Holds
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (F : Formula) :
+  Prop :=
+  HoldsAux 0 D I V F
 
 
 lemma CloseVarOpenVarComp
