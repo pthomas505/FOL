@@ -1327,10 +1327,11 @@ theorem extracted_1
   (x : String)
   (V : VarAssignment D)
   (k : ℕ)
-  (d : D)
-  (v : Var) :
-  shift D (V ∘ openVar k x) d v = shift D V d (openVar (k + 1) x v) :=
+  (d : D) :
+  shift D (V ∘ openVar k x) d = shift D V d ∘ openVar (k + 1) x :=
   by
+  funext v
+  simp
   cases v
   case _ a =>
     simp only [openVar]
@@ -1375,8 +1376,6 @@ example
     intro d
     simp only [<- phi_ih]
     congr! 1
-    funext v
-    simp
     apply extracted_1
   all_goals
     sorry
