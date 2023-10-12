@@ -1373,7 +1373,7 @@ example
     simp only [Holds]
     apply forall_congr'
     intro d
-    rw [<- phi_ih]
+    simp only [<- phi_ih]
     congr! 1
     funext v
     simp
