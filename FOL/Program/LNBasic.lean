@@ -1147,13 +1147,12 @@ theorem HoldsIffSubHoldsAux
   (I : Interpretation D)
   (V V' : VarAssignment D)
   (F : Formula)
-  (σ σ' : String → String)
+  (σ' : String → String)
   (h1 : ∀ v : Var, (v.isBound ∨ (Var.sub σ' v).isFree) → V v = V' (Var.sub σ' v))
-  (h2 : ∀ (v : Var) (d : D), v.isBound → shift D V d v = shift D V' d (Var.sub σ' v))
-  (h3 : ∀ v : Var, v.isFree → Var.sub σ' v = Var.sub σ v) :
+  (h2 : ∀ (v : Var) (d : D), v.isBound → shift D V d v = shift D V' d (Var.sub σ' v)) :
   Holds D I V F ↔ Holds D I V' (sub σ' F) :=
   by
-  induction F generalizing V V' σ σ'
+  induction F generalizing V V' σ'
   case pred_ X xs =>
     simp only [Formula.sub]
     simp only [Holds]
@@ -1212,7 +1211,6 @@ theorem HoldsIffSubHoldsAux
           simp only [shift] at h2
           simp only [Var.sub] at h2
           apply h2
-    · apply h3
 
   all_goals
     sorry
@@ -1227,7 +1225,7 @@ theorem substitution_fun_theorem
   Holds D I (V ∘ (Var.sub σ)) F ↔
     Holds D I V (sub σ F) :=
   by
-  apply HoldsIffSubHoldsAux D I (V ∘ (Var.sub σ)) V F σ σ
+  apply HoldsIffSubHoldsAux D I (V ∘ (Var.sub σ)) V F σ
   · simp
   · intro v d a1
     cases v
@@ -1242,4 +1240,3 @@ theorem substitution_fun_theorem
         simp only [shift]
         simp only [Var.sub]
         simp
-  · simp
