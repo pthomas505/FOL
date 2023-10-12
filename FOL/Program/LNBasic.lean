@@ -1148,8 +1148,8 @@ theorem HoldsIffSubHoldsAux
   (V V' : VarAssignment D)
   (F : Formula)
   (σ' : String → String)
-  (h1 : ∀ v : Var, (v.isBound ∨ (Var.sub σ' v).isFree) → V v = V' (Var.sub σ' v))
-  (h2 : ∀ (v : Var) (d : D), v.isBound → shift D V d v = shift D V' d (Var.sub σ' v)) :
+  (h1 : ∀ (v : Var), v.isFree → V v = V' (Var.sub σ' v))
+  (h2 : ∀ (v : Var), v.isBound → V v = V' v) :
   Holds D I V F ↔ Holds D I V' (sub σ' F) :=
   by
   induction F generalizing V V'
@@ -1161,21 +1161,19 @@ theorem HoldsIffSubHoldsAux
     simp only [List.map_eq_map_iff]
     intro v a1
     simp
-    apply h1
     cases v
     case _ a =>
-      right
-      simp only [Var.sub]
+      apply h1
       simp only [Var.isFree]
     case _ n =>
-      left
+      apply h2
       simp only [isBound]
   case forall_ phi phi_ih =>
     simp only [Formula.sub]
     simp only [Holds]
     apply forall_congr'
     intro d
-    apply phi_ih
+    apply phi_ih 
     · intro v a1
       specialize h1 v a1
       cases v
@@ -1186,31 +1184,19 @@ theorem HoldsIffSubHoldsAux
         simp only [shift]
         exact h1
       case _ n =>
-        apply h2
-        simp only [isBound]
-    · intro v
+        simp only [isFree] at a1
+    · intro v a1
       cases v
       case _ a =>
-        simp only [isBound]
-        simp
+        simp only [isBound] at a1
       case _ n =>
-        simp only [isBound]
-        simp
-        intro d'
-        simp only [shift]
         cases n
         case zero =>
-          simp
-          simp only [Var.sub]
+          simp only [shift]
         case succ n =>
-          simp
-          simp only [Var.sub]
-          specialize h2 (B n)
-          simp only [isBound] at h2
-          simp at h2
-          simp only [shift] at h2
-          simp only [Var.sub] at h2
+          simp only [shift]
           apply h2
+          simp only [isBound]
 
   all_goals
     sorry
@@ -1227,16 +1213,16 @@ theorem substitution_fun_theorem
   by
   apply HoldsIffSubHoldsAux D I (V ∘ (Var.sub σ)) V F σ
   · simp
-  · intro v d a1
+  · intro v a1
     cases v
     case _ a =>
       simp only [isBound] at a1
     case _ n =>
       cases n
       case zero =>
-        simp only [shift]
+        simp
         simp only [Var.sub]
       case succ n =>
-        simp only [shift]
-        simp only [Var.sub]
         simp
+        simp only [Var.sub]
+
