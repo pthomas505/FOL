@@ -1168,6 +1168,17 @@ theorem HoldsIffSubHoldsAux
     case _ n =>
       apply h2
       simp only [isBound]
+  case not_ phi phi_ih =>
+    simp only [Formula.sub]
+    simp only [Holds]
+    congr! 1
+    exact phi_ih V V' h1 h2
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.sub]
+    simp only [Holds]
+    congr! 1
+    · exact phi_ih V V' h1 h2
+    · exact psi_ih V V' h1 h2
   case forall_ phi phi_ih =>
     simp only [Formula.sub]
     simp only [Holds]
@@ -1197,9 +1208,6 @@ theorem HoldsIffSubHoldsAux
           simp only [shift]
           apply h2
           simp only [isBound]
-
-  all_goals
-    sorry
 
 
 theorem substitution_fun_theorem
