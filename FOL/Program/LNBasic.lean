@@ -1152,7 +1152,7 @@ theorem HoldsIffSubHoldsAux
   (h2 : ∀ (v : Var) (d : D), v.isBound → shift D V d v = shift D V' d (Var.sub σ' v)) :
   Holds D I V F ↔ Holds D I V' (sub σ' F) :=
   by
-  induction F generalizing V V' σ'
+  induction F generalizing V V'
   case pred_ X xs =>
     simp only [Formula.sub]
     simp only [Holds]
