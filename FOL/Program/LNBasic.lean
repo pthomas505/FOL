@@ -1260,75 +1260,14 @@ theorem substitution_fun_theorem
         simp only [Var.sub]
 
 
-example
-  (D : Type)
-  (I : Interpretation D)
-  (V V' : VarAssignment D)
-  (F : Formula)
-  (x : String)
-  (k : Nat)
-  (h1 : ∀ (v : Var), V' v = V (openVar k x v)) :
-  Holds D I V' F ↔
-    Holds D I V (openFormulaAux k x F) :=
-  by
-  induction F generalizing V V' k
-  case pred_ X xs =>
-    simp only [openFormulaAux]
-    simp only [Holds]
-    simp
-    congr! 1
-    simp only [List.map_eq_map_iff]
-    intro v a1
-    apply h1
-  case forall_ phi phi_ih =>
-    simp only [openFormulaAux]
-    simp only [Holds]
-    apply forall_congr'
-    intro d
-    apply phi_ih
-    intro v
-    cases v
-    case _ a =>
-      simp only [openVar]
-      simp only [shift]
-      apply h1
-    case _ n =>
-      simp only [openVar]
-      split
-      case _ c1 =>
-        cases n
-        case zero =>
-          simp at c1
-        case succ n =>
-          simp only [shift]
-          specialize h1 (B n)
-          simp only [openVar] at h1
-          simp at c1
-          subst c1
-          simp at h1
-          exact h1
-      case _ c1 =>
-        cases n
-        case zero =>
-          simp only [shift]
-        case succ n =>
-          simp only [shift]
-          specialize h1 (B n)
-          simp only [openVar] at h1
-          simp at c1
-          simp only [if_neg c1] at h1
-          exact h1
-  all_goals
-    sorry
-
-
 theorem extracted_1
   (D : Type)
   (x : String)
   (V : VarAssignment D)
   (k : ℕ)
   (d : D) :
-  shift D (V ∘ openVar k x) d = shift D V d ∘ openVar (k + 1) x :=
+  shift D (V ∘ openVar k x) d =
+    shift D V d ∘ openVar (k + 1) x :=
   by
   funext v
   simp
@@ -1369,6 +1308,17 @@ example
     simp only [openFormulaAux]
     simp only [Holds]
     simp
+  case not_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
   case forall_ phi phi_ih =>
     simp only [openFormulaAux]
     simp only [Holds]
@@ -1377,5 +1327,3 @@ example
     simp only [<- phi_ih]
     congr! 1
     apply extracted_1
-  all_goals
-    sorry
