@@ -111,6 +111,31 @@ def openFormula
   openFormulaAux 0 x F
 
 
+def Var.instantiate
+  (subst : Array Var)
+  (k : Nat) :
+  Var → Var
+  | F x => F x
+  | B n =>
+    if n < k
+    then B n
+    else
+      let n := n - k
+      if _ : n < subst.size
+      then subst[n]
+      else B (n - subst.size + k)
+
+def Formula.instantiate
+  (subst : Array Var)
+  (k : Nat) :
+  Formula → Formula
+  | pred_ X xs => pred_ X (xs.map (Var.instantiate subst k))
+  | not_ phi => not_ (phi.instantiate subst k)
+  | imp_ phi psi =>
+      imp_ (phi.instantiate subst k) (psi.instantiate subst k)
+  | forall_ phi => forall_ (phi.instantiate subst (k + 1))
+
+
 def closeVar
   (k : ℕ)
   (x : String) :
@@ -1234,3 +1259,124 @@ theorem substitution_fun_theorem
         simp
         simp only [Var.sub]
 
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : VarAssignment D)
+  (F : Formula)
+  (x : String)
+  (k : Nat)
+  (h1 : ∀ (v : Var), V' v = V (openVar k x v)) :
+  Holds D I V' F ↔
+    Holds D I V (openFormulaAux k x F) :=
+  by
+  induction F generalizing V V' k
+  case pred_ X xs =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    simp
+    congr! 1
+    simp only [List.map_eq_map_iff]
+    intro v a1
+    apply h1
+  case forall_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    apply phi_ih
+    intro v
+    cases v
+    case _ a =>
+      simp only [openVar]
+      simp only [shift]
+      apply h1
+    case _ n =>
+      simp only [openVar]
+      split
+      case _ c1 =>
+        cases n
+        case zero =>
+          simp at c1
+        case succ n =>
+          simp only [shift]
+          specialize h1 (B n)
+          simp only [openVar] at h1
+          simp at c1
+          subst c1
+          simp at h1
+          exact h1
+      case _ c1 =>
+        cases n
+        case zero =>
+          simp only [shift]
+        case succ n =>
+          simp only [shift]
+          specialize h1 (B n)
+          simp only [openVar] at h1
+          simp at c1
+          simp only [if_neg c1] at h1
+          exact h1
+  all_goals
+    sorry
+
+
+theorem extracted_1
+  (D : Type)
+  (x : String)
+  (V : VarAssignment D)
+  (k : ℕ)
+  (d : D)
+  (v : Var) :
+  shift D (V ∘ openVar k x) d v = shift D V d (openVar (k + 1) x v) :=
+  by
+  cases v
+  case _ a =>
+    simp only [openVar]
+    simp only [shift]
+    simp
+  case _ n =>
+    cases n
+    case zero =>
+      simp only [openVar]
+      simp only [shift]
+      simp
+    case succ n =>
+      simp only [openVar]
+      simp only [shift]
+      simp
+      split
+      case _ c1 =>
+        simp
+      case _ c1 =>
+        simp
+
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (F : Formula)
+  (x : String)
+  (k : Nat) :
+  Holds D I (V ∘ openVar k x) F ↔
+    Holds D I V (openFormulaAux k x F) :=
+  by
+  induction F generalizing V k
+  case pred_ X xs =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    simp
+  case forall_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    rw [<- phi_ih]
+    congr! 1
+    funext v
+    simp
+    apply extracted_1
+  all_goals
+    sorry
