@@ -112,7 +112,7 @@ def openFormula
 
 
 def Var.instantiate
-  (subst : Array Var)
+  (zs : Array String)
   (k : Nat) :
   Var → Var
   | F x => F x
@@ -121,19 +121,20 @@ def Var.instantiate
     then B n
     else
       let n := n - k
-      if _ : n < subst.size
-      then subst[n]
-      else B (n - subst.size + k)
+      if _ : n < zs.size
+      then F zs[n]
+      else B (n - zs.size + k)
+
 
 def Formula.instantiate
-  (subst : Array Var)
+  (zs : Array String)
   (k : Nat) :
   Formula → Formula
-  | pred_ X xs => pred_ X (xs.map (Var.instantiate subst k))
-  | not_ phi => not_ (phi.instantiate subst k)
+  | pred_ X xs => pred_ X (xs.map (Var.instantiate zs k))
+  | not_ phi => not_ (phi.instantiate zs k)
   | imp_ phi psi =>
-      imp_ (phi.instantiate subst k) (psi.instantiate subst k)
-  | forall_ phi => forall_ (phi.instantiate subst (k + 1))
+      imp_ (phi.instantiate zs k) (psi.instantiate zs k)
+  | forall_ phi => forall_ (phi.instantiate zs (k + 1))
 
 
 def closeVar
@@ -1327,3 +1328,82 @@ example
     simp only [<- phi_ih]
     congr! 1
     apply extracted_1
+
+
+theorem extracted_2
+  (D : Type)
+  (zs : Array String)
+  (V : VarAssignment D)
+  (k : ℕ)
+  (d : D) :
+  shift D (V ∘ Var.instantiate zs k) d = shift D V d ∘ Var.instantiate zs (k + 1) :=
+  by
+  funext v
+  simp
+  cases v
+  case _ a =>
+    simp only [Var.instantiate]
+    simp only [shift]
+    simp
+  case _ n =>
+    simp only [Var.instantiate]
+    simp only [shift]
+    simp
+    cases n
+    case zero =>
+      simp
+    case succ n =>
+      simp
+      split
+      case _ c1 =>
+        have s1 : n + 1 < k + 1
+        exact Nat.add_lt_add_right c1 1
+        simp only [if_pos s1]
+
+      case _ c1 =>
+        have s1 : ¬ n + 1 < k + 1
+        intro contra
+        apply c1
+        exact Nat.succ_lt_succ_iff.mp contra
+
+        split
+        case _ c2 =>
+          simp
+        case _ c2 =>
+          simp
+
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (zs : Array String)
+  (k : Nat)
+  (F : Formula) :
+  Holds D I (V ∘ Var.instantiate zs k) F ↔
+    Holds D I V (Formula.instantiate zs k F) :=
+  by
+  induction F generalizing V k
+  case pred_ X xs =>
+    simp only [Formula.instantiate]
+    simp only [Holds]
+    simp
+  case not_ phi phi_ih =>
+    simp only [Formula.instantiate]
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.instantiate]
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [Formula.instantiate]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [← phi_ih]
+    congr! 1
+    apply extracted_2
