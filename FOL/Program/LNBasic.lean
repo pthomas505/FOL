@@ -79,6 +79,13 @@ def Formula.freeVarSet : Formula → Finset String
   | forall_ phi => phi.freeVarSet
 
 
+def Formula.varSet : Formula → Finset Var
+  | pred_ _ xs => xs.toFinset
+  | not_ phi => phi.varSet
+  | imp_ phi psi => phi.varSet ∪ psi.varSet
+  | forall_ phi => phi.varSet
+
+
 /--
   Helper function for openFormulaAux.
 -/
@@ -1535,7 +1542,7 @@ theorem extracted_3
           simp
 
 
-example
+theorem SubHolds
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
@@ -1613,3 +1620,140 @@ lemma OpenFormulaLength'
   (v : Var) :
   length (openFormula' v F) = length F :=
   OpenFormulaLengthAux' F v 0
+
+--------------------------------------------------
+
+def Formula.predSub
+  (τ : String → ℕ → Formula) :
+  Formula → Formula
+  | pred_ X xs => (τ X xs.length).instantiate' 0 xs.toArray
+  | not_ phi => not_ (phi.predSub τ)
+  | imp_ phi psi => imp_ (phi.predSub τ) (psi.predSub τ)
+  | forall_ phi => forall_ (phi.predSub τ)
+
+
+theorem extracted_4
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : VarAssignment D)
+  (F : Formula)
+  (k : ℕ)
+  (vs : List Var)
+  (h1 : ∀ (v : Var), v ∈ F.varSet → isFree v)
+  (h2 : ∀ (v : Var), v ∈ vs → isFree v)
+  (h3 : ∀ (v : Var), v ∈ F.varSet → isFree v → V v = V' v)  :
+  Holds D I V' F ↔ Holds D I (V ∘ Var.instantiate' k (List.toArray vs)) F :=
+  by
+  induction F generalizing k V V'
+  case pred_ X xs =>
+    simp only [varSet] at h1
+    simp at h1
+
+    simp only [Holds]
+    congr! 1
+    simp only [List.map_eq_map_iff]
+    intro v a1
+    specialize h1 v a1
+    obtain s1 := IsFreeImpExistsString v h1
+    apply Exists.elim s1
+    intro a a2
+    subst a2
+    simp
+    simp only [Var.instantiate']
+    simp only [varSet] at h3
+    simp at h3
+    symm
+    apply h3
+    exact a1
+    exact h1
+  case forall_ phi phi_ih =>
+    simp only [varSet] at h1
+    simp only [varSet] at h3
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    specialize phi_ih (shift D V d) (shift D V' d) (k + 1) h1
+    rw [extracted_3]
+    apply phi_ih
+    intro v a1 a2
+    obtain s1 := IsFreeImpExistsString v a2
+    apply Exists.elim s1
+    intro a a3
+    subst a3
+    simp only [shift]
+    apply h3
+    · exact a1
+    · simp only [isFree]
+    · simp
+      exact h2
+  all_goals
+    sorry
+
+theorem extracted_5 (D : Type) (I : Interpretation D) (τ : String → ℕ → Formula)
+  (h2 : ∀ (X : String) (n : ℕ) (v : Var), v ∈ varSet (τ X n) → isFree v) (X : String) (xs : List Var)
+  (V V' : VarAssignment D) (h3 : ∀ (X : String) (n : ℕ) (v : Var), v ∈ varSet (τ X n) → isFree v → V v = V' v)
+  (h1 : ∀ (v : Var), v ∈ xs → isFree v) :
+  Holds D I V' (τ X (List.length xs)) ↔
+    Holds D I (V ∘ Var.instantiate' 0 (List.toArray xs)) (τ X (List.length xs)) := sorry
+
+
+theorem predSub_aux
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : VarAssignment D)
+  (τ : String → ℕ → Formula)
+  (F : Formula)
+  (h1 : ∀ (v : Var), v ∈ F.varSet → v.isFree)
+  (h2 : ∀ (X : String) (n : ℕ) (v : Var), v ∈ (τ X n).varSet → v.isFree)
+  (h3 : ∀ (X : String) (n : ℕ) (v : Var), v ∈ varSet (τ X n) → isFree v → V v = V' v)
+  :
+  Holds D ⟨ 
+      I.nonempty_,
+      fun (X : String) (ds : List D) =>
+        Holds D I V' (τ X ds.length)
+      ⟩  V F ↔ Holds D I V (F.predSub τ) :=
+  by
+  induction F generalizing V V'
+  case pred_ X xs =>
+    simp only [varSet] at h1
+    simp at h1
+
+    simp only [predSub]
+    simp only [Holds]
+    obtain s1 := SubHolds D I V 0 xs.toArray (τ X (List.length xs))
+    simp at s1
+    simp only [<- s1 h1]
+    clear s1
+    simp
+
+
+    extract_goal
+    apply extracted_4
+    specialize h2 X (xs.length)
+    exact h2
+    exact h1
+    intro v a1 a2
+    apply h3 X (xs.length)
+    exact a1
+    exact a2
+  case forall_ phi phi_ih =>
+    simp only [varSet] at h1
+    simp only [predSub]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    specialize phi_ih (shift D V d) V' h1
+    have s1 : (∀ (X : String) (n : ℕ) (v : Var), v ∈ varSet (τ X n) → isFree v → shift D V d v = V' v)
+    intro X n v a1 a2
+    obtain s2 := IsFreeImpExistsString v a2
+    apply Exists.elim s2
+    intro a a3
+    subst a3
+    simp only [shift]
+    apply h3 X n
+    exact a1
+    exact a2
+    specialize phi_ih s1
+    simp only [phi_ih]
+  all_goals
+    sorry
