@@ -1407,3 +1407,219 @@ example
     simp only [← phi_ih]
     congr! 1
     apply extracted_2
+
+
+--------------------------------------------------
+
+
+/--
+  Helper function for openFormulaAux.
+-/
+def openVar'
+  (k : ℕ)
+  (v : Var) :
+  Var → Var
+  | F a => F a
+  | B n => if k = n then v else B n
+
+/--
+  Helper function for openFormula.
+-/
+def openFormulaAux'
+  (k : ℕ)
+  (v : Var) :
+  Formula → Formula
+  | pred_ X xs => pred_ X (xs.map (openVar' k v))
+  | not_ phi => not_ (openFormulaAux' k v phi)
+  | imp_ phi psi => imp_ (openFormulaAux' k v phi) (openFormulaAux' k v psi)
+  | forall_ phi => forall_ (openFormulaAux' (k + 1) v phi)
+
+/--
+  openFormula x F := Each of the bound variables in the formula F that indexes one more than the outermost binder is replaced by a free variable named x.
+-/
+def openFormula'
+  (v : Var)
+  (F : Formula) :
+  Formula :=
+  openFormulaAux' 0 v F
+
+
+def Var.instantiate'
+  (k : Nat)
+  (zs : Array Var) :
+  Var → Var
+  | F x => F x
+  | B n =>
+    if n < k
+    then B n
+    else
+      let n := n - k
+      if _ : n < zs.size
+      then zs[n]
+      else B (n - zs.size + k)
+
+
+def Formula.instantiate'
+  (k : Nat)
+  (zs : Array Var) :
+  Formula → Formula
+  | pred_ X xs => pred_ X (xs.map (Var.instantiate' k zs))
+  | not_ phi => not_ (phi.instantiate' k zs)
+  | imp_ phi psi =>
+      imp_ (phi.instantiate' k zs) (psi.instantiate' k zs)
+  | forall_ phi => forall_ (phi.instantiate' (k + 1) zs)
+
+
+lemma IsFreeImpExistsString
+  (v : Var)
+  (h1 : v.isFree) :
+  ∃ (a : String), v = F a :=
+  by
+  cases v
+  case F a =>
+    apply Exists.intro a
+    rfl
+  case B n =>
+    simp only [isFree] at h1
+
+
+theorem extracted_3
+  (D : Type)
+  (V : VarAssignment D)
+  (k : ℕ)
+  (zs : Array Var)
+  (d : D)
+  (h1 : ∀ (z : Var), z ∈ zs.data → z.isFree) :
+  shift D (V ∘ Var.instantiate' k zs) d = shift D V d ∘ Var.instantiate' (k + 1) zs :=
+  by
+  funext v
+  simp
+  cases v
+  case _ a =>
+    simp only [Var.instantiate']
+    simp only [shift]
+    simp
+  case _ n =>
+    simp only [Var.instantiate']
+    simp only [shift]
+    simp
+    cases n
+    case zero =>
+      simp
+    case succ n =>
+      simp
+      split
+      case _ c1 =>
+        have s1 : n + 1 < k + 1
+        exact Nat.add_lt_add_right c1 1
+        simp only [if_pos s1]
+
+      case _ c1 =>
+        have s1 : ¬ n + 1 < k + 1
+        intro contra
+        apply c1
+        exact Nat.succ_lt_succ_iff.mp contra
+
+        split
+        case _ c2 =>
+          specialize h1 (zs[n - k])
+          have s1 : zs[n - k] ∈ zs.data
+          apply Array.getElem_mem_data
+
+          specialize h1 s1
+          obtain s2 := IsFreeImpExistsString (zs[n - k]) h1
+          apply Exists.elim s2
+          intro a a1
+          simp only [a1]
+        case _ c2 =>
+          simp
+
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (k : Nat)
+  (zs : Array Var)
+  (F : Formula)
+  (h1 : ∀ (z : Var), z ∈ zs.data → z.isFree) :
+  Holds D I (V ∘ Var.instantiate' k zs) F ↔
+    Holds D I V (Formula.instantiate' k zs F) :=
+  by
+  induction F generalizing V k
+  case pred_ X xs =>
+    simp only [Formula.instantiate']
+    simp only [Holds]
+    simp
+  case not_ phi phi_ih =>
+    simp only [Formula.instantiate']
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.instantiate']
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [Formula.instantiate']
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [← phi_ih]
+    congr! 1
+    exact extracted_3 D V k zs d h1
+
+
+def Formula.length : Formula → ℕ
+  | pred_ _ _ => 0
+  | not_ phi => 1 + phi.length
+  | imp_ phi psi => 1 + phi.length + psi.length
+  | forall_ phi => 1 + phi.length
+
+
+lemma OpenFormulaLengthAux'
+  (F : Formula)
+  (v : Var)
+  (k : ℕ) :
+  length (openFormulaAux' k v F) = length F :=
+  by
+  induction F generalizing k
+  case pred_ X xs =>
+    simp only [openFormulaAux']
+    simp only [Formula.length]
+  case not_ phi phi_ih =>
+    simp only [openFormulaAux']
+    simp only [Formula.length]
+    simp
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [openFormulaAux']
+    simp only [Formula.length]
+    congr! 1
+    · simp
+      apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [openFormulaAux']
+    simp only [Formula.length]
+    simp
+    apply phi_ih
+
+
+lemma OpenFormulaLength'
+  (F : Formula)
+  (v : Var) :
+  length (openFormula' v F) = length F :=
+  OpenFormulaLengthAux' F v 0
+
+
+def Formula.predSub'
+  (τ : String → ℕ → Formula)
+  (zs : Array Var) :
+  Formula → Formula
+  | pred_ X xs => (τ X xs.length).instantiate' 0 xs.toArray
+  | not_ phi => not_ (phi.predSub' τ zs)
+  | imp_ phi psi => imp_ (phi.predSub' τ zs) (psi.predSub' τ zs)
+  | forall_ phi => forall_ (openFormula' zs[k] phi).predSub' τ zs
