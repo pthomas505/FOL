@@ -1613,13 +1613,3 @@ lemma OpenFormulaLength'
   (v : Var) :
   length (openFormula' v F) = length F :=
   OpenFormulaLengthAux' F v 0
-
-
-def Formula.predSub'
-  (τ : String → ℕ → Formula)
-  (zs : Array Var) :
-  Formula → Formula
-  | pred_ X xs => (τ X xs.length).instantiate' 0 xs.toArray
-  | not_ phi => not_ (phi.predSub' τ zs)
-  | imp_ phi psi => imp_ (phi.predSub' τ zs) (psi.predSub' τ zs)
-  | forall_ phi => forall_ (openFormula' zs[k] phi).predSub' τ zs
