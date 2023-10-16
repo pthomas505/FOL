@@ -1401,6 +1401,33 @@ theorem HoldsIffSubHoldsAux'
           simp only [isBound]
 
 
+theorem substitution_fun_theorem'
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (σ : Var → Var)
+  (F : Formula)
+  (h1 : ∀ (v : Var), isFree v → isFree (σ v)) :
+  Holds D I (V ∘ (Var.sub' σ)) F ↔
+    Holds D I V (sub' σ F) :=
+  by
+  apply HoldsIffSubHoldsAux' D I (V ∘ (Var.sub' σ)) V F σ
+  · simp
+  · intro v a1
+    cases v
+    case _ a =>
+      simp only [isBound] at a1
+    case _ n =>
+      cases n
+      case zero =>
+        simp
+        simp only [Var.sub']
+      case succ n =>
+        simp
+        simp only [Var.sub']
+  · exact h1
+
+
 theorem extracted_1
   (D : Type)
   (x : String)
