@@ -1330,7 +1330,8 @@ theorem HoldsIffSubHoldsAux'
   (F : Formula)
   (σ' : Var → Var)
   (h1 : ∀ (v : Var), v.isFree → V v = V' (Var.sub' σ' v))
-  (h2 : ∀ (v : Var), v.isBound → V v = V' v) :
+  (h2 : ∀ (v : Var), v.isBound → V v = V' v)
+  (h3 : ∀ (v : Var), v.isFree → (σ' v).isFree) :
   Holds D I V F ↔ Holds D I V' (sub' σ' F) :=
   by
   induction F generalizing V V'
@@ -1374,10 +1375,16 @@ theorem HoldsIffSubHoldsAux'
       case _ a =>
         simp only [Var.sub'] at h1
 
+        obtain s1 := h3 (F a) a1
+        simp only [IsFreeIffExistsString] at s1
+        apply Exists.elim s1
+        intro a' a2
+
         simp only [Var.sub']
+        simp only [a2]
         simp only [shift]
-        sorry
-        --exact h1
+        simp only [h1]
+        simp only [a2]
       case _ n =>
         simp only [isFree] at a1
     · intro v a1
