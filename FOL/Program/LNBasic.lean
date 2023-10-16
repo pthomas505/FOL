@@ -267,7 +267,7 @@ def Formula.closed (F : Formula) : Prop :=
 
 
 def Var.sub (σ : String → String) : Var → Var
-  | F a => F (σ a) 
+  | F a => F (σ a)
   | B n => B n
 
 def Formula.sub (σ : String → String) : Formula → Formula
@@ -275,6 +275,34 @@ def Formula.sub (σ : String → String) : Formula → Formula
   | not_ phi => not_ (phi.sub σ)
   | imp_ phi psi => imp_ (phi.sub σ) (psi.sub σ)
   | forall_ phi => forall_ (phi.sub σ)
+
+
+def Var.sub' (σ : Var → Var) : Var → Var
+  | F a => σ (F a)
+  | B n => B n
+
+def Formula.sub' (σ : Var → Var) : Formula → Formula
+  | pred_ X xs => pred_ X (xs.map (Var.sub' σ))
+  | not_ phi => not_ (phi.sub' σ)
+  | imp_ phi psi => imp_ (phi.sub' σ) (psi.sub' σ)
+  | forall_ phi => forall_ (phi.sub' σ)
+
+
+def replacePredFun
+  (τ : String → ℕ → (List Var × Formula)) :
+  Formula → Formula
+  | pred_ X xs =>
+      let zs := (τ X xs.length).fst
+      let H := (τ X xs.length).snd
+      if xs.length = zs.length
+      then Formula.sub' (Function.updateListIte id zs xs) H
+      else pred_ X xs
+  | not_ phi => not_ (replacePredFun τ phi)
+  | imp_ phi psi =>
+      imp_
+      (replacePredFun τ phi)
+      (replacePredFun τ psi)
+  | forall_ phi => forall_ (replacePredFun τ phi)
 
 
 structure Interpretation (D : Type) : Type :=
@@ -302,6 +330,31 @@ def Holds
   | imp_ phi psi => Holds D I V phi → Holds D I V psi
   | forall_ phi =>
       ∀ d : D, Holds D I (shift D V d) phi
+
+
+lemma IsFreeImpExistsString
+  (v : Var)
+  (h1 : v.isFree) :
+  ∃ (a : String), v = F a :=
+  by
+  cases v
+  case F a =>
+    apply Exists.intro a
+    rfl
+  case B n =>
+    simp only [isFree] at h1
+
+lemma IsFreeIffExistsString
+  (v : Var) :
+  v.isFree ↔ ∃ (a : String), v = F a :=
+  by
+  cases v
+  case F a =>
+    simp only [isFree]
+    simp
+  case B n =>
+    simp only [isFree]
+    simp
 
 
 lemma CloseVarOpenVarComp
@@ -1196,9 +1249,11 @@ theorem HoldsIffSubHoldsAux
     simp
     cases v
     case _ a =>
+      simp only [Var.sub]
       apply h1
       simp only [Var.isFree]
     case _ n =>
+      simp only [Var.sub]
       apply h2
       simp only [isBound]
   case not_ phi phi_ih =>
@@ -1266,6 +1321,77 @@ theorem substitution_fun_theorem
       case succ n =>
         simp
         simp only [Var.sub]
+
+
+theorem HoldsIffSubHoldsAux'
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : VarAssignment D)
+  (F : Formula)
+  (σ' : Var → Var)
+  (h1 : ∀ (v : Var), v.isFree → V v = V' (Var.sub' σ' v))
+  (h2 : ∀ (v : Var), v.isBound → V v = V' v) :
+  Holds D I V F ↔ Holds D I V' (sub' σ' F) :=
+  by
+  induction F generalizing V V'
+  case pred_ X xs =>
+    simp only [Formula.sub']
+    simp only [Holds]
+    simp
+    congr! 1
+    simp only [List.map_eq_map_iff]
+    intro v a1
+    simp
+    cases v
+    case _ a =>
+      simp only [Var.sub']
+      apply h1
+      simp only [Var.isFree]
+    case _ n =>
+      simp only [Var.sub']
+      apply h2
+      simp only [isBound]
+  case not_ phi phi_ih =>
+    simp only [Formula.sub']
+    simp only [Holds]
+    congr! 1
+    exact phi_ih V V' h1 h2
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.sub']
+    simp only [Holds]
+    congr! 1
+    · exact phi_ih V V' h1 h2
+    · exact psi_ih V V' h1 h2
+  case forall_ phi phi_ih =>
+    simp only [Formula.sub']
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    apply phi_ih
+    · intro v a1
+      specialize h1 v a1
+      cases v
+      case _ a =>
+        simp only [Var.sub'] at h1
+
+        simp only [Var.sub']
+        simp only [shift]
+        sorry
+        --exact h1
+      case _ n =>
+        simp only [isFree] at a1
+    · intro v a1
+      cases v
+      case _ a =>
+        simp only [isBound] at a1
+      case _ n =>
+        cases n
+        case zero =>
+          simp only [shift]
+        case succ n =>
+          simp only [shift]
+          apply h2
+          simp only [isBound]
 
 
 theorem extracted_1
@@ -1475,19 +1601,6 @@ def Formula.instantiate'
   | imp_ phi psi =>
       imp_ (phi.instantiate' k zs) (psi.instantiate' k zs)
   | forall_ phi => forall_ (phi.instantiate' (k + 1) zs)
-
-
-lemma IsFreeImpExistsString
-  (v : Var)
-  (h1 : v.isFree) :
-  ∃ (a : String), v = F a :=
-  by
-  cases v
-  case F a =>
-    apply Exists.intro a
-    rfl
-  case B n =>
-    simp only [isFree] at h1
 
 
 theorem extracted_3
@@ -1726,8 +1839,6 @@ theorem predSub_aux
     clear s1
     simp
 
-
-    extract_goal
     apply extracted_4
     specialize h2 X (xs.length)
     exact h2
