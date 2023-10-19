@@ -741,6 +741,7 @@ lemma OpenVarInjOn
   apply Set.LeftInvOn.injOn
   exact OpenVarLeftInvOn k u h1
 
+
 lemma CloseVarInjOn
   (u : Var)
   (k : ℕ)
@@ -763,6 +764,7 @@ lemma OpenFormulaLeftInvOn
   apply CloseFormulaOpenFormulaComp
   · exact a1
   · exact h1
+
 
 lemma CloseFormulaLeftInvOn
   (u : Var)
@@ -800,21 +802,21 @@ lemma CloseFormulaInjOn
 
 example
   (F G : Formula)
-  (x : Var)
   (k : ℕ)
-  (h0 : x.isFree)
-  (h1 : x ∉ F.freeVarSet)
-  (h2 : x ∉ G.freeVarSet)
-  (h3 : openFormulaAux k x F = openFormulaAux k x G) :
+  (u : Var)
+  (h1 : u.isFree)
+  (h2 : u ∉ F.freeVarSet)
+  (h3 : u ∉ G.freeVarSet)
+  (h4 : openFormulaAux k u F = openFormulaAux k u G) :
   F = G :=
   by
   apply OpenFormulaInjOn
-  · exact h0
-  · simp
-    exact h1
+  · exact h1
   · simp
     exact h2
-  · exact h3
+  · simp
+    exact h3
+  · exact h4
 
 
 --------------------------------------------------
