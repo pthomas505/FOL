@@ -219,7 +219,7 @@ def openFormula
 /--
   Helper function for openFormulaListAux.
 
-  The multiple variable equivalent of openVar.
+  This is a multiple variable version of openVar.
 
   zs is intended to be an array of free variables.
 -/
@@ -246,7 +246,7 @@ def openVarList
 /--
   Helper function for openFormulaList.
 
-  The multiple variable equivalent of openFormulaAux.
+  This is a multiple variable version of openFormulaAux.
 
   zs is intended to be an array of free variables.
 -/
