@@ -475,7 +475,7 @@ def Var.sub (σ : Var → Var) : Var → Var
 
 
 def Formula.sub (σ : Var → Var) : Formula → Formula
-  | pred_ X xs => pred_ X (xs.map (Var.sub σ))
+  | pred_ X vs => pred_ X (vs.map (Var.sub σ))
   | not_ phi => not_ (phi.sub σ)
   | imp_ phi psi => imp_ (phi.sub σ) (psi.sub σ)
   | forall_ phi => forall_ (phi.sub σ)
