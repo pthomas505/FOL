@@ -511,28 +511,6 @@ def VarAssignment.subN
   | B n => subN_aux D (V ∘ B) ds n
 
 
-def Var.isLessThan (n : Nat) : Var → Prop
-  | F _ => True
-  | B i => i < n
-
-instance (n : ℕ) (v : Var) : Decidable (Var.isLessThan n v) :=
-  by
-  cases v
-  case F x =>
-    simp only [Var.isLessThan]
-    exact decidableTrue
-  case B i =>
-    simp only [Var.isLessThan]
-    exact Nat.decLt i n
-
-
-def Formula.isLessThan (n : Nat) : Formula → Prop
-  | pred_ _ vs => vs.all (fun (v : Var) => (Var.isLessThan n v))
-  | not_ phi => phi.isLessThan n
-  | imp_ phi psi => phi.isLessThan n ∧ psi.isLessThan n
-  | forall_ phi => phi.isLessThan (n + 1)
-
-
 --------------------------------------------------
 
 
