@@ -405,7 +405,7 @@ instance
 
 
 /--
-  Formula.lc_at k F := True if and only if every bound variable in the formula F has an index less than the number of binders that it is under plus k. If k is 0 then this is equivalent to being locally closed.
+  Formula.lc_at k F := True if and only if every bound variable in the formula F has an index less than the number of binders that it is under plus k. If this holds for k = 0 then this means that no bound variable in F is out of scope and hence that F is locally closed.
 -/
 def Formula.lc_at
   (k : ℕ) :
