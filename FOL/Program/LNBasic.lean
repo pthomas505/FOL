@@ -203,7 +203,7 @@ def openFormulaAux
 
 
 /--
-  openFormula v F := Each of the bound variables in the formula F that has an index equal to the number of binders that it is under is replaced by the variable v. This means that each bound variable replaced by v has an index out of scope by exactly one.
+  openFormula v F := Each of the bound variables in the formula F that has an index equal to the number of binders that it is under is replaced by the variable v. This means that v replaces each bound variable that has an index out of scope by exactly one.
 
   v is intended to be a free variable.
 -/
