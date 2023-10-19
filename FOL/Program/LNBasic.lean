@@ -263,7 +263,7 @@ def openFormulaListAux
 /--
   This is a multiple variable version of openFormula.
 
-  Let B i be a bound variable in F. Let k be the number of binders that it is under. Then
+  Let B i be a bound variable in the formula F. Let k be the number of binders that an occurrence of B i is under. Then that occurrence of B i is changed according to:
 
   i < k : B i -> B i
   k <= i < k + zs.size : B i -> zs[i - k]
