@@ -239,6 +239,7 @@ def openVarList
       -- 0 <= i - k < zs.size
       then zs[i - k]
       -- The index of each of the remaining out of scope bound variables is shifted to account for the removal of the zs.size number of out of scope variables that have been removed.
+      -- ¬ i - k < zs.size -> i - k >= zs.size -> i >= zs.size + k -> i - zs.size >= k. Since k >= 0 then i - zs.size >= 0.
       else B (i - zs.size)
 
 
