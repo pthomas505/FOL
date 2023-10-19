@@ -109,7 +109,7 @@ def Formula.varSet : Formula → Finset Var
 def occursIn (v : Var) : Formula → Prop
   | pred_ _ vs => v ∈ vs
   | not_ phi => occursIn v phi
-  | imp_ phi psi => occursIn v phi ∧ occursIn v psi
+  | imp_ phi psi => occursIn v phi ∨ occursIn v psi
   | forall_ phi => occursIn v phi
 
 
