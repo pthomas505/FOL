@@ -11,7 +11,8 @@ import FOL.Tactics
 set_option autoImplicit false
 
 
--- If a bound variable has a de Bruijn index of 0 then its binder is the first binder to its left.
+-- If a bound variable has a de Bruijn index of 0 then it is bound by the first binder to its left that it is in the scope of.
+
 
 /--
   The type of locally nameless variables.
@@ -29,11 +30,26 @@ open Var
   The string representation of locally nameless variables.
 -/
 def Var.toString : Var → String
-  | F a => a
-  | B n => s! "{n}"
+  | F x => x
+  | B i => s! "{i}"
 
 instance : ToString Var :=
-  { toString := fun x => x.toString }
+  { toString := fun v => v.toString }
+
+
+/--
+  Var.isFree v := True if and only if v is a free variable.
+-/
+def Var.isFree : Var → Prop
+  | F _ => True
+  | B _ => False
+
+/--
+  Var.isBound v := True if and only if v is a bound variable.
+-/
+def Var.isBound : Var → Prop
+  | F _ => False
+  | B _ => True
 
 
 /--
@@ -54,7 +70,7 @@ open Formula
   The string representation of locally nameless formulas.
 -/
 def Formula.toString : Formula → String
-  | pred_ X xs => s! "({X} {xs})"
+  | pred_ X vs => s! "({X} {vs})"
   | not_ phi => s! "(¬ {phi.toString})"
   | imp_ phi psi => s! "({phi.toString} → {psi.toString})"
   | forall_ phi => s! "(∀ {phi.toString})"
@@ -64,124 +80,258 @@ instance : ToString Formula :=
   { toString := fun F => F.toString }
 
 
-def Var.freeVarSet : Var → Finset String
-  | F a => {a}
-  | B _ => ∅
+/--
+  Useful for proving that some recursive functions terminate.
+-/
+def Formula.length  : Formula → ℕ
+  | pred_ _ _ => 0
+  | not_ phi => 1 + phi.length
+  | imp_ phi psi => 1 + phi.length + psi.length
+  | forall_ phi => 1 + phi.length
+
+
+--------------------------------------------------
 
 
 /--
-  Formula.freeVarSet F := The set of all of the variables that have a free occurrence in the formula F.
+  Formula.varSet F := The set of all of the variables in the formula F.
 -/
-def Formula.freeVarSet : Formula → Finset String
-  | pred_ _ xs => xs.toFinset.biUnion Var.freeVarSet
-  | not_ phi => phi.freeVarSet
-  | imp_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
-  | forall_ phi => phi.freeVarSet
-
-
 def Formula.varSet : Formula → Finset Var
-  | pred_ _ xs => xs.toFinset
+  | pred_ _ vs => vs.toFinset
   | not_ phi => phi.varSet
   | imp_ phi psi => phi.varSet ∪ psi.varSet
   | forall_ phi => phi.varSet
 
 
 /--
+  occursIn v F := True if and only if the variable v is in the formula F.
+-/
+def occursIn (v : Var) : Formula → Prop
+  | pred_ _ vs => v ∈ vs
+  | not_ phi => occursIn v phi
+  | imp_ phi psi => occursIn v phi ∧ occursIn v psi
+  | forall_ phi => occursIn v phi
+
+
+/--
+  Helper function for Formula.boundVarSet.
+-/
+def Var.boundVarSet : Var → Finset Var
+  | F _ => ∅
+  | B i => {B i}
+
+
+/--
+  Formula.boundVarSet F := The set of all of the bound variables in the formula F.
+-/
+def Formula.boundVarSet : Formula → Finset Var
+  | pred_ _ vs => vs.toFinset.biUnion Var.boundVarSet
+  | not_ phi => phi.boundVarSet
+  | imp_ phi psi => phi.boundVarSet ∪ psi.boundVarSet
+  | forall_ phi => phi.boundVarSet
+
+
+/--
+  isBoundIn v F := True if and only if v is a bound variable in the formula F.
+-/
+def isBoundIn (v : Var) (F : Formula) : Prop :=
+  v.isBound ∧ occursIn v F
+
+
+/--
+  Helper function for Formula.freeVarSet.
+-/
+def Var.freeVarSet : Var → Finset Var
+  | F x => {F x}
+  | B _ => ∅
+
+
+/--
+  Formula.freeVarSet F := The set of all of the free variables in the formula F.
+-/
+def Formula.freeVarSet : Formula → Finset Var
+  | pred_ _ vs => vs.toFinset.biUnion Var.freeVarSet
+  | not_ phi => phi.freeVarSet
+  | imp_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
+  | forall_ phi => phi.freeVarSet
+
+
+/--
+  isFreeIn v F := True if and only if v is a free variable in the formula F.
+-/
+def isFreeIn (v : Var) (F : Formula) : Prop :=
+  v.isFree ∧ occursIn v F
+
+
+/--
+  Formula.closed F := True if and only if the formula F contains no free variables.
+-/
+def Formula.closed (F : Formula) : Prop :=
+  F.freeVarSet = ∅
+
+
+--------------------------------------------------
+
+-- Single
+
+/--
   Helper function for openFormulaAux.
+
+  v is intended to be a free variable.
 -/
 def openVar
   (k : ℕ)
-  (x : String) :
+  (v : Var) :
   Var → Var
-  | F a => F a
-  | B n => if k = n then F x else B n
+  | F x => F x
+  | B i => if i = k then v else B i
+
 
 /--
   Helper function for openFormula.
+
+  v is intended to be a free variable.
 -/
 def openFormulaAux
   (k : ℕ)
-  (x : String) :
+  (v : Var) :
   Formula → Formula
-  | pred_ X xs => pred_ X (xs.map (openVar k x))
-  | not_ phi => not_ (openFormulaAux k x phi)
-  | imp_ phi psi => imp_ (openFormulaAux k x phi) (openFormulaAux k x psi)
-  | forall_ phi => forall_ (openFormulaAux (k + 1) x phi)
+  | pred_ X vs => pred_ X (vs.map (openVar k v))
+  | not_ phi => not_ (openFormulaAux k v phi)
+  | imp_ phi psi => imp_ (openFormulaAux k v phi) (openFormulaAux k v psi)
+  | forall_ phi => forall_ (openFormulaAux (k + 1) v phi)
+
 
 /--
-  openFormula x F := Each of the bound variables in the formula F that indexes one more than the outermost binder is replaced by a free variable named x.
+  openFormula v F := Each of the bound variables in the formula F that has an index equal to the number of binders that it is under is replaced by the variable v. This means that each bound variable that is replaced by v had an index out of scope by one.
+
+  v is intended to be a free variable.
 -/
 def openFormula
-  (x : String)
+  (v : Var)
   (F : Formula) :
   Formula :=
-  openFormulaAux 0 x F
+  openFormulaAux 0 v F
 
 
-def Var.instantiate
-  (zs : Array String)
-  (k : Nat) :
+-- Multiple
+
+/--
+  Helper function for openFormulaListAux.
+
+  The multiple variable equivalent of openVar.
+
+  zs is intended to be an array of free variables.
+-/
+def openVarList
+  (k : Nat)
+  (zs : Array Var) :
   Var → Var
   | F x => F x
-  | B n =>
-    if n < k
-    then B n
+  | B i =>
+    if i < k
+    -- i is in scope
+    then B i
     else
-      let n := n - k
-      if _ : n < zs.size
-      then F zs[n]
-      else B (n - zs.size + k)
+    -- i is out of scope
+      -- ¬ i < k -> i >= k -> i - k >= 0 -> 0 <= i - k
+      if _ : i - k < zs.size
+      -- 0 <= i - k < zs.size
+      then zs[i - k]
+      -- The index of each of the remaining out of scope bound variables is shifted to account for the removal of the zs.size number of out of scope variables that have been removed.
+      else B (i - zs.size)
 
 
-def Formula.instantiate
-  (zs : Array String)
-  (k : Nat) :
+/--
+  Helper function for openFormulaList.
+
+  The multiple variable equivalent of openFormulaAux.
+
+  zs is intended to be an array of free variables.
+-/
+def openFormulaListAux
+  (k : Nat)
+  (zs : Array Var) :
   Formula → Formula
-  | pred_ X xs => pred_ X (xs.map (Var.instantiate zs k))
-  | not_ phi => not_ (phi.instantiate zs k)
-  | imp_ phi psi =>
-      imp_ (phi.instantiate zs k) (psi.instantiate zs k)
-  | forall_ phi => forall_ (phi.instantiate zs (k + 1))
+  | pred_ X vs => pred_ X (vs.map (openVarList k zs))
+  | not_ phi => not_ (openFormulaListAux k zs phi)
+  | imp_ phi psi => imp_ (openFormulaListAux k zs phi) (openFormulaListAux k zs psi)
+  | forall_ phi => forall_ (openFormulaListAux (k + 1) zs phi)
 
 
-def closeVar
-  (k : ℕ)
-  (x : String) :
-  Var → Var
-  | F a => if x = a then B k else F a
-  | B n => B n
+/--
+  This is a multiple variable version of openFormula.
 
-def closeFormulaAux
-  (k : ℕ)
-  (x : String) :
-  Formula → Formula
-  | pred_ X xs => pred_ X (xs.map (closeVar k x))
-  | not_ phi => not_ (closeFormulaAux k x phi)
-  | imp_ phi psi => imp_ (closeFormulaAux k x phi) (closeFormulaAux k x psi)
-  | forall_ phi => forall_ (closeFormulaAux (k + 1) x phi)
+  Let B i be a bound variable in F. Let k be the number of binders that it is under. Then
 
-def closeFormula
-  (x : String)
+  i < k : B i -> B i
+  k <= i < k + zs.size : B i -> zs[i - k]
+  k + zs.size <= i : B i -> B (i - zs.size)
+
+  zs is intended to be an array of free variables.
+-/
+def openFormulaList
+  (zs : Array Var)
   (F : Formula) :
   Formula :=
-  closeFormulaAux 0 x F
+  openFormulaListAux 0 zs F
 
 
-def Var.isFree : Var → Prop
-  | F _ => True
-  | B _ => False
-
-def Var.isBound : Var → Prop
-  | F _ => False
-  | B _ => True
+--------------------------------------------------
 
 
+/--
+  Helper function for closeFormulaAux.
+
+  v is intended to be a free variable.
+-/
+def closeVar
+  (v : Var)
+  (k : ℕ) :
+  Var → Var
+  | F x => if v = F x then B k else F x
+  | B i => B i
+
+
+/--
+  Helper function for closeFormula.
+
+  v is intended to be a free variable.
+-/
+def closeFormulaAux
+  (v : Var)
+  (k : ℕ) :
+  Formula → Formula
+  | pred_ X vs => pred_ X (vs.map (closeVar v k))
+  | not_ phi => not_ (closeFormulaAux v k phi)
+  | imp_ phi psi => imp_ (closeFormulaAux v k phi) (closeFormulaAux v k psi)
+  | forall_ phi => forall_ (closeFormulaAux v (k + 1) phi)
+
+
+/--
+  closeFormula v F := If v is a free variable then each occurence of v in the formula F is replaced by a bound variable that has an index equal to the number of binders that it is under. This means that each of the bound variables that an occurence of v is replaced by is given an index out of scope by one.
+
+  v is intended to be a free variable.
+-/
+def closeFormula
+  (v : Var)
+  (F : Formula) :
+  Formula :=
+  closeFormulaAux v 0 F
+
+
+--------------------------------------------------
+
+
+/--
+  Formula.lc' F := True if and only if every bound variable in the formula F has an index less than the number of binders that it is under.
+-/
 inductive Formula.lc' : Formula → Prop
   | pred_
     (X : String)
-    (xs : List Var) :
-    (∀ (v : Var), v ∈ xs → v.isFree) →
-    lc' (pred_ X xs)
+    (vs : List Var) :
+    (∀ (v : Var), v ∈ vs → v.isFree) →
+    lc' (pred_ X vs)
 
   | not_
     (phi : Formula) :
@@ -196,17 +346,18 @@ inductive Formula.lc' : Formula → Prop
 
   | forall_
     (phi : Formula)
-    (x : String) :
-    lc' (openFormula x phi) →
+    (v : Var) :
+    v.isFree →
+    lc' (openFormula v phi) →
     lc' (forall_ phi)
 
 
 inductive Formula.lc : Formula → Prop
   | pred_
     (X : String)
-    (xs : List Var) :
-    (∀ (v : Var), v ∈ xs → v.isFree) →
-    lc (pred_ X xs)
+    (vs : List Var) :
+    (∀ (v : Var), v ∈ vs → v.isFree) →
+    lc (pred_ X vs)
 
   | not_
     (phi : Formula) :
@@ -221,28 +372,44 @@ inductive Formula.lc : Formula → Prop
 
   | forall_
     (phi : Formula)
-    (L : Finset String) :
-    (∀ (x : String), x ∉ L → lc (openFormula x phi)) →
+    (L : Finset Var) :
+    (∀ (v : Var), v.isFree → v ∉ L → lc (openFormula v phi)) →
     lc (forall_ phi)
 
 
+def Formula.body (F : Formula) : Prop :=
+  ∃ (L : Finset Var), ∀ (v : Var), v.isFree → v ∉ L → Formula.lc (openFormula v F)
+
+
+--------------------------------------------------
+
+
+/--
+  Helper function for Formula.lc_at.
+-/
 def Var.lc_at
   (k : ℕ) :
   Var → Prop
   | F _ => True
-  | B n => n < k
+  | B i => i < k
 
-instance (k : ℕ) (v : Var) : Decidable (Var.lc_at k v) :=
+instance
+  (k : ℕ) (v : Var) :
+  Decidable (Var.lc_at k v) :=
   by
   cases v
   all_goals
     simp only [lc_at]
     infer_instance
 
+
+/--
+  Formula.lc_at k F := True if and only if every bound variable in the formula F has an index less than the number of binders that it is under plus k. If k is 0 then this is equivalent to being locally closed.
+-/
 def Formula.lc_at
   (k : ℕ) :
   Formula → Prop
-  | pred_ _ xs => ∀ (v : Var), v ∈ xs → (v.lc_at k)
+  | pred_ _ vs => ∀ (v : Var), v ∈ vs → (v.lc_at k)
   | not_ phi => phi.lc_at k
   | imp_ phi psi => (phi.lc_at k) ∧ (psi.lc_at k)
   | forall_ phi => phi.lc_at (k + 1)
@@ -254,62 +421,21 @@ instance (k : ℕ) (F : Formula) : Decidable (Formula.lc_at k F) :=
     unfold Formula.lc_at
     infer_instance
 
+
 #eval Formula.lc_at 0 (forall_ (pred_ "X" [B 0]))
 #eval Formula.lc_at 0 (forall_ (pred_ "X" [B 1]))
 
 
-def Formula.body (F : Formula) : Prop :=
-  ∃ (L : Finset String), ∀ (x : String), x ∉ L → Formula.lc (openFormula x F)
-
-
-def Formula.closed (F : Formula) : Prop :=
-  F.freeVarSet = ∅
-
-
-def Var.sub (σ : String → String) : Var → Var
-  | F a => F (σ a)
-  | B n => B n
-
-def Formula.sub (σ : String → String) : Formula → Formula
-  | pred_ X xs => pred_ X (xs.map (Var.sub σ))
-  | not_ phi => not_ (phi.sub σ)
-  | imp_ phi psi => imp_ (phi.sub σ) (psi.sub σ)
-  | forall_ phi => forall_ (phi.sub σ)
-
-
-def Var.sub' (σ : Var → Var) : Var → Var
-  | F a => σ (F a)
-  | B n => B n
-
-def Formula.sub' (σ : Var → Var) : Formula → Formula
-  | pred_ X xs => pred_ X (xs.map (Var.sub' σ))
-  | not_ phi => not_ (phi.sub' σ)
-  | imp_ phi psi => imp_ (phi.sub' σ) (psi.sub' σ)
-  | forall_ phi => forall_ (phi.sub' σ)
-
-
-def replacePredFun
-  (τ : String → ℕ → (List Var × Formula)) :
-  Formula → Formula
-  | pred_ X xs =>
-      let zs := (τ X xs.length).fst
-      let H := (τ X xs.length).snd
-      if xs.length = zs.length
-      then Formula.sub' (Function.updateListIte id zs xs) H
-      else pred_ X xs
-  | not_ phi => not_ (replacePredFun τ phi)
-  | imp_ phi psi =>
-      imp_
-      (replacePredFun τ phi)
-      (replacePredFun τ psi)
-  | forall_ phi => forall_ (replacePredFun τ phi)
+--------------------------------------------------
 
 
 structure Interpretation (D : Type) : Type :=
   (nonempty_ : Nonempty D)
   (pred_ : String → (List D → Prop))
 
+
 def VarAssignment (D : Type) : Type := Var → D
+
 
 def shift
   (D : Type)
@@ -318,51 +444,113 @@ def shift
   VarAssignment D
   | F x => V (F x)
   | B 0 => d
-  | B (n + 1) => V (B n)
+  | B (i + 1) => V (B i)
+
 
 def Holds
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D) :
   Formula → Prop
-  | pred_ X xs => I.pred_ X (xs.map V)
+  | pred_ X vs => I.pred_ X (vs.map V)
   | not_ phi => ¬ Holds D I V phi
   | imp_ phi psi => Holds D I V phi → Holds D I V psi
-  | forall_ phi =>
-      ∀ d : D, Holds D I (shift D V d) phi
+  | forall_ phi => ∀ (d : D), Holds D I (shift D V d) phi
 
 
-lemma IsFreeImpExistsString
-  (v : Var)
-  (h1 : v.isFree) :
-  ∃ (a : String), v = F a :=
+--------------------------------------------------
+
+
+def Var.sub (σ : Var → Var) : Var → Var
+  | F x => σ (F x)
+  | B i => B i
+
+
+def Formula.sub (σ : Var → Var) : Formula → Formula
+  | pred_ X xs => pred_ X (xs.map (Var.sub σ))
+  | not_ phi => not_ (phi.sub σ)
+  | imp_ phi psi => imp_ (phi.sub σ) (psi.sub σ)
+  | forall_ phi => forall_ (phi.sub σ)
+
+
+--------------------------------------------------
+
+
+def Interpretation.subPred
+  (D : Type)
+  (I : Interpretation D)
+  (pred_ : String → List D → Prop) :
+  Interpretation D := {
+    nonempty_ := I.nonempty_
+    pred_ := pred_ }
+
+
+def VarAssignment.subN_aux
+  (D : Type)
+  (f : ℕ → D) :
+  List D → ℕ → D
+  | [], n => f n
+  | d :: _, 0 => d
+  | _ :: ds, n + 1 => subN_aux D f ds n
+
+
+def VarAssignment.subN
+  (D : Type)
+  (V : VarAssignment D)
+  (ds : List D) :
+  VarAssignment D
+  | F a => V (F a)
+  | B n => subN_aux D (V ∘ B) ds n
+
+
+def Var.isLessThan (n : Nat) : Var → Prop
+  | F _ => True
+  | B i => i < n
+
+instance (n : ℕ) (v : Var) : Decidable (Var.isLessThan n v) :=
   by
   cases v
-  case F a =>
-    apply Exists.intro a
-    rfl
-  case B n =>
-    simp only [isFree] at h1
+  case F x =>
+    simp only [Var.isLessThan]
+    exact decidableTrue
+  case B i =>
+    simp only [Var.isLessThan]
+    exact Nat.decLt i n
+
+
+def Formula.isLessThan (n : Nat) : Formula → Prop
+  | pred_ _ vs => vs.all (fun (v : Var) => (Var.isLessThan n v))
+  | not_ phi => phi.isLessThan n
+  | imp_ phi psi => phi.isLessThan n ∧ psi.isLessThan n
+  | forall_ phi => phi.isLessThan (n + 1)
+
+
+--------------------------------------------------
+
 
 lemma IsFreeIffExistsString
   (v : Var) :
-  v.isFree ↔ ∃ (a : String), v = F a :=
+  v.isFree ↔ ∃ (x : String), v = F x :=
   by
   cases v
-  case F a =>
+  case F x =>
     simp only [isFree]
     simp
-  case B n =>
+  case B i =>
     simp only [isFree]
     simp
+
+
+--------------------------------------------------
 
 
 lemma CloseVarOpenVarComp
   (v : Var)
-  (x : String)
+  (x : Var)
   (k : ℕ)
-  (h1 : x ∉ Var.freeVarSet v) :
-  (closeVar k x ∘ openVar k x) v = v :=
+  (h1 : x ∉ Var.freeVarSet v)
+  (h2 : x.isFree) :
+  (closeVar x k ∘ openVar k x) v = v :=
   by
   cases v
   case F a =>
@@ -374,22 +562,29 @@ lemma CloseVarOpenVarComp
     simp only [closeVar]
     simp only [if_neg h1]
   case B n =>
+    simp only [IsFreeIffExistsString] at h2
+    apply Exists.elim h2
+    intro a a1
+    subst a1
+
     simp
     simp only [openVar]
     split_ifs
     case _ c1 =>
       simp only [closeVar]
       simp
-      exact c1
+      simp only [c1]
     case _ c1 =>
       simp only [closeVar]
 
+
 lemma OpenVarCloseVarComp
   (v : Var)
-  (x : String)
+  (x : Var)
   (k : ℕ)
-  (h1 : Var.lc_at k v) :
-  (openVar k x ∘ closeVar k x) v = v :=
+  (h1 : Var.lc_at k v)
+  (h2 : x.isFree) :
+  (openVar k x ∘ closeVar x k) v = v :=
   by
   cases v
   case F a =>
@@ -419,9 +614,10 @@ lemma OpenVarCloseVarComp
 lemma CloseFormulaOpenFormulaComp
   (F : Formula)
   (k : ℕ)
-  (x : String)
-  (h1 : x ∉ F.freeVarSet) :
-  (closeFormulaAux k x ∘ openFormulaAux k x) F = F :=
+  (x : Var)
+  (h1 : x ∉ F.freeVarSet)
+  (h2 : x.isFree) :
+  (closeFormulaAux x k ∘ openFormulaAux k x) F = F :=
   by
   induction F generalizing k
   case pred_ X xs =>
@@ -435,7 +631,8 @@ lemma CloseFormulaOpenFormulaComp
     simp only [List.map_eq_self_iff]
     intro v a1
     apply CloseVarOpenVarComp
-    exact h1 v a1
+    · exact h1 v a1
+    · exact h2
   case not_ phi phi_ih =>
     unfold Formula.freeVarSet at h1
 
@@ -475,9 +672,10 @@ lemma CloseFormulaOpenFormulaComp
 lemma OpenFormulaCloseFormulaComp
   (F : Formula)
   (k : ℕ)
-  (x : String)
-  (h1 : Formula.lc_at k F) :
-  (openFormulaAux k x ∘ closeFormulaAux k x) F = F :=
+  (x : Var)
+  (h1 : Formula.lc_at k F)
+  (h2 : x.isFree) :
+  (openFormulaAux k x ∘ closeFormulaAux x k) F = F :=
   by
   induction F generalizing k
   case pred_ X xs =>
@@ -490,7 +688,8 @@ lemma OpenFormulaCloseFormulaComp
     simp only [List.map_eq_self_iff]
     intro v a1
     apply OpenVarCloseVarComp
-    exact h1 v a1
+    · exact h1 v a1
+    · exact h2
   case not_ phi phi_ih =>
     unfold Formula.lc_at at h1
 
@@ -524,98 +723,113 @@ lemma OpenFormulaCloseFormulaComp
 
 
 lemma OpenVarLeftInvOn
-  (x : String)
-  (k : ℕ) :
-  Set.LeftInvOn (closeVar k x) (openVar k x) {v | x ∉ v.freeVarSet} :=
+  (x : Var)
+  (k : ℕ)
+  (h1 : x.isFree) :
+  Set.LeftInvOn (closeVar x k) (openVar k x) {v | x ∉ v.freeVarSet} :=
   by
   simp only [Set.LeftInvOn]
   simp
   intro v a1
-  exact CloseVarOpenVarComp v x k a1
+  exact CloseVarOpenVarComp v x k a1 h1
 
 lemma CloseVarLeftInvOn
-  (x : String)
-  (k : ℕ) :
-  Set.LeftInvOn (openVar k x) (closeVar k x) {v | Var.lc_at k v} :=
+  (x : Var)
+  (k : ℕ)
+  (h1 : x.isFree) :
+  Set.LeftInvOn (openVar k x) (closeVar x k) {v | Var.lc_at k v} :=
   by
   simp only [Set.LeftInvOn]
   simp
   intro v a1
-  exact OpenVarCloseVarComp v x k a1
+  exact OpenVarCloseVarComp v x k a1 h1
 
 
 lemma OpenVarInjOn
-  (x : String)
-  (k : ℕ) :
+  (x : Var)
+  (k : ℕ)
+  (h1 : x.isFree) :
   Set.InjOn (openVar k x) {v | x ∉ v.freeVarSet} :=
   by
   apply Set.LeftInvOn.injOn
-  apply OpenVarLeftInvOn
+  exact OpenVarLeftInvOn x k h1
 
 lemma CloseVarInjOn
-  (x : String)
-  (k : ℕ) :
-  Set.InjOn (closeVar k x) {v | Var.lc_at k v} :=
+  (x : Var)
+  (k : ℕ)
+  (h1 : x.isFree) :
+  Set.InjOn (closeVar x k) {v | Var.lc_at k v} :=
   by
   apply Set.LeftInvOn.injOn
-  apply CloseVarLeftInvOn
+  apply CloseVarLeftInvOn x k h1
 
 
 lemma OpenFormulaLeftInvOn
-  (x : String)
-  (k : ℕ) :
-  Set.LeftInvOn (closeFormulaAux k x) (openFormulaAux k x) {F | x ∉ F.freeVarSet} :=
+  (x : Var)
+  (k : ℕ)
+  (h1 : x.isFree) :
+  Set.LeftInvOn (closeFormulaAux x k) (openFormulaAux k x) {F | x ∉ F.freeVarSet} :=
   by
   simp only [Set.LeftInvOn]
   simp
   intro F a1
   apply CloseFormulaOpenFormulaComp
-  exact a1
+  · exact a1
+  · exact h1
 
 lemma CloseFormulaLeftInvOn
-  (x : String)
-  (k : ℕ) :
-  Set.LeftInvOn (openFormulaAux k x) (closeFormulaAux k x) {F | Formula.lc_at k F} :=
+  (x : Var)
+  (k : ℕ)
+  (h1 : x.isFree) :
+  Set.LeftInvOn (openFormulaAux k x) (closeFormulaAux x k) {F | Formula.lc_at k F} :=
   by
   simp only [Set.LeftInvOn]
   simp
   intro F a1
   apply OpenFormulaCloseFormulaComp
-  exact a1
+  · exact a1
+  · exact h1
 
 
 lemma OpenFormulaInjOn
-  (x : String)
-  (k : ℕ) :
+  (x : Var)
+  (k : ℕ)
+  (h1 : x.isFree) :
   Set.InjOn (openFormulaAux k x) {F | x ∉ F.freeVarSet} :=
   by
   apply Set.LeftInvOn.injOn
-  apply OpenFormulaLeftInvOn
+  exact OpenFormulaLeftInvOn x k h1
 
 lemma CloseFormulaInjOn
-  (x : String)
-  (k : ℕ) :
-  Set.InjOn (closeFormulaAux k x) {F | Formula.lc_at k F} :=
+  (x : Var)
+  (k : ℕ)
+  (h1 : x.isFree) :
+  Set.InjOn (closeFormulaAux x k) {F | Formula.lc_at k F} :=
   by
   apply Set.LeftInvOn.injOn
-  apply CloseFormulaLeftInvOn
+  exact CloseFormulaLeftInvOn x k h1
 
 
 example
   (F G : Formula)
-  (x : String)
+  (x : Var)
   (k : ℕ)
+  (h0 : x.isFree)
   (h1 : x ∉ F.freeVarSet)
   (h2 : x ∉ G.freeVarSet)
   (h3 : openFormulaAux k x F = openFormulaAux k x G) :
   F = G :=
   by
   apply OpenFormulaInjOn
+  · exact h0
   · simp
     exact h1
   · simp
     exact h2
   · exact h3
+
+
+--------------------------------------------------
 
 
 lemma BodyImpLCForall
@@ -1428,6 +1642,66 @@ theorem substitution_fun_theorem'
   · exact h1
 
 
+theorem HoldsIffSubHolds'
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (σ : Var → Var)
+  (F : Formula)
+  (h1 : ∀ (v : Var), isFree v → isFree (σ v)) :
+  Holds D I (V ∘ (Var.sub' σ)) F ↔
+    Holds D I V (sub' σ F) :=
+  by
+  induction F generalizing V
+  case pred_ X xs =>
+    simp only [Formula.sub']
+    simp only [Holds]
+    congr! 1
+    simp
+  case not_ phi phi_ih =>
+    simp only [Formula.sub']
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.sub']
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [Formula.sub']
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [← phi_ih]
+    congr!
+    funext v
+    simp
+    cases v
+    case _ a =>
+      have s1 : isFree (F a)
+      simp only [isFree]
+
+      specialize h1 (F a) s1
+      simp only [IsFreeIffExistsString] at h1
+      apply Exists.elim h1
+      intro a' a1
+      simp only [Var.sub']
+      simp only [shift]
+      simp
+      simp only [a1]
+    case _ n =>
+      cases n
+      case zero =>
+        simp only [Var.sub']
+        simp only [shift]
+      case succ n =>
+        simp only [Var.sub']
+        simp only [shift]
+        simp
+
+
 theorem extracted_1
   (D : Type)
   (x : String)
@@ -1579,62 +1853,6 @@ example
 --------------------------------------------------
 
 
-/--
-  Helper function for openFormulaAux.
--/
-def openVar'
-  (k : ℕ)
-  (v : Var) :
-  Var → Var
-  | F a => F a
-  | B n => if k = n then v else B n
-
-/--
-  Helper function for openFormula.
--/
-def openFormulaAux'
-  (k : ℕ)
-  (v : Var) :
-  Formula → Formula
-  | pred_ X xs => pred_ X (xs.map (openVar' k v))
-  | not_ phi => not_ (openFormulaAux' k v phi)
-  | imp_ phi psi => imp_ (openFormulaAux' k v phi) (openFormulaAux' k v psi)
-  | forall_ phi => forall_ (openFormulaAux' (k + 1) v phi)
-
-/--
-  openFormula x F := Each of the bound variables in the formula F that indexes one more than the outermost binder is replaced by a free variable named x.
--/
-def openFormula'
-  (v : Var)
-  (F : Formula) :
-  Formula :=
-  openFormulaAux' 0 v F
-
-
-def Var.instantiate'
-  (k : Nat)
-  (zs : Array Var) :
-  Var → Var
-  | F x => F x
-  | B n =>
-    if n < k
-    then B n
-    else
-      let n := n - k
-      if _ : n < zs.size
-      then zs[n]
-      else B (n - zs.size + k)
-
-
-def Formula.instantiate'
-  (k : Nat)
-  (zs : Array Var) :
-  Formula → Formula
-  | pred_ X xs => pred_ X (xs.map (Var.instantiate' k zs))
-  | not_ phi => not_ (phi.instantiate' k zs)
-  | imp_ phi psi =>
-      imp_ (phi.instantiate' k zs) (psi.instantiate' k zs)
-  | forall_ phi => forall_ (phi.instantiate' (k + 1) zs)
 
 
 theorem extracted_3
@@ -1726,11 +1944,6 @@ theorem SubHolds
     exact extracted_3 D V k zs d h1
 
 
-def Formula.length : Formula → ℕ
-  | pred_ _ _ => 0
-  | not_ phi => 1 + phi.length
-  | imp_ phi psi => 1 + phi.length + psi.length
-  | forall_ phi => 1 + phi.length
 
 
 lemma OpenFormulaLengthAux'
@@ -1770,13 +1983,6 @@ lemma OpenFormulaLength'
 
 --------------------------------------------------
 
-def Formula.predSub
-  (τ : String → ℕ → Formula) :
-  Formula → Formula
-  | pred_ X xs => (τ X xs.length).instantiate' 0 xs.toArray
-  | not_ phi => not_ (phi.predSub τ)
-  | imp_ phi psi => imp_ (phi.predSub τ) (psi.predSub τ)
-  | forall_ phi => forall_ (phi.predSub τ)
 
 
 theorem extracted_4
@@ -1835,13 +2041,6 @@ theorem extracted_4
       exact h2
   all_goals
     sorry
-
-theorem extracted_5 (D : Type) (I : Interpretation D) (τ : String → ℕ → Formula)
-  (h2 : ∀ (X : String) (n : ℕ) (v : Var), v ∈ varSet (τ X n) → isFree v) (X : String) (xs : List Var)
-  (V V' : VarAssignment D) (h3 : ∀ (X : String) (n : ℕ) (v : Var), v ∈ varSet (τ X n) → isFree v → V v = V' v)
-  (h1 : ∀ (v : Var), v ∈ xs → isFree v) :
-  Holds D I V' (τ X (List.length xs)) ↔
-    Holds D I (V ∘ Var.instantiate' 0 (List.toArray xs)) (τ X (List.length xs)) := sorry
 
 
 theorem predSub_aux
@@ -1902,3 +2101,16 @@ theorem predSub_aux
     simp only [phi_ih]
   all_goals
     sorry
+
+
+
+theorem predSub_aux'
+  {D : Type}
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (τ : String → ℕ → Formula)
+  (F : Formula)
+  (h1 : ∀ (v : Var), v ∈ F.varSet → v.isFree) :
+  Holds D I V (F.predSub τ) ↔
+  Holds D (I.withPred fun P xs => Holds D I (V.subN xs) (τ P xs.length)) V F :=
+sorry
