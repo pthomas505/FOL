@@ -532,14 +532,14 @@ lemma IsFreeIffExistsString
 
 lemma CloseVarOpenVarComp
   (v : Var)
-  (x : Var)
+  (u : Var)
   (k : ℕ)
-  (h1 : x ∉ Var.freeVarSet v)
-  (h2 : x.isFree) :
-  (closeVar x k ∘ openVar k x) v = v :=
+  (h1 : u ∉ Var.freeVarSet v)
+  (h2 : u.isFree) :
+  (closeVar u k ∘ openVar k u) v = v :=
   by
   cases v
-  case F a =>
+  case F x =>
     simp only [Var.freeVarSet] at h1
     simp at h1
 
@@ -547,10 +547,10 @@ lemma CloseVarOpenVarComp
     simp only [openVar]
     simp only [closeVar]
     simp only [if_neg h1]
-  case B n =>
+  case B i =>
     simp only [IsFreeIffExistsString] at h2
     apply Exists.elim h2
-    intro a a1
+    intro x a1
     subst a1
 
     simp
@@ -566,14 +566,14 @@ lemma CloseVarOpenVarComp
 
 lemma OpenVarCloseVarComp
   (v : Var)
-  (x : Var)
+  (u : Var)
   (k : ℕ)
   (h1 : Var.lc_at k v)
-  (h2 : x.isFree) :
-  (openVar k x ∘ closeVar x k) v = v :=
+  (h2 : u.isFree) :
+  (openVar k u ∘ closeVar u k) v = v :=
   by
   cases v
-  case F a =>
+  case F x =>
     simp
     simp only [closeVar]
     split_ifs
@@ -583,7 +583,7 @@ lemma OpenVarCloseVarComp
       simp
     case neg c1 =>
       simp only [openVar]
-  case B n =>
+  case B i =>
     simp only [Var.lc_at] at h1
 
     simp
