@@ -566,8 +566,8 @@ lemma CloseVarOpenVarComp
 
 lemma OpenVarCloseVarComp
   (v : Var)
-  (u : Var)
   (k : ℕ)
+  (u : Var)
   (h1 : Var.lc_at k v)
   (h2 : u.isFree) :
   (openVar k u ∘ closeVar u k) v = v :=
@@ -599,14 +599,14 @@ lemma OpenVarCloseVarComp
 
 lemma CloseFormulaOpenFormulaComp
   (F : Formula)
+  (u : Var)
   (k : ℕ)
-  (x : Var)
-  (h1 : x ∉ F.freeVarSet)
-  (h2 : x.isFree) :
-  (closeFormulaAux x k ∘ openFormulaAux k x) F = F :=
+  (h1 : u ∉ F.freeVarSet)
+  (h2 : u.isFree) :
+  (closeFormulaAux u k ∘ openFormulaAux k u) F = F :=
   by
   induction F generalizing k
-  case pred_ X xs =>
+  case pred_ X vs =>
     unfold Formula.freeVarSet at h1
     simp at h1
 
@@ -658,13 +658,13 @@ lemma CloseFormulaOpenFormulaComp
 lemma OpenFormulaCloseFormulaComp
   (F : Formula)
   (k : ℕ)
-  (x : Var)
+  (u : Var)
   (h1 : Formula.lc_at k F)
-  (h2 : x.isFree) :
-  (openFormulaAux k x ∘ closeFormulaAux x k) F = F :=
+  (h2 : u.isFree) :
+  (openFormulaAux k u ∘ closeFormulaAux u k) F = F :=
   by
   induction F generalizing k
-  case pred_ X xs =>
+  case pred_ X vs =>
     unfold Formula.lc_at at h1
 
     simp
@@ -709,52 +709,53 @@ lemma OpenFormulaCloseFormulaComp
 
 
 lemma OpenVarLeftInvOn
-  (x : Var)
   (k : ℕ)
-  (h1 : x.isFree) :
-  Set.LeftInvOn (closeVar x k) (openVar k x) {v | x ∉ v.freeVarSet} :=
+  (u : Var)
+  (h1 : u.isFree) :
+  Set.LeftInvOn (closeVar u k) (openVar k u) {v | u ∉ v.freeVarSet} :=
   by
   simp only [Set.LeftInvOn]
   simp
   intro v a1
-  exact CloseVarOpenVarComp v x k a1 h1
+  exact CloseVarOpenVarComp v u k a1 h1
+
 
 lemma CloseVarLeftInvOn
-  (x : Var)
+  (u : Var)
   (k : ℕ)
-  (h1 : x.isFree) :
-  Set.LeftInvOn (openVar k x) (closeVar x k) {v | Var.lc_at k v} :=
+  (h1 : u.isFree) :
+  Set.LeftInvOn (openVar k u) (closeVar u k) {v | Var.lc_at k v} :=
   by
   simp only [Set.LeftInvOn]
   simp
   intro v a1
-  exact OpenVarCloseVarComp v x k a1 h1
+  exact OpenVarCloseVarComp v k u a1 h1
 
 
 lemma OpenVarInjOn
-  (x : Var)
   (k : ℕ)
-  (h1 : x.isFree) :
-  Set.InjOn (openVar k x) {v | x ∉ v.freeVarSet} :=
+  (u : Var)
+  (h1 : u.isFree) :
+  Set.InjOn (openVar k u) {v | u ∉ v.freeVarSet} :=
   by
   apply Set.LeftInvOn.injOn
-  exact OpenVarLeftInvOn x k h1
+  exact OpenVarLeftInvOn k u h1
 
 lemma CloseVarInjOn
-  (x : Var)
+  (u : Var)
   (k : ℕ)
-  (h1 : x.isFree) :
-  Set.InjOn (closeVar x k) {v | Var.lc_at k v} :=
+  (h1 : u.isFree) :
+  Set.InjOn (closeVar u k) {v | Var.lc_at k v} :=
   by
   apply Set.LeftInvOn.injOn
-  apply CloseVarLeftInvOn x k h1
+  apply CloseVarLeftInvOn u k h1
 
 
 lemma OpenFormulaLeftInvOn
-  (x : Var)
   (k : ℕ)
-  (h1 : x.isFree) :
-  Set.LeftInvOn (closeFormulaAux x k) (openFormulaAux k x) {F | x ∉ F.freeVarSet} :=
+  (u : Var)
+  (h1 : u.isFree) :
+  Set.LeftInvOn (closeFormulaAux u k) (openFormulaAux k u) {F | u ∉ F.freeVarSet} :=
   by
   simp only [Set.LeftInvOn]
   simp
@@ -764,10 +765,10 @@ lemma OpenFormulaLeftInvOn
   · exact h1
 
 lemma CloseFormulaLeftInvOn
-  (x : Var)
+  (u : Var)
   (k : ℕ)
-  (h1 : x.isFree) :
-  Set.LeftInvOn (openFormulaAux k x) (closeFormulaAux x k) {F | Formula.lc_at k F} :=
+  (h1 : u.isFree) :
+  Set.LeftInvOn (openFormulaAux k u) (closeFormulaAux u k) {F | Formula.lc_at k F} :=
   by
   simp only [Set.LeftInvOn]
   simp
@@ -778,22 +779,23 @@ lemma CloseFormulaLeftInvOn
 
 
 lemma OpenFormulaInjOn
-  (x : Var)
   (k : ℕ)
-  (h1 : x.isFree) :
-  Set.InjOn (openFormulaAux k x) {F | x ∉ F.freeVarSet} :=
+  (u : Var)
+  (h1 : u.isFree) :
+  Set.InjOn (openFormulaAux k u) {F | u ∉ F.freeVarSet} :=
   by
   apply Set.LeftInvOn.injOn
-  exact OpenFormulaLeftInvOn x k h1
+  exact OpenFormulaLeftInvOn k u h1
+
 
 lemma CloseFormulaInjOn
-  (x : Var)
+  (u : Var)
   (k : ℕ)
-  (h1 : x.isFree) :
-  Set.InjOn (closeFormulaAux x k) {F | Formula.lc_at k F} :=
+  (h1 : u.isFree) :
+  Set.InjOn (closeFormulaAux u k) {F | Formula.lc_at k F} :=
   by
   apply Set.LeftInvOn.injOn
-  exact CloseFormulaLeftInvOn x k h1
+  exact CloseFormulaLeftInvOn u k h1
 
 
 example
