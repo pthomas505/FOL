@@ -856,6 +856,9 @@ lemma LCForallIffBody
   · apply LCForallImpBody
 
 
+--------------------------------------------------
+
+
 lemma OpenVarFreeVar
   (v : Var)
   (x : String)
