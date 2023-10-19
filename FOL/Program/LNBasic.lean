@@ -325,7 +325,7 @@ def closeFormula
 
 
 /--
-  Formula.lc' F := True if and only if every bound variable in the formula F has an index less than the number of binders that it is under.
+  Formula.lc' F := True if and only if every bound variable in the formula F has an index less than the number of binders that it is under. This means that no bound variable in the formula F is out of scope.
 -/
 inductive Formula.lc' : Formula → Prop
   | pred_
