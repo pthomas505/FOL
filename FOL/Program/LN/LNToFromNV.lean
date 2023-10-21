@@ -24,7 +24,6 @@ def NVVarToLNVar
     LN.Var.bound_ (outer - n)
   else LN.Var.free_ x
 
-
 /--
   Helper function for NVToLN.
 -/
@@ -52,6 +51,9 @@ def NVToLN (F : NV.Formula) : LN.Formula :=
 
 -- locally nameless to named variable
 
+/--
+  The conversion of locally nameless variables to named variables.
+-/
 def LNVarToNVVar
   (outer : ℕ)
   (context : Std.HashMap ℤ String) :
@@ -59,7 +61,9 @@ def LNVarToNVVar
   | LN.Var.free_ x => Option.some x
   | LN.Var.bound_ n => context.find? (outer - n)
 
-
+/--
+  Helper function for LNToNV.
+-/
 def LNToNVAux
   (c : Char)
   (outer : ℕ)
@@ -84,9 +88,14 @@ def LNToNVAux
       let phi' ← LNToNVAux c (outer + 1) (context.insert (outer + 1) x') phi
       Option.some (NV.Formula.forall_ x' phi')
 
-
+/--
+  The conversion of locally nameless formulas to named variable formulas.
+-/
 def LNToNV
   (c : Char)
   (F : LN.Formula) :
   Option NV.Formula :=
   LNToNVAux c 0 ∅ F
+
+
+#lint
