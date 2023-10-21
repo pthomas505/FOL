@@ -9,7 +9,7 @@ namespace NV
   The type of named variable formulas.
 -/
 inductive Formula : Type
-  | pred_var_ : String → List String → Formula
+  | pred_ : String → List String → Formula
   | not_ : Formula → Formula
   | imp_ : Formula → Formula → Formula
   | forall_ : String → Formula → Formula
@@ -23,7 +23,7 @@ open Formula
   The string representation of named variable formulas.
 -/
 def Formula.toString : Formula → String
-  | pred_var_ X xs => s! "({X} {xs})"
+  | pred_ X xs => s! "({X} {xs})"
   | not_ phi => s! "(¬ {phi.toString})"
   | imp_ phi psi => s! "({phi.toString} → {psi.toString})"
   | forall_ x phi => s! "(∀ {x}. {phi.toString})"

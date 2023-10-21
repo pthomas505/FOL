@@ -87,6 +87,34 @@ def Formula.boundVarSet (F : Formula) : Finset Var :=
 
 --------------------------------------------------
 
+/--
+  Helper function for Formula.freeStringSet
+-/
+def Var.freeStringSet : Var → Finset String
+  | free_ x => {x}
+  | bound_ _ => ∅
+
+/--
+  Formula.freeStringSet F := The set of all of the strings that have an occurrence as a free variable in the formula F.
+-/
+def Formula.freeStringSet (F : Formula) : Finset String :=
+  F.varSet.biUnion Var.freeStringSet
+
+/--
+  Helper function for Formula.boundNatSet
+-/
+def Var.boundNatSet : Var → Finset ℕ
+  | free_ _ => ∅
+  | bound_ i => {i}
+
+/--
+  Formula.boundNatSet F := The set of all of the natural numbers that have an occurrence as a bound variable in the formula F.
+-/
+def Formula.boundNatSet (F : Formula) : Finset ℕ :=
+  F.varSet.biUnion Var.boundNatSet
+
+--------------------------------------------------
+
 theorem occursIn_iff_mem_varSet
   (v : Var)
   (F : Formula) :
