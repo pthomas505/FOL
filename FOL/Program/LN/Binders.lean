@@ -45,7 +45,7 @@ instance (v : Var) : Decidable v.isBound :=
 --------------------------------------------------
 
 /--
-  Formula.var F := The set of all of the variables that have an occurrence in the formula F.
+  Formula.varSet F := The set of all of the variables that have an occurrence in the formula F.
 -/
 def Formula.varSet : Formula → Finset Var
   | pred_ _ vs => vs.toFinset
@@ -95,7 +95,7 @@ def Var.freeStringSet : Var → Finset String
   | bound_ _ => ∅
 
 /--
-  Formula.freeStringSet F := The set of all of the strings that have an occurrence as a free variable in the formula F.
+  Formula.freeStringSet F := The set of all of the strings that have an occurrence as the name of a free variable in the formula F.
 -/
 def Formula.freeStringSet (F : Formula) : Finset String :=
   F.varSet.biUnion Var.freeStringSet
@@ -108,7 +108,7 @@ def Var.boundNatSet : Var → Finset ℕ
   | bound_ i => {i}
 
 /--
-  Formula.boundNatSet F := The set of all of the natural numbers that have an occurrence as a bound variable in the formula F.
+  Formula.boundNatSet F := The set of all of the natural numbers that have an occurrence as the de Bruijn index of a bound variable in the formula F.
 -/
 def Formula.boundNatSet (F : Formula) : Finset ℕ :=
   F.varSet.biUnion Var.boundNatSet
