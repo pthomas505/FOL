@@ -1,0 +1,77 @@
+import FOL.Program.LN.Formula
+import FOL.Tactics
+
+import Mathlib.Data.String.Lemmas
+
+
+def finset_string_max_len :
+  Finset String → ℕ :=
+  Finset.fold (fun (m n : ℕ) => max m n) 0 String.length
+
+
+lemma finset_string_max_len_mem
+  (x : String)
+  (xs : Finset String)
+  (h1 : x ∈ xs) :
+  x.length <= finset_string_max_len xs :=
+  by
+  induction xs using Finset.induction_on
+  case empty =>
+    simp at h1
+  case insert hd tl a1 ih =>
+    simp at h1
+
+    cases h1
+    case inl c1 =>
+      subst c1
+      unfold finset_string_max_len
+      simp
+    case inr c1 =>
+      unfold finset_string_max_len at ih
+
+      unfold finset_string_max_len
+      simp
+      right
+      exact ih c1
+
+
+def fresh
+  (x : String)
+  (c : Char)
+  (xs : Finset String) :
+  String :=
+  if h : x ∈ xs
+  then
+  have : finset_string_max_len xs - String.length x < finset_string_max_len xs + 1 - String.length x :=
+    by
+    obtain s1 := finset_string_max_len_mem x xs h
+    simp only [tsub_lt_tsub_iff_right s1]
+    simp
+  fresh (x ++ c.toString) c xs
+  else x
+  termination_by fresh x _ xs => finset_string_max_len xs + 1 - x.length
+
+
+lemma fresh_not_mem
+  (x : String)
+  (c : Char)
+  (xs : Finset String) :
+  fresh x c xs ∉ xs :=
+  if h : x ∈ xs
+  then
+  have : finset_string_max_len xs - String.length x < finset_string_max_len xs + 1 - String.length x :=
+    by
+    obtain s1 := finset_string_max_len_mem x xs h
+    simp only [tsub_lt_tsub_iff_right s1]
+    simp
+  by
+    unfold fresh
+    simp
+    simp only [if_pos h]
+    apply fresh_not_mem
+  else by
+    unfold fresh
+    simp
+    simp [if_neg h]
+    exact h
+  termination_by fresh_not_mem x _ xs => finset_string_max_len xs + 1 - x.length
