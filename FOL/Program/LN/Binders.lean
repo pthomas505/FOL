@@ -68,7 +68,7 @@ instance (v : Var) (F : Formula) : Decidable (occursIn v F) :=
   by
   induction F
   all_goals
-    unfold occursIn
+    simp only [occursIn]
     infer_instance
 
 --------------------------------------------------
