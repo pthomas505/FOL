@@ -116,9 +116,7 @@ def openFormulaList
   Formula :=
   openFormulaListAux 0 zs F
 
-
 --------------------------------------------------
-
 
 /--
   Helper function for closeFormulaAux.
@@ -159,9 +157,7 @@ def closeFormula
   Formula :=
   closeFormulaAux v 0 F
 
-
 --------------------------------------------------
-
 
 lemma CloseVarOpenVarComp
   (v : Var)
