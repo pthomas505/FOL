@@ -117,6 +117,14 @@ def Formula.boundNatSet (F : Formula) : Finset ℕ :=
 
 --------------------------------------------------
 
+/--
+  Formula.closed F := True if and only if the formula F contains no free variables.
+-/
+def Formula.closed (F : Formula) : Prop :=
+  F.freeVarSet = ∅
+
+--------------------------------------------------
+
 theorem occursIn_iff_mem_varSet
   (v : Var)
   (F : Formula) :
