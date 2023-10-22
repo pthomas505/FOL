@@ -46,7 +46,7 @@ namespace LN
 -/
 inductive Var
 | free_ : String → Var
-| bound_ : ℕ → Var
+| bound_ : ℕ → Var -- de Bruijn index
   deriving Inhabited, DecidableEq
 
 compile_inductive% Var
