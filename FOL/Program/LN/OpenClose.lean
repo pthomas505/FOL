@@ -102,11 +102,11 @@ def openFormulaListAux
 /--
   This is a multiple variable version of openFormula.
 
-  Let zs be an array of variables. Let B i be a bound variable in the formula F. Let k be the number of binders that an occurrence of B i is under. Then that occurrence of B i is changed according to:
+  Let zs be an array of variables. Let (bound_ i) be a bound variable in the formula F. Let k be the number of binders that an occurrence of (bound_ i) is under. Then that occurrence of (bound_ i) is changed according to:
 
-  i < k : B i -> B i
-  k <= i < k + zs.size : B i -> zs[i - k]
-  k + zs.size <= i : B i -> B (i - zs.size)
+  i < k : (bound_ i) -> (bound_ i)
+  k <= i < k + zs.size : (bound_ i) -> zs[i - k]
+  k + zs.size <= i : (bound_ i) -> bound_ (i - zs.size)
 
   zs is intended to be an array of free variables.
 -/
