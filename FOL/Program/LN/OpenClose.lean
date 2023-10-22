@@ -231,8 +231,8 @@ lemma CloseFormulaOpenFormulaComp
     simp only [occursIn] at h1
 
     simp
-    unfold openFormulaAux
-    unfold closeFormulaAux
+    simp only [openFormulaAux]
+    simp only [closeFormulaAux]
     simp
     simp only [List.map_eq_self_iff]
     intro v a1
@@ -246,8 +246,8 @@ lemma CloseFormulaOpenFormulaComp
     simp at phi_ih
 
     simp
-    unfold openFormulaAux
-    unfold closeFormulaAux
+    simp only [openFormulaAux]
+    simp only [closeFormulaAux]
     simp only [phi_ih k h1]
   case imp_ phi psi phi_ih psi_ih =>
     simp only [occursIn] at h1
@@ -256,8 +256,8 @@ lemma CloseFormulaOpenFormulaComp
     simp at phi_ih
 
     simp
-    unfold openFormulaAux
-    unfold closeFormulaAux
+    simp only [openFormulaAux]
+    simp only [closeFormulaAux]
     cases h1
     case _ h1_left h1_right =>
       congr
@@ -269,8 +269,8 @@ lemma CloseFormulaOpenFormulaComp
     simp at phi_ih
 
     simp
-    unfold openFormulaAux
-    unfold closeFormulaAux
+    simp only [openFormulaAux]
+    simp only [closeFormulaAux]
     congr
     exact phi_ih (k + 1) h1
 
@@ -287,30 +287,30 @@ lemma OpenFormulaCloseFormulaComp
     simp only [Formula.lc_at] at h1
 
     simp
-    unfold closeFormulaAux
-    unfold openFormulaAux
+    simp only [closeFormulaAux]
+    simp only [openFormulaAux]
     simp
     simp only [List.map_eq_self_iff]
     intro v a1
     apply OpenVarCloseVarComp
     exact h1 v a1
   case not_ phi phi_ih =>
-    unfold Formula.lc_at at h1
+    simp only [Formula.lc_at] at h1
 
     simp at phi_ih
 
     simp
-    unfold closeFormulaAux
-    unfold openFormulaAux
+    simp only [closeFormulaAux]
+    simp only [openFormulaAux]
     simp only [phi_ih k h1]
   case imp_ phi psi phi_ih psi_ih =>
-    unfold Formula.lc_at at h1
+    simp only [Formula.lc_at] at h1
 
     simp at phi_ih
 
     simp
-    unfold closeFormulaAux
-    unfold openFormulaAux
+    simp only [closeFormulaAux]
+    simp only [openFormulaAux]
     cases h1
     case _ h1_left h1_right =>
       congr
