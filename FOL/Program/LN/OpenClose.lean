@@ -3,6 +3,8 @@ import FOL.Program.LN.LC
 import FOL.List
 import FOL.Tactics
 
+set_option autoImplicit false
+
 
 namespace LN
 
