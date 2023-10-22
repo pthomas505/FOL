@@ -1,7 +1,6 @@
 import FOL.Program.LN.Formula
 import FOL.Tactics
 
-
 set_option autoImplicit false
 
 
@@ -50,6 +49,8 @@ instance (k : ℕ) (F : Formula) : Decidable (Formula.lc_at k F) :=
     infer_instance
 
 
+#eval Formula.lc_at 0 (pred_ "X" [free_ "x"])
+#eval Formula.lc_at 0 (pred_ "X" [bound_ 0])
 #eval Formula.lc_at 0 (forall_ "x" (pred_ "X" [bound_ 0]))
 #eval Formula.lc_at 0 (forall_ "x" (pred_ "X" [bound_ 1]))
 
