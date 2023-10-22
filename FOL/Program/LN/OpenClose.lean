@@ -371,15 +371,12 @@ lemma CloseVarInjOn
 lemma OpenFormulaLeftInvOn
   (k : ℕ)
   (y : String) :
-  Set.LeftInvOn (closeFormulaAux (free_ y) k) (openFormulaAux k (free_ y)) {F : Formula | (free_ y) ∉ F.freeVarSet} :=
+  Set.LeftInvOn (closeFormulaAux (free_ y) k) (openFormulaAux k (free_ y)) {F : Formula | ¬ occursIn (free_ y) F} :=
   by
   simp only [Set.LeftInvOn]
   simp
   intro F a1
   apply CloseFormulaOpenFormulaComp
-  simp only [← isFreeIn_iff_mem_freeVarSet] at a1
-  simp only [isFree] at a1
-  simp at a1
   exact a1
 
 
@@ -398,7 +395,7 @@ lemma CloseFormulaLeftInvOn
 lemma OpenFormulaInjOn
   (k : ℕ)
   (y : String) :
-  Set.InjOn (openFormulaAux k (free_ y)) {F : Formula | (free_ y) ∉ F.freeVarSet} :=
+  Set.InjOn (openFormulaAux k (free_ y)) {F : Formula | ¬ occursIn (free_ y) F} :=
   by
   apply Set.LeftInvOn.injOn
   exact OpenFormulaLeftInvOn k y
@@ -417,8 +414,8 @@ example
   (F G : Formula)
   (k : ℕ)
   (y : String)
-  (h1 : free_ y ∉ F.freeVarSet)
-  (h2 : free_ y ∉ G.freeVarSet)
+  (h1 : ¬ occursIn (free_ y) F)
+  (h2 : ¬ occursIn (free_ y) G)
   (h3 : openFormulaAux k (free_ y) F = openFormulaAux k (free_ y) G) :
   F = G :=
   by
