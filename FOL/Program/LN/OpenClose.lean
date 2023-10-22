@@ -77,7 +77,7 @@ def openVarList
       if _ : i - k < zs.size
       -- 0 <= i - k < zs.size
       then zs[i - k]
-      -- The index of each of the remaining out of scope bound variables is shifted to account for the removal of the zs.size number of out of scope indexes that have been removed.
+      -- The index of each of the remaining out of scope bound variables is reduced to account for the zs.size number of out of scope indexes that have been removed.
       -- ¬ i - k < zs.size -> i - k >= zs.size -> i >= zs.size + k -> i - zs.size >= k. Since k >= 0 then i - zs.size >= 0.
       else bound_ (i - zs.size)
 
@@ -102,7 +102,7 @@ def openFormulaListAux
 /--
   This is a multiple variable version of openFormula.
 
-  Let B i be a bound variable in the formula F. Let k be the number of binders that an occurrence of B i is under. Then that occurrence of B i is changed according to:
+  Let zs be an array of variables. Let B i be a bound variable in the formula F. Let k be the number of binders that an occurrence of B i is under. Then that occurrence of B i is changed according to:
 
   i < k : B i -> B i
   k <= i < k + zs.size : B i -> zs[i - k]
