@@ -325,6 +325,7 @@ lemma OpenFormulaCloseFormulaComp
     congr
     exact phi_ih (k + 1) h1
 
+--------------------------------------------------
 
 lemma OpenVarLeftInvOn
   (k : ℕ)
