@@ -66,6 +66,8 @@ instance : ToString Var :=
 
 /--
   The type of locally nameless formulas.
+
+  The string in the forall_ constructor is only used as a hint for translating to the named variable representation.
 -/
 inductive Formula : Type
   | pred_ : String → List Var → Formula
