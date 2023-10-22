@@ -3,9 +3,11 @@ import FOL.Tactics
 
 import Mathlib.Data.String.Lemmas
 
+set_option autoImplicit false
+
 
 /--
-  finset_string_max_len xs := The length of the longest string in the finite set of strings xs.
+  finset_string_max_len xs := The length of the longest string in the finite set of strings xs or 0 if the set is empty.
 -/
 def finset_string_max_len :
   Finset String → ℕ :=
