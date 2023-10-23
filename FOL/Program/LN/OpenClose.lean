@@ -425,5 +425,52 @@ example
     exact h2
   · exact h3
 
+--------------------------------------------------
+
+lemma OpenVarFreeVarSet
+  (v : Var)
+  (k : ℕ)
+  (y : String) :
+  (openVar k (free_ y) v).freeStringSet ⊆ v.freeStringSet ∪ {y} :=
+  by
+  cases v
+  case free_ x =>
+    simp only [openVar]
+    simp only [Var.freeStringSet]
+    simp
+  case bound_ i =>
+    simp only [openVar]
+    split
+    case _ c1 =>
+      simp only [Var.freeStringSet]
+      simp
+    case _ c1 =>
+      simp only [Var.freeStringSet]
+      simp
+
+
+lemma CloseVarFreeVarSet
+  (v : Var)
+  (y : String)
+  (k : ℕ) :
+  (closeVar (free_ y) k v).freeStringSet ⊆ v.freeStringSet \ {y} :=
+  by
+  cases v
+  case free_ x =>
+    simp only [closeVar]
+    split
+    case _ c1 =>
+      simp only [Var.freeStringSet]
+      simp
+    case _ c1 =>
+      simp at c1
+      simp only [Var.freeStringSet]
+      simp
+      exact ne_comm.mp c1
+  case bound_ i =>
+    simp only [closeVar]
+    simp only [Var.freeStringSet]
+    simp
+
 
 #lint
