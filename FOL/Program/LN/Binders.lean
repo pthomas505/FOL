@@ -6,7 +6,7 @@ set_option autoImplicit false
 
 namespace LN
 
-open Formula
+open Var Formula
 
 
 /--
@@ -170,6 +170,20 @@ theorem isBoundIn_iff_mem_boundVarSet
   simp
   intro _
   exact occursIn_iff_mem_varSet v F
+
+--------------------------------------------------
+
+lemma IsFreeIffExistsString
+  (v : Var) :
+  v.isFree ↔ ∃ (x : String), v = free_ x :=
+  by
+  cases v
+  case free_ x =>
+    simp only [isFree]
+    simp
+  case bound_ i =>
+    simp only [isFree]
+    simp
 
 
 #lint

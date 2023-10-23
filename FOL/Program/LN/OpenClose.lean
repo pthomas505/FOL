@@ -473,4 +473,51 @@ lemma CloseVarFreeVarSet
     simp
 
 
+lemma OpenFormulaFreeVarSet
+  (F : Formula)
+  (k : ℕ)
+  (y : String) :
+  (openFormulaAux k (free_ y) F).freeVarSet ⊆ F.freeVarSet ∪ {free_ y} :=
+  by
+  induction F generalizing k
+  case pred_ X vs =>
+    simp only [openFormulaAux]
+    simp only [Finset.subset_iff]
+    intro v
+    simp only [← isFreeIn_iff_mem_freeVarSet]
+    simp
+    simp only [← isFreeIn_iff_mem_freeVarSet]
+    simp only [occursIn]
+    simp
+    intro u a1 a2 a3
+    cases u
+    case _ x =>
+      simp only [openVar] at a2
+      simp only [a2] at a1
+      tauto
+    case _ i =>
+      simp only [openVar] at a2
+      split at a2
+      case _ c1 =>
+        right
+        simp only [a2]
+      case _ c2 =>
+        simp only [a2] at a1
+        tauto
+  case not_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    specialize phi_ih k
+    specialize psi_ih k
+    simp only [openFormulaAux]
+    simp only [Formula.freeVarSet]
+    sorry
+  case forall_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+
+
 #lint
