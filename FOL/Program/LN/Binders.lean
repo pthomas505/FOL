@@ -76,15 +76,53 @@ instance (v : Var) (F : Formula) : Decidable (occursIn v F) :=
 --------------------------------------------------
 
 /--
+  Helper function for Formula.freeVarSet
+-/
+def Var.freeVarSet : Var → Finset Var
+  | free_ x => {free_ x}
+  | bound_ _ => ∅
+
+
+/--
   Formula.freeVarSet F := The set of all of the free variables that have an occurrence in the formula F.
 -/
-def Formula.freeVarSet (F : Formula) : Finset Var :=
-  F.varSet.filter Var.isFree
+def Formula.freeVarSet : Formula → Finset Var
+  | pred_ _ vs => vs.toFinset.biUnion Var.freeVarSet
+  | not_ phi => phi.freeVarSet
+  | imp_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
+  | forall_ _ phi => phi.freeVarSet
+
+--------------------------------------------------
+
+/--
+  Helper function for Formula.boundVarSet
+-/
+def Var.boundVarSet : Var → Finset Var
+  | free_ _ => ∅
+  | bound_ i => {bound_ i}
+
 
 /--
   Formula.boundVarSet F := The set of all of the bound variables that have an occurrence in the formula F.
 -/
-def Formula.boundVarSet (F : Formula) : Finset Var :=
+def Formula.boundVarSet : Formula → Finset Var
+  | pred_ _ vs => vs.toFinset.biUnion Var.boundVarSet
+  | not_ phi => phi.boundVarSet
+  | imp_ phi psi => phi.boundVarSet ∪ psi.boundVarSet
+  | forall_ _ phi => phi.boundVarSet
+
+--------------------------------------------------
+
+/--
+  Formula.freeVarSet' F := The set of all of the free variables that have an occurrence in the formula F.
+-/
+def Formula.freeVarSet' (F : Formula) : Finset Var :=
+  F.varSet.filter Var.isFree
+
+/--
+  Formula.boundVarSet' F := The set of all of the bound variables that have an occurrence in the formula F.
+-/
+def Formula.boundVarSet' (F : Formula) : Finset Var :=
   F.varSet.filter Var.isBound
 
 --------------------------------------------------
@@ -155,10 +193,55 @@ theorem isFreeIn_iff_mem_freeVarSet
   (F : Formula) :
   occursIn v F ∧ v.isFree ↔ v ∈ F.freeVarSet :=
   by
-  simp only [freeVarSet]
-  simp
-  intro _
-  exact occursIn_iff_mem_varSet v F
+  induction F
+  case pred_ X vs =>
+    simp only [Formula.freeVarSet]
+    simp only [occursIn]
+    simp
+    constructor
+    · intro a1
+      apply Exists.intro v
+      cases v
+      case _ x =>
+        simp only [Var.freeVarSet]
+        simp
+        cases a1
+        case _ a1_left a1_right =>
+          exact a1_left
+      case _ i =>
+        simp only [isFree] at a1
+        cases a1
+        case _ a1_left a1_right =>
+          contradiction
+    · intro a1
+      apply Exists.elim a1
+      intro u a2
+      cases u
+      case _ x =>
+        simp only [Var.freeVarSet] at a2
+        simp at a2
+        cases a2
+        case _ a2_left a2_right =>
+          subst a2_right
+          simp only [isFree]
+          simp
+          exact a2_left
+      case _ i =>
+        simp only [Var.freeVarSet] at a2
+        simp at a2
+  case not_ phi phi_ih =>
+    simp only [Formula.freeVarSet]
+    simp only [occursIn]
+    exact phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.freeVarSet]
+    simp only [occursIn]
+    simp
+    tauto
+  case forall_ _ phi phi_ih =>
+    simp only [Formula.freeVarSet]
+    simp only [occursIn]
+    exact phi_ih
 
 
 theorem isBoundIn_iff_mem_boundVarSet
@@ -166,7 +249,74 @@ theorem isBoundIn_iff_mem_boundVarSet
   (F : Formula) :
   occursIn v F ∧ v.isBound ↔ v ∈ F.boundVarSet :=
   by
-  simp only [boundVarSet]
+  induction F
+  case pred_ X vs =>
+    simp only [Formula.boundVarSet]
+    simp only [occursIn]
+    simp
+    constructor
+    · intro a1
+      apply Exists.intro v
+      cases v
+      case _ x =>
+        simp only [Var.isBound] at a1
+        cases a1
+        case _ a1_left a1_right =>
+          contradiction
+      case _ i =>
+        simp only [Var.boundVarSet]
+        simp
+        cases a1
+        case _ a1_left a1_right =>
+          exact a1_left
+    · intro a1
+      apply Exists.elim a1
+      intro u a2
+      cases u
+      case _ x =>
+        simp only [Var.boundVarSet] at a2
+        simp at a2
+      case _ i =>
+        simp only [Var.boundVarSet] at a2
+        simp at a2
+        cases a2
+        case _ a2_left a2_right =>
+          subst a2_right
+          simp only [isBound]
+          simp
+          exact a2_left
+  case not_ phi phi_ih =>
+    simp only [Formula.boundVarSet]
+    simp only [occursIn]
+    exact phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.boundVarSet]
+    simp only [occursIn]
+    simp
+    tauto
+  case forall_ _ phi phi_ih =>
+    simp only [Formula.boundVarSet]
+    simp only [occursIn]
+    exact phi_ih
+
+
+theorem isFreeIn_iff_mem_freeVarSet'
+  (v : Var)
+  (F : Formula) :
+  occursIn v F ∧ v.isFree ↔ v ∈ F.freeVarSet' :=
+  by
+  simp only [freeVarSet']
+  simp
+  intro _
+  exact occursIn_iff_mem_varSet v F
+
+
+theorem isBoundIn_iff_mem_boundVarSet'
+  (v : Var)
+  (F : Formula) :
+  occursIn v F ∧ v.isBound ↔ v ∈ F.boundVarSet' :=
+  by
+  simp only [boundVarSet']
   simp
   intro _
   exact occursIn_iff_mem_varSet v F
