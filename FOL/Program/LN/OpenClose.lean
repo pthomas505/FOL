@@ -529,28 +529,15 @@ lemma OpenFormulaFreeVarSet
   induction F generalizing k
   case pred_ X vs =>
     simp only [openFormulaAux]
-    simp only [Finset.subset_iff]
-    intro v
-    simp only [← isFreeIn_iff_mem_freeVarSet]
+    simp only [Formula.freeVarSet]
     simp
-    simp only [← isFreeIn_iff_mem_freeVarSet]
-    simp only [occursIn]
-    simp
-    intro u a1 a2 a3
-    cases u
-    case _ x =>
-      simp only [openVar] at a2
-      simp only [a2] at a1
-      tauto
-    case _ i =>
-      simp only [openVar] at a2
-      split at a2
-      case _ c1 =>
-        right
-        simp only [a2]
-      case _ c2 =>
-        simp only [a2] at a1
-        tauto
+    intro v a1
+    trans (Var.freeVarSet v ∪ {free_ y})
+    · exact OpenVarFreeVarSet v k y
+    · apply Finset.union_subset_union_left
+      apply Finset.subset_biUnion_of_mem
+      simp
+      exact a1
   case not_ phi phi_ih =>
     simp only [openFormulaAux]
     simp only [Formula.freeVarSet]
@@ -563,6 +550,41 @@ lemma OpenFormulaFreeVarSet
     sorry
   case forall_ phi phi_ih =>
     simp only [openFormulaAux]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+
+
+lemma CloseFormulaFreeVarSet
+  (F : Formula)
+  (y : String)
+  (k : ℕ) :
+  (closeFormulaAux (free_ y) k F).freeVarSet ⊆ F.freeVarSet \ {free_ y} :=
+  by
+  induction F generalizing k
+  case pred_ X vs =>
+    simp only [closeFormulaAux]
+    simp only [Formula.freeVarSet]
+    simp
+    intro v a1
+    trans (v.freeVarSet \ {free_ y})
+    · exact CloseVarFreeVarSet v y k
+    · apply Finset.sdiff_subset_sdiff
+      · apply Finset.subset_biUnion_of_mem
+        simp
+        exact a1
+      · simp
+  case not_ phi phi_ih =>
+    simp only [closeFormulaAux]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    specialize phi_ih k
+    specialize psi_ih k
+    simp only [closeFormulaAux]
+    simp only [Formula.freeVarSet]
+    sorry
+  case forall_ phi phi_ih =>
+    simp only [closeFormulaAux]
     simp only [Formula.freeVarSet]
     apply phi_ih
 
