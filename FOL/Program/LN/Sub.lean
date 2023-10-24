@@ -111,7 +111,7 @@ lemma SubOpenFormula
     openFormulaAux k (free_ x) (Formula.sub_Var (str_fun_to_var_fun σ) F) :=
   by
   induction F generalizing k
-  case pred_ X xs =>
+  case pred_ X vs =>
     simp only [openFormulaAux]
     simp only [Formula.sub_Var]
     simp
@@ -146,7 +146,7 @@ lemma SubCloseFormula
   Formula.sub_Var (str_fun_to_var_fun σ) (closeFormulaAux (free_ x) k F) = closeFormulaAux (free_ x) k (Formula.sub_Var (str_fun_to_var_fun σ) F) :=
   by
   induction F generalizing k
-  case pred_ X xs =>
+  case pred_ X vs =>
     simp only [closeFormulaAux]
     simp only [Formula.sub_Var]
     simp
@@ -169,3 +169,67 @@ lemma SubCloseFormula
     simp only [Formula.sub_Var]
     congr! 1
     apply phi_ih
+
+--------------------------------------------------
+
+theorem shift_sub_Var
+  (D : Type)
+  (σ : String → String)
+  (V : VarAssignment D)
+  (d : D) :
+  shift D (V ∘ Var.sub_Var (str_fun_to_var_fun σ)) d =
+    shift D V d ∘ Var.sub_Var (str_fun_to_var_fun σ) :=
+  by
+  funext v
+  simp
+  cases v
+  case _ x =>
+    simp only [Var.sub_Var]
+    simp only [shift]
+    simp only [str_fun_to_var_fun]
+    simp
+  case _ i =>
+    cases i
+    case zero =>
+      simp only [Var.sub_Var]
+      simp only [shift]
+    case succ n =>
+      simp only [Var.sub_Var]
+      simp only [shift]
+      simp
+
+
+theorem HoldsIffSubHolds
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (σ : String → String)
+  (F : Formula) :
+  Holds D I (V ∘ (Var.sub_Var (str_fun_to_var_fun σ))) F ↔
+    Holds D I V (Formula.sub_Var (str_fun_to_var_fun σ) F) :=
+  by
+  induction F generalizing V
+  case pred_ X vs =>
+    simp only [Formula.sub_Var]
+    simp only [Holds]
+    congr! 1
+    simp
+  case not_ phi phi_ih =>
+    simp only [Formula.sub_Var]
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.sub_Var]
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [Formula.sub_Var]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [← phi_ih]
+    congr!
+    apply shift_sub_Var
