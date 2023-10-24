@@ -427,7 +427,7 @@ example
 
 --------------------------------------------------
 
-lemma OpenVarFreeVarSet
+lemma OpenVarFreeStringSet
   (v : Var)
   (k : ℕ)
   (y : String) :
@@ -449,7 +449,7 @@ lemma OpenVarFreeVarSet
       simp
 
 
-lemma CloseVarFreeVarSet
+lemma CloseVarFreeStringSet
   (v : Var)
   (y : String)
   (k : ℕ) :
@@ -470,6 +470,53 @@ lemma CloseVarFreeVarSet
   case bound_ i =>
     simp only [closeVar]
     simp only [Var.freeStringSet]
+    simp
+
+--------------------------------------------------
+
+lemma OpenVarFreeVarSet
+  (v : Var)
+  (k : ℕ)
+  (y : String) :
+  (openVar k (free_ y) v).freeVarSet ⊆ v.freeVarSet ∪ {free_ y} :=
+  by
+  cases v
+  case free_ x =>
+    simp only [openVar]
+    simp only [Var.freeVarSet]
+    simp
+  case bound_ i =>
+    simp only [openVar]
+    split
+    case _ c1 =>
+      simp only [Var.freeVarSet]
+      simp
+    case _ c1 =>
+      simp only [Var.freeVarSet]
+      simp
+
+
+lemma CloseVarFreeVarSet
+  (v : Var)
+  (y : String)
+  (k : ℕ) :
+  (closeVar (free_ y) k v).freeVarSet ⊆ v.freeVarSet \ {free_ y} :=
+  by
+  cases v
+  case free_ x =>
+    simp only [closeVar]
+    split
+    case _ c1 =>
+      simp only [Var.freeVarSet]
+      simp
+    case _ c1 =>
+      simp only [Var.freeVarSet]
+      simp
+      simp at c1
+      exact ne_comm.mp c1
+  case bound_ i =>
+    simp only [closeVar]
+    simp only [Var.freeVarSet]
     simp
 
 
