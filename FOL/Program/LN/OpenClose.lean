@@ -659,5 +659,91 @@ lemma Holds_openFormulaAux
     congr! 1
     apply shift_openVar
 
+--------------------------------------------------
+
+lemma shift_openVarList
+  (D : Type)
+  (V : VarAssignment D)
+  (k : ℕ)
+  (zs : Array String)
+  (d : D) :
+  shift D (V ∘ openVarList k (zs.map Var.free_)) d = shift D V d ∘ openVarList (k + 1) (zs.map Var.free_) :=
+  by
+  funext v
+  simp
+  cases v
+  case _ a =>
+    simp only [openVarList]
+    simp only [shift]
+    simp
+  case _ n =>
+    simp only [openVarList]
+    simp only [shift]
+    simp
+    cases n
+    case zero =>
+      simp
+    case succ n =>
+      simp
+      split
+      case _ c1 =>
+        have s1 : n + 1 < k + 1
+        exact Nat.add_lt_add_right c1 1
+        simp only [if_pos s1]
+
+      case _ c1 =>
+        have s1 : ¬ n + 1 < k + 1
+        intro contra
+        apply c1
+        exact Nat.succ_lt_succ_iff.mp contra
+
+        split
+        case _ c2 =>
+          simp
+        case _ c2 =>
+          have s2 : Array.size zs ≤ n
+          simp at c2
+          trans (n - k)
+          · exact c2
+          · exact Nat.sub_le n k
+
+          simp only [Nat.succ_sub s2]
+
+
+lemma Holds_openFormulaListAux
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (zs : Array String)
+  (k : Nat)
+  (F : Formula) :
+  Holds D I (V ∘ openVarList k (zs.map Var.free_)) F ↔
+    Holds D I V (openFormulaListAux k (zs.map Var.free_) F) :=
+  by
+  induction F generalizing V k
+  case pred_ X xs =>
+    simp only [openFormulaListAux]
+    simp only [Holds]
+    simp
+  case not_ phi phi_ih =>
+    simp only [openFormulaListAux]
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [openFormulaListAux]
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [openFormulaListAux]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [← phi_ih]
+    congr! 1
+    apply shift_openVarList
+
 
 #lint
