@@ -1,5 +1,6 @@
 import FOL.Program.LN.Binders
 import FOL.Program.LN.LC
+import FOL.Program.LN.Semantics
 import FOL.List
 import FOL.Tactics
 
@@ -587,6 +588,76 @@ lemma CloseFormulaFreeVarSet
     simp only [closeFormulaAux]
     simp only [Formula.freeVarSet]
     apply phi_ih
+
+--------------------------------------------------
+
+lemma shift_openVar
+  (D : Type)
+  (V : VarAssignment D)
+  (k : ℕ)
+  (y : String)
+  (d : D) :
+  shift D (V ∘ openVar k (free_ y)) d =
+    shift D V d ∘ openVar (k + 1) (free_ y) :=
+  by
+  funext v
+  simp
+  cases v
+  case _ x =>
+    simp only [openVar]
+    simp only [shift]
+    simp
+  case _ i =>
+    cases i
+    case zero =>
+      simp only [openVar]
+      simp only [shift]
+      rfl
+    case succ i =>
+      simp only [openVar]
+      simp only [shift]
+      simp
+      split
+      case _ c1 =>
+        simp
+      case _ c1 =>
+        simp
+
+
+lemma Holds_openFormulaAux
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (F : Formula)
+  (k : Nat)
+  (y : String) :
+  Holds D I (V ∘ openVar k (free_ y)) F ↔
+    Holds D I V (openFormulaAux k (free_ y) F) :=
+  by
+  induction F generalizing V k
+  case pred_ X xs =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    simp
+  case not_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [<- phi_ih]
+    congr! 1
+    apply shift_openVar
 
 
 #lint
