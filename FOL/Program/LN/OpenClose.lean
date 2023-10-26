@@ -65,7 +65,7 @@ def openFormula
 -/
 def openVarList
   (k : Nat)
-  (zs : Array Var) :
+  (zs : List Var) :
   Var → Var
   | free_ x => free_ x
   | bound_ i =>
@@ -75,12 +75,12 @@ def openVarList
     else
     -- i is out of scope
       -- ¬ i < k -> i >= k -> i - k >= 0 -> 0 <= i - k
-      if _ : i - k < zs.size
-      -- 0 <= i - k < zs.size
+      if _ : i - k < zs.length
+      -- 0 <= i - k < zs.length
       then zs[i - k]
-      -- The index of each of the remaining out of scope bound variables is reduced to account for the zs.size number of out of scope indexes that have been removed.
-      -- ¬ i - k < zs.size -> i - k >= zs.size -> i >= zs.size + k -> i - zs.size >= k. Since k >= 0 then i - zs.size >= 0.
-      else bound_ (i - zs.size)
+      -- The index of each of the remaining out of scope bound variables is reduced to account for the zs.length number of out of scope indexes that have been removed.
+      -- ¬ i - k < zs.length -> i - k >= zs.length -> i >= zs.length + k -> i - zs.length >= k. Since k >= 0 then i - zs.length >= 0.
+      else bound_ (i - zs.length)
 
 
 /--
@@ -92,7 +92,7 @@ def openVarList
 -/
 def openFormulaListAux
   (k : Nat)
-  (zs : Array Var) :
+  (zs : List Var) :
   Formula → Formula
   | pred_ X vs => pred_ X (vs.map (openVarList k zs))
   | not_ phi => not_ (openFormulaListAux k zs phi)
@@ -112,7 +112,7 @@ def openFormulaListAux
   zs is intended to be an array of free variables.
 -/
 def openFormulaList
-  (zs : Array Var)
+  (zs : List Var)
   (F : Formula) :
   Formula :=
   openFormulaListAux 0 zs F
@@ -665,7 +665,7 @@ lemma shift_openVarList
   (D : Type)
   (V : VarAssignment D)
   (k : ℕ)
-  (zs : Array String)
+  (zs : List String)
   (d : D) :
   shift D (V ∘ openVarList k (zs.map Var.free_)) d = shift D V d ∘ openVarList (k + 1) (zs.map Var.free_) :=
   by
@@ -701,7 +701,7 @@ lemma shift_openVarList
         case _ c2 =>
           simp
         case _ c2 =>
-          have s2 : Array.size zs ≤ n
+          have s2 : zs.length ≤ n
           simp at c2
           trans (n - k)
           · exact c2
@@ -714,7 +714,7 @@ lemma Holds_openFormulaListAux
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
-  (zs : Array String)
+  (zs : List String)
   (k : Nat)
   (F : Formula) :
   Holds D I (V ∘ openVarList k (zs.map Var.free_)) F ↔
@@ -745,5 +745,67 @@ lemma Holds_openFormulaListAux
     congr! 1
     apply shift_openVarList
 
+--------------------------------------------------
 
-#lint
+def Formula.predSub
+  (τ : String → ℕ → Formula) :
+  Formula → Formula
+  | pred_ X vs => openFormulaListAux 0 vs (τ X vs.length)
+  | not_ phi => not_ (phi.predSub τ)
+  | imp_ phi psi => imp_ (phi.predSub τ) (psi.predSub τ)
+  | forall_ x phi => forall_ x (phi.predSub τ)
+
+
+def Interpretation.usingPred
+  (D : Type)
+  (I : Interpretation D)
+  (pred_ : String → List D → Prop) :
+  Interpretation D := {
+    nonempty_ := I.nonempty_
+    pred_ := pred_ }
+
+
+def VarAssignment.subN_aux
+  (D : Type)
+  (f : ℕ → D) :
+  List D → ℕ → D
+  | [], n => f n
+  | d :: _, 0 => d
+  | _ :: ds, n + 1 => subN_aux D f ds n
+
+
+def VarAssignment.subN
+  (D : Type)
+  (V : VarAssignment D)
+  (ds : List D) :
+  VarAssignment D
+  | free_ x => V (free_ x)
+  | bound_ i => subN_aux D (V ∘ bound_) ds i
+
+
+theorem predSub_aux
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (τ : String → ℕ → Formula)
+  (F : Formula)
+  (h1 : ∀ (v : Var), v ∈ F.varSet → v.isFree) :
+  Holds D I V (F.predSub τ) ↔
+    Holds D (Interpretation.usingPred D I fun (X : String) (ds : List D) => Holds D I (VarAssignment.subN D V ds) (τ X ds.length)) V F :=
+  by
+  induction F
+  case pred_ X vs =>
+    simp only [varSet] at h1
+    simp at h1
+
+    simp only [predSub]
+    simp only [Interpretation.usingPred]
+    simp only [Holds]
+    simp
+    obtain s1 := Holds_openFormulaListAux D I V
+    sorry
+  all_goals
+    sorry
+
+
+--#lint
