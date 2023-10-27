@@ -635,7 +635,7 @@ lemma Holds_openFormulaAux
     Holds D I V (openFormulaAux k (free_ y) F) :=
   by
   induction F generalizing V k
-  case pred_ X xs =>
+  case pred_ X vs =>
     simp only [openFormulaAux]
     simp only [Holds]
     simp
@@ -721,7 +721,7 @@ lemma Holds_openFormulaListAux
     Holds D I V (openFormulaListAux k (zs.map Var.free_) F) :=
   by
   induction F generalizing V k
-  case pred_ X xs =>
+  case pred_ X vs =>
     simp only [openFormulaListAux]
     simp only [Holds]
     simp
@@ -789,21 +789,26 @@ theorem predSub_aux
   (V : VarAssignment D)
   (τ : String → ℕ → Formula)
   (F : Formula)
-  (h1 : ∀ (v : Var), v ∈ F.varSet → v.isFree) :
+  (h1 : F.lc_at 0) :
   Holds D I V (F.predSub τ) ↔
     Holds D (Interpretation.usingPred D I fun (X : String) (ds : List D) => Holds D I (VarAssignment.subN D V ds) (τ X ds.length)) V F :=
   by
-  induction F
+  induction F generalizing V
   case pred_ X vs =>
-    simp only [varSet] at h1
-    simp at h1
-
+    simp only [Formula.lc_at] at h1
     simp only [predSub]
     simp only [Interpretation.usingPred]
     simp only [Holds]
     simp
-    obtain s1 := Holds_openFormulaListAux D I V
+    obtain s1 := Holds_openFormulaListAux D I V _ 0 (τ X (List.length vs))
     sorry
+  case forall_ _ phi phi_ih =>
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    specialize phi_ih (shift D V d)
+    sorry
+
   all_goals
     sorry
 
