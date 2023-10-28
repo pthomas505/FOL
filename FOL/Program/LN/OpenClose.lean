@@ -831,10 +831,14 @@ theorem predSub_aux
     obtain s1 := free_var_list_to_string_list vs h1
     apply Exists.elim s1
     intro xs a1
+    clear s1
 
-    obtain s1 := Holds_openFormulaListAux D I V xs 0 (τ X (List.length vs))
+    subst a1
+    simp
 
-
+    obtain s2 := Holds_openFormulaListAux D I V xs 0 (τ X (List.length xs))
+    simp only [← s2]
+    clear s2
 
     sorry
   case forall_ _ phi phi_ih =>
