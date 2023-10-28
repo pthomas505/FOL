@@ -783,6 +783,32 @@ def VarAssignment.subN
   | bound_ i => subN_aux D (V ∘ bound_) ds i
 
 
+lemma free_var_list_to_string_list
+  (vs : List Var)
+  (h1 : ∀ (v : Var), v ∈ vs → Var.lc_at 0 v) :
+  ∃ xs, vs = List.map free_ xs :=
+  by
+  induction vs
+  case nil =>
+    apply Exists.intro []
+    simp
+  case cons hd tl ih =>
+    simp at h1
+    cases h1
+    case intro h1_left h1_right =>
+      specialize ih h1_right
+      apply Exists.elim ih
+      intro xs a1
+      cases hd
+      case free_ x =>
+        apply Exists.intro (x :: xs)
+        simp
+        exact a1
+      case bound_ i =>
+        simp only [Var.lc_at] at h1_left
+        simp at h1_left
+
+
 theorem predSub_aux
   (D : Type)
   (I : Interpretation D)
@@ -796,11 +822,20 @@ theorem predSub_aux
   induction F generalizing V
   case pred_ X vs =>
     simp only [Formula.lc_at] at h1
+
     simp only [predSub]
     simp only [Interpretation.usingPred]
     simp only [Holds]
     simp
-    obtain s1 := Holds_openFormulaListAux D I V _ 0 (τ X (List.length vs))
+
+    obtain s1 := free_var_list_to_string_list vs h1
+    apply Exists.elim s1
+    intro xs a1
+
+    obtain s1 := Holds_openFormulaListAux D I V xs 0 (τ X (List.length vs))
+
+
+
     sorry
   case forall_ _ phi phi_ih =>
     simp only [Holds]
