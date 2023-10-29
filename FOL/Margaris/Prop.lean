@@ -1048,4 +1048,12 @@ theorem prop_complete
       simp only [if_pos h1]
 
 
+macro "SC" : tactic => `(tactic|(
+  apply proof_imp_deduct
+  apply prop_complete
+  unfold Formula.IsTautoPrime
+  simp only [eval_not, eval_imp]
+  tauto))
+
+
 --#lint
