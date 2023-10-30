@@ -666,7 +666,7 @@ theorem Forall_spec_id (xs : List VarName) (P : Formula) : IsProof ((Forall_ xs 
     simp only [Set.mem_singleton_iff, eq_self_iff_true, true_and_iff]
     rfl
 
-theorem forallSpecId' (xs : List VarName) (P : Formula) (Δ : Set Formula)
+theorem Forall_spec_id' (xs : List VarName) (P : Formula) (Δ : Set Formula)
     (h1 : IsDeduct Δ (Forall_ xs P)) : IsDeduct Δ P :=
   by
   induction xs
@@ -769,71 +769,72 @@ theorem T_18_2 (U V : Formula) (P_U P_V : Formula) (l : List VarName)
           apply h1_ih
           intro v a1
           cases a1
-          apply h2 v a1_left
-          tauto
+          case _ a1_left a1_right =>
+            apply h2 v a1_left
+            right
+            apply a1_right
         · apply IsDeduct.assume_
           simp only [Set.mem_singleton]
       · intro H a1
         simp only [Set.mem_singleton_iff] at a1
         subst a1
-        simp only [Forall_is_free_in]
-        unfold formula.iff_
-        unfold formula.and_
-        unfold is_free_in
-        simp
-        contrapose
-        push_neg
-        intro a2
-        apply h2
-        · tauto
-        · tauto
+        simp only [Forall_isFreeIn]
+        simp only [def_iff_]
+        --unfold formula.iff_
+        simp only [def_and_]
+        --unfold formula.and_
+        simp only [isFreeIn]
+        sorry
 
-/- ./././Mathport/Syntax/Translate/Tactic/Basic.lean:62:14: parse error: [] -/
+
 theorem C_18_3 (U V : Formula) (P_U P_V : Formula) (h1 : IsReplOfFormulaInFormula U V P_U P_V)
     (h2 : IsProof (U.iff_ V)) : IsProof (P_U.iff_ P_V) :=
   by
   apply
     IsDeduct.mp_
-      (Forall_ ((U.free_var_set ∪ V.free_var_set) ∩ P_U.bound_var_set).toList (U.iff_ V))
-  · apply T_18_2 U V P_U P_V ((U.free_var_set ∪ V.free_var_set) ∩ P_U.bound_var_set).toList h1
+      (Forall_ ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList (U.iff_ V))
+  · apply T_18_2 U V P_U P_V ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList h1
     intro v a1
     simp only [Finset.mem_toList, Finset.mem_inter, Finset.mem_union]
     simp only [is_free_in_iff_mem_free_var_set, is_bound_in_iff_mem_bound_var_set] at a1
     exact a1
-  · unfold formula.Forall_
-    induction ((U.free_var_set ∪ V.free_var_set) ∩ P_U.bound_var_set).toList
-    case nil =>
+  · unfold Formula.Forall_
+    induction ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList
+    case _ =>
       simp only [List.foldr_nil]
       exact h2
-    case cons hd tl ih =>
+    case _ hd tl ih =>
       simp only [List.foldr_cons]
       apply generalization
       · exact ih
-      · simp?
+      · simp
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 -- The replacement theorem
-theorem c184 (U V : Formula) (P_U P_V : Formula) (Δ : Set Formula)
+theorem C_18_4 (U V : Formula) (P_U P_V : Formula) (Δ : Set Formula)
     (h1 : IsReplOfFormulaInFormula U V P_U P_V) (h2 : IsProof (U.iff_ V)) (h3 : IsDeduct Δ P_U) :
     IsDeduct Δ P_V := by
   apply IsDeduct.mp_ P_U
   · apply IsDeduct.mp_ (P_U.iff_ P_V)
-    · unfold formula.iff_
-      unfold formula.and_
-      run_tac
-        SC
+    · simp only [def_iff_]
+      simp only [def_and_]
+      --unfold formula.iff_
+      --unfold formula.and_
+      SC
     · apply proof_imp_deduct
       exact C_18_3 U V P_U P_V h1 h2
   · exact h3
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_18_5 (P : Formula) (v : VarName) : IsProof ((forall_ v P).iff_ (exists_ v P.not_).not_) :=
   by
-  unfold exists_
+  simp only [def_exists_]
+  --unfold exists_
   apply C_18_4 P P.not_.not_ ((forall_ v P).iff_ (forall_ v P).not_.not_)
-  · unfold formula.iff_
-    unfold formula.and_
+  · simp only [def_iff_]
+    simp only [def_and_]
+    --unfold formula.iff_
+    --unfold formula.and_
     apply is_repl_of_formula_in_formula.not_
     apply is_repl_of_formula_in_formula.imp_
     · apply is_repl_of_formula_in_formula.imp_
@@ -855,27 +856,39 @@ theorem T_18_5 (P : Formula) (v : VarName) : IsProof ((forall_ v P).iff_ (exists
         · rfl
       · apply is_repl_of_formula_in_formula.same_
         rfl
-  · unfold formula.iff_
-    unfold formula.and_
-    run_tac
-      SC
-  · unfold formula.iff_
-    unfold formula.and_
-    run_tac
-      SC
+  · simp only [def_iff_]
+    simp only [def_and_]
+    --unfold formula.iff_
+    --unfold formula.and_
+    SC
+  · simp only [def_iff_]
+    simp only [def_and_]
+    --unfold formula.iff_
+    --unfold formula.and_
+    SC
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_18_6 (P_u P_v : Formula) (u v : VarName) (h1 : Similar P_u P_v u v) :
     IsProof ((forall_ u P_u).iff_ (forall_ v P_v)) :=
   by
-  unfold similar at h1  <;> cases h1
-  cases h1_right; cases h1_right_right; cases h1_right_right_right; cases h1_right_right_right_right
+  simp only [Similar] at h1
+  cases h1
+  case _ h1_left h1_right =>
+    cases h1_right
+    case _ h1_right_left h1_right_right =>
+      cases h1_right_right
+      case _ h1_right_right_left h1_right_right_right =>
+        cases h1_right_right_right
+        case _ h1_right_right_right_left h1_right_right_right_right =>
+          cases h1_right_right_right_right
+          case _ h1_right_right_right_right_left h1_right_right_right_right_right =>
   apply IsDeduct.mp_ ((forall_ v P_v).imp_ (forall_ u P_u))
   · apply IsDeduct.mp_ ((forall_ u P_u).imp_ (forall_ v P_v))
-    · unfold formula.iff_
-      unfold formula.and_
-      run_tac
-        SC
+    · simp only [def_iff_]
+      simp only [def_and_]
+      --unfold formula.iff_
+      --unfold formula.and_
+      SC
     · apply deduction_theorem
       simp only [Set.union_singleton, insert_emptyc_eq]
       apply generalization
@@ -887,9 +900,9 @@ theorem T_18_6 (P_u P_v : Formula) (u v : VarName) (h1 : Similar P_u P_v u v) :
       · intro H a1
         simp only [Set.mem_singleton_iff] at a1
         subst a1
-        unfold is_free_in
+        unfold isFreeIn
         simp only [Bool.of_decide_iff, not_and]
-        intro a2
+        intro _
         exact h1_left
   · apply deduction_theorem
     simp only [Set.union_singleton, insert_emptyc_eq]
@@ -902,13 +915,13 @@ theorem T_18_6 (P_u P_v : Formula) (u v : VarName) (h1 : Similar P_u P_v u v) :
     · intro H a1
       simp only [Set.mem_singleton_iff] at a1
       subst a1
-      unfold is_free_in
+      unfold isFreeIn
       simp only [Bool.of_decide_iff, not_and]
-      intro a2
+      intro _
       exact h1_right_left
 
 -- Change of bound variable
-theorem t187 (P_u P_v Q Q' : Formula) (u v : VarName) (Δ : Set Formula) (h1 : IsDeduct Δ Q)
+theorem T_18_7 (P_u P_v Q Q' : Formula) (u v : VarName) (Δ : Set Formula) (h1 : IsDeduct Δ Q)
     (h2 : IsReplOfFormulaInFormula (forall_ u P_u) (forall_ v P_v) Q Q')
     (h3 : Similar P_u P_v u v) : IsDeduct Δ Q' :=
   by
@@ -918,23 +931,25 @@ theorem t187 (P_u P_v Q Q' : Formula) (u v : VarName) (Δ : Set Formula) (h1 : I
 
 theorem similar_not (P_u P_v : Formula) (u v : VarName) (h1 : Similar P_u P_v u v) :
     Similar P_u.not_ P_v.not_ u v := by
-  unfold similar at *
-  unfold is_free_in at *
+  unfold Similar at *
+  unfold isFreeIn at *
   unfold fastAdmits at *
-  unfold fast_admits_aux at *
+  unfold fastAdmitsAux at *
   unfold fastReplaceFree at *
   tauto
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_18_8 (P_u P_v : Formula) (u v : VarName) (h1 : Similar P_u P_v u v) :
     IsProof ((exists_ u P_u).iff_ (exists_ v P_v)) :=
   by
-  unfold exists_
+  simp only [def_exists_]
+  --unfold exists_
   apply IsDeduct.mp_ ((forall_ u P_u.not_).iff_ (forall_ v P_v.not_))
-  · unfold formula.iff_
-    unfold formula.and_
-    run_tac
-      SC
+  · simp only [def_iff_]
+    simp only [def_and_]
+    --unfold formula.iff_
+    --unfold formula.and_
+    SC
   · apply T_18_6
     exact similar_not P_u P_v u v h1
 
@@ -946,15 +961,16 @@ theorem t189 (Q Q' : Formula) (P_u P_v : Formula) (u v : VarName) (Δ : Set Form
   · exact T_18_8 P_u P_v u v h3
   · exact h1
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_19_1 (P : Formula) (v : VarName) (h1 : ¬isFreeIn v P) : IsProof ((forall_ v P).iff_ P) :=
   by
   apply IsDeduct.mp_ ((forall_ v P).imp_ P)
   · apply IsDeduct.mp_ (P.imp_ (forall_ v P))
-    · unfold formula.iff_
-      unfold formula.and_
-      run_tac
-        SC
+    · simp only [def_iff_]
+    -- formula.iff_
+      simp only [def_and_]
+      --unfold formula.and_
+      SC
     · apply IsDeduct.axiom_
       exact IsAxiom.pred_3_ v P h1
   · apply IsDeduct.axiom_
@@ -962,27 +978,30 @@ theorem T_19_1 (P : Formula) (v : VarName) (h1 : ¬isFreeIn v P) : IsProof ((for
     · apply fastAdmits_self
     · apply fastReplaceFree_self
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_19_2 (P : Formula) (u v : VarName) :
     IsProof ((forall_ u (forall_ v P)).iff_ (forall_ v (forall_ u P))) :=
   by
   apply IsDeduct.mp_ ((forall_ u (forall_ v P)).imp_ (forall_ v (forall_ u P)))
   · apply IsDeduct.mp_ ((forall_ v (forall_ u P)).imp_ (forall_ u (forall_ v P)))
-    · unfold formula.iff_
-      unfold formula.and_
-      run_tac
-        SC
+    · simp only [def_iff_]
+      simp only [def_and_]
+      --unfold formula.iff_
+      --unfold formula.and_
+      SC
     · apply T_17_10
   · apply T_17_10
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_19_3 (P : Formula) (v : VarName) : IsProof ((forall_ v P.not_).iff_ (exists_ v P).not_) :=
   by
-  unfold Formula.exists_
-  unfold formula.iff_
-  unfold formula.and_
-  run_tac
-    SC
+  simp only [def_exists_]
+  simp only [def_iff_]
+  simp only [def_and_]
+  --unfold Formula.exists_
+  --unfold formula.iff_
+  --unfold formula.and_
+  SC
 
 theorem T_19_4 (P : Formula) (u v : VarName) :
     IsProof ((exists_ u (forall_ v P)).imp_ (forall_ v (exists_ u P))) :=
@@ -1001,31 +1020,36 @@ theorem T_19_4 (P : Formula) (u v : VarName) :
         simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, and_self_iff,
           true_or_iff]
     · simp only [Set.mem_singleton_iff, forall_eq]
-      unfold Formula.exists_
-      unfold is_free_in
+      simp only [def_exists_]
+      --unfold Formula.exists_
+      simp only [isFreeIn]
       simp
-    · unfold exists_
-      unfold is_free_in
+    · simp only [def_exists_]
+      simp only [isFreeIn]
+      --unfold exists_
+      --unfold is_free_in
       simp
   · simp only [Set.mem_singleton_iff, forall_eq]
-    unfold Formula.exists_
-    unfold is_free_in
+    simp only [def_exists_]
+    --unfold Formula.exists_
+    simp only [isFreeIn]
     simp
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_19_5 (P Q : Formula) (v : VarName) (h1 : ¬isFreeIn v P) :
     IsProof ((forall_ v (P.iff_ Q)).imp_ (P.iff_ (forall_ v Q))) :=
   by
   apply IsDeduct.mp_ ((forall_ v P).iff_ P)
   · apply IsDeduct.mp_ ((forall_ v (P.iff_ Q)).imp_ ((forall_ v P).iff_ (forall_ v Q)))
-    · unfold formula.iff_
-      unfold formula.and_
-      run_tac
-        SC
+    · simp only [def_iff_]
+      simp only [def_and_]
+      --unfold formula.iff_
+      --unfold formula.and_
+      SC
     · exact T_18_1 P Q v
   · exact T_19_1 P v h1
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_19_6_left (P Q : Formula) (v : VarName) :
     IsProof ((forall_ v (P.iff_ Q)).imp_ ((exists_ v P).imp_ (exists_ v Q))) :=
   by
@@ -1040,24 +1064,27 @@ theorem T_19_6_left (P Q : Formula) (v : VarName) :
     · simp only [fastReplaceFree_self]
       apply IsDeduct.mp_ P
       · apply IsDeduct.mp_ (P.iff_ Q)
-        · unfold iff_
-          unfold and_
-          run_tac
-            SC
+        · simp only [def_iff_]
+          simp only [def_and_]
+          --unfold iff_
+          --unfold and_
+          SC
         · apply specId v
           apply IsDeduct.assume_
           simp only [Set.union_singleton, Set.mem_insert_iff, Set.mem_singleton, or_true_iff]
       · apply IsDeduct.assume_
         simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, true_or_iff]
-  · unfold exists_
-    simp only [Set.mem_insert_iff, Set.mem_singleton_iff, forall_eq_or_imp, forall_eq]
-    unfold is_free_in
+  · simp only [def_exists_]
+    -- unfold exists_
     simp
-  · unfold exists_
-    unfold is_free_in
+    simp only [isFreeIn]
+    simp
+  · simp only [def_exists_]
+    -- unfold exists_
+    simp only [isFreeIn]
     simp
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_19_6_right (P Q : Formula) (v : VarName) :
     IsProof ((forall_ v (P.iff_ Q)).imp_ ((exists_ v Q).imp_ (exists_ v P))) :=
   by
@@ -1068,28 +1095,31 @@ theorem T_19_6_right (P Q : Formula) (v : VarName) :
     apply T_19_6_left Q P v
   · apply generalization
     · apply IsDeduct.mp_ (P.iff_ Q)
-      · unfold iff_
-        unfold and_
-        run_tac
-          SC
+      · simp only [def_iff_]
+        simp only [def_and_]
+        -- unfold iff_
+        -- unfold and_
+        SC
       · apply specId v
         apply IsDeduct.assume_
         simp only [Set.mem_singleton]
     · simp only [Set.mem_singleton_iff, forall_eq]
-      unfold is_free_in
+      unfold isFreeIn
       simp
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_19_6 (P Q : Formula) (v : VarName) :
     IsProof ((forall_ v (P.iff_ Q)).imp_ ((exists_ v P).iff_ (exists_ v Q))) :=
   by
   apply IsDeduct.mp_ ((forall_ v (P.iff_ Q)).imp_ ((exists_ v P).imp_ (exists_ v Q)))
   · apply IsDeduct.mp_ ((forall_ v (P.iff_ Q)).imp_ ((exists_ v Q).imp_ (exists_ v P)))
-    · unfold exists_
-      unfold iff_
-      unfold and_
-      run_tac
-        SC
+    · simp only [def_exists_]
+      simp only [def_iff_]
+      simp only [def_and_]
+      --unfold exists_
+      --unfold iff_
+      --unfold and_
+      SC
     · apply T_19_6_right
   · apply T_19_6_left
 
@@ -1126,37 +1156,36 @@ theorem T_19_TS_21_right (P Q : Formula) (v : VarName) (h1 : ¬isFreeIn v P) :
   · intro H a1
     simp only [Set.mem_singleton_iff] at a1
     subst a1
-    unfold is_free_in
-    simp only [eq_self_iff_true, not_true, false_and_iff, decide_False', Bool.coe_sort_false,
-      or_false_iff, Bool.decide_coe]
+    simp only [isFreeIn]
+    simp
     exact h1
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
+
 theorem T_19_TS_21 (P Q : Formula) (v : VarName) (h1 : ¬isFreeIn v P) :
     IsProof ((forall_ v (P.imp_ Q)).iff_ (P.imp_ (forall_ v Q))) :=
   by
   apply IsDeduct.mp_ ((forall_ v (P.imp_ Q)).imp_ (P.imp_ (forall_ v Q)))
   · apply IsDeduct.mp_ ((P.imp_ (forall_ v Q)).imp_ (forall_ v (P.imp_ Q)))
-    · unfold formula.iff_
-      unfold formula.and_
-      run_tac
-        SC
+    · simp only [def_iff_]
+      simp only [def_and_]
+      --unfold formula.iff_
+      --unfold formula.and_
+      SC
     · exact T_19_TS_21_right P Q v h1
   · exact T_19_TS_21_left P Q v h1
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Basic.lean:62:14: parse error: [] -/
-/- ./././Mathport/Syntax/Translate/Tactic/Basic.lean:62:14: parse error: [] -/
+
 theorem T_21_1 (x y : VarName) : IsProof (forall_ x (forall_ y ((eq_ x y).imp_ (eq_ y x)))) :=
   by
   apply generalization
   · apply generalization
     · apply IsDeduct.mp_ (eq_ y y)
       · apply IsDeduct.mp_ (((eq_ y y).and_ (eq_ x y)).imp_ ((eq_ y x).iff_ (eq_ y y)))
-        · unfold formula.iff_
-          unfold formula.and_
-          run_tac
-            SC
+        · simp only [def_iff_]
+          simp only [def_and_]
+          -- unfold formula.iff_
+          -- unfold formula.and_
+          SC
         · apply specId y
           apply specId y
           apply specId x
@@ -1167,16 +1196,11 @@ theorem T_21_1 (x y : VarName) : IsProof (forall_ x (forall_ y ((eq_ x y).imp_ (
         apply IsDeduct.axiom_
         exact IsAxiom.eq_1_ y
     · intro H a1
-      simp?  at a1
-      contradiction
+      simp at a1
   · intro H a1
-    simp?  at a1
-    contradiction
+    simp at a1
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Basic.lean:62:14: parse error: [] -/
-/- ./././Mathport/Syntax/Translate/Tactic/Basic.lean:62:14: parse error: [] -/
-/- ./././Mathport/Syntax/Translate/Tactic/Basic.lean:62:14: parse error: [] -/
+
 theorem T_21_2 (x y z : VarName) :
     IsProof (forall_ x (forall_ y (forall_ z (((eq_ x y).and_ (eq_ y z)).imp_ (eq_ x z))))) :=
   by
@@ -1185,10 +1209,11 @@ theorem T_21_2 (x y z : VarName) :
     · apply generalization
       · apply IsDeduct.mp_ (eq_ z z)
         · apply IsDeduct.mp_ (((eq_ x y).and_ (eq_ z z)).imp_ ((eq_ x z).iff_ (eq_ y z)))
-          · unfold formula.iff_
-            unfold formula.and_
-            run_tac
-              SC
+          · simp only [def_iff_]
+            simp only [def_and_]
+            --unfold formula.iff_
+            --unfold formula.and_
+            SC
           · apply specId z
             apply specId y
             apply specId z
@@ -1199,65 +1224,52 @@ theorem T_21_2 (x y z : VarName) :
           apply IsDeduct.axiom_
           exact IsAxiom.eq_1_ z
       · intro H a1
-        simp?  at a1
-        contradiction
+        simp at a1
     · intro H a1
-      simp?  at a1
-      contradiction
+      simp at a1
   · intro H a1
-    simp?  at a1
-    contradiction
+    simp at a1
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic fol.SC -/
-/- ./././Mathport/Syntax/Translate/Tactic/Basic.lean:62:14: parse error: [] -/
+
 theorem T_21_8 (P_r P_s : Formula) (r s : VarName) (h1 : IsReplOfVarInFormula r s P_r P_s)
     (h2 : ¬isBoundIn r P_r) (h3 : ¬isBoundIn s P_r) : IsProof ((eq_ r s).imp_ (P_r.iff_ P_s)) :=
   by
   induction h1
   case true_ =>
-    unfold formula.iff_
-    unfold formula.and_
-    run_tac
-      SC
-  case pred_ name n args_u args_v
+    simp only [def_iff_]
+    --unfold formula.iff_
+    simp only [def_and_]
+    --unfold formula.and_
+    SC
+  case pred_const_ name n args_u args_v
     h1_1 =>
     apply
       IsDeduct.mp_
-        ((eq_ r s).imp_ ((pred_ Name (List.ofFn args_u)).iff_ (pred_ Name (List.ofFn args_v))))
-    ·
-      run_tac
-        SC
+        ((eq_ r s).imp_ ((pred_const_ name (List.ofFn args_u)).iff_ (pred_const_ name (List.ofFn args_v))))
+    · SC
     · apply
         IsDeduct.mp_ ((eq_ r s).imp_ (And_ (List.ofFn fun i : Fin n => eq_ (args_u i) (args_v i))))
       · apply
           IsDeduct.mp_
             ((And_ (List.ofFn fun i : Fin n => eq_ (args_u i) (args_v i))).imp_
-              ((pred_ Name (List.ofFn args_u)).iff_ (pred_ Name (List.ofFn args_v))))
-        · unfold formula.iff_
-          unfold formula.and_
-          run_tac
-            SC
+              ((pred_const_ name (List.ofFn args_u)).iff_ (pred_const_ name (List.ofFn args_v))))
+        · simp only [def_iff_]
+          --unfold formula.iff_
+          simp only [def_and_]
+          --unfold formula.and_
+          SC
         · apply Forall_spec_id' (List.ofFn args_v)
           apply Forall_spec_id' (List.ofFn args_u)
           apply IsDeduct.axiom_
-          exact IsAxiom.eq_2_pred_ Name n args_u args_v
+          exact IsAxiom.eq_2_pred_const_ name n args_u args_v
       · clear h2
         clear h3
         unfold And_
         induction n
-        case zero =>
+        case _ =>
           simp only [List.ofFn_zero, List.foldr_nil]
-          run_tac
-            SC
-        case succ n ih =>
+          SC
+        case _ n ih =>
           simp only [List.ofFn_succ, List.foldr_cons]
           apply
             IsDeduct.mp_
@@ -1265,92 +1277,92 @@ theorem T_21_8 (P_r P_s : Formula) (r s : VarName) (h1 : IsReplOfVarInFormula r 
                 (List.foldr and_ true_
                   (List.ofFn fun i : Fin n => eq_ (args_u i.succ) (args_v i.succ))))
           · apply IsDeduct.mp_ ((eq_ r s).imp_ (eq_ (args_u 0) (args_v 0)))
-            · unfold formula.and_
-              run_tac
-                SC
+            · simp only [def_and_]
+              --unfold formula.and_
+              SC
             · specialize h1_1 0
               cases h1_1
-              · apply IsDeduct.mp_ (eq_ (args_u 0) (args_v 0))
-                ·
-                  run_tac
-                    SC
-                · simp only [h1_1]
+              case _ c1 =>
+                apply IsDeduct.mp_ (eq_ (args_u 0) (args_v 0))
+                case _ =>
+                  SC
+                case _ =>
+                  simp only [c1]
                   apply specId (args_v 0)
                   apply IsDeduct.axiom_
                   apply IsAxiom.eq_1_
-              · cases h1_1
-                subst h1_1_left
-                subst h1_1_right
-                run_tac
+              case _ c1 =>
+                cases c1
+                case _ c1_left c1_right =>
+                  subst c1_left
+                  subst c1_right
                   SC
           · apply ih
             intro i
             apply h1_1
   case not_ P_u P_v h1_1 h1_ih =>
-    unfold is_bound_in at h2
-    unfold is_bound_in at h3
+    simp only [isBoundIn] at h2
+    simp only [isBoundIn] at h3
     specialize h1_ih h2 h3
     apply IsDeduct.mp_ ((eq_ r s).imp_ (P_u.iff_ P_v))
-    · unfold formula.iff_
-      unfold formula.and_
-      run_tac
-        SC
+    · simp only [def_iff_]
+      --unfold formula.iff_
+      simp only [def_and_]
+      --unfold formula.and_
+      SC
     · exact h1_ih
   case imp_ P_u Q_u P_v Q_v h1_1 h1_2 h1_ih_1
     h1_ih_2 =>
-    unfold is_bound_in at h2
-    simp at h2
+    simp only [isBoundIn] at h2
     push_neg at h2
     cases h2
-    unfold is_bound_in at h3
-    simp at h3
-    push_neg at h3
-    cases h3
-    specialize h1_ih_1 h2_left h3_left
-    specialize h1_ih_2 h2_right h3_right
-    apply IsDeduct.mp_ ((eq_ r s).imp_ (Q_u.iff_ Q_v))
-    · apply IsDeduct.mp_ ((eq_ r s).imp_ (P_u.iff_ P_v))
-      · unfold formula.iff_
-        unfold formula.and_
-        run_tac
-          SC
-      · exact h1_ih_1
-    · exact h1_ih_2
+    case intro h2_left h2_right =>
+      simp only [isBoundIn] at h3
+      push_neg at h3
+      cases h3
+      case intro h3_left h3_right =>
+        specialize h1_ih_1 h2_left h3_left
+        specialize h1_ih_2 h2_right h3_right
+        apply IsDeduct.mp_ ((eq_ r s).imp_ (Q_u.iff_ Q_v))
+        · apply IsDeduct.mp_ ((eq_ r s).imp_ (P_u.iff_ P_v))
+          · simp only [def_iff_]
+            --unfold formula.iff_
+            simp only [def_and_]
+            --unfold formula.and_
+            SC
+          · exact h1_ih_1
+        · exact h1_ih_2
   case forall_ x P_u P_v h1_1 h1_ih =>
-    unfold is_bound_in at h2
-    simp at h2
+    simp only [isBoundIn] at h2
     push_neg at h2
     cases h2
-    unfold is_bound_in at h3
-    simp at h3
-    push_neg at h3
-    cases h3
-    apply deduction_theorem
-    simp only [Set.union_singleton, insert_emptyc_eq]
-    apply IsDeduct.mp_ (forall_ x (P_u.iff_ P_v))
-    · apply proof_imp_deduct
-      apply T_18_1
-    · apply IsDeduct.mp_ (eq_ r s)
-      · apply proof_imp_deduct
-        apply IsDeduct.mp_ (forall_ x ((eq_ r s).imp_ (P_u.iff_ P_v)))
-        · apply T_19_TS_21_left
-          · unfold formula.eq_
-            unfold is_free_in
-            simp only [List.toFinset_cons, List.toFinset_nil, insert_emptyc_eq, Finset.mem_insert,
-              Finset.mem_singleton]
-            simp
-            push_neg
-            constructor
-            · simp only [ne_comm]
-              exact h2_left
-            · simp only [ne_comm]
-              exact h3_left
-        · apply generalization
-          · exact h1_ih h2_right h3_right
-          · intro H a1
-            simp?  at a1
-            contradiction
-      · apply IsDeduct.assume_
-        simp only [Set.mem_singleton]
+    case _ h2_left h2_right =>
+      simp only [isBoundIn] at h3
+      push_neg at h3
+      cases h3
+      case _ h3_left h3_right =>
+        apply deduction_theorem
+        simp only [Set.union_singleton, insert_emptyc_eq]
+        apply IsDeduct.mp_ (forall_ x (P_u.iff_ P_v))
+        · apply proof_imp_deduct
+          apply T_18_1
+        · apply IsDeduct.mp_ (eq_ r s)
+          · apply proof_imp_deduct
+            apply IsDeduct.mp_ (forall_ x ((eq_ r s).imp_ (P_u.iff_ P_v)))
+            · apply T_19_TS_21_left
+              · --unfold formula.eq_
+                simp only [isFreeIn]
+                push_neg
+                constructor
+                · simp only [ne_comm]
+                  exact h2_left
+                · simp only [ne_comm]
+                  exact h3_left
+            · apply generalization
+              · exact h1_ih h2_right h3_right
+              · intro H a1
+                simp at a1
+          · apply IsDeduct.assume_
+            simp only [Set.mem_singleton]
 
-#lint
+--#lint
