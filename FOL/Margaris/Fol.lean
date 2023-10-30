@@ -139,7 +139,7 @@ inductive IsReplOfVarInFormula
 
 
 /--
-  is_repl_of_formula_in_formula_fun U V P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of U in P_u by occurrences of V.
+  IsReplOfFormulaInFormula_fun U V P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of U in P_u by occurrences of V.
 -/
 def IsReplOfFormulaInFormulaFun
   (U V : Formula) :
@@ -408,10 +408,11 @@ theorem isProofAltImpIsDeduct (F : Formula) (h1 : IsProofAlt F) : IsDeduct ∅ F
   case gen_ h1_v h1_phi h1_1 h1_ih =>
     apply generalization
     · exact h1_ih
-    · simp?
+    · simp
   case mp_ h1_phi h1_psi h1_1 h1_2 h1_ih_1 h1_ih_2 =>
     exact IsDeduct.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
-
+  all_goals
+    sorry
 
 theorem isDeductImpIsProofAlt (F : Formula) (h1 : IsDeduct ∅ F) : IsProofAlt F :=
   by
@@ -436,8 +437,10 @@ theorem isDeductImpIsProofAlt (F : Formula) (h1 : IsDeduct ∅ F) : IsProofAlt F
       h1_1_ih =>
       apply IsProofAlt.gen_
       exact h1_1_ih
+    all_goals
+      sorry
   case assume_ h1_phi h1_1 =>
-    simp? at h1_1
+    simp at h1_1
   case mp_ h1_phi h1_psi h1_1 h1_2 h1_ih_1 h1_ih_2 =>
     exact IsProofAlt.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
 
@@ -785,7 +788,8 @@ theorem T_18_2 (U V : Formula) (P_U P_V : Formula) (l : List VarName)
         --unfold formula.and_
         simp only [isFreeIn]
         sorry
-
+  all_goals
+    sorry
 
 theorem C_18_3 (U V : Formula) (P_U P_V : Formula) (h1 : IsReplOfFormulaInFormula U V P_U P_V)
     (h2 : IsProof (U.iff_ V)) : IsProof (P_U.iff_ P_V) :=
@@ -796,7 +800,7 @@ theorem C_18_3 (U V : Formula) (P_U P_V : Formula) (h1 : IsReplOfFormulaInFormul
   · apply T_18_2 U V P_U P_V ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList h1
     intro v a1
     simp only [Finset.mem_toList, Finset.mem_inter, Finset.mem_union]
-    simp only [is_free_in_iff_mem_free_var_set, is_bound_in_iff_mem_bound_var_set] at a1
+    simp only [isFreeIn_iff_mem_freeVarSet, isBoundIn_iff_mem_boundVarSet] at a1
     exact a1
   · unfold Formula.Forall_
     induction ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList
@@ -835,26 +839,26 @@ theorem T_18_5 (P : Formula) (v : VarName) : IsProof ((forall_ v P).iff_ (exists
     simp only [def_and_]
     --unfold formula.iff_
     --unfold formula.and_
-    apply is_repl_of_formula_in_formula.not_
-    apply is_repl_of_formula_in_formula.imp_
-    · apply is_repl_of_formula_in_formula.imp_
-      · apply is_repl_of_formula_in_formula.same_
+    apply IsReplOfFormulaInFormula.not_
+    apply IsReplOfFormulaInFormula.imp_
+    · apply IsReplOfFormulaInFormula.imp_
+      · apply IsReplOfFormulaInFormula.same_
         rfl
-      · apply is_repl_of_formula_in_formula.not_
-        apply is_repl_of_formula_in_formula.not_
-        apply is_repl_of_formula_in_formula.forall_
-        apply is_repl_of_formula_in_formula.diff_
+      · apply IsReplOfFormulaInFormula.not_
+        apply IsReplOfFormulaInFormula.not_
+        apply IsReplOfFormulaInFormula.forall_
+        apply IsReplOfFormulaInFormula.diff_
         · rfl
         · rfl
-    · apply is_repl_of_formula_in_formula.not_
-      apply is_repl_of_formula_in_formula.imp_
-      · apply is_repl_of_formula_in_formula.not_
-        apply is_repl_of_formula_in_formula.not_
-        apply is_repl_of_formula_in_formula.forall_
-        apply is_repl_of_formula_in_formula.diff_
+    · apply IsReplOfFormulaInFormula.not_
+      apply IsReplOfFormulaInFormula.imp_
+      · apply IsReplOfFormulaInFormula.not_
+        apply IsReplOfFormulaInFormula.not_
+        apply IsReplOfFormulaInFormula.forall_
+        apply IsReplOfFormulaInFormula.diff_
         · rfl
         · rfl
-      · apply is_repl_of_formula_in_formula.same_
+      · apply IsReplOfFormulaInFormula.same_
         rfl
   · simp only [def_iff_]
     simp only [def_and_]
@@ -931,11 +935,11 @@ theorem T_18_7 (P_u P_v Q Q' : Formula) (u v : VarName) (Δ : Set Formula) (h1 :
 
 theorem similar_not (P_u P_v : Formula) (u v : VarName) (h1 : Similar P_u P_v u v) :
     Similar P_u.not_ P_v.not_ u v := by
-  unfold Similar at *
-  unfold isFreeIn at *
-  unfold fastAdmits at *
-  unfold fastAdmitsAux at *
-  unfold fastReplaceFree at *
+  simp only [Similar] at *
+  simp only [isFreeIn] at *
+  simp only [fastAdmits] at *
+  simp only [fastAdmitsAux] at *
+  simp only [fastReplaceFree] at *
   tauto
 
 
@@ -1127,14 +1131,14 @@ theorem T_19_TS_21_left (P Q : Formula) (v : VarName) (h1 : ¬isFreeIn v P) :
     IsProof ((forall_ v (P.imp_ Q)).imp_ (P.imp_ (forall_ v Q))) :=
   by
   apply C_18_4 (forall_ v P) P ((forall_ v (P.imp_ Q)).imp_ ((forall_ v P).imp_ (forall_ v Q)))
-  · apply is_repl_of_formula_in_formula.imp_
-    · apply is_repl_of_formula_in_formula.same_
+  · apply IsReplOfFormulaInFormula.imp_
+    · apply IsReplOfFormulaInFormula.same_
       rfl
-    · apply is_repl_of_formula_in_formula.imp_
-      · apply is_repl_of_formula_in_formula.diff_
+    · apply IsReplOfFormulaInFormula.imp_
+      · apply IsReplOfFormulaInFormula.diff_
         · rfl
         · rfl
-      · apply is_repl_of_formula_in_formula.same_
+      · apply IsReplOfFormulaInFormula.same_
         rfl
   · exact T_19_1 P v h1
   · apply IsDeduct.axiom_
@@ -1364,5 +1368,7 @@ theorem T_21_8 (P_r P_s : Formula) (r s : VarName) (h1 : IsReplOfVarInFormula r 
                 simp at a1
           · apply IsDeduct.assume_
             simp only [Set.mem_singleton]
+  all_goals
+    sorry
 
 --#lint
