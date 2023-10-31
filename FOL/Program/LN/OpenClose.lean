@@ -917,6 +917,63 @@ lemma Holds_instantiate
     apply extracted_1
 
 
+theorem extracted_2
+  (D : Type)
+  (V : VarAssignment D)
+  (xs : List String) :
+  V ∘ Var.instantiate 0 (List.map free_ xs) =
+    shift_list D V (List.map (V ∘ free_) xs) :=
+  by
+  induction xs
+  case nil =>
+    funext v
+    simp
+    simp only [shift_list]
+    cases v
+    case _ x =>
+      simp only [Var.instantiate]
+    case _ i =>
+      simp only [Var.instantiate]
+      split
+      case _ c1 =>
+        rfl
+      case _ c1 =>
+        simp
+  case _ hd tl ih =>
+    funext v
+    simp
+    simp only [shift_list]
+    cases v
+    case _ x =>
+      simp only [shift]
+      simp only [← ih]
+      simp only [Var.instantiate]
+      simp
+    case _ i =>
+      cases i
+      case zero =>
+        simp only [shift]
+        simp only [Var.instantiate]
+        simp
+      case succ i =>
+        simp only [shift]
+        simp only [← ih]
+        simp
+        simp only [Var.instantiate]
+        simp
+        split
+        case _ c1 =>
+          have s1 : i < tl.length
+          linarith
+          simp only [s1]
+          simp
+        case _ c1 =>
+          have s1 : ¬ i < tl.length
+          linarith
+          simp only [s1]
+          simp
+
+
 theorem predSub_aux
   (D : Type)
   (I : Interpretation D)
@@ -949,7 +1006,8 @@ theorem predSub_aux
     simp only [← s2]
     clear s2
 
-    sorry
+    congr! 1
+    apply extracted_2
   case forall_ _ phi phi_ih =>
     simp only [Formula.lc_at] at h1
 
