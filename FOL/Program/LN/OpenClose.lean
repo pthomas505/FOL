@@ -747,10 +747,61 @@ lemma Holds_openFormulaListAux
 
 --------------------------------------------------
 
+/-
+def Var.instantiate1 (k : Nat) (v : Var) : Var → Var
+  | free_ x => free_ x
+  | bound_ i =>
+      if i < k
+      then bound_ i
+      else
+        if i = k
+        then v
+        else bound_ (i - 1)
+
+
+def Var.instantiate
+  (k : Nat) :
+  List Var → (Var → Var)
+  | [] => id
+  | v :: vs => Var.instantiate k vs ∘ Var.instantiate1 k v
+-/
+
+
+def Var.instantiate
+  (k : Nat)
+  (zs : List Var) : Var → Var
+  | free_ x => free_ x
+  | bound_ i =>
+      if i < k
+      then bound_ i
+      else
+        let i := i - k
+        if _ : i < zs.length
+        then zs[i]
+        else bound_ (i - zs.length + k)
+
+
+def Formula.instantiate
+  (k : Nat)
+  (zs : List Var) :
+  Formula → Formula
+  | pred_ X vs => pred_ X (vs.map (Var.instantiate k zs))
+  | not_ phi => not_ (Formula.instantiate k zs phi)
+  | imp_ phi psi => imp_ (Formula.instantiate k zs phi) (Formula.instantiate k zs psi)
+  | forall_ x phi => forall_ x (Formula.instantiate (k + 1) zs phi)
+
+
+def shift_list
+  (D : Type)
+  (V : VarAssignment D) : List D → VarAssignment D
+  | [] => V
+  | d::ds => shift D (shift_list D V ds) d
+
+
 def Formula.predSub
   (τ : String → ℕ → Formula) :
   Formula → Formula
-  | pred_ X vs => openFormulaListAux 0 vs (τ X vs.length)
+  | pred_ X vs => Formula.instantiate 0 vs (τ X vs.length)
   | not_ phi => not_ (phi.predSub τ)
   | imp_ phi psi => imp_ (phi.predSub τ) (psi.predSub τ)
   | forall_ x phi => forall_ x (phi.predSub τ)
@@ -763,24 +814,6 @@ def Interpretation.usingPred
   Interpretation D := {
     nonempty_ := I.nonempty_
     pred_ := pred_ }
-
-
-def VarAssignment.subN_aux
-  (D : Type)
-  (f : ℕ → D) :
-  List D → ℕ → D
-  | [], n => f n
-  | d :: _, 0 => d
-  | _ :: ds, n + 1 => subN_aux D f ds n
-
-
-def VarAssignment.subN
-  (D : Type)
-  (V : VarAssignment D)
-  (ds : List D) :
-  VarAssignment D
-  | free_ x => V (free_ x)
-  | bound_ i => subN_aux D (V ∘ bound_) ds i
 
 
 lemma free_var_list_to_string_list
@@ -809,6 +842,81 @@ lemma free_var_list_to_string_list
         simp at h1_left
 
 
+theorem extracted_1
+  (D : Type)
+  (V : VarAssignment D)
+  (zs : List String)
+  (k : ℕ)
+  (d : D) :
+  shift D (V ∘ Var.instantiate k (List.map free_ zs)) d =
+    shift D V d ∘ Var.instantiate (k + 1) (List.map free_ zs) :=
+  by
+  funext v
+  simp
+  cases v
+  case _ x =>
+    simp only [Var.instantiate]
+    simp only [shift]
+    simp
+  case _ i =>
+    cases i
+    case zero =>
+      simp only [shift]
+      simp only [Var.instantiate]
+      simp
+    case succ i =>
+        simp only [shift]
+        simp only [Var.instantiate]
+        simp
+        split
+        case _ c1 =>
+          have s1 : i + 1 < k + 1
+          linarith
+          simp only [if_pos s1]
+        case _ c1 =>
+          have s1 : ¬ i + 1 < k + 1
+          linarith
+          simp only [if_neg s1]
+          split
+          case _ c2 =>
+            simp
+          case _ c2 =>
+            simp
+
+
+lemma Holds_instantiate
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (zs : List String)
+  (k : Nat)
+  (F : Formula) :
+  Holds D I (V ∘ Var.instantiate k (zs.map Var.free_)) F ↔
+    Holds D I V (Formula.instantiate k (zs.map Var.free_) F) :=
+  by
+  induction F generalizing V k
+  case pred_ X vs =>
+    simp only [Holds]
+    congr! 1
+    simp
+  case not_ phi phi_ih =>
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ _ phi phi_ih =>
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [← phi_ih]
+    congr!
+    apply extracted_1
+
+
 theorem predSub_aux
   (D : Type)
   (I : Interpretation D)
@@ -817,7 +925,7 @@ theorem predSub_aux
   (F : Formula)
   (h1 : F.lc_at 0) :
   Holds D I V (F.predSub τ) ↔
-    Holds D (Interpretation.usingPred D I fun (X : String) (ds : List D) => Holds D I (VarAssignment.subN D V ds) (τ X ds.length)) V F :=
+    Holds D (Interpretation.usingPred D I fun (X : String) (ds : List D) => Holds D I (shift_list D V ds) (τ X ds.length)) V F :=
   by
   induction F generalizing V
   case pred_ X vs =>
@@ -834,14 +942,17 @@ theorem predSub_aux
     clear s1
 
     subst a1
+    clear h1
     simp
 
-    obtain s2 := Holds_openFormulaListAux D I V xs 0 (τ X (List.length xs))
+    obtain s2 := Holds_instantiate D I V xs 0 (τ X (List.length xs))
     simp only [← s2]
     clear s2
 
     sorry
   case forall_ _ phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
     simp only [Holds]
     apply forall_congr'
     intro d
