@@ -36,3 +36,7 @@ def Holds
   | not_ phi => ¬ Holds D I V phi
   | imp_ phi psi => Holds D I V phi → Holds D I V psi
   | forall_ _ phi => ∀ (d : D), Holds D I (shift D V d) phi
+
+
+def Formula.isValid (F : Formula) : Prop :=
+  ∀ (D : Type) (I : Interpretation D) (V : VarAssignment D), Holds D I V F
