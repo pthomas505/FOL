@@ -816,6 +816,118 @@ def Interpretation.usingPred
     pred_ := pred_ }
 
 
+inductive Formula.lc : Formula → Prop
+  | pred_
+    (X : String)
+    (vs : List Var) :
+    (∀ (v : Var), v ∈ vs → v.isFree) →
+    lc (pred_ X vs)
+
+  | not_
+    (phi : Formula) :
+    lc phi →
+    lc (not_ phi)
+
+  | imp_
+    (phi psi : Formula) :
+    lc phi →
+    lc psi →
+    lc (imp_ phi psi)
+
+  | forall_
+    (x : String)
+    (phi : Formula)
+    (L : Finset String) :
+    (∀ (z : String), z ∉ L → lc (Formula.instantiate 0 [Var.free_ z] phi)) →
+    lc (forall_ x phi)
+
+
+example
+  (F : Formula)
+  (k : ℕ)
+  (zs : List String) :
+  Formula.lc_at k (instantiate k (zs.map Var.free_) F) ↔ Formula.lc_at (k + zs.length) F :=
+  by
+  induction F generalizing k zs
+  case pred_ X vs =>
+    simp only [Formula.instantiate]
+    simp only [Formula.lc_at]
+    constructor
+    · intro a1 v a2
+      specialize a1 (Var.instantiate k (List.map free_ zs) v)
+      simp at a1
+      specialize a1 v a2
+      simp at a1
+      cases v
+      case _ x =>
+        simp only [Var.lc_at]
+      case _ i =>
+        simp only [Var.lc_at]
+        simp only [Var.instantiate] at a1
+        split at a1
+        case _ c1 =>
+          linarith
+        case _ c1 =>
+          split at a1
+          case _ c2 =>
+            simp at c2
+            exact lt_add_of_tsub_lt_left c2
+          case _ c2 =>
+            simp only [Var.lc_at] at a1
+            simp at a1
+    · intro a1 v a2
+      cases v
+      case _ x =>
+        simp only [Var.lc_at]
+      case _ i =>
+        simp only [Var.lc_at]
+        simp at a2
+        apply Exists.elim a2
+        intro z a3
+        clear a2
+        cases a3
+        case _ a3_left a3_right =>
+          specialize a1 z a3_left
+          cases z
+          case _ x =>
+            simp only [Var.instantiate] at a3_right
+          case _ j =>
+            simp only [Var.lc_at] at a1
+            simp only [Var.instantiate] at a3_right
+            split at a3_right
+            case _ c1 =>
+              simp at a3_right
+              subst a3_right
+              exact c1
+            case _ c1 =>
+              simp at c1
+              simp at a3_right
+              split at a3_right
+              case _ c2 =>
+                contradiction
+              case _ c2 =>
+                exfalso
+                apply c2
+                exact Nat.sub_lt_left_of_lt_add c1 a1
+  case not_ phi phi_ih =>
+    simp only [Formula.instantiate]
+    simp only [Formula.lc_at]
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.instantiate]
+    simp only [Formula.lc_at]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ _ phi phi_ih =>
+    simp only [Formula.instantiate]
+    simp only [Formula.lc_at]
+    simp only [phi_ih]
+    have s1 : k + 1 + List.length zs = k + List.length zs + 1
+    linarith;
+    simp only [s1]
+
+
 lemma free_var_list_to_string_list
   (vs : List Var)
   (h1 : ∀ (v : Var), v ∈ vs → Var.lc_at 0 v) :
