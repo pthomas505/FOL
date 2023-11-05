@@ -833,16 +833,23 @@ inductive Formula.lc : Formula → Prop
     lc phi →
     lc psi →
     lc (imp_ phi psi)
-
+/-
   | forall_
     (x : String)
     (phi : Formula)
     (L : Finset String) :
     (∀ (z : String), z ∉ L → lc (Formula.instantiate 0 [Var.free_ z] phi)) →
     lc (forall_ x phi)
+-/
+  | forall_
+    (x : String)
+    (phi : Formula)
+    (z : String) :
+    lc (Formula.instantiate 0 [Var.free_ z] phi) →
+    lc (forall_ x phi)
 
 
-example
+lemma lc_at_instantiate
   (F : Formula)
   (k : ℕ)
   (zs : List String) :
@@ -1084,53 +1091,6 @@ theorem extracted_2
           linarith
           simp only [s1]
           simp
-
-
-theorem predSub_aux
-  (D : Type)
-  (I : Interpretation D)
-  (V : VarAssignment D)
-  (τ : String → ℕ → Formula)
-  (F : Formula)
-  (h1 : F.lc_at 0) :
-  Holds D I V (F.predSub τ) ↔
-    Holds D (Interpretation.usingPred D I fun (X : String) (ds : List D) => Holds D I (shift_list D V ds) (τ X ds.length)) V F :=
-  by
-  induction F generalizing V
-  case pred_ X vs =>
-    simp only [Formula.lc_at] at h1
-
-    simp only [predSub]
-    simp only [Interpretation.usingPred]
-    simp only [Holds]
-    simp
-
-    obtain s1 := free_var_list_to_string_list vs h1
-    apply Exists.elim s1
-    intro xs a1
-    clear s1
-
-    subst a1
-    clear h1
-    simp
-
-    obtain s2 := Holds_instantiate D I V xs 0 (τ X (List.length xs))
-    simp only [← s2]
-    clear s2
-
-    congr! 1
-    apply extracted_2
-  case forall_ _ phi phi_ih =>
-    simp only [Formula.lc_at] at h1
-
-    simp only [Holds]
-    apply forall_congr'
-    intro d
-    specialize phi_ih (shift D V d)
-    sorry
-
-  all_goals
-    sorry
 
 
 --#lint
