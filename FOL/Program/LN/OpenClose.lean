@@ -983,7 +983,7 @@ lemma lc_at_instantiate
     simp only [s1]
 
 
-lemma instantiate_append
+lemma Var.instantiate_append
   (k : ℕ)
   (zs zs' : List Var)
   (v : Var)
@@ -1018,6 +1018,39 @@ lemma instantiate_append
     · simp at *
       zify [c1', c2, c4, c3, c5, c6]; zify [c3] at c6
       linarith
+
+
+lemma Formula.instantiate_append
+  (k : ℕ)
+  (zs zs' : List Var)
+  (F : Formula)
+  (h1 : ∀ (z' : Var), z' ∈ zs' → z'.isFree) :
+  Formula.instantiate k zs (Formula.instantiate (k + List.length zs) zs' F) = Formula.instantiate k (zs ++ zs') F :=
+  by
+  induction F generalizing k
+  case pred_ X vs =>
+    simp only [Formula.instantiate]
+    simp
+    simp only [List.map_eq_map_iff]
+    intro v _
+    simp
+    apply Var.instantiate_append
+    exact h1
+  case not_ phi phi_ih =>
+    simp only [Formula.instantiate]
+    congr! 1
+    exact phi_ih k
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.instantiate]
+    congr! 1
+    · exact phi_ih k
+    · exact psi_ih k
+  case forall_ x phi phi_ih =>
+    simp only [Formula.instantiate]
+    congr! 1
+    simp only [← phi_ih]
+    congr! 2
+    linarith
 
 
 example
@@ -1057,13 +1090,36 @@ example
             contradiction
           case _ c1 =>
             contradiction
+  case not_ phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    apply Formula.lc.not_
+    exact phi_ih zs h1
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.lc_at] at h1
+    cases h1
+    case _ h1_left h1_right =>
+      apply Formula.lc.imp_
+      · exact phi_ih zs h1_left
+      · exact psi_ih zs h1_right
   case forall_ x phi phi_ih =>
     simp only [Formula.lc_at] at h1
 
-    simp only [Formula.instantiate]
     specialize phi_ih (default :: zs)
+    simp at phi_ih
+    specialize phi_ih h1
+
+    simp only [Formula.instantiate]
     apply Formula.lc.forall_ x (Formula.instantiate (0 + 1) (List.map free_ zs) phi) default
-    sorry
+    simp
+
+    obtain s1 := Formula.instantiate_append 0 [Var.free_ default] (zs.map Var.free_) phi
+    simp at s1
+    simp only [isFree] at s1
+    simp at s1
+
+    simp only [s1]
+    exact phi_ih
 
 --------------------------------------------------
 
