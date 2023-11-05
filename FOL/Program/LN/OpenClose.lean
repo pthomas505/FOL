@@ -982,6 +982,43 @@ lemma lc_at_instantiate
     linarith;
     simp only [s1]
 
+
+lemma instantiate_append
+  (k : ℕ)
+  (zs zs' : List Var)
+  (v : Var)
+  (h1 : ∀ (z' : Var), z' ∈ zs' → z'.isFree) :
+  Var.instantiate k zs (Var.instantiate (k + List.length zs) zs' v) = Var.instantiate k (zs ++ zs') v :=
+  by
+  rcases v with _ | i; · rfl
+  conv => rhs; simp only [Var.instantiate]
+  split_ifs with c1 c2 <;> simp only [Var.instantiate]
+  · rw [if_pos (by linarith)]; simp [c1]
+  · have c1' := not_lt.1 c1
+    split_ifs with c3 c4 <;> simp
+    · rw [if_neg c1, dif_pos (Nat.sub_lt_left_of_lt_add c1' c3), List.get_append]
+    · have c3' := not_lt.1 c3
+      let ⟨x, a1⟩ := (IsFreeIffExistsString (zs'.get ⟨_, c4⟩)).1 (h1 _ (List.get_mem ..))
+      simp only [a1]
+      rw [List.get_append_right', ← a1]; congr 2
+      rw [Nat.sub_sub]
+      exact Nat.le_sub_of_add_le (Nat.add_comm .. ▸ c3')
+    · exfalso; simp at *
+      zify [c1, c3] at c4; zify [c1] at c2
+      linarith
+  · have c1' := not_lt.1 c1
+    simp at c2
+    have c3 : k + zs.length ≤ i := by zify [c1'] at c2 ⊢; linarith
+    have c4 : zs'.length ≤ i - (k + zs.length) := by zify [c1', c3] at c2 ⊢; linarith
+    rw [if_neg (not_lt.2 c3), dif_neg (not_lt.2 c4)]
+    simp; split_ifs with c5 c6
+    · simp; linarith
+    · exfalso
+      zify [not_lt.1 c5, c4, c3] at c6; zify [c1'] at c2; linarith
+    · simp at *
+      zify [c1', c2, c4, c3, c5, c6]; zify [c3] at c6
+      linarith
+
 --------------------------------------------------
 
 lemma free_var_list_to_string_list
