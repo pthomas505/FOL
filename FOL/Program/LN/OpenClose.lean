@@ -1053,7 +1053,7 @@ lemma Formula.instantiate_append
     linarith
 
 
-example
+lemma lc_at_imp_lc_instantiate
   (F : Formula)
   (zs : List String)
   (h1 : lc_at zs.length F) :
@@ -1120,6 +1120,47 @@ example
 
     simp only [s1]
     exact phi_ih
+
+
+example
+  (F : Formula)
+  (h1 : lc_at 0 F) :
+  lc F :=
+  by
+  induction F
+  case pred_ X vs =>
+    simp only [Formula.lc_at] at h1
+
+    apply Formula.lc.pred_
+    intro v a1
+    specialize h1 v a1
+    cases v
+    case _ x =>
+      simp only [Var.isFree]
+    case _ i =>
+      simp only [Var.lc_at] at h1
+      simp at h1
+  case not_ phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    apply Formula.lc.not_
+    exact phi_ih h1
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    cases h1
+    case _ h1_left h1_right =>
+      apply Formula.lc.imp_
+      · exact phi_ih h1_left
+      · exact psi_ih h1_right
+  case forall_ x phi _ =>
+    simp only [Formula.lc_at] at h1
+    simp at h1
+
+    apply Formula.lc.forall_ x phi default
+    apply lc_at_imp_lc_instantiate phi [default]
+    simp
+    exact h1
 
 --------------------------------------------------
 
