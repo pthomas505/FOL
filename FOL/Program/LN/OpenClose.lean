@@ -982,6 +982,7 @@ lemma lc_at_instantiate
     linarith;
     simp only [s1]
 
+--------------------------------------------------
 
 lemma free_var_list_to_string_list
   (vs : List Var)
