@@ -1019,6 +1019,52 @@ lemma instantiate_append
       zify [c1', c2, c4, c3, c5, c6]; zify [c3] at c6
       linarith
 
+
+example
+  (F : Formula)
+  (zs : List String)
+  (h1 : lc_at zs.length F) :
+  lc (instantiate 0 (zs.map Var.free_) F) :=
+  by
+  induction F generalizing zs
+  case pred_ X vs =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.instantiate]
+    apply Formula.lc.pred_
+    intro v a1
+    cases v
+    case _ x =>
+      simp only [isFree]
+    case _ i =>
+      simp at a1
+      apply Exists.elim a1
+      intro z a2
+      cases a2
+      case _ a2_left a2_right =>
+        specialize h1 z a2_left
+
+        cases z
+        case _ x =>
+          simp only [Var.instantiate] at a2_right
+        case _ j =>
+          simp only [Var.lc_at] at h1
+
+          simp only [Var.instantiate] at a2_right
+          simp at a2_right
+          split at a2_right
+          case _ c1 =>
+            contradiction
+          case _ c1 =>
+            contradiction
+  case forall_ x phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.instantiate]
+    specialize phi_ih (default :: zs)
+    apply Formula.lc.forall_ x (Formula.instantiate (0 + 1) (List.map free_ zs) phi) default
+    sorry
+
 --------------------------------------------------
 
 lemma free_var_list_to_string_list
