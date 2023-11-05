@@ -1,5 +1,4 @@
 import FOL.Program.LN.Binders
-import FOL.Program.LN.LC
 import FOL.Program.LN.Semantics
 import FOL.List
 import FOL.Tactics
@@ -119,6 +118,51 @@ def openFormulaList
 
 --------------------------------------------------
 
+/-
+def Var.instantiate1 (k : Nat) (v : Var) : Var → Var
+  | free_ x => free_ x
+  | bound_ i =>
+      if i < k
+      then bound_ i
+      else
+        if i = k
+        then v
+        else bound_ (i - 1)
+
+
+def Var.instantiate
+  (k : Nat) :
+  List Var → (Var → Var)
+  | [] => id
+  | v :: vs => Var.instantiate k vs ∘ Var.instantiate1 k v
+-/
+
+
+def Var.instantiate
+  (k : Nat)
+  (zs : List Var) : Var → Var
+  | free_ x => free_ x
+  | bound_ i =>
+      if i < k
+      then bound_ i
+      else
+        let i := i - k
+        if _ : i < zs.length
+        then zs[i]
+        else bound_ (i - zs.length + k)
+
+
+def Formula.instantiate
+  (k : Nat)
+  (zs : List Var) :
+  Formula → Formula
+  | pred_ X vs => pred_ X (vs.map (Var.instantiate k zs))
+  | not_ phi => not_ (Formula.instantiate k zs phi)
+  | imp_ phi psi => imp_ (Formula.instantiate k zs phi) (Formula.instantiate k zs psi)
+  | forall_ x phi => forall_ x (Formula.instantiate (k + 1) zs phi)
+
+--------------------------------------------------
+
 /--
   Helper function for closeFormulaAux.
 
@@ -157,6 +201,112 @@ def closeFormula
   (F : Formula) :
   Formula :=
   closeFormulaAux v 0 F
+
+--------------------------------------------------
+
+/--
+  Helper function for Formula.lc_at.
+-/
+def Var.lc_at
+  (k : ℕ) :
+  Var → Prop
+  | free_ _ => True
+  | bound_ i => i < k
+
+instance
+  (k : ℕ) (v : Var) :
+  Decidable (Var.lc_at k v) :=
+  by
+  cases v
+  all_goals
+    simp only [lc_at]
+    infer_instance
+
+
+/--
+  For k = 0 this is a recursive definition of locally closed.
+
+  Formula.lc_at k F := True if and only if every bound variable in the formula F has an index less than the number of binders that it is under plus k. If this holds for k = 0 then this means that no bound variable in F is out of scope and hence that F is locally closed.
+-/
+def Formula.lc_at
+  (k : ℕ) :
+  Formula → Prop
+  | pred_ _ vs => ∀ (v : Var), v ∈ vs → (v.lc_at k)
+  | not_ phi => phi.lc_at k
+  | imp_ phi psi => (phi.lc_at k) ∧ (psi.lc_at k)
+  | forall_ _ phi => phi.lc_at (k + 1)
+
+instance (k : ℕ) (F : Formula) : Decidable (Formula.lc_at k F) :=
+  by
+  induction F generalizing k
+  all_goals
+    unfold Formula.lc_at
+    infer_instance
+
+
+#eval Formula.lc_at 0 (pred_ "X" [free_ "x"])
+#eval Formula.lc_at 0 (pred_ "X" [bound_ 0])
+#eval Formula.lc_at 0 (forall_ "x" (pred_ "X" [bound_ 0]))
+#eval Formula.lc_at 0 (forall_ "x" (pred_ "X" [bound_ 1]))
+
+
+inductive Formula.lc : Formula → Prop
+  | pred_
+    (X : String)
+    (vs : List Var) :
+    (∀ (v : Var), v ∈ vs → v.isFree) →
+    lc (pred_ X vs)
+
+  | not_
+    (phi : Formula) :
+    lc phi →
+    lc (not_ phi)
+
+  | imp_
+    (phi psi : Formula) :
+    lc phi →
+    lc psi →
+    lc (imp_ phi psi)
+/-
+  | forall_
+    (x : String)
+    (phi : Formula)
+    (L : Finset String) :
+    (∀ (z : String), z ∉ L → lc (Formula.instantiate 0 [Var.free_ z] phi)) →
+    lc (forall_ x phi)
+-/
+  | forall_
+    (x : String)
+    (phi : Formula)
+    (z : String) :
+    lc (Formula.instantiate 0 [Var.free_ z] phi) →
+    lc (forall_ x phi)
+
+--------------------------------------------------
+
+def shift_list
+  (D : Type)
+  (V : VarAssignment D) : List D → VarAssignment D
+  | [] => V
+  | d::ds => shift D (shift_list D V ds) d
+
+
+def Formula.predSub
+  (τ : String → ℕ → Formula) :
+  Formula → Formula
+  | pred_ X vs => Formula.instantiate 0 vs (τ X vs.length)
+  | not_ phi => not_ (phi.predSub τ)
+  | imp_ phi psi => imp_ (phi.predSub τ) (psi.predSub τ)
+  | forall_ x phi => forall_ x (phi.predSub τ)
+
+
+def Interpretation.usingPred
+  (D : Type)
+  (I : Interpretation D)
+  (pred_ : String → List D → Prop) :
+  Interpretation D := {
+    nonempty_ := I.nonempty_
+    pred_ := pred_ }
 
 --------------------------------------------------
 
@@ -746,108 +896,6 @@ lemma Holds_openFormulaListAux
     apply shift_openVarList
 
 --------------------------------------------------
-
-/-
-def Var.instantiate1 (k : Nat) (v : Var) : Var → Var
-  | free_ x => free_ x
-  | bound_ i =>
-      if i < k
-      then bound_ i
-      else
-        if i = k
-        then v
-        else bound_ (i - 1)
-
-
-def Var.instantiate
-  (k : Nat) :
-  List Var → (Var → Var)
-  | [] => id
-  | v :: vs => Var.instantiate k vs ∘ Var.instantiate1 k v
--/
-
-
-def Var.instantiate
-  (k : Nat)
-  (zs : List Var) : Var → Var
-  | free_ x => free_ x
-  | bound_ i =>
-      if i < k
-      then bound_ i
-      else
-        let i := i - k
-        if _ : i < zs.length
-        then zs[i]
-        else bound_ (i - zs.length + k)
-
-
-def Formula.instantiate
-  (k : Nat)
-  (zs : List Var) :
-  Formula → Formula
-  | pred_ X vs => pred_ X (vs.map (Var.instantiate k zs))
-  | not_ phi => not_ (Formula.instantiate k zs phi)
-  | imp_ phi psi => imp_ (Formula.instantiate k zs phi) (Formula.instantiate k zs psi)
-  | forall_ x phi => forall_ x (Formula.instantiate (k + 1) zs phi)
-
-
-def shift_list
-  (D : Type)
-  (V : VarAssignment D) : List D → VarAssignment D
-  | [] => V
-  | d::ds => shift D (shift_list D V ds) d
-
-
-def Formula.predSub
-  (τ : String → ℕ → Formula) :
-  Formula → Formula
-  | pred_ X vs => Formula.instantiate 0 vs (τ X vs.length)
-  | not_ phi => not_ (phi.predSub τ)
-  | imp_ phi psi => imp_ (phi.predSub τ) (psi.predSub τ)
-  | forall_ x phi => forall_ x (phi.predSub τ)
-
-
-def Interpretation.usingPred
-  (D : Type)
-  (I : Interpretation D)
-  (pred_ : String → List D → Prop) :
-  Interpretation D := {
-    nonempty_ := I.nonempty_
-    pred_ := pred_ }
-
-
-inductive Formula.lc : Formula → Prop
-  | pred_
-    (X : String)
-    (vs : List Var) :
-    (∀ (v : Var), v ∈ vs → v.isFree) →
-    lc (pred_ X vs)
-
-  | not_
-    (phi : Formula) :
-    lc phi →
-    lc (not_ phi)
-
-  | imp_
-    (phi psi : Formula) :
-    lc phi →
-    lc psi →
-    lc (imp_ phi psi)
-/-
-  | forall_
-    (x : String)
-    (phi : Formula)
-    (L : Finset String) :
-    (∀ (z : String), z ∉ L → lc (Formula.instantiate 0 [Var.free_ z] phi)) →
-    lc (forall_ x phi)
--/
-  | forall_
-    (x : String)
-    (phi : Formula)
-    (z : String) :
-    lc (Formula.instantiate 0 [Var.free_ z] phi) →
-    lc (forall_ x phi)
-
 
 lemma lc_at_instantiate
   (F : Formula)
