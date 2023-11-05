@@ -961,7 +961,7 @@ lemma free_var_list_to_string_list
         simp at h1_left
 
 
-theorem extracted_1
+theorem shift_instantiate
   (D : Type)
   (V : VarAssignment D)
   (zs : List String)
@@ -1033,10 +1033,10 @@ lemma Holds_instantiate
     intro d
     simp only [← phi_ih]
     congr!
-    apply extracted_1
+    apply shift_instantiate
 
 
-theorem extracted_2
+theorem shift_list_instantiate
   (D : Type)
   (V : VarAssignment D)
   (xs : List String) :
