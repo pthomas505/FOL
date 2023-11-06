@@ -288,7 +288,7 @@ def shift_list
   (D : Type)
   (V : VarAssignment D) : List D → VarAssignment D
   | [] => V
-  | d::ds => shift D (shift_list D V ds) d
+  | d :: ds => shift D (shift_list D V ds) d
 
 
 def Formula.predSub
@@ -1353,6 +1353,58 @@ theorem shift_list_instantiate
           linarith
           simp only [s1]
           simp
+
+--------------------------------------------------
+
+theorem predSub_aux
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : VarAssignment D)
+  (τ : String → ℕ → Formula)
+  (F : Formula)
+  (h1 : F.lc) :
+  Holds D I V (F.predSub τ) ↔
+    Holds D (Interpretation.usingPred D I fun (X : String) (ds : List D) => Holds D I (shift_list D V' ds) (τ X ds.length)) V F :=
+  by
+  induction h1 generalizing V
+  case pred_ X vs ih =>
+    simp only [predSub]
+    simp only [Interpretation.usingPred]
+    simp only [Holds]
+    simp
+
+    have s1 : ∀ (v : Var), v ∈ vs → Var.lc_at 0 v
+    intro v a1
+    specialize ih v a1
+    cases v
+    case _ x =>
+      simp only [Var.lc_at]
+    case _ i =>
+      simp only [Var.isFree] at ih
+
+    obtain s2 := free_var_list_to_string_list vs s1
+    apply Exists.elim s2
+    intro zs a1
+
+    obtain s3 := Holds_instantiate D I V zs 0 (τ X (List.length vs))
+    simp only [← a1] at s3
+    simp only [← s3]
+    clear s2
+
+    congr! 1
+    simp only [a1]
+    simp
+    obtain s4 := shift_list_instantiate D V zs
+    simp only [s4]
+    sorry
+  case forall_ x phi z ih_1 ih_2 =>
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    specialize ih_2 (shift D V d)
+    sorry
+  all_goals
+    sorry
 
 
 --#lint
