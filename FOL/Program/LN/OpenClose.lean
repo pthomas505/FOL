@@ -1162,6 +1162,39 @@ example
     simp
     exact h1
 
+
+example
+  (F : Formula)
+  (h1 : lc F) :
+  lc_at 0 F :=
+  by
+  induction h1
+  case pred_ X vs ih =>
+    simp only [Formula.lc_at]
+    intro v a1
+    specialize ih v a1
+    cases v
+    case _ x =>
+      simp only [Var.lc_at]
+    case _ i =>
+      simp only [isFree] at ih
+  case not_ phi ih_1 ih_2 =>
+    simp only [Formula.lc_at]
+    exact ih_2
+  case imp_ phi psi phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2 =>
+    simp only [Formula.lc_at]
+    constructor
+    · exact phi_ih_2
+    · exact psi_ih_2
+  case forall_ x phi z ih_1 ih_2 =>
+    simp only [Formula.lc_at]
+    simp
+
+    obtain s1 := lc_at_instantiate phi 0 [z]
+    simp at s1
+    simp only [← s1]
+    exact ih_2
+
 --------------------------------------------------
 
 lemma free_var_list_to_string_list
