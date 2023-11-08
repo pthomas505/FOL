@@ -1405,8 +1405,7 @@ example
     simp only [Holds]
     apply forall_congr'
     intro d
-    specialize phi_ih (shift D V d) (k + 1) h1
-    exact phi_ih
+    exact phi_ih (shift D V d) (k + 1) h1
 
 
 theorem predSub_aux
