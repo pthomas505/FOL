@@ -1356,6 +1356,59 @@ theorem shift_list_instantiate
 
 --------------------------------------------------
 
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (k : ℕ)
+  (z : String)
+  (F : Formula)
+  (h1 : F.lc_at k) :
+  Holds D I V F ↔ Holds D I V (Formula.instantiate k [free_ z] F) :=
+  by
+  induction F generalizing V k
+  case pred_ X vs =>
+      simp only [Formula.instantiate]
+      simp only [Holds]
+      congr! 1
+      simp
+      simp only [List.map_eq_map_iff]
+      intro v a1
+      specialize h1 v a1
+      simp
+      cases v
+      case _ x =>
+        simp only [Var.instantiate]
+      case _ i =>
+        simp only [Var.lc_at] at h1
+        simp only [Var.instantiate]
+        simp only [if_pos h1]
+  case not_ phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Holds]
+    congr! 1
+    exact phi_ih V k h1
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Holds]
+    cases h1
+    case _ h1_left h1_right =>
+    congr! 1
+    · exact phi_ih V k h1_left
+    · exact psi_ih V k h1_right
+  case forall_ x phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.instantiate]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    specialize phi_ih (shift D V d) (k + 1) h1
+    exact phi_ih
+
+
 theorem predSub_aux
   (D : Type)
   (I : Interpretation D)
