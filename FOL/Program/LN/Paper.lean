@@ -116,6 +116,24 @@ def Formula.lc_at
 
 --------------------------------------------------
 
+lemma Finset.union_subset_left_right
+  {α : Type}
+  [DecidableEq α]
+  (A B C D : Finset α)
+  (h1 : A ⊆ C)
+  (h2 : B ⊆ D) :
+  A ∪ B ⊆ C ∪ D :=
+  by
+    apply Finset.union_subset_iff.mpr
+    constructor
+    · trans C
+      · exact h1
+      · exact Finset.subset_union_left C D
+    · trans D
+      · exact h2
+      · exact Finset.subset_union_right C D
+
+
 lemma Finset.union_subset_union
   {α : Type}
   [DecidableEq α]
@@ -260,6 +278,65 @@ lemma FormulaOpenFreeVarSet
     simp only [Formula.freeVarSet]
     apply phi_ih
 
+--------------------------------------------------
+
+lemma VarOpenFreeVarSet'
+  (j : ℕ)
+  (y : String)
+  (v : Var) :
+  v.freeVarSet ⊆ (Var.open j (free_ y) v).freeVarSet :=
+  by
+  cases v
+  case free_ x =>
+    simp only [Var.open]
+    simp only [Var.freeVarSet]
+    simp
+  case bound_ i =>
+    simp only [Var.open]
+    split_ifs
+    case _ c1 =>
+      simp only [Var.freeVarSet]
+    case _ c1 c2 =>
+      simp only [Var.freeVarSet]
+      simp
+    case _ c1 c2 =>
+      simp only [Var.freeVarSet]
+
+
+lemma FormulaOpenFreeVarSet'
+  (j : ℕ)
+  (y : String)
+  (F : Formula) :
+  F.freeVarSet ⊆ (Formula.open j (free_ y) F).freeVarSet :=
+  by
+  induction F generalizing j
+  case pred_ X vs =>
+    simp only [Formula.open]
+    simp only [Formula.freeVarSet]
+    simp
+    intro v a1
+
+    trans Var.freeVarSet (Var.open j (free_ y) v)
+    · apply VarOpenFreeVarSet'
+    · apply Finset.subset_biUnion_of_mem Var.freeVarSet
+      apply List.mem_toFinset.mpr
+      exact List.mem_map_of_mem (Var.open j (free_ y)) a1
+  case not_ phi phi_ih =>
+    simp only [Formula.open]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.open]
+    simp only [Formula.freeVarSet]
+    apply Finset.union_subset_left_right
+    · exact phi_ih j
+    · exact psi_ih j
+  case forall_ x phi phi_ih =>
+    simp only [Formula.open]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+
+--------------------------------------------------
 
 lemma VarCloseFreeVarSet
   (j : ℕ)
