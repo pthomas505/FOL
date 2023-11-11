@@ -17,6 +17,26 @@ theorem List.map_eq_self_iff
     exact l_ih
 
 
+lemma List.map_mem_id
+  {α : Type}
+  (xs: List α)
+  (f : α → α)
+  (h1: ∀ (x : α), x ∈ xs → f x = x) :
+  List.map f xs = xs :=
+  by
+  induction xs
+  case nil =>
+    simp
+  case cons hd tl ih =>
+    simp at h1
+    cases h1
+    case _ h1_left h1_right =>
+      simp
+      constructor
+      · exact h1_left
+      · exact ih h1_right
+
+
 example
   {α β : Type}
   [DecidableEq α]
