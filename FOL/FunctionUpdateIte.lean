@@ -6,9 +6,9 @@ import FOL.Tactics
 
 /--
   Specialized version of Function.update for non-dependent functions.
-  Function.updateIte f a' b := Replaces the value of f at a' by b.
+  Function.updateITE f a' b := Replaces the value of f at a' by b.
 -/
-def Function.updateIte
+def Function.updateITE
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
@@ -18,42 +18,42 @@ def Function.updateIte
   β :=
   if a = a' then b else f a
 
-#eval Function.updateIte (fun n : ℕ => n) 5 10 1
-#eval Function.updateIte (fun n : ℕ => n) 5 10 5
+#eval Function.updateITE (fun n : ℕ => n) 5 10 1
+#eval Function.updateITE (fun n : ℕ => n) 5 10 5
 
 
 /--
-  Function.updateIte at multiple points.
-  Function.updateListIte f xs ys := Replaces the value of f at each point in xs by the value in ys at the same index.
+  Function.updateITE at multiple points.
+  Function.updateListITE f xs ys := Replaces the value of f at each point in xs by the value in ys at the same index.
   If there are duplicate values in xs then the value at the smallest index is used.
   If the lengths of xs and ys do not match then the longer is effectively truncated to the length of the smaller.
 -/
-def Function.updateListIte
+def Function.updateListITE
   {α β : Type}
   [DecidableEq α]
   (f : α → β) :
   List α → List β → α → β
-  | x::xs, y::ys => Function.updateIte (Function.updateListIte f xs ys) x y
+  | x::xs, y::ys => Function.updateITE (Function.updateListITE f xs ys) x y
   | _, _ => f
 
-#eval Function.updateListIte (fun n : ℕ => n) [5, 10, 5] [10, 20, 30] 5
-#eval Function.updateListIte (fun n : ℕ => n) [5, 10] [10] 5
-#eval Function.updateListIte (fun n : ℕ => n) [10] [5, 10] 10
-#eval Function.updateListIte (fun n : ℕ => n) [] [5, 10] 10
-#eval Function.updateListIte (fun n : ℕ => n) [5, 10] [] 5
+#eval Function.updateListITE (fun n : ℕ => n) [5, 10, 5] [10, 20, 30] 5
+#eval Function.updateListITE (fun n : ℕ => n) [5, 10] [10] 5
+#eval Function.updateListITE (fun n : ℕ => n) [10] [5, 10] 10
+#eval Function.updateListITE (fun n : ℕ => n) [] [5, 10] 10
+#eval Function.updateListITE (fun n : ℕ => n) [5, 10] [] 5
 
 
 /-
-def Function.updateListIte'
+def Function.updateListITE'
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
   (xs : List α)
   (ys : List β) :
   α → β :=
-  List.foldr (fun (p : α × β) (_ : α → β) => Function.updateIte f p.fst p.snd) f (List.zip xs ys)
+  List.foldr (fun (p : α × β) (_ : α → β) => Function.updateITE f p.fst p.snd) f (List.zip xs ys)
 
-#eval Function.updateListIte' (fun n : ℕ => n) [0, 3, 0] [10, 2, 2] 0
+#eval Function.updateListITE' (fun n : ℕ => n) [0, 3, 0] [10, 2, 2] 0
 -/
 
 
@@ -80,28 +80,28 @@ lemma Function.right_id_right_inverse
   exact Function.left_id_left_inverse g f h1
 
 
--- Function.updateIte
+-- Function.updateITE
 
 
-theorem Function.updateIte_comp_left
+theorem Function.updateITE_comp_left
   {α β γ : Type}
   [DecidableEq α]
   (f : β → γ)
   (g : α → β)
   (a : α)
   (b : β) :
-  f ∘ (Function.updateIte g a b) =
-    Function.updateIte (f ∘ g) a (f b) :=
+  f ∘ (Function.updateITE g a b) =
+    Function.updateITE (f ∘ g) a (f b) :=
   by
   funext x
-  unfold Function.updateIte
+  unfold Function.updateITE
   simp
   split_ifs
   · rfl
   · rfl
 
 
-theorem Function.updateIte_comp_right
+theorem Function.updateITE_comp_right
   {α β γ : Type}
   [DecidableEq α]
   [DecidableEq β]
@@ -112,11 +112,11 @@ theorem Function.updateIte_comp_right
   (b : γ)
   (h1 : finv ∘ f = id)
   (h2 : f ∘ finv = id) :
-  (Function.updateIte g a b) ∘ f =
-    Function.updateIte (g ∘ f) (finv a) b :=
+  (Function.updateITE g a b) ∘ f =
+    Function.updateITE (g ∘ f) (finv a) b :=
   by
   funext x
-  unfold Function.updateIte
+  unfold Function.updateITE
   simp
   congr!
   constructor
@@ -133,7 +133,7 @@ theorem Function.updateIte_comp_right
     exact s1 a
 
 
-theorem Function.updateIte_comp_right_injective
+theorem Function.updateITE_comp_right_injective
   {α β γ : Type}
   [DecidableEq α]
   [DecidableEq β]
@@ -142,13 +142,13 @@ theorem Function.updateIte_comp_right_injective
   (a : α)
   (b : γ)
   (h1 : Function.Injective f) :
-  (Function.updateIte g (f a) b) ∘ f =
-    Function.updateIte (g ∘ f) a b :=
+  (Function.updateITE g (f a) b) ∘ f =
+    Function.updateITE (g ∘ f) a b :=
   by
   unfold Function.Injective at h1
 
   funext x
-  unfold Function.updateIte
+  unfold Function.updateITE
   simp
   congr!
   constructor
@@ -158,18 +158,18 @@ theorem Function.updateIte_comp_right_injective
     rfl
 
 
-theorem Function.updateIte_comm
+theorem Function.updateITE_comm
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
   (a b : α)
   (u v : β)
   (h1 : ¬ a = b) :
-  Function.updateIte (Function.updateIte f a v) b u =
-    Function.updateIte (Function.updateIte f b u) a v :=
+  Function.updateITE (Function.updateITE f a v) b u =
+    Function.updateITE (Function.updateITE f b u) a v :=
   by
   funext x
-  unfold Function.updateIte
+  unfold Function.updateITE
   split_ifs
   case _ c1 c2 =>
     subst c1 c2
@@ -178,30 +178,30 @@ theorem Function.updateIte_comm
     rfl
 
 
-theorem Function.updateIte_idem
+theorem Function.updateITE_idem
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
   (a : α)
   (x y : β) :
-  Function.updateIte (Function.updateIte f a x) a y =
-    Function.updateIte f a y :=
+  Function.updateITE (Function.updateITE f a x) a y =
+    Function.updateITE f a y :=
   by
   funext v
-  unfold Function.updateIte
+  unfold Function.updateITE
   split_ifs
   · rfl
   · rfl
 
 
-theorem Function.updateIte_id
+theorem Function.updateITE_id
   {α : Type}
   [DecidableEq α]
   (x : α) :
-  Function.updateIte (id : α → α) x x = id :=
+  Function.updateITE (id : α → α) x x = id :=
   by
   funext v
-  unfold Function.updateIte
+  unfold Function.updateITE
   split_ifs
   case _ c1 =>
     subst c1
@@ -210,32 +210,32 @@ theorem Function.updateIte_id
     rfl
 
 
-theorem Function.updateIte_comm_id
+theorem Function.updateITE_comm_id
   {α : Type}
   [DecidableEq α]
   (x a b : α)
   (h1 : ¬ x = a) :
-  Function.updateIte (Function.updateIte id a b) x x =
-    Function.updateIte id a b :=
+  Function.updateITE (Function.updateITE id a b) x x =
+    Function.updateITE id a b :=
   by
   funext y
-  unfold Function.updateIte
+  unfold Function.updateITE
   simp
   intro a1
   subst a1
   simp only [if_neg h1]
 
 
-theorem Function.updateIte_coincide
+theorem Function.updateITE_coincide
   {α β : Type}
   [DecidableEq α]
   (f g : α → β)
   (x : α)
   (h1 : ∀ y : α, ¬ y = x → f y = g y) :
-  Function.updateIte f x (g x) = g :=
+  Function.updateITE f x (g x) = g :=
   by
   funext y
-  unfold Function.updateIte
+  unfold Function.updateITE
   split_ifs
   case _ c1 =>
     subst c1
@@ -244,7 +244,7 @@ theorem Function.updateIte_coincide
     exact h1 y c1
 
 
-theorem Function.updateIte_not_mem_list
+theorem Function.updateITE_not_mem_list
   {α β : Type}
   [DecidableEq α]
   (l : List α)
@@ -252,7 +252,7 @@ theorem Function.updateIte_not_mem_list
   (a : α)
   (b : β)
   (h1 : a ∉ l) :
-  l.map (Function.updateIte f a b) = l.map f :=
+  l.map (Function.updateITE f a b) = l.map f :=
   by
   induction l
   case nil =>
@@ -264,11 +264,11 @@ theorem Function.updateIte_not_mem_list
     cases h1
     case intro h1_left h1_right =>
       simp
-      unfold Function.updateIte
+      unfold Function.updateITE
       split_ifs <;> tauto
 
 
-theorem Function.updateIte_not_mem_set
+theorem Function.updateITE_not_mem_set
   {α β : Type}
   [DecidableEq α]
   [DecidableEq β]
@@ -277,7 +277,7 @@ theorem Function.updateIte_not_mem_set
   (a : α)
   (b : β)
   (h1 : a ∉ S) :
-  Finset.image (Function.updateIte f a b) S =
+  Finset.image (Function.updateITE f a b) S =
     Finset.image f S :=
   by
   induction S using Finset.induction_on
@@ -291,7 +291,7 @@ theorem Function.updateIte_not_mem_set
     case intro h1_left h1_right =>
     simp
     congr! 1
-    · unfold Function.updateIte
+    · unfold Function.updateITE
       split_ifs
       case _ c1 =>
         subst c1
@@ -301,18 +301,18 @@ theorem Function.updateIte_not_mem_set
     · exact S_ih h1_right
 
 
-theorem Function.updateIte_symm
+theorem Function.updateITE_symm
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
   (x y : α)
   (d d' : β)
   (h1 : ¬ x = y) :
-  Function.updateIte (Function.updateIte f x d) y d' =
-    Function.updateIte (Function.updateIte f y d') x d :=
+  Function.updateITE (Function.updateITE f x d) y d' =
+    Function.updateITE (Function.updateITE f y d') x d :=
   by
   funext a
-  unfold Function.updateIte
+  unfold Function.updateITE
   by_cases c1 : a = x
   · by_cases c2 : a = y
     · subst c1
@@ -329,65 +329,65 @@ theorem Function.updateIte_symm
     · simp only [if_neg c1]
 
 
--- Function.updateListIte
+-- Function.updateListITE
 
-theorem Function.updateListIte_comp
+theorem Function.updateListITE_comp
   {α β γ : Type}
   [DecidableEq α]
   (f : α → β)
   (g : β → γ)
   (xs : List α)
   (ys : List β) :
-  g ∘ Function.updateListIte f xs ys =
-    Function.updateListIte (g ∘ f) xs (ys.map g) :=
+  g ∘ Function.updateListITE f xs ys =
+    Function.updateListITE (g ∘ f) xs (ys.map g) :=
   by
   induction xs generalizing ys
   case nil =>
-    unfold Function.updateListIte
+    unfold Function.updateListITE
     rfl
   case cons _ xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
       simp
-      unfold Function.updateListIte
+      unfold Function.updateListITE
       rfl
     case cons ys_hd ys_tl =>
       simp
-      unfold Function.updateListIte
+      unfold Function.updateListITE
       simp only [← xs_ih]
-      apply Function.updateIte_comp_left
+      apply Function.updateITE_comp_left
 
 
-theorem Function.updateListIte_mem'
+theorem Function.updateListITE_mem'
   {α β : Type}
   [DecidableEq α]
   (f g : α → β)
   (xs ys : List α)
   (x : α)
   (h1 : f x = g x) :
-  Function.updateListIte f xs (List.map f ys) x =
-    Function.updateListIte g xs (List.map f ys) x :=
+  Function.updateListITE f xs (List.map f ys) x =
+    Function.updateListITE g xs (List.map f ys) x :=
   by
   induction xs generalizing ys
   case nil =>
-    unfold Function.updateListIte
+    unfold Function.updateListITE
     exact h1
   case cons _ xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
       simp
-      unfold Function.updateListIte
+      unfold Function.updateListITE
       exact h1
     case cons ys_hd ys_tl =>
       simp
-      unfold Function.updateListIte
-      unfold Function.updateIte
+      unfold Function.updateListITE
+      unfold Function.updateITE
       split_ifs
       · rfl
       · exact xs_ih ys_tl
 
 
-theorem Function.updateListIte_mem_eq_len
+theorem Function.updateListITE_mem_eq_len
   {α β : Type}
   [DecidableEq α]
   (f g : α → β)
@@ -396,8 +396,8 @@ theorem Function.updateListIte_mem_eq_len
   (ys : List β)
   (h1 : v ∈ xs)
   (h2 : xs.length = ys.length) :
-  Function.updateListIte f xs ys v =
-    Function.updateListIte g xs ys v :=
+  Function.updateListITE f xs ys v =
+    Function.updateListITE g xs ys v :=
   by
   induction xs generalizing ys
   case nil =>
@@ -409,8 +409,8 @@ theorem Function.updateListIte_mem_eq_len
     case nil =>
       contradiction
     case cons ys_hd ys_tl =>
-      unfold Function.updateListIte
-      unfold Function.updateIte
+      unfold Function.updateListITE
+      unfold Function.updateITE
       cases h1
       case inl h1 =>
         simp only [if_pos h1]
@@ -423,7 +423,7 @@ theorem Function.updateListIte_mem_eq_len
           exact xs_ih ys_tl h1 h2
 
 
-theorem Function.updateListIte_mem
+theorem Function.updateListITE_mem
   {α β : Type}
   [DecidableEq α]
   (f g : α → β)
@@ -432,8 +432,8 @@ theorem Function.updateListIte_mem
   (ys : List β)
   (h1 : v ∈ xs)
   (h2 : f v = g v) :
-  Function.updateListIte f xs ys v =
-    Function.updateListIte g xs ys v :=
+  Function.updateListITE f xs ys v =
+    Function.updateListITE g xs ys v :=
   by
   induction xs generalizing ys
   case nil =>
@@ -443,13 +443,13 @@ theorem Function.updateListIte_mem
     case nil =>
       simp at h1
 
-      unfold Function.updateListIte
+      unfold Function.updateListITE
       exact h2
     case cons ys_hd ys_tl =>
       simp at h1
 
-      unfold Function.updateListIte
-      unfold Function.updateIte
+      unfold Function.updateListITE
+      unfold Function.updateITE
       split_ifs
       case pos =>
         rfl
@@ -461,7 +461,7 @@ theorem Function.updateListIte_mem
           exact xs_ih ys_tl c2
 
 
-theorem Function.updateListIte_not_mem
+theorem Function.updateListITE_not_mem
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
@@ -469,20 +469,20 @@ theorem Function.updateListIte_not_mem
   (xs : List α)
   (ys : List β)
   (h1 : v ∉ xs) :
-  Function.updateListIte f xs ys v = f v :=
+  Function.updateListITE f xs ys v = f v :=
   by
   induction xs generalizing ys
   case nil =>
-    unfold Function.updateListIte
+    unfold Function.updateListITE
     rfl
   case cons xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
-      unfold Function.updateListIte
+      unfold Function.updateListITE
       rfl
     case cons ys_hd ys_tl =>
-      unfold Function.updateListIte
-      unfold Function.updateIte
+      unfold Function.updateListITE
+      unfold Function.updateITE
       split_ifs
       case pos c1 =>
         subst c1
@@ -495,7 +495,7 @@ theorem Function.updateListIte_not_mem
           apply xs_ih ys_tl h1_right
 
 
-theorem Function.updateListIte_updateIte
+theorem Function.updateListITE_updateIte
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
@@ -504,23 +504,23 @@ theorem Function.updateListIte_updateIte
   (x y : α)
   (z : β)
   (h1 : ¬ x = y) :
-  Function.updateListIte (Function.updateIte f y z) l1 l2 x =
-    Function.updateListIte f l1 l2 x :=
+  Function.updateListITE (Function.updateITE f y z) l1 l2 x =
+    Function.updateListITE f l1 l2 x :=
   by
   induction l1 generalizing l2
   case nil =>
-    unfold Function.updateListIte
-    unfold Function.updateIte
+    unfold Function.updateListITE
+    unfold Function.updateITE
     simp only [if_neg h1]
   case cons l1_hd l1_tl l1_ih =>
     cases l2
     case nil =>
-      unfold Function.updateListIte
-      unfold Function.updateIte
+      unfold Function.updateListITE
+      unfold Function.updateITE
       simp only [if_neg h1]
     case cons l2_hd l2_tl =>
-      unfold Function.updateListIte
-      unfold Function.updateIte
+      unfold Function.updateListITE
+      unfold Function.updateITE
       split_ifs
       case pos c1 =>
         rfl
@@ -528,7 +528,7 @@ theorem Function.updateListIte_updateIte
         apply l1_ih
 
 
-theorem Function.updateListIte_fun_coincide_mem_eq_len
+theorem Function.updateListITE_fun_coincide_mem_eq_len
   {α β : Type}
   [DecidableEq α]
   (f g : α → β)
@@ -537,21 +537,21 @@ theorem Function.updateListIte_fun_coincide_mem_eq_len
   (h1 : ∀ (v : α), v ∈ ys → f v = g v)
   (h2 : x ∈ xs)
   (h3 : xs.length = ys.length):
-  Function.updateListIte f xs (List.map f ys) x =
-    Function.updateListIte g xs (List.map g ys) x :=
+  Function.updateListITE f xs (List.map f ys) x =
+    Function.updateListITE g xs (List.map g ys) x :=
   by
   have s1 : List.map f ys = List.map g ys
   simp only [List.map_eq_map_iff]
   exact h1
 
   simp only [s1]
-  apply Function.updateListIte_mem_eq_len
+  apply Function.updateListITE_mem_eq_len
   · exact h2
   · simp
     exact h3
 
 
-theorem Function.updateListIte_map_mem_ext
+theorem Function.updateListITE_map_mem_ext
   {α β : Type}
   [DecidableEq α]
   (l1 l2 : List α)
@@ -560,38 +560,38 @@ theorem Function.updateListIte_map_mem_ext
   (h1 : ∀ y : α, y ∈ l2 → h y = h' y)
   (h2 : l1.length = l2.length)
   (h3 : x ∈ l1) :
-  Function.updateListIte f l1 (List.map h l2) x =
-      Function.updateListIte g l1 (List.map h' l2) x :=
+  Function.updateListITE f l1 (List.map h l2) x =
+      Function.updateListITE g l1 (List.map h' l2) x :=
   by
   have s1 : List.map h l2 = List.map h' l2
   simp only [List.map_eq_map_iff]
   exact h1
 
   simp only [s1]
-  apply Function.updateListIte_mem_eq_len
+  apply Function.updateListITE_mem_eq_len
   · exact h3
   · simp
     exact h2
 
 
-theorem Function.updateListIte_map_mem
+theorem Function.updateListITE_map_mem
   {α β : Type}
   [DecidableEq α]
   (f g : α → β)
   (l : List α)
   (x : α)
   (h1 : x ∈ l) :
-  Function.updateListIte f l (List.map g l) x = g x :=
+  Function.updateListITE f l (List.map g l) x = g x :=
   by
   induction l
   case nil =>
     simp at h1
   case cons hd tl ih =>
-    simp at h1 
+    simp at h1
 
     simp
-    unfold Function.updateListIte
-    unfold Function.updateIte
+    unfold Function.updateListITE
+    unfold Function.updateITE
     split_ifs
     case _ c1 =>
       subst c1
@@ -600,7 +600,7 @@ theorem Function.updateListIte_map_mem
       tauto
 
 
-theorem Function.updateListIte_map_updateIte
+theorem Function.updateListITE_map_updateIte
   {α β : Type}
   [DecidableEq α]
   (f g : α → β)
@@ -611,12 +611,12 @@ theorem Function.updateListIte_map_updateIte
   (h1 : ∀ y : α, y ∈ l2 → ¬ y = v)
   (h2 : l1.length = l2.length)
   (h3 : x ∈ l1) :
-  Function.updateListIte f l1 (List.map f l2) x =
-  Function.updateListIte g l1 (List.map (Function.updateIte f v a) l2) x :=
+  Function.updateListITE f l1 (List.map f l2) x =
+  Function.updateListITE g l1 (List.map (Function.updateITE f v a) l2) x :=
   by
-  have s1 : ∀ y : α, y ∈ l2 → f y =Function.updateIte f v a y
+  have s1 : ∀ y : α, y ∈ l2 → f y =Function.updateITE f v a y
   intro y a1
-  unfold Function.updateIte
+  unfold Function.updateITE
   split_ifs
   case _ c1 =>
     specialize h1 y a1
@@ -624,7 +624,7 @@ theorem Function.updateListIte_map_updateIte
   case _ c2 =>
     rfl
 
-  exact Function.updateListIte_map_mem_ext l1 l2 f g f (Function.updateIte f v a) x s1 h2 h3
+  exact Function.updateListITE_map_mem_ext l1 l2 f g f (Function.updateITE f v a) x s1 h2 h3
 
 
 #lint
