@@ -61,3 +61,6 @@ lemma Finset.union_subset_diff
     · apply Finset.sdiff_subset_sdiff
       · exact Finset.subset_union_right C D
       · rfl
+
+
+#lint
