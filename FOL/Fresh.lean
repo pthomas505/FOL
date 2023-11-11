@@ -1,4 +1,3 @@
-import FOL.Program.LN.Formula
 import FOL.Tactics
 
 import Mathlib.Data.String.Lemmas
