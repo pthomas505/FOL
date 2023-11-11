@@ -512,7 +512,7 @@ theorem predSub_aux
         then Holds D I (Function.updateListIte V' zs ds) E H
         else I.pred_var_ X ds
       else I.pred_var_ X ds
-    ⟩ 
+    ⟩
     V E F ↔ Holds D I V E (replacePredFun c τ F) :=
   by
   induction F generalizing binders V
@@ -770,7 +770,7 @@ example
         then Holds D I (Function.updateListIte V' zs ds) E H
         else I.pred_var_ X ds
       else I.pred_var_ X ds
-    ⟩ 
+    ⟩
     V E F ↔ Holds D I V E (subPredAux c τ F) :=
   by
   induction F generalizing V
