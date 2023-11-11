@@ -163,6 +163,21 @@ def Formula.instantiate
 
 --------------------------------------------------
 
+def Var.abstract1
+  (v : Var)
+  (k : ℕ) :
+  Var → Var
+  | free_ x =>
+      if v = free_ x
+      then bound_ k
+      else free_ x
+  | bound_ i =>
+      if i < k
+      then bound_ i
+      else bound_ (i + 1)
+
+--------------------------------------------------
+
 /--
   Helper function for closeFormulaAux.
 
@@ -897,6 +912,58 @@ lemma Holds_openFormulaListAux
 
 --------------------------------------------------
 
+lemma Formula.lc_at_instantiate_id
+  (F : Formula)
+  (k : ℕ)
+  (zs : List String)
+  (h1 : F.lc_at k) :
+  Formula.instantiate k (zs.map Var.free_) F = F :=
+  by
+  induction F generalizing k
+  case pred_ X vs =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.instantiate]
+    simp
+    apply List.map_mem_id
+    intro v a1
+    specialize h1 v a1
+    cases v
+    case _ x =>
+      simp only [Var.instantiate]
+    case _ i =>
+      cases i
+      case zero =>
+        simp only [Var.lc_at] at h1
+        simp only [Var.instantiate]
+        simp only [if_pos h1]
+      case succ i =>
+        simp only [Var.lc_at] at h1
+        simp only [Var.instantiate]
+        simp only [if_pos h1]
+  case not_ phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.instantiate]
+    congr!
+    exact phi_ih k h1
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.instantiate]
+    cases h1
+    case _ h1_left h1_right =>
+      congr!
+      · exact phi_ih k h1_left
+      · exact psi_ih k h1_right
+  case forall_ x phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.instantiate]
+    simp
+    exact phi_ih (k + 1) h1
+
+
 lemma lc_at_instantiate
   (F : Formula)
   (k : ℕ)
@@ -1122,7 +1189,7 @@ lemma lc_at_imp_lc_instantiate
     exact phi_ih
 
 
-example
+lemma lc_at_imp_lc
   (F : Formula)
   (h1 : lc_at 0 F) :
   lc F :=
@@ -1163,7 +1230,7 @@ example
     exact h1
 
 
-example
+lemma lc_imp_lc_at
   (F : Formula)
   (h1 : lc F) :
   lc_at 0 F :=
@@ -1194,6 +1261,17 @@ example
     simp at s1
     simp only [← s1]
     exact ih_2
+
+
+lemma lc_at_iff_lc
+  (F : Formula) :
+  lc_at 0 F ↔ lc F :=
+  by
+  constructor
+  · intro a1
+    exact lc_at_imp_lc F a1
+  · intro a1
+    exact lc_imp_lc_at F a1
 
 --------------------------------------------------
 
@@ -1356,59 +1434,140 @@ theorem shift_list_instantiate
 
 --------------------------------------------------
 
-example
+lemma shift_extract1
   (D : Type)
-  (I : Interpretation D)
   (V : VarAssignment D)
   (k : ℕ)
   (z : String)
+  (d : D) :
+  shift D V d ∘ Var.abstract1 (free_ z) (k + 1) = shift D (V ∘ Var.abstract1 (free_ z) k) d :=
+  by
+  funext v
+  simp
+  cases v
+  case _ x =>
+    conv =>
+      rhs
+      simp only [shift]
+      simp
+    simp only [Var.abstract1]
+    simp
+    split_ifs
+    case _ c1 =>
+      simp only [shift]
+      simp
+    case _ c1 =>
+      simp only [shift]
+  case _ i =>
+    cases i
+    case zero =>
+      conv =>
+        rhs
+        simp only [shift]
+      simp only [Var.abstract1]
+      simp
+      simp only [shift]
+    case succ i =>
+      conv =>
+        rhs
+        simp only [shift]
+        simp
+        simp only [Var.abstract1]
+      simp only [Var.abstract1]
+      split
+      case _ c1 =>
+        have s1 : i < k
+        linarith
+        simp only [if_pos s1]
+        simp only [shift]
+      case _ c1 =>
+        simp at c1
+        have s1 : ¬ i < k
+        linarith
+        simp only [if_neg s1]
+        simp only [shift]
+
+
+lemma Holds_abstract_instantiate
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (z : String)
   (F : Formula)
-  (h1 : F.lc_at k) :
-  Holds D I V F ↔ Holds D I V (Formula.instantiate k [free_ z] F) :=
+  (k : ℕ)
+  (h1 : ¬ occursIn (free_ z) F)
+  (h2 : F.lc_at k) :
+  Holds D I V F ↔ Holds D I (V ∘ Var.abstract1 (free_ z) k) (Formula.instantiate k [free_ z] F) :=
   by
   induction F generalizing V k
   case pred_ X vs =>
-      simp only [Formula.instantiate]
-      simp only [Holds]
-      congr! 1
+    simp only [occursIn] at h1
+    simp only [Formula.lc_at] at h2
+
+    simp only [Formula.instantiate]
+    simp only [Holds]
+    congr! 1
+    simp
+    simp only [List.map_eq_map_iff]
+    intro v a1
+    specialize h2 v a1
+    simp
+    cases v
+    case _ x =>
+      simp only [Var.instantiate]
+      simp only [Var.abstract1]
+
+      have s1 : ¬ free_ z = free_ x
+      intro contra
+      apply h1
+      simp only [contra]
+      exact a1
+
+      simp only [if_neg s1]
+    case _ i =>
+      simp only [Var.lc_at] at h2
+
+      simp only [Var.instantiate]
       simp
-      simp only [List.map_eq_map_iff]
-      intro v a1
-      specialize h1 v a1
-      simp
-      cases v
-      case _ x =>
-        simp only [Var.instantiate]
-      case _ i =>
-        simp only [Var.lc_at] at h1
-        simp only [Var.instantiate]
-        simp only [if_pos h1]
+      split_ifs
+      simp only [Var.abstract1]
+      simp only [if_pos h2]
   case not_ phi phi_ih =>
-    simp only [Formula.lc_at] at h1
+    simp only [occursIn] at h1
+    simp only [Formula.lc_at] at h2
 
     simp only [Holds]
     congr! 1
-    exact phi_ih V k h1
+    apply phi_ih V k h1 h2
   case imp_ phi psi phi_ih psi_ih =>
-    simp only [Formula.lc_at] at h1
+    simp only [occursIn] at h1
+    push_neg at h1
+    simp only [Formula.lc_at] at h2
 
-    simp only [Holds]
     cases h1
     case _ h1_left h1_right =>
-    congr! 1
-    · exact phi_ih V k h1_left
-    · exact psi_ih V k h1_right
+      cases h2
+      case _ h2_left h2_right =>
+        simp only [Holds]
+        congr! 1
+        · apply phi_ih V k h1_left h2_left
+        · apply psi_ih V k h1_right h2_right
   case forall_ x phi phi_ih =>
-    simp only [Formula.lc_at] at h1
+    simp only [occursIn] at h1
+    simp only [Formula.lc_at] at h2
 
     simp only [Formula.instantiate]
     simp only [Holds]
     apply forall_congr'
     intro d
-    exact phi_ih (shift D V d) (k + 1) h1
+    specialize phi_ih (shift D V d) (k + 1) h1 h2
+    simp only [phi_ih]
+    congr! 1
+    apply shift_extract1
 
+--------------------------------------------------
 
-theorem predSub_aux
+example
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
@@ -1459,7 +1618,61 @@ theorem predSub_aux
     · apply psi_ih_2
   case forall_ x phi z ih_1 ih_2 =>
     simp only [Holds]
+    apply forall_congr'
+    intro d
     sorry
 
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (τ : String → ℕ → Formula)
+  (zs : List String)
+  (F : Formula)
+  (h1 : F.lc_at 0) :
+  Holds D I V (F.predSub τ) ↔
+    Holds D (Interpretation.usingPred D I fun (X : String) (ds : List D) => Holds D I (shift_list D V ds) (τ X ds.length)) V F :=
+  by
+  induction F generalizing V
+  case pred_ X vs =>
+    simp only [predSub]
+    simp only [Interpretation.usingPred]
+    simp only [Holds]
+    simp
+
+    have s1 : ∀ (v : Var), v ∈ vs → Var.lc_at 0 v
+    intro v a1
+    specialize h1 v a1
+    cases v
+    case _ x =>
+      simp only [Var.lc_at]
+    case _ i =>
+      simp only [Var.lc_at] at h1
+      simp at h1
+
+    obtain s2 := free_var_list_to_string_list vs s1
+    apply Exists.elim s2
+    intro zs a1
+
+    obtain s3 := Holds_instantiate D I V zs 0 (τ X (List.length vs))
+    simp only [← a1] at s3
+    simp only [← s3]
+    clear s2
+
+    congr! 1
+    simp only [a1]
+    simp
+    obtain s4 := shift_list_instantiate D V zs
+    simp only [s4]
+  case forall_ x phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    sorry
+  all_goals
+    sorry
 
 --#lint
