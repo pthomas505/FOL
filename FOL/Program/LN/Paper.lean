@@ -77,8 +77,9 @@ def Formula.subst (v t : Var) : Formula → Formula
 inductive Formula.lc : Formula → Prop
   | pred_
     (X : String)
-    (xs : List String) :
-    lc (pred_ X (xs.map Var.free_))
+    (vs : List Var) :
+    (∀ (v : Var), v ∈ vs → v.isFree) →
+    lc (pred_ X vs)
 
   | not_
     (phi : Formula) :
@@ -281,3 +282,47 @@ lemma FormulaCloseFreeVarSet
     simp only [Formula.close]
     simp only [Formula.freeVarSet]
     apply phi_ih
+
+--------------------------------------------------
+
+lemma lc_at_zero_iff_is_free
+  (v : Var) :
+  Var.lc_at 0 v ↔ v.isFree :=
+  by
+  cases v
+  case free_ x =>
+    simp only [Var.lc_at]
+    simp only [isFree]
+  case bound_ i =>
+    simp only [Var.lc_at]
+    simp only [isFree]
+    simp
+
+--------------------------------------------------
+
+lemma free_var_list_to_string_list
+  (vs : List Var)
+  (h1 : ∀ (v : Var), v ∈ vs → Var.lc_at 0 v) :
+  ∃ xs, vs = List.map free_ xs :=
+  by
+  induction vs
+  case nil =>
+    apply Exists.intro []
+    simp
+  case cons hd tl ih =>
+    simp at h1
+    cases h1
+    case intro h1_left h1_right =>
+      specialize ih h1_right
+      apply Exists.elim ih
+      intro xs a1
+      cases hd
+      case free_ x =>
+        apply Exists.intro (x :: xs)
+        simp
+        exact a1
+      case bound_ i =>
+        simp only [Var.lc_at] at h1_left
+        simp at h1_left
+
+--------------------------------------------------
