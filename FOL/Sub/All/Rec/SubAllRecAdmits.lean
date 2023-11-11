@@ -225,7 +225,7 @@ theorem substitution_fun_theorem_aux
         simp only [eq_comm]
         exact c1_right
     case _ c1 c2 =>
-      simp only [List.length_map] at c2 
+      simp only [List.length_map] at c2
       contradiction
     case _ c1 c2 =>
       simp at c2
