@@ -1,3 +1,5 @@
+import Mathlib.Data.List.Card
+import FOL.FunctionUpdateITE
 import FOL.Tactics
 
 
@@ -144,6 +146,111 @@ example
           simp only [h3 x1 s1]
           simp only [h3 x2 s2]
           exact a1
+
+
+def List.InjOn
+  {α : Type}
+  [DecidableEq α]
+  (f : α → α)
+  (l : List α) :
+  Prop := ∀ ⦃x₁ : α⦄, x₁ ∈ l → ∀ ⦃x₂ : α⦄, x₂ ∈ l → f x₁ = f x₂ → x₁ = x₂
+
+
+lemma List.nodup_eq_len_imp_exists_bijon
+  {α : Type}
+  [DecidableEq α]
+  (xs ys : List α)
+  (h1 : xs.length = ys.length)
+  (h2 : xs.Nodup)
+  (h3 : ys.Nodup) :
+  ∃ f : α → α, List.InjOn f xs ∧ xs.map f = ys :=
+  by
+  induction xs generalizing ys
+  case nil =>
+    have s1 : ys = []
+    {
+      apply List.eq_nil_of_length_eq_zero
+      simp only [← h1]
+      simp
+    }
+    simp only [s1]
+    apply Exists.intro id
+    constructor
+    · simp only [List.InjOn]
+      simp
+    · simp
+  case cons xs_hd xs_tl xs_ih =>
+    cases ys
+    case nil =>
+      simp at h1
+    case cons ys_hd ys_tl =>
+      simp at h1
+      simp at h2
+      simp at h3
+
+      cases h2
+      case intro h2_left h2_right =>
+        cases h3
+        case intro h3_left h3_right =>
+          simp
+          specialize xs_ih ys_tl h1 h2_right h3_right
+
+          apply Exists.elim xs_ih
+          intro f a1
+          clear xs_ih
+
+          simp only [List.InjOn]
+          cases a1
+          case intro a1_left a1_right =>
+            apply Exists.intro (Function.updateITE f xs_hd ys_hd)
+            constructor
+            · intro x1 x1_mem x2 x2_mem
+              simp at x1_mem
+              simp at x2_mem
+              simp only [Function.updateITE]
+              split_ifs
+              case _ c1 c2 =>
+                intro _
+                simp only [c1]
+                simp only [c2]
+              case _ c1 c2 =>
+                intro a2
+                cases x2_mem
+                case inl c3 =>
+                  contradiction
+                case inr c3 =>
+                  obtain s1 := List.mem_map_of_mem f c3
+                  simp only [a1_right] at s1
+                  simp only [← a2] at s1
+                  contradiction
+              case _ c1 c2 =>
+                intro a2
+                cases x1_mem
+                case inl c3 =>
+                  contradiction
+                case inr c3 =>
+                  obtain s1 := List.mem_map_of_mem f c3
+                  simp only [a1_right] at s1
+                  simp only [a2] at s1
+                  contradiction
+              case _ c1 c2 =>
+                intro a2
+                cases x1_mem
+                case inl x1_mem_left =>
+                  contradiction
+                case inr x1_mem_right =>
+                  cases x2_mem
+                  case inl x2_mem_left =>
+                    contradiction
+                  case inr x2_mem_right =>
+                    simp only [List.InjOn] at a1_left
+                    apply a1_left x1_mem_right x2_mem_right a2
+            · constructor
+              · simp only [Function.updateITE]
+                simp
+              · simp only [← a1_right]
+                apply Function.updateITE_not_mem_list
+                exact h2_left
 
 
 theorem nodup_eq_len_imp_eqv
