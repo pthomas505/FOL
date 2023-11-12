@@ -46,15 +46,105 @@ example
   (h1 : Function.Injective f)
   (h2_left : g a = f b)
   (h2_right : g b = f a)
-  (h3 : ∀ x : α, ¬ x = a ∧ ¬ x = b → f x = g x) :
+  (h3 : ∀ x : α, (¬ x = a ∧ ¬ x = b) → f x = g x) :
   Function.Injective g :=
   by
   unfold Function.Injective at h1
 
   unfold Function.Injective
   intro x1 x2 a1
+  by_cases x1_a : x1 = a
+  · by_cases x2_a : x2 = a
+    · simp only [x1_a]
+      simp only [x2_a]
+    · by_cases x1_b : x1 = b
+      · by_cases x2_b : x2 = b
+        · simp only [x1_b]
+          simp only [x2_b]
+        · specialize h3 x2
+          simp at h3
+          specialize h3 x2_a x2_b
+          simp only [<- a1] at h3
+          simp only [x1_a] at h3
+          simp only [h2_left] at h3
+          specialize h1 h3
+          contradiction
+      · by_cases x2_b : x2 = b
+        · subst x1_a
+          subst x2_b
+          apply h1
+          simp only [<- h2_left]
+          simp only [<- h2_right]
+          simp only [a1]
+        · specialize h3 x2 --
+          simp at h3
+          specialize h3 x2_a x2_b
+          simp only [<- a1] at h3
+          simp only [x1_a] at h3
+          simp only [h2_left] at h3
+          specialize h1 h3
+          contradiction
+  · by_cases x2_a : x2 = a
+    · by_cases x1_b : x1 = b
+      · subst x1_b
+        subst x2_a
+        apply h1
+        simp only [<- h2_left]
+        simp only [<- h2_right]
+        simp only [a1]
+      · by_cases x2_b : x2 = b
+        · specialize h3 x1
+          simp at h3
+          specialize h3 x1_a x1_b
+          simp only [a1] at h3
+          simp only [x2_a] at h3
+          simp only [h2_left] at h3
+          simp only [← x2_b] at h3
+          exact h1 h3
+        · specialize h3 x1
+          simp at h3
+          specialize h3 x1_a x1_b
+          simp only [a1] at h3
+          simp only [x2_a] at h3
+          simp only [h2_left] at h3
+          specialize h1 h3
+          contradiction
+    · by_cases x1_b : x1 = b
+      · by_cases x2_b : x2 = b
+        · simp only [x1_b]
+          simp only [x2_b]
+        · specialize h3 x2
+          simp at h3
+          specialize h3 x2_a x2_b
+          simp only [<- a1] at h3
+          simp only [x1_b] at h3
+          simp only [h2_right] at h3
+          specialize h1 h3
+          contradiction
+      · by_cases x2_b : x2 = b
+        · specialize h3 x1
+          simp at h3
+          specialize h3 x1_a x1_b
+          simp only [a1] at h3
+          simp only [x2_b] at h3
+          simp only [h2_right] at h3
+          specialize h1 h3
+          contradiction
+        · have s1 : ¬ x1 = a ∧ ¬ x1 = b
+          constructor
+          · exact x1_a
+          · exact x1_b
 
-  sorry
+          have s2 : ¬ x2 = a ∧ ¬ x2 = b
+          constructor
+          · exact x2_a
+          · exact x2_b
+
+          apply h1
+          simp only [h3 x1 s1]
+          simp only [h3 x2 s2]
+          exact a1
+
 
 /-
   have s1 : x1 = a := sorry
