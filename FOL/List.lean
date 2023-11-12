@@ -76,7 +76,7 @@ example
           simp only [<- h2_left]
           simp only [<- h2_right]
           simp only [a1]
-        · specialize h3 x2 --
+        · specialize h3 x2
           simp at h3
           specialize h3 x2_a x2_b
           simp only [<- a1] at h3
@@ -144,85 +144,6 @@ example
           simp only [h3 x1 s1]
           simp only [h3 x2 s2]
           exact a1
-
-
-/-
-  have s1 : x1 = a := sorry
-  have s2 : ¬ x2 = a := sorry
-  have s3 : ¬ x2 = b := sorry
-  specialize h3 x2
-  simp at h3
-  specialize h3 s2 s3
-  simp only [<- a1] at h3
-  simp only [s1] at h3
-  simp only [h2_left] at h3
-  specialize h1 h3
-  contradiction
--/
-
-/-
-  have s1 : x1 = b := sorry
-  have s2 : ¬ x2 = a := sorry
-  have s3 : ¬ x2 = b := sorry
-  specialize h3 x2
-  simp at h3
-  specialize h3 s2 s3
-  simp only [<- a1] at h3
-  simp only [s1] at h3
-  simp only [h2_right] at h3
-  specialize h1 h3
-  contradiction
--/
-
-/-
-  have s1 : x1 = x2 := sorry
-  exact s1
--/
-
-/-
-  have s1 : x1 = a := sorry
-  have s2 : x2 = a := sorry
-  simp only [s1]
-  simp only [s2]
--/
-
-/-
-  have s1 : x1 = b := sorry
-  have s2 : x2 = b := sorry
-  simp only [s1]
-  simp only [s2]
--/
-
-/-
-  have s1 : x1 = a := sorry
-  have s2 : x2 = b := sorry
-  subst s1
-  subst s2
-  apply h1
-  simp only [<- h2_left]
-  simp only [<- h2_right]
-  simp only [a1]
--/
-
-/-
-  have s1 : x1 = b := sorry
-  have s2 : x2 = a := sorry
-  subst s1
-  subst s2
-  apply h1
-  simp only [<- h2_left]
-  simp only [<- h2_right]
-  simp only [a1]
--/
-
-/-
-  have s1 : ¬ x1 = a ∧ ¬ x1 = b := sorry
-  have s2 : ¬ x2 = a ∧ ¬ x2 = b := sorry
-  apply h1
-  simp only [h3 x1 s1]
-  simp only [h3 x2 s2]
-  exact a1
--/
 
 
 theorem nodup_eq_len_imp_eqv
