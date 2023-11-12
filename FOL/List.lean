@@ -39,6 +39,22 @@ lemma List.map_mem_id
       · exact ih h1_right
 
 
+theorem list_zipWith_of_map
+  {α β γ : Type}
+  (l : List α)
+  (f : α → β)
+  (g : α → β → γ) :
+  List.zipWith g l (List.map f l) =
+    List.map (fun x : α => g x (f x)) l :=
+  by
+  induction l
+  case nil =>
+    simp
+  case cons hd tl ih =>
+    simp
+    exact ih
+
+
 example
   {α β : Type}
   [DecidableEq α]
@@ -261,55 +277,7 @@ theorem nodup_eq_len_imp_eqv
   (h2 : xs.Nodup)
   (h3 : ys.Nodup) :
   ∃ f : α ≃ α, xs.map f = ys :=
-  by
-  induction xs generalizing ys
-  case nil =>
-    have s1 : ys = []
-    {
-      apply List.eq_nil_of_length_eq_zero
-      simp only [← h1]
-      simp
-    }
-    simp only [s1]
-    apply Exists.intro Equiv.inhabited'.default
-    simp
-  case cons xs_hd xs_tl xs_ih =>
-    cases ys
-    case nil =>
-      simp at h1
-    case cons ys_hd ys_tl =>
-      simp at h1
-      simp at h2
-      simp at h3
-
-      cases h2
-      case intro h2_left h2_right =>
-        cases h3
-        case intro h3_left h3_right =>
-          simp
-          specialize xs_ih ys_tl h1 h2_right h3_right
-
-          apply Exists.elim xs_ih
-          intro f a1
-          clear xs_ih
-
-          sorry
-
-
-theorem list_zipWith_of_map
-  {α β γ : Type}
-  (l : List α)
-  (f : α → β)
-  (g : α → β → γ) :
-  List.zipWith g l (List.map f l) =
-    List.map (fun x : α => g x (f x)) l :=
-  by
-  induction l
-  case nil =>
-    simp
-  case cons hd tl ih =>
-    simp
-    exact ih
+  by sorry
 
 
 --#lint
