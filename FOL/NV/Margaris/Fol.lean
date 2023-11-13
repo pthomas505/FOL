@@ -1,4 +1,4 @@
-import FOL.Margaris.Prop
+import FOL.NV.Margaris.Prop
 
 
 namespace FOL

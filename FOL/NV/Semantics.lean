@@ -1,6 +1,6 @@
-import FOL.Binders
-import FOL.Definition
-import FOL.FunctionUpdateIte
+import FOL.NV.Binders
+import FOL.NV.Definition
+import FOL.FunctionUpdateITE
 import FOL.Tactics
 
 
@@ -77,14 +77,14 @@ def Holds
     Holds D I V E phi ↔ Holds D I V E psi
   | E, forall_ x phi =>
     have : sizeOf phi < sizeOf (forall_ x phi) := by simp
-    ∀ d : D, Holds D I (Function.updateIte V x d) E phi
+    ∀ d : D, Holds D I (Function.updateITE V x d) E phi
   | E, exists_ x phi =>
     have : sizeOf phi < sizeOf (exists_ x phi) := by simp
-    ∃ d : D, Holds D I (Function.updateIte V x d) E phi
+    ∃ d : D, Holds D I (Function.updateITE V x d) E phi
   | ([] : Env), def_ _ _ => False
   | d :: E, def_ name args =>
     if name = d.name ∧ args.length = d.args.length
-    then Holds D I (Function.updateListIte V d.args (List.map V args)) E d.q
+    then Holds D I (Function.updateListITE V d.args (List.map V args)) E d.q
     else Holds D I V E (def_ name args)
 termination_by _ E phi => (E.length, phi)
 
@@ -159,7 +159,7 @@ theorem Holds_coincide_Var
       intro d
       apply phi_ih
       intro v a1
-      simp only [Function.updateIte]
+      simp only [Function.updateITE]
       split_ifs
       case _ c1 =>
         rfl
@@ -179,11 +179,11 @@ theorem Holds_coincide_Var
       apply ih
       intro v a1
       simp only [isFreeIn_iff_mem_freeVarSet v hd.q] at a1
-      
+
       have s2 : v ∈ List.toFinset hd.args
       apply Finset.mem_of_subset hd.h1 a1
 
-      apply Function.updateListIte_fun_coincide_mem_eq_len V V' hd.args xs v h1
+      apply Function.updateListITE_fun_coincide_mem_eq_len V V' hd.args xs v h1
       · simp only [List.mem_toFinset] at s2
         exact s2
       · cases c1
@@ -259,7 +259,7 @@ theorem Holds_coincide_PredVar
       unfold Holds
       first | apply forall_congr' | apply exists_congr
       intro d
-      exact phi_ih (Function.updateIte V x d) h2
+      exact phi_ih (Function.updateITE V x d) h2
 
   case nil.def_ X xs =>
     simp only [Holds]

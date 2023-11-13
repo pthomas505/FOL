@@ -1,5 +1,5 @@
-import FOL.Margaris.Deduct
-import FOL.FunctionUpdateIte
+import FOL.NV.Margaris.Deduct
+import FOL.FunctionUpdateITE
 import FOL.Tactics
 
 
@@ -240,13 +240,13 @@ example
   (V : VarBoolAssignment)
   (σ : Formula → Formula)
   (h1 : P.evalPrime V ↔ Q.evalPrime V) :
-  (S.substPrime (Function.updateIte σ R P)).evalPrime V ↔
-    (S.substPrime (Function.updateIte σ R Q)).evalPrime V :=
+  (S.substPrime (Function.updateITE σ R P)).evalPrime V ↔
+    (S.substPrime (Function.updateITE σ R Q)).evalPrime V :=
   by
   simp only [evalPrime_substPrime_eq_evalPrime_evalPrime]
   congr! 1
   funext Q'
-  unfold Function.updateIte
+  unfold Function.updateITE
   split_ifs
   · simp
     exact h1
@@ -931,12 +931,12 @@ theorem evalPrimeFfToNot_of_function_updateIte_true
   (F F' : Formula)
   (V : VarBoolAssignment)
   (h1 : F.IsPrime) :
-  evalPrimeFfToNot (Function.updateIte V F' true) F =
-    Function.updateIte (evalPrimeFfToNot V) F' F F :=
+  evalPrimeFfToNot (Function.updateITE V F' true) F =
+    Function.updateITE (evalPrimeFfToNot V) F' F F :=
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
-    unfold Function.updateIte
+    unfold Function.updateITE
     unfold evalPrimeFfToNot
     unfold Formula.evalPrime
     split_ifs <;> tauto
@@ -949,12 +949,12 @@ theorem evalPrimeFfToNot_of_function_updateIte_false
   (F F' : Formula)
   (V : VarBoolAssignment)
   (h1 : F.IsPrime) :
-  evalPrimeFfToNot (Function.updateIte V F' false) F =
-    Function.updateIte (evalPrimeFfToNot V) F' F.not_ F :=
+  evalPrimeFfToNot (Function.updateITE V F' false) F =
+    Function.updateITE (evalPrimeFfToNot V) F' F.not_ F :=
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
-    unfold Function.updateIte
+    unfold Function.updateITE
     unfold evalPrimeFfToNot
     unfold Formula.evalPrime
     split_ifs <;> tauto
@@ -971,7 +971,7 @@ theorem image_of_evalPrimeFfToNot_of_function_updateIte
   (h1_Δ : ∀ U' : Formula, U' ∈ Δ → U'.IsPrime)
   (h1_U : U.IsPrime)
   (h2 : U ∉ Δ) :
-  Δ.image (evalPrimeFfToNot (Function.updateIte V U b)) =
+  Δ.image (evalPrimeFfToNot (Function.updateITE V U b)) =
     Δ.image (evalPrimeFfToNot V) :=
   by
   apply Set.image_congr
@@ -979,13 +979,13 @@ theorem image_of_evalPrimeFfToNot_of_function_updateIte
   specialize h1_Δ U' a1
   cases b
   · simp only [evalPrimeFfToNot_of_function_updateIte_false U' U V h1_Δ]
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp
     intro a2
     subst a2
     contradiction
   · simp only [evalPrimeFfToNot_of_function_updateIte_true U' U V h1_Δ]
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp
     intro a2
     subst a2
@@ -1003,16 +1003,16 @@ theorem propCompleteAuxAux
   by
   intro V
   apply T_14_9_Deduct P U (Δ.image (evalPrimeFfToNot V))
-  · specialize h3 (Function.updateIte V U true)
+  · specialize h3 (Function.updateITE V U true)
     simp only [image_of_evalPrimeFfToNot_of_function_updateIte U Δ V true h1_Δ h1_U h2] at h3
     simp only [evalPrimeFfToNot_of_function_updateIte_true U U V h1_U] at h3
-    unfold Function.updateIte at h3
+    unfold Function.updateITE at h3
     simp only [eq_self_iff_true, if_true] at h3
     exact h3
-  · specialize h3 (Function.updateIte V U Bool.false)
+  · specialize h3 (Function.updateITE V U Bool.false)
     simp only [image_of_evalPrimeFfToNot_of_function_updateIte U Δ V false h1_Δ h1_U h2] at h3
     simp only [evalPrimeFfToNot_of_function_updateIte_false U U V h1_U] at h3
-    unfold Function.updateIte at h3
+    unfold Function.updateITE at h3
     simp only [eq_self_iff_true, if_true] at h3
     exact h3
 

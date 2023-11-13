@@ -1,4 +1,4 @@
-import FOL.Semantics
+import FOL.NV.Semantics
 import FOL.Tactics
 
 
@@ -72,13 +72,13 @@ example
     first | apply forall_congr' | apply exists_congr
     intro a
 
-    have s1 : Function.updateIte V (σ x) a ∘ σ = Function.updateIte (V ∘ σ) x a
-    apply Function.updateIte_comp_right_injective
+    have s1 : Function.updateITE V (σ x) a ∘ σ = Function.updateITE (V ∘ σ) x a
+    apply Function.updateITE_comp_right_injective
     apply h1
 
     simp only [← s1]
 
-    exact phi_ih (Function.updateIte V (σ x) a)
+    exact phi_ih (Function.updateITE V (σ x) a)
 
   case def_ X xs =>
     induction E
@@ -96,7 +96,7 @@ example
           apply Holds_coincide_Var
           intro v a1
           simp only [isFreeIn_iff_mem_freeVarSet v E_hd.q] at a1
-          apply Function.updateListIte_mem_eq_len
+          apply Function.updateListITE_mem_eq_len
           · simp only [<- List.mem_toFinset]
             apply Finset.mem_of_subset E_hd.h1 a1
           · simp

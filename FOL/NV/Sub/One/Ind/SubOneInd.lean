@@ -1,4 +1,4 @@
-import FOL.Sub.One.Rec.SubOneRecAdmits
+import FOL.NV.Sub.One.Rec.SubOneRecAdmits
 import FOL.Tactics
 
 
@@ -348,7 +348,7 @@ theorem substitution_theorem_ind
   (v t : VarName)
   (F F' : Formula)
   (h1 : IsFreeSub F v t F') :
-  Holds D I (Function.updateIte V v (V t)) E F ↔
+  Holds D I (Function.updateITE V v (V t)) E F ↔
     Holds D I V E F' :=
   by
   induction h1 generalizing V
@@ -358,7 +358,7 @@ theorem substitution_theorem_ind
     simp
     simp only [List.map_eq_map_iff]
     intro x _
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp only [eq_comm]
     split_ifs
     case _ c1 =>
@@ -369,7 +369,7 @@ theorem substitution_theorem_ind
       simp only [if_neg c1]
   case eq_ h1_x h1_y h1_v h1_t =>
     simp only [Holds]
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp only [eq_comm]
     congr! 1 <;> { split_ifs <;> rfl }
   case true_ _ _ | false_ _ _ =>
@@ -398,7 +398,7 @@ theorem substitution_theorem_ind
     intro d
     apply Holds_coincide_Var
     intro x a1
-    unfold Function.updateIte
+    unfold Function.updateITE
     split_ifs
     case _ c1 =>
       rfl
@@ -416,11 +416,11 @@ theorem substitution_theorem_ind
     simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
-    specialize h1_ih (Function.updateIte V h1_x d)
+    specialize h1_ih (Function.updateITE V h1_x d)
     simp only [← h1_ih]
     apply Holds_coincide_Var
     intro x _
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp only [eq_comm]
     split_ifs
     case _ c1 c2 c3 =>
@@ -441,10 +441,10 @@ theorem substitution_theorem_ind
         simp
         apply Holds_coincide_Var
         intro v' a1
-        have s1 : List.map (Function.updateIte V h1_v (V h1_t)) h1_xs = List.map (V ∘ fun x => if h1_v = x then h1_t else x) h1_xs
+        have s1 : List.map (Function.updateITE V h1_v (V h1_t)) h1_xs = List.map (V ∘ fun x => if h1_v = x then h1_t else x) h1_xs
         simp only [List.map_eq_map_iff]
         intro x _
-        unfold Function.updateIte
+        unfold Function.updateITE
         simp only [eq_comm]
         simp
         split_ifs
@@ -454,7 +454,7 @@ theorem substitution_theorem_ind
           simp only [if_neg c3]
 
         simp only [s1]
-        apply Function.updateListIte_mem_eq_len
+        apply Function.updateListITE_mem_eq_len
         · simp only [isFreeIn_iff_mem_freeVarSet] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset hd.h1 a1

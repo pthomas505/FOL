@@ -1,7 +1,7 @@
-import FOL.Formula
-import FOL.Binders
-import FOL.FunctionUpdateIte
-import FOL.Semantics
+import FOL.NV.Formula
+import FOL.NV.Binders
+import FOL.NV.Semantics
+import FOL.FunctionUpdateITE
 import FOL.Tactics
 
 import Mathlib.Data.String.Lemmas
@@ -104,15 +104,15 @@ def sub
 | forall_ x phi =>
   let x' : VarName :=
     if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then variant x c ((sub (Function.updateIte σ x x) c phi).freeVarSet)
+    then variant x c ((sub (Function.updateITE σ x x) c phi).freeVarSet)
     else x
-  forall_ x' (sub (Function.updateIte σ x x') c phi)
+  forall_ x' (sub (Function.updateITE σ x x') c phi)
 | exists_ x phi =>
   let x' : VarName :=
     if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then variant x c ((sub (Function.updateIte σ x x) c phi).freeVarSet)
+    then variant x c ((sub (Function.updateITE σ x x) c phi).freeVarSet)
     else x
-  exists_ x' (sub (Function.updateIte σ x x') c phi)
+  exists_ x' (sub (Function.updateITE σ x x') c phi)
 | def_ X xs => def_ X (xs.map σ)
 
 
@@ -124,38 +124,38 @@ lemma lem_1
   (h1 : ∀ τ : VarName → VarName, (sub τ c F).freeVarSet = F.freeVarSet.image τ) :
   let x' :=
     if ∃ (y : VarName), y ∈ F.freeVarSet \ {x} ∧ σ y = x
-    then variant x c (sub (Function.updateIte σ x x) c F).freeVarSet
+    then variant x c (sub (Function.updateITE σ x x) c F).freeVarSet
     else x
   x' ∉ (F.freeVarSet \ {x}).image σ :=
   by
-  have s1 : (F.freeVarSet \ {x}).image σ ⊆ (sub (Function.updateIte σ x x) c F).freeVarSet
+  have s1 : (F.freeVarSet \ {x}).image σ ⊆ (sub (Function.updateITE σ x x) c F).freeVarSet
   calc
         (F.freeVarSet \ {x}).image σ
 
-    _ = (F.freeVarSet \ {x}).image (Function.updateIte σ x x) :=
+    _ = (F.freeVarSet \ {x}).image (Function.updateITE σ x x) :=
       by
       apply Finset.image_congr
       unfold Set.EqOn
       intro y a1
-      unfold Function.updateIte
+      unfold Function.updateITE
       simp at a1
       cases a1
       case _ a1_left a1_right =>
         simp only [if_neg a1_right]
 
-    _ ⊆ F.freeVarSet.image (Function.updateIte σ x x) :=
+    _ ⊆ F.freeVarSet.image (Function.updateITE σ x x) :=
       by
       apply Finset.image_subset_image
       exact Finset.sdiff_subset (freeVarSet F) {x}
 
-    _ = (sub (Function.updateIte σ x x) c F).freeVarSet :=
+    _ = (sub (Function.updateITE σ x x) c F).freeVarSet :=
       by
       symm
-      exact h1 (Function.updateIte σ x x)
+      exact h1 (Function.updateITE σ x x)
 
   split
   case inl c1 =>
-    obtain s2 := variant_not_mem x c (freeVarSet (sub (Function.updateIte σ x x) c F))
+    obtain s2 := variant_not_mem x c (freeVarSet (sub (Function.updateITE σ x x) c F))
     exact Finset.not_mem_mono s1 s2
   case inr c1 =>
     simp at c1
@@ -207,14 +207,14 @@ lemma lem_3
   (x : α)
   (x' : β)
   (f : α → β) :
-  ((S \ {x}).image (Function.updateIte f x x')) =
+  ((S \ {x}).image (Function.updateITE f x x')) =
   ((S \ {x}).image f) :=
   by
   apply Finset.image_congr
   unfold Set.EqOn
   intro a a1
   simp at a1
-  unfold Function.updateIte
+  unfold Function.updateITE
   cases a1
   case _ a1_left a1_right =>
     simp only [if_neg a1_right]
@@ -255,20 +255,20 @@ theorem lem_4
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     let x' : VarName :=
     if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then variant x c ((sub (Function.updateIte σ x x) c phi).freeVarSet)
+    then variant x c ((sub (Function.updateITE σ x x) c phi).freeVarSet)
     else x
     calc
         (sub σ c (forall_ x phi)).freeVarSet
-    _ = (forall_ x' (sub (Function.updateIte σ x x') c phi)).freeVarSet := by simp only [sub]
+    _ = (forall_ x' (sub (Function.updateITE σ x x') c phi)).freeVarSet := by simp only [sub]
 
-    _ = (sub (Function.updateIte σ x x') c phi).freeVarSet \ {x'} := by simp only [freeVarSet]
+    _ = (sub (Function.updateITE σ x x') c phi).freeVarSet \ {x'} := by simp only [freeVarSet]
 
-    _ = (phi.freeVarSet.image (Function.updateIte σ x x')) \ {x'} := by simp only [phi_ih (Function.updateIte σ x x')]
+    _ = (phi.freeVarSet.image (Function.updateITE σ x x')) \ {x'} := by simp only [phi_ih (Function.updateITE σ x x')]
 
-    _ = ((phi.freeVarSet \ {x}).image (Function.updateIte σ x x')) \ {x'} :=
+    _ = ((phi.freeVarSet \ {x}).image (Function.updateITE σ x x')) \ {x'} :=
       by
       apply lem_2
-      unfold Function.updateIte
+      unfold Function.updateITE
       simp
 
     _ = ((phi.freeVarSet \ {x}).image σ) \ {x'} :=
@@ -319,15 +319,15 @@ theorem substitution_fun_theorem
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     let x' :=
       if ∃ y ∈ phi.freeVarSet \ {x}, σ y = x
-      then variant x c (sub (Function.updateIte σ x x) c phi).freeVarSet
+      then variant x c (sub (Function.updateITE σ x x) c phi).freeVarSet
       else x
 
-    have s1 : ∀ (a : D) (z : VarName), z ∈ phi.freeVarSet → ((Function.updateIte V x' a) ∘ (Function.updateIte σ x x')) z = (Function.updateIte (V ∘ σ) x a) z
+    have s1 : ∀ (a : D) (z : VarName), z ∈ phi.freeVarSet → ((Function.updateITE V x' a) ∘ (Function.updateITE σ x x')) z = (Function.updateITE (V ∘ σ) x a) z
     intro a z h1
     by_cases h2 : z = x
     case pos =>
       subst h2
-      unfold Function.updateIte
+      unfold Function.updateITE
       simp
     case neg =>
       have s3 : x' ∉ (phi.freeVarSet \ {x}).image σ
@@ -346,7 +346,7 @@ theorem substitution_fun_theorem
       simp only [<- contra]
       exact s4
 
-      unfold Function.updateIte
+      unfold Function.updateITE
       simp (config := {zeta := false})
       simp (config := {zeta := false}) only [if_neg h2]
       split_ifs
@@ -381,7 +381,7 @@ theorem substitution_fun_theorem
       case pos c1 =>
         apply Holds_coincide_Var
         intro v a1
-        apply Function.updateListIte_map_mem_ext
+        apply Function.updateListITE_map_mem_ext
         · simp
         · cases c1
           case _ c1_left c1_right =>
@@ -422,7 +422,7 @@ def replacePredFun
         let zs := val.fst
         let H := val.snd
         if xs.length = zs.length
-        then sub (Function.updateListIte id zs xs) c H
+        then sub (Function.updateListITE id zs xs) c H
         else pred_var_ X xs
       else pred_var_ X xs
   | eq_ x y => eq_ x y
@@ -509,7 +509,7 @@ theorem predSub_aux
         let zs := val.fst
         let H := val.snd
         if ds.length = zs.length
-        then Holds D I (Function.updateListIte V' zs ds) E H
+        then Holds D I (Function.updateListITE V' zs ds) E H
         else I.pred_var_ X ds
       else I.pred_var_ X ds
     ⟩
@@ -532,19 +532,19 @@ theorem predSub_aux
       let val := Option.get opt c1
       let zs := val.fst
       let H := val.snd
-      obtain s1 := substitution_fun_theorem D I V E (Function.updateListIte id zs xs) c H
-      simp only [Function.updateListIte_comp] at s1
+      obtain s1 := substitution_fun_theorem D I V E (Function.updateListITE id zs xs) c H
+      simp only [Function.updateListITE_comp] at s1
       simp at s1
       simp only [s1]
 
       apply Holds_coincide_Var
       intro v a1
       by_cases c3 : v ∈ zs
-      · apply Function.updateListIte_mem_eq_len V' V v zs (List.map V xs) c3
+      · apply Function.updateListITE_mem_eq_len V' V v zs (List.map V xs) c3
         simp
         simp only [← c2]
-      · simp only [Function.updateListIte_not_mem V v zs (List.map V xs) c3]
-        simp only [Function.updateListIte_not_mem V' v zs (List.map V xs) c3]
+      · simp only [Function.updateListITE_not_mem V v zs (List.map V xs) c3]
+        simp only [Function.updateListITE_not_mem V' v zs (List.map V xs) c3]
         apply h2
         split_ifs at h1
         cases h1
@@ -596,9 +596,9 @@ theorem predSub_aux
     simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
-    apply phi_ih (Function.updateIte V x d) (binders ∪ {x}) h1
+    apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
     intro v a1
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp at a1
     push_neg at a1
     cases a1
@@ -694,7 +694,7 @@ def subPredAux
         let zs := val.fst
         let H := val.snd
         if xs.length = zs.length
-        then sub (Function.updateListIte id zs xs) c H
+        then sub (Function.updateListITE id zs xs) c H
         else pred_var_ X xs
       else pred_var_ X xs
   | eq_ x y => eq_ x y
@@ -720,16 +720,16 @@ def subPredAux
       have : length psi < length (iff_ phi psi) := by simp only [Formula.length]; simp;
       iff_ (subPredAux c τ phi) (subPredAux c τ psi)
   | forall_ x phi =>
-      have : length (sub (Function.updateIte id x (if x ∈ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ) then variant x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)) else x)) c phi) < length (forall_ x phi) := by simp only [Formula.length]; simp only [sub_formula_length_same]; simp;
+      have : length (sub (Function.updateITE id x (if x ∈ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ) then variant x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)) else x)) c phi) < length (forall_ x phi) := by simp only [Formula.length]; simp only [sub_formula_length_same]; simp;
       let vs : Finset VarName := Finset.biUnion phi.predVarSet (predVarFreeVarSet τ)
       let x' : VarName :=
         if x ∈ vs
         then variant x c vs
         else x
-      forall_ x' (subPredAux c τ (sub (Function.updateIte id x x') c phi))
+      forall_ x' (subPredAux c τ (sub (Function.updateITE id x x') c phi))
   | exists_ x phi =>
       have : length (sub
-      (Function.updateIte id x
+      (Function.updateITE id x
         (if x ∈ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ) then
           variant x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ) ∪ freeVarSet phi \ {x})
         else x))
@@ -740,7 +740,7 @@ def subPredAux
         if x ∈ vs
         then variant x c (vs ∪ (phi.freeVarSet \ {x}))
         else x
-      exists_ x' (subPredAux c τ (sub (Function.updateIte id x x') c phi))
+      exists_ x' (subPredAux c τ (sub (Function.updateITE id x x') c phi))
   | def_ X xs => def_ X xs
   termination_by subPredAux c τ F => F.length
 
@@ -767,7 +767,7 @@ example
         let zs := val.fst
         let H := val.snd
         if ds.length = zs.length
-        then Holds D I (Function.updateListIte V' zs ds) E H
+        then Holds D I (Function.updateListITE V' zs ds) E H
         else I.pred_var_ X ds
       else I.pred_var_ X ds
     ⟩
@@ -787,19 +787,19 @@ example
       let val := Option.get opt c1
       let zs := val.fst
       let H := val.snd
-      obtain s1 := substitution_fun_theorem D I V E (Function.updateListIte id zs xs) c H
-      simp only [Function.updateListIte_comp] at s1
+      obtain s1 := substitution_fun_theorem D I V E (Function.updateListITE id zs xs) c H
+      simp only [Function.updateListITE_comp] at s1
       simp at s1
       simp only [s1]
 
       apply Holds_coincide_Var
       intro v a1
       by_cases c3 : v ∈ zs
-      · apply Function.updateListIte_mem_eq_len V' V v zs (List.map V xs) c3
+      · apply Function.updateListITE_mem_eq_len V' V v zs (List.map V xs) c3
         simp
         simp only [← c2]
-      · simp only [Function.updateListIte_not_mem V v zs (List.map V xs) c3]
-        simp only [Function.updateListIte_not_mem V' v zs (List.map V xs) c3]
+      · simp only [Function.updateListITE_not_mem V v zs (List.map V xs) c3]
+        simp only [Function.updateListITE_not_mem V' v zs (List.map V xs) c3]
         apply h1
     case _ c1 c2 =>
       simp only [Holds]
@@ -815,7 +815,7 @@ example
     case _ c1 =>
       sorry
     case _ c2 =>
-      obtain s1 := substitution_fun_theorem D I (Function.updateIte V x d) E (Function.updateIte id x x) c phi
+      obtain s1 := substitution_fun_theorem D I (Function.updateITE V x d) E (Function.updateITE id x x) c phi
       sorry
   all_goals sorry;
 

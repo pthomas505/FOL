@@ -1,5 +1,5 @@
-import FOL.Program.LN.Binders
-import FOL.Program.LN.Semantics
+import FOL.LN.Binders
+import FOL.LN.Semantics
 import FOL.List
 import FOL.Tactics
 

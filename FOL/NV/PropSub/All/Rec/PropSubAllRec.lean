@@ -1,4 +1,4 @@
-import FOL.Semantics
+import FOL.NV.Semantics
 
 
 namespace FOL
@@ -178,7 +178,7 @@ theorem prop_sub_aux
     simp only [Holds]
     split_ifs
     case _ c1 =>
-      specialize ih (Function.updateListIte V hd.args (List.map V xs)) hd.q
+      specialize ih (Function.updateListITE V hd.args (List.map V xs)) hd.q
       simp only [replacePropFun_no_predVar hd.q τ hd.h2] at ih
       apply ih
     case _ c1 =>

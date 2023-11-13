@@ -1,4 +1,4 @@
-import FOL.Sub.All.Rec.SubAllRecAdmits
+import FOL.NV.Sub.All.Rec.SubAllRecAdmits
 
 
 namespace FOL
@@ -45,9 +45,9 @@ inductive IsPredSub
     (X : PredName)
     (ts : List VarName) :
     X = P ∧ ts.length = zs.length →
-    admitsFun (Function.updateListIte id zs ts) H →
+    admitsFun (Function.updateListITE id zs ts) H →
     IsPredSub P zs H (pred_var_ P ts)
-    (fastReplaceFreeFun (Function.updateListIte id zs ts) H)
+    (fastReplaceFreeFun (Function.updateListITE id zs ts) H)
 
   | eq_
     (x y : VarName) :
@@ -140,7 +140,7 @@ theorem isPredSub_theorem
   (h1 : IsPredSub P zs H A B)
   (h2 : ∀ (Q : PredName) (ds : List D),
     Q = P ∧ ds.length = zs.length →
-      (Holds D I (Function.updateListIte V zs ds) E H ↔ J.pred_var_ P ds))
+      (Holds D I (Function.updateListITE V zs ds) E H ↔ J.pred_var_ P ds))
   (h3_const : I.pred_const_ = J.pred_const_)
   (h3_var : ∀ (Q : PredName) (ds : List D),
     ¬ (Q = P ∧ ds.length = zs.length) →
@@ -172,9 +172,9 @@ theorem isPredSub_theorem
           exact a1_right
         · exact contra
   case pred_occurs_in h1_X h1_ts h1_1 h1_2 =>
-    obtain s1 := substitution_fun_theorem D I V E (Function.updateListIte id zs h1_ts) H h1_2
+    obtain s1 := substitution_fun_theorem D I V E (Function.updateListITE id zs h1_ts) H h1_2
 
-    obtain s2 := Function.updateListIte_comp id V zs h1_ts
+    obtain s2 := Function.updateListITE_comp id V zs h1_ts
 
     simp only [s2] at s1
     simp at s1
@@ -213,12 +213,12 @@ theorem isPredSub_theorem
     intro Q ds a1
     specialize h2 Q ds a1
     have s1 :
-      Holds D I (Function.updateListIte (Function.updateIte V h1_x d) zs ds) E H ↔
-        Holds D I (Function.updateListIte V zs ds) E H :=
+      Holds D I (Function.updateListITE (Function.updateITE V h1_x d) zs ds) E H ↔
+        Holds D I (Function.updateListITE V zs ds) E H :=
       by
       apply Holds_coincide_Var
       intro v a1
-      apply Function.updateListIte_updateIte
+      apply Function.updateListITE_updateIte
       intro contra
       subst contra
       contradiction
@@ -261,7 +261,7 @@ theorem isPredSub_valid
       pred_const_ := I.pred_const_
       pred_var_ := fun (Q : PredName) (ds : List D) =>
         if (Q = P ∧ ds.length = zs.length)
-        then Holds D I (Function.updateListIte V zs ds) E H
+        then Holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ Q ds }
   obtain s1 := isPredSub_theorem D I J V E phi P zs H phi' h1
   simp only [Interpretation.pred_var_] at s1

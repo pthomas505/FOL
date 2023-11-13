@@ -1,5 +1,5 @@
-import FOL.FunctionUpdateIte
-import FOL.Sub.One.Rec.SubOneRecReplaceFree
+import FOL.NV.Sub.One.Rec.SubOneRecReplaceFree
+import FOL.FunctionUpdateITE
 import FOL.Tactics
 
 
@@ -88,9 +88,9 @@ def fastReplaceFreeFun : (VarName → VarName) → Formula → Formula
       (fastReplaceFreeFun σ phi)
       (fastReplaceFreeFun σ psi)
   | σ, forall_ x phi =>
-      forall_ x (fastReplaceFreeFun (Function.updateIte σ x x) phi)
+      forall_ x (fastReplaceFreeFun (Function.updateITE σ x x) phi)
   | σ, exists_ x phi =>
-      exists_ x (fastReplaceFreeFun (Function.updateIte σ x x) phi)
+      exists_ x (fastReplaceFreeFun (Function.updateITE σ x x) phi)
   | σ, def_ X xs => def_ X (xs.map σ)
 
 
@@ -122,27 +122,27 @@ theorem fastReplaceFreeFun_id
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold fastReplaceFreeFun
     congr!
-    simp only [Function.updateIte_id]
+    simp only [Function.updateITE_id]
     exact phi_ih
 
 
 example
   (F : Formula)
   (v t : VarName) :
-  fastReplaceFreeFun (Function.updateIte id v t) F =
+  fastReplaceFreeFun (Function.updateITE id v t) F =
     fastReplaceFree v t F :=
   by
   induction F
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastReplaceFreeFun
     unfold fastReplaceFree
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp only [eq_comm]
     rfl
   case eq_ x y =>
     unfold fastReplaceFreeFun
     unfold fastReplaceFree
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp only [eq_comm]
     rfl
   case true_ | false_ =>
@@ -166,14 +166,14 @@ example
     case pos c1 =>
       subst c1
       congr!
-      simp only [Function.updateIte_idem]
-      simp only [Function.updateIte_id]
+      simp only [Function.updateITE_idem]
+      simp only [Function.updateITE_id]
       apply fastReplaceFreeFun_id
     case neg c1 =>
       congr! 1
       simp only [← phi_ih]
       congr! 1
-      apply Function.updateIte_comm_id x v t
+      apply Function.updateITE_comm_id x v t
       simp only [eq_comm]
       exact c1
 
@@ -235,7 +235,7 @@ theorem fastReplaceFreeFun_same_on_free
     congr! 1
     apply phi_ih
     intro v a1
-    unfold Function.updateIte
+    unfold Function.updateITE
     split_ifs
     case _ c1 =>
       rfl
@@ -362,10 +362,10 @@ example
     unfold replaceFreeFunAux
     congr! 1
 
-    have s1 : (∀ (v : VarName), v ∈ binders ∪ {x} → v = Function.updateIte σ x x v)
+    have s1 : (∀ (v : VarName), v ∈ binders ∪ {x} → v = Function.updateITE σ x x v)
     intros v a1
     simp at a1
-    unfold Function.updateIte
+    unfold Function.updateITE
     cases a1
     case _ c1 =>
       split_ifs
@@ -377,9 +377,9 @@ example
       simp only [if_pos c1]
       exact c1
 
-    simp only [← phi_ih (Function.updateIte σ x x) (binders ∪ {x}) s1]
-    apply replaceFreeFunAux_same_on_free phi σ (Function.updateIte σ x x) (binders ∪ {x})
-    unfold Function.updateIte
+    simp only [← phi_ih (Function.updateITE σ x x) (binders ∪ {x}) s1]
+    apply replaceFreeFunAux_same_on_free phi σ (Function.updateITE σ x x) (binders ∪ {x})
+    unfold Function.updateITE
     intro v a1
     simp at a1
     push_neg at a1

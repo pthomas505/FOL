@@ -1,7 +1,7 @@
 import Std.Data.String.Basic
 import Mathlib.Control.Basic
 
-import FOL.Program.Editor
+import FOL.NV.Program.Editor
 
 
 def isAlpha (c : Char) : Bool :=

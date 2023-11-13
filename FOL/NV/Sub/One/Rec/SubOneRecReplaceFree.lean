@@ -1,5 +1,5 @@
+import FOL.NV.Binders
 import FOL.List
-import FOL.Binders
 import FOL.Tactics
 
 

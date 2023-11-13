@@ -1,4 +1,4 @@
-import FOL.FunctionUpdateIte
+import FOL.FunctionUpdateITE
 import FOL.Tactics
 
 import Mathlib.Util.CompileInductive
@@ -486,11 +486,11 @@ def Holds
     Holds D I V M E phi → Holds D I V M E psi
   | E, forall_ x phi =>
     have : sizeOf phi < sizeOf (forall_ x phi) := by simp
-    ∀ d : D, Holds D I (Function.updateIte V x d) M E phi
+    ∀ d : D, Holds D I (Function.updateITE V x d) M E phi
   | ([] : Env), def_ _ _ => False
   | d :: E, def_ name args =>
     if name = d.name ∧ args.length = d.args.length
-    then Holds D I (Function.updateListIte V d.args (List.map V args)) M E d.F
+    then Holds D I (Function.updateListITE V d.args (List.map V args)) M E d.F
     else Holds D I V M E (def_ name args)
 termination_by _ E phi => (E.length, phi)
 
@@ -508,7 +508,7 @@ def IsNotFree
   Prop :=
   ∀ (V : Valuation D) (d : D),
     Holds D I V M E F ↔
-      Holds D I (Function.updateIte V v d) M E F
+      Holds D I (Function.updateITE V v d) M E F
 
 
 example
@@ -582,7 +582,7 @@ theorem all_free_in_list_and_not_in_list_imp_not_free
 
     contradiction
   case pred_ X xs =>
-    unfold NoMetaVarAndAllFreeInList at h1 
+    unfold NoMetaVarAndAllFreeInList at h1
 
     unfold NotFree
     tauto
@@ -838,7 +838,7 @@ theorem no_meta_var_imp_meta_instantiation_irrelevance_in_sub
     congr! 1
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
-    unfold Formula.metaVarSet at h1 
+    unfold Formula.metaVarSet at h1
     simp only [Finset.union_eq_empty_iff] at h1
 
     unfold sub
@@ -1167,7 +1167,7 @@ theorem holds_coincide_var
       apply phi_ih
       · exact h1
       · intro v a1
-        unfold Function.updateIte
+        unfold Function.updateITE
         split_ifs
         case _ c1 =>
           rfl
@@ -1184,9 +1184,9 @@ theorem holds_coincide_var
     simp only [Holds]
     split_ifs
     case _ c1 =>
-      apply E_ih (Function.updateListIte V E_hd.args (List.map V xs)) (Function.updateListIte V' E_hd.args (List.map V' xs)) E_hd.F E_hd.args E_hd.nf
+      apply E_ih (Function.updateListITE V E_hd.args (List.map V xs)) (Function.updateListITE V' E_hd.args (List.map V' xs)) E_hd.F E_hd.args E_hd.nf
       intro v a1
-      apply Function.updateListIte_fun_coincide_mem_eq_len
+      apply Function.updateListITE_fun_coincide_mem_eq_len
       · tauto
       · exact a1
       · tauto
@@ -1250,7 +1250,7 @@ theorem holds_coincide_meta_var
       simp only [Holds]
       apply forall_congr'
       intro a
-      exact phi_ih (Function.updateIte V x a) M M' h1
+      exact phi_ih (Function.updateITE V x a) M M' h1
 
   case nil.def_ X xs =>
     simp only [Holds]
@@ -1415,7 +1415,7 @@ theorem holds_coincide_env
     simp only [Holds]
     apply forall_congr'
     intro a
-    exact phi_ih (Function.updateIte V x a) h2
+    exact phi_ih (Function.updateITE V x a) h2
   case def_ X xs =>
     apply Exists.elim h1
     intro E1 h1_1
@@ -1521,13 +1521,13 @@ theorem holds_sub
       apply forall_congr'
       intro a
 
-      have s1 : Function.updateIte V (σ.val x) a ∘ σ.val = Function.updateIte (V ∘ σ.val) x a
-      apply Function.updateIte_comp_right_injective
+      have s1 : Function.updateITE V (σ.val x) a ∘ σ.val = Function.updateITE (V ∘ σ.val) x a
+      apply Function.updateITE_comp_right_injective
       apply Instantiation.is_injective
 
       simp only [← s1]
 
-      exact phi_ih (Function.updateIte V (σ.val x) a) h1
+      exact phi_ih (Function.updateITE V (σ.val x) a) h1
 
   case def_ X xs =>
     induction E
@@ -1548,10 +1548,10 @@ theorem holds_sub
       case _ c1 =>
         cases c1
         case intro c1_left c1_right =>
-          have s2 : Holds D I (Function.updateListIte (V ∘ σ.val) E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F ↔ Holds D I (Function.updateListIte V E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F
-          apply holds_coincide_var D I (Function.updateListIte (V ∘ σ.val) E_hd.args (List.map (V ∘ σ.val) xs)) (Function.updateListIte V E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
+          have s2 : Holds D I (Function.updateListITE (V ∘ σ.val) E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F ↔ Holds D I (Function.updateListITE V E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F
+          apply holds_coincide_var D I (Function.updateListITE (V ∘ σ.val) E_hd.args (List.map (V ∘ σ.val) xs)) (Function.updateListITE V E_hd.args (List.map (V ∘ σ.val) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
           intro v a1
-          apply Function.updateListIte_mem_eq_len
+          apply Function.updateListITE_mem_eq_len
           · exact a1
           · simp
             simp only [c1_right]
@@ -1590,11 +1590,11 @@ example
   constructor
   · intro a1 V V' a2
     simp only [a1 V (V' v)]
-    simp only [Function.updateIte_coincide V V' v a2]
+    simp only [Function.updateITE_coincide V V' v a2]
   · intro a1 V d
     apply a1
     intro a' a2
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp only [if_neg a2]
 
 
@@ -1630,7 +1630,7 @@ theorem not_free_imp_is_not_free
     subst contra
     contradiction
 
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp only [if_neg s1]
   case eq_ x y =>
     unfold NotFree at h1
@@ -1640,7 +1640,7 @@ theorem not_free_imp_is_not_free
     intro V d
     cases h1
     case intro h1_left h1_right =>
-      simp only [Function.updateIte]
+      simp only [Function.updateITE]
       simp only [if_neg h1_left]
       simp only [if_neg h1_right]
   case true_ =>
@@ -1685,16 +1685,16 @@ theorem not_free_imp_is_not_free
     · cases h1
       case _ c2 =>
         subst c1
-        simp only [Function.updateIte_idem]
+        simp only [Function.updateITE_idem]
       case _ c2 =>
         subst c1
-        simp only [Function.updateIte_idem]
+        simp only [Function.updateITE_idem]
     · cases h1
       case _ c2 =>
         contradiction
       case _ c2 =>
-        simp only [← Function.updateIte_comm V x v d d' c1]
-        exact phi_ih c2 (Function.updateIte V x d') d
+        simp only [← Function.updateITE_comm V x v d d' c1]
+        exact phi_ih c2 (Function.updateITE V x d') d
   case def_ X xs =>
     induction E
     case nil =>
@@ -1706,7 +1706,7 @@ theorem not_free_imp_is_not_free
 
       unfold IsNotFree at h2
       simp only [Holds] at h2
-      simp only [Function.updateIte] at h2
+      simp only [Function.updateITE] at h2
 
       unfold IsNotFree at E_ih
       simp only [Holds] at E_ih
@@ -1718,9 +1718,9 @@ theorem not_free_imp_is_not_free
 
       split_ifs
       case _ c1 =>
-        apply holds_coincide_var D I (Function.updateListIte V E_hd.args (List.map V xs)) (Function.updateListIte (Function.updateIte V v a) E_hd.args (List.map (Function.updateIte V v a) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
+        apply holds_coincide_var D I (Function.updateListITE V E_hd.args (List.map V xs)) (Function.updateListITE (Function.updateITE V v a) E_hd.args (List.map (Function.updateITE V v a) xs)) M E_tl E_hd.F E_hd.args E_hd.nf
         · intro v' a1
-          apply Function.updateListIte_map_updateIte V (Function.updateIte V v a)
+          apply Function.updateListITE_map_updateIte V (Function.updateITE V v a)
           · intro y a2 contra
             subst contra
             contradiction
@@ -1754,7 +1754,7 @@ theorem lem_1
   intro V d
   cases h1
   case intro h1_left h1_right =>
-    simp only [Function.updateIte_comp_right σ' σ.1 V v d h1_left h1_right]
+    simp only [Function.updateITE_comp_right σ' σ.1 V v d h1_left h1_right]
     apply not_free_imp_is_not_free D I M E (τ X) Γ' (σ.1 v)
     · exact h3 v X a1
     · intro X' a2
@@ -1942,7 +1942,7 @@ theorem lem_4
   (h1 : E.WellFormed)
   (h2 : d ∈ E)
   (h3 : name = d.name ∧ args.length = d.args.length) :
-  Holds D I (Function.updateListIte V d.args (List.map V args)) M E d.F ↔ Holds D I V M E (def_ name args) :=
+  Holds D I (Function.updateListITE V d.args (List.map V args)) M E d.F ↔ Holds D I V M E (def_ name args) :=
   by
   induction E
   case nil =>
@@ -1968,7 +1968,7 @@ theorem lem_4
           cases h2
           case inl c2 =>
             subst c2
-            exact holds_coincide_env D I (Function.updateListIte V d.args (List.map V args)) M tl (d :: tl) d.F s2 h1_right_left s1
+            exact holds_coincide_env D I (Function.updateListITE V d.args (List.map V args)) M tl (d :: tl) d.F s2 h1_right_left s1
           case inr c2 =>
             cases h3
             case intro h3_left h3_right =>
@@ -1992,7 +1992,7 @@ theorem lem_4
           case inr c2 =>
             specialize ih h1_right_right c2
             simp only [← ih]
-            apply holds_coincide_env D I (Function.updateListIte V d.args (List.map V args)) M tl (hd :: tl) d.F s2
+            apply holds_coincide_env D I (Function.updateListITE V d.args (List.map V args)) M tl (hd :: tl) d.F s2
             apply def_in_well_formed_env_is_meta_var_or_all_def_in_env tl d h1_right_right c2
             exact s1
 
@@ -2031,7 +2031,7 @@ theorem holds_conv
     simp only [Holds]
     apply forall_congr'
     intro a
-    exact h2_ih (Function.updateIte V h2_x a)
+    exact h2_ih (Function.updateITE V h2_x a)
   case conv_unfold d σ h2 =>
     obtain ⟨σ', a1⟩ := σ.2
     have s1 : IsMetaVarOrAllDefInEnv E d.F := def_in_well_formed_env_is_meta_var_or_all_def_in_env E d h1 h2
@@ -2049,10 +2049,10 @@ theorem holds_conv
     simp only [holds_coincide_meta_var_no_meta_var D I (V ∘ σ.val) (fun (X' : MetaVarName) (V' : Valuation D) => Holds D I (V' ∘ σ') M E (meta_var_ X')) M E d.F s3]
     clear s3
 
-    apply holds_coincide_var D I (Function.updateListIte V d.args (List.map V (List.map σ.val d.args))) (V ∘ σ.val) M E d.F d.args d.nf
+    apply holds_coincide_var D I (Function.updateListITE V d.args (List.map V (List.map σ.val d.args))) (V ∘ σ.val) M E d.F d.args d.nf
     intro v a2
     simp
-    exact Function.updateListIte_map_mem V (V ∘ σ.val) d.args v a2
+    exact Function.updateListITE_map_mem V (V ∘ σ.val) d.args v a2
 
 
 theorem holds_is_proof
@@ -2074,7 +2074,7 @@ theorem holds_is_proof
     intro V
     exact hyp h1_phi V h1_2
   case mp h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 h1_ih_1 h1_ih_2 =>
-    simp only [Holds] at h1_ih_2 
+    simp only [Holds] at h1_ih_2
     intro V
     exact h1_ih_2 M nf hyp V (h1_ih_1 M nf hyp V)
   case prop_1 h1_Γ h1_Δ h1_phi h1_psi h1_1 h1_2 =>
@@ -2094,7 +2094,7 @@ theorem holds_is_proof
   case gen h1_Γ h1_Δ h1_phi h1_x h1_1 h1_ih =>
     simp only [Holds]
     intro V d
-    exact h1_ih M nf hyp (Function.updateIte V h1_x d)
+    exact h1_ih M nf hyp (Function.updateITE V h1_x d)
   case pred_1 h1_Γ h1_Δ h1_phi h1_psi h1_x h1_1 h1_2 =>
     simp only [Holds]
     intro V a1 a2 d
@@ -2116,7 +2116,7 @@ theorem holds_is_proof
     simp
     intro V
     apply Exists.intro (V h1_y)
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp
   case eq_2 h1_Γ h1_Δ h1_x h1_y h1_z =>
     simp only [Holds]

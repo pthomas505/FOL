@@ -1,5 +1,5 @@
-import FOL.Sub.One.Rec.SubOneRecReplaceFree
-import FOL.Semantics
+import FOL.NV.Sub.One.Rec.SubOneRecReplaceFree
+import FOL.NV.Semantics
 import FOL.Tactics
 
 
@@ -561,7 +561,7 @@ theorem not_isBoundIn_imp_fastAdmitsAux
       · simp
         push_neg
         constructor
-        · exact h2 
+        · exact h2
         · exact h1_left
 
 
@@ -1586,7 +1586,7 @@ theorem substitution_theorem_aux
   (F : Formula)
   (h1 : fastAdmitsAux v t binders F)
   (h2 : ∀ v : VarName, ¬ v ∈ binders → V' v = V v) :
-  Holds D I (Function.updateIte V v (V' t)) E F ↔
+  Holds D I (Function.updateITE V v (V' t)) E F ↔
     Holds D I V E (fastReplaceFree v t F) :=
   by
   induction E generalizing F binders V
@@ -1597,7 +1597,7 @@ theorem substitution_theorem_aux
 
       unfold fastReplaceFree
       simp only [Holds]
-      unfold Function.updateIte
+      unfold Function.updateITE
       congr! 1
       simp
       simp only [List.map_eq_map_iff]
@@ -1615,7 +1615,7 @@ theorem substitution_theorem_aux
 
       unfold fastReplaceFree
       unfold Holds
-      unfold Function.updateIte
+      unfold Function.updateITE
       simp only [eq_comm]
       congr! 1
       all_goals
@@ -1661,7 +1661,7 @@ theorem substitution_theorem_aux
         intro d
         congr! 1
         funext x
-        unfold Function.updateIte
+        unfold Function.updateITE
         split_ifs <;> rfl
       case _ c1 =>
         simp only [Holds]
@@ -1671,9 +1671,9 @@ theorem substitution_theorem_aux
         case inl h1 =>
           contradiction
         case inr h1 =>
-          simp only [Function.updateIte_comm V v x d (V' t) c1]
-          apply phi_ih (Function.updateIte V x d) (binders ∪ {x}) h1
-          unfold Function.updateIte
+          simp only [Function.updateITE_comm V v x d (V' t) c1]
+          apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
+          unfold Function.updateITE
           simp
           push_neg
           intros v' a1
@@ -1691,7 +1691,7 @@ theorem substitution_theorem_aux
 
       unfold fastReplaceFree
       simp only [Holds]
-      unfold Function.updateIte
+      unfold Function.updateITE
       congr! 1
       case _ =>
         simp
@@ -1715,7 +1715,7 @@ theorem substitution_theorem_aux
           rfl
         }
         simp only [s1]
-        apply Function.updateListIte_mem_eq_len
+        apply Function.updateListITE_mem_eq_len
         · simp only [isFreeIn_iff_mem_freeVarSet] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset hd.h1 a1
@@ -1740,7 +1740,7 @@ theorem substitution_theorem
   (v t : VarName)
   (F : Formula)
   (h1 : fastAdmits v t F) :
-  Holds D I (Function.updateIte V v (V t)) E F ↔
+  Holds D I (Function.updateITE V v (V t)) E F ↔
     Holds D I V E (fastReplaceFree v t F) :=
   by
   unfold fastAdmits at h1

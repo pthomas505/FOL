@@ -1,4 +1,4 @@
-import FOL.Sub.All.Rec.SubAllRecAdmits
+import FOL.NV.Sub.All.Rec.SubAllRecAdmits
 import FOL.Tactics
 
 
@@ -20,7 +20,7 @@ def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formu
       let zs := (τ X xs.length).fst
       let H := (τ X xs.length).snd
       if xs.length = zs.length
-      then fastReplaceFreeFun (Function.updateListIte id zs xs) H
+      then fastReplaceFreeFun (Function.updateListITE id zs xs) H
       else pred_var_ X xs
   | eq_ x y => eq_ x y
   | true_ => true_
@@ -54,7 +54,7 @@ def admitsPredFunAux
   | binders, pred_var_ X xs =>
     let zs := (τ X xs.length).fst
     let H := (τ X xs.length).snd
-    admitsFun (Function.updateListIte id zs xs) H ∧ (∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)) ∧ xs.length = zs.length
+    admitsFun (Function.updateListITE id zs xs) H ∧ (∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)) ∧ xs.length = zs.length
   | _, true_ => True
   | _, false_ => True
   | _, eq_ _ _ => True
@@ -111,14 +111,14 @@ theorem predSub_aux
   (h1 : admitsPredFunAux τ binders F)
   (h2 : ∀ x : VarName, x ∉ binders → V x = V' x) :
   Holds D
-    ⟨ 
+    ⟨
       I.nonempty,
       I.pred_const_,
       fun (X : PredName) (ds : List D) =>
         if ds.length = (τ X ds.length).fst.length
-        then Holds D I (Function.updateListIte V' (τ X ds.length).fst ds) E (τ X ds.length).snd
+        then Holds D I (Function.updateListITE V' (τ X ds.length).fst ds) E (τ X ds.length).snd
         else I.pred_var_ X ds
-      ⟩ 
+      ⟩
       V E F ↔ Holds D I V E (replacePredFun τ F) :=
   by
   induction F generalizing binders V
@@ -134,21 +134,21 @@ theorem predSub_aux
       cases h1_right
       case intro h1_right_left h1_right_right =>
         obtain s1 :=
-        substitution_fun_theorem D I V E (Function.updateListIte id (τ X xs.length).fst xs)
+        substitution_fun_theorem D I V E (Function.updateListITE id (τ X xs.length).fst xs)
           (τ X xs.length).snd h1_left
-        simp only [Function.updateListIte_comp] at s1
+        simp only [Function.updateListITE_comp] at s1
         simp at s1
 
         have s2 :
-          Holds D I (Function.updateListIte V (τ X xs.length).fst (List.map V xs)) E
+          Holds D I (Function.updateListITE V (τ X xs.length).fst (List.map V xs)) E
             (τ X xs.length).snd ↔
-          Holds D I (Function.updateListIte V' (τ X xs.length).fst (List.map V xs)) E
+          Holds D I (Function.updateListITE V' (τ X xs.length).fst (List.map V xs)) E
             (τ X xs.length).snd :=
         by
           apply Holds_coincide_Var
           intro v a1
           by_cases c1 : v ∈ (τ X xs.length).fst
-          · apply Function.updateListIte_mem_eq_len V V' v (τ X xs.length).fst (List.map V xs) c1
+          · apply Function.updateListITE_mem_eq_len V V' v (τ X xs.length).fst (List.map V xs) c1
             simp
             symm
             exact h1_right_right
@@ -156,7 +156,7 @@ theorem predSub_aux
             · specialize h1_right_left v c2 a1
               contradiction
             · specialize h2 v c2
-              apply Function.updateListIte_mem'
+              apply Function.updateListITE_mem'
               exact h2
         simp only [s2] at s1
         clear s2
@@ -201,9 +201,9 @@ theorem predSub_aux
     simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
-    apply phi_ih (Function.updateIte V x d) (binders ∪ {x}) h1
+    apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
     intro v a1
-    unfold Function.updateIte
+    unfold Function.updateITE
     simp at a1
     push_neg at a1
     cases a1
@@ -248,7 +248,7 @@ theorem predSub
         let zs := (τ X ds.length).fst
         let H := (τ X ds.length).snd
         if ds.length = zs.length
-        then Holds D I (Function.updateListIte V zs ds) E H
+        then Holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ X ds
       ⟩
       V E F ↔ Holds D I V E (replacePredFun τ F) :=

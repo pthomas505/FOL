@@ -1,5 +1,5 @@
-import FOL.Sub.All.Rec.SubAllRecReplaceFree
-import FOL.Semantics
+import FOL.NV.Sub.All.Rec.SubAllRecReplaceFree
+import FOL.NV.Semantics
 import FOL.Tactics
 
 
@@ -152,12 +152,12 @@ theorem substitution_fun_theorem_aux
       simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intro d
-      apply phi_ih (Function.updateIte V x d) (Function.updateIte V' x d) σ (Function.updateIte σ' x x) (binders ∪ {x}) h1
+      apply phi_ih (Function.updateITE V x d) (Function.updateITE V' x d) σ (Function.updateITE σ' x x) (binders ∪ {x}) h1
       · intro v a1
-        unfold Function.updateIte at a1
+        unfold Function.updateITE at a1
         simp at a1
         push_neg at a1
-        unfold Function.updateIte
+        unfold Function.updateITE
         split_ifs
         case _ c1 c2 =>
           rfl
@@ -172,7 +172,7 @@ theorem substitution_fun_theorem_aux
           tauto
       · intro v a1
         simp at a1
-        unfold Function.updateIte
+        unfold Function.updateITE
         split_ifs
         case _ c1 =>
           exact c1
@@ -183,7 +183,7 @@ theorem substitution_fun_theorem_aux
         push_neg at a1
         cases a1
         case intro a1_left a1_right =>
-          unfold Function.updateIte
+          unfold Function.updateITE
           simp only [if_neg a1_right]
           exact h3 v a1_left
 
@@ -215,7 +215,7 @@ theorem substitution_fun_theorem_aux
       simp only [s1]
       apply Holds_coincide_Var
       intro v a1
-      apply Function.updateListIte_mem_eq_len
+      apply Function.updateListITE_mem_eq_len
       · simp only [isFreeIn_iff_mem_freeVarSet] at a1
         simp only [← List.mem_toFinset]
         apply Finset.mem_of_subset hd.h1 a1

@@ -1,5 +1,5 @@
-import FOL.Program.LN.Binders
-import FOL.Program.LN.Fresh
+import FOL.LN.Binders
+import FOL.Fresh
 import FOL.Tactics
 
 

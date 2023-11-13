@@ -1,6 +1,7 @@
-import FOL.Program.LN.Binders
-import FOL.Program.LN.Semantics
+import FOL.LN.Binders
+import FOL.LN.Semantics
 import FOL.List
+import FOL.Finset
 import FOL.Tactics
 
 set_option autoImplicit false
@@ -209,7 +210,7 @@ lemma FormulaOpenFreeVarSet
   case imp_ phi psi phi_ih psi_ih =>
     simp only [Formula.open]
     simp only [Formula.freeVarSet]
-    apply Finset.union_subset_union
+    apply Finset.union_subset_union_left_right
     · exact phi_ih j
     · exact psi_ih j
   case forall_ x phi phi_ih =>

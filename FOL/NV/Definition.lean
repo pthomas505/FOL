@@ -1,5 +1,5 @@
-import FOL.Formula
-import FOL.Binders
+import FOL.NV.Formula
+import FOL.NV.Binders
 import FOL.Tactics
 
 

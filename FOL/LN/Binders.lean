@@ -1,4 +1,4 @@
-import FOL.Program.LN.Formula
+import FOL.LN.Formula
 import FOL.Tactics
 
 set_option autoImplicit false

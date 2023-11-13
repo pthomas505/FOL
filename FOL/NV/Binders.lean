@@ -1,4 +1,4 @@
-import FOL.Formula
+import FOL.NV.Formula
 import FOL.Tactics
 
 
@@ -327,7 +327,7 @@ theorem isFreeIn_iff_mem_freeVarSet
 
 theorem predVarOccursIn_iff_mem_predVarSet
   (P : PredName)
-  (n : ℕ) 
+  (n : ℕ)
   (F : Formula) :
   predVarOccursIn P n F ↔ (P, n) ∈ F.predVarSet :=
   by

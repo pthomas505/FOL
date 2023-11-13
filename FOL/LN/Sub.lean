@@ -1,6 +1,6 @@
-import FOL.Program.LN.Formula
-import FOL.Program.LN.OpenClose
-import FOL.Program.LN.Semantics
+import FOL.LN.Formula
+import FOL.LN.OpenClose
+import FOL.LN.Semantics
 import FOL.Tactics
 
 set_option autoImplicit false

@@ -1,6 +1,6 @@
-import FOL.Alpha
-import FOL.Sub.One.Rec.SubOneRecAdmits
-import FOL.PredSub.All.Rec.PredSubAllRec
+import FOL.NV.Alpha
+import FOL.NV.Sub.One.Rec.SubOneRecAdmits
+import FOL.NV.PredSub.All.Rec.PredSubAllRec
 
 import FOL.Tactics
 

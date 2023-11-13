@@ -1,5 +1,5 @@
-import FOL.Sub.One.Rec.SubOneRecReplaceFree
-import FOL.Semantics
+import FOL.NV.Sub.One.Rec.SubOneRecReplaceFree
+import FOL.NV.Semantics
 import FOL.Tactics
 
 
@@ -92,8 +92,8 @@ theorem replace_empty_Holds
   (a : D)
   (h1 : ¬ isFreeIn v F)
   (h2 : ¬ isBoundIn v F) :
-  Holds D I (Function.updateIte V u a) E F ↔
-    Holds D I (Function.updateIte V v a) E (fastReplaceFree u v F) :=
+  Holds D I (Function.updateITE V u a) E F ↔
+    Holds D I (Function.updateITE V v a) E (fastReplaceFree u v F) :=
   by
   induction E generalizing F V
   all_goals
@@ -108,7 +108,7 @@ theorem replace_empty_Holds
       simp only [List.map_eq_map_iff]
       intro x a1
       simp
-      unfold Function.updateIte
+      unfold Function.updateITE
       simp only [eq_comm]
       split_ifs
       case _ c1 c2 =>
@@ -126,9 +126,9 @@ theorem replace_empty_Holds
       unfold fastReplaceFree
       simp only [Holds]
       congr! 1
-      · unfold Function.updateIte
+      · unfold Function.updateITE
         split_ifs <;> tauto
-      · unfold Function.updateIte
+      · unfold Function.updateITE
         split_ifs <;> tauto
     case true_ | false_ =>
       unfold fastReplaceFree
@@ -180,7 +180,7 @@ theorem replace_empty_Holds
           unfold isFreeIn at a1
           cases a1
           case h1.intro a1_left a1_right =>
-            unfold Function.updateIte
+            unfold Function.updateITE
             simp only [if_neg a1_left]
             split_ifs
             case pos c2 =>
@@ -192,8 +192,8 @@ theorem replace_empty_Holds
           simp only [Holds]
           first | apply forall_congr' | apply exists_congr
           intro d
-          simp only [Function.updateIte_comm V v x d a h2_left]
-          simp only [Function.updateIte_comm V u x d a c1]
+          simp only [Function.updateITE_comm V v x d a h2_left]
+          simp only [Function.updateITE_comm V u x d a c1]
           apply phi_ih
           · exact h1 h2_left
           · exact h2_right
@@ -203,7 +203,7 @@ theorem replace_empty_Holds
   case cons.def_ hd tl ih X xs =>
       unfold fastReplaceFree
       simp only [Holds]
-      unfold Function.updateIte
+      unfold Function.updateITE
       congr! 1
       case _ =>
         simp
@@ -233,7 +233,7 @@ theorem replace_empty_Holds
         }
 
         simp only [s1]
-        apply Function.updateListIte_mem_eq_len
+        apply Function.updateListITE_mem_eq_len
         · simp only [isFreeIn_iff_mem_freeVarSet] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset hd.h1 a1
@@ -281,7 +281,7 @@ theorem Holds_iff_alphaEqv_Holds
     simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
-    exact h1_ih (Function.updateIte V h1_x d)
+    exact h1_ih (Function.updateITE V h1_x d)
   case refl_ h1 =>
     rfl
   case symm_ h1_phi h1_phi' _ h1_ih =>
@@ -415,7 +415,7 @@ inductive AlphaEqvVarAssignment
 
   | cons {binders x y V V' d} :
     AlphaEqvVarAssignment D binders V V' →
-    AlphaEqvVarAssignment D ((x, y)::binders) (Function.updateIte V x d) (Function.updateIte V' y d)
+    AlphaEqvVarAssignment D ((x, y)::binders) (Function.updateITE V x d) (Function.updateITE V' y d)
 
 
 theorem aux_1
@@ -437,7 +437,7 @@ theorem aux_1
     unfold isAlphaEqvVar at h2
     simp at h2
 
-    unfold Function.updateIte
+    unfold Function.updateITE
     cases h2
     case inl h2 =>
       cases h2
@@ -621,7 +621,7 @@ lemma isAlphaEqv_Holds_aux
         apply Holds_coincide_Var
         intro v a1
         simp only [aux_2 D binders xs ys V V' h1 h2_right]
-        apply Function.updateListIte_mem_eq_len
+        apply Function.updateListITE_mem_eq_len
         · simp only [isFreeIn_iff_mem_freeVarSet] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset hd.h1 a1
