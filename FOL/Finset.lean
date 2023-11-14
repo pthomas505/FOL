@@ -63,4 +63,28 @@ lemma Finset.union_subset_diff
       · rfl
 
 
+lemma Finset.union_subset_left_right_diff
+  {α : Type}
+  [DecidableEq α]
+  (A B C D E F : Finset α)
+  (h1 : A ⊆ E ∪ C \ F)
+  (h2 : B ⊆ E ∪ D \ F) :
+  A ∪ B ⊆ E ∪ (C ∪ D) \ F :=
+  by
+  apply Finset.union_subset_iff.mpr
+  constructor
+  · trans E ∪ C \ F
+    · exact h1
+    · apply Finset.union_subset_union_right
+      apply Finset.sdiff_subset_sdiff
+      · exact Finset.subset_union_left C D
+      · rfl
+  · trans E ∪ D \ F
+    · exact h2
+    · apply Finset.union_subset_union_right
+      apply Finset.sdiff_subset_sdiff
+      · exact Finset.subset_union_right C D
+      · rfl
+
+
 #lint

@@ -343,3 +343,67 @@ lemma FormulaCloseFreeVarSet
     apply phi_ih
 
 --------------------------------------------------
+
+lemma VarSubstFreeVarSet
+  (y : String)
+  (t : Var)
+  (v : Var) :
+  (Var.subst (Var.free_ y) t v).freeVarSet ⊆ t.freeVarSet ∪ v.freeVarSet \ {Var.free_ y} :=
+  by
+  cases v
+  case free_ x =>
+    simp only [Var.subst]
+    split_ifs
+    case pos c1 =>
+      apply Finset.subset_union_left
+    case neg c1 =>
+      have s1 : Var.freeVarSet (free_ x) \ {free_ y} = {free_ x}
+      simp only [Var.freeVarSet]
+      simp
+      simp at c1
+      exact c1
+
+      simp only [s1]
+      apply Finset.subset_union_right
+  case bound_ i =>
+    simp only [Var.subst]
+    conv =>
+      lhs
+      simp only [Var.freeVarSet]
+    simp
+
+
+lemma FormulaSubstFreeVarSet
+  (y : String)
+  (t : Var)
+  (F : Formula) :
+  (Formula.subst (Var.free_ y) t F).freeVarSet ⊆ t.freeVarSet ∪ F.freeVarSet \ {Var.free_ y} :=
+  by
+  induction F
+  case pred_ X vs =>
+    simp only [Formula.subst]
+    simp only [Formula.freeVarSet]
+    simp
+    intro v a1
+
+    trans Var.freeVarSet t ∪ Var.freeVarSet v \ {free_ y}
+    · exact VarSubstFreeVarSet y t v
+    · apply Finset.union_subset_union_right
+      simp only [← List.mem_toFinset] at a1
+      apply Finset.sdiff_subset_sdiff
+      · apply Finset.subset_biUnion_of_mem Var.freeVarSet a1
+      · simp
+  case not_ phi phi_ih =>
+    simp only [Formula.subst]
+    simp only [Formula.freeVarSet]
+    exact phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.subst]
+    simp only [Formula.freeVarSet]
+    apply Finset.union_subset_left_right_diff
+    · exact phi_ih
+    · exact psi_ih
+  case forall_ x phi phi_ih =>
+    simp only [Formula.subst]
+    simp only [Formula.freeVarSet]
+    exact phi_ih
