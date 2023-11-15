@@ -135,7 +135,7 @@ lemma lc_at_zero_iff_is_free
 lemma free_var_list_to_string_list
   (vs : List Var)
   (h1 : ∀ (v : Var), v ∈ vs → Var.lc_at 0 v) :
-  ∃ xs, vs = List.map free_ xs :=
+  ∃ (xs : List String), vs = List.map free_ xs :=
   by
   induction vs
   case nil =>
@@ -143,6 +143,7 @@ lemma free_var_list_to_string_list
     simp
   case cons hd tl ih =>
     simp at h1
+
     cases h1
     case intro h1_left h1_right =>
       specialize ih h1_right
@@ -161,9 +162,9 @@ lemma free_var_list_to_string_list
 
 lemma VarOpenFreeVarSet
   (j : ℕ)
-  (y : String)
+  (z : String)
   (v : Var) :
-  (Var.open j (free_ y) v).freeVarSet ⊆ v.freeVarSet ∪ {free_ y} :=
+  (Var.open j (free_ z) v).freeVarSet ⊆ v.freeVarSet ∪ {free_ z} :=
   by
   cases v
   case free_ x =>
@@ -186,9 +187,9 @@ lemma VarOpenFreeVarSet
 
 lemma FormulaOpenFreeVarSet
   (j : ℕ)
-  (y : String)
+  (z : String)
   (F : Formula) :
-  (Formula.open j (free_ y) F).freeVarSet ⊆ F.freeVarSet ∪ {free_ y} :=
+  (Formula.open j (free_ z) F).freeVarSet ⊆ F.freeVarSet ∪ {free_ z} :=
   by
   induction F generalizing j
   case pred_ X vs =>
@@ -197,8 +198,8 @@ lemma FormulaOpenFreeVarSet
     simp
     intro v a1
 
-    trans Var.freeVarSet v ∪ {free_ y}
-    · exact VarOpenFreeVarSet j y v
+    trans Var.freeVarSet v ∪ {free_ z}
+    · exact VarOpenFreeVarSet j z v
     · apply Finset.union_subset_union_left
       apply Finset.subset_biUnion_of_mem
       simp
@@ -222,9 +223,9 @@ lemma FormulaOpenFreeVarSet
 
 lemma VarOpenFreeVarSet'
   (j : ℕ)
-  (y : String)
+  (z : String)
   (v : Var) :
-  v.freeVarSet ⊆ (Var.open j (free_ y) v).freeVarSet :=
+  v.freeVarSet ⊆ (Var.open j (free_ z) v).freeVarSet :=
   by
   cases v
   case free_ x =>
@@ -245,9 +246,9 @@ lemma VarOpenFreeVarSet'
 
 lemma FormulaOpenFreeVarSet'
   (j : ℕ)
-  (y : String)
+  (z : String)
   (F : Formula) :
-  F.freeVarSet ⊆ (Formula.open j (free_ y) F).freeVarSet :=
+  F.freeVarSet ⊆ (Formula.open j (free_ z) F).freeVarSet :=
   by
   induction F generalizing j
   case pred_ X vs =>
@@ -256,11 +257,11 @@ lemma FormulaOpenFreeVarSet'
     simp
     intro v a1
 
-    trans Var.freeVarSet (Var.open j (free_ y) v)
+    trans Var.freeVarSet (Var.open j (free_ z) v)
     · apply VarOpenFreeVarSet'
     · apply Finset.subset_biUnion_of_mem Var.freeVarSet
       apply List.mem_toFinset.mpr
-      exact List.mem_map_of_mem (Var.open j (free_ y)) a1
+      exact List.mem_map_of_mem (Var.open j (free_ z)) a1
   case not_ phi phi_ih =>
     simp only [Formula.open]
     simp only [Formula.freeVarSet]
@@ -280,9 +281,9 @@ lemma FormulaOpenFreeVarSet'
 
 lemma VarCloseFreeVarSet
   (j : ℕ)
-  (y : String)
+  (z : String)
   (v : Var) :
-  (Var.close j (free_ y) v).freeVarSet ⊆ v.freeVarSet \ {free_ y} :=
+  (Var.close j (free_ z) v).freeVarSet ⊆ v.freeVarSet \ {free_ z} :=
   by
   cases v
   case free_ x =>
@@ -309,9 +310,9 @@ lemma VarCloseFreeVarSet
 
 lemma FormulaCloseFreeVarSet
   (j : ℕ)
-  (y : String)
+  (z : String)
   (F : Formula) :
-  (Formula.close j (free_ y) F).freeVarSet ⊆ F.freeVarSet \ {free_ y} :=
+  (Formula.close j (free_ z) F).freeVarSet ⊆ F.freeVarSet \ {free_ z} :=
   by
   induction F generalizing j
   case pred_ X vs =>
@@ -320,8 +321,8 @@ lemma FormulaCloseFreeVarSet
     simp
     intro v a1
 
-    trans Var.freeVarSet v \ {free_ y}
-    · exact VarCloseFreeVarSet j y v
+    trans Var.freeVarSet v \ {free_ z}
+    · exact VarCloseFreeVarSet j z v
     · apply Finset.sdiff_subset_sdiff
       · apply Finset.subset_biUnion_of_mem
         simp
@@ -344,11 +345,13 @@ lemma FormulaCloseFreeVarSet
 
 --------------------------------------------------
 
+-- leftmost and middle are reversed from paper
+
 lemma VarSubstFreeVarSet
-  (y : String)
+  (z : String)
   (t : Var)
   (v : Var) :
-  (Var.subst (Var.free_ y) t v).freeVarSet ⊆ t.freeVarSet ∪ v.freeVarSet \ {Var.free_ y} :=
+  (Var.subst (Var.free_ z) t v).freeVarSet ⊆ t.freeVarSet ∪ v.freeVarSet \ {Var.free_ z} :=
   by
   cases v
   case free_ x =>
@@ -357,7 +360,7 @@ lemma VarSubstFreeVarSet
     case pos c1 =>
       apply Finset.subset_union_left
     case neg c1 =>
-      have s1 : Var.freeVarSet (free_ x) \ {free_ y} = {free_ x}
+      have s1 : Var.freeVarSet (free_ x) \ {free_ z} = {free_ x}
       simp only [Var.freeVarSet]
       simp
       simp at c1
@@ -374,10 +377,10 @@ lemma VarSubstFreeVarSet
 
 
 lemma FormulaSubstFreeVarSet
-  (y : String)
+  (z : String)
   (t : Var)
   (F : Formula) :
-  (Formula.subst (Var.free_ y) t F).freeVarSet ⊆ t.freeVarSet ∪ F.freeVarSet \ {Var.free_ y} :=
+  (Formula.subst (Var.free_ z) t F).freeVarSet ⊆ t.freeVarSet ∪ F.freeVarSet \ {Var.free_ z} :=
   by
   induction F
   case pred_ X vs =>
@@ -386,8 +389,8 @@ lemma FormulaSubstFreeVarSet
     simp
     intro v a1
 
-    trans Var.freeVarSet t ∪ Var.freeVarSet v \ {free_ y}
-    · exact VarSubstFreeVarSet y t v
+    trans Var.freeVarSet t ∪ Var.freeVarSet v \ {free_ z}
+    · exact VarSubstFreeVarSet z t v
     · apply Finset.union_subset_union_right
       simp only [← List.mem_toFinset] at a1
       apply Finset.sdiff_subset_sdiff
@@ -407,3 +410,55 @@ lemma FormulaSubstFreeVarSet
     simp only [Formula.subst]
     simp only [Formula.freeVarSet]
     exact phi_ih
+
+--------------------------------------------------
+
+lemma VarSubstFreeVarSet'
+  (z : String)
+  (t : Var)
+  (v : Var) :
+  v.freeVarSet \ {Var.free_ z} ⊆ (Var.subst (Var.free_ z) t v).freeVarSet :=
+  by
+  cases v
+  case free_ x =>
+    simp only [Var.subst]
+    split_ifs
+    case pos c1 =>
+      simp only [c1]
+      conv =>
+        lhs
+        simp only [Var.freeVarSet]
+      simp
+    case neg c1 =>
+      simp only [Var.freeVarSet]
+      exact Finset.sdiff_subset {free_ x} {free_ z}
+  case bound_ i =>
+    conv =>
+      lhs
+      simp only [Var.freeVarSet]
+
+
+lemma FormulaSubstFreeVarSet'
+  (z : String)
+  (t : Var)
+  (F : Formula) :
+  F.freeVarSet \ {Var.free_ z} ⊆ (Formula.subst (Var.free_ z) t F).freeVarSet :=
+  by
+  induction F
+  case pred_ X vs =>
+    simp only [Formula.subst]
+    simp only [Formula.freeVarSet]
+
+    induction vs
+    case nil =>
+      simp
+    case cons hd tl ih =>
+      simp
+
+      have s1 : (Var.freeVarSet hd ∪ Finset.biUnion (List.toFinset tl) Var.freeVarSet) \ {free_ z} = (Var.freeVarSet hd \ {free_ z}) ∪ ((Finset.biUnion (List.toFinset tl) Var.freeVarSet) \ {free_ z})
+      exact Finset.union_sdiff_distrib (Var.freeVarSet hd) (Finset.biUnion (List.toFinset tl) Var.freeVarSet) {free_ z}
+
+      simp only [s1]
+      exact Finset.union_subset_union (VarSubstFreeVarSet' z t hd) ih
+  all_goals
+    sorry
