@@ -36,6 +36,30 @@ def Formula.open
   | forall_ x phi => forall_ x (Formula.open (j + 1) v phi)
 
 
+def Var.openList
+  (j : Nat)
+  (us : List Var) : Var → Var
+  | free_ x => free_ x
+  | bound_ i =>
+      if i < j
+      then bound_ i
+      else
+        let i := i - j
+        if _ : i < us.length
+        then us[i]
+        else bound_ (i - us.length + j)
+
+
+def Formula.openList
+  (j : ℕ)
+  (us : List Var) :
+  Formula → Formula
+  | pred_ X vs => pred_ X (vs.map (Var.openList j us))
+  | not_ phi => not_ (Formula.openList j us phi)
+  | imp_ phi psi => imp_ (Formula.openList j us phi) (Formula.openList j us psi)
+  | forall_ x phi => forall_ x (Formula.openList (j + 1) us phi)
+
+
 def Var.close
   (j : ℕ)
   (v : Var) :
@@ -216,6 +240,69 @@ lemma FormulaOpenFreeVarSet
     · exact psi_ih j
   case forall_ x phi phi_ih =>
     simp only [Formula.open]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+
+--------------------------------------------------
+
+lemma VarOpenListFreeVarSet
+  (j : ℕ)
+  (zs : List String)
+  (v : Var) :
+  (Var.openList j (zs.map free_) v).freeVarSet ⊆ v.freeVarSet ∪ (zs.map free_).toFinset :=
+  by
+  cases v
+  case free_ x =>
+    simp only [Var.openList]
+    simp only [Var.freeVarSet]
+    simp
+  case bound_ i =>
+    simp only [Var.openList]
+    split_ifs
+    case pos c1 =>
+      simp only [Var.freeVarSet]
+      simp
+    case pos c1 c2 =>
+      simp
+      simp only [Var.freeVarSet]
+      simp
+      apply List.get_mem
+    case neg c1 c2 =>
+      simp only [Var.freeVarSet]
+      simp
+
+
+lemma FormulaOpenListFreeVarSet
+  (j : ℕ)
+  (zs : List String)
+  (F : Formula) :
+  (Formula.openList j (zs.map free_) F).freeVarSet ⊆ F.freeVarSet ∪ (zs.map free_).toFinset :=
+  by
+  induction F generalizing j
+  case pred_ X vs =>
+    simp only [Formula.openList]
+    simp only [Formula.freeVarSet]
+    simp
+    intro v a1
+
+    trans v.freeVarSet ∪ (zs.map free_).toFinset
+    · exact VarOpenListFreeVarSet j zs v
+    · apply Finset.union_subset_union_left
+      apply Finset.subset_biUnion_of_mem
+      simp
+      exact a1
+  case not_ phi phi_ih =>
+    simp only [Formula.openList]
+    simp only [Formula.freeVarSet]
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.openList]
+    simp only [Formula.freeVarSet]
+    apply Finset.union_subset_union_left_right
+    · exact phi_ih j
+    · exact psi_ih j
+  case forall_ x phi phi_ih =>
+    simp only [Formula.openList]
     simp only [Formula.freeVarSet]
     apply phi_ih
 
