@@ -460,5 +460,17 @@ lemma FormulaSubstFreeVarSet'
 
       simp only [s1]
       exact Finset.union_subset_union (VarSubstFreeVarSet' z t hd) ih
-  all_goals
-    sorry
+  case not_ phi phi_ih =>
+    simp only [Formula.subst]
+    simp only [Formula.freeVarSet]
+    exact phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.subst]
+    simp only [Formula.freeVarSet]
+    apply Finset.diff_union_subset
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ x phi phi_ih =>
+    simp only [Formula.subst]
+    simp only [Formula.freeVarSet]
+    exact phi_ih

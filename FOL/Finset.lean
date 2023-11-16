@@ -87,4 +87,20 @@ lemma Finset.union_subset_left_right_diff
       · rfl
 
 
+lemma Finset.diff_union_subset
+  {α : Type}
+  [DecidableEq α]
+  (A B C D E : Finset α)
+  (h1 : A \ E ⊆ C)
+  (h2 : B \ E ⊆ D) :
+  (A ∪ B) \ E ⊆ C ∪ D :=
+  by
+  have s1 : (A ∪ B) \ E = (A \ E) ∪ (B \ E)
+  exact Finset.union_sdiff_distrib A B E
+  trans (A \ E) ∪ (B \ E)
+  · simp only [s1]
+    rfl
+  · exact Finset.union_subset_left_right (A \ E) (B \ E) C D h1 h2
+
+
 #lint
