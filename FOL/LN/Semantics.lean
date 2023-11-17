@@ -14,6 +14,15 @@ structure Interpretation (D : Type) : Type :=
   (pred_ : String → (List D → Prop))
 
 
+def Interpretation.usingPred
+  (D : Type)
+  (I : Interpretation D)
+  (pred_ : String → List D → Prop) :
+  Interpretation D := {
+    nonempty_ := I.nonempty_
+    pred_ := pred_ }
+
+
 def VarAssignment (D : Type) : Type := Var → D
 
 
@@ -25,6 +34,14 @@ def shift
   | free_ x => V (free_ x)
   | bound_ 0 => d
   | bound_ (i + 1) => V (bound_ i)
+
+
+def shift_list
+  (D : Type)
+  (V : VarAssignment D) :
+  List D → VarAssignment D
+  | [] => V
+  | d :: ds => shift D (shift_list D V ds) d
 
 
 def Holds

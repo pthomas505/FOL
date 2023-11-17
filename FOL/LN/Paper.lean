@@ -99,6 +99,15 @@ def Formula.subst (v t : Var) : Formula → Formula
   | forall_ x phi => forall_ x (Formula.subst v t phi)
 
 
+def Formula.predSub
+  (τ : String → ℕ → Formula) :
+  Formula → Formula
+  | pred_ X vs => Formula.openList 0 vs (τ X vs.length)
+  | not_ phi => not_ (phi.predSub τ)
+  | imp_ phi psi => imp_ (phi.predSub τ) (psi.predSub τ)
+  | forall_ x phi => forall_ x (phi.predSub τ)
+
+
 inductive Formula.lc : Formula → Prop
   | pred_
     (X : String)
@@ -561,3 +570,81 @@ lemma FormulaSubstFreeVarSet'
     simp only [Formula.subst]
     simp only [Formula.freeVarSet]
     exact phi_ih
+
+--------------------------------------------------
+
+theorem ShiftVarOpenList
+  (D : Type)
+  (V : VarAssignment D)
+  (j : ℕ)
+  (zs : List String)
+  (d : D) :
+  shift D (V ∘ Var.openList j (List.map free_ zs)) d =
+    shift D V d ∘ Var.openList (j + 1) (List.map free_ zs) :=
+  by
+  funext v
+  simp
+  cases v
+  case _ x =>
+    simp only [Var.openList]
+    simp only [shift]
+    simp
+  case _ i =>
+    cases i
+    case zero =>
+      simp only [shift]
+      simp only [Var.openList]
+      simp
+    case succ i =>
+        simp only [shift]
+        simp only [Var.openList]
+        simp
+        split
+        case _ c1 =>
+          have s1 : i + 1 < j + 1
+          linarith
+          simp only [if_pos s1]
+        case _ c1 =>
+          have s1 : ¬ i + 1 < j + 1
+          linarith
+          simp only [if_neg s1]
+          split
+          case _ c2 =>
+            simp
+          case _ c2 =>
+            simp
+
+
+lemma HoldsOpenList
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (j : Nat)
+  (zs : List String)
+  (F : Formula) :
+  Holds D I (V ∘ Var.openList j (zs.map Var.free_)) F ↔
+    Holds D I V (Formula.openList j (zs.map Var.free_) F) :=
+  by
+  induction F generalizing V j
+  case pred_ X vs =>
+    simp only [Holds]
+    congr! 1
+    simp
+  case not_ phi phi_ih =>
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ _ phi phi_ih =>
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [← phi_ih]
+    congr!
+    apply ShiftVarOpenList
+
+--------------------------------------------------
