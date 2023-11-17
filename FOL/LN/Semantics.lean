@@ -36,12 +36,12 @@ def shift
   | bound_ (i + 1) => V (bound_ i)
 
 
-def shift_list
+def shiftList
   (D : Type)
   (V : VarAssignment D) :
   List D → VarAssignment D
   | [] => V
-  | d :: ds => shift D (shift_list D V ds) d
+  | d :: ds => shift D (shiftList D V ds) d
 
 
 def Holds
