@@ -71,7 +71,7 @@ def Var.close
   | bound_ i =>
       if i < j
       then bound_ i
-      else bound_ (1 + i)
+      else bound_ (i + 1)
 
 
 def Formula.close
@@ -97,6 +97,18 @@ def Formula.subst (v t : Var) : Formula → Formula
   | not_ phi => not_ (Formula.subst v t phi)
   | imp_ phi psi => imp_ (Formula.subst v t phi) (Formula.subst v t psi)
   | forall_ x phi => forall_ x (Formula.subst v t phi)
+
+
+def Var.substFun (σ : Var → Var) : Var → Var
+  | free_ x => σ (free_ x)
+  | bound_ i => bound_ i
+
+
+def Formula.substFun (σ : Var → Var) : Formula → Formula
+  | pred_ X vs => pred_ X (vs.map (Var.substFun σ))
+  | not_ phi => not_ (phi.substFun σ)
+  | imp_ phi psi => imp_ (phi.substFun σ) (psi.substFun σ)
+  | forall_ x phi => forall_ x (phi.substFun σ)
 
 
 def Formula.predSub
@@ -125,11 +137,18 @@ inductive Formula.lc : Formula → Prop
     lc phi →
     lc psi →
     lc (imp_ phi psi)
-
+/-
   | forall_
     (x : String)
     (phi : Formula) :
     (∀ (z : String), lc (Formula.open 0 (Var.free_ z) phi)) →
+    lc (forall_ x phi)
+-/
+  | forall_
+    (x : String)
+    (phi : Formula)
+    (z : String) :
+    lc (Formula.openList 0 [Var.free_ z] phi) →
     lc (forall_ x phi)
 
 
@@ -193,6 +212,8 @@ lemma free_var_list_to_string_list
 
 --------------------------------------------------
 
+-- 1.
+
 lemma VarOpenFreeVarSet
   (j : ℕ)
   (z : String)
@@ -253,6 +274,8 @@ lemma FormulaOpenFreeVarSet
     apply phi_ih
 
 --------------------------------------------------
+
+-- 1. for list
 
 lemma VarOpenListFreeVarSet
   (j : ℕ)
@@ -317,6 +340,8 @@ lemma FormulaOpenListFreeVarSet
 
 --------------------------------------------------
 
+-- 2.
+
 lemma VarOpenFreeVarSet'
   (j : ℕ)
   (z : String)
@@ -374,6 +399,8 @@ lemma FormulaOpenFreeVarSet'
     apply phi_ih
 
 --------------------------------------------------
+
+-- 3.
 
 lemma VarCloseFreeVarSet
   (j : ℕ)
@@ -441,7 +468,7 @@ lemma FormulaCloseFreeVarSet
 
 --------------------------------------------------
 
--- leftmost and middle are reversed from paper
+-- 4.
 
 lemma VarSubstFreeVarSet
   (z : String)
@@ -573,6 +600,217 @@ lemma FormulaSubstFreeVarSet'
 
 --------------------------------------------------
 
+def str_fun_to_var_fun
+  (σ : String → String) :
+  Var → Var
+  | free_ x => free_ (σ x)
+  | bound_ i => bound_ i
+
+
+lemma SubOpenVar
+  (v : Var)
+  (σ : String → String)
+  (j : ℕ)
+  (z : String)
+  (h1 : σ z = z) :
+  Var.substFun (str_fun_to_var_fun σ) (Var.open j (free_ z) v) =
+    Var.open j (free_ z) (Var.substFun (str_fun_to_var_fun σ) v) :=
+  by
+  cases v
+  case free_ x =>
+    conv =>
+      lhs
+      simp only [Var.open]
+      simp only [Var.substFun]
+      simp only [str_fun_to_var_fun]
+  case bound_ i =>
+    conv =>
+      lhs
+      simp only [Var.open]
+    split_ifs
+    case pos c1 =>
+      simp only [Var.substFun]
+      simp only [Var.open]
+      simp only [if_pos c1]
+    case pos c1 c2 =>
+      simp only [Var.substFun]
+      simp only [str_fun_to_var_fun]
+      simp only [Var.open]
+      simp only [if_neg c1]
+      simp only [if_pos c2]
+      simp only [h1]
+    case neg c1 c2 =>
+      simp only [Var.substFun]
+      simp only [Var.open]
+      simp only [if_neg c1]
+      simp only [if_neg c2]
+
+/-
+lemma SubCloseVar
+  (v : Var)
+  (σ : String → String)
+  (y : String)
+  (k : ℕ)
+  (h1 : σ y = y)
+  (h2 : ∀ (x : String), ¬ y = σ x) :
+  Var.substFun (str_fun_to_var_fun σ) (Var.close k (free_ y) v) =
+    Var.close (free_ y) k (Var.sub_Var (str_fun_to_var_fun σ) v) :=
+  by
+  cases v
+  case free_ x =>
+    simp only [closeVar]
+    by_cases c1 : y = x
+    · subst c1
+      simp only [Var.sub_Var]
+      simp only [str_fun_to_var_fun]
+      simp only [h1]
+      simp
+    · simp
+      simp only [if_neg c1]
+      simp only [Var.sub_Var]
+      simp only [str_fun_to_var_fun]
+      specialize h2 x
+      simp only [if_neg h2]
+  case bound_ i =>
+    simp only [closeVar]
+    simp only [Var.sub_Var]
+
+
+lemma SubOpenFormula
+  (F : Formula)
+  (σ : String → String)
+  (k : ℕ)
+  (x : String)
+  (h1 : σ x = x) :
+  Formula.sub_Var (str_fun_to_var_fun σ) (openFormulaAux k (free_ x) F) =
+    openFormulaAux k (free_ x) (Formula.sub_Var (str_fun_to_var_fun σ) F) :=
+  by
+  induction F generalizing k
+  case pred_ X vs =>
+    simp only [openFormulaAux]
+    simp only [Formula.sub_Var]
+    simp
+    simp only [List.map_eq_map_iff]
+    intro v _
+    exact SubOpenVar v σ k x h1
+  case not_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Formula.sub_Var]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [openFormulaAux]
+    simp only [Formula.sub_Var]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [openFormulaAux]
+    simp only [Formula.sub_Var]
+    congr! 1
+    apply phi_ih
+
+
+lemma SubCloseFormula
+  (F : Formula)
+  (σ : String → String)
+  (x : String)
+  (k : ℕ)
+  (h1 : σ x = x)
+  (h2 : ∀ (y : String), ¬ x = σ y) :
+  Formula.sub_Var (str_fun_to_var_fun σ) (closeFormulaAux (free_ x) k F) = closeFormulaAux (free_ x) k (Formula.sub_Var (str_fun_to_var_fun σ) F) :=
+  by
+  induction F generalizing k
+  case pred_ X vs =>
+    simp only [closeFormulaAux]
+    simp only [Formula.sub_Var]
+    simp
+    simp only [List.map_eq_map_iff]
+    intro v _
+    exact SubCloseVar v σ x k h1 h2
+  case not_ phi phi_ih =>
+    simp only [closeFormulaAux]
+    simp only [Formula.sub_Var]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [closeFormulaAux]
+    simp only [Formula.sub_Var]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [closeFormulaAux]
+    simp only [Formula.sub_Var]
+    congr! 1
+    apply phi_ih
+
+--------------------------------------------------
+
+theorem shift_sub_Var
+  (D : Type)
+  (σ : String → String)
+  (V : VarAssignment D)
+  (d : D) :
+  shift D (V ∘ Var.sub_Var (str_fun_to_var_fun σ)) d =
+    shift D V d ∘ Var.sub_Var (str_fun_to_var_fun σ) :=
+  by
+  funext v
+  simp
+  cases v
+  case _ x =>
+    simp only [Var.sub_Var]
+    simp only [shift]
+    simp only [str_fun_to_var_fun]
+    simp
+  case _ i =>
+    cases i
+    case zero =>
+      simp only [Var.sub_Var]
+      simp only [shift]
+    case succ n =>
+      simp only [Var.sub_Var]
+      simp only [shift]
+      simp
+
+
+theorem HoldsIffSubHolds
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (σ : String → String)
+  (F : Formula) :
+  Holds D I (V ∘ (Var.sub_Var (str_fun_to_var_fun σ))) F ↔
+    Holds D I V (Formula.sub_Var (str_fun_to_var_fun σ) F) :=
+  by
+  induction F generalizing V
+  case pred_ X vs =>
+    simp only [Formula.sub_Var]
+    simp only [Holds]
+    congr! 1
+    simp
+  case not_ phi phi_ih =>
+    simp only [Formula.sub_Var]
+    simp only [Holds]
+    congr! 1
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.sub_Var]
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ phi phi_ih =>
+    simp only [Formula.sub_Var]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [← phi_ih]
+    congr!
+    apply shift_sub_Var
+-/
+--------------------------------------------------
+
 theorem ShiftVarOpenList
   (D : Type)
   (V : VarAssignment D)
@@ -648,3 +886,424 @@ lemma HoldsOpenList
     apply ShiftVarOpenList
 
 --------------------------------------------------
+
+theorem ShiftListVarOpenList
+  (D : Type)
+  (V : VarAssignment D)
+  (xs : List String) :
+  V ∘ Var.openList 0 (List.map free_ xs) =
+    shiftList D V (List.map (V ∘ free_) xs) :=
+  by
+  induction xs
+  case nil =>
+    funext v
+    simp
+    simp only [shiftList]
+    cases v
+    case _ x =>
+      simp only [Var.openList]
+    case _ i =>
+      simp only [Var.openList]
+      split
+      case _ c1 =>
+        rfl
+      case _ c1 =>
+        simp
+  case _ hd tl ih =>
+    funext v
+    simp
+    simp only [shiftList]
+    cases v
+    case _ x =>
+      simp only [shift]
+      simp only [← ih]
+      simp only [Var.openList]
+      simp
+    case _ i =>
+      cases i
+      case zero =>
+        simp only [shift]
+        simp only [Var.openList]
+        simp
+      case succ i =>
+        simp only [shift]
+        simp only [← ih]
+        simp
+        simp only [Var.openList]
+        simp
+        split
+        case _ c1 =>
+          have s1 : i < tl.length
+          linarith
+          simp only [s1]
+          simp
+        case _ c1 =>
+          have s1 : ¬ i < tl.length
+          linarith
+          simp only [s1]
+          simp
+
+
+lemma lc_at_iff_lc
+  (F : Formula) :
+  lc_at 0 F ↔ lc F :=
+  by
+  constructor
+  · intro a1
+    sorry
+  · intro a1
+    sorry
+
+
+theorem HoldsCoincideVar
+  (D : Type)
+  (I : Interpretation D)
+  (V V' : VarAssignment D)
+  (F : Formula)
+  (h1 : ∀ (v : Var), occursFreeIn v F → V v = V' v) :
+  Holds D I V F ↔ Holds D I V' F :=
+  by
+  induction F generalizing V V'
+  case pred_ X vs =>
+    simp only [occursFreeIn] at h1
+
+    simp only [Holds]
+    congr! 1
+    simp only [List.map_eq_map_iff]
+    exact h1
+  case not_ phi phi_ih =>
+    simp only [occursFreeIn] at h1
+
+    simp only [Holds]
+    congr! 1
+    exact phi_ih V V' h1
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih
+      intro v a1
+      apply h1
+      simp only [occursFreeIn]
+      tauto
+    · apply psi_ih
+      intro v a1
+      apply h1
+      simp only [occursFreeIn]
+      tauto
+  case forall_ x phi phi_ih =>
+    simp only [occursFreeIn] at h1
+
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    apply phi_ih
+    intro v a1
+    cases v
+    case free_ x =>
+      simp only [shift]
+      apply h1
+      exact a1
+    case bound_ i =>
+      cases i
+      case zero =>
+        simp only [shift]
+      case succ i =>
+        simp only [shift]
+        apply h1
+        simp only [lift]
+        exact a1
+
+
+lemma HoldsShift
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (F : Formula)
+  (z : String)
+  (h1 : ¬ occursFreeIn (free_ z) F) :
+  (∀ (d : D), Holds D I (shift D V d) F) ↔ ∀ (d : D), Holds D I (Function.updateITE V (free_ z) d ∘ Var.openList 0 [free_ z]) F :=
+  by
+  apply forall_congr'
+  intro d
+  apply HoldsCoincideVar
+  intro v a1
+  simp
+  simp only [Function.updateITE]
+  cases v
+  case _ x' =>
+    simp only [shift]
+    simp only [Var.openList]
+    split_ifs
+    case _ c1 =>
+      simp at c1
+      simp only [← c1] at h1
+      contradiction
+    case _ c1 =>
+      rfl
+  case _ i =>
+    cases i
+    case zero =>
+      simp only [shift]
+      simp only [Var.openList]
+      simp
+    case succ i =>
+      simp only [shift]
+      simp only [Var.openList]
+      simp
+
+
+lemma HoldsForall
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (x : String)
+  (F : Formula)
+  (z : String)
+  (h1 : ¬ occursFreeIn (free_ z) F) :
+  Holds D I V (forall_ x F) ↔ ∀ (d : D), Holds D I (Function.updateITE V (free_ z) d) (Formula.openList 0 [free_ z] F) :=
+  by
+  simp only [Holds]
+  simp only [HoldsShift D I V F z h1]
+  apply forall_congr'
+  intro d
+  obtain s1 := HoldsOpenList D I (Function.updateITE V (free_ z) d) 0 [z] F
+  simp at s1
+  exact s1
+
+
+theorem extracted_1
+  (D : Type)
+  (V : VarAssignment D)
+  (j : ℕ)
+  (z : String)
+  (d : D) :
+  shift D V d ∘ Var.close (j + 1) (free_ z) = shift D (V ∘ Var.close j (free_ z)) d :=
+  by
+  funext v
+  simp
+  cases v
+  case _ x =>
+    conv =>
+      rhs
+      simp only [shift]
+      simp
+    simp only [Var.close]
+    simp
+    split_ifs
+    case _ c1 =>
+      simp only [shift]
+      simp
+    case _ c1 =>
+      simp only [shift]
+  case _ i =>
+    cases i
+    case zero =>
+      conv =>
+        rhs
+        simp only [shift]
+      simp only [Var.close]
+      simp
+      simp only [shift]
+    case succ i =>
+      conv =>
+        rhs
+        simp only [shift]
+        simp
+        simp only [Var.close]
+      simp only [Var.close]
+      split
+      case _ c1 =>
+        have s1 : i < j
+        linarith
+        simp only [if_pos s1]
+        simp only [shift]
+      case _ c1 =>
+        simp at c1
+        have s1 : ¬ i < j
+        linarith
+        simp only [if_neg s1]
+        simp only [shift]
+
+
+lemma HoldsClose
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (z : String)
+  (F : Formula)
+  (j : ℕ)
+  (h1 : ¬ occursIn (free_ z) F)
+  (h2 : F.lc_at j) :
+  Holds D I V F ↔ Holds D I (V ∘ Var.close j (free_ z)) (Formula.openList j [free_ z] F) :=
+  by
+  induction F generalizing V j
+  case pred_ X vs =>
+    simp only [occursIn] at h1
+    simp only [Formula.lc_at] at h2
+
+    simp only [Formula.openList]
+    simp only [Holds]
+    congr! 1
+    simp
+    simp only [List.map_eq_map_iff]
+    intro v a1
+    specialize h2 v a1
+    simp
+    cases v
+    case _ x =>
+      simp only [Var.openList]
+      simp only [Var.close]
+
+      have s1 : ¬ free_ x = free_ z
+      intro contra
+      apply h1
+      simp only [← contra]
+      exact a1
+
+      simp only [if_neg s1]
+    case _ i =>
+      simp only [Var.lc_at] at h2
+
+      simp only [Var.openList]
+      simp
+      split_ifs
+      simp only [Var.close]
+      simp only [if_pos h2]
+  case not_ phi phi_ih =>
+    simp only [occursIn] at h1
+    simp only [Formula.lc_at] at h2
+
+    simp only [Holds]
+    congr! 1
+    exact phi_ih V j h1 h2
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [occursIn] at h1
+    push_neg at h1
+    simp only [Formula.lc_at] at h2
+
+    cases h1
+    case _ h1_left h1_right =>
+      cases h2
+      case _ h2_left h2_right =>
+        simp only [Holds]
+        congr! 1
+        · exact phi_ih V j h1_left h2_left
+        · exact psi_ih V j h1_right h2_right
+  case forall_ x phi phi_ih =>
+    simp only [occursIn] at h1
+    simp only [Formula.lc_at] at h2
+
+    simp only [Formula.openList]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    specialize phi_ih (shift D V d) (j + 1) h1 h2
+    simp only [phi_ih]
+    congr! 1
+    apply extracted_1
+
+
+lemma Formula.OpenListLC
+  (F : Formula)
+  (j : ℕ)
+  (zs : List String)
+  (h1 : F.lc_at j) :
+  Formula.openList j (zs.map free_) F = F :=
+  by
+  induction F generalizing j
+  case pred_ X vs =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.openList]
+    simp
+    apply List.map_mem_id
+    intro v a1
+    specialize h1 v a1
+    cases v
+    case _ x =>
+      simp only [Var.openList]
+    case _ i =>
+      cases i
+      case zero =>
+        simp only [Var.lc_at] at h1
+        simp only [Var.openList]
+        simp only [if_pos h1]
+      case succ i =>
+        simp only [Var.lc_at] at h1
+        simp only [Var.openList]
+        simp only [if_pos h1]
+  case not_ phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.openList]
+    congr!
+    exact phi_ih j h1
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.openList]
+    cases h1
+    case _ h1_left h1_right =>
+      congr!
+      · exact phi_ih j h1_left
+      · exact psi_ih j h1_right
+  case forall_ x phi phi_ih =>
+    simp only [Formula.lc_at] at h1
+
+    simp only [Formula.openList]
+    simp
+    exact phi_ih (j + 1) h1
+
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (τ : String → ℕ → Formula)
+  (F : Formula)
+  (h1 : F.lc) :
+  Holds D I V (F.predSub τ) ↔
+    Holds D (Interpretation.usingPred D I fun (X : String) (ds : List D) => Holds D I (shiftList D V ds) (τ X ds.length)) V F :=
+  by
+  induction h1 generalizing V
+  case pred_ X vs ih =>
+    simp only [predSub]
+    simp only [Interpretation.usingPred]
+    simp only [Holds]
+    simp
+
+    have s1 : ∀ (v : Var), v ∈ vs → Var.lc_at 0 v
+    intro v a1
+    specialize ih v a1
+    cases v
+    case _ x =>
+      simp only [Var.lc_at]
+    case _ i =>
+      simp only [Var.isFree] at ih
+
+    obtain s2 := free_var_list_to_string_list vs s1
+    apply Exists.elim s2
+    intro zs a1
+
+    obtain s3 := HoldsOpenList D I V 0 zs (τ X (List.length vs))
+    simp only [← a1] at s3
+    simp only [← s3]
+    clear s2
+
+    congr! 1
+    simp only [a1]
+    simp
+    simp only [ShiftListVarOpenList]
+  case forall_ x phi z ih_1 ih_2 =>
+    simp only [← lc_at_iff_lc] at ih_1
+
+    simp only [predSub]
+
+    obtain s1 := HoldsForall D I V x (predSub τ phi) z
+
+    obtain s2 := ShiftListVarOpenList D V [z]
+    simp at s2
+
+    sorry
+  all_goals
+    sorry

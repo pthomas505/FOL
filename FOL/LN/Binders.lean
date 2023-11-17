@@ -76,6 +76,27 @@ instance (v : Var) (F : Formula) : Decidable (occursIn v F) :=
 --------------------------------------------------
 
 /--
+  Helper function for occursFreeIn.
+-/
+def lift : Var → Var
+  | free_ x => free_ x
+  | bound_ i => bound_ (i + 1)
+
+
+/--
+  occursFreeIn v F :=
+  If v = free_ x then true if and only if there is an occurrence of free_ x in the formula F.
+  If v = bound_ i then true if and only if there is an occurrence of a variable of the form bound_ _ that is out of scope by i + 1.
+-/
+def occursFreeIn (v : Var) : Formula → Prop
+  | pred_ _ vs => v ∈ vs
+  | not_ phi => occursFreeIn v phi
+  | imp_ phi psi => occursFreeIn v phi ∨ occursFreeIn v psi
+  | forall_ _ phi => occursFreeIn (lift v) phi
+
+--------------------------------------------------
+
+/--
   Helper function for Formula.freeVarSet
 -/
 def Var.freeVarSet : Var → Finset Var
