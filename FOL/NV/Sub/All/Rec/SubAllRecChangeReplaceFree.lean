@@ -745,6 +745,34 @@ def subPredAux
   termination_by subPredAux c τ F => F.length
 
 
+lemma SubId
+  (c : Char)
+  (F : Formula) :
+  sub id c F = F :=
+  by
+  induction F
+  case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
+    simp only [sub]
+    simp
+  case true_ | false_ =>
+    simp only [sub]
+  case not_ phi phi_ih =>
+    simp only [sub]
+    congr!
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [sub]
+    congr!
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp only [sub]
+    simp
+    simp only [Function.updateITE_id]
+    exact phi_ih
+
+
 example
   (D : Type)
   (I : Interpretation D)
@@ -753,8 +781,7 @@ example
   (σ : VarName → VarName)
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
-  (F : Formula)
-  (h1 : ∀ x : VarName, V' x = V x) :
+  (F : Formula) :
   Holds D
     ⟨
       I.nonempty,
@@ -791,6 +818,7 @@ example
       simp only [Function.updateListITE_comp] at s1
       simp at s1
       simp only [s1]
+      clear s1
 
       apply Holds_coincide_Var
       intro v a1
@@ -800,7 +828,7 @@ example
         simp only [← c2]
       · simp only [Function.updateListITE_not_mem V v zs (List.map V xs) c3]
         simp only [Function.updateListITE_not_mem V' v zs (List.map V xs) c3]
-        apply h1
+        sorry
     case _ c1 c2 =>
       simp only [Holds]
     case _ c1 =>
@@ -811,12 +839,31 @@ example
     simp only [Holds]
     apply forall_congr'
     intro d
+
+    generalize (fun X ds =>
+      let opt := τ X (List.length ds);
+      if h : Option.isSome opt = true
+      then
+        let val := Option.get opt h;
+        let zs := val.fst;
+        let H := val.snd;
+        if List.length ds = List.length zs
+        then Holds D I (Function.updateListITE V' zs ds) E H
+        else Interpretation.pred_var_ I X ds
+      else Interpretation.pred_var_ I X ds) = pred_var_' at *
+
+    generalize ({ nonempty := (_ : Nonempty D), pred_const_ := I.pred_const_, pred_var_ := pred_var_' } : Interpretation D) = I' at *
+
+    generalize (variant x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))) = x' at *
+
     split_ifs
     case _ c1 =>
+      simp only [phi_ih]
       sorry
     case _ c2 =>
-      obtain s1 := substitution_fun_theorem D I (Function.updateITE V x d) E (Function.updateITE id x x) c phi
-      sorry
+      simp only [Function.updateITE_id]
+      simp only [SubId]
+      apply phi_ih
   all_goals sorry;
 
 
