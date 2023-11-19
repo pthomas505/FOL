@@ -253,7 +253,12 @@ def subPredAlphaAux
       (subPredAlphaAux c τ α binders psi)
   | forall_ x phi =>
       let free := phi.freeVarSet \ (binders ∪ {x})
-      let free_after_sub := (replacePredFun c τ phi).freeVarSet
-      sorry
+      let replaced_free := (replacePredFun c τ phi).freeVarSet
+      let captured := subPredCaptured (binders ∪ {x}) τ phi
+      let x' :=
+        if captured = ∅
+        then x
+        else fresh x c (replaced_free ∪ free)
+      forall_ x' (subPredAlphaAux c τ (Function.updateITE α x x') (binders ∪ {x'}) phi)
   | exists_ x phi => sorry
   | def_ X xs => def_ X (xs.map α)
