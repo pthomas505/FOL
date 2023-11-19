@@ -342,6 +342,20 @@ instance
       infer_instance
 
 
+lemma isAlphaEqvVarListId
+  (xs : List VarName) :
+  isAlphaEqvVarList [] xs xs :=
+  by
+  induction xs
+  case nil =>
+    simp only [isAlphaEqvVarList]
+  case cons hd tl ih =>
+    simp only [isAlphaEqvVarList]
+    constructor
+    · simp only [isAlphaEqvVar]
+    · exact ih
+
+
 def isAlphaEqvAux : List (VarName × VarName) → Formula → Formula → Prop
   | binders, pred_const_ X xs, pred_const_ Y ys =>
       X = Y ∧ isAlphaEqvVarList binders xs ys
