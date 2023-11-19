@@ -61,7 +61,8 @@ def admitsPredFunAux
         let zs := val.fst
         let H := val.snd
         if xs.length = zs.length
-        then ∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)
+        then binders ∩ (H.freeVarSet \ zs.toFinset) = ∅
+        --then ∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)
         else True
       else True
   | _, true_ => True
@@ -147,11 +148,14 @@ theorem predSub_aux
         apply h2
         split_ifs at h1
         cases h1
-        case _ h1_c1 =>
+        case _ h1_c1 h1_c2 =>
           contradiction
-        case _ h1_c1 =>
+        case _ h1_c1 h1_c2 =>
           intro contra
-          specialize h1_c1 v contra a1
+          simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          simp only [Finset.eq_empty_iff_forall_not_mem] at h1_c2
+          simp at h1_c2
+          specialize h1_c2 v contra a1
           contradiction
         case _ h1_c1 =>
           contradiction
