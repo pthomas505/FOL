@@ -419,83 +419,83 @@ lemma SubId
 
 def sub_alpha
   (σ : VarName → VarName)
-  (τ : VarName → VarName)
+  (α : VarName → VarName)
   (binders : Finset VarName)
   (c : Char) :
   Formula → Formula
-  | pred_const_ X xs => pred_const_ X (xs.map τ)
-  | pred_var_ X xs => pred_var_ X (xs.map τ)
-  | eq_ x y => eq_ (τ x) (τ y)
+  | pred_const_ X xs => pred_const_ X (xs.map α)
+  | pred_var_ X xs => pred_var_ X (xs.map α)
+  | eq_ x y => eq_ (α x) (α y)
   | true_ => true_
   | false_ => false_
-  | not_ phi => sub_alpha σ τ binders c phi
+  | not_ phi => sub_alpha σ α binders c phi
   | imp_ phi psi =>
       imp_
-      (sub_alpha σ τ binders c phi)
-      (sub_alpha σ τ binders c psi)
+      (sub_alpha σ α binders c phi)
+      (sub_alpha σ α binders c psi)
   | and_ phi psi =>
       and_
-      (sub_alpha σ τ binders c phi)
-      (sub_alpha σ τ binders c psi)
+      (sub_alpha σ α binders c phi)
+      (sub_alpha σ α binders c psi)
   | or_ phi psi =>
       or_
-      (sub_alpha σ τ binders c phi)
-      (sub_alpha σ τ binders c psi)
+      (sub_alpha σ α binders c phi)
+      (sub_alpha σ α binders c psi)
   | iff_ phi psi =>
       iff_
-      (sub_alpha σ τ binders c phi)
-      (sub_alpha σ τ binders c psi)
+      (sub_alpha σ α binders c phi)
+      (sub_alpha σ α binders c psi)
   | forall_ x phi =>
       let free := phi.freeVarSet \ (binders ∪ {x})
-      let free_after_sub := free.image σ
-      let captured := free_after_sub ∩ (binders ∪ {x})
+      let replaced_free := free.image σ
+      let captured := replaced_free ∩ (binders ∪ {x})
       let x' :=
         if captured = ∅
         then x
-        else fresh x c (free_after_sub ∪ free)
-      forall_ x' (sub_alpha σ (Function.updateITE τ x x') (binders ∪ {x'}) c phi)
+        else fresh x c (replaced_free ∪ free)
+      forall_ x' (sub_alpha σ (Function.updateITE α x x') (binders ∪ {x'}) c phi)
   | exists_ x phi =>
       let free := phi.freeVarSet \ (binders ∪ {x})
-      let free_after_sub := free.image σ
-      let captured := free_after_sub ∩ (binders ∪ {x})
+      let replaced_free := free.image σ
+      let captured := replaced_free ∩ (binders ∪ {x})
       let x' :=
         if captured = ∅
         then x
-        else fresh x c (free_after_sub ∪ free)
-      forall_ x' (sub_alpha σ (Function.updateITE τ x x') (binders ∪ {x'}) c phi)
-  | def_ X xs => def_ X (xs.map τ)
+        else fresh x c (replaced_free ∪ free)
+      exists_ x' (sub_alpha σ (Function.updateITE α x x') (binders ∪ {x'}) c phi)
+  | def_ X xs => def_ X (xs.map α)
 
 
 def sub_alpha'
   (σ : VarName → VarName)
-  (τ : VarName → VarName)
+  (α : VarName → VarName)
   (c : Char) :
   Formula → (Formula × Formula)
-| pred_const_ X xs => (pred_const_ X (xs.map σ), pred_const_ X (xs.map τ))
-| pred_var_ X xs => (pred_var_ X (xs.map σ), pred_var_ X (xs.map τ))
-| eq_ x y => (eq_ (σ x) (σ y), eq_ (τ x) (τ y))
+| pred_const_ X xs => (pred_const_ X (xs.map σ), pred_const_ X (xs.map α))
+| pred_var_ X xs => (pred_var_ X (xs.map σ), pred_var_ X (xs.map α))
+| eq_ x y => (eq_ (σ x) (σ y), eq_ (α x) (α y))
 | true_ => (true_, true_)
 | false_ => (false_, false_)
-| not_ phi => (not_ (sub_alpha' σ τ c phi).fst, not_ (sub_alpha' σ τ c phi).snd)
-| imp_ phi psi => ((imp_ (sub_alpha' σ τ c phi).fst (sub_alpha' σ τ c psi).fst), (imp_ (sub_alpha' σ τ c phi).snd (sub_alpha' σ τ c psi).snd))
-| and_ phi psi => ((and_ (sub_alpha' σ τ c phi).fst (sub_alpha' σ τ c psi).fst), (and_ (sub_alpha' σ τ c phi).snd (sub_alpha' σ τ c psi).snd))
-| or_ phi psi => ((or_ (sub_alpha' σ τ c phi).fst (sub_alpha' σ τ c psi).fst), (or_ (sub_alpha' σ τ c phi).snd (sub_alpha' σ τ c psi).snd))
-| iff_ phi psi => ((iff_ (sub_alpha' σ τ c phi).fst (sub_alpha' σ τ c psi).fst), (iff_ (sub_alpha' σ τ c phi).snd (sub_alpha' σ τ c psi).snd))
+| not_ phi => (not_ (sub_alpha' σ α c phi).fst, not_ (sub_alpha' σ α c phi).snd)
+| imp_ phi psi => ((imp_ (sub_alpha' σ α c phi).fst (sub_alpha' σ α c psi).fst), (imp_ (sub_alpha' σ α c phi).snd (sub_alpha' σ α c psi).snd))
+| and_ phi psi => ((and_ (sub_alpha' σ α c phi).fst (sub_alpha' σ α c psi).fst), (and_ (sub_alpha' σ α c phi).snd (sub_alpha' σ α c psi).snd))
+| or_ phi psi => ((or_ (sub_alpha' σ α c phi).fst (sub_alpha' σ α c psi).fst), (or_ (sub_alpha' σ α c phi).snd (sub_alpha' σ α c psi).snd))
+| iff_ phi psi => ((iff_ (sub_alpha' σ α c phi).fst (sub_alpha' σ α c psi).fst), (iff_ (sub_alpha' σ α c phi).snd (sub_alpha' σ α c psi).snd))
 | forall_ x phi =>
   let x' : VarName :=
     if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then fresh x c ((sub_alpha' (Function.updateITE σ x x) τ c phi).fst.freeVarSet)
+    then fresh x c ((sub_alpha' (Function.updateITE σ x x) α c phi).fst.freeVarSet)
     else x
-  let phi' := (sub_alpha' (Function.updateITE σ x x') (Function.updateITE τ x x') c phi)
+  let phi' := (sub_alpha' (Function.updateITE σ x x') (Function.updateITE α x x') c phi)
   (forall_ x' phi'.fst, forall_ x' phi'.snd)
 | exists_ x phi =>
   let x' : VarName :=
     if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then fresh x c ((sub_alpha' (Function.updateITE σ x x) τ c phi).fst.freeVarSet)
+    then fresh x c ((sub_alpha' (Function.updateITE σ x x) α c phi).fst.freeVarSet)
     else x
-  let phi' := (sub_alpha' (Function.updateITE σ x x') (Function.updateITE τ x x') c phi)
+  let phi' := (sub_alpha' (Function.updateITE σ x x') (Function.updateITE α x x') c phi)
   (exists_ x' phi'.fst, exists_ x' phi'.snd)
-| def_ X xs => (def_ X (xs.map σ), def_ X (xs.map τ))
+| def_ X xs => (def_ X (xs.map σ), def_ X (xs.map α))
 
 
 
