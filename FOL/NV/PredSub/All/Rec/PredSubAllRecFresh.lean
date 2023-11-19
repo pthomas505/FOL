@@ -193,7 +193,7 @@ example
 
 --------------------------------------------------
 
-def subPredCaptured
+def subPredCapturedAux
   (binders : Finset VarName)
   (τ : PredName → ℕ → Option (List VarName × Formula)) :
   Formula → Finset VarName
@@ -212,14 +212,21 @@ def subPredCaptured
   | eq_ _ _ => ∅
   | true_ => ∅
   | false_ => ∅
-  | not_ phi => subPredCaptured binders τ phi
-  | imp_ phi psi => subPredCaptured binders τ phi ∪ subPredCaptured binders τ psi
-  | and_ phi psi => subPredCaptured binders τ phi ∪ subPredCaptured binders τ psi
-  | or_ phi psi => subPredCaptured binders τ phi ∪ subPredCaptured binders τ psi
-  | iff_ phi psi => subPredCaptured binders τ phi ∪ subPredCaptured binders τ psi
-  | forall_ x phi => subPredCaptured (binders ∪ {x}) τ phi
-  | exists_ x phi => subPredCaptured (binders ∪ {x}) τ phi
+  | not_ phi => subPredCapturedAux binders τ phi
+  | imp_ phi psi => subPredCapturedAux binders τ phi ∪ subPredCapturedAux binders τ psi
+  | and_ phi psi => subPredCapturedAux binders τ phi ∪ subPredCapturedAux binders τ psi
+  | or_ phi psi => subPredCapturedAux binders τ phi ∪ subPredCapturedAux binders τ psi
+  | iff_ phi psi => subPredCapturedAux binders τ phi ∪ subPredCapturedAux binders τ psi
+  | forall_ x phi => subPredCapturedAux (binders ∪ {x}) τ phi
+  | exists_ x phi => subPredCapturedAux (binders ∪ {x}) τ phi
   | def_ _ _ => ∅
+
+
+def subPredCaptured
+  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (F : Formula) :
+  Finset VarName :=
+  subPredCapturedAux ∅ τ F
 
 
 def subPredAlphaAux
@@ -254,7 +261,7 @@ def subPredAlphaAux
   | forall_ x phi =>
       let free := phi.freeVarSet \ (binders ∪ {x})
       let replaced_free := (replacePredFun c τ phi).freeVarSet
-      let captured := subPredCaptured (binders ∪ {x}) τ phi
+      let captured := subPredCapturedAux (binders ∪ {x}) τ phi
       let x' :=
         if captured = ∅
         then x
