@@ -19,7 +19,7 @@ def predVarFreeVarSet
         let zs := val.fst
         let H := val.snd
         H.freeVarSet \ zs.toFinset
-      else {}
+      else ∅
 
 
 def subPredAlphaAux
