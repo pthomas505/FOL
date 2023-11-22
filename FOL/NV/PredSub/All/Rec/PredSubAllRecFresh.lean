@@ -11,15 +11,15 @@ open Formula
 
 def predVarFreeVarSet
   (τ : PredName → ℕ → Option (List VarName × Formula)) :=
-    fun (p, n) =>
-      let opt := τ p n
-      if h : Option.isSome opt
-      then
-        let val := Option.get opt h
-        let zs := val.fst
-        let H := val.snd
-        H.freeVarSet \ zs.toFinset
-      else ∅
+  fun (p, n) =>
+    let opt := τ p n
+    if h : Option.isSome opt
+    then
+      let val := Option.get opt h
+      let zs := val.fst
+      let H := val.snd
+      H.freeVarSet \ zs.toFinset
+    else ∅
 
 
 def subPredAlphaAux
@@ -69,20 +69,18 @@ def subPredAlphaAux
 
 
 example
-  (D : Type)
-  (I : Interpretation D)
-  (V : VarAssignment D)
-  (E : Env)
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (α : VarName → VarName)
   (binders : Finset VarName)
   (F : Formula)
-  (h1 : ∀ (x : VarName), x ∈ binders → x ∉ (Finset.biUnion F.predVarSet (predVarFreeVarSet τ)))
-  :
+  (h1 : ∀ (x : VarName), x ∈ binders → x ∉ (Finset.biUnion F.predVarSet (predVarFreeVarSet τ))) :
   admitsPredFunAux τ binders (subPredAlphaAux c τ α binders F) :=
   by
   induction F generalizing α binders
+  case pred_const_ X xs | true_ | false_ | eq_ | def_ =>
+    simp only [subPredAlphaAux]
+    simp only [admitsPredFunAux]
   case pred_var_ X xs =>
     simp only [predVarSet] at h1
     simp at h1
@@ -101,7 +99,37 @@ example
       simp only [c1] at h1
       simp at h1
       exact h1 a2
-  case forall_ x phi phi_ih =>
+  case not_ phi phi_ih =>
+    simp only [predVarSet] at h1
+
+    simp only [subPredAlphaAux]
+    simp only [admitsPredFunAux]
+    apply phi_ih
+    exact h1
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [predVarSet] at h1
+    simp at h1
+
+    simp only [subPredAlphaAux]
+    simp only [admitsPredFunAux]
+    constructor
+    · apply phi_ih
+      simp
+      intro x a1 X n a2
+      apply h1 x a1 X n
+      left
+      exact a2
+    · apply psi_ih
+      simp
+      intro x a1 X n a2
+      apply h1 x a1 X n
+      right
+      exact a2
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [predVarSet] at h1
 
     simp only [subPredAlphaAux]
@@ -139,5 +167,3 @@ example
       case _ c2 =>
         subst c2
         exact c1
-  all_goals
-    sorry
