@@ -25,8 +25,7 @@ def predVarFreeVarSet
 def subPredAlphaAux
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
-  (α : VarName → VarName)
-  (binders : Finset VarName) :
+  (α : VarName → VarName) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map α)
   | pred_var_ X xs => pred_var_ X (xs.map α)
@@ -34,38 +33,72 @@ def subPredAlphaAux
   | true_ => true_
   | false_ => false_
   | not_ phi =>
-      not_ (subPredAlphaAux c τ α binders phi)
+      not_ (subPredAlphaAux c τ α phi)
   | imp_ phi psi =>
       imp_
-      (subPredAlphaAux c τ α binders phi)
-      (subPredAlphaAux c τ α binders psi)
+      (subPredAlphaAux c τ α phi)
+      (subPredAlphaAux c τ α psi)
   | and_ phi psi =>
       and_
-      (subPredAlphaAux c τ α binders phi)
-      (subPredAlphaAux c τ α binders psi)
+      (subPredAlphaAux c τ α phi)
+      (subPredAlphaAux c τ α psi)
   | or_ phi psi =>
       or_
-      (subPredAlphaAux c τ α binders phi)
-      (subPredAlphaAux c τ α binders psi)
+      (subPredAlphaAux c τ α phi)
+      (subPredAlphaAux c τ α psi)
   | iff_ phi psi =>
       iff_
-      (subPredAlphaAux c τ α binders phi)
-      (subPredAlphaAux c τ α binders psi)
+      (subPredAlphaAux c τ α phi)
+      (subPredAlphaAux c τ α psi)
   | forall_ x phi =>
       let vs : Finset VarName := Finset.biUnion phi.predVarSet (predVarFreeVarSet τ)
       let x' : VarName :=
         if x ∈ vs
         then fresh x c vs
         else x
-      forall_ x' (subPredAlphaAux c τ (Function.updateITE α x x') (binders ∪ {x'}) phi)
+      forall_ x' (subPredAlphaAux c τ (Function.updateITE α x x') phi)
   | exists_ x phi =>
       let vs : Finset VarName := Finset.biUnion phi.predVarSet (predVarFreeVarSet τ)
       let x' : VarName :=
         if x ∈ vs
         then fresh x c vs
         else x
-      exists_ x' (subPredAlphaAux c τ (Function.updateITE α x x') (binders ∪ {x'}) phi)
+      exists_ x' (subPredAlphaAux c τ (Function.updateITE α x x') phi)
   | def_ X xs => def_ X (xs.map α)
+
+
+example
+  (c : Char)
+  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (F : Formula) :
+  AlphaEqv F (subPredAlphaAux c τ id F) :=
+  by
+  induction F
+  case pred_var_ X xs =>
+    simp only [subPredAlphaAux]
+    simp
+    apply AlphaEqv.refl_
+  case forall_ x phi phi_ih =>
+    simp only [subPredAlphaAux]
+
+    obtain s1 := fresh_not_mem x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+
+    generalize fresh x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)) = x' at *
+
+    split_ifs
+    case pos c1 =>
+      have s2 : ¬ x' = x
+      intro contra
+      subst contra
+      apply s1
+      exact c1
+      sorry
+    case neg c1 =>
+      simp only [Function.updateITE_id]
+      apply AlphaEqv.compat_forall_
+      apply phi_ih
+  all_goals
+    sorry
 
 
 example
@@ -75,7 +108,7 @@ example
   (binders : Finset VarName)
   (F : Formula)
   (h1 : ∀ (x : VarName), x ∈ binders → x ∉ (Finset.biUnion F.predVarSet (predVarFreeVarSet τ))) :
-  admitsPredFunAux τ binders (subPredAlphaAux c τ α binders F) :=
+  admitsPredFunAux τ binders (subPredAlphaAux c τ α F) :=
   by
   induction F generalizing α binders
   case pred_const_ X xs | true_ | false_ | eq_ | def_ =>
