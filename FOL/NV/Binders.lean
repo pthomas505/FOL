@@ -155,6 +155,96 @@ instance (v : VarName) (F : Formula) : Decidable (isFreeIn v F) :=
 
 
 /--
+  isFreeInInd v F := True if and only if there is a free occurrence of the variable v in the formula F.
+-/
+inductive isFreeInInd
+  (v : VarName) :
+  Formula → Prop
+
+  | pred_const_
+    (X : PredName)
+    (xs : List VarName) :
+    v ∈ xs →
+    isFreeInInd v (pred_const_ X xs)
+
+  | pred_var_
+    (X : PredName)
+    (xs : List VarName) :
+    v ∈ xs →
+    isFreeInInd v (pred_var_ X xs)
+
+  | eq_
+    (x y : VarName) :
+    v = x ∨ v = y →
+    isFreeInInd v (eq_ x y)
+
+  | not_
+    (phi : Formula) :
+    isFreeInInd v phi →
+    isFreeInInd v (not_ phi)
+
+  | imp_left_
+    (phi psi : Formula) :
+    isFreeInInd v phi →
+    isFreeInInd v (imp_ phi psi)
+
+  | imp_right_
+    (phi psi : Formula) :
+    isFreeInInd v psi →
+    isFreeInInd v (imp_ phi psi)
+
+  | and_left_
+    (phi psi : Formula) :
+    isFreeInInd v phi →
+    isFreeInInd v (and_ phi psi)
+
+  | and_right_
+    (phi psi : Formula) :
+    isFreeInInd v psi →
+    isFreeInInd v (and_ phi psi)
+
+  | or_left_
+    (phi psi : Formula) :
+    isFreeInInd v phi →
+    isFreeInInd v (or_ phi psi)
+
+  | or_right_
+    (phi psi : Formula) :
+    isFreeInInd v psi →
+    isFreeInInd v (or_ phi psi)
+
+  | iff_left_
+    (phi psi : Formula) :
+    isFreeInInd v phi →
+    isFreeInInd v (iff_ phi psi)
+
+  | iff_right_
+    (phi psi : Formula) :
+    isFreeInInd v psi →
+    isFreeInInd v (iff_ phi psi)
+
+  | forall_
+    (x : VarName)
+    (phi : Formula) :
+    ¬ v = x →
+    isFreeInInd v phi →
+    isFreeInInd v (forall_ x phi)
+
+  | exists_
+    (x : VarName)
+    (phi : Formula) :
+    ¬ v = x →
+    isFreeInInd v phi →
+    isFreeInInd v (exists_ x phi)
+
+  | def_
+    (X : DefName)
+    (xs : List VarName) :
+    v ∈ xs →
+    isFreeInInd v (def_ X xs)
+
+
+/--
   Formula.predVarSet F := The set of all of the predicate variables that have an occurrence in the formula F.
 -/
 def Formula.predVarSet : Formula → Finset (PredName × ℕ)
@@ -323,6 +413,91 @@ theorem isFreeIn_iff_mem_freeVarSet
     unfold isFreeIn
     unfold Formula.freeVarSet
     simp
+
+
+theorem isFreeIn_imp_isFreeInInd
+  (v : VarName)
+  (F : Formula)
+  (h1 : isFreeIn v F) :
+  isFreeInInd v F :=
+  by
+  induction F
+  case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
+    simp only [isFreeIn] at h1
+
+    first | exact isFreeInInd.pred_const_ X xs h1 | exact isFreeInInd.pred_var_ X xs h1 | exact isFreeInInd.eq_ x y h1 | exact isFreeInInd.def_ X xs h1
+  case true_ | false_ =>
+    simp only [isFreeIn] at h1
+  case not_ phi phi_ih =>
+    simp only [isFreeIn] at h1
+
+    apply isFreeInInd.not_
+    exact phi_ih h1
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [isFreeIn] at h1
+
+    cases h1
+    case inl c1 =>
+      first | apply isFreeInInd.imp_left_ | apply isFreeInInd.and_left_ | apply isFreeInInd.or_left_ | apply isFreeInInd.iff_left_
+      exact phi_ih c1
+    case inr c1 =>
+      first | apply isFreeInInd.imp_right_ | apply isFreeInInd.and_right_ | apply isFreeInInd.or_right_ | apply isFreeInInd.iff_right_
+      exact psi_ih c1
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp only [isFreeIn] at h1
+
+    cases h1
+    case _ h1_left h1_right =>
+      first | apply isFreeInInd.forall_ | apply isFreeInInd.exists_
+      · exact h1_left
+      · exact phi_ih h1_right
+
+
+theorem isFreeInInd_imp_isFreeIn
+  (v : VarName)
+  (F : Formula)
+  (h1 : isFreeInInd v F) :
+  isFreeIn v F :=
+  by
+  induction h1
+  case pred_const_ X xs ih | pred_var_ X xs ih | eq_ x y ih | def_ X xs ih =>
+    simp only [isFreeIn]
+    exact ih
+  case not_ phi ih_1 ih_2 =>
+    simp only [isFreeIn]
+    exact ih_2
+  case
+      imp_left_ phi psi ih_1 ih_2
+    | imp_right_ phi psi ih_1 ih_2
+    | and_left_ phi psi ih_1 ih_2
+    | and_right_ phi psi ih_1 ih_2
+    | or_left_ phi psi ih_1 ih_2
+    | or_right_ phi psi ih_1 ih_2
+    | iff_left_ phi psi ih_1 ih_2
+    | iff_right_ phi psi ih_1 ih_2 =>
+    simp only [isFreeIn]
+    first | left; exact ih_2 | right; exact ih_2
+  case
+      forall_ x phi ih_1 ih_2 ih_3
+    | exists_ x phi ih_1 ih_2 ih_3 =>
+    simp only [isFreeIn]
+    constructor
+    · exact ih_1
+    · exact ih_3
+
+
+theorem isFreeIn_iff_isFreeInInd
+  (v : VarName)
+  (F : Formula) :
+  isFreeIn v F ↔ isFreeInInd v F :=
+  by
+  constructor
+  · exact isFreeIn_imp_isFreeInInd v F
+  · exact isFreeInInd_imp_isFreeIn v F
 
 
 theorem predVarOccursIn_iff_mem_predVarSet
