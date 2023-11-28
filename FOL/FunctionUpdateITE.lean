@@ -23,6 +23,20 @@ def Function.updateITE
 
 
 /--
+  Symmetric equality version of Function.updateITE.
+-/
+def Function.updateITE'
+  {α β : Type}
+  [DecidableEq α]
+  (f : α → β)
+  (a' : α)
+  (b : β)
+  (a : α) :
+  β :=
+  if a' = a then b else f a
+
+
+/--
   Function.updateITE at multiple points.
   Function.updateListITE f xs ys := Replaces the value of f at each point in xs by the value in ys at the same index.
   If there are duplicate values in xs then the value at the smallest index is used.
@@ -81,6 +95,29 @@ lemma Function.right_id_right_inverse
 
 
 -- Function.updateITE
+
+lemma Function.updateITE_eq_Function.updateITE'
+  {α β : Type}
+  [DecidableEq α]
+  (f : α → β)
+  (a' : α)
+  (b : β) :
+  Function.updateITE f a' b = Function.updateITE' f a' b :=
+  by
+  simp only [Function.updateITE]
+  simp only [Function.updateITE']
+  funext a
+  split_ifs
+  case _ c1 c2 =>
+    rfl
+  case _ c1 c2 =>
+    subst c1
+    contradiction
+  case _ c1 c2 =>
+    subst c2
+    contradiction
+  case _ c1 c2 =>
+    rfl
 
 
 theorem Function.updateITE_comp_left
