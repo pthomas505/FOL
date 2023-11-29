@@ -169,7 +169,6 @@ inductive IsFreeSubFun :
     (x : VarName)
     (phi phi' : Formula) :
     IsFreeSubFun (Function.updateITE σ x x) (binders ∪ {x}) phi phi' →
-    --IsFreeSubFun σ (binders ∪ {x}) phi phi' →
     IsFreeSubFun σ binders (forall_ x phi) (forall_ x phi')
 
   | def_
@@ -187,10 +186,9 @@ example
   (binders : Finset VarName)
   (F F' : Formula)
   (h1 : IsFreeSubFun σ binders F F')
-  --(h2 : ∀ v : VarName, v ∈ binders ∨ σ v ∉ binders → V v = V' (σ v))
   (h2 : ∀ v : VarName, v ∈ binders → V v = V' (σ v))
-  (h2' : ∀ v : VarName, σ v ∉ binders → V v = V' (σ v))
-  (h3 : ∀ v : VarName, v ∈ binders → v = σ v) :
+  (h3 : ∀ v : VarName, σ v ∉ binders → V v = V' (σ v))
+  (h4 : ∀ v : VarName, v ∈ binders → v = σ v) :
   Holds D I V E F ↔ Holds D I V' E F' :=
   by
   induction h1 generalizing V V'
@@ -203,7 +201,7 @@ example
     simp
     by_cases c1 : x ∈ binders'
     · exact h2 x c1
-    · apply h2'
+    · apply h3
       exact ih_1 x a1 c1
   case forall_ σ' binders' x phi phi' ih_1 ih_2 =>
     simp at ih_2
@@ -212,7 +210,7 @@ example
     intro v a1 a2 contra
     apply a1
     simp only [← contra]
-    exact h3 v a2
+    exact h4 v a2
 
     simp only [Holds]
     apply forall_congr'
@@ -247,7 +245,7 @@ example
         cases a1
         case _ a1_left a1_right =>
           simp only [if_neg a1_right]
-          apply h2' v a1_left
+          apply h3 v a1_left
     · intro v a1
       simp only [Function.updateITE]
       split_ifs
@@ -256,7 +254,7 @@ example
       case _ c1 =>
         cases a1
         case _ c2 =>
-          exact h3 v c2
+          exact h4 v c2
         case _ c2 =>
           contradiction
   all_goals
