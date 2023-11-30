@@ -1,6 +1,4 @@
 import Std.Tactic.Lint.Frontend
-import Std.Data.HashMap.Basic
-import Std.Data.HashMap.WF
 import Mathlib.Util.CompileInductive
 
 
