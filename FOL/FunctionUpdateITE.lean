@@ -78,7 +78,7 @@ lemma Function.left_id_left_inverse
   (h1 : g ∘ f = id) :
   Function.LeftInverse g f :=
   by
-  unfold Function.LeftInverse
+  simp only [Function.LeftInverse]
   intro x
   exact congrFun h1 x
 
@@ -90,7 +90,7 @@ lemma Function.right_id_right_inverse
   (h1 : f ∘ g = id) :
   Function.RightInverse g f :=
   by
-  unfold Function.RightInverse
+  simp only [Function.RightInverse]
   exact Function.left_id_left_inverse g f h1
 
 
@@ -131,7 +131,7 @@ theorem Function.updateITE_comp_left
     Function.updateITE (f ∘ g) a (f b) :=
   by
   funext x
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   simp
   split_ifs
   · rfl
@@ -153,20 +153,20 @@ theorem Function.updateITE_comp_right
     Function.updateITE (g ∘ f) (finv a) b :=
   by
   funext x
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   simp
   congr!
   constructor
   · intro a1
     simp only [← a1]
     obtain s1 := Function.left_id_left_inverse f finv h1
-    unfold Function.LeftInverse at s1
+    simp only [Function.LeftInverse] at s1
     simp only [s1 x]
   · intro a1
     simp only [a1]
     obtain s1 := Function.right_id_right_inverse f finv h2
-    unfold Function.RightInverse at s1
-    unfold Function.LeftInverse at s1
+    simp only [Function.RightInverse] at s1
+    simp only [Function.LeftInverse] at s1
     exact s1 a
 
 
@@ -182,10 +182,10 @@ theorem Function.updateITE_comp_right_injective
   (Function.updateITE g (f a) b) ∘ f =
     Function.updateITE (g ∘ f) a b :=
   by
-  unfold Function.Injective at h1
+  simp only [Function.Injective] at h1
 
   funext x
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   simp
   congr!
   constructor
@@ -206,7 +206,7 @@ theorem Function.updateITE_comm
     Function.updateITE (Function.updateITE f b u) a v :=
   by
   funext x
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   split_ifs
   case _ c1 c2 =>
     subst c1 c2
@@ -225,7 +225,7 @@ theorem Function.updateITE_idem
     Function.updateITE f a y :=
   by
   funext v
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   split_ifs
   · rfl
   · rfl
@@ -238,7 +238,7 @@ theorem Function.updateITE_id
   Function.updateITE (id : α → α) x x = id :=
   by
   funext v
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   split_ifs
   case _ c1 =>
     subst c1
@@ -256,7 +256,7 @@ theorem Function.updateITE_comm_id
     Function.updateITE id a b :=
   by
   funext y
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   simp
   intro a1
   subst a1
@@ -272,7 +272,7 @@ theorem Function.updateITE_coincide
   Function.updateITE f x (g x) = g :=
   by
   funext y
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   split_ifs
   case _ c1 =>
     subst c1
@@ -301,7 +301,7 @@ theorem Function.updateITE_not_mem_list
     cases h1
     case intro h1_left h1_right =>
       simp
-      unfold Function.updateITE
+      simp only [Function.updateITE]
       split_ifs <;> tauto
 
 
@@ -328,7 +328,7 @@ theorem Function.updateITE_not_mem_set
     case intro h1_left h1_right =>
     simp
     congr! 1
-    · unfold Function.updateITE
+    · simp only [Function.updateITE]
       split_ifs
       case _ c1 =>
         subst c1
@@ -349,7 +349,7 @@ theorem Function.updateITE_symm
     Function.updateITE (Function.updateITE f y d') x d :=
   by
   funext a
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   by_cases c1 : a = x
   · by_cases c2 : a = y
     · subst c1
@@ -380,17 +380,15 @@ theorem Function.updateListITE_comp
   by
   induction xs generalizing ys
   case nil =>
-    unfold Function.updateListITE
-    rfl
+    simp only [Function.updateListITE]
   case cons _ xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
       simp
-      unfold Function.updateListITE
-      rfl
+      simp only [Function.updateListITE]
     case cons ys_hd ys_tl =>
       simp
-      unfold Function.updateListITE
+      simp only [Function.updateListITE]
       simp only [← xs_ih]
       apply Function.updateITE_comp_left
 
@@ -407,18 +405,18 @@ theorem Function.updateListITE_mem'
   by
   induction xs generalizing ys
   case nil =>
-    unfold Function.updateListITE
+    simp only [Function.updateListITE]
     exact h1
   case cons _ xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
       simp
-      unfold Function.updateListITE
+      simp only [Function.updateListITE]
       exact h1
     case cons ys_hd ys_tl =>
       simp
-      unfold Function.updateListITE
-      unfold Function.updateITE
+      simp only [Function.updateListITE]
+      simp only [Function.updateITE]
       split_ifs
       · rfl
       · exact xs_ih ys_tl
@@ -446,8 +444,8 @@ theorem Function.updateListITE_mem_eq_len
     case nil =>
       contradiction
     case cons ys_hd ys_tl =>
-      unfold Function.updateListITE
-      unfold Function.updateITE
+      simp only [Function.updateListITE]
+      simp only [Function.updateITE]
       cases h1
       case inl h1 =>
         simp only [if_pos h1]
@@ -480,13 +478,13 @@ theorem Function.updateListITE_mem
     case nil =>
       simp at h1
 
-      unfold Function.updateListITE
+      simp only [Function.updateListITE]
       exact h2
     case cons ys_hd ys_tl =>
       simp at h1
 
-      unfold Function.updateListITE
-      unfold Function.updateITE
+      simp only [Function.updateListITE]
+      simp only [Function.updateITE]
       split_ifs
       case pos =>
         rfl
@@ -510,16 +508,14 @@ theorem Function.updateListITE_not_mem
   by
   induction xs generalizing ys
   case nil =>
-    unfold Function.updateListITE
-    rfl
+    simp only [Function.updateListITE]
   case cons xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
-      unfold Function.updateListITE
-      rfl
+      simp only [Function.updateListITE]
     case cons ys_hd ys_tl =>
-      unfold Function.updateListITE
-      unfold Function.updateITE
+      simp only [Function.updateListITE]
+      simp only [Function.updateITE]
       split_ifs
       case pos c1 =>
         subst c1
@@ -546,18 +542,18 @@ theorem Function.updateListITE_updateIte
   by
   induction l1 generalizing l2
   case nil =>
-    unfold Function.updateListITE
-    unfold Function.updateITE
+    simp only [Function.updateListITE]
+    simp only [Function.updateITE]
     simp only [if_neg h1]
   case cons l1_hd l1_tl l1_ih =>
     cases l2
     case nil =>
-      unfold Function.updateListITE
-      unfold Function.updateITE
+      simp only [Function.updateListITE]
+      simp only [Function.updateITE]
       simp only [if_neg h1]
     case cons l2_hd l2_tl =>
-      unfold Function.updateListITE
-      unfold Function.updateITE
+      simp only [Function.updateListITE]
+      simp only [Function.updateITE]
       split_ifs
       case pos c1 =>
         rfl
@@ -627,8 +623,8 @@ theorem Function.updateListITE_map_mem
     simp at h1
 
     simp
-    unfold Function.updateListITE
-    unfold Function.updateITE
+    simp only [Function.updateListITE]
+    simp only [Function.updateITE]
     split_ifs
     case _ c1 =>
       subst c1
@@ -653,7 +649,7 @@ theorem Function.updateListITE_map_updateIte
   by
   have s1 : ∀ y : α, y ∈ l2 → f y =Function.updateITE f v a y
   intro y a1
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   split_ifs
   case _ c1 =>
     specialize h1 y a1

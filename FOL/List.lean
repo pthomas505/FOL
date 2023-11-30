@@ -50,9 +50,9 @@ example
   (h3 : ∀ (x : α), (¬ x = a ∧ ¬ x = b) → f x = g x) :
   Function.Injective g :=
   by
-  unfold Function.Injective at h1
+  simp only [Function.Injective] at h1
 
-  unfold Function.Injective
+  simp only [Function.Injective]
   intro x1 x2 a1
   by_cases x1_a : x1 = a
   · by_cases x2_a : x2 = a
