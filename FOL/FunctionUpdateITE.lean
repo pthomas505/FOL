@@ -12,11 +12,11 @@ def Function.updateITE
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
-  (a' : α)
+  (a : α)
   (b : β)
-  (a : α) :
+  (c : α) :
   β :=
-  if a = a' then b else f a
+  if c = a then b else f c
 
 #eval Function.updateITE (fun n : ℕ => n) 5 10 1
 #eval Function.updateITE (fun n : ℕ => n) 5 10 5
@@ -29,11 +29,11 @@ def Function.updateITE'
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
-  (a' : α)
+  (a : α)
   (b : β)
-  (a : α) :
+  (c : α) :
   β :=
-  if a' = a then b else f a
+  if a = c then b else f c
 
 
 /--
