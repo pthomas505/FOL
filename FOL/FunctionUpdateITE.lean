@@ -6,7 +6,7 @@ import FOL.Tactics
 
 /--
   Specialized version of Function.update for non-dependent functions.
-  Function.updateITE f a' b := Replaces the value of f at a' by b.
+  Function.updateITE f a b := Replaces the value of f at a by b.
 -/
 def Function.updateITE
   {α β : Type}
