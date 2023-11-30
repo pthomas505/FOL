@@ -1,6 +1,9 @@
 import FOL.NV.Sub.All.Rec.SubAllRecAdmits
 
 
+set_option autoImplicit false
+
+
 namespace FOL
 
 namespace NV

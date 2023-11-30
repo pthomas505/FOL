@@ -1,5 +1,8 @@
-import Mathlib.Data.Finset.Basic
 import Mathlib.Util.CompileInductive
+import Mathlib.Data.Finset.Basic
+
+
+set_option autoImplicit false
 
 
 /--
@@ -757,15 +760,15 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
   | add_def_
     (E : Env)
     (Δ : List Formula)
-    (phi : Formula)
+    (F : Formula)
     (d : Definition) :
     (∀ d' : Definition, d' ∈ E → d.name = d'.name → d.args.length = d'.args.length → False) →
     d.F.all_def_in_env E →
     d.args.Nodup →
     (∀ v : VarName, isFreeIn v F → v ∈ d.args.toFinset) →
     d.F.predVarSet = ∅ →
-    IsDeduct E Δ phi →
-    IsDeduct (d :: E) Δ phi
+    IsDeduct E Δ F →
+    IsDeduct (d :: E) Δ F
 
   | unfold_def_
     (E : Env)
@@ -788,6 +791,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     IsDeduct E (Δ.map (replacePredFun τ)) (replacePredFun τ phi)
 
   | thm
+    (E : Env)
     (Δ Δ' : List Formula)
     (phi : Formula)
     (σ : Instantiation) :

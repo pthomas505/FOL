@@ -1,5 +1,8 @@
-import FOL.NV.PredSub.All.Rec.PredSubAllRecOption
 import FOL.NV.Alpha
+import FOL.NV.PredSub.All.Rec.PredSubAllRecOption
+
+
+set_option autoImplicit false
 
 
 namespace FOL
@@ -70,6 +73,7 @@ def subPredAlphaAux
 example
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
+  (α : VarName → VarName)
   (F : Formula) :
   AlphaEqv F (subPredAlphaAux c τ α F) :=
   by

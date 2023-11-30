@@ -3,6 +3,9 @@ import FOL.NV.Definition
 import FOL.FunctionUpdateITE
 
 
+set_option autoImplicit false
+
+
 namespace FOL
 
 namespace NV

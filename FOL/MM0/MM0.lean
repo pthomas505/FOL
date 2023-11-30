@@ -3,6 +3,9 @@ import FOL.FunctionUpdateITE
 import Mathlib.Util.CompileInductive
 
 
+set_option autoImplicit false
+
+
 namespace MM0
 
 

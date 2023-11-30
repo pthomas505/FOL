@@ -1,5 +1,8 @@
-import FOL.NV.Sub.All.Rec.SubAllRecReplaceFree
 import FOL.NV.Semantics
+import FOL.NV.Sub.All.Rec.SubAllRecReplaceFree
+
+
+set_option autoImplicit false
 
 
 namespace FOL

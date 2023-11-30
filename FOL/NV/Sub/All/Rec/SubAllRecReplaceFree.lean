@@ -1,5 +1,8 @@
-import FOL.NV.Sub.One.Rec.SubOneRecReplaceFree
 import FOL.FunctionUpdateITE
+import FOL.NV.Sub.One.Rec.SubOneRecReplaceFree
+
+
+set_option autoImplicit false
 
 
 namespace FOL

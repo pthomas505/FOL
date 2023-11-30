@@ -1,5 +1,8 @@
-import FOL.NV.Margaris.Deduct
 import FOL.FunctionUpdateITE
+import FOL.NV.Margaris.Deduct
+
+
+set_option autoImplicit false
 
 
 namespace FOL

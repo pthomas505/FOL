@@ -1,6 +1,9 @@
 import FOL.FunctionUpdateITE
 
 
+set_option autoImplicit false
+
+
 theorem List.map_eq_self_iff
   {α : Type}
   (xs : List α)

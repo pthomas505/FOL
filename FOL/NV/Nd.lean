@@ -5,6 +5,9 @@ import FOL.NV.PredSub.All.Rec.PredSubAllRec
 import Mathlib.Data.Finset.Basic
 
 
+set_option autoImplicit false
+
+
 namespace FOL
 
 namespace NV

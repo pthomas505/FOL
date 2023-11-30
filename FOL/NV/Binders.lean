@@ -1,5 +1,10 @@
 import FOL.NV.Formula
+
 import Mathlib.Tactic
+
+
+set_option autoImplicit false
+
 
 namespace FOL
 

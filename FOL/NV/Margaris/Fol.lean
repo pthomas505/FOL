@@ -1,6 +1,9 @@
 import FOL.NV.Margaris.Prop
 
 
+set_option autoImplicit false
+
+
 namespace FOL
 
 namespace NV

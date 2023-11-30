@@ -1,6 +1,9 @@
 import FOL.NV.Semantics
 
 
+set_option autoImplicit false
+
+
 namespace FOL
 
 namespace NV
@@ -32,7 +35,7 @@ def replacePropFun (τ : PredName → PredName) : Formula → Formula
   | def_ P ts => def_ P ts
 
 
-instance {xs : List α} : Decidable (xs = []) :=
+instance {α : Type} {xs : List α} : Decidable (xs = []) :=
   by
   cases xs
   case nil =>

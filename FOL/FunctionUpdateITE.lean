@@ -1,6 +1,9 @@
 import Mathlib.Tactic
 
 
+set_option autoImplicit false
+
+
 /--
   Specialized version of Function.update for non-dependent functions.
   Function.updateITE f a b := Replaces the value of f at a by b.

@@ -2,6 +2,9 @@ import FOL.NV.Formula
 import FOL.NV.Binders
 
 
+set_option autoImplicit false
+
+
 namespace FOL
 
 namespace NV

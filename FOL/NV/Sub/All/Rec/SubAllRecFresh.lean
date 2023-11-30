@@ -1,12 +1,13 @@
+import FOL.FunctionUpdateITE
 import FOL.NV.Formula
 import FOL.NV.Binders
 import FOL.NV.Semantics
-import FOL.NV.Fresh
-
-import FOL.NV.Sub.All.Rec.SubAllRecAdmits
 import FOL.NV.Alpha
+import FOL.NV.Fresh
+import FOL.NV.Sub.All.Rec.SubAllRecAdmits
 
-import FOL.FunctionUpdateITE
+
+set_option autoImplicit false
 
 
 namespace FOL

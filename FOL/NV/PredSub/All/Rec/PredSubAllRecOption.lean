@@ -1,6 +1,9 @@
 import FOL.NV.Sub.All.Rec.SubAllRecFresh
 
 
+set_option autoImplicit false
+
+
 namespace FOL
 
 namespace NV

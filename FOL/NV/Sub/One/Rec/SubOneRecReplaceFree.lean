@@ -1,5 +1,8 @@
-import FOL.NV.Binders
 import FOL.List
+import FOL.NV.Binders
+
+
+set_option autoImplicit false
 
 
 namespace FOL

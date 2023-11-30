@@ -1,7 +1,10 @@
+import FOL.NV.Program.Editor
+
 import Std.Data.String.Basic
 import Mathlib.Control.Basic
 
-import FOL.NV.Program.Editor
+
+set_option autoImplicit false
 
 
 def isAlpha (c : Char) : Bool :=
