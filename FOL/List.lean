@@ -4,18 +4,18 @@ import FOL.Tactics
 
 theorem List.map_eq_self_iff
   {α : Type}
-  {f : α → α}
-  (l : List α) :
-  List.map f l = l ↔
-    ∀ (x : α), x ∈ l → f x = x :=
+  (xs : List α)
+  (f : α → α) :
+  List.map f xs = xs ↔
+    ∀ (x : α), x ∈ xs → f x = x :=
   by
-  induction l
+  induction xs
   case nil =>
     simp
-  case cons l_hd l_tl l_ih =>
+  case cons hd tl ih =>
     simp
     intro _
-    exact l_ih
+    exact ih
 
 
 lemma List.map_mem_id
@@ -47,7 +47,7 @@ example
   (h1 : Function.Injective f)
   (h2_left : g a = f b)
   (h2_right : g b = f a)
-  (h3 : ∀ x : α, (¬ x = a ∧ ¬ x = b) → f x = g x) :
+  (h3 : ∀ (x : α), (¬ x = a ∧ ¬ x = b) → f x = g x) :
   Function.Injective g :=
   by
   unfold Function.Injective at h1
