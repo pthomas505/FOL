@@ -1,6 +1,5 @@
 import FOL.NV.Binders
 import FOL.List
-import FOL.Tactics
 
 
 namespace FOL

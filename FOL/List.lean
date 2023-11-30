@@ -1,5 +1,4 @@
 import FOL.FunctionUpdateITE
-import FOL.Tactics
 
 
 theorem List.map_eq_self_iff

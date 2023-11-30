@@ -1,5 +1,4 @@
 import FOL.NV.Sub.All.Rec.SubAllRecAdmits
-import FOL.Tactics
 
 
 namespace FOL

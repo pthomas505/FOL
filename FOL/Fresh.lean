@@ -1,5 +1,4 @@
-import FOL.Tactics
-
+import Mathlib.Tactic
 import Mathlib.Data.String.Lemmas
 
 set_option autoImplicit false

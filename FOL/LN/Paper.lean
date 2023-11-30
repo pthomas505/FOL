@@ -2,7 +2,6 @@ import FOL.LN.Binders
 import FOL.LN.Semantics
 import FOL.List
 import FOL.Finset
-import FOL.Tactics
 
 set_option autoImplicit false
 

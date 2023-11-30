@@ -1,5 +1,4 @@
 import FOL.NV.Sub.All.Rec.SubAllRecAdmits
-import FOL.Tactics
 
 
 namespace FOL
@@ -123,7 +122,7 @@ lemma replacePred_no_predVar
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     unfold predVarSet at h1
-    simp only [Finset.union_eq_empty_iff] at h1
+    simp only [Finset.union_eq_empty] at h1
 
     cases h1
     case intro h1_left h1_right =>

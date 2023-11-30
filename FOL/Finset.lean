@@ -1,4 +1,4 @@
-import FOL.Tactics
+import Mathlib.Tactic
 
 set_option autoImplicit false
 

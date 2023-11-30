@@ -1,6 +1,5 @@
 import FOL.NV.Formula
-import FOL.Tactics
-
+import Mathlib.Tactic
 
 namespace FOL
 

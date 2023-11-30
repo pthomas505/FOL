@@ -1,5 +1,4 @@
 import FOL.NV.Semantics
-import FOL.Tactics
 
 
 namespace FOL

@@ -1,5 +1,4 @@
 import FOL.FunctionUpdateITE
-import FOL.Tactics
 
 import Mathlib.Util.CompileInductive
 
@@ -669,6 +668,7 @@ theorem no_meta_var_imp_meta_var_set_is_empty
     case intro h1_left h1_right =>
       simp only [phi_ih vs h1_left]
       simp only [psi_ih vs h1_right]
+      simp
   case forall_ x phi phi_ih =>
     unfold NoMetaVarAndAllFreeInList at h1
 
@@ -794,13 +794,13 @@ theorem sub_preserves_empty_meta_var_set
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
     unfold Formula.metaVarSet at h1
-    simp only [Finset.union_eq_empty_iff] at h1
+    simp only [Finset.union_eq_empty] at h1
 
     unfold sub
     unfold Formula.metaVarSet
     cases h1
     case intro h1_left h1_right =>
-      simp only [Finset.union_eq_empty_iff]
+      simp only [Finset.union_eq_empty]
       constructor
       · exact phi_ih h1_left
       · exact psi_ih h1_right
@@ -839,7 +839,7 @@ theorem no_meta_var_imp_meta_instantiation_irrelevance_in_sub
     exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
     unfold Formula.metaVarSet at h1
-    simp only [Finset.union_eq_empty_iff] at h1
+    simp only [Finset.union_eq_empty] at h1
 
     unfold sub
     cases h1
@@ -1706,7 +1706,6 @@ theorem not_free_imp_is_not_free
 
       unfold IsNotFree at h2
       simp only [Holds] at h2
-      simp only [Function.updateITE] at h2
 
       unfold IsNotFree at E_ih
       simp only [Holds] at E_ih

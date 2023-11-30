@@ -1,6 +1,5 @@
 import FOL.NV.Sub.One.Rec.SubOneRecReplaceFree
 import FOL.FunctionUpdateITE
-import FOL.Tactics
 
 
 namespace FOL

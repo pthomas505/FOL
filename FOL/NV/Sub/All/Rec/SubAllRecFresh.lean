@@ -7,7 +7,6 @@ import FOL.NV.Sub.All.Rec.SubAllRecAdmits
 import FOL.NV.Alpha
 
 import FOL.FunctionUpdateITE
-import FOL.Tactics
 
 
 namespace FOL

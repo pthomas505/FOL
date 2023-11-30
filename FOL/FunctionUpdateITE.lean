@@ -1,7 +1,4 @@
-import Std.Tactic.Lint.Frontend
 import Mathlib.Tactic
-
-import FOL.Tactics
 
 
 /--
@@ -100,13 +97,13 @@ lemma Function.updateITE_eq_Function.updateITE'
   {α β : Type}
   [DecidableEq α]
   (f : α → β)
-  (a' : α)
+  (a : α)
   (b : β) :
-  Function.updateITE f a' b = Function.updateITE' f a' b :=
+  Function.updateITE f a b = Function.updateITE' f a b :=
   by
+  funext a
   simp only [Function.updateITE]
   simp only [Function.updateITE']
-  funext a
   split_ifs
   case _ c1 c2 =>
     rfl
@@ -131,8 +128,8 @@ theorem Function.updateITE_comp_left
     Function.updateITE (f ∘ g) a (f b) :=
   by
   funext x
-  simp only [Function.updateITE]
   simp
+  simp only [Function.updateITE]
   split_ifs
   · rfl
   · rfl
@@ -153,8 +150,8 @@ theorem Function.updateITE_comp_right
     Function.updateITE (g ∘ f) (finv a) b :=
   by
   funext x
-  simp only [Function.updateITE]
   simp
+  simp only [Function.updateITE]
   congr!
   constructor
   · intro a1
@@ -185,8 +182,8 @@ theorem Function.updateITE_comp_right_injective
   simp only [Function.Injective] at h1
 
   funext x
-  simp only [Function.updateITE]
   simp
+  simp only [Function.updateITE]
   congr!
   constructor
   · apply h1

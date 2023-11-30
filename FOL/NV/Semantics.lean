@@ -1,7 +1,6 @@
 import FOL.NV.Binders
 import FOL.NV.Definition
 import FOL.FunctionUpdateITE
-import FOL.Tactics
 
 
 namespace FOL

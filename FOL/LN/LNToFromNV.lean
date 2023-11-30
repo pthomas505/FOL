@@ -1,6 +1,5 @@
 import FOL.LN.Binders
 import FOL.Fresh
-import FOL.Tactics
 
 
 set_option autoImplicit false

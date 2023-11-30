@@ -1,6 +1,5 @@
 import FOL.NV.Margaris.Deduct
 import FOL.FunctionUpdateITE
-import FOL.Tactics
 
 
 namespace FOL

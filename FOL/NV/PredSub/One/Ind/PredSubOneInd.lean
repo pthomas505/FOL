@@ -156,7 +156,7 @@ theorem isPredSub_theorem
     apply Holds_coincide_PredVar
     · exact h3_const
     · intro X ds a1
-      simp at a1
+      simp only [predVarOccursIn] at a1
       cases a1
       case intro a1_left a1_right =>
         subst a1_left

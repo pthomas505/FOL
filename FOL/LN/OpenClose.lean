@@ -1,7 +1,6 @@
 import FOL.LN.Binders
 import FOL.LN.Semantics
 import FOL.List
-import FOL.Tactics
 import FOL.FunctionUpdateITE
 
 set_option autoImplicit false

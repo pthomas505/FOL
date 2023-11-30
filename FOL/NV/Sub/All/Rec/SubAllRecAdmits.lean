@@ -1,6 +1,5 @@
 import FOL.NV.Sub.All.Rec.SubAllRecReplaceFree
 import FOL.NV.Semantics
-import FOL.Tactics
 
 
 namespace FOL
