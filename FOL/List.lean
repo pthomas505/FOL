@@ -1,4 +1,3 @@
-import Mathlib.Data.List.Card
 import FOL.FunctionUpdateITE
 import FOL.Tactics
 
@@ -8,7 +7,7 @@ theorem List.map_eq_self_iff
   {f : α → α}
   (l : List α) :
   List.map f l = l ↔
-    ∀ x : α, x ∈ l → f x = x :=
+    ∀ (x : α), x ∈ l → f x = x :=
   by
   induction l
   case nil =>
@@ -37,22 +36,6 @@ lemma List.map_mem_id
       constructor
       · exact h1_left
       · exact ih h1_right
-
-
-theorem list_zipWith_of_map
-  {α β γ : Type}
-  (l : List α)
-  (f : α → β)
-  (g : α → β → γ) :
-  List.zipWith g l (List.map f l) =
-    List.map (fun x : α => g x (f x)) l :=
-  by
-  induction l
-  case nil =>
-    simp
-  case cons hd tl ih =>
-    simp
-    exact ih
 
 
 example
