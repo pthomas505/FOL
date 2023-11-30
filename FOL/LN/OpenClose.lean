@@ -2,6 +2,7 @@ import FOL.LN.Binders
 import FOL.LN.Semantics
 import FOL.List
 import FOL.Tactics
+import FOL.FunctionUpdateITE
 
 set_option autoImplicit false
 
@@ -1620,6 +1621,18 @@ example
     simp only [Holds]
     apply forall_congr'
     intro d
+
+    simp only [← lc_at_iff_lc] at ih_1
+    obtain s1 := lc_at_instantiate phi 0 [z]
+    simp at s1
+    simp only [s1] at ih_1
+    clear s1
+
+    specialize ih_2 (shift D V d)
+
+    obtain s2 := Holds_abstract_instantiate
+
+
     sorry
 
 
@@ -1671,8 +1684,91 @@ example
     simp only [Holds]
     apply forall_congr'
     intro d
+
+    obtain s1 := Holds_abstract_instantiate
     sorry
   all_goals
     sorry
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (x : String)
+  (F : Formula)
+  (z : String) :
+ ∀ (d : D), (shift D V d)
+↔ ∀ (d : D), (Function.updateITE V (free_ z) d ∘ Var.instantiate 0 [free_ z]) F :=
+
+example
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (x : String)
+  (F : Formula)
+  (z : String)
+  (h1 : (free_ z) ∉ F.freeVarSet) :
+  Holds D I V (forall_ x F) ↔ ∀ (d : D), Holds D I (Function.updateITE V (free_ z) d) (instantiate 0 [free_ z] F) :=
+  by
+  simp only [Holds]
+  apply forall_congr'
+  intro d
+
+
+  induction F generalizing V
+  case pred_ X vs =>
+    simp only [Formula.freeVarSet] at h1
+    simp at h1
+    simp only [Formula.instantiate]
+    simp only [Holds]
+    simp
+    apply forall_congr'
+    intro d
+    congr! 1
+    simp only [List.map_eq_map_iff]
+    intro v a1
+    simp
+
+    cases v
+    case _ b =>
+      simp only [Var.instantiate]
+      simp only [shift]
+      specialize h1 (free_ b) a1
+      simp only [Var.freeVarSet] at h1
+      simp at h1
+      simp only [Function.updateITE]
+      simp
+      split_ifs
+      case _ c1 =>
+        simp only [c1] at h1
+      case _ c1 =>
+        rfl
+    case _ i =>
+      cases i
+      case zero =>
+        simp only [Var.instantiate]
+        simp only [shift]
+        simp
+        simp only [Function.updateITE]
+        simp
+      case succ i =>
+        simp only [Var.instantiate]
+        simp only [shift]
+        simp
+        simp only [Function.updateITE]
+        simp
+  case forall_ x' phi phi_ih =>
+    simp only [Formula.freeVarSet] at h1
+    simp only [Formula.instantiate]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    simp only [Holds] at phi_ih
+    rw [phi_ih]
+    apply forall_congr'
+    intro a
+
+
+
 
 --#lint

@@ -51,14 +51,14 @@ def subPredAlphaAux
       (subPredAlphaAux c τ α phi)
       (subPredAlphaAux c τ α psi)
   | forall_ x phi =>
-      let vs : Finset VarName := Finset.biUnion phi.predVarSet (predVarFreeVarSet τ)
+      let vs : Finset VarName := sorry
       let x' : VarName :=
         if x ∈ vs
         then fresh x c vs
         else x
       forall_ x' (subPredAlphaAux c τ (Function.updateITE α x x') phi)
   | exists_ x phi =>
-      let vs : Finset VarName := Finset.biUnion phi.predVarSet (predVarFreeVarSet τ)
+      let vs : Finset VarName := sorry
       let x' : VarName :=
         if x ∈ vs
         then fresh x c vs
@@ -71,13 +71,13 @@ example
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (F : Formula) :
-  AlphaEqv F (subPredAlphaAux c τ id F) :=
+  AlphaEqv F (subPredAlphaAux c τ α F) :=
   by
   induction F
   case pred_var_ X xs =>
     simp only [subPredAlphaAux]
-    simp
-    apply AlphaEqv.refl_
+    sorry
+
   case forall_ x phi phi_ih =>
     simp only [subPredAlphaAux]
 
@@ -87,16 +87,10 @@ example
 
     split_ifs
     case pos c1 =>
-      have s2 : ¬ x' = x
-      intro contra
-      subst contra
-      apply s1
-      exact c1
+
       sorry
     case neg c1 =>
-      simp only [Function.updateITE_id]
-      apply AlphaEqv.compat_forall_
-      apply phi_ih
+      sorry
   all_goals
     sorry
 
@@ -177,7 +171,7 @@ example
       intro contra
       subst contra
       apply s1
-      exact c1
+      sorry
 
       apply phi_ih
       intro x_1 a1
@@ -188,7 +182,7 @@ example
         exact c2
       case _ c2 =>
         subst c2
-        exact s1
+        sorry
     case neg c1 =>
       apply phi_ih
       intro x_1 a1
@@ -199,4 +193,4 @@ example
         exact c2
       case _ c2 =>
         subst c2
-        exact c1
+        sorry

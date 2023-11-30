@@ -1255,6 +1255,109 @@ lemma Formula.OpenListLC
     exact phi_ih (j + 1) h1
 
 
+lemma lc_at_instantiate
+  (F : Formula)
+  (j : ℕ)
+  (zs : List String) :
+  Formula.lc_at j (Formula.openList j (zs.map Var.free_) F) ↔ Formula.lc_at (j + zs.length) F :=
+  by
+  induction F generalizing j zs
+  case pred_ X vs =>
+    simp only [Formula.openList]
+    simp only [Formula.lc_at]
+    constructor
+    · intro a1 v a2
+      specialize a1 (Var.openList j (List.map free_ zs) v)
+      simp at a1
+      specialize a1 v a2
+      simp at a1
+      cases v
+      case _ x =>
+        simp only [Var.lc_at]
+      case _ i =>
+        simp only [Var.lc_at]
+        simp only [Var.openList] at a1
+        split at a1
+        case _ c1 =>
+          linarith
+        case _ c1 =>
+          split at a1
+          case _ c2 =>
+            simp at c2
+            exact lt_add_of_tsub_lt_left c2
+          case _ c2 =>
+            simp only [Var.lc_at] at a1
+            simp at a1
+    · intro a1 v a2
+      cases v
+      case _ x =>
+        simp only [Var.lc_at]
+      case _ i =>
+        simp only [Var.lc_at]
+        simp at a2
+        apply Exists.elim a2
+        intro z a3
+        clear a2
+        cases a3
+        case _ a3_left a3_right =>
+          specialize a1 z a3_left
+          cases z
+          case _ x =>
+            simp only [Var.openList] at a3_right
+          case _ i' =>
+            simp only [Var.lc_at] at a1
+            simp only [Var.openList] at a3_right
+            split at a3_right
+            case _ c1 =>
+              simp at a3_right
+              subst a3_right
+              exact c1
+            case _ c1 =>
+              simp at c1
+              simp at a3_right
+              split at a3_right
+              case _ c2 =>
+                contradiction
+              case _ c2 =>
+                exfalso
+                apply c2
+                exact Nat.sub_lt_left_of_lt_add c1 a1
+  case not_ phi phi_ih =>
+    simp only [Formula.openList]
+    simp only [Formula.lc_at]
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    simp only [Formula.openList]
+    simp only [Formula.lc_at]
+    congr! 1
+    · apply phi_ih
+    · apply psi_ih
+  case forall_ _ phi phi_ih =>
+    simp only [Formula.openList]
+    simp only [Formula.lc_at]
+    simp only [phi_ih]
+    have s1 : j + 1 + List.length zs = j + List.length zs + 1
+    linarith;
+    simp only [s1]
+
+
+example
+  (τ : String → ℕ → Formula)
+  (j j' : ℕ)
+  (zs zs' : List String)
+  (F : Formula) :
+  predSub τ (Formula.openList j (zs.map free_) F) = Formula.openList j' (zs'.map free_) (predSub τ F) := by
+  induction F generalizing j j'
+  case pred_ X vs =>
+    simp only [predSub]
+    simp
+    sorry
+  case forall_ x phi phi_ih =>
+    simp only [predSub]
+    simp only [Formula.openList]
+    simp only [phi_ih (j + 1) (j' + 1)]
+
+
 example
   (D : Type)
   (I : Interpretation D)
@@ -1299,10 +1402,28 @@ example
 
     simp only [predSub]
 
+    obtain s0 := lc_at_instantiate phi 0 [z]
+    simp at s0
+    simp only [s0] at ih_1
+    clear s0
+
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+
+
     obtain s1 := HoldsForall D I V x (predSub τ phi) z
+    simp only [Holds] at s1
 
     obtain s2 := ShiftListVarOpenList D V [z]
     simp at s2
+
+    obtain s3 := Formula.OpenListLC phi 1 [z] ih_1
+    simp at s3
+
+    obtain s4 := HoldsClose D I V z
+
+
 
     sorry
   all_goals
