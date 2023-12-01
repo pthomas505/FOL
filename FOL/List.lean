@@ -67,7 +67,7 @@ example
         · specialize h3 x2
           simp at h3
           specialize h3 x2_a x2_b
-          simp only [<- a1] at h3
+          simp only [← a1] at h3
           simp only [x1_a] at h3
           simp only [h2_left] at h3
           specialize h1 h3
@@ -76,13 +76,13 @@ example
         · subst x1_a
           subst x2_b
           apply h1
-          simp only [<- h2_left]
-          simp only [<- h2_right]
+          simp only [← h2_left]
+          simp only [← h2_right]
           simp only [a1]
         · specialize h3 x2
           simp at h3
           specialize h3 x2_a x2_b
-          simp only [<- a1] at h3
+          simp only [← a1] at h3
           simp only [x1_a] at h3
           simp only [h2_left] at h3
           specialize h1 h3
@@ -92,8 +92,8 @@ example
       · subst x1_b
         subst x2_a
         apply h1
-        simp only [<- h2_left]
-        simp only [<- h2_right]
+        simp only [← h2_left]
+        simp only [← h2_right]
         simp only [a1]
       · by_cases x2_b : x2 = b
         · specialize h3 x1
@@ -119,7 +119,7 @@ example
         · specialize h3 x2
           simp at h3
           specialize h3 x2_a x2_b
-          simp only [<- a1] at h3
+          simp only [← a1] at h3
           simp only [x1_b] at h3
           simp only [h2_right] at h3
           specialize h1 h3
@@ -164,7 +164,7 @@ lemma List.nodup_eq_len_imp_exists_bijon
   (h1 : xs.length = ys.length)
   (h2 : xs.Nodup)
   (h3 : ys.Nodup) :
-  ∃ f : α → α, List.InjOn f xs ∧ xs.map f = ys :=
+  ∃ (f : α → α), List.InjOn f xs ∧ xs.map f = ys :=
   by
   induction xs generalizing ys
   case nil =>
