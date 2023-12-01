@@ -47,7 +47,7 @@ def Function.updateListITE
   [DecidableEq α]
   (f : α → β) :
   List α → List β → α → β
-  | x::xs, y::ys => Function.updateITE (Function.updateListITE f xs ys) x y
+  | x :: xs, y :: ys => Function.updateITE (Function.updateListITE f xs ys) x y
   | _, _ => f
 
 #eval Function.updateListITE (fun n : ℕ => n) [5, 10, 5] [10, 20, 30] 5
