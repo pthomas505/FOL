@@ -57,7 +57,7 @@ instance (E : Env) (F : Formula) : Decidable (F.all_def_in_env E) :=
   by
   induction F
   all_goals
-    unfold Formula.all_def_in_env
+    simp only [Formula.all_def_in_env]
     infer_instance
 
 

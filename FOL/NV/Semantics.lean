@@ -106,7 +106,7 @@ theorem Holds_coincide_Var
   (V V' : VarAssignment D)
   (E : Env)
   (F : Formula)
-  (h1 : ∀ v : VarName, isFreeIn v F → V v = V' v) :
+  (h1 : ∀ (v : VarName), isFreeIn v F → V v = V' v) :
   Holds D I V E F ↔ Holds D I V' E F :=
   by
   induction E generalizing F V V'
