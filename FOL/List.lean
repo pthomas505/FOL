@@ -149,9 +149,11 @@ example
           exact a1
 
 
+/--
+  List.InjOn f l := f is injective on l if the restriction of f to l is injective.
+-/
 def List.InjOn
   {α : Type}
-  [DecidableEq α]
   (f : α → α)
   (l : List α) :
   Prop := ∀ ⦃x₁ : α⦄, x₁ ∈ l → ∀ ⦃x₂ : α⦄, x₂ ∈ l → f x₁ = f x₂ → x₁ = x₂
@@ -265,4 +267,4 @@ theorem nodup_eq_len_imp_eqv
   by sorry
 
 
---#lint
+#lint
