@@ -1,7 +1,6 @@
 import FOL.FunctionUpdateITE
 import FOL.List
 import FOL.Finset
-import FOL.Fresh
 
 import FOL.NV.Fresh
 import FOL.NV.Formula
