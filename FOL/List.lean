@@ -6,8 +6,8 @@ set_option autoImplicit false
 
 theorem List.map_eq_self_iff
   {α : Type}
-  (xs : List α)
-  (f : α → α) :
+  (f : α → α)
+  (xs : List α) :
   List.map f xs = xs ↔
     ∀ (x : α), x ∈ xs → f x = x :=
   by
@@ -22,8 +22,8 @@ theorem List.map_eq_self_iff
 
 lemma List.map_mem_id
   {α : Type}
-  (xs: List α)
   (f : α → α)
+  (xs: List α)
   (h1: ∀ (x : α), x ∈ xs → f x = x) :
   List.map f xs = xs :=
   by
@@ -150,13 +150,13 @@ example
 
 
 /--
-  List.InjOn f l := f is injective on l if the restriction of f to l is injective.
+  List.InjOn f xs := f is injective on xs if the restriction of f to xs is injective.
 -/
 def List.InjOn
   {α : Type}
   (f : α → α)
-  (l : List α) :
-  Prop := ∀ ⦃x₁ : α⦄, x₁ ∈ l → ∀ ⦃x₂ : α⦄, x₂ ∈ l → f x₁ = f x₂ → x₁ = x₂
+  (xs : List α) :
+  Prop := ∀ ⦃x₁ : α⦄, x₁ ∈ xs → ∀ ⦃x₂ : α⦄, x₂ ∈ xs → f x₁ = f x₂ → x₁ = x₂
 
 
 lemma List.nodup_eq_len_imp_exists_bijon
@@ -263,7 +263,7 @@ theorem nodup_eq_len_imp_eqv
   (h1 : xs.length = ys.length)
   (h2 : xs.Nodup)
   (h3 : ys.Nodup) :
-  ∃ f : α ≃ α, xs.map f = ys :=
+  ∃ (f : α ≃ α), List.map f xs = ys :=
   by sorry
 
 
