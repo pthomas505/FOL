@@ -14,6 +14,8 @@ namespace NV
 open Formula
 
 
+-- File to be deleted in favor of FOL.Fresh.lean
+
 def finset_var_name_max_len :
   Finset VarName → ℕ :=
   Finset.fold (fun (m n : ℕ) => max m n) 0 (String.length ∘ VarName.toString)
