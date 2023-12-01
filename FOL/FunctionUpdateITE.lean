@@ -269,7 +269,7 @@ theorem Function.updateITE_coincide
   [DecidableEq α]
   (f g : α → β)
   (a : α)
-  (h1 : ∀ x : α, ¬ x = a → f x = g x) :
+  (h1 : ∀ (x : α), ¬ x = a → f x = g x) :
   Function.updateITE f a (g a) = g :=
   by
   funext x
@@ -591,7 +591,7 @@ theorem Function.updateListITE_map_mem_ext
   (xs ys : List α)
   (f g h h' : α → β)
   (x : α)
-  (h1 : ∀ y : α, y ∈ ys → h y = h' y)
+  (h1 : ∀ (y : α), y ∈ ys → h y = h' y)
   (h2 : xs.length = ys.length)
   (h3 : x ∈ xs) :
   Function.updateListITE f xs (List.map h ys) x =
@@ -642,13 +642,13 @@ theorem Function.updateListITE_map_updateIte
   (v : α)
   (a : β)
   (x : α)
-  (h1 : ∀ y : α, y ∈ ys → ¬ y = v)
+  (h1 : ∀ (y : α), y ∈ ys → ¬ y = v)
   (h2 : xs.length = ys.length)
   (h3 : x ∈ xs) :
   Function.updateListITE f xs (List.map f ys) x =
   Function.updateListITE g xs (List.map (Function.updateITE f v a) ys) x :=
   by
-  have s1 : ∀ y : α, y ∈ ys → f y =Function.updateITE f v a y
+  have s1 : ∀ (y : α), y ∈ ys → f y =Function.updateITE f v a y
   intro y a1
   simp only [Function.updateITE]
   split_ifs
