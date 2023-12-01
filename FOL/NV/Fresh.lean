@@ -14,6 +14,9 @@ namespace NV
 open Formula
 
 
+/--
+  finset_string_max_len xs := The length of the longest string in the finite set of strings xs or 0 if the set is empty.
+-/
 def finset_var_name_max_len :
   Finset VarName → ℕ :=
   Finset.fold (fun (m n : ℕ) => max m n) 0 (String.length ∘ VarName.toString)
@@ -45,6 +48,9 @@ lemma finset_var_name_max_len_mem
       exact ih c1
 
 
+/--
+  fresh x c xs := If the string x is not a member of the finite set of strings xs then x is returned. If x is a member of xs then the character c is repeatedly appended to x until the resulting string is not a member of xs. The resulting string is then returned.
+-/
 def fresh
   (x : VarName)
   (c : Char)
