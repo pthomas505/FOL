@@ -28,6 +28,9 @@ instance : Membership Definition Env :=
   inferInstanceAs (Membership Definition (List Definition))
 
 
+/--
+  Formula.all_def_in_env E F := True if and only if every definition that occurs in the formula F is in the environment E.
+-/
 def Formula.all_def_in_env (E : Env) : Formula → Prop
 | pred_const_ _ _ => True
 | pred_var_ _ _ => True
