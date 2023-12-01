@@ -15,6 +15,9 @@ namespace NV
 open Formula
 
 
+/--
+  IsDeduct Δ F := True if and only if there is a deduction of F from Δ in classical propositional logic.
+-/
 inductive IsDeduct : Finset Formula → Formula → Prop
   | true_intro_
     (Δ : Finset Formula) :
@@ -197,4 +200,4 @@ inductive IsDeduct : Finset Formula → Formula → Prop
     IsDeduct Δ psi
 
 
---#lint
+#lint
