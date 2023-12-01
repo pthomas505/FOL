@@ -28,12 +28,12 @@ lemma finset_string_max_len_mem
     cases h1
     case inl c1 =>
       subst c1
-      unfold finset_string_max_len
+      simp only [finset_string_max_len]
       simp
     case inr c1 =>
-      unfold finset_string_max_len at ih
+      simp only [finset_string_max_len] at ih
 
-      unfold finset_string_max_len
+      simp only [finset_string_max_len]
       simp
       right
       exact ih c1
