@@ -37,12 +37,12 @@ lemma finset_var_name_max_len_mem
     cases h1
     case inl c1 =>
       subst c1
-      unfold finset_var_name_max_len
+      simp only [finset_var_name_max_len]
       simp
     case inr c1 =>
-      unfold finset_var_name_max_len at ih
+      simp only [finset_var_name_max_len] at ih
 
-      unfold finset_var_name_max_len
+      simp only [finset_var_name_max_len]
       simp
       right
       exact ih c1
@@ -91,3 +91,6 @@ lemma fresh_not_mem
     simp [if_neg h]
     exact h
   termination_by fresh_not_mem x _ xs => finset_var_name_max_len xs + 1 - x.length
+
+
+#lint
