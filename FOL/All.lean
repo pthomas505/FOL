@@ -6,7 +6,6 @@ import FOL.NV.Fresh
 import FOL.NV.Formula
 import FOL.NV.Binders
 import FOL.NV.Definition
-import FOL.NV.Nd
 import FOL.NV.Semantics
 
 import FOL.NV.Sub.One.Ind.SubOneInd
