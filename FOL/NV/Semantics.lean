@@ -48,7 +48,7 @@ def VarAssignment (D : Type) : Type := VarName → D
 
 instance (D : Type) [Inhabited D] : Inhabited (VarAssignment D) :=
   by
-  unfold VarAssignment
+  simp only [VarAssignment]
   exact inferInstance
 
 
@@ -94,7 +94,7 @@ termination_by _ E phi => (E.length, phi)
 /--
   The definition of valid formulas.
 
-  Formula.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation and variable assignment.
+  Formula.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation, variable assignment and environment.
 -/
 def Formula.IsValid (F : Formula) : Prop :=
   ∀ (D : Type) (I : Interpretation D) (V : VarAssignment D) (E : Env), Holds D I V E F
@@ -113,14 +113,14 @@ theorem Holds_coincide_Var
   all_goals
     induction F generalizing V V'
     case pred_const_ X xs | pred_var_ X xs =>
-      unfold isFreeIn at h1
+      simp only [isFreeIn] at h1
 
       simp only [Holds]
       congr! 1
       simp only [List.map_eq_map_iff]
       exact h1
     case eq_ x y =>
-      unfold isFreeIn at h1
+      simp only [isFreeIn] at h1
       simp at h1
 
       simp only [Holds]
@@ -138,7 +138,7 @@ theorem Holds_coincide_Var
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      unfold isFreeIn at h1
+      simp only [isFreeIn] at h1
 
       simp only [Holds]
       congr! 1
@@ -153,7 +153,7 @@ theorem Holds_coincide_Var
         right
         exact a1
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      unfold isFreeIn at h1
+      simp only [isFreeIn] at h1
       simp at h1
 
       simp only [Holds]
@@ -169,11 +169,10 @@ theorem Holds_coincide_Var
         exact h1 v c1 a1
 
   case nil.def_ X xs =>
-    unfold Holds
-    rfl
+    simp only [Holds]
 
   case cons.def_ hd tl ih X xs =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
     simp only [Holds]
     split_ifs
@@ -194,7 +193,7 @@ theorem Holds_coincide_Var
           exact c1_right
     case neg c1 =>
       apply ih
-      unfold isFreeIn
+      simp only [isFreeIn]
       exact h1
 
 
@@ -214,26 +213,24 @@ theorem Holds_coincide_PredVar
   all_goals
     induction F generalizing V
     case pred_const_ X xs =>
-      unfold Holds
+      simp only [Holds]
       simp only [h1]
     case pred_var_ X xs =>
-      unfold predVarOccursIn at h2
+      simp only [predVarOccursIn] at h2
       simp at h2
 
-      unfold Holds
+      simp only [Holds]
       apply h2
       · rfl
       · simp
     case eq_ x y =>
-      unfold Holds
-      rfl
+      simp only [Holds]
     case true_ | false_ =>
-      unfold Holds
-      rfl
+      simp only [Holds]
     case not_ phi phi_ih =>
-      unfold predVarOccursIn at h2
+      simp only [predVarOccursIn] at h2
 
-      unfold Holds
+      simp only [Holds]
       congr! 1
       exact phi_ih V h2
     case
@@ -241,7 +238,7 @@ theorem Holds_coincide_PredVar
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      unfold predVarOccursIn at h2
+      simp only [predVarOccursIn] at h2
 
       simp only [Holds]
       congr! 1
@@ -256,9 +253,9 @@ theorem Holds_coincide_PredVar
         right
         exact a1
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      unfold predVarOccursIn at h2
+      simp only [predVarOccursIn] at h2
 
-      unfold Holds
+      simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intro d
       exact phi_ih (Function.updateITE V x d) h2
@@ -278,8 +275,7 @@ theorem Holds_coincide_PredVar
     case neg c1 =>
       apply ih
       intro P ds a1
-      unfold predVarOccursIn at a1
-      contradiction
+      simp only [predVarOccursIn] at a1
 
 
 lemma Holds_coincide_Env
@@ -295,7 +291,7 @@ lemma Holds_coincide_Env
   by
   induction F generalizing V
   any_goals
-    unfold all_def_in_env at h2
+    simp only [all_def_in_env] at h2
 
     simp only [Holds]
   case not_ phi phi_ih =>
@@ -321,12 +317,12 @@ lemma Holds_coincide_Env
     intro E1 h1_1
     clear h1
 
-    unfold all_def_in_env at h2
+    simp only [all_def_in_env] at h2
     apply Exists.elim h2
     intro a h2_1
     clear h2
 
-    unfold Env.nodup_ at h3
+    simp only [Env.nodup_] at h3
 
     subst h1_1
 
