@@ -1,6 +1,6 @@
+import FOL.FunctionUpdateITE
 import FOL.NV.Binders
 import FOL.NV.Definition
-import FOL.FunctionUpdateITE
 
 
 set_option autoImplicit false
