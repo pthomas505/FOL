@@ -8,7 +8,7 @@ theorem List.map_eq_self_iff
   {α : Type}
   (f : α → α)
   (xs : List α) :
-  List.map f xs = xs ↔
+  xs.map f = xs ↔
     ∀ (x : α), x ∈ xs → f x = x :=
   by
   induction xs
@@ -25,7 +25,7 @@ lemma List.map_mem_id
   (f : α → α)
   (xs: List α)
   (h1: ∀ (x : α), x ∈ xs → f x = x) :
-  List.map f xs = xs :=
+  xs.map f = xs :=
   by
   induction xs
   case nil =>
@@ -263,7 +263,7 @@ theorem nodup_eq_len_imp_eqv
   (h1 : xs.length = ys.length)
   (h2 : xs.Nodup)
   (h3 : ys.Nodup) :
-  ∃ (f : α ≃ α), List.map f xs = ys :=
+  ∃ (f : α ≃ α), xs.map f = ys :=
   by sorry
 
 
