@@ -5,7 +5,7 @@ import Mathlib.Util.CompileInductive
 set_option autoImplicit false
 
 
-namespace FOL
+namespace FOL.NV
 
 
 /--
@@ -46,8 +46,6 @@ instance : ToString DefName :=
 instance : Repr DefName :=
   { reprPrec := fun X _ => X.toString.toFormat }
 
-
-namespace NV
 
 /--
   The type of formulas.

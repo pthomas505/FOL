@@ -6,9 +6,7 @@ import FOL.NV.Definition
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV
 
 open Formula
 
