@@ -64,7 +64,7 @@ instance (E : Env) (F : Formula) : Decidable (F.all_def_in_env E) :=
 
 
 /--
-  Env.nodup_ E := True if and only if each definition in the environment E has a unique combination of name and argument length.
+  Env.nodup_ E := True if and only if every definition that occurs in the environment E has a unique combination of name and argument length.
 -/
 def Env.nodup_ : Env → Prop :=
   List.Pairwise (fun (d1 d2 : Definition) => d1.name = d2.name → d1.args.length = d2.args.length → False)
@@ -77,6 +77,11 @@ instance (E : Env) : Decidable (E.nodup_) :=
     infer_instance
 
 
+/--
+  Env.WellFormed E := True if and only if
+  1. Every definition that occurs in the environment E has a unique combination of name and argument length.
+  2. Every definition that occurs in the formula of a definition d in the environment d :: E' ⊆ E occurs in the environment E'. This means there are no circular definitions.
+-/
 def Env.WellFormed : Env → Prop
   | List.nil => True
   | d :: E =>
