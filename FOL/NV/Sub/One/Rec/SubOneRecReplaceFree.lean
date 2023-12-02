@@ -26,11 +26,11 @@ def replaceFreeAux (v t : VarName) (binders : Finset VarName) : Formula → Form
   | pred_const_ X xs =>
       pred_const_
       X
-      (xs.map fun x : VarName => if v = x ∧ x ∉ binders then t else x)
+      (xs.map fun (x : VarName) => if v = x ∧ x ∉ binders then t else x)
   | pred_var_ X xs =>
       pred_var_
       X
-      (xs.map fun x : VarName => if v = x ∧ x ∉ binders then t else x)
+      (xs.map fun (x : VarName) => if v = x ∧ x ∉ binders then t else x)
   | eq_ x y =>
       eq_
       (if v = x ∧ x ∉ binders then t else x)
@@ -59,7 +59,7 @@ def replaceFreeAux (v t : VarName) (binders : Finset VarName) : Formula → Form
   | def_ X xs =>
       def_
       X
-      (xs.map fun x : VarName => if v = x ∧ x ∉ binders then t else x)
+      (xs.map fun (x : VarName) => if v = x ∧ x ∉ binders then t else x)
 
 /--
   replaceFree v t P :=
@@ -89,11 +89,11 @@ def fastReplaceFree (v t : VarName) : Formula → Formula
   | pred_const_ X xs =>
       pred_const_
       X
-      (xs.map fun x : VarName => if v = x then t else x)
+      (xs.map fun (x : VarName) => if v = x then t else x)
   | pred_var_ X xs =>
       pred_var_
       X
-      (xs.map fun x : VarName => if v = x then t else x)
+      (xs.map fun (x : VarName) => if v = x then t else x)
   | eq_ x y =>
     eq_
     (if v = x then t else x)
@@ -116,7 +116,7 @@ def fastReplaceFree (v t : VarName) : Formula → Formula
   | def_ X xs =>
       def_
       X
-      (xs.map fun x : VarName => if v = x then t else x)
+      (xs.map fun (x : VarName) => if v = x then t else x)
 
 
 -- replaceFree = fastReplaceFree
@@ -130,7 +130,7 @@ theorem replaceFreeAux_mem_binders
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold replaceFreeAux
+    simp only [replaceFreeAux]
     congr!
     simp only [List.map_eq_self_iff]
     simp
@@ -138,7 +138,7 @@ theorem replaceFreeAux_mem_binders
     subst a2
     contradiction
   case eq_ x y =>
-    unfold replaceFreeAux
+    simp only [replaceFreeAux]
     simp
     constructor
     case left | right =>
@@ -148,7 +148,7 @@ theorem replaceFreeAux_mem_binders
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold replaceFreeAux
+    simp only [replaceFreeAux]
     congr!
     exact phi_ih binders h1
   case
@@ -156,12 +156,12 @@ theorem replaceFreeAux_mem_binders
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold replaceFreeAux
+    simp only [replaceFreeAux]
     congr!
     · exact phi_ih binders h1
     · exact psi_ih binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold replaceFreeAux
+    simp only [replaceFreeAux]
     congr!
     apply phi_ih
     simp
@@ -179,8 +179,8 @@ theorem replaceFreeAux_eq_fastReplaceFree
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold replaceFreeAux
-    unfold fastReplaceFree
+    simp only [replaceFreeAux]
+    simp only [fastReplaceFree]
     congr!
     case _ x =>
       constructor
@@ -191,8 +191,8 @@ theorem replaceFreeAux_eq_fastReplaceFree
         subst a1
         tauto
   case eq_ x y =>
-    unfold replaceFreeAux
-    unfold fastReplaceFree
+    simp only [replaceFreeAux]
+    simp only [fastReplaceFree]
     congr!
     case _ | _ =>
       constructor
@@ -205,8 +205,8 @@ theorem replaceFreeAux_eq_fastReplaceFree
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold replaceFreeAux
-    unfold fastReplaceFree
+    simp only [replaceFreeAux]
+    simp only [fastReplaceFree]
     congr! 1
     exact phi_ih binders h1
   case
@@ -214,14 +214,14 @@ theorem replaceFreeAux_eq_fastReplaceFree
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold replaceFreeAux
-    unfold fastReplaceFree
+    simp only [replaceFreeAux]
+    simp only [fastReplaceFree]
     congr! 1
     · exact phi_ih binders h1
     · exact psi_ih binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold replaceFreeAux
-    unfold fastReplaceFree
+    simp only [replaceFreeAux]
+    simp only [fastReplaceFree]
     split_ifs
     case pos c1 =>
       congr!
@@ -241,7 +241,7 @@ theorem replaceFree_eq_fastReplaceFree
   (v t : VarName) :
   replaceFree v t F = fastReplaceFree v t F :=
   by
-  unfold replaceFree
+  simp only [replaceFree]
   apply replaceFreeAux_eq_fastReplaceFree
   simp
 
@@ -254,27 +254,27 @@ theorem fastReplaceFree_self
   by
   induction F
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     simp
     simp only [List.map_eq_self_iff]
     simp
   case eq_ x y =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     simp
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     congr!
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     congr!
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     simp
     intro _
     exact phi_ih
@@ -288,9 +288,9 @@ theorem not_free_in_fastReplaceFree_self
   by
   induction F
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     simp
     simp only [List.map_eq_self_iff]
     simp
@@ -298,12 +298,12 @@ theorem not_free_in_fastReplaceFree_self
     subst a2
     contradiction
   case eq_ x y =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
     push_neg at h1
 
     cases h1
     case intro h1_left h1_right =>
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       congr!
       · simp
         tauto
@@ -312,29 +312,29 @@ theorem not_free_in_fastReplaceFree_self
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     tauto
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
     push_neg at h1
 
     cases h1
     case intro h1_left h1_right =>
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       congr!
       · exact phi_ih h1_left
       · exact psi_ih h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
     push_neg at h1
 
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     simp
     intro a1
     apply phi_ih
@@ -349,7 +349,7 @@ theorem fastReplaceFree_inverse
   by
   induction F
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
 
     simp only [fastReplaceFree]
     congr!
@@ -367,7 +367,7 @@ theorem fastReplaceFree_inverse
       subst a2
       contradiction
   case eq_ x y =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
     push_neg at h1
 
     cases h1
@@ -379,7 +379,7 @@ theorem fastReplaceFree_inverse
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
 
     simp only [fastReplaceFree]
     congr!
@@ -389,7 +389,7 @@ theorem fastReplaceFree_inverse
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
     push_neg at h1
 
     cases h1
@@ -399,7 +399,7 @@ theorem fastReplaceFree_inverse
       · exact phi_ih h1_left
       · exact psi_ih h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
     push_neg at h1
 
     cases h1
@@ -407,14 +407,14 @@ theorem fastReplaceFree_inverse
       simp only [fastReplaceFree]
       split_ifs
       case pos c1 =>
-        unfold fastReplaceFree
+        simp only [fastReplaceFree]
         simp only [if_neg h1_left]
         congr!
         apply not_free_in_fastReplaceFree_self
         contrapose! h1_right
         exact isFreeIn_imp_occursIn t phi h1_right
       case neg c1 =>
-        unfold fastReplaceFree
+        simp only [fastReplaceFree]
         simp only [if_neg h1_left]
         congr!
         exact phi_ih h1_right
@@ -428,8 +428,8 @@ theorem not_isFreeIn_fastReplaceFree
   by
   induction F
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastReplaceFree
-    unfold isFreeIn
+    simp only [fastReplaceFree]
+    simp only [isFreeIn]
     push_neg
     simp
     intro x _
@@ -439,8 +439,8 @@ theorem not_isFreeIn_fastReplaceFree
     case neg c1 =>
       tauto
   case eq_ x y =>
-    unfold fastReplaceFree
-    unfold isFreeIn
+    simp only [fastReplaceFree]
+    simp only [isFreeIn]
     push_neg
     constructor
     case left | right =>
@@ -450,34 +450,34 @@ theorem not_isFreeIn_fastReplaceFree
       case neg c1 =>
         exact c1
   case true_ | false_ =>
-    unfold fastReplaceFree
-    unfold isFreeIn
+    simp only [fastReplaceFree]
+    simp only [isFreeIn]
     simp
   case not_ phi phi_ih =>
-    unfold fastReplaceFree
-    unfold isFreeIn
+    simp only [fastReplaceFree]
+    simp only [isFreeIn]
     exact phi_ih
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastReplaceFree
-    unfold isFreeIn
+    simp only [fastReplaceFree]
+    simp only [isFreeIn]
     push_neg
     constructor
     · exact phi_ih
     · exact psi_ih
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     split_ifs
     case pos c1 =>
-      unfold isFreeIn
+      simp only [isFreeIn]
       simp
       intro a1
       contradiction
     case neg c1 =>
-      unfold isFreeIn
+      simp only [isFreeIn]
       simp
       intro _
       exact phi_ih
