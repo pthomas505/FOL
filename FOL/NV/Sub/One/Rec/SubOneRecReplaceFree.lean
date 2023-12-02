@@ -22,41 +22,41 @@ If $P$ is a formula, $v$ is a variable, and $t$ is a term, then $P(t/v)$ is the 
 /--
   Helper function for replaceFree.
 -/
-def replaceFreeAux (v t : VarName) : Finset VarName → Formula → Formula
-  | binders, pred_const_ X xs =>
+def replaceFreeAux (v t : VarName) (binders : Finset VarName) : Formula → Formula
+  | pred_const_ X xs =>
       pred_const_
       X
       (xs.map fun x : VarName => if v = x ∧ x ∉ binders then t else x)
-  | binders, pred_var_ X xs =>
+  | pred_var_ X xs =>
       pred_var_
       X
       (xs.map fun x : VarName => if v = x ∧ x ∉ binders then t else x)
-  | binders, eq_ x y =>
+  | eq_ x y =>
       eq_
       (if v = x ∧ x ∉ binders then t else x)
       (if v = y ∧ y ∉ binders then t else y)
-  | _, true_ => true_
-  | _, false_ => false_
-  | binders, not_ phi => not_ (replaceFreeAux v t binders phi)
-  | binders, imp_ phi psi =>
+  | true_ => true_
+  | false_ => false_
+  | not_ phi => not_ (replaceFreeAux v t binders phi)
+  | imp_ phi psi =>
       imp_
       (replaceFreeAux v t binders phi)
       (replaceFreeAux v t binders psi)
-  | binders, and_ phi psi =>
+  | and_ phi psi =>
       and_
       (replaceFreeAux v t binders phi)
       (replaceFreeAux v t binders psi)
-  | binders, or_ phi psi =>
+  | or_ phi psi =>
       or_
       (replaceFreeAux v t binders phi)
       (replaceFreeAux v t binders psi)
-  | binders, iff_ phi psi =>
+  | iff_ phi psi =>
       iff_
       (replaceFreeAux v t binders phi)
       (replaceFreeAux v t binders psi)
-  | binders, forall_ x phi => forall_ x (replaceFreeAux v t (binders ∪ {x}) phi)
-  | binders, exists_ x phi => exists_ x (replaceFreeAux v t (binders ∪ {x}) phi)
-  | binders, def_ X xs =>
+  | forall_ x phi => forall_ x (replaceFreeAux v t (binders ∪ {x}) phi)
+  | exists_ x phi => exists_ x (replaceFreeAux v t (binders ∪ {x}) phi)
+  | def_ X xs =>
       def_
       X
       (xs.map fun x : VarName => if v = x ∧ x ∉ binders then t else x)
