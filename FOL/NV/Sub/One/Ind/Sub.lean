@@ -19,14 +19,14 @@ inductive IsFreeSub : Formula → VarName → VarName → Formula → Prop
     (X : PredName)
     (xs : List VarName)
     (v t : VarName) :
-    IsFreeSub (pred_const_ X xs) v t (pred_const_ X (xs.map fun x : VarName =>
+    IsFreeSub (pred_const_ X xs) v t (pred_const_ X (xs.map fun (x : VarName) =>
       if v = x then t else x))
 
   | pred_var_
     (X : PredName)
     (xs : List VarName)
     (v t : VarName) :
-    IsFreeSub (pred_var_ X xs) v t (pred_var_ X (xs.map fun x : VarName =>
+    IsFreeSub (pred_var_ X xs) v t (pred_var_ X (xs.map fun (x : VarName) =>
       if v = x then t else x))
 
   | eq_
@@ -119,7 +119,7 @@ inductive IsFreeSub : Formula → VarName → VarName → Formula → Prop
     (X : DefName)
     (xs : List VarName)
     (v t : VarName) :
-    IsFreeSub (def_ X xs) v t (def_ X (xs.map fun x : VarName =>
+    IsFreeSub (def_ X xs) v t (def_ X (xs.map fun (x : VarName) =>
       if v = x then t else x))
 
 
@@ -213,36 +213,14 @@ theorem isFreeSub_imp_fastAdmitsAux
   intro F' h1_1
   clear h1
   induction h1_1 generalizing binders
-  case pred_const_ h1_1_X h1_1_xs h1_1_v h1_1_t | pred_var_ h1_1_X h1_1_xs h1_1_v h1_1_t =>
+  all_goals
     unfold fastAdmitsAux
-    intro _
-    exact h2
-  case true_ h1_1_v h1_1_t | false_ h1_1_v h1_1_t =>
-    unfold fastAdmitsAux
-    simp
-  case eq_ h1_1_x h1_1_y h1_1_v h1_1_t =>
-    unfold fastAdmitsAux
-    intro _
-    exact h2
-  case not_ h1_1_phi h1_1_v h1_1_t _ _ h1_1_ih =>
-    unfold fastAdmitsAux
-    exact h1_1_ih binders h2
-  case
-    imp_ h1_1_phi h1_1_psi h1_1_v h1_1_t _ _ _ _ h1_1_ih_1 h1_1_ih_2
-  | and_ h1_1_phi h1_1_psi h1_1_v h1_1_t _ _ _ _ h1_1_ih_1 h1_1_ih_2
-  | or_ h1_1_phi h1_1_psi h1_1_v h1_1_t _ _ _ _ h1_1_ih_1 h1_1_ih_2
-  | iff_ h1_1_phi h1_1_psi h1_1_v h1_1_t _ _ _ _ h1_1_ih_1 h1_1_ih_2 =>
-    unfold fastAdmitsAux
-    constructor
-    · exact h1_1_ih_1 binders h2
-    · exact h1_1_ih_2 binders h2
   case
       forall_not_free_in h1_1_x h1_1_phi h1_1_v h1_1_t h1_1_1
     | exists_not_free_in h1_1_x h1_1_phi h1_1_v h1_1_t h1_1_1 =>
     unfold isFreeIn at h1_1_1
     simp at h1_1_1
 
-    unfold fastAdmitsAux
     by_cases c1 : h1_1_v = h1_1_x
     · left
       exact c1
@@ -252,15 +230,12 @@ theorem isFreeSub_imp_fastAdmitsAux
   case
       forall_free_in h1_1_x h1_1_phi h1_1_v h1_1_t _ _ h1_1_2 _ h1_1_ih
     | exists_free_in h1_1_x h1_1_phi h1_1_v h1_1_t _ _ h1_1_2 _ h1_1_ih =>
-    unfold fastAdmitsAux
     right
     apply h1_1_ih
     simp
     tauto
-  case def_ h1_1_X h1_1_xs h1_1_v h1_1_t =>
-    unfold fastAdmitsAux
-    intro _
-    exact h2
+  all_goals
+    tauto
 
 
 theorem isFreeSub_imp_fastReplaceFree
