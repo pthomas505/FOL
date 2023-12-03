@@ -685,8 +685,7 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
 
     simp only [fastReplaceFree]
     simp only [toIsBoundAux]
-    congr! 1
-    exact phi_ih binders h1 h2
+    tauto
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
@@ -696,11 +695,8 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
 
     simp only [fastReplaceFree]
     simp only [toIsBoundAux]
-    cases h2
-    case intro h2_left h2_right =>
-      congr! 1
-      · exact phi_ih binders h1 h2_left
-      · exact psi_ih binders h1 h2_right
+    simp
+    tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [fastAdmitsAux] at h2
 
@@ -791,11 +787,7 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
     simp at h2
 
     simp only [fastAdmitsAux]
-    cases h2
-    case intro h2_left h2_right =>
-      constructor
-      · exact phi_ih binders h1 h2_left
-      · exact psi_ih binders h1 h2_right
+    tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [fastReplaceFree] at h2
 
