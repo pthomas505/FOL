@@ -1576,19 +1576,20 @@ theorem substitution_theorem_aux
 
       simp only [fastReplaceFree]
       simp only [Holds]
-      unfold Function.updateITE
-      congr! 1
       simp
+      congr! 1
       simp only [List.map_eq_map_iff]
       intro x a1
-      simp only [eq_comm]
       simp
       split_ifs
       case _ c1 =>
         subst c1
+        simp only [Function.updateITE]
         tauto
       case _ c1 =>
-        rfl
+        simp only [Function.updateITE]
+        simp only [eq_comm]
+        simp only [if_neg c1]
     case eq_ x y =>
       simp only [fastAdmitsAux] at h1
 
