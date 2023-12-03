@@ -523,38 +523,11 @@ theorem fastAdmitsAux_add_binders
   fastAdmitsAux v u (S ∪ T) F :=
   by
   induction F generalizing S
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [fastAdmitsAux] at h1
 
     simp only [fastAdmitsAux]
-    simp
-    tauto
-  case eq_ x y =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [fastAdmitsAux]
-    simp
-    tauto
-  case true_ | false_ =>
-    simp only [fastAdmitsAux]
-  case not_ phi phi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [fastAdmitsAux]
-    tauto
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [fastAdmitsAux]
-    tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [fastAdmitsAux]
     simp
     cases h1
     case inl h1 =>
@@ -565,6 +538,10 @@ theorem fastAdmitsAux_add_binders
       simp only [Finset.union_right_comm S {x} T] at phi_ih
       simp only [Finset.union_assoc S T {x}] at phi_ih
       exact phi_ih
+  any_goals
+    simp
+  all_goals
+    tauto
 
 
 theorem fastAdmitsAux_del_binders
@@ -621,47 +598,11 @@ theorem fastAdmitsAux_isFreeIn
   u ∉ binders :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [fastAdmitsAux] at h1
 
     simp only [isFreeIn] at h2
-
-    tauto
-  case eq_ x y =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [isFreeIn] at h2
-
-    tauto
-  case true_ | false_ =>
-    simp only [isFreeIn] at h2
-  case not_ phi phi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [isFreeIn] at h2
-
-    exact phi_ih binders h1 h2
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [isFreeIn] at h2
-
-    cases h1
-    case intro h1_left h1_right =>
-      cases h2
-      case inl h2 =>
-        exact phi_ih binders h1_left h2
-      case inr h2 =>
-        exact psi_ih binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [isFreeIn] at h2
-
     cases h2
     case intro h2_left h2_right =>
       cases h1
@@ -671,6 +612,8 @@ theorem fastAdmitsAux_isFreeIn
         apply phi_ih
         · exact fastAdmitsAux_del_binders phi v u binders {x} h1
         · exact h2_right
+  all_goals
+    tauto
 
 
 theorem fastAdmitsAux_mem_binders
