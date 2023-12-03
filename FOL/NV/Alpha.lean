@@ -215,7 +215,7 @@ theorem replace_empty_Holds
         intro v' a1
         simp
 
-        have s1 : (List.map ((fun a_1 => if a_1 = v then a else V a_1) ∘ fun x => if u = x then v else x) xs) = (List.map (fun a_1 => if a_1 = u then a else V a_1) xs)
+        have s1 : (List.map ((fun (a_1 : VarName) => if a_1 = v then a else V a_1) ∘ fun (x : VarName) => if u = x then v else x) xs) = (List.map (fun (a_1 : VarName) => if a_1 = u then a else V a_1) xs)
         {
           simp only [List.map_eq_map_iff]
           intro x a2
