@@ -15,10 +15,10 @@ structure VarName extends String
   deriving Inhabited, DecidableEq, Hashable
 
 instance : ToString VarName :=
-  { toString := fun x => x.toString }
+  { toString := fun (x : VarName) => x.toString }
 
 instance : Repr VarName :=
-  { reprPrec := fun x _ => x.toString.toFormat }
+  { reprPrec := fun (x : VarName) _ => x.toString.toFormat }
 
 
 /--
@@ -28,10 +28,10 @@ structure PredName extends String
   deriving Inhabited, DecidableEq
 
 instance : ToString PredName :=
-  { toString := fun X => X.toString }
+  { toString := fun (X : PredName) => X.toString }
 
 instance : Repr PredName :=
-  { reprPrec := fun X _ => X.toString.toFormat }
+  { reprPrec := fun (X : PredName) _ => X.toString.toFormat }
 
 
 /--
@@ -41,10 +41,10 @@ structure DefName extends String
   deriving Inhabited, DecidableEq
 
 instance : ToString DefName :=
-  { toString := fun X => X.toString }
+  { toString := fun (X : DefName) => X.toString }
 
 instance : Repr DefName :=
-  { reprPrec := fun X _ => X.toString.toFormat }
+  { reprPrec := fun (X : DefName) _ => X.toString.toFormat }
 
 
 /--
@@ -90,10 +90,10 @@ def Formula.toString : Formula → String
 
 
 instance : ToString Formula :=
-  { toString := fun F => F.toString }
+  { toString := fun (F : Formula) => F.toString }
 
 instance : Repr Formula :=
-  { reprPrec := fun F _ => F.toString.toFormat }
+  { reprPrec := fun (F : Formula) _ => F.toString.toFormat }
 
 
 /--

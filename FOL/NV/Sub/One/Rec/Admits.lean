@@ -169,10 +169,10 @@ inductive BoolFormula : Type
 -/
 def toIsBoundAux (binders : Finset VarName) : Formula → BoolFormula
   | pred_const_ X xs =>
-      BoolFormula.pred_const_ X (xs.map fun v : VarName => v ∈ binders)
+      BoolFormula.pred_const_ X (xs.map fun (v : VarName) => v ∈ binders)
 
   | pred_var_ X xs =>
-      BoolFormula.pred_var_ X (xs.map fun v : VarName => v ∈ binders)
+      BoolFormula.pred_var_ X (xs.map fun (v : VarName) => v ∈ binders)
 
   | eq_ x y =>
       BoolFormula.eq_ (x ∈ binders) (y ∈ binders)
@@ -202,7 +202,7 @@ def toIsBoundAux (binders : Finset VarName) : Formula → BoolFormula
       BoolFormula.forall_ True (toIsBoundAux (binders ∪ {x}) phi)
 
   | def_ X xs =>
-      BoolFormula.def_ X (xs.map fun v : VarName => v ∈ binders)
+      BoolFormula.def_ X (xs.map fun (v : VarName) => v ∈ binders)
 
 /--
   Creates a BoolFormula from a formula. Each bound occurence of a variable in the formula is mapped to true in the bool formula. Each free occurence of a variable in the formula is mapped to false in the bool formula.
@@ -1093,7 +1093,7 @@ theorem substitution_theorem_aux
   (binders : Finset VarName)
   (F : Formula)
   (h1 : fastAdmitsAux v t binders F)
-  (h2 : ∀ v : VarName, ¬ v ∈ binders → V' v = V v) :
+  (h2 : ∀ (v : VarName), ¬ v ∈ binders → V' v = V v) :
   Holds D I (Function.updateITE V v (V' t)) E F ↔
     Holds D I V E (fastReplaceFree v t F) :=
   by
@@ -1209,7 +1209,7 @@ theorem substitution_theorem_aux
         intro v' a1
         simp
 
-        have s1 : (List.map (fun a => if a = v then V' t else V a) xs) = (List.map (V ∘ fun x => if v = x then t else x) xs)
+        have s1 : (List.map (fun (a : VarName) => if a = v then V' t else V a) xs) = (List.map (V ∘ fun (x : VarName) => if v = x then t else x) xs)
         {
         simp only [List.map_eq_map_iff]
         intro x a2

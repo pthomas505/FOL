@@ -18,8 +18,8 @@ def Function.updateITE
   β :=
   if c = a then b else f c
 
-#eval Function.updateITE (fun n : ℕ => n) 5 10 1
-#eval Function.updateITE (fun n : ℕ => n) 5 10 5
+#eval Function.updateITE (fun (n : ℕ) => n) 5 10 1
+#eval Function.updateITE (fun (n : ℕ) => n) 5 10 5
 
 
 /--
@@ -50,11 +50,11 @@ def Function.updateListITE
   | x :: xs, y :: ys => Function.updateITE (Function.updateListITE f xs ys) x y
   | _, _ => f
 
-#eval Function.updateListITE (fun n : ℕ => n) [5, 10, 5] [10, 20, 30] 5
-#eval Function.updateListITE (fun n : ℕ => n) [5, 10] [10] 5
-#eval Function.updateListITE (fun n : ℕ => n) [10] [5, 10] 10
-#eval Function.updateListITE (fun n : ℕ => n) [] [5, 10] 10
-#eval Function.updateListITE (fun n : ℕ => n) [5, 10] [] 5
+#eval Function.updateListITE (fun (n : ℕ) => n) [5, 10, 5] [10, 20, 30] 5
+#eval Function.updateListITE (fun (n : ℕ) => n) [5, 10] [10] 5
+#eval Function.updateListITE (fun (n : ℕ) => n) [10] [5, 10] 10
+#eval Function.updateListITE (fun (n : ℕ) => n) [] [5, 10] 10
+#eval Function.updateListITE (fun (n : ℕ) => n) [5, 10] [] 5
 
 
 /-
@@ -67,7 +67,7 @@ def Function.updateListITE'
   α → β :=
   List.foldr (fun (p : α × β) (_ : α → β) => Function.updateITE f p.fst p.snd) f (List.zip xs ys)
 
-#eval Function.updateListITE' (fun n : ℕ => n) [0, 3, 0] [10, 2, 2] 0
+#eval Function.updateListITE' (fun (n : ℕ) => n) [0, 3, 0] [10, 2, 2] 0
 -/
 
 
