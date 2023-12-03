@@ -185,10 +185,7 @@ theorem Holds_coincide_Var
       apply Function.updateListITE_fun_coincide_mem_eq_len V V' hd.args xs v h1
       · simp only [List.mem_toFinset] at s2
         exact s2
-      · cases c1
-        case _ c1_left c1_right =>
-          simp only [eq_comm]
-          exact c1_right
+      · tauto
     case neg c1 =>
       apply ih
       simp only [isFreeIn]

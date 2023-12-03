@@ -298,39 +298,13 @@ theorem occursIn_iff_mem_varSet
   occursIn v F ↔ v ∈ F.varSet :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  all_goals
     simp only [occursIn]
     simp only [Formula.varSet]
+  any_goals
     simp
-  case eq_ x y =>
-    simp only [occursIn]
-    simp only [Formula.varSet]
-    simp
-  case true_ | false_ =>
-    simp only [occursIn]
-    simp only [Formula.varSet]
-    simp
-  case not_ _ phi_ih =>
-    exact phi_ih
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [occursIn]
-    simp only [Formula.varSet]
-    simp
-    simp only [phi_ih, psi_ih]
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [occursIn]
-    simp only [Formula.varSet]
-    simp
-    simp only [phi_ih]
+  all_goals
     tauto
-  case def_ X xs =>
-    simp only [occursIn]
-    simp only [Formula.varSet]
-    simp
 
 
 theorem isBoundIn_iff_mem_boundVarSet
@@ -339,41 +313,13 @@ theorem isBoundIn_iff_mem_boundVarSet
   isBoundIn v F ↔ v ∈ F.boundVarSet :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  all_goals
     simp only [isBoundIn]
     simp only [Formula.boundVarSet]
+  any_goals
     simp
-  case eq_ x y =>
-    simp only [isBoundIn]
-    simp only [Formula.boundVarSet]
-    simp
-  case true_ | false_ =>
-    simp only [isBoundIn]
-    simp only [Formula.boundVarSet]
-    simp
-  case not_ phi phi_ih =>
-    simp only [isBoundIn]
-    simp only [Formula.boundVarSet]
-    exact phi_ih
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [isBoundIn]
-    simp only [Formula.boundVarSet]
-    simp
-    simp only [phi_ih, psi_ih]
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [isBoundIn]
-    simp only [Formula.boundVarSet]
-    simp
-    simp only [phi_ih]
+  all_goals
     tauto
-  case def_ X xs =>
-    simp only [isBoundIn]
-    simp only [Formula.boundVarSet]
-    simp
 
 
 theorem isFreeIn_iff_mem_freeVarSet
@@ -382,39 +328,13 @@ theorem isFreeIn_iff_mem_freeVarSet
   isFreeIn v F ↔ v ∈ F.freeVarSet :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  all_goals
     simp only [isFreeIn]
     simp only [Formula.freeVarSet]
+  any_goals
     simp
-  case eq_ x y =>
-    simp only [isFreeIn]
-    simp only [Formula.freeVarSet]
-    simp
-  case true_ | false_ =>
-    simp only [isFreeIn]
-    simp only [Formula.freeVarSet]
-    simp
-  case not_ _ phi_ih =>
-    exact phi_ih
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [isFreeIn]
-    simp only [Formula.freeVarSet]
-    simp
-    simp only [phi_ih, psi_ih]
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [isFreeIn]
-    simp only [Formula.freeVarSet]
-    simp
-    simp only [phi_ih]
+  all_goals
     tauto
-  case def_ X xs =>
-    simp only [isFreeIn]
-    simp only [Formula.freeVarSet]
-    simp
 
 
 theorem isFreeIn_imp_isFreeInInd
@@ -424,15 +344,11 @@ theorem isFreeIn_imp_isFreeInInd
   isFreeInInd v F :=
   by
   induction F
+  any_goals
+    simp only [isFreeIn] at h1
   case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
-    simp only [isFreeIn] at h1
-
     first | exact isFreeInInd.pred_const_ X xs h1 | exact isFreeInInd.pred_var_ X xs h1 | exact isFreeInInd.eq_ x y h1 | exact isFreeInInd.def_ X xs h1
-  case true_ | false_ =>
-    simp only [isFreeIn] at h1
   case not_ phi phi_ih =>
-    simp only [isFreeIn] at h1
-
     apply isFreeInInd.not_
     exact phi_ih h1
   case
@@ -440,8 +356,6 @@ theorem isFreeIn_imp_isFreeInInd
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [isFreeIn] at h1
-
     cases h1
     case inl c1 =>
       first | apply isFreeInInd.imp_left_ | apply isFreeInInd.and_left_ | apply isFreeInInd.or_left_ | apply isFreeInInd.iff_left_
@@ -450,8 +364,6 @@ theorem isFreeIn_imp_isFreeInInd
       first | apply isFreeInInd.imp_right_ | apply isFreeInInd.and_right_ | apply isFreeInInd.or_right_ | apply isFreeInInd.iff_right_
       exact psi_ih c1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [isFreeIn] at h1
-
     cases h1
     case _ h1_left h1_right =>
       first | apply isFreeInInd.forall_ | apply isFreeInInd.exists_
@@ -466,30 +378,9 @@ theorem isFreeInInd_imp_isFreeIn
   isFreeIn v F :=
   by
   induction h1
-  case pred_const_ X xs ih | pred_var_ X xs ih | eq_ x y ih | def_ X xs ih =>
+  all_goals
     simp only [isFreeIn]
-    exact ih
-  case not_ phi ih_1 ih_2 =>
-    simp only [isFreeIn]
-    exact ih_2
-  case
-      imp_left_ phi psi ih_1 ih_2
-    | imp_right_ phi psi ih_1 ih_2
-    | and_left_ phi psi ih_1 ih_2
-    | and_right_ phi psi ih_1 ih_2
-    | or_left_ phi psi ih_1 ih_2
-    | or_right_ phi psi ih_1 ih_2
-    | iff_left_ phi psi ih_1 ih_2
-    | iff_right_ phi psi ih_1 ih_2 =>
-    simp only [isFreeIn]
-    first | left; exact ih_2 | right; exact ih_2
-  case
-      forall_ x phi ih_1 ih_2 ih_3
-    | exists_ x phi ih_1 ih_2 ih_3 =>
-    simp only [isFreeIn]
-    constructor
-    · exact ih_1
-    · exact ih_3
+    tauto
 
 
 theorem isFreeIn_iff_isFreeInInd
@@ -509,41 +400,13 @@ theorem predVarOccursIn_iff_mem_predVarSet
   predVarOccursIn P n F ↔ (P, n) ∈ F.predVarSet :=
   by
   induction F
-  case pred_const_ X xs =>
+  all_goals
     simp only [predVarOccursIn]
     simp only [Formula.predVarSet]
+  any_goals
     simp
-  case pred_var_ X xs =>
-    simp only [predVarOccursIn]
-    simp only [Formula.predVarSet]
-    simp
-  case eq_ x y =>
-    simp only [predVarOccursIn]
-    simp only [Formula.predVarSet]
-    simp
-  case true_ | false_ =>
-    simp only [predVarOccursIn]
-    simp only [Formula.predVarSet]
-    simp
-  case not_ _ phi_ih =>
-    exact phi_ih
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [predVarOccursIn]
-    simp only [Formula.predVarSet]
-    simp
-    simp only [phi_ih, psi_ih]
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [predVarOccursIn]
-    simp only [Formula.predVarSet]
-    exact phi_ih
-  case def_ X xs =>
-    simp only [predVarOccursIn]
-    simp only [Formula.predVarSet]
-    simp
+  all_goals
+    tauto
 
 
 theorem isBoundIn_imp_occursIn
@@ -553,33 +416,11 @@ theorem isBoundIn_imp_occursIn
   occursIn v F :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  all_goals
     simp only [isBoundIn] at h1
-  case eq_ x y =>
-    simp only [isBoundIn] at h1
-  case true_ | false_ =>
-    simp only [isBoundIn] at h1
-  case not_ phi phi_ih =>
-    simp only [isBoundIn] at h1
-
-    simp only [occursIn]
-    exact phi_ih h1
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [isBoundIn] at h1
-
+  all_goals
     simp only [occursIn]
     tauto
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [isBoundIn] at h1
-
-    simp only [occursIn]
-    tauto
-  case def_ X xs =>
-    simp only [isBoundIn] at h1
 
 
 theorem isFreeIn_imp_occursIn
@@ -589,42 +430,11 @@ theorem isFreeIn_imp_occursIn
   occursIn v F :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs =>
+  all_goals
     simp only [isFreeIn] at h1
-
-    simp only [occursIn]
-    exact h1
-  case eq_ x y =>
-    simp only [isFreeIn] at h1
-
-    simp only [occursIn]
-    exact h1
-  case true_ | false_ =>
-    simp only [isFreeIn] at h1
-  case not_ phi phi_ih =>
-    simp only [isFreeIn] at h1
-
-    simp only [occursIn]
-    exact phi_ih h1
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [isFreeIn] at h1
-
+  all_goals
     simp only [occursIn]
     tauto
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [isFreeIn] at h1
-
-    simp only [occursIn]
-    tauto
-  case def_ X xs =>
-    simp only [isFreeIn] at h1
-
-    simp only [occursIn]
-    exact h1
 
 
 #lint
