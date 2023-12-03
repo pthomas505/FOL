@@ -888,47 +888,20 @@ theorem not_isBoundIn_imp_admitsAux
   admitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    simp only [admitsAux]
-    simp
-    intro _ _
-    exact h2
-  case eq_ x y =>
-    simp only [admitsAux]
-    simp
-    intro _ _
-    exact h2
-  case true_ | false_ =>
-    simp only [admitsAux]
-  case not_ phi phi_ih =>
+  all_goals
     simp only [isBoundIn] at h1
 
     simp only [admitsAux]
-    exact phi_ih binders h1 h2
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [isBoundIn] at h1
-    push_neg at h1
-
-    simp only [admitsAux]
-    cases h1
-    case intro h1_left h1_right =>
-      constructor
-      · exact phi_ih binders h1_left h2
-      · exact psi_ih binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [isBoundIn] at h1
     push_neg at h1
 
-    simp only [admitsAux]
     cases h1
     case intro h1_left h1_right =>
       apply phi_ih (binders ∪ {x}) h1_right
       simp
       tauto
+  all_goals
+    tauto
 
 
 theorem not_isBoundIn_imp_admits
