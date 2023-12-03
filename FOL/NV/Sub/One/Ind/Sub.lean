@@ -205,7 +205,7 @@ theorem isFreeSub_imp_fastAdmitsAux
   (F : Formula)
   (v u : VarName)
   (binders : Finset VarName)
-  (h1 : ∃ F' : Formula, IsFreeSub F v u F')
+  (h1 : ∃ (F' : Formula), IsFreeSub F v u F')
   (h2 : u ∉ binders) :
   fastAdmitsAux v u binders F :=
   by
@@ -414,7 +414,7 @@ theorem substitution_theorem_ind
         simp
         apply Holds_coincide_Var
         intro v' a1
-        have s1 : List.map (Function.updateITE V h1_v (V h1_t)) h1_xs = List.map (V ∘ fun x => if h1_v = x then h1_t else x) h1_xs
+        have s1 : List.map (Function.updateITE V h1_v (V h1_t)) h1_xs = List.map (V ∘ fun (x : VarName) => if h1_v = x then h1_t else x) h1_xs
         simp only [List.map_eq_map_iff]
         intro x _
         simp only [Function.updateITE]
