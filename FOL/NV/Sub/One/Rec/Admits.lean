@@ -455,11 +455,12 @@ theorem replaceFreeAux_fastAdmitsAux
   fastAdmitsAux t v binders (replaceFreeAux v t binders F) :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [occursIn] at h1
 
     simp only [replaceFreeAux]
     simp only [fastAdmitsAux]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x a1 a2
     by_cases c1 : v = x ∧ x ∉ binders
@@ -472,11 +473,8 @@ theorem replaceFreeAux_fastAdmitsAux
       subst a2
       contradiction
   case eq_ x y =>
-    simp only [occursIn] at h1
     push_neg at h1
 
-    simp only [replaceFreeAux]
-    simp only [fastAdmitsAux]
     intros a1
     split_ifs at a1
     case _ c1 c2 =>
@@ -500,30 +498,7 @@ theorem replaceFreeAux_fastAdmitsAux
         cases h1
         case intro h1_left h1_right =>
           contradiction
-  case true_ | false_ =>
-    simp only [replaceFreeAux]
-    simp only [fastAdmitsAux]
-  case not_ phi phi_ih =>
-    simp only [occursIn] at h1
-
-    simp only [replaceFreeAux]
-    simp only [fastAdmitsAux]
-    tauto
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [occursIn] at h1
-
-    simp only [replaceFreeAux]
-    simp only [fastAdmitsAux]
-    tauto
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [occursIn] at h1
-
-    simp only [replaceFreeAux]
-    simp only [fastAdmitsAux]
+  all_goals
     tauto
 
 
