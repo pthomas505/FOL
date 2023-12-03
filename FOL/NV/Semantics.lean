@@ -77,10 +77,10 @@ def Holds
     Holds D I V E phi ↔ Holds D I V E psi
   | E, forall_ x phi =>
     have : sizeOf phi < sizeOf (forall_ x phi) := by simp
-    ∀ d : D, Holds D I (Function.updateITE V x d) E phi
-  | E, exists_ x phi =>
+    ∀ (d : D), Holds D I (Function.updateITE V x d) E phi
+  | E, exists_ (x : VarName) (phi : Formula) =>
     have : sizeOf phi < sizeOf (exists_ x phi) := by simp
-    ∃ d : D, Holds D I (Function.updateITE V x d) E phi
+    ∃ (d : D), Holds D I (Function.updateITE V x d) E phi
   | ([] : Env), def_ _ _ => False
   | d :: E, def_ name args =>
     if name = d.name ∧ args.length = d.args.length
