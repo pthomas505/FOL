@@ -167,41 +167,41 @@ inductive BoolFormula : Type
 /--
   Helper function for toIsBound.
 -/
-def toIsBoundAux : Finset VarName → Formula → BoolFormula
-  | binders, pred_const_ X xs =>
+def toIsBoundAux (binders : Finset VarName) : Formula → BoolFormula
+  | pred_const_ X xs =>
       BoolFormula.pred_const_ X (xs.map fun v : VarName => v ∈ binders)
 
-  | binders, pred_var_ X xs =>
+  | pred_var_ X xs =>
       BoolFormula.pred_var_ X (xs.map fun v : VarName => v ∈ binders)
 
-  | binders, eq_ x y =>
+  | eq_ x y =>
       BoolFormula.eq_ (x ∈ binders) (y ∈ binders)
 
-  | _, true_ => BoolFormula.true_
+  | true_ => BoolFormula.true_
 
-  | _, false_ => BoolFormula.false_
+  | false_ => BoolFormula.false_
 
-  | binders, not_ phi => BoolFormula.not_ (toIsBoundAux binders phi)
+  | not_ phi => BoolFormula.not_ (toIsBoundAux binders phi)
 
-  | binders, imp_ phi psi =>
+  | imp_ phi psi =>
       BoolFormula.imp_ (toIsBoundAux binders phi) (toIsBoundAux binders psi)
 
-  | binders, and_ phi psi =>
+  | and_ phi psi =>
       BoolFormula.and_ (toIsBoundAux binders phi) (toIsBoundAux binders psi)
 
-  | binders, or_ phi psi =>
+  | or_ phi psi =>
       BoolFormula.or_ (toIsBoundAux binders phi) (toIsBoundAux binders psi)
 
-  | binders, iff_ phi psi =>
+  | iff_ phi psi =>
       BoolFormula.iff_ (toIsBoundAux binders phi) (toIsBoundAux binders psi)
 
-  | binders, forall_ x phi =>
+  | forall_ x phi =>
       BoolFormula.forall_ True (toIsBoundAux (binders ∪ {x}) phi)
 
-  | binders, exists_ x phi =>
+  | exists_ x phi =>
       BoolFormula.forall_ True (toIsBoundAux (binders ∪ {x}) phi)
 
-  | binders, def_ X xs =>
+  | def_ X xs =>
       BoolFormula.def_ X (xs.map fun v : VarName => v ∈ binders)
 
 /--
