@@ -266,45 +266,11 @@ theorem fastAdmitsAux_imp_admitsAux
   admitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [fastAdmitsAux] at h1
 
     simp only [admitsAux]
-    simp
-    intros a1 _
-    exact h1 a1
-  case eq_ x y =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [admitsAux]
-    intros a1
-    cases a1
-    case intro a1_left a1_right =>
-      exact h1 a1_left
-  case true_ | false_ =>
-    simp only [admitsAux]
-  case not_ phi phi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [admitsAux]
-    exact phi_ih binders h1
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [admitsAux]
-    cases h1
-    case intro h1_left h1_right =>
-      constructor
-      · exact phi_ih binders h1_left
-      · exact psi_ih binders h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [admitsAux]
     cases h1
     case inl h1 =>
       apply mem_binders_imp_admitsAux
@@ -313,6 +279,8 @@ theorem fastAdmitsAux_imp_admitsAux
     case inr h1 =>
       apply phi_ih
       exact h1
+  all_goals
+    tauto
 
 
 theorem admits_iff_fastAdmits
@@ -338,40 +306,18 @@ theorem fastAdmitsAux_self
   fastAdmitsAux v v binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [fastAdmitsAux]
-    intro _
-    exact h1
-  case eq_ x y =>
-    simp only [fastAdmitsAux]
-    intro _
-    exact h1
-  case true_ | false_ =>
-    simp only [fastAdmitsAux]
-  case not_ phi phi_ih =>
-    simp only [fastAdmitsAux]
-    exact phi_ih binders h1
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastAdmitsAux]
-    constructor
-    · exact phi_ih binders h1
-    · exact psi_ih binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastAdmitsAux]
     by_cases c1 : v = x
     · left
       exact c1
     · right
       apply phi_ih
       simp
-      push_neg
-      constructor
-      · exact h1
-      · exact c1
+      tauto
+  all_goals
+    tauto
 
 
 theorem fastAdmits_self
