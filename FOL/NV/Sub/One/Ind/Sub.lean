@@ -134,16 +134,16 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
   subst h2
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     first | apply IsFreeSub.pred_const_ | apply IsFreeSub.pred_var_
   case eq_ x y =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     apply IsFreeSub.eq_
   case true_ | false_ =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     first | apply IsFreeSub.true_ | apply IsFreeSub.false_
   case not_ phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
     apply IsFreeSub.not_
     exact phi_ih binders h1
@@ -152,7 +152,7 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
     cases h1
     case intro h1_left h1_right =>
@@ -160,27 +160,27 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
     · exact phi_ih binders h1_left
     · exact psi_ih binders h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     cases h1
     case inl h1 =>
       split_ifs
       case pos c1 | neg c1 =>
         first | apply IsFreeSub.forall_not_free_in | apply IsFreeSub.exists_not_free_in
         subst h1
-        unfold isFreeIn
+        simp only [isFreeIn]
         simp
     case inr h1 =>
       split_ifs
       case pos c1 =>
         first | apply IsFreeSub.forall_not_free_in | apply IsFreeSub.exists_not_free_in
-        unfold isFreeIn
+        simp only [isFreeIn]
         tauto
       case neg c1 =>
         by_cases c2 : isFreeIn v phi
         · first | apply IsFreeSub.forall_free_in | apply IsFreeSub.exists_free_in
-          unfold isFreeIn
+          simp only [isFreeIn]
           constructor
           · exact c1
           . exact c2
@@ -194,10 +194,10 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
 
           simp only [s1]
           first | apply IsFreeSub.forall_not_free_in | apply IsFreeSub.exists_not_free_in
-          unfold isFreeIn
+          simp only [isFreeIn]
           tauto
   case def_ X xs =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     apply IsFreeSub.def_
 
 
@@ -214,11 +214,11 @@ theorem isFreeSub_imp_fastAdmitsAux
   clear h1
   induction h1_1 generalizing binders
   all_goals
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
   case
       forall_not_free_in h1_1_x h1_1_phi h1_1_v h1_1_t h1_1_1
     | exists_not_free_in h1_1_x h1_1_phi h1_1_v h1_1_t h1_1_1 =>
-    unfold isFreeIn at h1_1_1
+    simp only [isFreeIn] at h1_1_1
     simp at h1_1_1
 
     by_cases c1 : h1_1_v = h1_1_x
@@ -246,15 +246,13 @@ theorem isFreeSub_imp_fastReplaceFree
   by
   induction h1
   case pred_const_ h1_X h1_xs h1_v h1_t | pred_var_ h1_X h1_xs h1_v h1_t =>
-    unfold fastReplaceFree
-    rfl
+    simp only [fastReplaceFree]
   case eq_ h1_x h1_y h1_v h1_t =>
-    unfold fastReplaceFree
-    rfl
+    simp only [fastReplaceFree]
   case true_ h1_v h1_t | false_ h1_v h1_t =>
     rfl
   case not_ h1_phi h1_v h1_t h1_phi' h1_1 h1_ih =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     subst h1_ih
     rfl
   case
@@ -262,17 +260,17 @@ theorem isFreeSub_imp_fastReplaceFree
   | and_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' h1_1 h1_2 h1_ih_1 h1_ih_2
   | or_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' h1_1 h1_2 h1_ih_1 h1_ih_2
   | iff_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' h1_1 h1_2 h1_ih_1 h1_ih_2 =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     subst h1_ih_1
     subst h1_ih_2
     rfl
   case
     forall_not_free_in h1_x h1_phi h1_v h1_t h1_1
   | exists_not_free_in h1_x h1_phi h1_v h1_t h1_1 =>
-    unfold isFreeIn at h1_1
+    simp only [isFreeIn] at h1_1
     simp at h1_1
 
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     split_ifs
     case pos c1 =>
       rfl
@@ -283,17 +281,16 @@ theorem isFreeSub_imp_fastReplaceFree
   case
     forall_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 _ _ h1_ih
   | exists_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 _ _ h1_ih =>
-    unfold isFreeIn at h1_1
+    simp only [isFreeIn] at h1_1
 
     cases h1_1
     case intro h1_1_left h1_1_right =>
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [if_neg h1_1_left]
       subst h1_ih
       rfl
   case def_ h1_X h1_xs h1_v h1_t =>
-    unfold fastReplaceFree
-    rfl
+    simp only [fastReplaceFree]
 
 
 example
@@ -302,7 +299,7 @@ example
   IsFreeSub F v u F' ↔
     fastAdmits v u F ∧ fastReplaceFree v u F = F' :=
   by
-  unfold fastAdmits
+  simp only [fastAdmits]
   constructor
   · intro a1
     constructor
@@ -334,7 +331,7 @@ theorem substitution_theorem_ind
     simp
     simp only [List.map_eq_map_iff]
     intro x _
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     simp only [eq_comm]
     split_ifs
     case _ c1 =>
@@ -345,7 +342,7 @@ theorem substitution_theorem_ind
       simp only [if_neg c1]
   case eq_ h1_x h1_y h1_v h1_t =>
     simp only [Holds]
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     simp only [eq_comm]
     congr! 1 <;> { split_ifs <;> rfl }
   case true_ _ _ | false_ _ _ =>
@@ -366,7 +363,7 @@ theorem substitution_theorem_ind
   case
     forall_not_free_in h1_x h1_phi h1_v h1_t h1_1
   | exists_not_free_in h1_x h1_phi h1_v h1_t h1_1 =>
-    unfold isFreeIn at h1_1
+    simp only [isFreeIn] at h1_1
     simp at h1_1
 
     simp only [Holds]
@@ -374,7 +371,7 @@ theorem substitution_theorem_ind
     intro d
     apply Holds_coincide_Var
     intro x a1
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     split_ifs
     case _ c1 =>
       rfl
@@ -387,7 +384,7 @@ theorem substitution_theorem_ind
   case
     forall_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 h1_2 _ h1_ih
   | exists_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 h1_2 _ h1_ih =>
-    unfold isFreeIn at h1_1
+    simp only [isFreeIn] at h1_1
 
     simp only [Holds]
     first | apply forall_congr' | apply exists_congr
@@ -396,7 +393,7 @@ theorem substitution_theorem_ind
     simp only [← h1_ih]
     apply Holds_coincide_Var
     intro x _
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     simp only [eq_comm]
     split_ifs
     case _ c1 c2 c3 =>
@@ -420,7 +417,7 @@ theorem substitution_theorem_ind
         have s1 : List.map (Function.updateITE V h1_v (V h1_t)) h1_xs = List.map (V ∘ fun x => if h1_v = x then h1_t else x) h1_xs
         simp only [List.map_eq_map_iff]
         intro x _
-        unfold Function.updateITE
+        simp only [Function.updateITE]
         simp only [eq_comm]
         simp
         split_ifs
