@@ -55,7 +55,7 @@ instance
   by
   induction F generalizing binders
   all_goals
-    unfold admitsAux
+    simp only [admitsAux]
     infer_instance
 
 
@@ -75,7 +75,7 @@ instance
   (F : Formula) :
   Decidable (admits v u F) :=
   by
-  unfold admits
+  simp only [admits]
   infer_instance
 
 
@@ -118,7 +118,7 @@ instance
   by
   induction F generalizing binders
   all_goals
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     infer_instance
 
 
@@ -140,7 +140,7 @@ instance
   (F : Formula) :
   Decidable (fastAdmits v u F) :=
   by
-  unfold fastAdmits
+  simp only [fastAdmits]
   infer_instance
 
 
@@ -223,44 +223,43 @@ theorem admitsAux_imp_fastAdmitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold admitsAux at h2
+    simp only [admitsAux] at h2
     simp at h2
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     intro a1
     exact h2 a1 h1
   case eq_ x y =>
-    unfold admitsAux at h2
+    simp only [admitsAux] at h2
     simp at h2
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     intro a1
     exact h2 a1 h1
   case true_ | false_ =>
-    unfold fastAdmitsAux
-    simp
+    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    unfold admitsAux at h2
+    simp only [admitsAux] at h2
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     exact phi_ih binders h1 h2
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold admitsAux at h2
+    simp only [admitsAux] at h2
 
     cases h2
     case intro h2_left h2_right =>
-      unfold fastAdmitsAux
+      simp only [fastAdmitsAux]
       constructor
       · exact phi_ih binders h1 h2_left
       · exact psi_ih binders h1 h2_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold admitsAux at h2
+    simp only [admitsAux] at h2
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     by_cases c1 : v = x
     · left
       exact c1
@@ -283,32 +282,31 @@ theorem mem_binders_imp_admitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     intro _ a2
     contradiction
   case eq_ x y =>
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     intro _ a2
     contradiction
   case true_ | false_ =>
-    unfold admitsAux
-    simp
+    simp only [admitsAux]
   case not_ phi phi_ih =>
-    unfold admitsAux
+    simp only [admitsAux]
     exact phi_ih binders h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold admitsAux
+    simp only [admitsAux]
     constructor
     · exact phi_ih binders h1
     · exact psi_ih binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold admitsAux
+    simp only [admitsAux]
     apply phi_ih
     simp
     left
@@ -324,45 +322,44 @@ theorem fastAdmitsAux_imp_admitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     intros a1 _
     exact h1 a1
   case eq_ x y =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     intros a1
     cases a1
     case intro a1_left a1_right =>
       exact h1 a1_left
   case true_ | false_ =>
-    unfold admitsAux
-    simp
+    simp only [admitsAux]
   case not_ phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     exact phi_ih binders h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     cases h1
     case intro h1_left h1_right =>
       constructor
       · exact phi_ih binders h1_left
       · exact psi_ih binders h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     cases h1
     case inl h1 =>
       apply mem_binders_imp_admitsAux
@@ -378,8 +375,8 @@ theorem admits_iff_fastAdmits
   (v u : VarName) :
   admits v u F ↔ fastAdmits v u F :=
   by
-  unfold admits
-  unfold fastAdmits
+  simp only [admits]
+  simp only [fastAdmits]
   constructor
   · apply admitsAux_imp_fastAdmitsAux
     simp
@@ -397,30 +394,29 @@ theorem fastAdmitsAux_self
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     intro _
     exact h1
   case eq_ x y =>
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     intro _
     exact h1
   case true_ | false_ =>
-    unfold fastAdmitsAux
-    simp
+    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     exact phi_ih binders h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     constructor
     · exact phi_ih binders h1
     · exact psi_ih binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     by_cases c1 : v = x
     · left
       exact c1
@@ -438,7 +434,7 @@ theorem fastAdmits_self
   (v : VarName) :
   fastAdmits v v F :=
   by
-  unfold fastAdmits
+  simp only [fastAdmits]
   apply fastAdmitsAux_self
   simp
 
@@ -453,44 +449,43 @@ theorem not_isFreeIn_imp_fastAdmitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     intro a1
     contradiction
   case eq_ x y =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     intro a1
     contradiction
   case true_ | false_ =>
-    unfold fastAdmitsAux
-    simp
+    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     exact phi_ih binders h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
     push_neg at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     cases h1
     case intro h1_left h1_right =>
       constructor
       · exact phi_ih binders h1_left
       · exact psi_ih binders h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
     push_neg at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     by_cases c1 : v = x
     · left
       exact c1
@@ -505,7 +500,7 @@ theorem not_isFreeIn_imp_fastAdmits
   (h1 : ¬ isFreeIn v F) :
   fastAdmits v u F :=
   by
-  unfold fastAdmits
+  simp only [fastAdmits]
   exact not_isFreeIn_imp_fastAdmitsAux F v u ∅ h1
 
 --
@@ -520,40 +515,39 @@ theorem not_isBoundIn_imp_fastAdmitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     intros _
     exact h2
   case eq_ x y =>
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     intros _
     exact h2
   case true_ | false_ =>
-    unfold fastAdmitsAux
-    simp
+    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    unfold isBoundIn at h1
+    simp only [isBoundIn] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     exact phi_ih binders h1 h2
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold isBoundIn at h1
+    simp only [isBoundIn] at h1
     push_neg at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     cases h1
     case intro h1_left h1_right =>
       constructor
       · exact phi_ih binders h1_left h2
       · exact psi_ih binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold isBoundIn at h1
+    simp only [isBoundIn] at h1
     push_neg at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     cases h1
     case intro h1_left h1_right =>
       right
@@ -571,7 +565,7 @@ theorem not_isBoundIn_imp_fastAdmits
   (h1 : ¬ isBoundIn u F) :
   fastAdmits v u F :=
   by
-  unfold fastAdmits
+  simp only [fastAdmits]
   apply not_isBoundIn_imp_fastAdmitsAux F v u ∅ h1
   simp
 
@@ -587,50 +581,49 @@ theorem fastReplaceFree_aux_fastAdmitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastReplaceFree
-    unfold fastAdmitsAux
+    simp only [fastReplaceFree]
+    simp only [fastAdmitsAux]
     intro _
     exact h2
   case eq_ x y =>
-    unfold fastReplaceFree
-    unfold fastAdmitsAux
+    simp only [fastReplaceFree]
+    simp only [fastAdmitsAux]
     intro _
     exact h2
   case true_ | false_ =>
-    unfold fastReplaceFree
-    unfold fastAdmitsAux
-    simp
+    simp only [fastReplaceFree]
+    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
 
-    unfold fastReplaceFree
-    unfold fastAdmitsAux
+    simp only [fastReplaceFree]
+    simp only [fastAdmitsAux]
     exact phi_ih binders h1 h2
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
     push_neg at h1
 
-    unfold fastReplaceFree
-    unfold fastAdmitsAux
+    simp only [fastReplaceFree]
+    simp only [fastAdmitsAux]
     cases h1
     case intro h1_left h1_right =>
       constructor
       · exact phi_ih binders h1_left h2
       · exact psi_ih binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
     push_neg at h1
 
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     cases h1
     case intro h1_left h1_right =>
       split_ifs
       case pos c1 =>
-        unfold fastAdmitsAux
+        simp only [fastAdmitsAux]
         subst c1
         right
         apply not_isFreeIn_imp_fastAdmitsAux
@@ -639,7 +632,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
         apply isFreeIn_imp_occursIn
         exact contra
       case neg c1 =>
-        unfold fastAdmitsAux
+        simp only [fastAdmitsAux]
         right
         apply phi_ih (binders ∪ {x}) h1_right
         simp
@@ -655,7 +648,7 @@ theorem fastReplaceFree_fastAdmits
   (h1 : ¬ occursIn t F) :
   fastAdmits t v (fastReplaceFree v t F) :=
   by
-  unfold fastAdmits
+  simp only [fastAdmits]
   apply fastReplaceFree_aux_fastAdmitsAux F v t ∅ h1
   simp
 
@@ -670,10 +663,10 @@ theorem replaceFreeAux_fastAdmitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
 
-    unfold replaceFreeAux
-    unfold fastAdmitsAux
+    simp only [replaceFreeAux]
+    simp only [fastAdmitsAux]
     simp
     intro x a1 a2
     by_cases c1 : v = x ∧ x ∉ binders
@@ -686,11 +679,11 @@ theorem replaceFreeAux_fastAdmitsAux
       subst a2
       contradiction
   case eq_ x y =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
     push_neg at h1
 
-    unfold replaceFreeAux
-    unfold fastAdmitsAux
+    simp only [replaceFreeAux]
+    simp only [fastAdmitsAux]
     intros a1
     split_ifs at a1
     case _ c1 c2 =>
@@ -715,30 +708,29 @@ theorem replaceFreeAux_fastAdmitsAux
         case intro h1_left h1_right =>
           contradiction
   case true_ | false_ =>
-    unfold replaceFreeAux
-    unfold fastAdmitsAux
-    simp
+    simp only [replaceFreeAux]
+    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
 
-    unfold replaceFreeAux
-    unfold fastAdmitsAux
+    simp only [replaceFreeAux]
+    simp only [fastAdmitsAux]
     tauto
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
 
-    unfold replaceFreeAux
-    unfold fastAdmitsAux
+    simp only [replaceFreeAux]
+    simp only [fastAdmitsAux]
     tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
 
-    unfold replaceFreeAux
-    unfold fastAdmitsAux
+    simp only [replaceFreeAux]
+    simp only [fastAdmitsAux]
     tauto
 
 
@@ -748,8 +740,8 @@ theorem replaceFree_fastAdmits
   (h1 : ¬ occursIn t F) :
   fastAdmits t v (replaceFree v t F) :=
   by
-  unfold replaceFree
-  unfold fastAdmits
+  simp only [replaceFree]
+  simp only [fastAdmits]
   exact replaceFreeAux_fastAdmitsAux F v t ∅ h1
 
 --
@@ -764,38 +756,37 @@ theorem fastAdmitsAux_add_binders
   by
   induction F generalizing S
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     simp
     tauto
   case eq_ x y =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     simp
     tauto
   case true_ | false_ =>
-    unfold fastAdmitsAux
-    simp
+    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     tauto
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     simp
     cases h1
     case inl h1 =>
@@ -817,39 +808,38 @@ theorem fastAdmitsAux_del_binders
   by
   induction F generalizing S
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
     simp at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     tauto
   case eq_ x y =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
     simp at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     tauto
   case true_ | false_ =>
-    unfold fastAdmitsAux
-    simp
+    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     tauto
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
     simp only [Finset.union_right_comm S T {x}] at h1
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     tauto
 
 --
@@ -864,25 +854,23 @@ theorem fastAdmitsAux_isFreeIn
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     tauto
   case eq_ x y =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     tauto
   case true_ | false_ =>
-    unfold isFreeIn at h2
-
-    contradiction
+    simp only [isFreeIn] at h2
   case not_ phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     exact phi_ih binders h1 h2
   case
@@ -890,9 +878,9 @@ theorem fastAdmitsAux_isFreeIn
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     cases h1
     case intro h1_left h1_right =>
@@ -902,9 +890,9 @@ theorem fastAdmitsAux_isFreeIn
       case inr h2 =>
         exact psi_ih binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastAdmitsAux at h1
+    simp only [fastAdmitsAux] at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     cases h2
     case intro h2_left h2_right =>
@@ -943,19 +931,19 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     induction xs
     case nil =>
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp
     case cons args_hd args_tl args_ih =>
-      unfold fastAdmitsAux at h2
+      simp only [fastAdmitsAux] at h2
       simp at h2
 
-      unfold fastAdmitsAux at args_ih
-      unfold fastReplaceFree at args_ih
-      unfold toIsBoundAux at args_ih
+      simp only [fastAdmitsAux] at args_ih
+      simp only [fastReplaceFree] at args_ih
+      simp only [toIsBoundAux] at args_ih
       simp at args_ih
 
-      unfold fastReplaceFree
-      unfold toIsBoundAux
+      simp only [fastReplaceFree]
+      simp only [toIsBoundAux]
       simp
       constructor
       · split_ifs
@@ -966,10 +954,10 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
           rfl
       · tauto
   case eq_ x y =>
-    unfold fastAdmitsAux at h2
+    simp only [fastAdmitsAux] at h2
 
-    unfold fastReplaceFree
-    unfold toIsBoundAux
+    simp only [fastReplaceFree]
+    simp only [toIsBoundAux]
     simp
     constructor
     case left | right =>
@@ -982,10 +970,10 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold fastAdmitsAux at h2
+    simp only [fastAdmitsAux] at h2
 
-    unfold fastReplaceFree
-    unfold toIsBoundAux
+    simp only [fastReplaceFree]
+    simp only [toIsBoundAux]
     congr! 1
     exact phi_ih binders h1 h2
   case
@@ -993,24 +981,24 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastAdmitsAux at h2
+    simp only [fastAdmitsAux] at h2
 
-    unfold fastReplaceFree
-    unfold toIsBoundAux
+    simp only [fastReplaceFree]
+    simp only [toIsBoundAux]
     cases h2
     case intro h2_left h2_right =>
       congr! 1
       · exact phi_ih binders h1 h2_left
       · exact psi_ih binders h1 h2_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastAdmitsAux at h2
+    simp only [fastAdmitsAux] at h2
 
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     split_ifs
     case pos c1 =>
       rfl
     case neg c1 =>
-      unfold toIsBoundAux
+      simp only [toIsBoundAux]
       simp
       apply phi_ih
       · simp
@@ -1031,19 +1019,19 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     induction xs
     case nil =>
-      unfold fastAdmitsAux
+      simp only [fastAdmitsAux]
       simp
     case cons args_hd args_tl args_ih =>
-      unfold fastReplaceFree at h2
-      unfold toIsBoundAux at h2
+      simp only [fastReplaceFree] at h2
+      simp only [toIsBoundAux] at h2
       simp at h2
 
-      unfold fastAdmitsAux at args_ih
-      unfold fastReplaceFree at args_ih
-      unfold toIsBoundAux at args_ih
+      simp only [fastAdmitsAux] at args_ih
+      simp only [fastReplaceFree] at args_ih
+      simp only [toIsBoundAux] at args_ih
       simp at args_ih
 
-      unfold fastAdmitsAux
+      simp only [fastAdmitsAux]
       simp
       intro a1
       cases a1
@@ -1056,11 +1044,11 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
       case inr a1 =>
         tauto
   case eq_ x y =>
-    unfold fastReplaceFree at h2
-    unfold toIsBoundAux at h2
+    simp only [fastReplaceFree] at h2
+    simp only [toIsBoundAux] at h2
     simp at h2
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     cases h2
     case intro h2_left h2_right =>
       intros a1
@@ -1074,34 +1062,33 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
         simp at h2_right
         tauto
   case true_ | false_ =>
-    unfold fastAdmitsAux
-    simp
+    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    unfold fastReplaceFree at h2
-    unfold toIsBoundAux at h2
+    simp only [fastReplaceFree] at h2
+    simp only [toIsBoundAux] at h2
     simp at h2
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     exact phi_ih binders h1 h2
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastReplaceFree at h2
-    unfold toIsBoundAux at h2
+    simp only [fastReplaceFree] at h2
+    simp only [toIsBoundAux] at h2
     simp at h2
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     cases h2
     case intro h2_left h2_right =>
       constructor
       · exact phi_ih binders h1 h2_left
       · exact psi_ih binders h1 h2_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastReplaceFree at h2
+    simp only [fastReplaceFree] at h2
 
-    unfold fastAdmitsAux
+    simp only [fastAdmitsAux]
     split_ifs at h2
     case pos c1 =>
       left
@@ -1111,7 +1098,7 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
       apply phi_ih
       · simp
         tauto
-      · unfold toIsBoundAux at h2
+      · simp only [toIsBoundAux] at h2
         simp at h2
         exact h2
 
@@ -1122,8 +1109,8 @@ example
   fastAdmits v u F ↔
     toIsBound F = toIsBound (fastReplaceFree v u F) :=
   by
-  unfold fastAdmits
-  unfold toIsBound
+  simp only [fastAdmits]
+  simp only [toIsBound]
   constructor
   · apply fastAdmitsAux_imp_free_and_bound_unchanged
     simp
@@ -1140,26 +1127,25 @@ theorem admitsAux_self
   admitsAux v v binders F := by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold admitsAux
+    simp only [admitsAux]
     simp
   case eq_ x y =>
-    unfold admitsAux
+    simp only [admitsAux]
     simp
   case true_ | false_ =>
-    unfold admitsAux
-    simp
+    simp only [admitsAux]
   case not_ phi phi_ih =>
-    unfold admitsAux
+    simp only [admitsAux]
     exact phi_ih binders
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold admitsAux
+    simp only [admitsAux]
     tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold admitsAux
+    simp only [admitsAux]
     tauto
 
 
@@ -1168,7 +1154,7 @@ theorem admits_self
   (v : VarName) :
   admits v v F :=
   by
-  unfold admits
+  simp only [admits]
   apply admitsAux_self
 
 --
@@ -1182,44 +1168,43 @@ theorem not_isFreeIn_imp_admitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     tauto
   case eq_ x y =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     tauto
   case true_ | false_ =>
-    unfold admitsAux
-    simp
+    simp only [admitsAux]
   case not_ phi phi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     exact phi_ih binders h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
     push_neg at h1
 
     cases h1
     case intro h1_left h1_right =>
-    unfold admitsAux
+    simp only [admitsAux]
     constructor
     · exact phi_ih binders h1_left
     · exact psi_ih binders h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
     simp at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     by_cases c1 : v = x
     · apply mem_binders_imp_admitsAux
       simp
@@ -1234,7 +1219,7 @@ theorem not_isFreeIn_imp_admits
   (h1 : ¬ isFreeIn v F) :
   admits v u F :=
   by
-  unfold admits
+  simp only [admits]
   exact not_isFreeIn_imp_admitsAux F v u ∅ h1
 
 --
@@ -1249,42 +1234,41 @@ theorem not_isBoundIn_imp_admitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     intro _ _
     exact h2
   case eq_ x y =>
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     intro _ _
     exact h2
   case true_ | false_ =>
-    unfold admitsAux
-    simp
+    simp only [admitsAux]
   case not_ phi phi_ih =>
-    unfold isBoundIn at h1
+    simp only [isBoundIn] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     exact phi_ih binders h1 h2
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold isBoundIn at h1
+    simp only [isBoundIn] at h1
     push_neg at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     cases h1
     case intro h1_left h1_right =>
       constructor
       · exact phi_ih binders h1_left h2
       · exact psi_ih binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold isBoundIn at h1
+    simp only [isBoundIn] at h1
     push_neg at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     cases h1
     case intro h1_left h1_right =>
       apply phi_ih (binders ∪ {x}) h1_right
@@ -1298,7 +1282,7 @@ theorem not_isBoundIn_imp_admits
   (h1 : ¬ isBoundIn u F) :
   admits v u F :=
   by
-  unfold admits
+  simp only [admits]
   apply not_isBoundIn_imp_admitsAux F v u ∅ h1
   simp
 
@@ -1313,10 +1297,10 @@ theorem replaceFreeAux_admitsAux
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
 
-    unfold replaceFreeAux
-    unfold admitsAux
+    simp only [replaceFreeAux]
+    simp only [admitsAux]
     simp
     intro x a1 a2 a3
     by_cases c1 : v = x ∧ x ∉ binders
@@ -1331,11 +1315,11 @@ theorem replaceFreeAux_admitsAux
       subst a2
       contradiction
   case eq_ x y =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
     push_neg at h1
 
-    unfold replaceFreeAux
-    unfold admitsAux
+    simp only [replaceFreeAux]
+    simp only [admitsAux]
     cases h1
     case intro h1_left h1_right =>
       intro a1
@@ -1362,36 +1346,35 @@ theorem replaceFreeAux_admitsAux
           case inl a1 | inr a1 =>
           contradiction
   case true_ | false_ =>
-    unfold replaceFreeAux
-    unfold admitsAux
-    simp
+    simp only [replaceFreeAux]
+    simp only [admitsAux]
   case not_ phi phi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
 
-    unfold replaceFreeAux
-    unfold admitsAux
+    simp only [replaceFreeAux]
+    simp only [admitsAux]
     exact phi_ih binders h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
     push_neg at h1
 
-    unfold replaceFreeAux
-    unfold admitsAux
+    simp only [replaceFreeAux]
+    simp only [admitsAux]
     cases h1
     case intro h1_left h1_right =>
       constructor
       · exact phi_ih binders h1_left
       · exact psi_ih binders h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold occursIn at h1
+    simp only [occursIn] at h1
     push_neg at h1
 
-    unfold replaceFreeAux
-    unfold admitsAux
+    simp only [replaceFreeAux]
+    simp only [admitsAux]
     tauto
 
 
@@ -1401,8 +1384,8 @@ theorem replaceFree_admits
   (h1 : ¬ occursIn t F) :
   admits t v (replaceFree v t F) :=
   by
-  unfold replaceFree
-  unfold admits
+  simp only [replaceFree]
+  simp only [admits]
   exact replaceFreeAux_admitsAux F v t ∅ h1
 
 --
@@ -1417,44 +1400,43 @@ theorem admitsAux_add_binders
   by
   induction F generalizing S
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
     simp at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     tauto
   case eq_ x y =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
     simp at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     tauto
   case true_ | false_ =>
-    unfold admitsAux
-    simp
+    simp only [admitsAux]
   case not_ phi phi_ih =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     exact phi_ih S h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     cases h1
     case intro h1_left h1_right =>
     constructor
     · exact phi_ih S h1_left
     · exact psi_ih S h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     simp only [Finset.union_right_comm S T {x}]
     tauto
 
@@ -1469,45 +1451,44 @@ theorem admitsAux_del_binders
   by
   induction F generalizing S
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
     simp at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     tauto
   case eq_ x y =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
     simp at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     simp
     tauto
   case true_ | false_ =>
-    unfold admitsAux
-    simp
+    simp only [admitsAux]
   case not_ phi phi_ih =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     exact phi_ih S h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     cases h1
     case intro h1_left h1_right =>
       constructor
       · exact phi_ih S h1_left
       · exact psi_ih S h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
     simp only [Finset.union_right_comm S T {x}] at h1
 
-    unfold admitsAux
+    simp only [admitsAux]
     tauto
 
 
@@ -1522,27 +1503,25 @@ theorem admitsAux_isFreeIn
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
     simp at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     exact h1 h2 h3
   case eq_ x y =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
     simp at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     exact h1 h2 h3
   case true_ | false_ =>
-    unfold isFreeIn at h2
-
-    contradiction
+    simp only [isFreeIn] at h2
   case not_ phi phi_ih =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     exact phi_ih binders h1 h2 h3
   case
@@ -1550,9 +1529,9 @@ theorem admitsAux_isFreeIn
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     cases h1
     case intro h1_left h1_right =>
@@ -1562,9 +1541,9 @@ theorem admitsAux_isFreeIn
       case inr h2 =>
         exact psi_ih binders h1_right h2 h3
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold admitsAux at h1
+    simp only [admitsAux] at h1
 
-    unfold isFreeIn at h2
+    simp only [isFreeIn] at h2
 
     cases h2
     case intro h2_left h2_right =>
@@ -1593,9 +1572,9 @@ theorem substitution_theorem_aux
   all_goals
     induction F generalizing binders V
     case pred_const_ X xs | pred_var_ X xs =>
-      unfold fastAdmitsAux at h1
+      simp only [fastAdmitsAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       unfold Function.updateITE
       congr! 1
@@ -1611,11 +1590,11 @@ theorem substitution_theorem_aux
       case _ c1 =>
         rfl
     case eq_ x y =>
-      unfold fastAdmitsAux at h1
+      simp only [fastAdmitsAux] at h1
 
-      unfold fastReplaceFree
-      unfold Holds
-      unfold Function.updateITE
+      simp only [fastReplaceFree]
+      simp only [Holds]
+      simp only [Function.updateITE]
       simp only [eq_comm]
       congr! 1
       all_goals
@@ -1626,12 +1605,12 @@ theorem substitution_theorem_aux
         case _ c1 =>
           rfl
     case true_ | false_ =>
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
     case not_ phi phi_ih =>
-      unfold fastAdmitsAux at h1
+      simp only [fastAdmitsAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       congr! 1
       exact phi_ih V binders h1 h2
@@ -1640,9 +1619,9 @@ theorem substitution_theorem_aux
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      unfold fastAdmitsAux at h1
+      simp only [fastAdmitsAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
@@ -1650,9 +1629,9 @@ theorem substitution_theorem_aux
       · exact phi_ih V binders h1_left h2
       · exact psi_ih V binders h1_right h2
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      unfold fastAdmitsAux at h1
+      simp only [fastAdmitsAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       split_ifs
       case _ c1 =>
         subst c1
@@ -1661,7 +1640,7 @@ theorem substitution_theorem_aux
         intro d
         congr! 1
         funext x
-        unfold Function.updateITE
+        simp only [Function.updateITE]
         split_ifs <;> rfl
       case _ c1 =>
         simp only [Holds]
@@ -1673,7 +1652,7 @@ theorem substitution_theorem_aux
         case inr h1 =>
           simp only [Function.updateITE_comm V v x d (V' t) c1]
           apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
-          unfold Function.updateITE
+          simp only [Function.updateITE]
           simp
           push_neg
           intros v' a1
@@ -1683,13 +1662,13 @@ theorem substitution_theorem_aux
             tauto
 
   case nil.def_ X xs =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     simp only [Holds]
 
   case cons.def_ hd tl ih X xs =>
-      unfold fastAdmitsAux at h1
+      simp only [fastAdmitsAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       unfold Function.updateITE
       congr! 1
@@ -1727,7 +1706,7 @@ theorem substitution_theorem_aux
             exact c1_right
       case _ _ =>
         apply ih V binders
-        · unfold fastAdmitsAux
+        · simp only [fastAdmitsAux]
           exact h1
         · exact h2
 
@@ -1743,7 +1722,7 @@ theorem substitution_theorem
   Holds D I (Function.updateITE V v (V t)) E F ↔
     Holds D I V E (fastReplaceFree v t F) :=
   by
-  unfold fastAdmits at h1
+  simp only [fastAdmits] at h1
 
   apply substitution_theorem_aux D I V V E v t ∅ F h1
   simp
@@ -1756,9 +1735,9 @@ theorem substitution_is_valid
   (h2 : F.IsValid) :
   (fastReplaceFree v t F).IsValid :=
   by
-  unfold IsValid at h2
+  simp only [IsValid] at h2
 
-  unfold IsValid
+  simp only [IsValid]
   intro D I V E
   simp only [← substitution_theorem D I V E v t F h1]
   apply h2
