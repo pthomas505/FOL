@@ -264,12 +264,9 @@ theorem admitsAux_imp_fastAdmitsAux
     · left
       exact c1
     · right
-      apply phi_ih (binders ∪ {x})
+      apply phi_ih
       · simp
-        push_neg
-        constructor
-        · exact h1
-        · exact c1
+        tauto
       · exact h2
 
 
