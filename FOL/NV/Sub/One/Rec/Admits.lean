@@ -19,30 +19,30 @@ If $v$ and $u$ are variables and $P$ is a formula, then $P$ admits $u$ for $v$ i
 /--
   Helper function for admits.
 -/
-def admitsAux (v u : VarName) : Finset VarName → Formula → Prop
-  | binders, pred_const_ _ xs =>
+def admitsAux (v u : VarName) (binders : Finset VarName) : Formula → Prop
+  | pred_const_ _ xs =>
       v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
-  | binders, pred_var_ _ xs =>
+  | pred_var_ _ xs =>
       v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
-  | binders, eq_ x y =>
+  | eq_ x y =>
       (v = x ∨ v = y) ∧ v ∉ binders → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
-  | _, true_ => True
-  | _, false_ => True
-  | binders, not_ phi => admitsAux v u binders phi
-  | binders, imp_ phi psi =>
+  | true_ => True
+  | false_ => True
+  | not_ phi => admitsAux v u binders phi
+  | imp_ phi psi =>
       admitsAux v u binders phi ∧ admitsAux v u binders psi
-  | binders, and_ phi psi =>
+  | and_ phi psi =>
       admitsAux v u binders phi ∧ admitsAux v u binders psi
-  | binders, or_ phi psi =>
+  | or_ phi psi =>
       admitsAux v u binders phi ∧ admitsAux v u binders psi
-  | binders, iff_ phi psi =>
+  | iff_ phi psi =>
       admitsAux v u binders phi ∧ admitsAux v u binders psi
-  | binders, forall_ x phi => admitsAux v u (binders ∪ {x}) phi
-  | binders, exists_ x phi => admitsAux v u (binders ∪ {x}) phi
-  | binders, def_ _ xs =>
+  | forall_ x phi => admitsAux v u (binders ∪ {x}) phi
+  | exists_ x phi => admitsAux v u (binders ∪ {x}) phi
+  | def_ _ xs =>
       v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
 
@@ -82,30 +82,30 @@ instance
 /--
   Helper function for fastAdmits.
 -/
-def fastAdmitsAux (v u : VarName) : Finset VarName → Formula → Prop
-  | binders, pred_const_ _ xs =>
+def fastAdmitsAux (v u : VarName) (binders : Finset VarName) : Formula → Prop
+  | pred_const_ _ xs =>
       v ∈ xs → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
-  | binders, pred_var_ _ xs =>
+  | pred_var_ _ xs =>
       v ∈ xs → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
-  | binders, eq_ x y =>
+  | eq_ x y =>
       (v = x ∨ v = y) → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
-  | _, true_ => True
-  | _, false_ => True
-  | binders, not_ phi => fastAdmitsAux v u binders phi
-  | binders, imp_ phi psi =>
+  | true_ => True
+  | false_ => True
+  | not_ phi => fastAdmitsAux v u binders phi
+  | imp_ phi psi =>
       fastAdmitsAux v u binders phi ∧ fastAdmitsAux v u binders psi
-  | binders, and_ phi psi =>
+  | and_ phi psi =>
       fastAdmitsAux v u binders phi ∧ fastAdmitsAux v u binders psi
-  | binders, or_ phi psi =>
+  | or_ phi psi =>
       fastAdmitsAux v u binders phi ∧ fastAdmitsAux v u binders psi
-  | binders, iff_ phi psi =>
+  | iff_ phi psi =>
       fastAdmitsAux v u binders phi ∧ fastAdmitsAux v u binders psi
-  | binders, forall_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
-  | binders, exists_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
-  | binders, def_ _ xs =>
+  | forall_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
+  | exists_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
+  | def_ _ xs =>
       v ∈ xs → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
 
