@@ -968,11 +968,7 @@ theorem replaceFreeAux_admitsAux
           subst c2_left
           exact c2_right
       case _ c1 c2 =>
-        cases a1
-        case intro a1_left a1_right =>
-          cases a1_left
-          case inl a1 | inr a1 =>
-          contradiction
+        tauto
   any_goals
     simp only [occursIn] at h1
 
@@ -1003,45 +999,16 @@ theorem admitsAux_add_binders
   admitsAux v u (S ∪ T) F :=
   by
   induction F generalizing S
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    simp only [admitsAux] at h1
-    simp at h1
-
-    simp only [admitsAux]
-    simp
-    tauto
-  case eq_ x y =>
-    simp only [admitsAux] at h1
-    simp at h1
-
-    simp only [admitsAux]
-    simp
-    tauto
-  case true_ | false_ =>
-    simp only [admitsAux]
-  case not_ phi phi_ih =>
+  all_goals
     simp only [admitsAux] at h1
 
     simp only [admitsAux]
-    exact phi_ih S h1
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [admitsAux] at h1
-
-    simp only [admitsAux]
-    cases h1
-    case intro h1_left h1_right =>
-    constructor
-    · exact phi_ih S h1_left
-    · exact psi_ih S h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [admitsAux] at h1
-
-    simp only [admitsAux]
     simp only [Finset.union_right_comm S T {x}]
+    tauto
+  any_goals
+    simp
+  all_goals
     tauto
 
 
@@ -1059,14 +1026,12 @@ theorem admitsAux_del_binders
     simp at h1
 
     simp only [admitsAux]
-    simp
     tauto
   case eq_ x y =>
     simp only [admitsAux] at h1
     simp at h1
 
     simp only [admitsAux]
-    simp
     tauto
   case true_ | false_ =>
     simp only [admitsAux]
@@ -1083,11 +1048,7 @@ theorem admitsAux_del_binders
     simp only [admitsAux] at h1
 
     simp only [admitsAux]
-    cases h1
-    case intro h1_left h1_right =>
-      constructor
-      · exact phi_ih S h1_left
-      · exact psi_ih S h1_right
+    tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [admitsAux] at h1
     simp only [Finset.union_right_comm S T {x}] at h1
@@ -1106,49 +1067,11 @@ theorem admitsAux_isFreeIn
   u ∉ binders :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    simp only [admitsAux] at h1
-    simp at h1
-
-    simp only [isFreeIn] at h2
-
-    exact h1 h2 h3
-  case eq_ x y =>
-    simp only [admitsAux] at h1
-    simp at h1
-
-    simp only [isFreeIn] at h2
-
-    exact h1 h2 h3
-  case true_ | false_ =>
-    simp only [isFreeIn] at h2
-  case not_ phi phi_ih =>
+  all_goals
     simp only [admitsAux] at h1
 
     simp only [isFreeIn] at h2
-
-    exact phi_ih binders h1 h2 h3
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [admitsAux] at h1
-
-    simp only [isFreeIn] at h2
-
-    cases h1
-    case intro h1_left h1_right =>
-      cases h2
-      case inl h2 =>
-        exact phi_ih binders h1_left h2 h3
-      case inr h2 =>
-        exact psi_ih binders h1_right h2 h3
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [admitsAux] at h1
-
-    simp only [isFreeIn] at h2
-
     cases h2
     case intro h2_left h2_right =>
       apply phi_ih binders
@@ -1157,6 +1080,8 @@ theorem admitsAux_isFreeIn
           exact h2_left
       · exact h2_right
       · exact h3
+  all_goals
+    tauto
 
 
 theorem substitution_theorem_aux
