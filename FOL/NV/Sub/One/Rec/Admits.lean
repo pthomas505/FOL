@@ -339,50 +339,12 @@ theorem not_isFreeIn_imp_fastAdmitsAux
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [isFreeIn] at h1
 
     simp only [fastAdmitsAux]
-    intro a1
-    contradiction
-  case eq_ x y =>
-    simp only [isFreeIn] at h1
-
-    simp only [fastAdmitsAux]
-    intro a1
-    contradiction
-  case true_ | false_ =>
-    simp only [fastAdmitsAux]
-  case not_ phi phi_ih =>
-    simp only [isFreeIn] at h1
-
-    simp only [fastAdmitsAux]
-    exact phi_ih binders h1
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [isFreeIn] at h1
-    push_neg at h1
-
-    simp only [fastAdmitsAux]
-    cases h1
-    case intro h1_left h1_right =>
-      constructor
-      · exact phi_ih binders h1_left
-      · exact psi_ih binders h1_right
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [isFreeIn] at h1
-    push_neg at h1
-
-    simp only [fastAdmitsAux]
-    by_cases c1 : v = x
-    · left
-      exact c1
-    · right
-      apply phi_ih (binders ∪ {x})
-      exact h1 c1
+  all_goals
+    tauto
 
 
 theorem not_isFreeIn_imp_fastAdmits
@@ -405,49 +367,21 @@ theorem not_isBoundIn_imp_fastAdmitsAux
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    simp only [fastAdmitsAux]
-    intros _
-    exact h2
-  case eq_ x y =>
-    simp only [fastAdmitsAux]
-    intros _
-    exact h2
-  case true_ | false_ =>
-    simp only [fastAdmitsAux]
-  case not_ phi phi_ih =>
+  all_goals
     simp only [isBoundIn] at h1
 
     simp only [fastAdmitsAux]
-    exact phi_ih binders h1 h2
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [isBoundIn] at h1
-    push_neg at h1
-
-    simp only [fastAdmitsAux]
-    cases h1
-    case intro h1_left h1_right =>
-      constructor
-      · exact phi_ih binders h1_left h2
-      · exact psi_ih binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [isBoundIn] at h1
     push_neg at h1
 
-    simp only [fastAdmitsAux]
     cases h1
     case intro h1_left h1_right =>
       right
       apply phi_ih (binders ∪ {x}) h1_right
       · simp
-        push_neg
-        constructor
-        · exact h2
-        · exact h1_left
+        tauto
+  all_goals
+    tauto
 
 
 theorem not_isBoundIn_imp_fastAdmits
@@ -471,45 +405,14 @@ theorem fastReplaceFree_aux_fastAdmitsAux
   fastAdmitsAux t v binders (fastReplaceFree v t F) :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    simp only [fastReplaceFree]
-    simp only [fastAdmitsAux]
-    intro _
-    exact h2
-  case eq_ x y =>
-    simp only [fastReplaceFree]
-    simp only [fastAdmitsAux]
-    intro _
-    exact h2
-  case true_ | false_ =>
-    simp only [fastReplaceFree]
-    simp only [fastAdmitsAux]
-  case not_ phi phi_ih =>
+  all_goals
     simp only [occursIn] at h1
-
     simp only [fastReplaceFree]
+  any_goals
     simp only [fastAdmitsAux]
-    exact phi_ih binders h1 h2
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [occursIn] at h1
-    push_neg at h1
-
-    simp only [fastReplaceFree]
-    simp only [fastAdmitsAux]
-    cases h1
-    case intro h1_left h1_right =>
-      constructor
-      · exact phi_ih binders h1_left h2
-      · exact psi_ih binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [occursIn] at h1
     push_neg at h1
 
-    simp only [fastReplaceFree]
     cases h1
     case intro h1_left h1_right =>
       split_ifs
@@ -527,10 +430,9 @@ theorem fastReplaceFree_aux_fastAdmitsAux
         right
         apply phi_ih (binders ∪ {x}) h1_right
         simp
-        push_neg
-        constructor
-        · exact h2
-        · exact c1
+        tauto
+  all_goals
+    tauto
 
 
 theorem fastReplaceFree_fastAdmits
