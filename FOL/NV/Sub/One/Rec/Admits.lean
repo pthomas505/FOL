@@ -973,36 +973,12 @@ theorem replaceFreeAux_admitsAux
           cases a1_left
           case inl a1 | inr a1 =>
           contradiction
-  case true_ | false_ =>
-    simp only [replaceFreeAux]
-    simp only [admitsAux]
-  case not_ phi phi_ih =>
+  any_goals
     simp only [occursIn] at h1
 
     simp only [replaceFreeAux]
     simp only [admitsAux]
-    exact phi_ih binders h1
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [occursIn] at h1
-    push_neg at h1
-
-    simp only [replaceFreeAux]
-    simp only [admitsAux]
-    cases h1
-    case intro h1_left h1_right =>
-      constructor
-      · exact phi_ih binders h1_left
-      · exact psi_ih binders h1_right
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [occursIn] at h1
-    push_neg at h1
-
-    simp only [replaceFreeAux]
-    simp only [admitsAux]
+  all_goals
     tauto
 
 
