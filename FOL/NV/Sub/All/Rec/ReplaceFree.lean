@@ -95,7 +95,7 @@ def fastReplaceFree (σ : VarName → VarName) : Formula → Formula
   | def_ X xs => def_ X (xs.map σ)
 
 
-theorem fastReplaceFreeFun_id
+theorem fastReplaceFree_id
   (F : Formula) :
   fastReplaceFree id F = F :=
   by
@@ -159,7 +159,7 @@ example
       simp
       simp only [Function.updateITE_idem]
       simp only [Function.updateITE_id]
-      apply fastReplaceFreeFun_id
+      apply fastReplaceFree_id
     case neg c1 =>
       simp
       simp only [← phi_ih]
@@ -168,7 +168,7 @@ example
       tauto
 
 
-theorem fastReplaceFreeFun_same_on_free
+theorem fastReplaceFree_same_on_free
   (F : Formula)
   (σ σ' : VarName → VarName)
   (h1 : ∀ v : VarName, isFreeIn v F → σ v = σ' v) :
@@ -223,7 +223,7 @@ theorem fastReplaceFreeFun_same_on_free
       tauto
 
 
-theorem replaceFreeFunAux_same_on_free
+theorem replaceFreeAux_same_on_free
   (F : Formula)
   (σ σ' : VarName → VarName)
   (binders : Finset VarName)
@@ -305,7 +305,7 @@ example
       exact c1
 
     simp only [← phi_ih (Function.updateITE σ x x) (binders ∪ {x}) s1]
-    apply replaceFreeFunAux_same_on_free phi σ (Function.updateITE σ x x) (binders ∪ {x})
+    apply replaceFreeAux_same_on_free phi σ (Function.updateITE σ x x) (binders ∪ {x})
     simp only [Function.updateITE]
     intro v a1
     simp at a1
