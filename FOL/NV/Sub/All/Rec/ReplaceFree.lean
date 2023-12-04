@@ -100,27 +100,22 @@ theorem fastReplaceFreeFun_id
   fastReplaceFreeFun id F = F :=
   by
   induction F
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [fastReplaceFreeFun]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr!
     simp
   case eq_ x y =>
-    simp only [fastReplaceFreeFun]
     congr!
-  case true_ | false_ =>
-    simp only [fastReplaceFreeFun]
   case not_ phi phi_ih =>
-    simp only [fastReplaceFreeFun]
     congr!
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastReplaceFreeFun]
     congr!
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastReplaceFreeFun]
     congr!
     simp only [Function.updateITE_id]
     exact phi_ih
