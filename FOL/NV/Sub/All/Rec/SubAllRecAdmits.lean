@@ -1,13 +1,11 @@
 import FOL.NV.Semantics
-import FOL.NV.Sub.All.Rec.SubAllRecReplaceFree
+import FOL.NV.Sub.All.Rec.ReplaceFree
 
 
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV.Sub.All.Rec
 
 open Formula
 
@@ -80,7 +78,7 @@ theorem substitution_fun_theorem_aux
   (h2 : ∀ v : VarName, v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
   (h2' : ∀ v : VarName, v ∈ binders → v = σ' v)
   (h3 : ∀ v : VarName, v ∉ binders → σ' v = σ v) :
-  Holds D I V E F ↔ Holds D I V' E (fastReplaceFreeFun σ' F) :=
+  Holds D I V E F ↔ Holds D I V' E (fastReplaceFree σ' F) :=
   by
   induction E generalizing F binders V V' σ σ'
   all_goals
@@ -88,7 +86,7 @@ theorem substitution_fun_theorem_aux
     case pred_const_ X xs | pred_var_ X xs =>
       unfold admitsFunAux at h1
 
-      unfold fastReplaceFreeFun
+      unfold fastReplaceFree
       simp only [Holds]
       congr! 1
       simp
@@ -104,7 +102,7 @@ theorem substitution_fun_theorem_aux
     case eq_ x y =>
       unfold admitsFunAux at h1
 
-      unfold fastReplaceFreeFun
+      unfold fastReplaceFree
       simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
@@ -124,12 +122,12 @@ theorem substitution_fun_theorem_aux
             simp only [h3 y c1]
             exact h1_right c1
     case true_ | false_ =>
-      unfold fastReplaceFreeFun
+      unfold fastReplaceFree
       simp only [Holds]
     case not_ phi phi_ih =>
       unfold admitsFunAux at h1
 
-      unfold fastReplaceFreeFun
+      unfold fastReplaceFree
       simp only [Holds]
       congr! 1
       exact phi_ih V V' σ σ' binders h1 h2 h2' h3
@@ -140,7 +138,7 @@ theorem substitution_fun_theorem_aux
       | iff_ phi psi phi_ih psi_ih =>
       unfold admitsFunAux at h1
 
-      unfold fastReplaceFreeFun
+      unfold fastReplaceFree
       simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
@@ -150,7 +148,7 @@ theorem substitution_fun_theorem_aux
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
       unfold admitsFunAux at h1
 
-      unfold fastReplaceFreeFun
+      unfold fastReplaceFree
       simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intro d
@@ -190,10 +188,10 @@ theorem substitution_fun_theorem_aux
           exact h3 v a1_left
 
   case nil.def_ X xs =>
-    unfold fastReplaceFreeFun
+    unfold fastReplaceFree
     simp only [Holds]
   case cons.def_ hd tl ih X xs =>
-    unfold fastReplaceFreeFun
+    unfold fastReplaceFree
     simp only [Holds]
     split_ifs
     case _ c1 c2 =>
@@ -234,7 +232,7 @@ theorem substitution_fun_theorem_aux
       contradiction
     case _ c1 c2 =>
       specialize ih V V' σ σ' binders (def_ X xs)
-      unfold fastReplaceFreeFun at ih
+      unfold fastReplaceFree at ih
       apply ih h1 h2 h2' h3
 
 
@@ -247,7 +245,7 @@ theorem substitution_fun_theorem
   (F : Formula)
   (h1 : admitsFun σ F) :
   Holds D I (V ∘ σ) E F ↔
-    Holds D I V E (fastReplaceFreeFun σ F) :=
+    Holds D I V E (fastReplaceFree σ F) :=
   by
   apply substitution_fun_theorem_aux D I (V ∘ σ) V E σ σ ∅ F h1
   · simp
@@ -260,7 +258,7 @@ theorem substitution_fun_valid
   (F : Formula)
   (h1 : admitsFun σ F)
   (h2 : F.IsValid) :
-  (fastReplaceFreeFun σ F).IsValid :=
+  (fastReplaceFree σ F).IsValid :=
   by
   unfold IsValid at h2
 
