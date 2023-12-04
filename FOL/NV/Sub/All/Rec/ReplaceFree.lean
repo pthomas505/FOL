@@ -100,27 +100,26 @@ theorem fastReplaceFreeFun_id
   by
   induction F
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastReplaceFreeFun
+    simp only [fastReplaceFreeFun]
     congr!
     simp
   case eq_ x y =>
-    unfold fastReplaceFreeFun
+    simp only [fastReplaceFreeFun]
     congr!
   case true_ | false_ =>
-    unfold fastReplaceFreeFun
-    rfl
+    simp only [fastReplaceFreeFun]
   case not_ phi phi_ih =>
-    unfold fastReplaceFreeFun
+    simp only [fastReplaceFreeFun]
     congr!
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastReplaceFreeFun
+    simp only [fastReplaceFreeFun]
     congr!
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastReplaceFreeFun
+    simp only [fastReplaceFreeFun]
     congr!
     simp only [Function.updateITE_id]
     exact phi_ih
@@ -133,49 +132,44 @@ example
     One.Rec.fastReplaceFree v t F :=
   by
   induction F
+  all_goals
+    simp only [fastReplaceFreeFun]
+    simp only [One.Rec.fastReplaceFree]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastReplaceFreeFun
-    unfold One.Rec.fastReplaceFree
-    unfold Function.updateITE
+    simp
+    simp only [List.map_eq_map_iff]
+    intro x a1
+    simp only [Function.updateITE]
     simp only [eq_comm]
-    rfl
+    simp
   case eq_ x y =>
-    unfold fastReplaceFreeFun
-    unfold One.Rec.fastReplaceFree
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     simp only [eq_comm]
-    rfl
-  case true_ | false_ =>
-    rfl
+    simp
   case not_ phi phi_ih =>
-    unfold fastReplaceFreeFun
-    unfold One.Rec.fastReplaceFree
-    congr!
+    simp
+    exact phi_ih
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastReplaceFreeFun
-    unfold One.Rec.fastReplaceFree
-    congr!
+    simp
+    tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastReplaceFreeFun
-    unfold One.Rec.fastReplaceFree
     split_ifs
     case pos c1 =>
       subst c1
-      congr!
+      simp
       simp only [Function.updateITE_idem]
       simp only [Function.updateITE_id]
       apply fastReplaceFreeFun_id
     case neg c1 =>
-      congr! 1
+      simp
       simp only [← phi_ih]
       congr! 1
       apply Function.updateITE_comm_id x v t
-      simp only [eq_comm]
-      exact c1
+      tauto
 
 
 theorem fastReplaceFreeFun_same_on_free
@@ -186,15 +180,15 @@ theorem fastReplaceFreeFun_same_on_free
   by
   induction F generalizing σ σ'
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold fastReplaceFreeFun
+    simp only [fastReplaceFreeFun]
     congr! 1
     simp only [List.map_eq_map_iff]
     exact h1
   case eq_ x y =>
-    unfold isFreeIn at h1
-    unfold fastReplaceFreeFun
+    simp only [isFreeIn] at h1
+    simp only [fastReplaceFreeFun]
     congr! 1
     · apply h1
       left
@@ -203,12 +197,11 @@ theorem fastReplaceFreeFun_same_on_free
       right
       rfl
   case true_ | false_ =>
-    unfold fastReplaceFreeFun
-    rfl
+    simp only [fastReplaceFreeFun]
   case not_ phi phi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold fastReplaceFreeFun
+    simp only [fastReplaceFreeFun]
     congr! 1
     exact phi_ih σ σ' h1
   case
@@ -216,9 +209,9 @@ theorem fastReplaceFreeFun_same_on_free
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold isFreeIn at h1
+    simp only [isFreeIn] at h1
 
-    unfold fastReplaceFreeFun
+    simp only [fastReplaceFreeFun]
     congr! 1
     · apply phi_ih
       intro v a1
@@ -231,17 +224,17 @@ theorem fastReplaceFreeFun_same_on_free
       right
       exact a1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastReplaceFreeFun
+    simp only [fastReplaceFreeFun]
     congr! 1
     apply phi_ih
     intro v a1
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     split_ifs
     case _ c1 =>
       rfl
     case _ c1 =>
       apply h1
-      unfold isFreeIn
+      simp only [isFreeIn]
       constructor
       · exact c1
       · exact a1
@@ -257,7 +250,7 @@ theorem replaceFreeFunAux_same_on_free
   by
   induction F generalizing binders
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold replaceFreeFunAux
+    simp only [replaceFreeFunAux]
     congr! 1
     simp only [List.map_eq_map_iff]
     intro x _
@@ -267,7 +260,7 @@ theorem replaceFreeFunAux_same_on_free
     case _ c1 =>
       exact h1 x c1
   case eq_ x y =>
-    unfold replaceFreeFunAux
+    simp only [replaceFreeFunAux]
     congr! 1
     · split_ifs
       case _ c1 =>
@@ -282,7 +275,7 @@ theorem replaceFreeFunAux_same_on_free
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold replaceFreeFunAux
+    simp only [replaceFreeFunAux]
     congr! 1
     exact phi_ih binders h1
   case
@@ -290,12 +283,12 @@ theorem replaceFreeFunAux_same_on_free
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold replaceFreeFunAux
+    simp only [replaceFreeFunAux]
     congr! 1
     · exact phi_ih binders h1
     · exact psi_ih binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold replaceFreeFunAux
+    simp only [replaceFreeFunAux]
     congr! 1
     apply phi_ih
     intro v a1
@@ -316,8 +309,8 @@ example
   by
   induction F generalizing binders σ
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    unfold fastReplaceFreeFun
-    unfold replaceFreeFunAux
+    simp only [fastReplaceFreeFun]
+    simp only [replaceFreeFunAux]
     congr! 1
     simp only [List.map_eq_map_iff]
     intro x _
@@ -327,8 +320,8 @@ example
     case _ c1 =>
       rfl
   case eq_ x y =>
-    unfold fastReplaceFreeFun
-    unfold replaceFreeFunAux
+    simp only [fastReplaceFreeFun]
+    simp only [replaceFreeFunAux]
     congr! 1
     · split_ifs
       case _ c1 =>
@@ -343,8 +336,8 @@ example
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold fastReplaceFreeFun
-    unfold replaceFreeFunAux
+    simp only [fastReplaceFreeFun]
+    simp only [replaceFreeFunAux]
     congr! 1
     exact phi_ih σ binders h1
   case
@@ -352,20 +345,20 @@ example
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold fastReplaceFreeFun
-    unfold replaceFreeFunAux
+    simp only [fastReplaceFreeFun]
+    simp only [replaceFreeFunAux]
     congr! 1
     · exact phi_ih σ binders h1
     · exact psi_ih σ binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold fastReplaceFreeFun
-    unfold replaceFreeFunAux
+    simp only [fastReplaceFreeFun]
+    simp only [replaceFreeFunAux]
     congr! 1
 
     have s1 : (∀ (v : VarName), v ∈ binders ∪ {x} → v = Function.updateITE σ x x v)
     intros v a1
     simp at a1
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     cases a1
     case _ c1 =>
       split_ifs
@@ -379,7 +372,7 @@ example
 
     simp only [← phi_ih (Function.updateITE σ x x) (binders ∪ {x}) s1]
     apply replaceFreeFunAux_same_on_free phi σ (Function.updateITE σ x x) (binders ∪ {x})
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     intro v a1
     simp at a1
     push_neg at a1
