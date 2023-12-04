@@ -17,11 +17,11 @@ def replaceFreeFunAux (σ : VarName → VarName) (binders : Finset VarName) : Fo
   | pred_const_ X xs =>
       pred_const_
       X
-      (xs.map fun x : VarName => if x ∉ binders then σ x else x)
+      (xs.map fun (x : VarName) => if x ∉ binders then σ x else x)
   | pred_var_ X xs =>
       pred_var_
       X
-      (xs.map fun x : VarName => if x ∉ binders then σ x else x)
+      (xs.map fun (x : VarName) => if x ∉ binders then σ x else x)
   | eq_ x y =>
       eq_
       (if x ∉ binders then σ x else x)
@@ -52,7 +52,8 @@ def replaceFreeFunAux (σ : VarName → VarName) (binders : Finset VarName) : Fo
   | def_ X xs =>
       def_
       X
-      (xs.map fun x : VarName => if x ∉ binders then σ x else x)
+      (xs.map fun (x : VarName) => if x ∉ binders then σ x else x)
+
 
 /--
   replaceFreeFun σ F := The simultaneous replacement of each free occurence of any variable v in the formula F by σ v.
