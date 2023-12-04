@@ -360,8 +360,7 @@ theorem substitution_theorem_ind
       rfl
     case _ c1 c2 =>
       subst c2
-      specialize h1_1 c1
-      contradiction
+      tauto
     case _ c1 c2 =>
       rfl
   case
