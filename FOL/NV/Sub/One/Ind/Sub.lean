@@ -133,18 +133,17 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
   by
   subst h2
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs =>
-    simp only [fastReplaceFree]
-    first | apply IsFreeSub.pred_const_ | apply IsFreeSub.pred_var_
-  case eq_ x y =>
-    simp only [fastReplaceFree]
-    apply IsFreeSub.eq_
-  case true_ | false_ =>
-    simp only [fastReplaceFree]
-    first | apply IsFreeSub.true_ | apply IsFreeSub.false_
-  case not_ phi phi_ih =>
+  all_goals
     simp only [fastAdmitsAux] at h1
 
+    simp only [fastReplaceFree]
+  case pred_const_ X xs | pred_var_ X xs =>
+    first | apply IsFreeSub.pred_const_ | apply IsFreeSub.pred_var_
+  case eq_ x y =>
+    apply IsFreeSub.eq_
+  case true_ | false_ =>
+    first | apply IsFreeSub.true_ | apply IsFreeSub.false_
+  case not_ phi phi_ih =>
     apply IsFreeSub.not_
     exact phi_ih binders h1
   case
@@ -152,17 +151,12 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastAdmitsAux] at h1
-
     cases h1
     case intro h1_left h1_right =>
     first | apply IsFreeSub.imp_ | apply IsFreeSub.and_ | apply IsFreeSub.or_ | apply IsFreeSub.iff_
     · exact phi_ih binders h1_left
     · exact psi_ih binders h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [fastReplaceFree]
     cases h1
     case inl h1 =>
       split_ifs
@@ -186,6 +180,7 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
           . exact c2
           . have s1 : ¬ u ∈ binders ∪ {x}
             exact fastAdmitsAux_isFreeIn phi v u (binders ∪ {x}) h1 c2
+
             simp at s1
             tauto
           · exact phi_ih (binders ∪ {x}) h1
@@ -197,7 +192,6 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
           simp only [isFreeIn]
           tauto
   case def_ X xs =>
-    simp only [fastReplaceFree]
     apply IsFreeSub.def_
 
 
