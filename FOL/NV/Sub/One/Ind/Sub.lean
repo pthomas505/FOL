@@ -239,22 +239,15 @@ theorem isFreeSub_imp_fastReplaceFree
   fastReplaceFree v u F = F' :=
   by
   induction h1
-  case pred_const_ h1_X h1_xs h1_v h1_t | pred_var_ h1_X h1_xs h1_v h1_t =>
+  all_goals
     simp only [fastReplaceFree]
-  case eq_ h1_x h1_y h1_v h1_t =>
-    simp only [fastReplaceFree]
-  case true_ h1_v h1_t | false_ h1_v h1_t =>
-    rfl
   case not_ h1_phi h1_v h1_t h1_phi' h1_1 h1_ih =>
-    simp only [fastReplaceFree]
-    subst h1_ih
-    rfl
+    tauto
   case
     imp_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' h1_1 h1_2 h1_ih_1 h1_ih_2
   | and_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' h1_1 h1_2 h1_ih_1 h1_ih_2
   | or_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' h1_1 h1_2 h1_ih_1 h1_ih_2
   | iff_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' h1_1 h1_2 h1_ih_1 h1_ih_2 =>
-    simp only [fastReplaceFree]
     subst h1_ih_1
     subst h1_ih_2
     rfl
@@ -264,7 +257,6 @@ theorem isFreeSub_imp_fastReplaceFree
     simp only [isFreeIn] at h1_1
     simp at h1_1
 
-    simp only [fastReplaceFree]
     split_ifs
     case pos c1 =>
       rfl
@@ -279,12 +271,9 @@ theorem isFreeSub_imp_fastReplaceFree
 
     cases h1_1
     case intro h1_1_left h1_1_right =>
-      simp only [fastReplaceFree]
       simp only [if_neg h1_1_left]
       subst h1_ih
       rfl
-  case def_ h1_X h1_xs h1_v h1_t =>
-    simp only [fastReplaceFree]
 
 
 example
