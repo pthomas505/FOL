@@ -1,13 +1,11 @@
 import FOL.FunctionUpdateITE
-import FOL.NV.Sub.One.Rec.SubOneRecReplaceFree
+import FOL.NV.Sub.One.Rec.ReplaceFree
 
 
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV.Sub.All.Rec
 
 open Formula
 
@@ -132,18 +130,18 @@ example
   (F : Formula)
   (v t : VarName) :
   fastReplaceFreeFun (Function.updateITE id v t) F =
-    fastReplaceFree v t F :=
+    One.Rec.fastReplaceFree v t F :=
   by
   induction F
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     unfold fastReplaceFreeFun
-    unfold fastReplaceFree
+    unfold One.Rec.fastReplaceFree
     unfold Function.updateITE
     simp only [eq_comm]
     rfl
   case eq_ x y =>
     unfold fastReplaceFreeFun
-    unfold fastReplaceFree
+    unfold One.Rec.fastReplaceFree
     unfold Function.updateITE
     simp only [eq_comm]
     rfl
@@ -151,7 +149,7 @@ example
     rfl
   case not_ phi phi_ih =>
     unfold fastReplaceFreeFun
-    unfold fastReplaceFree
+    unfold One.Rec.fastReplaceFree
     congr!
   case
       imp_ phi psi phi_ih psi_ih
@@ -159,11 +157,11 @@ example
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     unfold fastReplaceFreeFun
-    unfold fastReplaceFree
+    unfold One.Rec.fastReplaceFree
     congr!
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold fastReplaceFreeFun
-    unfold fastReplaceFree
+    unfold One.Rec.fastReplaceFree
     split_ifs
     case pos c1 =>
       subst c1
