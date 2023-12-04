@@ -175,16 +175,15 @@ theorem fastReplaceFreeFun_same_on_free
   fastReplaceFreeFun σ F = fastReplaceFreeFun σ' F :=
   by
   induction F generalizing σ σ'
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [isFreeIn] at h1
 
     simp only [fastReplaceFreeFun]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr! 1
     simp only [List.map_eq_map_iff]
     exact h1
   case eq_ x y =>
-    simp only [isFreeIn] at h1
-    simp only [fastReplaceFreeFun]
     congr! 1
     · apply h1
       left
@@ -192,12 +191,7 @@ theorem fastReplaceFreeFun_same_on_free
     · apply h1
       right
       rfl
-  case true_ | false_ =>
-    simp only [fastReplaceFreeFun]
   case not_ phi phi_ih =>
-    simp only [isFreeIn] at h1
-
-    simp only [fastReplaceFreeFun]
     congr! 1
     exact phi_ih σ σ' h1
   case
@@ -205,9 +199,6 @@ theorem fastReplaceFreeFun_same_on_free
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [isFreeIn] at h1
-
-    simp only [fastReplaceFreeFun]
     congr! 1
     · apply phi_ih
       intro v a1
@@ -220,7 +211,6 @@ theorem fastReplaceFreeFun_same_on_free
       right
       exact a1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastReplaceFreeFun]
     congr! 1
     apply phi_ih
     intro v a1
@@ -230,10 +220,7 @@ theorem fastReplaceFreeFun_same_on_free
       rfl
     case _ c1 =>
       apply h1
-      simp only [isFreeIn]
-      constructor
-      · exact c1
-      · exact a1
+      tauto
 
 
 theorem replaceFreeFunAux_same_on_free
@@ -245,54 +232,32 @@ theorem replaceFreeFunAux_same_on_free
     replaceFreeFunAux σ' binders F :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [replaceFreeFunAux]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr! 1
     simp only [List.map_eq_map_iff]
     intro x _
-    split_ifs
-    case _ c1 =>
-      rfl
-    case _ c1 =>
-      exact h1 x c1
+    split_ifs <;> tauto
   case eq_ x y =>
-    simp only [replaceFreeFunAux]
     congr! 1
-    · split_ifs
-      case _ c1 =>
-        rfl
-      case _ c1 =>
-        exact h1 x c1
-    · split_ifs
-      case _ c1 =>
-        rfl
-      case _ c1 =>
-        exact h1 y c1
-  case true_ | false_ =>
-    rfl
+    · split_ifs <;> tauto
+    · split_ifs <;> tauto
   case not_ phi phi_ih =>
-    simp only [replaceFreeFunAux]
-    congr! 1
-    exact phi_ih binders h1
+    simp
+    tauto
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [replaceFreeFunAux]
-    congr! 1
-    · exact phi_ih binders h1
-    · exact psi_ih binders h1
+    simp
+    tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [replaceFreeFunAux]
     congr! 1
     apply phi_ih
-    intro v a1
-    simp at a1
-    push_neg at a1
-    cases a1
-    case _ a1_left a1_right =>
-      exact h1 v a1_left
+    simp
+    tauto
 
 
 example
