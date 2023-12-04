@@ -276,34 +276,20 @@ example
     congr! 1
     simp only [List.map_eq_map_iff]
     intro x _
-    split_ifs
-    case _ c1 =>
-      exact h1 x c1
-    case _ c1 =>
-      rfl
+    split_ifs <;> tauto
   case eq_ x y =>
     congr! 1
-    · split_ifs
-      case _ c1 =>
-        exact h1 x c1
-      case _ c1 =>
-        rfl
-    · split_ifs
-      case _ c1 =>
-        exact h1 y c1
-      case _ c1 =>
-        rfl
+    · split_ifs <;> tauto
+    · split_ifs <;> tauto
   case not_ phi phi_ih =>
-    congr! 1
-    exact phi_ih σ binders h1
+    tauto
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    congr! 1
-    · exact phi_ih σ binders h1
-    · exact psi_ih σ binders h1
+    simp
+    tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     congr! 1
 
@@ -313,11 +299,7 @@ example
     simp only [Function.updateITE]
     cases a1
     case _ c1 =>
-      split_ifs
-      case _ c2 =>
-        exact c2
-      case _ c2 =>
-        exact h1 v c1
+      split_ifs <;> tauto
     case _ c1 =>
       simp only [if_pos c1]
       exact c1
