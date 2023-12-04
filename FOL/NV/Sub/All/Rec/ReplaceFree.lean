@@ -171,7 +171,7 @@ example
 theorem fastReplaceFree_same_on_free
   (F : Formula)
   (σ σ' : VarName → VarName)
-  (h1 : ∀ v : VarName, isFreeIn v F → σ v = σ' v) :
+  (h1 : ∀ (v : VarName), isFreeIn v F → σ v = σ' v) :
   fastReplaceFree σ F = fastReplaceFree σ' F :=
   by
   induction F generalizing σ σ'
@@ -227,7 +227,7 @@ theorem replaceFreeAux_same_on_free
   (F : Formula)
   (σ σ' : VarName → VarName)
   (binders : Finset VarName)
-  (h1 : ∀ v : VarName, v ∉ binders → σ v = σ' v) :
+  (h1 : ∀ (v : VarName), v ∉ binders → σ v = σ' v) :
   replaceFreeAux σ binders F =
     replaceFreeAux σ' binders F :=
   by
@@ -264,7 +264,7 @@ example
   (F : Formula)
   (σ : VarName → VarName)
   (binders : Finset VarName)
-  (h1 : ∀ v : VarName, v ∈ binders → v = σ v) :
+  (h1 : ∀ (v : VarName), v ∈ binders → v = σ v) :
   replaceFreeAux σ binders F =
     fastReplaceFree σ F :=
   by
