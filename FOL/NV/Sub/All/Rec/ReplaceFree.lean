@@ -13,43 +13,43 @@ open Formula
 /--
   Helper function for replaceFreeFun.
 -/
-def replaceFreeFunAux (σ : VarName → VarName) : Finset VarName → Formula → Formula
-  | binders, pred_const_ X xs =>
+def replaceFreeFunAux (σ : VarName → VarName) (binders : Finset VarName) : Formula → Formula
+  | pred_const_ X xs =>
       pred_const_
       X
       (xs.map fun x : VarName => if x ∉ binders then σ x else x)
-  | binders, pred_var_ X xs =>
+  | pred_var_ X xs =>
       pred_var_
       X
       (xs.map fun x : VarName => if x ∉ binders then σ x else x)
-  | binders, eq_ x y =>
+  | eq_ x y =>
       eq_
       (if x ∉ binders then σ x else x)
       (if y ∉ binders then σ y else y)
-  | _, true_ => true_
-  | _, false_ => false_
-  | binders, not_ phi => not_ (replaceFreeFunAux σ binders phi)
-  | binders, imp_ phi psi =>
+  | true_ => true_
+  | false_ => false_
+  | not_ phi => not_ (replaceFreeFunAux σ binders phi)
+  | imp_ phi psi =>
       imp_
       (replaceFreeFunAux σ binders phi)
       (replaceFreeFunAux σ binders psi)
-  | binders, and_ phi psi =>
+  | and_ phi psi =>
       and_
       (replaceFreeFunAux σ binders phi)
       (replaceFreeFunAux σ binders psi)
-  | binders, or_ phi psi =>
+  | or_ phi psi =>
       or_
       (replaceFreeFunAux σ binders phi)
       (replaceFreeFunAux σ binders psi)
-  | binders, iff_ phi psi =>
+  | iff_ phi psi =>
       iff_
       (replaceFreeFunAux σ binders phi)
       (replaceFreeFunAux σ binders psi)
-  | binders, forall_ x phi =>
+  | forall_ x phi =>
       forall_ x (replaceFreeFunAux σ (binders ∪ {x}) phi)
-  | binders, exists_ x phi =>
+  | exists_ x phi =>
       exists_ x (replaceFreeFunAux σ (binders ∪ {x}) phi)
-  | binders, def_ X xs =>
+  | def_ X xs =>
       def_
       X
       (xs.map fun x : VarName => if x ∉ binders then σ x else x)
@@ -64,34 +64,34 @@ def replaceFreeFun (σ : VarName → VarName) (F : Formula) : Formula :=
 /--
   fastReplaceFreeFun σ F := The simultaneous replacement of each free occurence of any variable v in the formula F by σ v.
 -/
-def fastReplaceFreeFun : (VarName → VarName) → Formula → Formula
-  | σ, pred_const_ X xs => pred_const_ X (xs.map σ)
-  | σ, pred_var_ X xs => pred_var_ X (xs.map σ)
-  | σ, eq_ x y => eq_ (σ x) (σ y)
-  | _, true_ => true_
-  | _, false_ => false_
-  | σ, not_ phi => not_ (fastReplaceFreeFun σ phi)
-  | σ, imp_ phi psi =>
+def fastReplaceFreeFun (σ : VarName → VarName) : Formula → Formula
+  | pred_const_ X xs => pred_const_ X (xs.map σ)
+  | pred_var_ X xs => pred_var_ X (xs.map σ)
+  | eq_ x y => eq_ (σ x) (σ y)
+  | true_ => true_
+  | false_ => false_
+  | not_ phi => not_ (fastReplaceFreeFun σ phi)
+  | imp_ phi psi =>
       imp_
       (fastReplaceFreeFun σ phi)
       (fastReplaceFreeFun σ psi)
-  | σ, and_ phi psi =>
+  | and_ phi psi =>
       and_
       (fastReplaceFreeFun σ phi)
       (fastReplaceFreeFun σ psi)
-  | σ, or_ phi psi =>
+  | or_ phi psi =>
       or_
       (fastReplaceFreeFun σ phi)
       (fastReplaceFreeFun σ psi)
-  | σ, iff_ phi psi =>
+  | iff_ phi psi =>
       iff_
       (fastReplaceFreeFun σ phi)
       (fastReplaceFreeFun σ psi)
-  | σ, forall_ x phi =>
+  | forall_ x phi =>
       forall_ x (fastReplaceFreeFun (Function.updateITE σ x x) phi)
-  | σ, exists_ x phi =>
+  | exists_ x phi =>
       exists_ x (fastReplaceFreeFun (Function.updateITE σ x x) phi)
-  | σ, def_ X xs => def_ X (xs.map σ)
+  | def_ X xs => def_ X (xs.map σ)
 
 
 theorem fastReplaceFreeFun_id
