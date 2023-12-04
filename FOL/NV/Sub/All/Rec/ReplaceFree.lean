@@ -269,9 +269,10 @@ example
     fastReplaceFreeFun σ F :=
   by
   induction F generalizing binders σ
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [fastReplaceFreeFun]
     simp only [replaceFreeFunAux]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr! 1
     simp only [List.map_eq_map_iff]
     intro x _
@@ -281,8 +282,6 @@ example
     case _ c1 =>
       rfl
   case eq_ x y =>
-    simp only [fastReplaceFreeFun]
-    simp only [replaceFreeFunAux]
     congr! 1
     · split_ifs
       case _ c1 =>
@@ -294,11 +293,7 @@ example
         exact h1 y c1
       case _ c1 =>
         rfl
-  case true_ | false_ =>
-    rfl
   case not_ phi phi_ih =>
-    simp only [fastReplaceFreeFun]
-    simp only [replaceFreeFunAux]
     congr! 1
     exact phi_ih σ binders h1
   case
@@ -306,14 +301,10 @@ example
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastReplaceFreeFun]
-    simp only [replaceFreeFunAux]
     congr! 1
     · exact phi_ih σ binders h1
     · exact psi_ih σ binders h1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastReplaceFreeFun]
-    simp only [replaceFreeFunAux]
     congr! 1
 
     have s1 : (∀ (v : VarName), v ∈ binders ∪ {x} → v = Function.updateITE σ x x v)
