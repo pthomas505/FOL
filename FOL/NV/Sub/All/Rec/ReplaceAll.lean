@@ -39,20 +39,15 @@ theorem substitution_theorem
     Holds D I V E (replaceAll σ F) :=
   by
   induction F generalizing V
-  case pred_const_ X xs | pred_var_ X xs =>
+  all_goals
     simp only [replaceAll]
+  any_goals
     simp only [Holds]
+  case pred_const_ X xs | pred_var_ X xs =>
     simp
   case eq_ x y =>
-    simp only [replaceAll]
-    simp only [Holds]
     simp
-  case true_ | false_ =>
-    simp only [replaceAll]
-    simp only [Holds]
   case not_ phi phi_ih =>
-    simp only [replaceAll]
-    simp only [Holds]
     congr! 1
     exact phi_ih V
   case
@@ -60,15 +55,10 @@ theorem substitution_theorem
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [replaceAll]
-    simp only [Holds]
     congr! 1
     · exact phi_ih V
     · exact psi_ih V
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [replaceAll]
-    simp only [Holds]
-
     first | apply forall_congr' | apply exists_congr
     intro a
 
@@ -77,16 +67,13 @@ theorem substitution_theorem
     apply h1
 
     simp only [← s1]
-
     exact phi_ih (Function.updateITE V (σ x) a)
 
   case def_ X xs =>
     induction E
     case nil =>
-      simp only [replaceAll]
       simp only [Holds]
     case cons E_hd E_tl E_ih =>
-      simp only [replaceAll]
       simp only [Holds]
       simp
       split_ifs
