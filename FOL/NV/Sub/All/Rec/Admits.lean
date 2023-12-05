@@ -13,9 +13,9 @@ open Formula
 def admitsFunAux
   (σ : VarName → VarName) (binders : Finset VarName) : Formula → Prop
   | pred_const_ _ xs =>
-      ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
+      ∀ (v : VarName), v ∈ xs → v ∉ binders → σ v ∉ binders
   | pred_var_ _ xs =>
-      ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
+      ∀ (v : VarName), v ∈ xs → v ∉ binders → σ v ∉ binders
   | eq_ x y =>
       (x ∉ binders → σ x ∉ binders) ∧
       (y ∉ binders → σ y ∉ binders)
@@ -37,7 +37,7 @@ def admitsFunAux
   | forall_ x phi => admitsFunAux σ (binders ∪ {x}) phi
   | exists_ x phi => admitsFunAux σ (binders ∪ {x}) phi
   | def_ _ xs =>
-      ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
+      ∀ (v : VarName), v ∈ xs → v ∉ binders → σ v ∉ binders
 
 
 instance
@@ -74,9 +74,9 @@ theorem substitution_fun_theorem_aux
   (binders : Finset VarName)
   (F : Formula)
   (h1 : admitsFunAux σ binders F)
-  (h2 : ∀ v : VarName, v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
-  (h2' : ∀ v : VarName, v ∈ binders → v = σ' v)
-  (h3 : ∀ v : VarName, v ∉ binders → σ' v = σ v) :
+  (h2 : ∀ (v : VarName), v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
+  (h2' : ∀ (v : VarName), v ∈ binders → v = σ' v)
+  (h3 : ∀ (v : VarName), v ∉ binders → σ' v = σ v) :
   Holds D I V E F ↔ Holds D I V' E (fastReplaceFree σ' F) :=
   by
   induction E generalizing F binders V V' σ σ'
