@@ -9,7 +9,7 @@ namespace FOL.NV.Sub.All.Rec
 open Formula
 
 
-def replaceAllVar
+def replaceAll
   (σ : VarName → VarName) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map σ)
@@ -17,13 +17,13 @@ def replaceAllVar
   | eq_ x y => eq_ (σ x) (σ y)
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (replaceAllVar σ phi)
-  | imp_ phi psi => imp_ (replaceAllVar σ phi) (replaceAllVar σ psi)
-  | and_ phi psi => and_ (replaceAllVar σ phi) (replaceAllVar σ psi)
-  | or_ phi psi => or_ (replaceAllVar σ phi) (replaceAllVar σ psi)
-  | iff_ phi psi => iff_ (replaceAllVar σ phi) (replaceAllVar σ psi)
-  | forall_ x phi => forall_ (σ x) (replaceAllVar σ phi)
-  | exists_ x phi => exists_ (σ x) (replaceAllVar σ phi)
+  | not_ phi => not_ (replaceAll σ phi)
+  | imp_ phi psi => imp_ (replaceAll σ phi) (replaceAll σ psi)
+  | and_ phi psi => and_ (replaceAll σ phi) (replaceAll σ psi)
+  | or_ phi psi => or_ (replaceAll σ phi) (replaceAll σ psi)
+  | iff_ phi psi => iff_ (replaceAll σ phi) (replaceAll σ psi)
+  | forall_ x phi => forall_ (σ x) (replaceAll σ phi)
+  | exists_ x phi => exists_ (σ x) (replaceAll σ phi)
   | def_ X xs => def_ X (xs.map σ)
 
 
@@ -36,22 +36,22 @@ theorem substitution_theorem
   (σ : VarName → VarName)
   (h1 : Function.Injective σ) :
   Holds D I (V ∘ σ) E F ↔
-    Holds D I V E (replaceAllVar σ F) :=
+    Holds D I V E (replaceAll σ F) :=
   by
   induction F generalizing V
   case pred_const_ X xs | pred_var_ X xs =>
-    unfold replaceAllVar
+    simp only [replaceAll]
     simp only [Holds]
     simp
   case eq_ x y =>
-    unfold replaceAllVar
+    simp only [replaceAll]
     simp only [Holds]
     simp
   case true_ | false_ =>
-    unfold replaceAllVar
+    simp only [replaceAll]
     simp only [Holds]
   case not_ phi phi_ih =>
-    unfold replaceAllVar
+    simp only [replaceAll]
     simp only [Holds]
     congr! 1
     exact phi_ih V
@@ -60,13 +60,13 @@ theorem substitution_theorem
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold replaceAllVar
+    simp only [replaceAll]
     simp only [Holds]
     congr! 1
     · exact phi_ih V
     · exact psi_ih V
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold replaceAllVar
+    simp only [replaceAll]
     simp only [Holds]
 
     first | apply forall_congr' | apply exists_congr
@@ -83,10 +83,10 @@ theorem substitution_theorem
   case def_ X xs =>
     induction E
     case nil =>
-      unfold replaceAllVar
+      simp only [replaceAll]
       simp only [Holds]
     case cons E_hd E_tl E_ih =>
-      unfold replaceAllVar
+      simp only [replaceAll]
       simp only [Holds]
       simp
       split_ifs
@@ -111,7 +111,7 @@ theorem substitution_is_valid
   (σ : VarName → VarName)
   (h1 : Function.Injective σ)
   (h2 : F.IsValid) :
-  (replaceAllVar σ F).IsValid :=
+  (replaceAll σ F).IsValid :=
   by
     simp only [IsValid] at h2
 
