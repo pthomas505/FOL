@@ -27,7 +27,7 @@ def replaceAllVar
   | def_ X xs => def_ X (xs.map σ)
 
 
-example
+theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
@@ -104,3 +104,18 @@ example
 
       case _ c1 =>
         apply E_ih
+
+
+theorem substitution_is_valid
+  (F : Formula)
+  (σ : VarName → VarName)
+  (h1 : Function.Injective σ)
+  (h2 : F.IsValid) :
+  (replaceAllVar σ F).IsValid :=
+  by
+    simp only [IsValid] at h2
+
+    simp only [IsValid]
+    intro D I V E
+    simp only [← substitution_theorem D I V E F σ h1]
+    apply h2
