@@ -4,9 +4,7 @@ import FOL.NV.Semantics
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV.Sub.All.Rec
 
 open Formula
 
