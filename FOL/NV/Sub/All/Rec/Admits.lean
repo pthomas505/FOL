@@ -52,16 +52,16 @@ instance
     infer_instance
 
 
-def admitsFun (σ : VarName → VarName) (phi : Formula) : Prop :=
+def admits (σ : VarName → VarName) (phi : Formula) : Prop :=
   admitsAux σ ∅ phi
 
 
 instance
   (σ : VarName → VarName)
   (F : Formula) :
-  Decidable (admitsFun σ F) :=
+  Decidable (admits σ F) :=
   by
-  simp only [admitsFun]
+  simp only [admits]
   infer_instance
 
 
@@ -242,7 +242,7 @@ theorem substitution_fun_theorem
   (E : Env)
   (σ : VarName → VarName)
   (F : Formula)
-  (h1 : admitsFun σ F) :
+  (h1 : admits σ F) :
   Holds D I (V ∘ σ) E F ↔
     Holds D I V E (fastReplaceFree σ F) :=
   by
@@ -255,7 +255,7 @@ theorem substitution_fun_theorem
 theorem substitution_fun_valid
   (σ : VarName → VarName)
   (F : Formula)
-  (h1 : admitsFun σ F)
+  (h1 : admits σ F)
   (h2 : F.IsValid) :
   (fastReplaceFree σ F).IsValid :=
   by
