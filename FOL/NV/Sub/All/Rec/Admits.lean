@@ -65,7 +65,7 @@ instance
   infer_instance
 
 
-theorem substitution_fun_theorem_aux
+theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
   (V V' : VarAssignment D)
@@ -235,7 +235,7 @@ theorem substitution_fun_theorem_aux
       apply ih h1 h2 h2' h3
 
 
-theorem substitution_fun_theorem
+theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
@@ -246,13 +246,13 @@ theorem substitution_fun_theorem
   Holds D I (V ∘ σ) E F ↔
     Holds D I V E (fastReplaceFree σ F) :=
   by
-  apply substitution_fun_theorem_aux D I (V ∘ σ) V E σ σ ∅ F h1
+  apply substitution_theorem_aux D I (V ∘ σ) V E σ σ ∅ F h1
   · simp
   · simp
   · simp
 
 
-theorem substitution_fun_valid
+theorem substitution_is_valid
   (σ : VarName → VarName)
   (F : Formula)
   (h1 : admits σ F)
@@ -263,7 +263,7 @@ theorem substitution_fun_valid
 
   simp only [IsValid]
   intro D I V E
-  simp only [← substitution_fun_theorem D I V E σ F h1]
+  simp only [← substitution_theorem D I V E σ F h1]
   exact h2 D I (V ∘ σ) E
 
 
