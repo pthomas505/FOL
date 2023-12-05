@@ -1,9 +1,7 @@
 import FOL.FunctionUpdateITE
 import FOL.NV.Formula
-import FOL.NV.Binders
-import FOL.NV.Semantics
-import FOL.NV.Alpha
 import FOL.NV.Fresh
+import FOL.NV.Semantics
 
 
 set_option autoImplicit false
