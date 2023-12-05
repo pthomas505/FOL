@@ -10,6 +10,9 @@ namespace FOL.NV.Sub.All.Rec
 open Formula
 
 
+/--
+  Helper function for admits.
+-/
 def admitsAux
   (σ : VarName → VarName) (binders : Finset VarName) : Formula → Prop
   | pred_const_ _ xs =>
@@ -52,8 +55,11 @@ instance
     infer_instance
 
 
-def admits (σ : VarName → VarName) (phi : Formula) : Prop :=
-  admitsAux σ ∅ phi
+/--
+  admits σ P := True if and only if there is no free occurrence of a variable in the formula P that becomes a bound occurrence in the formula (fastReplaceFree σ P).
+-/
+def admits (σ : VarName → VarName) (F : Formula) : Prop :=
+  admitsAux σ ∅ F
 
 
 instance
@@ -267,4 +273,4 @@ theorem substitution_is_valid
   exact h2 D I (V ∘ σ) E
 
 
---#lint
+#lint
