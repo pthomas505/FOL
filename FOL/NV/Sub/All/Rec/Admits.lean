@@ -48,7 +48,7 @@ instance
   by
   induction F generalizing binders
   all_goals
-    unfold admitsFunAux
+    simp only [admitsFunAux]
     infer_instance
 
 
@@ -61,7 +61,7 @@ instance
   (F : Formula) :
   Decidable (admitsFun σ F) :=
   by
-  unfold admitsFun
+  simp only [admitsFun]
   infer_instance
 
 
@@ -83,9 +83,9 @@ theorem substitution_fun_theorem_aux
   all_goals
     induction F generalizing binders V V' σ σ'
     case pred_const_ X xs | pred_var_ X xs =>
-      unfold admitsFunAux at h1
+      simp only [admitsFunAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       congr! 1
       simp
@@ -99,9 +99,9 @@ theorem substitution_fun_theorem_aux
         simp only [h3 v c1]
         exact h1 v a1 c1
     case eq_ x y =>
-      unfold admitsFunAux at h1
+      simp only [admitsFunAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
@@ -121,12 +121,12 @@ theorem substitution_fun_theorem_aux
             simp only [h3 y c1]
             exact h1_right c1
     case true_ | false_ =>
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
     case not_ phi phi_ih =>
-      unfold admitsFunAux at h1
+      simp only [admitsFunAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       congr! 1
       exact phi_ih V V' σ σ' binders h1 h2 h2' h3
@@ -135,9 +135,9 @@ theorem substitution_fun_theorem_aux
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      unfold admitsFunAux at h1
+      simp only [admitsFunAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
@@ -145,18 +145,18 @@ theorem substitution_fun_theorem_aux
         · exact phi_ih V V' σ σ' binders h1_left h2 h2' h3
         · exact psi_ih V V' σ σ' binders h1_right h2 h2' h3
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      unfold admitsFunAux at h1
+      simp only [admitsFunAux] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intro d
       apply phi_ih (Function.updateITE V x d) (Function.updateITE V' x d) σ (Function.updateITE σ' x x) (binders ∪ {x}) h1
       · intro v a1
-        unfold Function.updateITE at a1
+        simp only [Function.updateITE] at a1
         simp at a1
         push_neg at a1
-        unfold Function.updateITE
+        simp only [Function.updateITE]
         split_ifs
         case _ c1 c2 =>
           rfl
@@ -171,7 +171,7 @@ theorem substitution_fun_theorem_aux
           tauto
       · intro v a1
         simp at a1
-        unfold Function.updateITE
+        simp only [Function.updateITE]
         split_ifs
         case _ c1 =>
           exact c1
@@ -182,19 +182,19 @@ theorem substitution_fun_theorem_aux
         push_neg at a1
         cases a1
         case intro a1_left a1_right =>
-          unfold Function.updateITE
+          simp only [Function.updateITE]
           simp only [if_neg a1_right]
           exact h3 v a1_left
 
   case nil.def_ X xs =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     simp only [Holds]
   case cons.def_ hd tl ih X xs =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     simp only [Holds]
     split_ifs
     case _ c1 c2 =>
-      unfold admitsFunAux at h1
+      simp only [admitsFunAux] at h1
 
       simp
       have s1 : List.map V xs = List.map (V' ∘ σ') xs
@@ -231,7 +231,7 @@ theorem substitution_fun_theorem_aux
       contradiction
     case _ c1 c2 =>
       specialize ih V V' σ σ' binders (def_ X xs)
-      unfold fastReplaceFree at ih
+      simp only [fastReplaceFree] at ih
       apply ih h1 h2 h2' h3
 
 
@@ -259,9 +259,9 @@ theorem substitution_fun_valid
   (h2 : F.IsValid) :
   (fastReplaceFree σ F).IsValid :=
   by
-  unfold IsValid at h2
+  simp only [IsValid] at h2
 
-  unfold IsValid
+  simp only [IsValid]
   intro D I V E
   simp only [← substitution_fun_theorem D I V E σ F h1]
   exact h2 D I (V ∘ σ) E
