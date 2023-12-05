@@ -10,7 +10,7 @@ namespace FOL.NV.Sub.All.Rec
 open Formula
 
 
-def admitsFunAux
+def admitsAux
   (σ : VarName → VarName) (binders : Finset VarName) : Formula → Prop
   | pred_const_ _ xs =>
       ∀ (v : VarName), v ∈ xs → v ∉ binders → σ v ∉ binders
@@ -21,21 +21,21 @@ def admitsFunAux
       (y ∉ binders → σ y ∉ binders)
   | true_ => True
   | false_ => True
-  | not_ phi => admitsFunAux σ binders phi
+  | not_ phi => admitsAux σ binders phi
   | imp_ phi psi =>
-      admitsFunAux σ binders phi ∧
-      admitsFunAux σ binders psi
+      admitsAux σ binders phi ∧
+      admitsAux σ binders psi
   | and_ phi psi =>
-      admitsFunAux σ binders phi ∧
-      admitsFunAux σ binders psi
+      admitsAux σ binders phi ∧
+      admitsAux σ binders psi
   | or_ phi psi =>
-      admitsFunAux σ binders phi ∧
-      admitsFunAux σ binders psi
+      admitsAux σ binders phi ∧
+      admitsAux σ binders psi
   | iff_ phi psi =>
-      admitsFunAux σ binders phi ∧
-      admitsFunAux σ binders psi
-  | forall_ x phi => admitsFunAux σ (binders ∪ {x}) phi
-  | exists_ x phi => admitsFunAux σ (binders ∪ {x}) phi
+      admitsAux σ binders phi ∧
+      admitsAux σ binders psi
+  | forall_ x phi => admitsAux σ (binders ∪ {x}) phi
+  | exists_ x phi => admitsAux σ (binders ∪ {x}) phi
   | def_ _ xs =>
       ∀ (v : VarName), v ∈ xs → v ∉ binders → σ v ∉ binders
 
@@ -44,16 +44,16 @@ instance
   (σ : VarName → VarName)
   (binders : Finset VarName)
   (F : Formula) :
-  Decidable (admitsFunAux σ binders F) :=
+  Decidable (admitsAux σ binders F) :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admitsFunAux]
+    simp only [admitsAux]
     infer_instance
 
 
 def admitsFun (σ : VarName → VarName) (phi : Formula) : Prop :=
-  admitsFunAux σ ∅ phi
+  admitsAux σ ∅ phi
 
 
 instance
@@ -73,7 +73,7 @@ theorem substitution_fun_theorem_aux
   (σ σ' : VarName → VarName)
   (binders : Finset VarName)
   (F : Formula)
-  (h1 : admitsFunAux σ binders F)
+  (h1 : admitsAux σ binders F)
   (h2 : ∀ (v : VarName), v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
   (h2' : ∀ (v : VarName), v ∈ binders → v = σ' v)
   (h3 : ∀ (v : VarName), v ∉ binders → σ' v = σ v) :
@@ -83,7 +83,7 @@ theorem substitution_fun_theorem_aux
   all_goals
     induction F generalizing binders V V' σ σ'
     case pred_const_ X xs | pred_var_ X xs =>
-      simp only [admitsFunAux] at h1
+      simp only [admitsAux] at h1
 
       simp only [fastReplaceFree]
       simp only [Holds]
@@ -99,7 +99,7 @@ theorem substitution_fun_theorem_aux
         simp only [h3 v c1]
         exact h1 v a1 c1
     case eq_ x y =>
-      simp only [admitsFunAux] at h1
+      simp only [admitsAux] at h1
 
       simp only [fastReplaceFree]
       simp only [Holds]
@@ -124,7 +124,7 @@ theorem substitution_fun_theorem_aux
       simp only [fastReplaceFree]
       simp only [Holds]
     case not_ phi phi_ih =>
-      simp only [admitsFunAux] at h1
+      simp only [admitsAux] at h1
 
       simp only [fastReplaceFree]
       simp only [Holds]
@@ -135,7 +135,7 @@ theorem substitution_fun_theorem_aux
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      simp only [admitsFunAux] at h1
+      simp only [admitsAux] at h1
 
       simp only [fastReplaceFree]
       simp only [Holds]
@@ -145,7 +145,7 @@ theorem substitution_fun_theorem_aux
         · exact phi_ih V V' σ σ' binders h1_left h2 h2' h3
         · exact psi_ih V V' σ σ' binders h1_right h2 h2' h3
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [admitsFunAux] at h1
+      simp only [admitsAux] at h1
 
       simp only [fastReplaceFree]
       simp only [Holds]
@@ -194,7 +194,7 @@ theorem substitution_fun_theorem_aux
     simp only [Holds]
     split_ifs
     case _ c1 c2 =>
-      simp only [admitsFunAux] at h1
+      simp only [admitsAux] at h1
 
       simp
       have s1 : List.map V xs = List.map (V' ∘ σ') xs
