@@ -4,15 +4,12 @@ import FOL.NV.Binders
 import FOL.NV.Semantics
 import FOL.NV.Alpha
 import FOL.NV.Fresh
-import FOL.NV.Sub.All.Rec.SubAllRecAdmits
 
 
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV.Sub.All.Rec
 
 open Formula
 
@@ -340,6 +337,8 @@ theorem sub_valid
 
 --------------------------------------------------
 
+/-
+
 def Formula.length : Formula → ℕ
   | pred_const_ _ _ => 0
   | pred_var_ _ _ => 0
@@ -517,9 +516,11 @@ def F'' := sub_alpha σ id ∅ c F
 #eval isAlphaEqv F F''
 
 #eval subFresh σ c F''
-#eval admitsFunAux σ ∅ F''
+#eval admitsAux σ ∅ F''
 
 #eval F' = F''
 
-#eval fastReplaceFreeFun σ F'' = subFresh σ c F
-#eval fastReplaceFreeFun σ F' = subFresh σ c F
+#eval fastReplaceFree σ F'' = subFresh σ c F
+#eval fastReplaceFree σ F' = subFresh σ c F
+
+-/
