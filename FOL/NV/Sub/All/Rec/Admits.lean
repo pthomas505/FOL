@@ -11,33 +11,32 @@ open Formula
 
 
 def admitsFunAux
-  (σ : VarName → VarName) :
-  Finset VarName → Formula → Prop
-  | binders, pred_const_ _ xs =>
+  (σ : VarName → VarName) (binders : Finset VarName) : Formula → Prop
+  | pred_const_ _ xs =>
       ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
-  | binders, pred_var_ _ xs =>
+  | pred_var_ _ xs =>
       ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
-  | binders, eq_ x y =>
+  | eq_ x y =>
       (x ∉ binders → σ x ∉ binders) ∧
       (y ∉ binders → σ y ∉ binders)
-  | _, true_ => True
-  | _, false_ => True
-  | binders, not_ phi => admitsFunAux σ binders phi
-  | binders, imp_ phi psi =>
+  | true_ => True
+  | false_ => True
+  | not_ phi => admitsFunAux σ binders phi
+  | imp_ phi psi =>
       admitsFunAux σ binders phi ∧
       admitsFunAux σ binders psi
-  | binders, and_ phi psi =>
+  | and_ phi psi =>
       admitsFunAux σ binders phi ∧
       admitsFunAux σ binders psi
-  | binders, or_ phi psi =>
+  | or_ phi psi =>
       admitsFunAux σ binders phi ∧
       admitsFunAux σ binders psi
-  | binders, iff_ phi psi =>
+  | iff_ phi psi =>
       admitsFunAux σ binders phi ∧
       admitsFunAux σ binders psi
-  | binders, forall_ x phi => admitsFunAux σ (binders ∪ {x}) phi
-  | binders, exists_ x phi => admitsFunAux σ (binders ∪ {x}) phi
-  | binders, def_ _ xs =>
+  | forall_ x phi => admitsFunAux σ (binders ∪ {x}) phi
+  | exists_ x phi => admitsFunAux σ (binders ∪ {x}) phi
+  | def_ _ xs =>
       ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
 
 
