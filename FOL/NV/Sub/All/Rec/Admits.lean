@@ -143,7 +143,7 @@ theorem substitution_theorem_aux
       · intro v a1
         simp only [Function.updateITE] at a1
         simp at a1
-        push_neg at a1
+
         simp only [Function.updateITE]
         split_ifs
         case _ c1 c2 =>
@@ -154,25 +154,19 @@ theorem substitution_theorem_aux
           subst c2
           tauto
         case _ c1 c2 =>
-          apply h2
           simp only [if_neg c1] at a1
+          apply h2
           tauto
       · intro v a1
         simp at a1
+
         simp only [Function.updateITE]
-        split_ifs
-        case _ c1 =>
-          exact c1
-        case _ c1 =>
-          tauto
+        split_ifs <;> tauto
       · intro v a1
         simp at a1
-        push_neg at a1
-        cases a1
-        case intro a1_left a1_right =>
-          simp only [Function.updateITE]
-          simp only [if_neg a1_right]
-          exact h3 v a1_left
+
+        simp only [Function.updateITE]
+        split_ifs <;> tauto
 
   case cons.def_ hd tl ih X xs =>
     split_ifs
@@ -200,10 +194,7 @@ theorem substitution_theorem_aux
         simp only [← List.mem_toFinset]
         apply Finset.mem_of_subset hd.h1 a1
       · simp
-        cases c1
-        case intro c1_left c1_right =>
-        simp only [eq_comm]
-        exact c1_right
+        tauto
     case _ c1 c2 =>
       simp only [List.length_map] at c2
       contradiction
