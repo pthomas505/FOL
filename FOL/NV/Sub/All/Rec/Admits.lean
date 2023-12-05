@@ -88,11 +88,12 @@ theorem substitution_theorem_aux
   induction E generalizing F binders V V' σ σ'
   all_goals
     induction F generalizing binders V V' σ σ'
-    case pred_const_ X xs | pred_var_ X xs =>
+    all_goals
       simp only [admitsAux] at h1
 
       simp only [fastReplaceFree]
       simp only [Holds]
+    case pred_const_ X xs | pred_var_ X xs =>
       congr! 1
       simp
       simp only [List.map_eq_map_iff]
@@ -105,10 +106,6 @@ theorem substitution_theorem_aux
         simp only [h3 v c1]
         exact h1 v a1 c1
     case eq_ x y =>
-      simp only [admitsAux] at h1
-
-      simp only [fastReplaceFree]
-      simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
         congr! 1
@@ -126,14 +123,7 @@ theorem substitution_theorem_aux
           · right
             simp only [h3 y c1]
             exact h1_right c1
-    case true_ | false_ =>
-      simp only [fastReplaceFree]
-      simp only [Holds]
     case not_ phi phi_ih =>
-      simp only [admitsAux] at h1
-
-      simp only [fastReplaceFree]
-      simp only [Holds]
       congr! 1
       exact phi_ih V V' σ σ' binders h1 h2 h2' h3
     case
@@ -141,20 +131,12 @@ theorem substitution_theorem_aux
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      simp only [admitsAux] at h1
-
-      simp only [fastReplaceFree]
-      simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
         congr! 1
         · exact phi_ih V V' σ σ' binders h1_left h2 h2' h3
         · exact psi_ih V V' σ σ' binders h1_right h2 h2' h3
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [admitsAux] at h1
-
-      simp only [fastReplaceFree]
-      simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intro d
       apply phi_ih (Function.updateITE V x d) (Function.updateITE V' x d) σ (Function.updateITE σ' x x) (binders ∪ {x}) h1
@@ -192,16 +174,9 @@ theorem substitution_theorem_aux
           simp only [if_neg a1_right]
           exact h3 v a1_left
 
-  case nil.def_ X xs =>
-    simp only [fastReplaceFree]
-    simp only [Holds]
   case cons.def_ hd tl ih X xs =>
-    simp only [fastReplaceFree]
-    simp only [Holds]
     split_ifs
     case _ c1 c2 =>
-      simp only [admitsAux] at h1
-
       simp
       have s1 : List.map V xs = List.map (V' ∘ σ') xs
       {
