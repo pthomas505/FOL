@@ -9,6 +9,9 @@ namespace FOL.NV.Sub.All.Rec
 open Formula
 
 
+/--
+  replaceAll σ F := The simultaneous replacement of each occurence of any variable v in the formula F by σ v.
+-/
 def replaceAll
   (σ : VarName → VarName) :
   Formula → Formula
@@ -106,3 +109,6 @@ theorem substitution_is_valid
     intro D I V E
     simp only [← substitution_theorem D I V E F σ h1]
     apply h2
+
+
+#lint
