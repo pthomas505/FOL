@@ -61,9 +61,9 @@ lemma lem_1
     _ = (F.freeVarSet \ {x}).image (Function.updateITE σ x x) :=
       by
       apply Finset.image_congr
-      unfold Set.EqOn
+      simp only [Set.EqOn]
       intro y a1
-      unfold Function.updateITE
+      simp only [Function.updateITE]
       simp at a1
       cases a1
       case _ a1_left a1_right =>
@@ -97,26 +97,26 @@ theorem lem_2
   by
   induction F generalizing σ
   case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
-    unfold subFresh
-    unfold freeVarSet
+    simp only [subFresh]
+    simp only [freeVarSet]
     apply Finset.ext
     intro a
     simp
   case true_ | false_ =>
-    unfold subFresh
-    unfold freeVarSet
+    simp only [subFresh]
+    simp only [freeVarSet]
     simp
   case not_ phi phi_ih =>
-    unfold subFresh
-    unfold freeVarSet
+    simp only [subFresh]
+    simp only [freeVarSet]
     exact phi_ih σ
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold subFresh
-    unfold freeVarSet
+    simp only [subFresh]
+    simp only [freeVarSet]
     simp only [Finset.image_union]
     congr!
     · exact phi_ih σ
@@ -137,7 +137,7 @@ theorem lem_2
     _ = ((phi.freeVarSet \ {x}).image (Function.updateITE σ x x')) \ {x'} :=
       by
       apply Finset.image_sdiff_singleton
-      unfold Function.updateITE
+      simp only [Function.updateITE]
       simp
 
     _ = ((phi.freeVarSet \ {x}).image σ) \ {x'} :=
@@ -164,14 +164,14 @@ theorem substitution_fun_theorem'
   by
   induction F generalizing σ V
   case pred_const_ X xs | pred_var_ X xs | eq_ x y =>
-    unfold subFresh
+    simp only [subFresh]
     simp only [Holds]
     simp
   case true_ | false_ =>
-    unfold subFresh
+    simp only [subFresh]
     simp only [Holds]
   case not_ phi phi_ih =>
-    unfold subFresh
+    simp only [subFresh]
     simp only [Holds]
     congr! 1
     exact phi_ih V σ
@@ -180,7 +180,7 @@ theorem substitution_fun_theorem'
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold subFresh
+    simp only [subFresh]
     simp only [Holds]
     congr! 1
     · exact phi_ih V σ
@@ -196,8 +196,10 @@ theorem substitution_fun_theorem'
     by_cases h2 : z = x
     case pos =>
       subst h2
-      unfold Function.updateITE
-      simp
+      simp (config := {zeta := false}) only [Function.updateITE]
+      simp (config := {zeta := false})
+      simp (config := {zeta := false}) only [Function.updateITE]
+      simp (config := {zeta := false})
     case neg =>
       have s3 : x' ∉ (phi.freeVarSet \ {x}).image σ
       apply lem_1
@@ -215,9 +217,11 @@ theorem substitution_fun_theorem'
       simp only [<- contra]
       exact s4
 
-      unfold Function.updateITE
+      simp (config := {zeta := false}) only [Function.updateITE]
       simp (config := {zeta := false})
       simp (config := {zeta := false}) only [if_neg h2]
+      simp (config := {zeta := false}) only [Function.updateITE]
+      simp (config := {zeta := false})
       split_ifs
       case pos c1 =>
         tauto
@@ -238,12 +242,12 @@ theorem substitution_fun_theorem'
   case def_ X xs =>
     induction E
     case nil =>
-      unfold subFresh
+      simp only [subFresh]
       simp only [Holds]
     case cons E_hd E_tl E_ih =>
-      unfold subFresh at E_ih
+      simp only [subFresh] at E_ih
 
-      unfold subFresh
+      simp only [subFresh]
       simp only [Holds]
       simp
       split_ifs
@@ -270,9 +274,9 @@ theorem sub_valid
   (h1 : IsValid phi) :
   IsValid (subFresh σ c phi) :=
   by
-  unfold IsValid at h1
+  simp only [IsValid] at h1
 
-  unfold IsValid
+  simp only [IsValid]
   intros D I V E
   simp only [substitution_fun_theorem']
   apply h1
@@ -305,26 +309,26 @@ lemma sub_formula_length_same
   by
   induction F generalizing σ
   case not_ phi phi_ih =>
-    unfold subFresh
-    unfold Formula.length
+    simp only [subFresh]
+    simp only [Formula.length]
     simp only [phi_ih]
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold subFresh
-    unfold Formula.length
+    simp only [subFresh]
+    simp only [Formula.length]
     simp only [phi_ih σ]
     simp only [psi_ih σ]
   case forall_ x phi phi_ih | exists_ x phi_ih =>
-    unfold subFresh
-    unfold Formula.length
+    simp only [subFresh]
+    simp only [Formula.length]
     simp
     apply phi_ih
   all_goals
-    unfold subFresh
-    unfold Formula.length
+    simp only [subFresh]
+    simp only [Formula.length]
     simp
 
 --------------------------------------------------
