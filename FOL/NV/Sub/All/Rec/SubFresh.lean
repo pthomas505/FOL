@@ -192,41 +192,37 @@ theorem substitution_theorem
       else x
 
     have s1 : ∀ (a : D) (z : VarName), z ∈ phi.freeVarSet → ((Function.updateITE V x' a) ∘ (Function.updateITE σ x x')) z = (Function.updateITE (V ∘ σ) x a) z
-    intro a z h1
-    by_cases h2 : z = x
+    intro a z a1
+    by_cases c1 : z = x
     case pos =>
-      subst h2
+      subst c1
       simp (config := {zeta := false}) only [Function.updateITE]
       simp (config := {zeta := false})
       simp (config := {zeta := false}) only [Function.updateITE]
       simp (config := {zeta := false})
     case neg =>
-      have s3 : x' ∉ (phi.freeVarSet \ {x}).image σ
+      have s2 : x' ∉ (phi.freeVarSet \ {x}).image σ
       apply lem_1
       intro τ
       exact lem_2 τ c phi
 
-      have s4 : σ z ∈ (phi.freeVarSet \ {x}).image σ
+      have s3 : σ z ∈ (phi.freeVarSet \ {x}).image σ
       apply Finset.mem_image_of_mem
       simp
       tauto
 
-      have s5 : ¬ σ z = x'
+      have s4 : ¬ σ z = x'
       intro contra
-      apply s3
+      apply s2
       simp only [<- contra]
-      exact s4
+      exact s3
 
       simp (config := {zeta := false}) only [Function.updateITE]
       simp (config := {zeta := false})
-      simp (config := {zeta := false}) only [if_neg h2]
+      simp (config := {zeta := false}) only [if_neg c1]
       simp (config := {zeta := false}) only [Function.updateITE]
       simp (config := {zeta := false})
-      split_ifs
-      case pos c1 =>
-        tauto
-      case neg c1 =>
-        rfl
+      split_ifs <;> tauto
 
     simp only [subFresh]
     simp only [Holds]
