@@ -1,3 +1,4 @@
+import FOL.Finset
 import FOL.FunctionUpdateITE
 import FOL.NV.Formula
 import FOL.NV.Fresh
@@ -88,42 +89,6 @@ lemma lem_1
     exact c1
 
 
-lemma lem_2
-  {α β : Type}
-  [DecidableEq α]
-  [DecidableEq β]
-  (S : Finset α)
-  (x : α)
-  (x' : β)
-  (f : α → β)
-  (h1 : f x = x') :
-  (Finset.image f S) \ {x'} =
-  (Finset.image f (S \ {x})) \ {x'} :=
-  by
-  subst h1
-  apply Finset.ext
-  intro a
-  simp
-  intro a1
-  constructor
-  · intro a2
-    apply Exists.elim a2
-    intro b a3
-    apply Exists.intro b
-    cases a3
-    case _ a3_left a3_right =>
-      subst a3_right
-      tauto
-  · intro a2
-    apply Exists.elim a2
-    intro b a3
-    apply Exists.intro b
-    cases a3
-    case _ a3_left a3_right =>
-      subst a3_right
-      tauto
-
-
 lemma lem_3
   {α β : Type}
   [DecidableEq α]
@@ -192,7 +157,7 @@ theorem lem_4
 
     _ = ((phi.freeVarSet \ {x}).image (Function.updateITE σ x x')) \ {x'} :=
       by
-      apply lem_2
+      apply Finset.image_sdiff_singleton
       unfold Function.updateITE
       simp
 

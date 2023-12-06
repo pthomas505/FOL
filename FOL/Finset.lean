@@ -104,4 +104,40 @@ lemma Finset.diff_union_subset
   · exact Finset.union_subset_left_right (A \ E) (B \ E) C D h1 h2
 
 
+lemma Finset.image_sdiff_singleton
+  {α β : Type}
+  [DecidableEq α]
+  [DecidableEq β]
+  (S : Finset α)
+  (x : α)
+  (x' : β)
+  (f : α → β)
+  (h1 : f x = x') :
+  (Finset.image f S) \ {x'} =
+  (Finset.image f (S \ {x})) \ {x'} :=
+  by
+  subst h1
+  apply Finset.ext
+  intro a
+  simp
+  intro a1
+  constructor
+  · intro a2
+    apply Exists.elim a2
+    intro b a3
+    apply Exists.intro b
+    cases a3
+    case _ a3_left a3_right =>
+      subst a3_right
+      tauto
+  · intro a2
+    apply Exists.elim a2
+    intro b a3
+    apply Exists.intro b
+    cases a3
+    case _ a3_left a3_right =>
+      subst a3_right
+      tauto
+
+
 #lint
