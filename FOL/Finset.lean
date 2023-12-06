@@ -1,3 +1,4 @@
+import FOL.FunctionUpdateITE
 import Mathlib.Tactic
 
 
@@ -138,6 +139,27 @@ lemma Finset.image_sdiff_singleton
     case _ a3_left a3_right =>
       subst a3_right
       tauto
+
+
+lemma Finset.image_sdiff_singleton_updateITE
+  {α β : Type}
+  [DecidableEq α]
+  [DecidableEq β]
+  (S : Finset α)
+  (x : α)
+  (x' : β)
+  (f : α → β) :
+  ((S \ {x}).image (Function.updateITE f x x')) =
+  ((S \ {x}).image f) :=
+  by
+  apply Finset.image_congr
+  simp only [Set.EqOn]
+  intro a a1
+  simp at a1
+  simp only [Function.updateITE]
+  cases a1
+  case _ a1_left a1_right =>
+    simp only [if_neg a1_right]
 
 
 #lint

@@ -89,27 +89,6 @@ lemma lem_1
     exact c1
 
 
-lemma lem_3
-  {α β : Type}
-  [DecidableEq α]
-  [DecidableEq β]
-  (S : Finset α)
-  (x : α)
-  (x' : β)
-  (f : α → β) :
-  ((S \ {x}).image (Function.updateITE f x x')) =
-  ((S \ {x}).image f) :=
-  by
-  apply Finset.image_congr
-  unfold Set.EqOn
-  intro a a1
-  simp at a1
-  unfold Function.updateITE
-  cases a1
-  case _ a1_left a1_right =>
-    simp only [if_neg a1_right]
-
-
 theorem lem_4
   (σ : VarName → VarName)
   (c : Char)
@@ -164,7 +143,7 @@ theorem lem_4
     _ = ((phi.freeVarSet \ {x}).image σ) \ {x'} :=
       by
       congr! 1
-      apply lem_3
+      apply Finset.image_sdiff_singleton_updateITE
 
     _ = (phi.freeVarSet \ {x}).image σ :=
       by
