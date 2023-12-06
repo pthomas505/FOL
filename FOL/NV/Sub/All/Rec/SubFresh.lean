@@ -151,7 +151,7 @@ theorem lem_2
       exact lem_1 σ c phi x phi_ih
 
 
-theorem substitution_fun_theorem'
+theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
@@ -267,7 +267,7 @@ theorem substitution_fun_theorem'
         exact E_ih
 
 
-theorem sub_valid
+theorem substitution_is_valid
   (σ : VarName → VarName)
   (c : Char)
   (phi : Formula)
@@ -278,7 +278,7 @@ theorem sub_valid
 
   simp only [IsValid]
   intros D I V E
-  simp only [substitution_fun_theorem']
+  simp only [substitution_theorem]
   apply h1
 
 --------------------------------------------------
