@@ -89,7 +89,7 @@ lemma lem_1
     exact c1
 
 
-theorem lem_4
+theorem lem_2
   (σ : VarName → VarName)
   (c : Char)
   (F : Formula) :
@@ -202,7 +202,7 @@ theorem substitution_fun_theorem'
       have s3 : x' ∉ (phi.freeVarSet \ {x}).image σ
       apply lem_1
       intro τ
-      exact lem_4 τ c phi
+      exact lem_2 τ c phi
 
       have s4 : σ z ∈ (phi.freeVarSet \ {x}).image σ
       apply Finset.mem_image_of_mem
