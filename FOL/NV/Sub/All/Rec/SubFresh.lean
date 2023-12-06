@@ -47,7 +47,7 @@ lemma lem_1
   (c : Char)
   (F : Formula)
   (x : VarName)
-  (h1 : ∀ τ : VarName → VarName, (subFresh τ c F).freeVarSet = F.freeVarSet.image τ) :
+  (h1 : ∀ (τ : VarName → VarName), (subFresh τ c F).freeVarSet = F.freeVarSet.image τ) :
   let x' :=
     if ∃ (y : VarName), y ∈ F.freeVarSet \ {x} ∧ σ y = x
     then fresh x c (subFresh (Function.updateITE σ x x) c F).freeVarSet
@@ -187,7 +187,7 @@ theorem substitution_fun_theorem'
     · exact psi_ih V σ
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     let x' :=
-      if ∃ y ∈ phi.freeVarSet \ {x}, σ y = x
+      if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
       then fresh x c (subFresh (Function.updateITE σ x x) c phi).freeVarSet
       else x
 
