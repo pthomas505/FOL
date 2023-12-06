@@ -17,29 +17,29 @@ def subFresh
   (σ : VarName → VarName)
   (c : Char) :
   Formula → Formula
-| pred_const_ X xs => pred_const_ X (xs.map σ)
-| pred_var_ X xs => pred_var_ X (xs.map σ)
-| eq_ x y => eq_ (σ x) (σ y)
-| true_ => true_
-| false_ => false_
-| not_ phi => not_ (subFresh σ c phi)
-| imp_ phi psi => imp_ (subFresh σ c phi) (subFresh σ c psi)
-| and_ phi psi => and_ (subFresh σ c phi) (subFresh σ c psi)
-| or_ phi psi => or_ (subFresh σ c phi) (subFresh σ c psi)
-| iff_ phi psi => iff_ (subFresh σ c phi) (subFresh σ c psi)
-| forall_ x phi =>
-  let x' : VarName :=
-    if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then fresh x c ((subFresh (Function.updateITE σ x x) c phi).freeVarSet)
-    else x
-  forall_ x' (subFresh (Function.updateITE σ x x') c phi)
-| exists_ x phi =>
-  let x' : VarName :=
-    if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then fresh x c ((subFresh (Function.updateITE σ x x) c phi).freeVarSet)
-    else x
-  exists_ x' (subFresh (Function.updateITE σ x x') c phi)
-| def_ X xs => def_ X (xs.map σ)
+  | pred_const_ X xs => pred_const_ X (xs.map σ)
+  | pred_var_ X xs => pred_var_ X (xs.map σ)
+  | eq_ x y => eq_ (σ x) (σ y)
+  | true_ => true_
+  | false_ => false_
+  | not_ phi => not_ (subFresh σ c phi)
+  | imp_ phi psi => imp_ (subFresh σ c phi) (subFresh σ c psi)
+  | and_ phi psi => and_ (subFresh σ c phi) (subFresh σ c psi)
+  | or_ phi psi => or_ (subFresh σ c phi) (subFresh σ c psi)
+  | iff_ phi psi => iff_ (subFresh σ c phi) (subFresh σ c psi)
+  | forall_ x phi =>
+    let x' : VarName :=
+      if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
+      then fresh x c ((subFresh (Function.updateITE σ x x) c phi).freeVarSet)
+      else x
+    forall_ x' (subFresh (Function.updateITE σ x x') c phi)
+  | exists_ x phi =>
+    let x' : VarName :=
+      if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
+      then fresh x c ((subFresh (Function.updateITE σ x x) c phi).freeVarSet)
+      else x
+    exists_ x' (subFresh (Function.updateITE σ x x') c phi)
+  | def_ X xs => def_ X (xs.map σ)
 
 
 lemma lem_1
