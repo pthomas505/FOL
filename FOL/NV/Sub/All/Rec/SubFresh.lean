@@ -42,54 +42,7 @@ def subFresh
   | def_ X xs => def_ X (xs.map σ)
 
 
-lemma lem_1
-  (σ : VarName → VarName)
-  (c : Char)
-  (F : Formula)
-  (x : VarName)
-  (h1 : ∀ (τ : VarName → VarName), (subFresh τ c F).freeVarSet = F.freeVarSet.image τ) :
-  let x' :=
-    if ∃ (y : VarName), y ∈ F.freeVarSet \ {x} ∧ σ y = x
-    then fresh x c (subFresh (Function.updateITE σ x x) c F).freeVarSet
-    else x
-  x' ∉ (F.freeVarSet \ {x}).image σ :=
-  by
-  have s1 : (F.freeVarSet \ {x}).image σ ⊆ (subFresh (Function.updateITE σ x x) c F).freeVarSet
-  calc
-        (F.freeVarSet \ {x}).image σ
-
-    _ = (F.freeVarSet \ {x}).image (Function.updateITE σ x x) :=
-      by
-      apply Finset.image_congr
-      simp only [Set.EqOn]
-      intro y a1
-      simp only [Function.updateITE]
-      simp at a1
-      cases a1
-      case _ a1_left a1_right =>
-        simp only [if_neg a1_right]
-
-    _ ⊆ F.freeVarSet.image (Function.updateITE σ x x) :=
-      by
-      apply Finset.image_subset_image
-      exact Finset.sdiff_subset (freeVarSet F) {x}
-
-    _ = (subFresh (Function.updateITE σ x x) c F).freeVarSet :=
-      by
-      symm
-      exact h1 (Function.updateITE σ x x)
-
-  split
-  case inl c1 =>
-    obtain s2 := fresh_not_mem x c (freeVarSet (subFresh (Function.updateITE σ x x) c F))
-    exact Finset.not_mem_mono s1 s2
-  case inr c1 =>
-    simp at c1
-    simp
-    exact c1
-
-
-theorem lem_2
+theorem lem_1
   (σ : VarName → VarName)
   (c : Char)
   (F : Formula) :
@@ -148,7 +101,23 @@ theorem lem_2
     _ = (phi.freeVarSet \ {x}).image σ :=
       by
       apply Finset.sdiff_singleton_eq_self
-      exact lem_1 σ c phi x phi_ih
+
+      have s1 : (phi.freeVarSet \ {x}).image σ ⊆ (subFresh (Function.updateITE σ x x) c phi).freeVarSet
+      simp only [phi_ih]
+      simp only [<- Finset.image_sdiff_singleton_updateITE phi.freeVarSet x x σ]
+      apply Finset.image_subset_image
+      exact Finset.sdiff_subset (freeVarSet phi) {x}
+
+      obtain s2 := fresh_not_mem x c (freeVarSet (subFresh (Function.updateITE σ x x) c phi))
+
+      simp only
+      split_ifs
+      case _ c1 =>
+        apply Finset.not_mem_mono s1 s2
+      case _ c1 =>
+        simp at c1
+        simp
+        exact c1
 
 
 theorem substitution_theorem
@@ -186,55 +155,64 @@ theorem substitution_theorem
     · exact phi_ih V σ
     · exact psi_ih V σ
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    let x' :=
-      if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-      then fresh x c (subFresh (Function.updateITE σ x x) c phi).freeVarSet
-      else x
-
-    have s1 : ∀ (a : D) (z : VarName), z ∈ phi.freeVarSet → ((Function.updateITE V x' a) ∘ (Function.updateITE σ x x')) z = (Function.updateITE (V ∘ σ) x a) z
-    intro a z a1
-    by_cases c1 : z = x
-    case pos =>
-      subst c1
-      simp (config := {zeta := false}) only [Function.updateITE]
-      simp (config := {zeta := false})
-      simp (config := {zeta := false}) only [Function.updateITE]
-      simp (config := {zeta := false})
-    case neg =>
-      have s2 : x' ∉ (phi.freeVarSet \ {x}).image σ
-      apply lem_1
-      intro τ
-      exact lem_2 τ c phi
-
-      have s3 : σ z ∈ (phi.freeVarSet \ {x}).image σ
-      apply Finset.mem_image_of_mem
-      simp
-      tauto
-
-      have s4 : ¬ σ z = x'
-      intro contra
-      apply s2
-      simp only [<- contra]
-      exact s3
-
-      simp (config := {zeta := false}) only [Function.updateITE]
-      simp (config := {zeta := false})
-      simp (config := {zeta := false}) only [if_neg c1]
-      simp (config := {zeta := false}) only [Function.updateITE]
-      simp (config := {zeta := false})
-      split_ifs <;> tauto
-
     simp only [subFresh]
     simp only [Holds]
+
     first | apply forall_congr' | apply exists_congr
-    intro a
+    intro d
+
     simp only [phi_ih]
     apply Holds_coincide_Var
     intro v a1
-    apply s1
-    simp only [isFreeIn_iff_mem_freeVarSet] at a1
-    exact a1
 
+    simp
+    split_ifs
+    case _ c1 =>
+      set x' := (fresh x c (freeVarSet (subFresh (Function.updateITE σ x x) c phi)))
+      by_cases c2 : v = x
+      · simp only [c2]
+        simp only [Function.updateITE]
+        simp
+      · by_cases c3 : σ v = x'
+        · simp only [Function.updateITE]
+          simp only [if_neg c2]
+          simp
+          intro a2
+
+          obtain s1 := lem_1 (Function.updateITE σ x x) c phi
+          simp only [s1] at a2
+
+          obtain s2 := fresh_not_mem x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi))
+
+          simp only [← a2] at s2
+          exfalso
+          apply s2
+          apply Finset.mem_image_update
+          · exact c2
+          · simp only [← isFreeIn_iff_mem_freeVarSet]
+            exact a1
+        · simp only [Function.updateITE]
+          simp only [if_neg c2]
+          simp only [if_neg c3]
+          simp
+    case _ c1 =>
+      by_cases c2 : v = x
+      · subst c2
+        simp only [Function.updateITE]
+        simp
+      · have s1 : ¬ σ v = x
+        intro contra
+        apply c1
+        apply Exists.intro v
+        constructor
+        simp
+        simp only [← isFreeIn_iff_mem_freeVarSet]
+        tauto
+        exact contra
+        simp only [Function.updateITE]
+        simp only [if_neg c2]
+        simp only [if_neg s1]
+        simp
   case def_ X xs =>
     induction E
     case nil =>

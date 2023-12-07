@@ -367,6 +367,25 @@ theorem Function.updateITE_symm
     · simp only [if_neg c1]
 
 
+lemma Function.updateITE_comp
+  {α β : Type}
+  [DecidableEq α]
+  (a b c : α)
+  (d : β)
+  (f : α → α)
+  (g : α → β)
+  (h1 : f a = c → d = g (f a)) :
+  Function.updateITE g c d (Function.updateITE f b c a) = Function.updateITE (g ∘ f) b d a :=
+  by
+  simp only [Function.updateITE]
+  by_cases c1 : a = b
+  · simp only [c1]
+    simp
+  · simp only [c1]
+    simp
+    exact h1
+
+
 -- Function.updateListITE
 
 theorem Function.updateListITE_comp

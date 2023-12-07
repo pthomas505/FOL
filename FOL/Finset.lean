@@ -162,4 +162,22 @@ lemma Finset.image_sdiff_singleton_updateITE
     simp only [if_neg a1_right]
 
 
+lemma Finset.mem_image_update
+  {α : Type}
+  [DecidableEq α]
+  (x y : α)
+  (f : α → α)
+  (S : Finset α)
+  (h1 : ¬ y = x)
+  (h2 : y ∈ S) :
+  f y ∈ Finset.image (Function.updateITE f x x) S :=
+  by
+  simp only [Finset.mem_image]
+  apply Exists.intro y
+  constructor
+  · exact h2
+  · simp only [Function.updateITE]
+    simp only [if_neg h1]
+
+
 #lint
