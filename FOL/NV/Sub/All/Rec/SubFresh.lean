@@ -72,6 +72,8 @@ lemma freeVarSet_subFresh_eq_freeVarSet_image
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [phi_ih]
 
+    simp only [<- Finset.image_sdiff_singleton_updateITE phi.freeVarSet x x σ]
+
     split_ifs
     case _ c1 =>
       obtain s1 := fresh_not_mem x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi))
@@ -88,8 +90,6 @@ lemma freeVarSet_subFresh_eq_freeVarSet_image
       clear s1
       clear s2
 
-      simp only [<- Finset.image_sdiff_singleton_updateITE phi.freeVarSet x x σ]
-
       have s4 : Finset.image (Function.updateITE σ x x') (freeVarSet phi) \ {x'} = Finset.image (Function.updateITE σ x x') (freeVarSet phi \ {x}) \ {x'}
       apply Finset.image_sdiff_singleton phi.freeVarSet x x' (Function.updateITE σ x x')
       simp only [Function.updateITE]
@@ -102,28 +102,22 @@ lemma freeVarSet_subFresh_eq_freeVarSet_image
     case _ c1 =>
       simp at c1
 
-      have s2 : Finset.image (Function.updateITE σ x x) (freeVarSet phi) \ {x} = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) \ {x}
+      have s1 : Finset.image (Function.updateITE σ x x) (freeVarSet phi) \ {x} = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) \ {x}
       apply Finset.image_sdiff_singleton
       simp only [Function.updateITE]
       simp
 
-      simp only [s2]
-      clear s2
-
-      have s1 : Finset.image σ (freeVarSet phi \ {x}) = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x})
-      simp only [Finset.image_sdiff_singleton_updateITE]
-
       simp only [s1]
       clear s1
 
-      have s3 : x ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x})
+      have s2 : x ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x})
       simp only [Finset.mem_image]
       simp
       simp only [Function.updateITE]
       simp
       tauto
 
-      simp only [Finset.sdiff_singleton_eq_self s3]
+      simp only [Finset.sdiff_singleton_eq_self s2]
 
 
 theorem substitution_theorem
