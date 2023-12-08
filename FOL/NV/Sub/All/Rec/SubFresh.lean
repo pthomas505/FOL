@@ -106,23 +106,28 @@ theorem lem_1
     case _ c1 =>
       simp at c1
 
-      obtain s1 := Finset.image_sdiff_singleton phi.freeVarSet x x (Function.updateITE σ x x)
-      simp only [Function.updateITE] at s1
-      simp at s1
+      have s1 : Finset.image σ (freeVarSet phi \ {x}) = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x})
+      simp only [Finset.image_sdiff_singleton_updateITE]
+
       simp only [s1]
       clear s1
 
-      have s2 : x ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x})
+      have s2 : Finset.image (Function.updateITE σ x x) (freeVarSet phi) \ {x} = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) \ {x}
+      apply Finset.image_sdiff_singleton
+      simp only [Function.updateITE]
+      simp
+
+      simp only [s2]
+      clear s2
+
+      have s3 : x ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x})
       simp only [Finset.mem_image]
       simp
-      intro v a1 a2
       simp only [Function.updateITE]
-      simp only [if_neg a2]
-      exact c1 v a1 a2
+      simp
+      tauto
 
-      simp only [Finset.sdiff_singleton_eq_self s2]
-
-      simp only [<- Finset.image_sdiff_singleton_updateITE phi.freeVarSet x x σ]
+      simp only [Finset.sdiff_singleton_eq_self s3]
 
 
 theorem substitution_theorem
