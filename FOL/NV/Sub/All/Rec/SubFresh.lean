@@ -49,35 +49,27 @@ theorem lem_1
   (subFresh σ c F).freeVarSet = F.freeVarSet.image σ :=
   by
   induction F generalizing σ
-  case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
+  all_goals
     simp only [subFresh]
     simp only [freeVarSet]
+  case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
     apply Finset.ext
     intro a
     simp
   case true_ | false_ =>
-    simp only [subFresh]
-    simp only [freeVarSet]
     simp
   case not_ phi phi_ih =>
-    simp only [subFresh]
-    simp only [freeVarSet]
     exact phi_ih σ
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [subFresh]
-    simp only [freeVarSet]
     simp only [Finset.image_union]
     congr!
     · exact phi_ih σ
     · exact psi_ih σ
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [subFresh]
-    simp only [freeVarSet]
-
     simp only [phi_ih]
 
     split_ifs
