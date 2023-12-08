@@ -90,9 +90,10 @@ lemma freeVarSet_subFresh_eq_freeVarSet_image
 
       simp only [<- Finset.image_sdiff_singleton_updateITE phi.freeVarSet x x σ]
 
-      obtain s4 := Finset.image_sdiff_singleton phi.freeVarSet x x' (Function.updateITE σ x x')
-      simp only [Function.updateITE] at s4
-      simp at s4
+      have s4 : Finset.image (Function.updateITE σ x x') (freeVarSet phi) \ {x'} = Finset.image (Function.updateITE σ x x') (freeVarSet phi \ {x}) \ {x'}
+      apply Finset.image_sdiff_singleton phi.freeVarSet x x' (Function.updateITE σ x x')
+      simp only [Function.updateITE]
+      simp
       simp only [s4]
 
       simp only [Finset.image_congr_update_ite phi.freeVarSet x x' x]
