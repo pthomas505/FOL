@@ -296,7 +296,7 @@ example
       exact fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub F F' v u ∅ a1_left a1_right
 
 
-theorem substitution_theorem_aux
+theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
@@ -426,6 +426,21 @@ theorem substitution_theorem_aux
         contradiction
       case _ c1 c2 =>
         exact ih
+
+
+theorem substitution_is_valid
+  (v t : VarName)
+  (F F' : Formula)
+  (h1 : IsSub F v t F')
+  (h2 : F.IsValid) :
+  F'.IsValid :=
+  by
+  simp only [IsValid] at h2
+
+  simp only [IsValid]
+  intro D I V E
+  simp only [← substitution_theorem D I V E v t F F' h1]
+  apply h2
 
 
 #lint
