@@ -222,7 +222,7 @@ theorem admitsAux_imp_fastAdmitsAux
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
-  any_goals
+  all_goals
     simp only [admitsAux] at h2
 
     simp only [fastAdmitsAux]
@@ -247,7 +247,7 @@ theorem mem_binders_imp_admitsAux
   admitsAux v u binders F :=
   by
   induction F generalizing binders
-  any_goals
+  all_goals
     simp only [admitsAux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     apply phi_ih
@@ -407,6 +407,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
   induction F generalizing binders
   all_goals
     simp only [occursIn] at h1
+
     simp only [fastReplaceFree]
   any_goals
     simp only [fastAdmitsAux]
