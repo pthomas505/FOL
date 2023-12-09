@@ -265,3 +265,19 @@ theorem substitution_theorem_aux
         contradiction
       case _ c1 c2 =>
         exact ih
+
+
+theorem substitution_theorem
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (E : Env)
+  (σ : VarName → VarName)
+  (F F' : Formula)
+  (h1 : IsSub σ ∅ F F') :
+  Holds D I (V ∘ σ) E F ↔ Holds D I V E F' :=
+  by
+  apply substitution_theorem_aux D I (V ∘ σ) V E σ ∅ F F' h1
+  · simp
+  · simp
+  · simp
