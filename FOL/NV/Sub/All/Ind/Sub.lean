@@ -113,6 +113,7 @@ inductive IsSub :
     (binders : Finset VarName)
     (X : DefName)
     (xs : List VarName) :
+    (∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders) →
     IsSub σ binders (def_ X xs) (def_ X (xs.map σ))
 
 
@@ -214,5 +215,41 @@ theorem substitution_theorem_aux
           exact h4 v c2
         case _ c2 =>
           contradiction
-  all_goals
-    sorry
+  case def_ σ' binders' X' xs' ih_1 =>
+    induction E
+    case nil =>
+      simp only [Holds]
+    case cons hd tl ih =>
+      simp only [Holds]
+      split_ifs
+      case _ c1 c2 =>
+        simp
+        apply Holds_coincide_Var
+        intro v a1
+
+        have s1 : List.map V xs' = List.map (V' ∘ σ') xs'
+        simp only [List.map_eq_map_iff]
+        intro x a2
+        by_cases c3 : x ∈ binders'
+        · exact h2 x c3
+        · apply h3 x
+          apply ih_1 x a2 c3
+
+        simp only [s1]
+        apply Function.updateListITE_mem_eq_len
+        simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        obtain s2 := hd.h1 a1
+        simp at s2
+        exact s2
+
+        simp at c2
+        simp
+        tauto
+      case _ c1 c2 =>
+        simp only [List.length_map] at c2
+        contradiction
+      case _ c1 c2 =>
+        simp at c2
+        contradiction
+      case _ c1 c2 =>
+        exact ih
