@@ -1,4 +1,4 @@
-import FOL.NV.Sub.One.Rec.ReplaceFree
+import FOL.NV.Sub.Var.One.Rec.ReplaceFree
 import FOL.NV.Semantics
 
 
@@ -8,7 +8,7 @@ set_option autoImplicit false
 namespace FOL.NV
 
 open Formula
-open Sub.One.Rec
+open Sub.Var.One.Rec
 
 
 inductive AlphaEqv : Formula → Formula → Prop
