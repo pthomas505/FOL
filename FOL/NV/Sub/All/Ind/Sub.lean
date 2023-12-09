@@ -100,6 +100,14 @@ inductive IsSub :
     IsSub (Function.updateITE σ x x) (binders ∪ {x}) phi phi' →
     IsSub σ binders (forall_ x phi) (forall_ x phi')
 
+  | exists_
+    (σ : VarName → VarName)
+    (binders : Finset VarName)
+    (x : VarName)
+    (phi phi' : Formula) :
+    IsSub (Function.updateITE σ x x) (binders ∪ {x}) phi phi' →
+    IsSub σ binders (exists_ x phi) (exists_ x phi')
+
   | def_
     (σ : VarName → VarName)
     (binders : Finset VarName)
@@ -134,7 +142,25 @@ theorem substitution_theorem_aux
     · exact h2 x c1
     · apply h3
       exact ih_1 x a1 c1
-  case forall_ σ' binders' x phi phi' ih_1 ih_2 =>
+  case eq_ σ' binders' x y v ih_1 ih_2 ih_3 =>
+    simp only [Holds]
+    sorry
+  case true_ | false_ =>
+    simp only [Holds]
+  case not_ σ' binders' phi phi' ih_1 ih_2 =>
+    simp only [Holds]
+    congr! 1
+    exact ih_2 V V' h2 h3 h4
+  case
+      imp_ σ' binders' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2
+    | and_ σ' binders' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2
+    | or_ σ' binders' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2
+    | iff_ σ' binders' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2 =>
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih_2 V V' h2 h3 h4
+    · apply psi_ih_2 V V' h2 h3 h4
+  case forall_ σ' binders' x phi phi' ih_1 ih_2 | exists_ σ' binders' x phi phi' ih_1 ih_2 =>
     simp at ih_2
 
     have s1 : ∀ (v : VarName), ¬ v = x → v ∈ binders' → ¬ σ' v = x
@@ -144,7 +170,7 @@ theorem substitution_theorem_aux
     exact h4 v a2
 
     simp only [Holds]
-    apply forall_congr'
+    first | apply forall_congr'| apply exists_congr
     intro d
 
     apply ih_2
