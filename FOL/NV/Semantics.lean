@@ -110,25 +110,22 @@ theorem Holds_coincide_Var
   induction E generalizing F V V'
   all_goals
     induction F generalizing V V'
-    case pred_const_ X xs | pred_var_ X xs =>
+    all_goals
       simp only [isFreeIn] at h1
 
       simp only [Holds]
+    case pred_const_ X xs | pred_var_ X xs =>
       congr! 1
       simp only [List.map_eq_map_iff]
       exact h1
     case eq_ x y =>
-      simp only [isFreeIn] at h1
       simp at h1
 
-      simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
-        simp only [h1_left, h1_right]
-    case true_ | false_ =>
-      simp only [Holds]
+        simp only [h1_left]
+        simp only [h1_right]
     case not_ phi phi_ih =>
-      simp only [Holds]
       congr! 1
       exact phi_ih V V' h1
     case
@@ -136,9 +133,6 @@ theorem Holds_coincide_Var
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      simp only [isFreeIn] at h1
-
-      simp only [Holds]
       congr! 1
       · apply phi_ih V V'
         intro v a1
@@ -151,45 +145,32 @@ theorem Holds_coincide_Var
         right
         exact a1
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [isFreeIn] at h1
       simp at h1
 
-      simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intro d
       apply phi_ih
       intro v a1
       simp only [Function.updateITE]
-      split_ifs
-      case _ c1 =>
-        rfl
-      case _ c1 =>
-        exact h1 v c1 a1
-
-  case nil.def_ X xs =>
-    simp only [Holds]
+      split_ifs <;> tauto
 
   case cons.def_ hd tl ih X xs =>
-    simp only [isFreeIn] at h1
-
-    simp only [Holds]
     split_ifs
     case pos c1 =>
       apply ih
       intro v a1
       simp only [isFreeIn_iff_mem_freeVarSet v hd.q] at a1
 
-      have s2 : v ∈ List.toFinset hd.args
+      have s1 : v ∈ List.toFinset hd.args
       apply Finset.mem_of_subset hd.h1 a1
 
-      apply Function.updateListITE_fun_coincide_mem_eq_len V V' hd.args xs v h1
-      · simp only [List.mem_toFinset] at s2
-        exact s2
-      · tauto
+      simp only [List.mem_toFinset] at s1
+
+      apply Function.updateListITE_fun_coincide_mem_eq_len V V' hd.args xs v h1 s1
+      tauto
     case neg c1 =>
       apply ih
-      simp only [isFreeIn]
-      exact h1
+      tauto
 
 
 theorem Holds_coincide_PredVar
@@ -207,25 +188,18 @@ theorem Holds_coincide_PredVar
   induction E generalizing F V
   all_goals
     induction F generalizing V
-    case pred_const_ X xs =>
+    all_goals
+      simp only [predVarOccursIn] at h2
+
       simp only [Holds]
+    case pred_const_ X xs =>
       simp only [h1]
     case pred_var_ X xs =>
-      simp only [predVarOccursIn] at h2
       simp at h2
-
-      simp only [Holds]
-      apply h2
-      · rfl
-      · simp
-    case eq_ x y =>
-      simp only [Holds]
-    case true_ | false_ =>
-      simp only [Holds]
+      specialize h2 X (List.map V xs)
+      simp at h2
+      exact h2
     case not_ phi phi_ih =>
-      simp only [predVarOccursIn] at h2
-
-      simp only [Holds]
       congr! 1
       exact phi_ih V h2
     case
@@ -233,9 +207,6 @@ theorem Holds_coincide_PredVar
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      simp only [predVarOccursIn] at h2
-
-      simp only [Holds]
       congr! 1
       · apply phi_ih
         intro P ds a1
@@ -248,18 +219,11 @@ theorem Holds_coincide_PredVar
         right
         exact a1
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [predVarOccursIn] at h2
-
-      simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intro d
       exact phi_ih (Function.updateITE V x d) h2
 
-  case nil.def_ X xs =>
-    simp only [Holds]
-
   case cons.def_ hd tl ih X xs =>
-    simp only [Holds]
     split_ifs
     case pos c1 =>
       apply ih
