@@ -332,11 +332,11 @@ theorem T_17_6
   IsProof ((forall_ v P).imp_ (exists_ v P)) :=
   by
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   apply existsIntroId
   apply specId v
   apply IsDeduct.assume_
-  simp only [Set.mem_singleton]
+  simp
 
 
 theorem T_17_7
@@ -384,16 +384,16 @@ theorem univIntro
   apply IsDeduct.mp_ (forall_ t (fastReplaceFree v t P))
   · apply proof_imp_deduct
     apply deduction_theorem
-    simp only [Set.union_singleton, insert_emptyc_eq]
+    simp
     apply generalization
     · apply spec
       · apply IsDeduct.assume_
-        simp only [Set.mem_singleton]
+        simp
       · apply fastReplaceFree_fastAdmits
         exact h1
-    · simp only [Set.mem_singleton_iff, forall_eq]
+    · simp
       simp only [isFreeIn]
-      simp only [Bool.of_decide_iff, not_and]
+      simp
       intro a1 contra
       exact not_isFreeIn_fastReplaceFree P v t a1 contra
   · exact generalization (fastReplaceFree v t P) t Δ h2 h3
@@ -492,17 +492,17 @@ theorem T_17_10
   IsProof ((forall_ u (forall_ v P)).imp_ (forall_ v (forall_ u P))) :=
   by
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   apply generalization
   · apply generalization
     · apply specId v P
       apply specId u (forall_ v P)
       apply IsDeduct.assume_
-      simp only [Set.mem_singleton]
-    · simp only [Set.mem_singleton_iff, forall_eq]
+      simp
+    · simp
       simp only [isFreeIn]
       simp
-  · simp only [Set.mem_singleton_iff, forall_eq]
+  · simp
     simp only [isFreeIn]
     simp
 
@@ -514,7 +514,7 @@ theorem T_17_11
   IsProof ((forall_ v (P.imp_ Q)).imp_ ((exists_ v P).imp_ Q)) :=
   by
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   simp only [def_exists_]
   -- simp only [exists_]
   apply IsDeduct.mp_ (Q.not_.imp_ (forall_ v Q.not_))
@@ -529,8 +529,8 @@ theorem T_17_11
             apply T_14_7
           · apply specId v (P.imp_ Q)
             apply IsDeduct.assume_
-            simp only [Set.mem_singleton]
-        · simp only [Set.mem_singleton_iff, forall_eq]
+            simp
+        · simp
           simp only [isFreeIn]
           simp
   · apply IsDeduct.axiom_
@@ -586,10 +586,9 @@ theorem existsElim
         apply univIntro P.not_ v t _ h3
         · apply specId t
           apply IsDeduct.assume_
-          simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, and_self_iff,
-            true_or_iff]
+          simp
         · intro H a1
-          simp only [Set.union_singleton, Set.mem_insert_iff] at a1
+          simp at a1
           cases a1
           case _ c1 =>
             subst c1
@@ -610,10 +609,10 @@ theorem T_17_14
   IsProof ((exists_ v (P.and_ Q)).imp_ ((exists_ v P).and_ (exists_ v Q))) :=
   by
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   apply rule_C (P.and_ Q) ((exists_ v P).and_ (exists_ v Q)) v
   · apply IsDeduct.assume_
-    simp only [Set.mem_singleton]
+    simp
   · apply IsDeduct.mp_ (exists_ v Q)
     · apply IsDeduct.mp_ (exists_ v P)
       · simp only [def_and_]
@@ -627,7 +626,7 @@ theorem T_17_14
             -- simp only [formula.and_]
             SC
           · apply IsDeduct.assume_
-            simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, true_or_iff]
+            simp
     · apply exists_intro Q v v
       · apply fastAdmits_self
       · simp only [fastReplaceFree_self]
@@ -636,12 +635,12 @@ theorem T_17_14
           -- simp only [formula.and_]
           SC
         · apply IsDeduct.assume_
-          simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, true_or_iff]
+          simp
   · simp only [def_and_]
     -- simp only [and_]
     simp only [def_exists_]
     -- simp only [exists_]
-    simp only [Set.mem_singleton_iff, forall_eq]
+    simp
     simp only [isFreeIn]
     simp
   · simp only [def_and_]
@@ -661,7 +660,7 @@ theorem T_18_1_left
   -- simp only [iff_]
   apply deduction_theorem
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   apply generalization
   · apply IsDeduct.mp_ P
     · apply IsDeduct.mp_ ((P.imp_ Q).and_ (Q.imp_ P))
@@ -670,11 +669,11 @@ theorem T_18_1_left
         SC
       · apply specId v
         apply IsDeduct.assume_
-        simp only [Set.mem_insert_iff, Set.mem_singleton, or_true_iff]
+        simp
     · apply specId v
       apply IsDeduct.assume_
-      simp only [Set.mem_insert_iff, eq_self_iff_true, true_and_iff, true_or_iff]
-  · simp only [Set.mem_insert_iff, Set.mem_singleton_iff, forall_eq_or_imp, forall_eq]
+      simp
+  · simp
     simp only [isFreeIn]
     simp
 
@@ -688,7 +687,7 @@ theorem T_18_1_right
   -- simp only [iff_]
   apply deduction_theorem
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   apply generalization
   · apply IsDeduct.mp_ Q
     · apply IsDeduct.mp_ ((P.imp_ Q).and_ (Q.imp_ P))
@@ -697,11 +696,11 @@ theorem T_18_1_right
         SC
       · apply specId v
         apply IsDeduct.assume_
-        simp only [Set.mem_insert_iff, Set.mem_singleton, or_true_iff]
+        simp
     · apply specId v
       apply IsDeduct.assume_
-      simp only [Set.mem_insert_iff, eq_self_iff_true, true_and_iff, true_or_iff]
-  · simp only [Set.mem_insert_iff, Set.mem_singleton_iff, forall_eq_or_imp, forall_eq]
+      simp
+  · simp
     simp only [isFreeIn]
     simp
 
@@ -734,13 +733,13 @@ theorem Forall_spec_id
   case cons xs_hd xs_tl xs_ih =>
     simp only [Forall_]
     apply deduction_theorem
-    simp only [List.foldr_cons, Set.union_singleton, insert_emptyc_eq]
+    simp
     apply IsDeduct.mp_ (Forall_ xs_tl P)
     apply proof_imp_deduct
     exact xs_ih
     apply specId xs_hd
     apply IsDeduct.assume_
-    simp only [Set.mem_singleton_iff, eq_self_iff_true, true_and_iff]
+    simp
     rfl
 
 
@@ -754,11 +753,11 @@ theorem Forall_spec_id'
   induction xs
   case nil =>
     simp only [Forall_] at h1
-    simp only [List.foldr_nil] at h1
+    simp at h1
     exact h1
   case cons xs_hd xs_tl xs_ih =>
     simp only [Forall_] at h1
-    simp only [List.foldr_cons] at h1
+    simp at h1
     apply xs_ih
     simp only [Forall_]
     apply specId xs_hd
@@ -773,10 +772,10 @@ theorem Forall_isBoundIn
   by
   simp only [Formula.Forall_]
   induction xs
-  case nil => simp only [List.foldr_nil, List.not_mem_nil, false_or_iff]
-  case cons xs_hd xs_tl
-    xs_ih =>
-    simp only [List.foldr_cons, List.mem_cons]
+  case nil =>
+    simp
+  case cons xs_hd xs_tl xs_ih =>
+    simp
     simp only [isBoundIn]
     simp only [xs_ih]
     tauto
@@ -791,9 +790,9 @@ theorem Forall_isFreeIn
   simp only [Formula.Forall_]
   induction xs
   case nil =>
-    simp only [List.foldr_nil, List.not_mem_nil, not_false_iff, true_and_iff]
+    simp
   case cons xs_hd xs_tl xs_ih =>
-    simp only [List.foldr_cons, List.mem_cons]
+    simp
     simp only [isFreeIn]
     simp only [xs_ih]
     tauto
@@ -857,7 +856,7 @@ theorem T_18_2
     simp only [isBoundIn] at h2
     simp at h2
     apply deduction_theorem
-    simp only [Set.union_singleton, insert_emptyc_eq]
+    simp
     apply IsDeduct.mp_ (forall_ h1_x (h1_P.iff_ h1_P'))
     · apply proof_imp_deduct
       apply T_18_1
@@ -872,9 +871,9 @@ theorem T_18_2
             right
             apply a1_right
         · apply IsDeduct.assume_
-          simp only [Set.mem_singleton]
+          simp
       · intro H a1
-        simp only [Set.mem_singleton_iff] at a1
+        simp at a1
         subst a1
         simp only [Forall_isFreeIn]
         simp only [def_iff_]
@@ -898,16 +897,17 @@ theorem C_18_3
       (Forall_ ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList (U.iff_ V))
   · apply T_18_2 U V P_U P_V ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList h1
     intro v a1
-    simp only [Finset.mem_toList, Finset.mem_inter, Finset.mem_union]
-    simp only [isFreeIn_iff_mem_freeVarSet, isBoundIn_iff_mem_boundVarSet] at a1
+    simp
+    simp only [isFreeIn_iff_mem_freeVarSet] at a1
+    simp only [isBoundIn_iff_mem_boundVarSet] at a1
     exact a1
   · simp only [Formula.Forall_]
     induction ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList
     case _ =>
-      simp only [List.foldr_nil]
+      simp
       exact h2
     case _ hd tl ih =>
-      simp only [List.foldr_cons]
+      simp
       apply generalization
       · exact ih
       · simp
@@ -1005,33 +1005,33 @@ theorem T_18_6
                 -- simp only [formula.and_]
                 SC
               · apply deduction_theorem
-                simp only [Set.union_singleton, insert_emptyc_eq]
+                simp
                 apply generalization
                 · subst h1_right_right_right_right_left
                   apply spec
                   · apply IsDeduct.assume_
-                    simp only [Set.mem_singleton]
+                    simp
                   · exact h1_right_right_left
                 · intro H a1
-                  simp only [Set.mem_singleton_iff] at a1
+                  simp at a1
                   subst a1
                   simp only [isFreeIn]
-                  simp only [Bool.of_decide_iff, not_and]
+                  simp
                   intro _
                   exact h1_left
             · apply deduction_theorem
-              simp only [Set.union_singleton, insert_emptyc_eq]
+              simp
               apply generalization
               · subst h1_right_right_right_right_right
                 apply spec
                 · apply IsDeduct.assume_
-                  simp only [Set.mem_singleton]
+                  simp
                 · exact h1_right_right_right_left
               · intro H a1
-                simp only [Set.mem_singleton_iff] at a1
+                simp at a1
                 subst a1
                 simp only [isFreeIn]
-                simp only [Bool.of_decide_iff, not_and]
+                simp
                 intro _
                 exact h1_right_left
 
@@ -1155,19 +1155,18 @@ theorem T_19_4
   IsProof ((exists_ u (forall_ v P)).imp_ (forall_ v (exists_ u P))) :=
   by
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   apply generalization
   · apply rule_C (forall_ v P) (exists_ u P) u {exists_ u (forall_ v P)}
     · apply IsDeduct.assume_
-      simp only [Set.mem_singleton]
+      simp
     · apply exists_intro P u u
       · apply fastAdmits_self
       · simp only [fastReplaceFree_self]
         apply specId v
         apply IsDeduct.assume_
-        simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, and_self_iff,
-          true_or_iff]
-    · simp only [Set.mem_singleton_iff, forall_eq]
+        simp
+    · simp
       simp only [def_exists_]
       -- simp only [Formula.exists_]
       simp only [isFreeIn]
@@ -1177,7 +1176,7 @@ theorem T_19_4
       -- simp only [exists_]
       -- simp only [is_free_in]
       simp
-  · simp only [Set.mem_singleton_iff, forall_eq]
+  · simp
     simp only [def_exists_]
     -- simp only [Formula.exists_]
     simp only [isFreeIn]
@@ -1208,10 +1207,10 @@ theorem T_19_6_left
   by
   apply deduction_theorem
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   apply rule_C P (exists_ v Q) v {exists_ v P, forall_ v (P.iff_ Q)}
   · apply IsDeduct.assume_
-    simp only [Set.mem_insert_iff, eq_self_iff_true, true_or_iff]
+    simp
   · apply exists_intro Q v v
     · apply fastAdmits_self
     · simp only [fastReplaceFree_self]
@@ -1224,9 +1223,9 @@ theorem T_19_6_left
           SC
         · apply specId v
           apply IsDeduct.assume_
-          simp only [Set.union_singleton, Set.mem_insert_iff, Set.mem_singleton, or_true_iff]
+          simp
       · apply IsDeduct.assume_
-        simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, true_or_iff]
+        simp
   · simp only [def_exists_]
     -- simp only [exists_]
     simp
@@ -1244,7 +1243,7 @@ theorem T_19_6_right
   IsProof ((forall_ v (P.iff_ Q)).imp_ ((exists_ v Q).imp_ (exists_ v P))) :=
   by
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   apply IsDeduct.mp_ (forall_ v (Q.iff_ P))
   · apply proof_imp_deduct
     apply T_19_6_left Q P v
@@ -1257,8 +1256,8 @@ theorem T_19_6_right
         SC
       · apply specId v
         apply IsDeduct.assume_
-        simp only [Set.mem_singleton]
-    · simp only [Set.mem_singleton_iff, forall_eq]
+        simp
+    · simp
       simp only [isFreeIn]
       simp
 
@@ -1309,17 +1308,17 @@ theorem T_19_TS_21_right
   IsProof ((P.imp_ (forall_ v Q)).imp_ (forall_ v (P.imp_ Q))) :=
   by
   apply deduction_theorem
-  simp only [Set.union_singleton, insert_emptyc_eq]
+  simp
   apply generalization
   · apply deduction_theorem
     apply specId v
     apply IsDeduct.mp_ P
     · apply IsDeduct.assume_
-      simp only [Set.union_singleton, Set.mem_insert_iff, Set.mem_singleton, or_true_iff]
+      simp
     · apply IsDeduct.assume_
-      simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, true_or_iff]
+      simp
   · intro H a1
-    simp only [Set.mem_singleton_iff] at a1
+    simp at a1
     subst a1
     simp only [isFreeIn]
     simp
@@ -1443,10 +1442,10 @@ theorem T_21_8
         simp only [And_]
         induction n
         case _ =>
-          simp only [List.ofFn_zero, List.foldr_nil]
+          simp
           SC
         case _ n ih =>
-          simp only [List.ofFn_succ, List.foldr_cons]
+          simp
           apply
             IsDeduct.mp_
               ((eq_ r s).imp_
@@ -1518,7 +1517,7 @@ theorem T_21_8
       cases h3
       case _ h3_left h3_right =>
         apply deduction_theorem
-        simp only [Set.union_singleton, insert_emptyc_eq]
+        simp
         apply IsDeduct.mp_ (forall_ x (P_u.iff_ P_v))
         · apply proof_imp_deduct
           apply T_18_1
@@ -1539,7 +1538,7 @@ theorem T_21_8
               · intro H a1
                 simp at a1
           · apply IsDeduct.assume_
-            simp only [Set.mem_singleton]
+            simp
   all_goals
     sorry
 
