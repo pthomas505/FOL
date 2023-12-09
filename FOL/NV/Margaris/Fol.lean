@@ -4,11 +4,11 @@ import FOL.NV.Margaris.Prop
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV
 
 open Formula
+
+open Sub.Var.One.Rec
 
 open Margaris
 
