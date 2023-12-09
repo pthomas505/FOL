@@ -1,10 +1,10 @@
-import FOL.NV.Sub.One.Rec.Admits
+import FOL.NV.Sub.Var.One.Rec.Admits
 
 
 set_option autoImplicit false
 
 
-namespace FOL.NV.Sub.One.Ind
+namespace FOL.NV.Sub.Var.One.Ind
 
 open Formula
 open Rec

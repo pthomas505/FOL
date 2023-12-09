@@ -1,11 +1,11 @@
 import FOL.NV.Semantics
-import FOL.NV.Sub.One.Rec.ReplaceFree
+import FOL.NV.Sub.Var.One.Rec.ReplaceFree
 
 
 set_option autoImplicit false
 
 
-namespace FOL.NV.Sub.One.Rec
+namespace FOL.NV.Sub.Var.One.Rec
 
 open Formula
 

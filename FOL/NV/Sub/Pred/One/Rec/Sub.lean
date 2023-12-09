@@ -1,12 +1,10 @@
-import FOL.NV.Sub.All.Rec.Admits
+import FOL.NV.Sub.Var.All.Rec.Admits
 
 
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV.Sub.Pred.One.Rec
 
 open Formula
 
@@ -25,7 +23,7 @@ def replacePred
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
       if X = P ∧ xs.length = zs.length
-      then Sub.All.Rec.fastReplaceFree (Function.updateListITE id zs xs) H
+      then Sub.Var.All.Rec.fastReplaceFree (Function.updateListITE id zs xs) H
       else pred_var_ X xs
   | eq_ x y => eq_ x y
   | true_ => true_
@@ -61,7 +59,7 @@ def admitsPredAux
   | binders, pred_var_ X ts =>
       if X = P ∧ ts.length = zs.length
       then
-        Sub.All.Rec.admits (Function.updateListITE id zs ts) H ∧
+        Sub.Var.All.Rec.admits (Function.updateListITE id zs ts) H ∧
             /-
               Suppose F is the formula that the predicate X ts occurs in.
               Ensures that the free variables in H that are not being replaced by a variable in ts do not become bound variables in F. The bound variables in F are in the 'binders' set.
@@ -182,16 +180,16 @@ theorem pred_sub_single_aux
         simp
         split_ifs at h1
         case pos c1 =>
-          unfold Sub.All.Rec.admits at h1
+          unfold Sub.Var.All.Rec.admits at h1
           simp at h1
 
           cases h1
           case intro h1_left h1_right =>
             have s1 :
               Holds D I (V ∘ Function.updateListITE id zs xs) E_ref H ↔
-                Holds D I V E_ref (Sub.All.Rec.fastReplaceFree (Function.updateListITE id zs xs) H) :=
+                Holds D I V E_ref (Sub.Var.All.Rec.fastReplaceFree (Function.updateListITE id zs xs) H) :=
               by
-              exact Sub.All.Rec.substitution_theorem D I V E_ref (Function.updateListITE id zs xs) H h1_left
+              exact Sub.Var.All.Rec.substitution_theorem D I V E_ref (Function.updateListITE id zs xs) H h1_left
 
             simp only [Function.updateListITE_comp] at s1
             simp at s1

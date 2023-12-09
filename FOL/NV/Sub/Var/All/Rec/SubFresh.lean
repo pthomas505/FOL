@@ -8,7 +8,7 @@ import FOL.NV.Semantics
 set_option autoImplicit false
 
 
-namespace FOL.NV.Sub.All.Rec
+namespace FOL.NV.Sub.Var.All.Rec
 
 open Formula
 

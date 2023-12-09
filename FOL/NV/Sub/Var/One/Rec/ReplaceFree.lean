@@ -5,7 +5,7 @@ import FOL.NV.Binders
 set_option autoImplicit false
 
 
-namespace FOL.NV.Sub.One.Rec
+namespace FOL.NV.Sub.Var.One.Rec
 
 open Formula
 

@@ -1,11 +1,11 @@
 import FOL.FunctionUpdateITE
-import FOL.NV.Sub.One.Rec.ReplaceFree
+import FOL.NV.Sub.Var.One.Rec.ReplaceFree
 
 
 set_option autoImplicit false
 
 
-namespace FOL.NV.Sub.All.Rec
+namespace FOL.NV.Sub.Var.All.Rec
 
 open Formula
 
