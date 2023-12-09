@@ -160,20 +160,20 @@ theorem substitution_theorem_aux
         · exact c1
   case true_ | false_ =>
     simp only [Holds]
-  case not_ σ' binders' phi phi' ih_1 ih_2 =>
+  case not_ σ' binders' phi phi' _ ih_2 =>
     simp only [Holds]
     congr! 1
     exact ih_2 V V' h2 h3 h4
   case
-      imp_ σ' binders' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2
-    | and_ σ' binders' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2
-    | or_ σ' binders' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2
-    | iff_ σ' binders' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2 =>
+      imp_ σ' binders' phi psi phi' psi' _ _ phi_ih_2 psi_ih_2
+    | and_ σ' binders' phi psi phi' psi' _ _ phi_ih_2 psi_ih_2
+    | or_ σ' binders' phi psi phi' psi' _ _ phi_ih_2 psi_ih_2
+    | iff_ σ' binders' phi psi phi' psi' _ _ phi_ih_2 psi_ih_2 =>
     simp only [Holds]
     congr! 1
     · apply phi_ih_2 V V' h2 h3 h4
     · apply psi_ih_2 V V' h2 h3 h4
-  case forall_ σ' binders' x phi phi' ih_1 ih_2 | exists_ σ' binders' x phi phi' ih_1 ih_2 =>
+  case forall_ σ' binders' x phi phi' _ ih_2 | exists_ σ' binders' x phi phi' _ ih_2 =>
     simp at ih_2
 
     have s1 : ∀ (v : VarName), ¬ v = x → v ∈ binders' → ¬ σ' v = x
