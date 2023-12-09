@@ -539,7 +539,7 @@ theorem fastAdmitsAux_add_binders
       simp only [Finset.union_assoc S T {x}] at phi_ih
       exact phi_ih
   any_goals
-    simp
+    simp only [Finset.mem_union]
   all_goals
     tauto
 
@@ -552,39 +552,29 @@ theorem fastAdmitsAux_del_binders
   fastAdmitsAux v u S F :=
   by
   induction F generalizing S
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [fastAdmitsAux] at h1
-    simp at h1
 
     simp only [fastAdmitsAux]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+    simp at h1
+
     tauto
   case eq_ x y =>
-    simp only [fastAdmitsAux] at h1
     simp at h1
 
-    simp only [fastAdmitsAux]
     tauto
-  case true_ | false_ =>
-    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [fastAdmitsAux]
     tauto
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastAdmitsAux] at h1
-
-    simp only [fastAdmitsAux]
     tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastAdmitsAux] at h1
     simp only [Finset.union_right_comm S T {x}] at h1
 
-    simp only [fastAdmitsAux]
     tauto
 
 --
@@ -639,22 +629,23 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
     toIsBoundAux binders (fastReplaceFree v u F) :=
   by
   induction F generalizing binders
+  all_goals
+    simp only [fastAdmitsAux] at h2
+
+    simp only [fastReplaceFree]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     induction xs
+    all_goals
+      simp only [toIsBoundAux]
     case nil =>
-      simp only [fastReplaceFree]
-      simp
+      rfl
     case cons args_hd args_tl args_ih =>
-      simp only [fastAdmitsAux] at h2
       simp at h2
 
       simp only [fastAdmitsAux] at args_ih
-      simp only [fastReplaceFree] at args_ih
       simp only [toIsBoundAux] at args_ih
       simp at args_ih
 
-      simp only [fastReplaceFree]
-      simp only [toIsBoundAux]
       simp
       constructor
       · split_ifs
@@ -664,11 +655,9 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
         case neg c1 =>
           rfl
       · tauto
-  case eq_ x y =>
-    simp only [fastAdmitsAux] at h2
-
-    simp only [fastReplaceFree]
+  all_goals
     simp only [toIsBoundAux]
+  case eq_ x y =>
     simp
     constructor
     case left | right =>
@@ -678,29 +667,16 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
         tauto
       case neg c1 =>
         rfl
-  case true_ | false_ =>
-    rfl
   case not_ phi phi_ih =>
-    simp only [fastAdmitsAux] at h2
-
-    simp only [fastReplaceFree]
-    simp only [toIsBoundAux]
     tauto
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastAdmitsAux] at h2
-
-    simp only [fastReplaceFree]
-    simp only [toIsBoundAux]
     simp
     tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastAdmitsAux] at h2
-
-    simp only [fastReplaceFree]
     split_ifs
     case pos c1 =>
       rfl
@@ -723,22 +699,23 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
+  all_goals
+    simp only [fastReplaceFree] at h2
+
+    simp only [fastAdmitsAux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     induction xs
+    all_goals
+      simp only [toIsBoundAux] at h2
     case nil =>
-      simp only [fastAdmitsAux]
       simp
     case cons args_hd args_tl args_ih =>
-      simp only [fastReplaceFree] at h2
-      simp only [toIsBoundAux] at h2
       simp at h2
 
       simp only [fastAdmitsAux] at args_ih
-      simp only [fastReplaceFree] at args_ih
       simp only [toIsBoundAux] at args_ih
       simp at args_ih
 
-      simp only [fastAdmitsAux]
       simp
       intro a1
       cases a1
@@ -750,12 +727,11 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
           tauto
       case inr a1 =>
         tauto
-  case eq_ x y =>
-    simp only [fastReplaceFree] at h2
+  all_goals
     simp only [toIsBoundAux] at h2
+  case eq_ x y =>
     simp at h2
 
-    simp only [fastAdmitsAux]
     cases h2
     case intro h2_left h2_right =>
       intros a1
@@ -768,30 +744,19 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
         subst a1
         simp at h2_right
         tauto
-  case true_ | false_ =>
-    simp only [fastAdmitsAux]
   case not_ phi phi_ih =>
-    simp only [fastReplaceFree] at h2
-    simp only [toIsBoundAux] at h2
     simp at h2
 
-    simp only [fastAdmitsAux]
     exact phi_ih binders h1 h2
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [fastReplaceFree] at h2
-    simp only [toIsBoundAux] at h2
     simp at h2
 
-    simp only [fastAdmitsAux]
     tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastReplaceFree] at h2
-
-    simp only [fastAdmitsAux]
     split_ifs at h2
     case pos c1 =>
       left
@@ -924,11 +889,12 @@ theorem replaceFreeAux_admitsAux
   admitsAux t v binders (replaceFreeAux v t binders F) :=
   by
   induction F generalizing binders
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [occursIn] at h1
 
     simp only [replaceFreeAux]
     simp only [admitsAux]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x a1 a2 a3
     by_cases c1 : v = x ∧ x ∉ binders
@@ -943,11 +909,8 @@ theorem replaceFreeAux_admitsAux
       subst a2
       contradiction
   case eq_ x y =>
-    simp only [occursIn] at h1
     push_neg at h1
 
-    simp only [replaceFreeAux]
-    simp only [admitsAux]
     cases h1
     case intro h1_left h1_right =>
       intro a1
@@ -969,11 +932,6 @@ theorem replaceFreeAux_admitsAux
           exact c2_right
       case _ c1 c2 =>
         tauto
-  any_goals
-    simp only [occursIn] at h1
-
-    simp only [replaceFreeAux]
-    simp only [admitsAux]
   all_goals
     tauto
 
@@ -1003,11 +961,12 @@ theorem admitsAux_add_binders
     simp only [admitsAux] at h1
 
     simp only [admitsAux]
+  case pred_const_ X xs | pred_var_ X xs | eq_ x y |def_ X xs =>
+    simp
+    tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [Finset.union_right_comm S T {x}]
     tauto
-  any_goals
-    simp
   all_goals
     tauto
 
@@ -1021,39 +980,25 @@ theorem admitsAux_del_binders
   admitsAux v u S F :=
   by
   induction F generalizing S
-  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+  all_goals
     simp only [admitsAux] at h1
-    simp at h1
 
     simp only [admitsAux]
-    tauto
-  case eq_ x y =>
-    simp only [admitsAux] at h1
+  case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
     simp at h1
 
-    simp only [admitsAux]
     tauto
-  case true_ | false_ =>
-    simp only [admitsAux]
   case not_ phi phi_ih =>
-    simp only [admitsAux] at h1
-
-    simp only [admitsAux]
     exact phi_ih S h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [admitsAux] at h1
-
-    simp only [admitsAux]
     tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [admitsAux] at h1
     simp only [Finset.union_right_comm S T {x}] at h1
 
-    simp only [admitsAux]
     tauto
 
 
@@ -1100,11 +1045,12 @@ theorem substitution_theorem_aux
   induction E generalizing F binders V
   all_goals
     induction F generalizing binders V
-    case pred_const_ X xs | pred_var_ X xs =>
+    all_goals
       simp only [fastAdmitsAux] at h1
 
       simp only [fastReplaceFree]
       simp only [Holds]
+    case pred_const_ X xs | pred_var_ X xs =>
       simp
       congr! 1
       simp only [List.map_eq_map_iff]
@@ -1120,10 +1066,6 @@ theorem substitution_theorem_aux
         simp only [eq_comm]
         simp only [if_neg c1]
     case eq_ x y =>
-      simp only [fastAdmitsAux] at h1
-
-      simp only [fastReplaceFree]
-      simp only [Holds]
       simp only [Function.updateITE]
       simp only [eq_comm]
       congr! 1
@@ -1134,14 +1076,7 @@ theorem substitution_theorem_aux
           tauto
         case _ c1 =>
           rfl
-    case true_ | false_ =>
-      simp only [fastReplaceFree]
-      simp only [Holds]
     case not_ phi phi_ih =>
-      simp only [fastAdmitsAux] at h1
-
-      simp only [fastReplaceFree]
-      simp only [Holds]
       congr! 1
       exact phi_ih V binders h1 h2
     case
@@ -1149,19 +1084,12 @@ theorem substitution_theorem_aux
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      simp only [fastAdmitsAux] at h1
-
-      simp only [fastReplaceFree]
-      simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
       congr! 1
       · exact phi_ih V binders h1_left h2
       · exact psi_ih V binders h1_right h2
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [fastAdmitsAux] at h1
-
-      simp only [fastReplaceFree]
       split_ifs
       case _ c1 =>
         subst c1
@@ -1191,54 +1119,46 @@ theorem substitution_theorem_aux
             simp only [if_neg a1_right]
             tauto
 
-  case nil.def_ X xs =>
-    simp only [fastReplaceFree]
-    simp only [Holds]
-
   case cons.def_ hd tl ih X xs =>
-      simp only [fastAdmitsAux] at h1
+    unfold Function.updateITE
+    congr! 1
+    case _ =>
+      simp
+    case _ c1 =>
+      apply Holds_coincide_Var
+      intro v' a1
+      simp
 
-      simp only [fastReplaceFree]
-      simp only [Holds]
-      unfold Function.updateITE
-      congr! 1
-      case _ =>
-        simp
-      case _ c1 =>
-        apply Holds_coincide_Var
-        intro v' a1
-        simp
-
-        have s1 : (List.map (fun (a : VarName) => if a = v then V' t else V a) xs) = (List.map (V ∘ fun (x : VarName) => if v = x then t else x) xs)
-        {
-        simp only [List.map_eq_map_iff]
-        intro x a2
-        simp only [eq_comm]
-        simp
-        split_ifs
-        case _ c2 =>
-          apply h2
-          subst c2
-          exact h1 a2
-        case _ c2 =>
-          rfl
-        }
-        simp only [s1]
-        apply Function.updateListITE_mem_eq_len
-        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
-          simp only [← List.mem_toFinset]
-          apply Finset.mem_of_subset hd.h1 a1
-        · simp at c1
-          cases c1
-          case intro c1_left c1_right =>
-            simp
-            simp only [eq_comm]
-            exact c1_right
-      case _ _ =>
-        apply ih V binders
-        · simp only [fastAdmitsAux]
-          exact h1
-        · exact h2
+      have s1 : (List.map (fun (a : VarName) => if a = v then V' t else V a) xs) = (List.map (V ∘ fun (x : VarName) => if v = x then t else x) xs)
+      {
+      simp only [List.map_eq_map_iff]
+      intro x a2
+      simp only [eq_comm]
+      simp
+      split_ifs
+      case _ c2 =>
+        apply h2
+        subst c2
+        exact h1 a2
+      case _ c2 =>
+        rfl
+      }
+      simp only [s1]
+      apply Function.updateListITE_mem_eq_len
+      · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        simp only [← List.mem_toFinset]
+        apply Finset.mem_of_subset hd.h1 a1
+      · simp at c1
+        cases c1
+        case intro c1_left c1_right =>
+          simp
+          simp only [eq_comm]
+          exact c1_right
+    case _ _ =>
+      apply ih V binders
+      · simp only [fastAdmitsAux]
+        exact h1
+      · exact h2
 
 
 theorem substitution_theorem
@@ -1273,4 +1193,4 @@ theorem substitution_is_valid
   apply h2
 
 
---#lint
+#lint
