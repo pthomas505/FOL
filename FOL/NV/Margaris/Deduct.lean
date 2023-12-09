@@ -1,14 +1,10 @@
-import FOL.NV.Sub.One.Rec.SubOneRecAdmits
+import FOL.NV.Sub.Var.One.Rec.Admits
 
 
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
-
-namespace Margaris
+namespace FOL.NV.Margaris
 
 open Formula
 
@@ -113,8 +109,8 @@ inductive IsAxiom : Formula → Prop
   | pred_2_
     (v t : VarName)
     (phi phi' : Formula) :
-    fastAdmits v t phi →
-    fastReplaceFree v t phi = phi' →
+    Sub.Var.One.Rec.fastAdmits v t phi →
+    Sub.Var.One.Rec.fastReplaceFree v t phi = phi' →
     IsAxiom ((forall_ v phi).imp_ phi')
 
   -- ⊢ phi → (∀ v phi)  provided v is not free in phi
@@ -250,8 +246,8 @@ inductive IsProofAlt : Formula → Prop
   -- ⊢ (∀ v phi) → phi(t/v)  provided phi admits t for v
   | pred_2_
     (v t : VarName) (phi phi' : Formula) :
-    fastAdmits v t phi →
-      fastReplaceFree v t phi = phi' →
+    Sub.Var.One.Rec.fastAdmits v t phi →
+      Sub.Var.One.Rec.fastReplaceFree v t phi = phi' →
         IsProofAlt ((forall_ v phi).imp_ phi')
 
   -- ⊢ phi → (∀ v phi)  provided v is not free in phi
