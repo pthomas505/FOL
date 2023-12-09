@@ -10,6 +10,9 @@ namespace FOL.NV.Sub.All.Ind
 open Formula
 
 
+/--
+  Helper definition for IsSub.
+-/
 inductive IsSubAux :
   (VarName → VarName) →
   Finset VarName →
@@ -302,3 +305,6 @@ theorem substitution_is_valid
   intro D I V E
   simp only [← substitution_theorem D I V E σ F F' h1]
   apply h2
+
+
+#lint
