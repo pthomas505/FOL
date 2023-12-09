@@ -1,12 +1,10 @@
-import FOL.NV.Sub.All.Rec.SubAllRecAdmits
+import FOL.NV.Sub.All.Rec.Admits
 
 
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV.PredSub.All.Rec
 
 open Formula
 
@@ -22,7 +20,7 @@ def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formu
       let zs := (τ X xs.length).fst
       let H := (τ X xs.length).snd
       if xs.length = zs.length
-      then fastReplaceFreeFun (Function.updateListITE id zs xs) H
+      then Sub.All.Rec.fastReplaceFree (Function.updateListITE id zs xs) H
       else pred_var_ X xs
   | eq_ x y => eq_ x y
   | true_ => true_
@@ -56,7 +54,7 @@ def admitsPredFunAux
   | binders, pred_var_ X xs =>
     let zs := (τ X xs.length).fst
     let H := (τ X xs.length).snd
-    admitsFun (Function.updateListITE id zs xs) H ∧ (∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)) ∧ xs.length = zs.length
+    Sub.All.Rec.admits (Function.updateListITE id zs xs) H ∧ (∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)) ∧ xs.length = zs.length
   | _, true_ => True
   | _, false_ => True
   | _, eq_ _ _ => True
@@ -136,7 +134,7 @@ theorem predSub_aux
       cases h1_right
       case intro h1_right_left h1_right_right =>
         obtain s1 :=
-        substitution_fun_theorem D I V E (Function.updateListITE id (τ X xs.length).fst xs)
+        Sub.All.Rec.substitution_theorem D I V E (Function.updateListITE id (τ X xs.length).fst xs)
           (τ X xs.length).snd h1_left
         simp only [Function.updateListITE_comp] at s1
         simp at s1
