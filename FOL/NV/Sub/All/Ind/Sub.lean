@@ -143,9 +143,21 @@ theorem substitution_theorem_aux
     · exact h2 x c1
     · apply h3
       exact ih_1 x a1 c1
-  case eq_ σ' binders' x y v ih_1 ih_2 ih_3 =>
+  case eq_ σ' binders' x y ih_1 =>
     simp only [Holds]
-    sorry
+    congr! 1
+    · by_cases c1 : x ∈ binders'
+      · exact h2 x c1
+      · apply h3
+        apply ih_1
+        · simp
+        · exact c1
+    · by_cases c1 : y ∈ binders'
+      · exact h2 y c1
+      · apply h3
+        apply ih_1
+        · simp
+        · exact c1
   case true_ | false_ =>
     simp only [Holds]
   case not_ σ' binders' phi phi' ih_1 ih_2 =>
