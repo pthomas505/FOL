@@ -759,7 +759,12 @@ theorem T_18_2 (U V : Formula) (P_U P_V : Formula) (l : List VarName)
     · apply h1_ih_1
       intro v a1
       apply h2 v
-      tauto
+      cases a1
+      case _ a1_left a1_right =>
+        constructor
+        · exact a1_left
+        · left
+          exact a1_right
   case forall_ h1_x h1_P h1_P' h1_1
     h1_ih =>
     unfold isBoundIn at h2
