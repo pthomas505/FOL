@@ -35,7 +35,7 @@ inductive IsSub :
     (σ : VarName → VarName)
     (binders : Finset VarName)
     (x y : VarName) :
-    ∀ v : VarName, (v = x ∨ v = y) → v ∉ binders → σ v ∉ binders →
+    (∀ v : VarName, (v = x ∨ v = y) → v ∉ binders → σ v ∉ binders) →
     IsSub σ binders (eq_ x y) (eq_ (σ x) (σ y))
 
   | true_
