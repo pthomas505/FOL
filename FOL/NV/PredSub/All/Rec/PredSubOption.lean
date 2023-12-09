@@ -1,12 +1,10 @@
-import FOL.NV.Sub.All.Rec.SubAllRecFresh
+import FOL.NV.Sub.All.Rec.SubFresh
 
 
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV.PredSub.All.Rec
 
 open Formula
 
@@ -24,7 +22,7 @@ def replacePredFun
         let zs := val.fst
         let H := val.snd
         if xs.length = zs.length
-        then subFresh (Function.updateListITE id zs xs) c H
+        then Sub.All.Rec.subFresh (Function.updateListITE id zs xs) c H
         else pred_var_ X xs
       else pred_var_ X xs
   | eq_ x y => eq_ x y
@@ -135,7 +133,7 @@ theorem predSub_aux
       let val := Option.get opt c1
       let zs := val.fst
       let H := val.snd
-      obtain s1 := substitution_fun_theorem' D I V E (Function.updateListITE id zs xs) c H
+      obtain s1 := Sub.All.Rec.substitution_theorem D I V E (Function.updateListITE id zs xs) c H
       simp only [Function.updateListITE_comp] at s1
       simp at s1
       simp only [s1]
