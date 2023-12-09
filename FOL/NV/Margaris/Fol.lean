@@ -73,14 +73,14 @@ inductive IsReplOfVarInFormula
     (name : PredName)
     (n : ℕ)
     (args_u args_v : Fin n → VarName) :
-    (∀ i : Fin n, (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →
+    (∀ (i : Fin n), (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →
     IsReplOfVarInFormula u v (pred_const_ name (List.ofFn args_u)) (pred_const_ name (List.ofFn args_v))
 
   | pred_var_
     (name : PredName)
     (n : ℕ)
     (args_u args_v : Fin n → VarName) :
-    (∀ i : Fin n, (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →
+    (∀ (i : Fin n), (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →
     IsReplOfVarInFormula u v (pred_var_ name (List.ofFn args_u)) (pred_var_ name (List.ofFn args_v))
 
   | eq_
@@ -231,8 +231,8 @@ def Similar
   (P_u P_v : Formula)
   (u v : VarName) :
   Prop :=
-  ¬isFreeIn v P_u ∧
-    ¬isFreeIn u P_v ∧
+  ¬ isFreeIn v P_u ∧
+    ¬ isFreeIn u P_v ∧
       fastAdmits u v P_u ∧
         fastAdmits v u P_v ∧ P_v = fastReplaceFree u v P_u ∧ P_u = fastReplaceFree v u P_v
 
@@ -282,7 +282,7 @@ theorem T_17_3
   simp only [fastAdmits] at h1
 
   simp only [def_exists_]
-  --simp only [Formula.exists_]
+  -- simp only [Formula.exists_]
 
   simp only [IsProof]
   apply IsDeduct.mp_ ((forall_ v P.not_).imp_ (fastReplaceFree v t P).not_)
@@ -344,7 +344,7 @@ theorem T_17_7
   (v : VarName)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ F)
-  (h2 : ∀ H : Formula, H ∈ Δ → ¬ isFreeIn v H) :
+  (h2 : ∀ (H : Formula), H ∈ Δ → ¬ isFreeIn v H) :
   IsDeduct Δ (forall_ v F) :=
   by
   induction h1
@@ -375,9 +375,9 @@ theorem univIntro
   (P : Formula)
   (v t : VarName)
   (Δ : Set Formula)
-  (h1 : ¬occursIn t P)
+  (h1 : ¬ occursIn t P)
   (h2 : IsDeduct Δ (fastReplaceFree v t P))
-  (h3 : ∀ H : Formula, H ∈ Δ → ¬isFreeIn t H) :
+  (h3 : ∀ (H : Formula), H ∈ Δ → ¬ isFreeIn t H) :
   IsDeduct Δ (forall_ v P) :=
   by
   rw [← fastReplaceFree_inverse P v t h1]
@@ -510,13 +510,13 @@ theorem T_17_10
 theorem T_17_11
   (P Q : Formula)
   (v : VarName)
-  (h1 : ¬isFreeIn v Q) :
+  (h1 : ¬ isFreeIn v Q) :
   IsProof ((forall_ v (P.imp_ Q)).imp_ ((exists_ v P).imp_ Q)) :=
   by
   apply deduction_theorem
   simp only [Set.union_singleton, insert_emptyc_eq]
   simp only [def_exists_]
-  --simp only [exists_
+  -- simp only [exists_]
   apply IsDeduct.mp_ (Q.not_.imp_ (forall_ v Q.not_))
   · apply IsDeduct.mp_ ((forall_ v Q.not_).imp_ (forall_ v P.not_))
     · SC
@@ -546,8 +546,8 @@ theorem T_17_12
   (Δ : Set Formula)
   (h1 : IsDeduct Δ (exists_ v P))
   (h2 : IsDeduct (Δ ∪ {P}) Q)
-  (h3 : ∀ H : Formula, H ∈ Δ → ¬isFreeIn v H)
-  (h4 : ¬isFreeIn v Q) :
+  (h3 : ∀ (H : Formula), H ∈ Δ → ¬ isFreeIn v H)
+  (h4 : ¬ isFreeIn v Q) :
   IsDeduct Δ Q :=
   by
   apply IsDeduct.mp_ (exists_ v P)
@@ -570,15 +570,15 @@ theorem existsElim
   (Δ : Set Formula)
   (h1 : IsDeduct Δ (exists_ v P))
   (h2 : IsDeduct (Δ ∪ {fastReplaceFree v t P}) Q)
-  (h3 : ¬occursIn t P)
-  (h4 : ¬occursIn t Q)
-  (h5 : ∀ H : Formula, H ∈ Δ → ¬isFreeIn t H) : IsDeduct Δ Q :=
+  (h3 : ¬ occursIn t P)
+  (h4 : ¬ occursIn t Q)
+  (h5 : ∀ (H : Formula), H ∈ Δ → ¬ isFreeIn t H) : IsDeduct Δ Q :=
   by
   refine' rule_C (fastReplaceFree v t P) Q t Δ _ h2 h5 _
   · simp only [def_exists_] at h1
-    --simp only [exists_ at h1
+    -- simp only [exists_] at h1
     simp only [def_exists_]
-    --simp only [exists_
+    -- simp only [exists_]
     apply IsDeduct.mp_ (forall_ v P.not_).not_
     · apply IsDeduct.mp_ ((forall_ t (fastReplaceFree v t P.not_)).imp_ (forall_ v P.not_))
       · SC
@@ -617,14 +617,14 @@ theorem T_17_14
   · apply IsDeduct.mp_ (exists_ v Q)
     · apply IsDeduct.mp_ (exists_ v P)
       · simp only [def_and_]
-        --simp only [formula.and_
+        -- simp only [formula.and_]
         SC
       · apply exists_intro P v v
         · apply fastAdmits_self
         · simp only [fastReplaceFree_self]
           apply IsDeduct.mp_ (P.and_ Q)
           · simp only [def_and_]
-            -- simp only [formula.and_
+            -- simp only [formula.and_]
             SC
           · apply IsDeduct.assume_
             simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, true_or_iff]
@@ -633,21 +633,21 @@ theorem T_17_14
       · simp only [fastReplaceFree_self]
         apply IsDeduct.mp_ (P.and_ Q)
         · simp only [def_and_]
-          --simp only [formula.and_
+          -- simp only [formula.and_]
           SC
         · apply IsDeduct.assume_
           simp only [Set.union_singleton, Set.mem_insert_iff, eq_self_iff_true, true_or_iff]
   · simp only [def_and_]
-    --simp only [and_
+    -- simp only [and_]
     simp only [def_exists_]
-    --simp only [exists_
+    -- simp only [exists_]
     simp only [Set.mem_singleton_iff, forall_eq]
     simp only [isFreeIn]
     simp
   · simp only [def_and_]
-    --simp only [and_
+    -- simp only [and_]
     simp only [def_exists_]
-    --simp only [exists_
+    -- simp only [exists_]
     simp only [isFreeIn]
     simp
 
@@ -658,7 +658,7 @@ theorem T_18_1_left
   IsProof ((forall_ v (P.iff_ Q)).imp_ ((forall_ v P).imp_ (forall_ v Q))) :=
   by
   simp only [def_iff_]
-  --simp only [iff_
+  -- simp only [iff_]
   apply deduction_theorem
   apply deduction_theorem
   simp only [Set.union_singleton, insert_emptyc_eq]
@@ -666,7 +666,7 @@ theorem T_18_1_left
   · apply IsDeduct.mp_ P
     · apply IsDeduct.mp_ ((P.imp_ Q).and_ (Q.imp_ P))
       · simp only [def_and_]
-        --simp only [formula.and_
+        -- simp only [formula.and_]
         SC
       · apply specId v
         apply IsDeduct.assume_
@@ -685,7 +685,7 @@ theorem T_18_1_right
   IsProof ((forall_ v (P.iff_ Q)).imp_ ((forall_ v Q).imp_ (forall_ v P))) :=
   by
   simp only [def_iff_]
-  --simp only [iff_
+  -- simp only [iff_]
   apply deduction_theorem
   apply deduction_theorem
   simp only [Set.union_singleton, insert_emptyc_eq]
@@ -693,7 +693,7 @@ theorem T_18_1_right
   · apply IsDeduct.mp_ Q
     · apply IsDeduct.mp_ ((P.imp_ Q).and_ (Q.imp_ P))
       · simp only [def_and_]
-        --simp only [formula.and_
+        -- simp only [formula.and_]
         SC
       · apply specId v
         apply IsDeduct.assume_
@@ -714,9 +714,9 @@ theorem T_18_1
   apply IsDeduct.mp_ ((forall_ v (P.iff_ Q)).imp_ ((forall_ v Q).imp_ (forall_ v P)))
   · apply IsDeduct.mp_ ((forall_ v (P.iff_ Q)).imp_ ((forall_ v P).imp_ (forall_ v Q)))
     · simp only [def_iff_]
-      --simp only [formula.iff_
+      -- simp only [formula.iff_]
       simp only [def_and_]
-      --simp only [formula.and_
+      -- simp only [formula.and_]
       SC
     · apply T_18_1_left
   · apply T_18_1_right
@@ -805,16 +805,16 @@ theorem T_18_2
   (P_U P_V : Formula)
   (l : List VarName)
   (h1 : IsReplOfFormulaInFormula U V P_U P_V)
-  (h2 : ∀ v : VarName, (isFreeIn v U ∨ isFreeIn v V) ∧ isBoundIn v P_U → v ∈ l) :
+  (h2 : ∀ (v : VarName), (isFreeIn v U ∨ isFreeIn v V) ∧ isBoundIn v P_U → v ∈ l) :
   IsProof ((Forall_ l (U.iff_ V)).imp_ (P_U.iff_ P_V)) :=
   by
   induction h1
   case same_ h1_P h1_P' h1_1 =>
     subst h1_1
     simp only [def_iff_]
-    --simp only [formula.iff_
+    -- simp only [formula.iff_]
     simp only [def_and_]
-    --simp only [formula.and_
+    -- simp only [formula.and_]
     SC
   case diff_ h1_P h1_P' h1_1 h1_2 =>
     subst h1_1
@@ -824,9 +824,9 @@ theorem T_18_2
     simp only [isBoundIn] at h2
     apply IsDeduct.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_P.iff_ h1_P'))
     · simp only [def_iff_]
-      --simp only [formula.iff_
+      -- simp only [formula.iff_]
       simp only [def_and_]
-      --simp only [formula.and_
+      -- simp only [formula.and_]
       SC
     · exact h1_ih h2
   case imp_ h1_P h1_Q h1_P' h1_Q' h1_1 h1_2 h1_ih_1
@@ -835,9 +835,9 @@ theorem T_18_2
     apply IsDeduct.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_P.iff_ h1_P'))
     · apply IsDeduct.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_Q.iff_ h1_Q'))
       · simp only [def_iff_]
-        --simp only [formula.iff_
+        -- simp only [formula.iff_]
         simp only [def_and_]
-        --simp only [formula.and_
+        -- simp only [formula.and_]
         SC
       · apply h1_ih_2
         intro v a2
@@ -878,9 +878,9 @@ theorem T_18_2
         subst a1
         simp only [Forall_isFreeIn]
         simp only [def_iff_]
-        --simp only [formula.iff_
+        -- simp only [formula.iff_]
         simp only [def_and_]
-        --simp only [formula.and_
+        -- simp only [formula.and_]
         simp only [isFreeIn]
         sorry
   all_goals
@@ -927,8 +927,8 @@ theorem C_18_4
   · apply IsDeduct.mp_ (P_U.iff_ P_V)
     · simp only [def_iff_]
       simp only [def_and_]
-      --simp only [formula.iff_
-      --simp only [formula.and_
+      -- simp only [formula.iff_]
+      -- simp only [formula.and_]
       SC
     · apply proof_imp_deduct
       exact C_18_3 U V P_U P_V h1 h2
@@ -941,12 +941,12 @@ theorem T_18_5
   IsProof ((forall_ v P).iff_ (exists_ v P.not_).not_) :=
   by
   simp only [def_exists_]
-  --simp only [exists_]
+  -- simp only [exists_]
   apply C_18_4 P P.not_.not_ ((forall_ v P).iff_ (forall_ v P).not_.not_)
   · simp only [def_iff_]
     simp only [def_and_]
-    --simp only [formula.iff_]
-    --simp only [formula.and_]
+    -- simp only [formula.iff_]
+    -- simp only [formula.and_]
     apply IsReplOfFormulaInFormula.not_
     apply IsReplOfFormulaInFormula.imp_
     · apply IsReplOfFormulaInFormula.imp_
@@ -970,13 +970,13 @@ theorem T_18_5
         rfl
   · simp only [def_iff_]
     simp only [def_and_]
-    --simp only [formula.iff_]
-    --simp only [formula.and_]
+    -- simp only [formula.iff_]
+    -- simp only [formula.and_]
     SC
   · simp only [def_iff_]
     simp only [def_and_]
-    --simp only [formula.iff_]
-    --simp only [formula.and_]
+    -- simp only [formula.iff_]
+    -- simp only [formula.and_]
     SC
 
 
@@ -1001,8 +1001,8 @@ theorem T_18_6
             · apply IsDeduct.mp_ ((forall_ u P_u).imp_ (forall_ v P_v))
               · simp only [def_iff_]
                 simp only [def_and_]
-                --simp only [formula.iff_
-                --simp only [formula.and_
+                -- simp only [formula.iff_]
+                -- simp only [formula.and_]
                 SC
               · apply deduction_theorem
                 simp only [Set.union_singleton, insert_emptyc_eq]
@@ -1072,12 +1072,12 @@ theorem T_18_8
   IsProof ((exists_ u P_u).iff_ (exists_ v P_v)) :=
   by
   simp only [def_exists_]
-  --simp only [exists_
+  -- simp only [exists_]
   apply IsDeduct.mp_ ((forall_ u P_u.not_).iff_ (forall_ v P_v.not_))
   · simp only [def_iff_]
     simp only [def_and_]
-    --simp only [formula.iff_
-    --simp only [formula.and_
+    -- simp only [formula.iff_]
+    -- simp only [formula.and_]
     SC
   · apply T_18_6
     exact similar_not P_u P_v u v h1
@@ -1107,9 +1107,9 @@ theorem T_19_1
   apply IsDeduct.mp_ ((forall_ v P).imp_ P)
   · apply IsDeduct.mp_ (P.imp_ (forall_ v P))
     · simp only [def_iff_]
-    -- formula.iff_
+    -- sim only [formula.iff_]
       simp only [def_and_]
-      --simp only [formula.and_
+      -- simp only [formula.and_]
       SC
     · apply IsDeduct.axiom_
       exact IsAxiom.pred_3_ v P h1
@@ -1128,8 +1128,8 @@ theorem T_19_2
   · apply IsDeduct.mp_ ((forall_ v (forall_ u P)).imp_ (forall_ u (forall_ v P)))
     · simp only [def_iff_]
       simp only [def_and_]
-      --simp only [formula.iff_
-      --simp only [formula.and_
+      -- simp only [formula.iff_]
+      -- simp only [formula.and_]
       SC
     · apply T_17_10
   · apply T_17_10
@@ -1143,9 +1143,9 @@ theorem T_19_3
   simp only [def_exists_]
   simp only [def_iff_]
   simp only [def_and_]
-  --simp only [Formula.exists_
-  --simp only [formula.iff_
-  --simp only [formula.and_
+  -- simp only [Formula.exists_]
+  -- simp only [formula.iff_]
+  -- simp only [formula.and_]
   SC
 
 
@@ -1169,17 +1169,17 @@ theorem T_19_4
           true_or_iff]
     · simp only [Set.mem_singleton_iff, forall_eq]
       simp only [def_exists_]
-      --simp only [Formula.exists_
+      -- simp only [Formula.exists_]
       simp only [isFreeIn]
       simp
     · simp only [def_exists_]
       simp only [isFreeIn]
-      --simp only [exists_
-      --simp only [is_free_in
+      -- simp only [exists_]
+      -- simp only [is_free_in]
       simp
   · simp only [Set.mem_singleton_iff, forall_eq]
     simp only [def_exists_]
-    --simp only [Formula.exists_
+    -- simp only [Formula.exists_]
     simp only [isFreeIn]
     simp
 
@@ -1194,8 +1194,8 @@ theorem T_19_5
   · apply IsDeduct.mp_ ((forall_ v (P.iff_ Q)).imp_ ((forall_ v P).iff_ (forall_ v Q)))
     · simp only [def_iff_]
       simp only [def_and_]
-      --simp only [formula.iff_]
-      --simp only [formula.and_]
+      -- simp only [formula.iff_]
+      -- simp only [formula.and_]
       SC
     · exact T_18_1 P Q v
   · exact T_19_1 P v h1
@@ -1219,8 +1219,8 @@ theorem T_19_6_left
       · apply IsDeduct.mp_ (P.iff_ Q)
         · simp only [def_iff_]
           simp only [def_and_]
-          --simp only [iff_]
-          --simp only [and_]
+          -- simp only [iff_]
+          -- simp only [and_]
           SC
         · apply specId v
           apply IsDeduct.assume_
@@ -1273,9 +1273,9 @@ theorem T_19_6
     · simp only [def_exists_]
       simp only [def_iff_]
       simp only [def_and_]
-      --simp only [exists_]
-      --simp only [iff_]
-      --simp only [and_]
+      -- simp only [exists_]
+      -- simp only [iff_]
+      -- simp only [and_]
       SC
     · apply T_19_6_right
   · apply T_19_6_left
@@ -1336,8 +1336,8 @@ theorem T_19_TS_21
   · apply IsDeduct.mp_ ((P.imp_ (forall_ v Q)).imp_ (forall_ v (P.imp_ Q)))
     · simp only [def_iff_]
       simp only [def_and_]
-      --simp only [formula.iff_]
-      --simp only [formula.and_]
+      -- simp only [formula.iff_]
+      -- simp only [formula.and_]
       SC
     · exact T_19_TS_21_right P Q v h1
   · exact T_19_TS_21_left P Q v h1
@@ -1353,8 +1353,8 @@ theorem T_21_1
       · apply IsDeduct.mp_ (((eq_ y y).and_ (eq_ x y)).imp_ ((eq_ y x).iff_ (eq_ y y)))
         · simp only [def_iff_]
           simp only [def_and_]
-          -- simp only [formula.iff_
-          -- simp only [formula.and_
+          -- simp only [formula.iff_]
+          -- simp only [formula.and_]
           SC
         · apply specId y
           apply specId y
@@ -1382,8 +1382,8 @@ theorem T_21_2
         · apply IsDeduct.mp_ (((eq_ x y).and_ (eq_ z z)).imp_ ((eq_ x z).iff_ (eq_ y z)))
           · simp only [def_iff_]
             simp only [def_and_]
-            --simp only [formula.iff_
-            --simp only [formula.and_
+            -- simp only [formula.iff_]
+            -- simp only [formula.and_]
             SC
           · apply specId z
             apply specId y
@@ -1413,9 +1413,9 @@ theorem T_21_8
   induction h1
   case true_ =>
     simp only [def_iff_]
-    --simp only [formula.iff_]
+    -- simp only [formula.iff_]
     simp only [def_and_]
-    --simp only [formula.and_]
+    -- simp only [formula.and_]
     SC
   case pred_const_ name n args_u args_v
     h1_1 =>
@@ -1424,15 +1424,15 @@ theorem T_21_8
         ((eq_ r s).imp_ ((pred_const_ name (List.ofFn args_u)).iff_ (pred_const_ name (List.ofFn args_v))))
     · SC
     · apply
-        IsDeduct.mp_ ((eq_ r s).imp_ (And_ (List.ofFn fun i : Fin n => eq_ (args_u i) (args_v i))))
+        IsDeduct.mp_ ((eq_ r s).imp_ (And_ (List.ofFn fun (i : Fin n) => eq_ (args_u i) (args_v i))))
       · apply
           IsDeduct.mp_
-            ((And_ (List.ofFn fun i : Fin n => eq_ (args_u i) (args_v i))).imp_
+            ((And_ (List.ofFn fun (i : Fin n) => eq_ (args_u i) (args_v i))).imp_
               ((pred_const_ name (List.ofFn args_u)).iff_ (pred_const_ name (List.ofFn args_v))))
         · simp only [def_iff_]
-          --simp only [formula.iff_]
+          -- simp only [formula.iff_]
           simp only [def_and_]
-          --simp only [formula.and_]
+          -- simp only [formula.and_]
           SC
         · apply Forall_spec_id' (List.ofFn args_v)
           apply Forall_spec_id' (List.ofFn args_u)
@@ -1451,10 +1451,10 @@ theorem T_21_8
             IsDeduct.mp_
               ((eq_ r s).imp_
                 (List.foldr and_ true_
-                  (List.ofFn fun i : Fin n => eq_ (args_u i.succ) (args_v i.succ))))
+                  (List.ofFn fun (i : Fin n) => eq_ (args_u i.succ) (args_v i.succ))))
           · apply IsDeduct.mp_ ((eq_ r s).imp_ (eq_ (args_u 0) (args_v 0)))
             · simp only [def_and_]
-              --simp only [formula.and_
+              -- simp only [formula.and_]
               SC
             · specialize h1_1 0
               cases h1_1
@@ -1482,9 +1482,9 @@ theorem T_21_8
     specialize h1_ih h2 h3
     apply IsDeduct.mp_ ((eq_ r s).imp_ (P_u.iff_ P_v))
     · simp only [def_iff_]
-      --simp only [formula.iff_]
+      -- simp only [formula.iff_]
       simp only [def_and_]
-      --simp only [formula.and_]
+      -- simp only [formula.and_]
       SC
     · exact h1_ih
   case imp_ P_u Q_u P_v Q_v h1_1 h1_2 h1_ih_1
@@ -1502,9 +1502,9 @@ theorem T_21_8
         apply IsDeduct.mp_ ((eq_ r s).imp_ (Q_u.iff_ Q_v))
         · apply IsDeduct.mp_ ((eq_ r s).imp_ (P_u.iff_ P_v))
           · simp only [def_iff_]
-            --simp only [formula.iff_
+            -- simp only [formula.iff_]
             simp only [def_and_]
-            --simp only [formula.and_
+            -- simp only [formula.and_]
             SC
           · exact h1_ih_1
         · exact h1_ih_2
@@ -1526,7 +1526,7 @@ theorem T_21_8
           · apply proof_imp_deduct
             apply IsDeduct.mp_ (forall_ x ((eq_ r s).imp_ (P_u.iff_ P_v)))
             · apply T_19_TS_21_left
-              · --simp only [formula.eq_
+              · -- simp only [formula.eq_]
                 simp only [isFreeIn]
                 push_neg
                 constructor
