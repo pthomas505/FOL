@@ -296,7 +296,7 @@ example
       exact fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub F F' v u ∅ a1_left a1_right
 
 
-theorem substitution_theorem_ind
+theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
