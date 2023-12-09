@@ -10,6 +10,9 @@ namespace FOL.NV.Sub.All.Ind
 open Formula
 
 
+/--
+  IsReplaceFree σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurence of any variable v in the formula F by σ v.
+-/
 inductive IsReplaceFree : (VarName → VarName) → Formula → Formula → Prop
 
   | pred_const_
@@ -105,12 +108,71 @@ example
   by
   subst h1
   induction F generalizing σ
+  all_goals
+    simp only [Rec.fastReplaceFree]
   case pred_const_ X xs =>
-    simp only [Rec.fastReplaceFree]
     apply IsReplaceFree.pred_const_
+  case pred_var_ X xs =>
+    apply IsReplaceFree.pred_var_
+  case eq_ x y =>
+    apply IsReplaceFree.eq_
+  case true_ =>
+    apply IsReplaceFree.true_
+  case false_ =>
+    apply IsReplaceFree.false_
+  case not_ phi phi_ih =>
+    apply IsReplaceFree.not_
+    apply phi_ih
+  case imp_ phi psi phi_ih psi_ih =>
+    apply IsReplaceFree.imp_
+    · apply phi_ih
+    · apply psi_ih
+  case and_ phi psi phi_ih psi_ih =>
+    apply IsReplaceFree.and_
+    · apply phi_ih
+    · apply psi_ih
+  case or_ phi psi phi_ih psi_ih =>
+    apply IsReplaceFree.or_
+    · apply phi_ih
+    · apply psi_ih
+  case iff_ phi psi phi_ih psi_ih =>
+    apply IsReplaceFree.iff_
+    · apply phi_ih
+    · apply psi_ih
   case forall_ x phi phi_ih =>
-    simp only [Rec.fastReplaceFree]
     apply IsReplaceFree.forall_
     apply phi_ih
+  case exists_ x phi phi_ih =>
+    apply IsReplaceFree.exists_
+    · apply phi_ih
+  case def_ X xs =>
+    apply IsReplaceFree.def_
+
+
+example
+  (F F' : Formula)
+  (σ : VarName → VarName)
+  (h1 : IsReplaceFree σ F F') :
+  Rec.fastReplaceFree σ F = F' :=
+  by
+  induction h1
   all_goals
-    sorry
+    simp only [Rec.fastReplaceFree]
+  case not_ σ' phi phi' ih_1 ih_2 =>
+    simp
+    exact ih_2
+  case
+      imp_ σ' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2
+    | and_ σ' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2
+    | or_ σ' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2
+    | iff_ σ' phi psi phi' psi' phi_ih_1 psi_ih_1 phi_ih_2 psi_ih_2 =>
+    simp
+    tauto
+  case
+      forall_ σ' x phi phi' ih_1 ih_2
+    | exists_ σ' x phi phi' ih_1 ih_2 =>
+    simp
+    exact ih_2
+
+
+#lint
