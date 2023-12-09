@@ -301,9 +301,23 @@ theorem occursIn_iff_mem_varSet
   all_goals
     simp only [occursIn]
     simp only [Formula.varSet]
-  any_goals
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
-  all_goals
+  case eq_ x y =>
+    simp
+  case true_ | false_ =>
+    tauto
+  case not_ phi phi_ih =>
+    tauto
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp
+    tauto
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp
     tauto
 
 
@@ -316,9 +330,23 @@ theorem isBoundIn_iff_mem_boundVarSet
   all_goals
     simp only [isBoundIn]
     simp only [Formula.boundVarSet]
-  any_goals
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
-  all_goals
+  case eq_ x y =>
+    simp
+  case true_ | false_ =>
+    tauto
+  case not_ phi phi_ih =>
+    tauto
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp
+    tauto
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp
     tauto
 
 
@@ -331,9 +359,23 @@ theorem isFreeIn_iff_mem_freeVarSet
   all_goals
     simp only [isFreeIn]
     simp only [Formula.freeVarSet]
-  any_goals
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
-  all_goals
+  case eq_ x y =>
+    simp
+  case true_ | false_ =>
+    tauto
+  case not_ phi phi_ih =>
+    tauto
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp
+    tauto
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp
     tauto
 
 
@@ -403,9 +445,22 @@ theorem predVarOccursIn_iff_mem_predVarSet
   all_goals
     simp only [predVarOccursIn]
     simp only [Formula.predVarSet]
-  any_goals
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
-  all_goals
+  case eq_ x y =>
+    simp
+  case true_ | false_ =>
+    tauto
+  case not_ phi phi_ih =>
+    tauto
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp
+    tauto
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     tauto
 
 
