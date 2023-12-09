@@ -1,13 +1,11 @@
 import FOL.NV.Alpha
-import FOL.NV.PredSub.All.Rec.PredSubAllRecOption
+import FOL.NV.PredSub.All.Rec.PredSubOption
 
 
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV.PredSub.All.Rec
 
 open Formula
 
