@@ -116,7 +116,7 @@ instance
   by
   induction F generalizing V
   all_goals
-    unfold Formula.evalPrime
+    simp only [Formula.evalPrime]
     infer_instance
 
 
@@ -141,9 +141,7 @@ theorem evalPrime_prime
   by
   induction F
   case true_ | false_ | not_ | imp_ | and_ | or_ | iff_ =>
-    unfold Formula.IsPrime at h1
-
-    contradiction
+    simp only [Formula.IsPrime] at h1
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     rfl
 
@@ -156,19 +154,18 @@ example
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
 
-    unfold Formula.evalPrime
+    simp only [Formula.evalPrime]
     congr! 1
     apply h1
     simp
   case true_ | false_ =>
-    unfold Formula.evalPrime
-    rfl
+    simp only [Formula.evalPrime]
   case not_ phi phi_ih =>
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
 
-    unfold Formula.evalPrime
+    simp only [Formula.evalPrime]
     congr! 1
     exact phi_ih h1
   case
@@ -176,10 +173,10 @@ example
   | and_ phi psi phi_ih psi_ih
   | or_ phi psi phi_ih psi_ih
   | iff_ phi psi phi_ih psi_ih =>
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
 
-    unfold Formula.evalPrime
+    simp only [Formula.evalPrime]
     congr! 1
     · apply phi_ih
       intro H a1
@@ -202,22 +199,22 @@ theorem evalPrime_substPrime_eq_evalPrime_evalPrime
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
-    unfold Formula.substPrime
+    simp only [Formula.substPrime]
     simp only [Formula.evalPrime]
     simp
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    unfold Formula.substPrime
-    unfold Formula.evalPrime
+    simp only [Formula.substPrime]
+    simp only [Formula.evalPrime]
     congr! 1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold Formula.substPrime
-    unfold Formula.evalPrime
+    simp only [Formula.substPrime]
+    simp only [Formula.evalPrime]
     congr! 1
 
 
@@ -227,9 +224,9 @@ theorem isTautoPrime_imp_isTautoPrime_substPrime
   (σ : Formula → Formula) :
   (Formula.substPrime σ P).IsTautoPrime :=
   by
-  unfold Formula.IsTautoPrime at h1
+  simp only [Formula.IsTautoPrime] at h1
 
-  unfold Formula.IsTautoPrime
+  simp only [Formula.IsTautoPrime]
   intro V
   simp only [evalPrime_substPrime_eq_evalPrime_evalPrime P σ V]
   apply h1
@@ -246,7 +243,7 @@ example
   simp only [evalPrime_substPrime_eq_evalPrime_evalPrime]
   congr! 1
   funext Q'
-  unfold Function.updateITE
+  simp only [Function.updateITE]
   split_ifs
   · simp
     exact h1
@@ -257,7 +254,7 @@ theorem T_13_5
   (P : Formula) :
   IsProof (P.imp_ P) :=
   by
-  unfold IsProof
+  simp only [IsProof]
   apply IsDeduct.mp_ (P.imp_ (P.imp_ P))
   · apply IsDeduct.mp_ (P.imp_ ((P.imp_ P).imp_ P))
     · apply IsDeduct.axiom_
@@ -375,7 +372,7 @@ theorem T_13_6
   (P Q : Formula) :
   IsProof (P.not_.imp_ (P.imp_ Q)) :=
   by
-  unfold IsProof
+  simp only [IsProof]
   apply deduction_theorem
   apply IsDeduct.mp_ (Q.not_.imp_ P.not_)
   · apply IsDeduct.axiom_
@@ -391,7 +388,7 @@ theorem T_14_5
   (P : Formula) :
   IsProof (P.not_.not_.imp_ P) :=
   by
-  unfold IsProof
+  simp only [IsProof]
   apply deduction_theorem
   apply IsDeduct.mp_ P.not_.not_
   · apply IsDeduct.mp_ (P.not_.imp_ P.not_.not_.not_)
@@ -410,7 +407,7 @@ theorem T_14_6
   (P : Formula) :
   IsProof (P.imp_ P.not_.not_) :=
   by
-  unfold IsProof
+  simp only [IsProof]
   apply IsDeduct.mp_ (P.not_.not_.not_.imp_ P.not_)
   · apply IsDeduct.axiom_
     exact IsAxiom.prop_3_ P.not_.not_ P
@@ -422,7 +419,7 @@ theorem T_14_7
   (P Q : Formula) :
   IsProof ((P.imp_ Q).imp_ (Q.not_.imp_ P.not_)) :=
   by
-  unfold IsProof
+  simp only [IsProof]
   apply deduction_theorem
   apply IsDeduct.mp_ (P.not_.not_.imp_ Q.not_.not_)
   · apply IsDeduct.axiom_
@@ -445,7 +442,7 @@ theorem T_14_8
   (Q R : Formula) :
   IsProof (Q.imp_ (R.not_.imp_ (Q.imp_ R).not_)) :=
   by
-  unfold IsProof
+  simp only [IsProof]
   apply deduction_theorem
   apply IsDeduct.mp_ ((Q.imp_ R).imp_ R)
   · apply proof_imp_deduct
@@ -462,7 +459,7 @@ theorem T_14_9
   (P S : Formula) :
   IsProof ((S.imp_ P).imp_ ((S.not_.imp_ P).imp_ P)) :=
   by
-  unfold IsProof
+  simp only [IsProof]
   apply deduction_theorem
   apply IsDeduct.mp_ (P.not_.imp_ (S.not_.imp_ P).not_)
   · apply IsDeduct.axiom_
@@ -560,8 +557,9 @@ theorem C_14_17
   (h2 : ∀ P : Formula, P ∈ Γ → IsProof P) :
   IsProof Q :=
   by
-  unfold IsProof at h2
-  unfold IsProof
+  simp only [IsProof] at h2
+
+  simp only [IsProof]
   exact T_14_16 Q ∅ Γ h1 h2
 
 
@@ -630,7 +628,7 @@ theorem is_tauto_prop_1
   (P Q : Formula) :
   (P.imp_ (Q.imp_ P)).IsTautoPrime :=
   by
-  unfold Formula.IsTautoPrime
+  simp only [Formula.IsTautoPrime]
   tauto
 
 
@@ -638,7 +636,7 @@ theorem is_tauto_prop_2
   (P Q R : Formula) :
   ((P.imp_ (Q.imp_ R)).imp_ ((P.imp_ Q).imp_ (P.imp_ R))).IsTautoPrime :=
   by
-  unfold Formula.IsTautoPrime
+  simp only [Formula.IsTautoPrime]
   tauto
 
 
@@ -646,7 +644,7 @@ theorem is_tauto_prop_3
   (P Q : Formula) :
   (((not_ P).imp_ (not_ Q)).imp_ (Q.imp_ P)).IsTautoPrime :=
   by
-  unfold Formula.IsTautoPrime
+  simp only [Formula.IsTautoPrime]
   simp only [eval_not, eval_imp]
   tauto
 
@@ -657,10 +655,10 @@ theorem is_tauto_mp
   (h2 : P.IsTautoPrime) :
   Q.IsTautoPrime :=
   by
-  unfold Formula.IsTautoPrime at h1
+  simp only [Formula.IsTautoPrime] at h1
   simp only [eval_imp] at h1
 
-  unfold Formula.IsTautoPrime at h2
+  simp only [Formula.IsTautoPrime] at h2
 
   tauto
 
@@ -668,7 +666,7 @@ theorem is_tauto_mp
 theorem is_tauto_def_false :
   (false_.iff_ (not_ true_)).IsTautoPrime :=
   by
-  unfold Formula.IsTautoPrime
+  simp only [Formula.IsTautoPrime]
   simp only [eval_not, eval_iff]
   tauto
 
@@ -676,7 +674,7 @@ theorem is_tauto_def_and
   (P Q : Formula) :
   ((P.and_ Q).iff_ (not_ (P.imp_ (not_ Q)))).IsTautoPrime :=
   by
-  unfold Formula.IsTautoPrime
+  simp only [Formula.IsTautoPrime]
   simp only [eval_and, eval_not, eval_imp, eval_iff]
   tauto
 
@@ -684,7 +682,7 @@ theorem is_tauto_def_or
   (P Q : Formula) :
   ((P.or_ Q).iff_ ((not_ P).imp_ Q)).IsTautoPrime :=
   by
-  unfold Formula.IsTautoPrime
+  simp only [Formula.IsTautoPrime]
   simp only [eval_or, eval_not, eval_imp, eval_iff]
   tauto
 
@@ -692,7 +690,7 @@ theorem is_tauto_def_iff
   (P Q : Formula) :
   (not_ (((P.iff_ Q).imp_ (not_ ((P.imp_ Q).imp_ (not_ (Q.imp_ P))))).imp_ (not_ ((not_ ((P.imp_ Q).imp_ (not_ (Q.imp_ P)))).imp_ (P.iff_ Q))))).IsTautoPrime :=
   by
-  unfold Formula.IsTautoPrime
+  simp only [Formula.IsTautoPrime]
   simp only [eval_iff, eval_not, eval_imp]
   tauto
 
@@ -708,14 +706,22 @@ example
   induction h1
   case axiom_ h1_phi h1_1 =>
     induction h1_1
-    case prop_true_ => exact is_tauto_prop_true
-    case prop_1_ h1_1_phi h1_1_psi => exact is_tauto_prop_1 h1_1_phi h1_1_psi
-    case prop_2_ h1_1_phi h1_1_psi h1_1_chi => exact is_tauto_prop_2 h1_1_phi h1_1_psi h1_1_chi
-    case prop_3_ h1_1_phi h1_1_psi => exact is_tauto_prop_3 h1_1_phi h1_1_psi
-    case def_false_ => exact is_tauto_def_false
-    case def_and_ h1_1_phi h1_1_psi => exact is_tauto_def_and h1_1_phi h1_1_psi
-    case def_or_ h1_1_phi h1_1_psi => exact is_tauto_def_or h1_1_phi h1_1_psi
-    case def_iff_ h1_1_phi h1_1_psi => exact is_tauto_def_iff h1_1_phi h1_1_psi
+    case prop_true_ =>
+      exact is_tauto_prop_true
+    case prop_1_ h1_1_phi h1_1_psi =>
+      exact is_tauto_prop_1 h1_1_phi h1_1_psi
+    case prop_2_ h1_1_phi h1_1_psi h1_1_chi =>
+      exact is_tauto_prop_2 h1_1_phi h1_1_psi h1_1_chi
+    case prop_3_ h1_1_phi h1_1_psi =>
+      exact is_tauto_prop_3 h1_1_phi h1_1_psi
+    case def_false_ =>
+      exact is_tauto_def_false
+    case def_and_ h1_1_phi h1_1_psi =>
+      exact is_tauto_def_and h1_1_phi h1_1_psi
+    case def_or_ h1_1_phi h1_1_psi =>
+      exact is_tauto_def_or h1_1_phi h1_1_psi
+    case def_iff_ h1_1_phi h1_1_psi =>
+      exact is_tauto_def_iff h1_1_phi h1_1_psi
   case assume_ h1_phi h1_1 =>
     simp at h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1 h1_ih_2 =>
@@ -734,7 +740,7 @@ theorem mem_primeSet_isPrime
     subst h1
     simp only [Formula.IsPrime]
   case true_ | false_ =>
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
   case eq_ x y =>
     simp only [Formula.primeSet] at h1
@@ -742,14 +748,14 @@ theorem mem_primeSet_isPrime
     subst h1
     simp only [Formula.IsPrime]
   case not_ phi phi_ih =>
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     exact phi_ih h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
     tauto
   case forall_ x phi | exists_ x phi =>
@@ -779,33 +785,33 @@ theorem L_15_7
   induction F
   case pred_const_ X xs =>
     let F := pred_const_ X xs
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
 
-    unfold evalPrimeFfToNot
-    unfold Formula.evalPrime
+    simp only [evalPrimeFfToNot]
+    simp only [Formula.evalPrime]
     apply IsDeduct.assume_
     simp
     apply Exists.intro F
     tauto
   case pred_var_ X xs =>
     let F := pred_var_ X xs
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
 
-    unfold evalPrimeFfToNot
-    unfold Formula.evalPrime
+    simp only [evalPrimeFfToNot]
+    simp only [Formula.evalPrime]
     apply IsDeduct.assume_
     simp
     apply Exists.intro F
     tauto
   case eq_ x y =>
     let F := eq_ x y
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
 
-    unfold evalPrimeFfToNot
-    unfold Formula.evalPrime
+    simp only [evalPrimeFfToNot]
+    simp only [Formula.evalPrime]
     apply IsDeduct.assume_
     simp
     apply Exists.intro F
@@ -814,11 +820,11 @@ theorem L_15_7
     apply IsDeduct.axiom_
     apply IsAxiom.prop_true_
   case false_ =>
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
 
-    unfold evalPrimeFfToNot
-    unfold Formula.evalPrime
+    simp only [evalPrimeFfToNot]
+    simp only [Formula.evalPrime]
     simp
     sorry
   case not_ phi phi_ih =>
@@ -842,19 +848,19 @@ theorem L_15_7
       simp at phi_ih
       exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
 
-    unfold evalPrimeFfToNot at phi_ih
-    unfold evalPrimeFfToNot at psi_ih
+    simp only [evalPrimeFfToNot] at phi_ih
+    simp only [evalPrimeFfToNot] at psi_ih
 
-    unfold evalPrimeFfToNot
+    simp only [evalPrimeFfToNot]
 
     cases h1
     case intro h1_left h1_right =>
       split_ifs
       case _ c1 =>
-        unfold evalPrime at c1
+        simp only [evalPrime] at c1
         simp only [imp_iff_not_or] at c1
         cases c1
         case _ c1 =>
@@ -871,7 +877,7 @@ theorem L_15_7
           apply psi_ih
           exact h1_right
       case _ c1 =>
-        unfold evalPrime at c1
+        simp only [evalPrime] at c1
         simp at c1
         cases c1
         case intro c1_left c1_right =>
@@ -886,22 +892,22 @@ theorem L_15_7
   case forall_ x phi phi_ih =>
     let F := forall_ x phi
 
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
 
-    unfold evalPrimeFfToNot
-    unfold Formula.evalPrime
+    simp only [evalPrimeFfToNot]
+    simp only [Formula.evalPrime]
     apply IsDeduct.assume_
     simp
     apply Exists.intro F
     tauto
   case def_ X xs =>
     let F := def_ X xs
-    unfold Formula.primeSet at h1
+    simp only [Formula.primeSet] at h1
     simp at h1
 
-    unfold evalPrimeFfToNot
-    unfold Formula.evalPrime
+    simp only [evalPrimeFfToNot]
+    simp only [Formula.evalPrime]
     apply IsDeduct.assume_
     simp
     apply Exists.intro F
@@ -937,12 +943,11 @@ theorem evalPrimeFfToNot_of_function_updateIte_true
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     unfold Function.updateITE
-    unfold evalPrimeFfToNot
-    unfold Formula.evalPrime
+    simp only [evalPrimeFfToNot]
+    simp only [Formula.evalPrime]
     split_ifs <;> tauto
   case true_ | false_ | not_ | imp_ | and_ | or_ | iff_ =>
-    unfold Formula.IsPrime at h1
-    contradiction
+    simp only [Formula.IsPrime] at h1
 
 
 theorem evalPrimeFfToNot_of_function_updateIte_false
@@ -955,12 +960,11 @@ theorem evalPrimeFfToNot_of_function_updateIte_false
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     unfold Function.updateITE
-    unfold evalPrimeFfToNot
-    unfold Formula.evalPrime
+    simp only [evalPrimeFfToNot]
+    simp only [Formula.evalPrime]
     split_ifs <;> tauto
   case true_ | false_ | not_ | imp_ | and_ | or_ | iff_ =>
-    unfold Formula.IsPrime at h1
-    contradiction
+    simp only [Formula.IsPrime] at h1
 
 
 theorem image_of_evalPrimeFfToNot_of_function_updateIte
@@ -979,13 +983,13 @@ theorem image_of_evalPrimeFfToNot_of_function_updateIte
   specialize h1_Δ U' a1
   cases b
   · simp only [evalPrimeFfToNot_of_function_updateIte_false U' U V h1_Δ]
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     simp
     intro a2
     subst a2
     contradiction
   · simp only [evalPrimeFfToNot_of_function_updateIte_true U' U V h1_Δ]
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     simp
     intro a2
     subst a2
@@ -1006,13 +1010,13 @@ theorem propCompleteAuxAux
   · specialize h3 (Function.updateITE V U true)
     simp only [image_of_evalPrimeFfToNot_of_function_updateIte U Δ V true h1_Δ h1_U h2] at h3
     simp only [evalPrimeFfToNot_of_function_updateIte_true U U V h1_U] at h3
-    unfold Function.updateITE at h3
+    simp only [Function.updateITE] at h3
     simp only [eq_self_iff_true, if_true] at h3
     exact h3
   · specialize h3 (Function.updateITE V U Bool.false)
     simp only [image_of_evalPrimeFfToNot_of_function_updateIte U Δ V false h1_Δ h1_U h2] at h3
     simp only [evalPrimeFfToNot_of_function_updateIte_false U U V h1_U] at h3
-    unfold Function.updateITE at h3
+    simp only [Function.updateITE] at h3
     simp only [eq_self_iff_true, if_true] at h3
     exact h3
 
@@ -1061,15 +1065,15 @@ theorem prop_complete
   (h1 : P.IsTautoPrime) :
   IsProof P :=
   by
-  unfold IsProof
+  simp only [IsProof]
   apply propCompleteAux P P.primeSet
   · rfl
   · intro V
     apply L_15_7 P P P.primeSet V (P.primeSet.image (evalPrimeFfToNot V))
     · rfl
     · simp only [Finset.coe_image]
-    · unfold Formula.IsTautoPrime at h1
-      unfold evalPrimeFfToNot
+    · simp only [Formula.IsTautoPrime] at h1
+      simp only [evalPrimeFfToNot]
       specialize h1 V
       simp only [if_pos h1]
 
@@ -1077,7 +1081,7 @@ theorem prop_complete
 macro "SC" : tactic => `(tactic|(
   apply proof_imp_deduct
   apply prop_complete
-  unfold Formula.IsTautoPrime
+  simp only [Formula.IsTautoPrime]
   simp only [eval_not, eval_imp]
   tauto))
 
