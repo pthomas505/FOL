@@ -1,6 +1,6 @@
 import FOL.NV.Alpha
-import FOL.NV.Sub.One.Rec.SubOneRecAdmits
-import FOL.NV.PredSub.All.Rec.PredSubAllRec
+import FOL.NV.Sub.Var.One.Rec.Admits
+import FOL.NV.Sub.Pred.All.Rec.Sub
 
 import Mathlib.Data.Finset.Basic
 
@@ -8,9 +8,7 @@ import Mathlib.Data.Finset.Basic
 set_option autoImplicit false
 
 
-namespace FOL
-
-namespace NV
+namespace FOL.NV
 
 open Formula
 
@@ -133,8 +131,8 @@ inductive IsDeduct : Finset Formula → Formula → Prop
     (x y : VarName) :
     IsDeduct Δ (Formula.eq_ x y) →
     IsDeduct Δ phi →
-    fastAdmits x y phi →
-    IsDeduct Δ (fastReplaceFree x y phi)
+    Sub.Var.One.Rec.fastAdmits x y phi →
+    IsDeduct Δ (Sub.Var.One.Rec.fastReplaceFree x y phi)
 
   | forall_intro_
     (Δ : Finset Formula)
@@ -149,15 +147,15 @@ inductive IsDeduct : Finset Formula → Formula → Prop
     (phi : Formula)
     (x y : VarName) :
     IsDeduct Δ (forall_ x phi) →
-    fastAdmits x y phi →
-    IsDeduct Δ (fastReplaceFree x y phi)
+    Sub.Var.One.Rec.fastAdmits x y phi →
+    IsDeduct Δ (Sub.Var.One.Rec.fastReplaceFree x y phi)
 
   | exists_intro_
     (Δ : Finset Formula)
     (phi : Formula)
     (x y : VarName) :
-    fastAdmits x y phi →
-    IsDeduct Δ (fastReplaceFree x y phi) →
+    Sub.Var.One.Rec.fastAdmits x y phi →
+    IsDeduct Δ (Sub.Var.One.Rec.fastReplaceFree x y phi) →
     IsDeduct Δ (exists_ x phi)
 
   | exists_elim_
@@ -176,9 +174,9 @@ inductive IsDeduct : Finset Formula → Formula → Prop
     (phi : Formula)
     (τ : PredName → ℕ → List VarName × Formula) :
     IsDeduct Δ phi →
-    admitsPredFun τ phi →
-    (∀ H : Formula, H ∈ Δ → admitsPredFun τ H) →
-    IsDeduct (Δ.image (replacePredFun τ)) (replacePredFun τ phi)
+    Sub.Pred.All.Rec.admitsPredFun τ phi →
+    (∀ H : Formula, H ∈ Δ → Sub.Pred.All.Rec.admitsPredFun τ H) →
+    IsDeduct (Δ.image (Sub.Pred.All.Rec.replacePredFun τ)) (Sub.Pred.All.Rec.replacePredFun τ phi)
 
   | weaken_
     (Δ Δ' : Finset Formula)
