@@ -123,8 +123,7 @@ theorem Holds_coincide_Var
 
       cases h1
       case intro h1_left h1_right =>
-        simp only [h1_left]
-        simp only [h1_right]
+        congr! 1
     case not_ phi phi_ih =>
       congr! 1
       exact phi_ih V V' h1
