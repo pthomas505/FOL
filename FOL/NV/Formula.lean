@@ -12,7 +12,7 @@ namespace FOL.NV
   The type of variable names.
 -/
 structure VarName extends String
-  deriving Inhabited, DecidableEq, Hashable
+  deriving Inhabited, DecidableEq
 
 instance : ToString VarName :=
   { toString := fun (x : VarName) => x.toString }
