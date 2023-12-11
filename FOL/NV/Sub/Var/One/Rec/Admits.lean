@@ -1103,20 +1103,24 @@ theorem substitution_theorem_aux
       apply Holds_coincide_Var
       intro v' a1
       simp
-
-      have s1 : (List.map (fun (a : VarName) => if a = v then V' t else V a) xs) = (List.map (V ∘ fun (x : VarName) => if v = x then t else x) xs)
-      {
-      simp only [List.map_eq_map_iff]
-      intro x a2
       simp only [eq_comm]
-      simp
-      split_ifs
-      case _ c2 =>
-        apply h2
-        subst c2
-        exact h1 a2
-      case _ c2 =>
-        rfl
+
+      have s1 :
+        (List.map (fun (x : VarName) =>
+          if v = x then V' t else V x) xs) =
+            (List.map (V ∘ fun (x : VarName) =>
+              if v = x then t else x) xs)
+      {
+        simp only [List.map_eq_map_iff]
+        intro x a2
+        simp
+        split_ifs
+        case _ c2 =>
+          apply h2
+          subst c2
+          exact h1 a2
+        case _ c2 =>
+          rfl
       }
 
       simp only [s1]
