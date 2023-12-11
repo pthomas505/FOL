@@ -317,10 +317,6 @@ theorem fastReplaceFree_inverse
       subst a2
       contradiction
   case eq_ x y =>
-    push_neg at h1
-
-    cases h1
-    case intro h1_left h1_right =>
       congr!
       · split_ifs <;> tauto
       · split_ifs <;> tauto
