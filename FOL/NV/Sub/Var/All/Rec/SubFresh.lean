@@ -87,18 +87,20 @@ lemma freeVarSet_subFresh_eq_freeVarSet_image
 
       have s3 : x' ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x})
       apply Finset.not_mem_mono s2 s1
-      clear s1
-      clear s2
 
-      have s4 : Finset.image (Function.updateITE σ x x') (freeVarSet phi) \ {x'} = Finset.image (Function.updateITE σ x x') (freeVarSet phi \ {x}) \ {x'}
-      apply Finset.image_sdiff_singleton phi.freeVarSet x x' (Function.updateITE σ x x')
-      simp only [Function.updateITE]
-      simp
-      simp only [s4]
-
-      simp only [Finset.image_congr_update_ite phi.freeVarSet x x' x]
-
-      exact Finset.sdiff_singleton_eq_self s3
+      calc
+        Finset.image (Function.updateITE σ x x') (freeVarSet phi) \ {x'}
+      = Finset.image (Function.updateITE σ x x') (freeVarSet phi \ {x}) \ {x'} :=
+          by
+          {
+            apply Finset.image_sdiff_singleton phi.freeVarSet x x' (Function.updateITE σ x x')
+            simp only [Function.updateITE]
+            simp
+          }
+      _ = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) \ {x'} :=
+          by simp only [Finset.image_congr_update_ite phi.freeVarSet x x' x]
+      _ = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) :=
+          by exact Finset.sdiff_singleton_eq_self s3
     case _ c1 =>
       simp at c1
 
