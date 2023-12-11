@@ -168,27 +168,27 @@ theorem substitution_theorem
     simp
     split_ifs
     case _ c1 =>
-      set x' := (fresh x c (freeVarSet (subFresh (Function.updateITE σ x x) c phi)))
+      obtain s0 := fresh_not_mem x c (freeVarSet (subFresh (Function.updateITE σ x x) c phi))
+
+      generalize (fresh x c (freeVarSet (subFresh (Function.updateITE σ x x) c phi))) = x' at *
       by_cases c2 : v = x
       · simp only [c2]
         simp only [Function.updateITE]
         simp
       · by_cases c3 : σ v = x'
-        ·
-          have s1 : freeVarSet (subFresh (Function.updateITE σ x x) c phi) = Finset.image (Function.updateITE σ x x) (freeVarSet phi)
-          sorry
-
-          have s2 : σ v ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi)
-          simp only [c3]
-          simp only [← s1]
-          apply fresh_not_mem
-
-          exfalso
-          apply s2
+        · have s1 : σ v ∈ Finset.image (Function.updateITE σ x x) (freeVarSet phi)
           apply Finset.mem_image_update
           · exact c2
           · simp only [← isFreeIn_iff_mem_freeVarSet]
             exact a1
+
+          simp only [c3] at s1
+
+          exfalso
+          apply s0
+
+          simp only [freeVarSet_subFresh_eq_freeVarSet_image]
+          exact s1
         · simp only [Function.updateITE]
           simp only [if_neg c2]
           simp only [if_neg c3]
