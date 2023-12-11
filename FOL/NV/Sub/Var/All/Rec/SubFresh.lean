@@ -174,16 +174,12 @@ theorem substitution_theorem
         simp only [Function.updateITE]
         simp
       · by_cases c3 : σ v = x'
-        · simp only [Function.updateITE]
-          simp only [if_neg c2]
-          simp
-          intro a2
-
+        ·
           have s1 : freeVarSet (subFresh (Function.updateITE σ x x) c phi) = Finset.image (Function.updateITE σ x x) (freeVarSet phi)
           sorry
 
           have s2 : σ v ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi)
-          simp only [a2]
+          simp only [c3]
           simp only [← s1]
           apply fresh_not_mem
 
