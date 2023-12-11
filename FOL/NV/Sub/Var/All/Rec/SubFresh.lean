@@ -176,15 +176,15 @@ theorem substitution_theorem
         simp only [Function.updateITE]
         simp
       · by_cases c3 : σ v = x'
-        · simp only [freeVarSet_subFresh_eq_freeVarSet_image] at s0
+        · subst c3
+
+          simp only [freeVarSet_subFresh_eq_freeVarSet_image] at s0
 
           have s1 : σ v ∈ Finset.image (Function.updateITE σ x x) (freeVarSet phi)
           apply Finset.mem_image_update
           · exact c2
           · simp only [← isFreeIn_iff_mem_freeVarSet]
             exact a1
-
-          simp only [c3] at s1
 
           contradiction
         · simp only [Function.updateITE]
