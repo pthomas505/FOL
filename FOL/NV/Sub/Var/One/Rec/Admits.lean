@@ -630,29 +630,28 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
     simp only [fastAdmitsAux] at h2
 
     simp only [fastReplaceFree]
+  any_goals
+    simp only [toIsBoundAux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
-    simp only [toIsBoundAux]
-
-    induction xs
-    case nil =>
-      rfl
-    case cons args_hd args_tl args_ih =>
-      simp at h2
-
-      simp only [fastAdmitsAux] at args_ih
-      simp at args_ih
-
-      simp
-      constructor
-      · split_ifs
-        case pos c1 =>
-          subst c1
-          tauto
-        case neg c1 =>
-          rfl
-      · tauto
-  all_goals
-    simp only [toIsBoundAux]
+    simp
+    simp only [List.map_eq_map_iff]
+    intro x a1
+    simp
+    constructor
+    · intro a2
+      split_ifs
+      case _ c1 =>
+        subst c1
+        contradiction
+      case _ c1 =>
+        exact a2
+    · split_ifs
+      case _ c1 =>
+        subst c1
+        tauto
+      case _ c1 =>
+        intro a2
+        exact a2
   case eq_ x y =>
     simp
     constructor
