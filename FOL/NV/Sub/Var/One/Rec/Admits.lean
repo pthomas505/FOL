@@ -1025,15 +1025,19 @@ theorem substitution_theorem_aux
       simp only [List.map_eq_map_iff]
       intro x a1
       simp
+      simp only [Function.updateITE]
       split_ifs
-      case _ c1 =>
+      case _ c1 c2 =>
         subst c1
-        simp only [Function.updateITE]
         tauto
-      case _ c1 =>
-        simp only [Function.updateITE]
-        simp only [eq_comm]
-        simp only [if_neg c1]
+      case _ c1 c2 =>
+        subst c1
+        contradiction
+      case _ c1 c2 =>
+        subst c2
+        contradiction
+      case _ c1 c2 =>
+        rfl
     case eq_ x y =>
       simp only [Function.updateITE]
       simp only [eq_comm]
