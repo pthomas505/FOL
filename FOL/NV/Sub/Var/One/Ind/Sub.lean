@@ -413,11 +413,8 @@ theorem substitution_theorem
         · simp only [isFreeIn_iff_mem_freeVarSet] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset hd.h1 a1
-        · cases c1
-          case intro c1_left c1_right =>
-            simp
-            simp only [eq_comm]
-            exact c1_right
+        · simp
+          tauto
       case _ c1 c2 =>
         simp only [List.length_map] at c2
         contradiction
