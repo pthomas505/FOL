@@ -1069,6 +1069,7 @@ theorem substitution_theorem_aux
         simp only [Holds]
         first | apply forall_congr' | apply exists_congr
         intro d
+
         congr! 1
         funext x
         simp only [Function.updateITE]
@@ -1077,6 +1078,7 @@ theorem substitution_theorem_aux
         simp only [Holds]
         first | apply forall_congr' | apply exists_congr
         intro d
+
         cases h1
         case inl h1 =>
           contradiction
@@ -1090,7 +1092,7 @@ theorem substitution_theorem_aux
           cases a1
           case intro a1_left a1_right =>
             simp only [if_neg a1_right]
-            tauto
+            exact h2 v' a1_left
 
   case cons.def_ hd tl ih X xs =>
     unfold Function.updateITE
