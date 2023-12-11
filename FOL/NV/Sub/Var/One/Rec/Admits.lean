@@ -1118,11 +1118,12 @@ theorem substitution_theorem_aux
       case _ c2 =>
         rfl
       }
+
       simp only [s1]
       apply Function.updateListITE_mem_eq_len
       · simp only [isFreeIn_iff_mem_freeVarSet] at a1
         simp only [← List.mem_toFinset]
-        apply Finset.mem_of_subset hd.h1 a1
+        exact Finset.mem_of_subset hd.h1 a1
       · simp at c1
         cases c1
         case intro c1_left c1_right =>
