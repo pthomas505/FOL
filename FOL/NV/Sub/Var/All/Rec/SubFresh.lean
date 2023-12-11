@@ -179,12 +179,14 @@ theorem substitution_theorem
           simp
           intro a2
 
-          obtain s1 := freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
-          simp only [s1] at a2
+          have s1 : freeVarSet (subFresh (Function.updateITE σ x x) c phi) = Finset.image (Function.updateITE σ x x) (freeVarSet phi)
+          sorry
 
-          obtain s2 := fresh_not_mem x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi))
+          have s2 : σ v ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi)
+          simp only [a2]
+          simp only [← s1]
+          apply fresh_not_mem
 
-          simp only [← a2] at s2
           exfalso
           apply s2
           apply Finset.mem_image_update
