@@ -699,16 +699,14 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
 
     simp only [fastAdmitsAux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+    simp only [toIsBoundAux] at h2
     induction xs
-    all_goals
-      simp only [toIsBoundAux] at h2
     case nil =>
       simp
     case cons args_hd args_tl args_ih =>
       simp at h2
 
       simp only [fastAdmitsAux] at args_ih
-      simp only [toIsBoundAux] at args_ih
       simp at args_ih
 
       simp
