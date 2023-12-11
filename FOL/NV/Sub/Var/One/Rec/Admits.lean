@@ -1125,11 +1125,8 @@ theorem substitution_theorem_aux
         simp only [← List.mem_toFinset]
         exact Finset.mem_of_subset hd.h1 a1
       · simp at c1
-        cases c1
-        case intro c1_left c1_right =>
-          simp
-          simp only [eq_comm]
-          exact c1_right
+        simp
+        tauto
     case _ _ =>
       apply ih V binders
       · simp only [fastAdmitsAux]
