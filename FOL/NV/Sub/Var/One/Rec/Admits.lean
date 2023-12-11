@@ -631,16 +631,15 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
 
     simp only [fastReplaceFree]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+    simp only [toIsBoundAux]
+
     induction xs
-    all_goals
-      simp only [toIsBoundAux]
     case nil =>
       rfl
     case cons args_hd args_tl args_ih =>
       simp at h2
 
       simp only [fastAdmitsAux] at args_ih
-      simp only [toIsBoundAux] at args_ih
       simp at args_ih
 
       simp
