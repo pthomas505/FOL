@@ -637,21 +637,11 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
     simp only [List.map_eq_map_iff]
     intro x a1
     simp
-    constructor
-    · intro a2
-      split_ifs
-      case _ c1 =>
-        subst c1
-        contradiction
-      case _ c1 =>
-        exact a2
-    · split_ifs
-      case _ c1 =>
-        subst c1
-        tauto
-      case _ c1 =>
-        intro a2
-        exact a2
+    by_cases c1 : v = x
+    · subst c1
+      simp
+      tauto
+    · simp only [if_neg c1]
   case eq_ x y =>
     simp
     constructor
