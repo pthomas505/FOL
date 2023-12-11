@@ -201,14 +201,17 @@ theorem substitution_theorem
         simp only [Function.updateITE]
         simp
       · have s1 : ¬ σ v = x
-        intro contra
-        apply c1
-        apply Exists.intro v
-        constructor
-        simp
-        simp only [← isFreeIn_iff_mem_freeVarSet]
-        tauto
-        exact contra
+        {
+          intro contra
+          apply c1
+          apply Exists.intro v
+          constructor
+          · simp
+            simp only [← isFreeIn_iff_mem_freeVarSet]
+            tauto
+          · exact contra
+        }
+
         simp only [Function.updateITE]
         simp only [if_neg c2]
         simp only [if_neg s1]
