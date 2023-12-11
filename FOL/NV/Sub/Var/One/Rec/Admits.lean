@@ -494,11 +494,7 @@ theorem replaceFreeAux_fastAdmitsAux
         subst c2_left
         exact c2_right
     case _ c1 c2 =>
-      cases a1
-      case inl a1 | inr a1 =>
-        cases h1
-        case intro h1_left h1_right =>
-          contradiction
+      tauto
   all_goals
     tauto
 
