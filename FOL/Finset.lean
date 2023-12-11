@@ -105,6 +105,17 @@ lemma Finset.diff_union_subset
   · exact Finset.union_subset_left_right (A \ E) (B \ E) C D h1 h2
 
 
+lemma Finset.union_right_comm_assoc
+  {α : Type}
+  [DecidableEq α]
+  (x : α)
+  (S T : Finset α) :
+  (S ∪ (T ∪ {x})) = ((S ∪ {x}) ∪ T) :=
+  by
+  simp only [Finset.union_right_comm S {x} T]
+  simp only [Finset.union_assoc S T {x}]
+
+
 lemma Finset.image_sdiff_singleton
   {α β : Type}
   [DecidableEq α]

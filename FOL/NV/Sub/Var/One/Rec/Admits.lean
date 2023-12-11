@@ -1,3 +1,4 @@
+import FOL.Finset
 import FOL.NV.Semantics
 import FOL.NV.Sub.Var.One.Rec.ReplaceFree
 
@@ -532,8 +533,7 @@ theorem fastAdmitsAux_add_binders
     case inr h1 =>
       specialize phi_ih (S ∪ {x}) h1
       right
-      simp only [Finset.union_right_comm S {x} T] at phi_ih
-      simp only [Finset.union_assoc S T {x}] at phi_ih
+      simp only [Finset.union_right_comm_assoc]
       exact phi_ih
   any_goals
     simp only [Finset.mem_union]
