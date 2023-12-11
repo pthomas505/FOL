@@ -328,13 +328,7 @@ theorem fastReplaceFree_inverse
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    push_neg at h1
-
-    cases h1
-    case intro h1_left h1_right =>
-      congr!
-      · exact phi_ih h1_left
-      · exact psi_ih h1_right
+      congr! <;> tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     push_neg at h1
 
