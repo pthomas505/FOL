@@ -1,6 +1,8 @@
 import FOL.NV.Sub.Var.One.Rec.ReplaceFree
+import FOL.NV.Sub.Var.One.Ind.ReplaceFree
 import FOL.NV.Semantics
 
+import Mathlib.Data.List.Defs
 
 set_option autoImplicit false
 
@@ -9,6 +11,101 @@ namespace FOL.NV
 
 open Formula
 open Sub.Var.One.Rec
+open Sub.Var.One.Ind
+
+
+inductive AlphaEqvVar :
+  List (VarName × VarName) → VarName → VarName → Prop
+| nil
+  (x : VarName) :
+  AlphaEqvVar [] x x
+
+| head
+  (binders : List (VarName × VarName))
+  (x y : VarName) :
+  AlphaEqvVar ((x, y) :: binders) x y
+
+| tail
+  (binders : List (VarName × VarName))
+  (x y x' y' : VarName) :
+  ¬ x = x' →
+  ¬ y = y' →
+  AlphaEqvVar binders x' y' →
+  AlphaEqvVar ((x, y) :: binders) x' y'
+
+
+inductive AlphaEqv' :
+  List (VarName × VarName) → Formula → Formula → Prop
+
+  | pred_var_
+    (binders : List (VarName × VarName))
+    (X : PredName)
+    (xs ys : List VarName) :
+    List.Forall₂ (AlphaEqvVar binders) xs ys →
+    AlphaEqv' binders (pred_var_ X xs) (pred_var_ X ys)
+
+  | pred_const_
+    (binders : List (VarName × VarName))
+    (X : PredName)
+    (xs ys : List VarName) :
+    List.Forall₂ (AlphaEqvVar binders) xs ys →
+    AlphaEqv' binders (pred_const_ X xs) (pred_const_ X ys)
+
+  | compat_true_
+    (binders : List (VarName × VarName)) :
+    AlphaEqv' binders true_ true_
+
+  | compat_false_
+    (binders : List (VarName × VarName)) :
+    AlphaEqv' binders false_ false_
+
+  | compat_not_
+    (binders : List (VarName × VarName))
+    (phi phi' : Formula) :
+    AlphaEqv' binders phi phi' →
+    AlphaEqv' binders (not_ phi) (not_ phi')
+
+  | compat_imp_
+    (binders : List (VarName × VarName))
+    (phi phi' psi psi' : Formula) :
+    AlphaEqv' binders phi phi' →
+    AlphaEqv' binders psi psi' →
+    AlphaEqv' binders (imp_ phi psi) (imp_ phi' psi')
+
+  | compat_and_
+    (binders : List (VarName × VarName))
+    (phi phi' psi psi' : Formula) :
+    AlphaEqv' binders phi phi' →
+    AlphaEqv' binders psi psi' →
+    AlphaEqv' binders (and_ phi psi) (and_ phi' psi')
+
+  | compat_or_
+    (binders : List (VarName × VarName))
+    (phi phi' psi psi' : Formula) :
+    AlphaEqv' binders phi phi' →
+    AlphaEqv' binders psi psi' →
+    AlphaEqv' binders (or_ phi psi) (or_ phi' psi')
+
+  | compat_iff_
+    (binders : List (VarName × VarName))
+    (phi phi' psi psi' : Formula) :
+    AlphaEqv' binders phi phi' →
+    AlphaEqv' binders psi psi' →
+    AlphaEqv' binders (iff_ phi psi) (iff_ phi' psi')
+
+  | compat_forall_
+    (binders : List (VarName × VarName))
+    (phi phi' : Formula)
+    (x y : VarName) :
+    AlphaEqv' ((x, y) :: binders) phi phi' →
+    AlphaEqv' binders (forall_ x phi) (forall_ y phi')
+
+  | compat_exists_
+    (binders : List (VarName × VarName))
+    (phi phi' : Formula)
+    (x y : VarName) :
+    AlphaEqv' ((x, y) :: binders) phi phi' →
+    AlphaEqv' binders (exists_ x phi) (exists_ y phi')
 
 
 inductive AlphaEqv : Formula → Formula → Prop
