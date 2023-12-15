@@ -12,8 +12,8 @@ open Formula
 
 def predVarFreeVarSet
   (τ : PredName → ℕ → Option (List VarName × Formula)) :=
-  fun (p, n) =>
-    let opt := τ p n
+  fun ((X : PredName), (n : ℕ)) =>
+    let opt := τ X n
     if h : Option.isSome opt
     then
       let val := Option.get opt h
@@ -26,173 +26,139 @@ def predVarFreeVarSet
 def subPredAlphaAux
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
-  (α : VarName → VarName) :
+  (σ : VarName → VarName) :
   Formula → Formula
-  | pred_const_ X xs => pred_const_ X (xs.map α)
-  | pred_var_ X xs => pred_var_ X (xs.map α)
-  | eq_ x y => eq_ (α x) (α y)
+  | pred_const_ X xs => pred_const_ X (xs.map σ)
+  | pred_var_ X xs =>
+      let opt := τ X xs.length
+      if h : Option.isSome opt
+      then
+        let val := Option.get opt h
+        let zs := val.fst
+        let H := val.snd
+        if xs.length = zs.length
+        then Sub.Var.All.Rec.subFresh (Function.updateListITE id zs (xs.map σ)) c H
+        else pred_var_ X (xs.map σ)
+      else pred_var_ X (xs.map σ)
+  | eq_ x y => eq_ (σ x) (σ y)
   | true_ => true_
   | false_ => false_
   | not_ phi =>
-      not_ (subPredAlphaAux c τ α phi)
+      not_ (subPredAlphaAux c τ σ phi)
   | imp_ phi psi =>
       imp_
-      (subPredAlphaAux c τ α phi)
-      (subPredAlphaAux c τ α psi)
+      (subPredAlphaAux c τ σ phi)
+      (subPredAlphaAux c τ σ psi)
   | and_ phi psi =>
       and_
-      (subPredAlphaAux c τ α phi)
-      (subPredAlphaAux c τ α psi)
+      (subPredAlphaAux c τ σ phi)
+      (subPredAlphaAux c τ σ psi)
   | or_ phi psi =>
       or_
-      (subPredAlphaAux c τ α phi)
-      (subPredAlphaAux c τ α psi)
+      (subPredAlphaAux c τ σ phi)
+      (subPredAlphaAux c τ σ psi)
   | iff_ phi psi =>
       iff_
-      (subPredAlphaAux c τ α phi)
-      (subPredAlphaAux c τ α psi)
+      (subPredAlphaAux c τ σ phi)
+      (subPredAlphaAux c τ σ psi)
   | forall_ x phi =>
-      let vs : Finset VarName := sorry
       let x' : VarName :=
-        if x ∈ vs
-        then fresh x c vs
+        if x ∈ phi.predVarSet.biUnion (predVarFreeVarSet τ)
+        then fresh x c ((subPredAlphaAux c τ (Function.updateITE σ x x) phi).predVarSet.biUnion (predVarFreeVarSet τ))
         else x
-      forall_ x' (subPredAlphaAux c τ (Function.updateITE α x x') phi)
+      forall_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') phi)
   | exists_ x phi =>
       let vs : Finset VarName := sorry
       let x' : VarName :=
         if x ∈ vs
         then fresh x c vs
         else x
-      exists_ x' (subPredAlphaAux c τ (Function.updateITE α x x') phi)
-  | def_ X xs => def_ X (xs.map α)
+      exists_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') phi)
+  | def_ X xs => def_ X (xs.map σ)
+
+
+def Interpretation.usingPred
+  (D : Type)
+  (I : Interpretation D)
+  (pred_ : PredName → List D → Prop) :
+  Interpretation D := {
+    nonempty := I.nonempty
+    pred_const_ := I.pred_const_
+    pred_var_ := pred_ }
 
 
 example
+  (D : Type)
+  (I : Interpretation D)
+  (V V' V'': VarAssignment D)
+  (E : Env)
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
-  (α : VarName → VarName)
+  (σ : VarName → VarName)
   (F : Formula) :
-  AlphaEqv F (subPredAlphaAux c τ α F) :=
+  let I' := (Interpretation.usingPred D I (
+      fun (X : PredName) (ds : List D) =>
+      let opt := τ X ds.length
+      if h : Option.isSome opt
+      then
+        let val := Option.get opt h
+        let zs := val.fst
+        let H := val.snd
+        if ds.length = zs.length
+        then Holds D I (Function.updateListITE V'' zs ds) E H
+        else I.pred_var_ X ds
+      else I.pred_var_ X ds) )
+  Holds D I'
+    V' E F ↔ Holds D I V E (subPredAlphaAux c τ σ F) :=
   by
-  induction F
+  intro I'
+  induction F generalizing V V' V'' σ
+  case pred_const_ X xs =>
+    simp only [subPredAlphaAux]
+    simp only [Holds]
+    simp only [Interpretation.usingPred]
+    simp
+    congr! 1
+    simp only [List.map_eq_map_iff]
+    intro x a1
+    simp
+    sorry
   case pred_var_ X xs =>
     simp only [subPredAlphaAux]
-    sorry
-
-  case forall_ x phi phi_ih =>
-    simp only [subPredAlphaAux]
-
-    obtain s1 := fresh_not_mem x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
-
-    generalize fresh x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)) = x' at *
-
-    split_ifs
-    case pos c1 =>
-
-      sorry
-    case neg c1 =>
-      sorry
-  all_goals
-    sorry
-
-
-example
-  (c : Char)
-  (τ : PredName → ℕ → Option (List VarName × Formula))
-  (α : VarName → VarName)
-  (binders : Finset VarName)
-  (F : Formula)
-  (h1 : ∀ (x : VarName), x ∈ binders → x ∉ (Finset.biUnion F.predVarSet (predVarFreeVarSet τ))) :
-  admitsPredFunAux τ binders (subPredAlphaAux c τ α F) :=
-  by
-  induction F generalizing α binders
-  case pred_const_ X xs | true_ | false_ | eq_ | def_ =>
-    simp only [subPredAlphaAux]
-    simp only [admitsPredFunAux]
-  case pred_var_ X xs =>
-    simp only [predVarSet] at h1
-    simp at h1
-
-    simp only [subPredAlphaAux]
-    simp only [admitsPredFunAux]
+    simp only [Holds]
+    simp only [Interpretation.usingPred]
+    simp
     split_ifs
     case _ c1 c2 =>
-      simp at c1
+      generalize (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).1 = zs at *
+      generalize (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).2 = H at *
 
-      apply Finset.eq_empty_of_forall_not_mem
-      simp
-      intro x a1 a2
-      specialize h1 x a1
-      simp only [predVarFreeVarSet] at h1
-      simp only [c1] at h1
-      simp at h1
-      exact h1 a2
-  case not_ phi phi_ih =>
-    simp only [predVarSet] at h1
+      obtain s1 := Sub.Var.All.Rec.substitution_theorem D I V E (Function.updateListITE id zs xs) c H
+      simp only [Function.updateListITE_comp] at s1
 
-    simp only [subPredAlphaAux]
-    simp only [admitsPredFunAux]
-    apply phi_ih
-    exact h1
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    simp only [predVarSet] at h1
-    simp at h1
-
-    simp only [subPredAlphaAux]
-    simp only [admitsPredFunAux]
-    constructor
-    · apply phi_ih
-      simp
-      intro x a1 X n a2
-      apply h1 x a1 X n
-      left
-      exact a2
-    · apply psi_ih
-      simp
-      intro x a1 X n a2
-      apply h1 x a1 X n
-      right
-      exact a2
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [predVarSet] at h1
-
-    simp only [subPredAlphaAux]
-    simp only [admitsPredFunAux]
-    split_ifs
-    case pos c1 =>
-      obtain s1 := fresh_not_mem x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
-
-      generalize (fresh x c (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))) = x' at *
-
-      have s2 : ¬ x' = x
-      intro contra
-      subst contra
-      apply s1
       sorry
-
-      apply phi_ih
-      intro x_1 a1
-      simp at a1
-      cases a1
-      case _ c2 =>
-        apply h1
-        exact c2
-      case _ c2 =>
-        subst c2
-        sorry
-    case neg c1 =>
-      apply phi_ih
-      intro x_1 a1
-      simp at a1
-      cases a1
-      case _ c2 =>
-        apply h1
-        exact c2
-      case _ c2 =>
-        subst c2
-        sorry
+    case _ c1 c2 =>
+      simp only [Holds]
+      simp
+      congr! 1
+      simp only [List.map_eq_map_iff]
+      intro x a1
+      simp
+      sorry
+    case _ c1 =>
+      simp only [Holds]
+      simp
+      congr! 1
+      simp only [List.map_eq_map_iff]
+      intro x a1
+      simp
+      sorry
+  case forall_ x phi ih =>
+    simp only [subPredAlphaAux]
+    simp only [Interpretation.usingPred]
+    simp only [Holds]
+    apply forall_congr'
+    intro d
+    apply ih
+  all_goals
+    sorry
