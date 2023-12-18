@@ -51,10 +51,10 @@ def replacePredFun
 
 
 def admitsPredFunAux
-  (τ : PredName → ℕ → Option (List VarName × Formula)) :
-  Finset VarName → Formula → Prop
-  | _, pred_const_ _ _ => True
-  | binders, pred_var_ X xs =>
+  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (binders : Finset VarName) : Formula → Prop
+  | pred_const_ _ _ => True
+  | pred_var_ X xs =>
       let opt := τ X xs.length
       if h : Option.isSome opt
       then
@@ -66,25 +66,25 @@ def admitsPredFunAux
         --then ∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)
         else True
       else True
-  | _, true_ => True
-  | _, false_ => True
-  | _, eq_ _ _ => True
-  | binders, not_ phi => admitsPredFunAux τ binders phi
-  | binders, imp_ phi psi =>
+  | true_ => True
+  | false_ => True
+  | eq_ _ _ => True
+  | not_ phi => admitsPredFunAux τ binders phi
+  | imp_ phi psi =>
       admitsPredFunAux τ binders phi ∧
       admitsPredFunAux τ binders psi
-  | binders, and_ phi psi =>
+  | and_ phi psi =>
       admitsPredFunAux τ binders phi ∧
       admitsPredFunAux τ binders psi
-  | binders, or_ phi psi =>
+  | or_ phi psi =>
       admitsPredFunAux τ binders phi ∧
       admitsPredFunAux τ binders psi
-  | binders, iff_ phi psi =>
+  | iff_ phi psi =>
       admitsPredFunAux τ binders phi ∧
       admitsPredFunAux τ binders psi
-  | binders, forall_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
-  | binders, exists_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
-  | _, def_ _ _ => True
+  | forall_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
+  | exists_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
+  | def_ _ _ => True
 
 
 theorem predSub_aux
