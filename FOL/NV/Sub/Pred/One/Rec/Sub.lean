@@ -53,10 +53,10 @@ def replacePred
 def admitsPredAux
   (P : PredName)
   (zs : List VarName)
-  (H : Formula) :
-  Finset VarName → Formula → Prop
-  | _, pred_const_ _ _ => True
-  | binders, pred_var_ X ts =>
+  (H : Formula)
+  (binders : Finset VarName) : Formula → Prop
+  | pred_const_ _ _ => True
+  | pred_var_ X ts =>
       if X = P ∧ ts.length = zs.length
       then
         Sub.Var.All.Rec.admits (Function.updateListITE id zs ts) H ∧
@@ -68,25 +68,25 @@ def admitsPredAux
             -/
           ∀ x : VarName, x ∈ binders → ¬(isFreeIn x H ∧ x ∉ zs)
       else True
-  | _, eq_ _ _ => True
-  | _, true_ => True
-  | _, false_ => True
-  | binders, not_ phi => admitsPredAux P zs H binders phi
-  | binders, imp_ phi psi =>
+  | eq_ _ _ => True
+  | true_ => True
+  | false_ => True
+  | not_ phi => admitsPredAux P zs H binders phi
+  | imp_ phi psi =>
       admitsPredAux P zs H binders phi ∧
       admitsPredAux P zs H binders psi
-  | binders, and_ phi psi =>
+  | and_ phi psi =>
       admitsPredAux P zs H binders phi ∧
       admitsPredAux P zs H binders psi
-  | binders, or_ phi psi =>
+  | or_ phi psi =>
       admitsPredAux P zs H binders phi ∧
       admitsPredAux P zs H binders psi
-  | binders, iff_ phi psi =>
+  | iff_ phi psi =>
       admitsPredAux P zs H binders phi ∧
       admitsPredAux P zs H binders psi
-  | binders, forall_ x phi => admitsPredAux P zs H (binders ∪ {x}) phi
-  | binders, exists_ x phi => admitsPredAux P zs H (binders ∪ {x}) phi
-  | _, def_ _ _ => True
+  | forall_ x phi => admitsPredAux P zs H (binders ∪ {x}) phi
+  | exists_ x phi => admitsPredAux P zs H (binders ∪ {x}) phi
+  | def_ _ _ => True
 
 
 lemma replacePred_no_predVar
