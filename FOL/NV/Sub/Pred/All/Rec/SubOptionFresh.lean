@@ -1,4 +1,5 @@
 import FOL.NV.Alpha
+import FOL.NV.Sub.Var.All.Rec.SubFresh
 import FOL.NV.Sub.Pred.All.Rec.SubOption
 
 
@@ -95,7 +96,10 @@ example
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (σ : VarName → VarName)
-  (F : Formula) :
+  (F : Formula)
+  (h1 : ∀ (x : VarName), isFreeIn x F → V' x = V (σ x))
+  (h2 : ∀ (x : VarName), x ∈ F.predVarSet.biUnion (predVarFreeVarSet τ) → V'' x = V x)
+  :
   let I' := (Interpretation.usingPred D I (
       fun (X : PredName) (ds : List D) =>
       let opt := τ X ds.length
@@ -122,7 +126,8 @@ example
     simp only [List.map_eq_map_iff]
     intro x a1
     simp
-    sorry
+    simp only [isFreeIn] at h1
+    exact h1 x a1
   case pred_var_ X xs =>
     simp only [subPredAlphaAux]
     simp only [Holds]
@@ -130,13 +135,38 @@ example
     simp
     split_ifs
     case _ c1 c2 =>
+      simp only [isFreeIn] at h1
+
+      simp only [predVarSet] at h2
+      simp at h2
+      simp only [predVarFreeVarSet] at h2
+      simp only [c1] at h2
+      simp at h2
+
       generalize (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).1 = zs at *
+
       generalize (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).2 = H at *
 
-      obtain s1 := Sub.Var.All.Rec.substitution_theorem D I V E (Function.updateListITE id zs xs) c H
+      obtain s1 := Sub.Var.All.Rec.substitution_theorem D I V E (Function.updateListITE id zs (xs.map σ)) c H
       simp only [Function.updateListITE_comp] at s1
 
-      sorry
+      simp at s1
+      simp only [s1]
+
+      apply Holds_coincide_Var
+      intro x a1
+      by_cases c3 : x ∈ zs
+      · apply Function.updateListITE_map_mem_ext
+        · simp
+          exact h1
+        · simp only [c2]
+        · exact c3
+      · simp only [Function.updateListITE_not_mem V'' x zs (List.map V' xs) c3]
+        simp only [Function.updateListITE_not_mem V x zs (List.map (V ∘ σ ) xs) c3]
+        apply h2
+        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          exact a1
+        · exact c3
     case _ c1 c2 =>
       simp only [Holds]
       simp
@@ -144,7 +174,8 @@ example
       simp only [List.map_eq_map_iff]
       intro x a1
       simp
-      sorry
+      simp only [isFreeIn] at h1
+      exact h1 x a1
     case _ c1 =>
       simp only [Holds]
       simp
@@ -152,13 +183,44 @@ example
       simp only [List.map_eq_map_iff]
       intro x a1
       simp
-      sorry
+      simp only [isFreeIn] at h1
+      exact h1 x a1
   case forall_ x phi ih =>
+    simp only [isFreeIn] at h1
+
+    simp only [predVarSet] at h2
+    simp at h2
+    simp only [predVarFreeVarSet] at h2
+
     simp only [subPredAlphaAux]
     simp only [Interpretation.usingPred]
     simp only [Holds]
     apply forall_congr'
     intro d
     apply ih
+    · intro v a1
+      split_ifs
+      case _ c1 =>
+        generalize (fresh x c (Finset.biUnion (predVarSet (subPredAlphaAux c τ (Function.updateITE σ x x) phi)) (predVarFreeVarSet τ))) = x' at *
+        simp only [Function.updateITE]
+        split_ifs
+        case _ c2 c3 =>
+          rfl
+        case _ c2 c3 =>
+          contradiction
+        case _ c2 c3 =>
+          specialize h1 v
+          simp only [c2] at h1
+          simp only [a1] at h1
+          simp at h1
+          subst c3
+          sorry
+        case _ c2 c3 =>
+          apply h1
+          tauto
+      case _ c1 =>
+        sorry
+    · sorry
+
   all_goals
     sorry
