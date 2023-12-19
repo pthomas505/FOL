@@ -70,10 +70,9 @@ def subPredAlphaAux
         else x
       forall_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') S T phi)
   | exists_ x phi =>
-      let vs : Finset VarName := sorry
       let x' : VarName :=
-        if x ∈ vs
-        then fresh x c vs
+        if x ∈ (((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+        then fresh x c ((Finset.image (Function.updateITE σ x x) (freeVarSet phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
         else x
       exists_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') S T phi)
   | def_ X xs => def_ X (xs.map σ)
@@ -187,14 +186,14 @@ example
       intro x a1
       simp
       exact h1 x a1
-  case forall_ x phi ih =>
+  case forall_ x phi ih | exists_ x phi ih =>
     simp only [isFreeIn] at h1
 
     simp only [subPredAlphaAux]
     simp only [Interpretation.usingPred]
     simp only [Holds]
 
-    apply forall_congr'
+    first | apply forall_congr' | apply exists_congr
     intro d
 
     apply ih
