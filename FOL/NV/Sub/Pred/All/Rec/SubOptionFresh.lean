@@ -66,7 +66,7 @@ def subPredAlphaAux
   | forall_ x phi =>
       let x' : VarName :=
         if x ∈ (((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
-        then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi))
+        then fresh x c ((Finset.image (Function.updateITE σ x x) (freeVarSet phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
         else x
       forall_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') S T phi)
   | exists_ x phi =>
@@ -198,7 +198,7 @@ example
         case _ c2 c3 =>
           contradiction
         case _ c2 c3 =>
-          obtain s1 := fresh_not_mem x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi))
+          obtain s1 := fresh_not_mem x c ((Finset.image (Function.updateITE σ x x) (freeVarSet phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
           simp only [← c3] at s1
           obtain s2 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
           simp only [s2] at c1
@@ -209,6 +209,8 @@ example
           obtain s5 := Finset.mem_image_of_mem (Function.updateITE σ x x) a1
           simp only [Function.updateITE] at s5
           simp only [if_neg c2] at s5
+          simp only [Finset.mem_union]
+          left
           exact s5
         case _ c2 c3 =>
           apply h1
@@ -250,7 +252,7 @@ example
           obtain s1 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
           --simp only [s1] at c1
           simp only [<- s1] at c2
-          obtain s30 := fresh_not_mem x c (freeVarSet (Var.All.Rec.subFresh (Function.updateITE σ x x) c phi))
+          obtain s30 := fresh_not_mem x c ((freeVarSet (Var.All.Rec.subFresh (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
           simp only [← c2] at s30
           cases c1
           case _ c1 =>
@@ -258,12 +260,20 @@ example
             intro contra
             subst contra
             apply s30
+            simp only [Finset.mem_union]
+            left
             exact c1
-
-            sorry
+            simp only [Finset.mem_union] at s30
+            push_neg at s30
+            cases s30
+            case _ s30_left s30_right =>
+              contradiction
           case _ c1 =>
-
-            sorry
+            simp only [Finset.mem_union] at s30
+            push_neg at s30
+            cases s30
+            case _ s30_left s30_right =>
+              contradiction
         case _ c2 =>
           exact h2
       case _ c1 =>
