@@ -139,9 +139,9 @@ example
     simp
     split_ifs
     case _ c1 c2 =>
-      generalize (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).1 = zs at *
+      set zs := (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).1
 
-      generalize (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).2 = H at *
+      set H := (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).2
 
       obtain s1 := Sub.Var.All.Rec.substitution_theorem D I V E (Function.updateListITE id zs (xs.map σ)) c H
       simp only [Function.updateListITE_comp] at s1
@@ -156,11 +156,21 @@ example
       · apply Function.updateListITE_map_mem_ext
         · simp
           exact h1
-        · simp only [c2]
+        · simp at c2
+          simp only [← c2]
         · exact c3
       · simp only [Function.updateListITE_not_mem V'' x zs (List.map V' xs) c3]
         simp only [Function.updateListITE_not_mem V x zs (List.map (V ∘ σ ) xs) c3]
-        sorry
+
+        simp only [predVarSet] at h2
+        simp at h2
+        simp only [predVarFreeVarSet] at h2
+        simp only [c1] at h2
+        simp at h2
+        apply h2
+        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          exact a1
+        · exact c3
     case _ c1 c2 =>
       simp only [Holds]
       simp
