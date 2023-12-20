@@ -282,6 +282,7 @@ example
           apply c1_right
           subst contra
           exact a1
+
           simp only [Function.updateITE]
           simp only [if_neg s1]
           exact h2 v a1
