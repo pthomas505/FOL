@@ -262,27 +262,27 @@ example
           obtain s1 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
           simp only [← s1] at c2
 
-          obtain s30 := fresh_not_mem x c ((freeVarSet (Var.All.Rec.subFresh (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
-          simp only [← c2] at s30
+          obtain s2 := fresh_not_mem x c ((freeVarSet (Var.All.Rec.subFresh (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
+          simp only [← c2] at s2
           cases c1
           case _ c1 =>
             have s50 : ¬ v = x
             intro contra
             subst contra
-            apply s30
+            apply s2
             simp only [Finset.mem_union]
             left
             exact c1
-            simp only [Finset.mem_union] at s30
-            push_neg at s30
-            cases s30
-            case _ s30_left s30_right =>
+            simp only [Finset.mem_union] at s2
+            push_neg at s2
+            cases s2
+            case _ s2_left s2_right =>
               contradiction
           case _ c1 =>
-            simp only [Finset.mem_union] at s30
-            push_neg at s30
-            cases s30
-            case _ s30_left s30_right =>
+            simp only [Finset.mem_union] at s2
+            push_neg at s2
+            cases s2
+            case _ s2_left s2_right =>
               contradiction
         case _ c2 =>
           exact h2 v a1
