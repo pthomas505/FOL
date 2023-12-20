@@ -266,13 +266,6 @@ example
           simp only [← c2] at s2
           cases c1
           case _ c1 =>
-            have s50 : ¬ v = x
-            intro contra
-            subst contra
-            apply s2
-            simp only [Finset.mem_union]
-            left
-            exact c1
             simp only [Finset.mem_union] at s2
             push_neg at s2
             cases s2
