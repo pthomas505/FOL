@@ -65,14 +65,14 @@ def subPredAlphaAux
       (subPredAlphaAux c τ σ S T psi)
   | forall_ x phi =>
       let x' : VarName :=
-        if x ∈ (((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
-        then fresh x c ((Finset.image (Function.updateITE σ x x) (freeVarSet phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
+        if x ∈ ((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+        then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         else x
       forall_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') S T phi)
   | exists_ x phi =>
       let x' : VarName :=
-        if x ∈ (((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
-        then fresh x c ((Finset.image (Function.updateITE σ x x) (freeVarSet phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
+        if x ∈ ((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+        then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         else x
       exists_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') S T phi)
   | def_ X xs => def_ X (xs.map σ)
