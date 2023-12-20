@@ -264,19 +264,12 @@ example
 
           obtain s2 := fresh_not_mem x c ((freeVarSet (Var.All.Rec.subFresh (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
           simp only [← c2] at s2
-          cases c1
-          case _ c1 =>
-            simp only [Finset.mem_union] at s2
-            push_neg at s2
-            cases s2
-            case _ s2_left s2_right =>
-              contradiction
-          case _ c1 =>
-            simp only [Finset.mem_union] at s2
-            push_neg at s2
-            cases s2
-            case _ s2_left s2_right =>
-              contradiction
+          simp only [Finset.mem_union] at s2
+
+          push_neg at s2
+          cases s2
+          case _ s2_left s2_right =>
+            contradiction
         case _ c2 =>
           exact h2 v a1
       case _ c1 =>
