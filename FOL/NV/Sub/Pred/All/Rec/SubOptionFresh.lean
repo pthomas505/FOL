@@ -187,6 +187,8 @@ example
   case forall_ x phi ih | exists_ x phi ih =>
     simp only [isFreeIn] at h1
 
+    simp only [predVarSet] at h2
+
     simp only [subPredAlphaAux]
     simp only [Interpretation.usingPred]
     simp only [Holds]
@@ -251,16 +253,16 @@ example
             apply h1
             tauto
     · intro v a1
-      simp only [predVarSet] at h2
-      specialize h2 v a1
       split_ifs
       case _ c1 =>
+        simp only [Finset.mem_union] at c1
+
         simp only [Function.updateITE]
         split_ifs
         case _ c2 =>
-          simp only [Finset.mem_union] at c1
           obtain s1 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
-          simp only [<- s1] at c2
+          simp only [← s1] at c2
+
           obtain s30 := fresh_not_mem x c ((freeVarSet (Var.All.Rec.subFresh (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
           simp only [← c2] at s30
           cases c1
@@ -284,7 +286,7 @@ example
             case _ s30_left s30_right =>
               contradiction
         case _ c2 =>
-          exact h2
+          exact h2 v a1
       case _ c1 =>
         simp only [Finset.mem_union] at c1
         push_neg at c1
@@ -297,7 +299,8 @@ example
           exact a1
           simp only [Function.updateITE]
           simp only [if_neg s20]
-          exact h2
+          exact h2 v a1
+
 
 
   all_goals
