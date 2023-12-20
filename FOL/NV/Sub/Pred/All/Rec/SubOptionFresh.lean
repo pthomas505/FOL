@@ -277,16 +277,14 @@ example
         push_neg at c1
         cases c1
         case _ c1_left c1_right =>
-          have s20 : ¬ v = x
+          have s1 : ¬ v = x
           intro contra
           apply c1_right
           subst contra
           exact a1
           simp only [Function.updateITE]
-          simp only [if_neg s20]
+          simp only [if_neg s1]
           exact h2 v a1
-
-
 
   all_goals
     sorry
