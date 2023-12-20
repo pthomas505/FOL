@@ -27,8 +27,7 @@ def predVarFreeVarSet
 def subPredAlphaAux
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
-  (σ : VarName → VarName)
-  (S T : Finset VarName) :
+  (σ : VarName → VarName) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs =>
@@ -46,35 +45,35 @@ def subPredAlphaAux
   | true_ => true_
   | false_ => false_
   | not_ phi =>
-      not_ (subPredAlphaAux c τ σ S T phi)
+      not_ (subPredAlphaAux c τ σ phi)
   | imp_ phi psi =>
       imp_
-      (subPredAlphaAux c τ σ S T phi)
-      (subPredAlphaAux c τ σ S T psi)
+      (subPredAlphaAux c τ σ phi)
+      (subPredAlphaAux c τ σ psi)
   | and_ phi psi =>
       and_
-      (subPredAlphaAux c τ σ S T phi)
-      (subPredAlphaAux c τ σ S T psi)
+      (subPredAlphaAux c τ σ phi)
+      (subPredAlphaAux c τ σ psi)
   | or_ phi psi =>
       or_
-      (subPredAlphaAux c τ σ S T phi)
-      (subPredAlphaAux c τ σ S T psi)
+      (subPredAlphaAux c τ σ phi)
+      (subPredAlphaAux c τ σ psi)
   | iff_ phi psi =>
       iff_
-      (subPredAlphaAux c τ σ S T phi)
-      (subPredAlphaAux c τ σ S T psi)
+      (subPredAlphaAux c τ σ phi)
+      (subPredAlphaAux c τ σ psi)
   | forall_ x phi =>
       let x' : VarName :=
         if x ∈ ((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         else x
-      forall_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') S T phi)
+      forall_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') phi)
   | exists_ x phi =>
       let x' : VarName :=
         if x ∈ ((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         else x
-      exists_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') S T phi)
+      exists_ x' (subPredAlphaAux c τ (Function.updateITE σ x x') phi)
   | def_ X xs => def_ X (xs.map σ)
 
 
@@ -96,11 +95,9 @@ example
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (σ : VarName → VarName)
-  (S T : Finset VarName)
   (F : Formula)
   (h1 : ∀ (x : VarName), isFreeIn x F → V' x = V (σ x))
-  (h2 : ∀ (x : VarName), x ∈ F.predVarSet.biUnion (predVarFreeVarSet τ) → V'' x = V x)
-  :
+  (h2 : ∀ (x : VarName), x ∈ F.predVarSet.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
   let I' := (Interpretation.usingPred D I (
       fun (X : PredName) (ds : List D) =>
       let opt := τ X ds.length
@@ -113,7 +110,7 @@ example
         then Holds D I (Function.updateListITE V'' zs ds) E H
         else I.pred_var_ X ds
       else I.pred_var_ X ds) )
-  Holds D I' V' E F ↔ Holds D I V E (subPredAlphaAux c τ σ S T F) :=
+  Holds D I' V' E F ↔ Holds D I V E (subPredAlphaAux c τ σ F) :=
   by
   intro I'
   induction F generalizing V V' σ
@@ -259,7 +256,6 @@ example
         case _ c2 =>
           simp only [Finset.mem_union] at c1
           obtain s1 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
-          --simp only [s1] at c1
           simp only [<- s1] at c2
           obtain s30 := fresh_not_mem x c ((freeVarSet (Var.All.Rec.subFresh (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
           simp only [← c2] at s30
