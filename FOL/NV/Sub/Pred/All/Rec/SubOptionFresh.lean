@@ -208,18 +208,18 @@ example
           obtain s1 := fresh_not_mem x c ((Finset.image (Function.updateITE σ x x) (freeVarSet phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
           simp only [← c3] at s1
 
-          obtain s2 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
-          simp only [s2] at c1
-
-          simp only [isFreeIn_iff_mem_freeVarSet] at a1
           exfalso
           apply s1
-          obtain s3 := Finset.mem_image_of_mem (Function.updateITE σ x x) a1
-          simp only [Function.updateITE] at s3
-          simp only [if_neg c2] at s3
+
+          simp only [isFreeIn_iff_mem_freeVarSet] at a1
+
+          obtain s2 := Finset.mem_image_of_mem (Function.updateITE σ x x) a1
+          simp only [Function.updateITE] at s2
+          simp only [if_neg c2] at s2
+
           simp only [Finset.mem_union]
           left
-          exact s3
+          exact s2
         case _ c2 c3 =>
           apply h1
           tauto
@@ -233,18 +233,20 @@ example
           case _ c3 =>
             obtain s1 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
             simp only [s1] at c1
+
             exfalso
             apply c1
             simp only [← c3]
+
             simp only [isFreeIn_iff_mem_freeVarSet] at a1
-            obtain s5 := Finset.mem_image_of_mem (Function.updateITE σ (σ v) (σ v)) a1
-            simp only [Function.updateITE] at s5
+
+            obtain s2 := Finset.mem_image_of_mem (Function.updateITE σ (σ v) (σ v)) a1
+            simp only [Function.updateITE] at s2
+            simp only [ite_self] at s2
+
             simp only [Finset.mem_union]
             left
-
-            split_ifs at s5
-            · exact s5
-            · exact s5
+            exact s2
           case _ c3 =>
             apply h1
             tauto
