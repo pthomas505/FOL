@@ -235,9 +235,8 @@ example
             obtain s1 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
             simp only [s1] at c1
 
-            exfalso
-            apply c1
-            simp only [← c3]
+            simp only [← c3] at c1
+            simp only [Finset.mem_union] at c1
 
             simp only [isFreeIn_iff_mem_freeVarSet] at a1
 
@@ -245,7 +244,8 @@ example
             simp only [Function.updateITE] at s2
             simp only [ite_self] at s2
 
-            simp only [Finset.mem_union]
+            exfalso
+            apply c1
             left
             exact s2
           case _ c3 =>
