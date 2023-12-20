@@ -210,15 +210,14 @@ example
           obtain s1 := fresh_not_mem x c ((Finset.image (Function.updateITE σ x x) (freeVarSet phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
           simp only [← c3] at s1
 
-          exfalso
-          apply s1
-
           simp only [isFreeIn_iff_mem_freeVarSet] at a1
 
           obtain s2 := Finset.mem_image_of_mem (Function.updateITE σ x x) a1
           simp only [Function.updateITE] at s2
           simp only [if_neg c2] at s2
 
+          exfalso
+          apply s1
           simp only [Finset.mem_union]
           left
           exact s2
