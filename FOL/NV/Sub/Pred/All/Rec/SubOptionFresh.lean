@@ -99,17 +99,17 @@ example
   (h1 : ∀ (x : VarName), isFreeIn x F → V' x = V (σ x))
   (h2 : ∀ (x : VarName), x ∈ F.predVarSet.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
   let I' := (Interpretation.usingPred D I (
-      fun (X : PredName) (ds : List D) =>
-      let opt := τ X ds.length
-      if h : Option.isSome opt
-      then
-        let val := Option.get opt h
-        let zs := val.fst
-        let H := val.snd
-        if ds.length = zs.length
-        then Holds D I (Function.updateListITE V'' zs ds) E H
-        else I.pred_var_ X ds
-      else I.pred_var_ X ds) )
+    fun (X : PredName) (ds : List D) =>
+    let opt := τ X ds.length
+    if h : Option.isSome opt
+    then
+      let val := Option.get opt h
+      let zs := val.fst
+      let H := val.snd
+      if ds.length = zs.length
+      then Holds D I (Function.updateListITE V'' zs ds) E H
+      else I.pred_var_ X ds
+    else I.pred_var_ X ds) )
   Holds D I' V' E F ↔ Holds D I V E (subPredAlphaAux c τ σ F) :=
   by
   intro I'
@@ -129,12 +129,19 @@ example
   case pred_var_ X xs =>
     simp only [isFreeIn] at h1
 
+    simp only [predVarSet] at h2
+    simp at h2
+    simp only [predVarFreeVarSet] at h2
+
     simp only [subPredAlphaAux]
     simp only [Holds]
     simp only [Interpretation.usingPred]
     simp
     split_ifs
     case _ c1 c2 =>
+      simp only [c1] at h2
+      simp at h2
+
       set zs := (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).1
 
       set H := (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).2
@@ -157,12 +164,6 @@ example
         · exact c3
       · simp only [Function.updateListITE_not_mem V'' x zs (List.map V' xs) c3]
         simp only [Function.updateListITE_not_mem V x zs (List.map (V ∘ σ ) xs) c3]
-
-        simp only [predVarSet] at h2
-        simp at h2
-        simp only [predVarFreeVarSet] at h2
-        simp only [c1] at h2
-        simp at h2
         apply h2
         · simp only [isFreeIn_iff_mem_freeVarSet] at a1
           exact a1
@@ -206,18 +207,19 @@ example
         case _ c2 c3 =>
           obtain s1 := fresh_not_mem x c ((Finset.image (Function.updateITE σ x x) (freeVarSet phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
           simp only [← c3] at s1
+
           obtain s2 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
           simp only [s2] at c1
 
           simp only [isFreeIn_iff_mem_freeVarSet] at a1
           exfalso
           apply s1
-          obtain s5 := Finset.mem_image_of_mem (Function.updateITE σ x x) a1
-          simp only [Function.updateITE] at s5
-          simp only [if_neg c2] at s5
+          obtain s3 := Finset.mem_image_of_mem (Function.updateITE σ x x) a1
+          simp only [Function.updateITE] at s3
+          simp only [if_neg c2] at s3
           simp only [Finset.mem_union]
           left
-          exact s5
+          exact s3
         case _ c2 c3 =>
           apply h1
           tauto
