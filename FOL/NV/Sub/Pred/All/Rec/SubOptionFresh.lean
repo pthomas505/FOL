@@ -184,6 +184,73 @@ example
       intro x a1
       simp
       exact h1 x a1
+  case eq_ x y =>
+    simp only [isFreeIn] at h1
+
+    simp only [subPredAlphaAux]
+    simp only [Holds]
+
+    have s1 : V' x = V (σ x)
+    apply h1
+    simp
+    simp only [s1]
+
+    have s2 : V' y = V (σ y)
+    apply h1
+    simp
+    simp only [s2]
+  case true_ | false_ =>
+    simp only [subPredAlphaAux]
+    simp only [Holds]
+  case not_ phi phi_ih =>
+    simp only [isFreeIn] at h1
+
+    simp only [predVarSet] at h2
+
+    simp only [subPredAlphaAux]
+    simp only [Holds]
+    congr! 1
+    exact phi_ih V V' σ h1 h2
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [isFreeIn] at h1
+
+    simp only [predVarSet] at h2
+
+    simp only [subPredAlphaAux]
+    simp only [Holds]
+    congr! 1
+    · apply phi_ih V V' σ
+      · intro x a1
+        apply h1
+        left
+        exact a1
+      · intro x a1
+        apply h2
+        simp only [Finset.mem_biUnion, Finset.mem_union] at a1
+        apply Exists.elim a1
+        intro a a2
+
+        simp only [Finset.mem_biUnion, Finset.mem_union]
+        apply Exists.intro a
+        tauto
+    · apply psi_ih V V' σ
+      · intro x a1
+        apply h1
+        right
+        exact a1
+      · intro x a1
+        apply h2
+        simp only [Finset.mem_biUnion, Finset.mem_union] at a1
+        apply Exists.elim a1
+        intro a a2
+
+        simp only [Finset.mem_biUnion, Finset.mem_union]
+        apply Exists.intro a
+        tauto
   case forall_ x phi ih | exists_ x phi ih =>
     simp only [isFreeIn] at h1
 
@@ -254,8 +321,6 @@ example
     · intro v a1
       split_ifs
       case _ c1 =>
-        simp only [Finset.mem_union] at c1
-
         simp only [Function.updateITE]
         split_ifs
         case _ c2 =>
