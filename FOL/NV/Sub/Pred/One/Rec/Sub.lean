@@ -50,6 +50,9 @@ def replace
   | def_ X xs => def_ X xs
 
 
+/--
+  Helper function for admits.
+-/
 def admitsAux
   (P : PredName)
   (zs : List VarName)
@@ -89,6 +92,9 @@ def admitsAux
   | def_ _ _ => True
 
 
+/--
+  admits P zs H F := True if and only if there is no variable in (H.freeVarSet \ zs) that becomes a bound occurrence in the formula (replace P zs H F).
+-/
 def admits
   (P : PredName)
   (zs : List VarName)
@@ -146,6 +152,9 @@ lemma replace_no_predVar
     simp only [replace]
 
 
+/--
+  Helper function for I'.
+-/
 def Interpretation.usingPred
   (D : Type)
   (I : Interpretation D)
@@ -156,6 +165,9 @@ def Interpretation.usingPred
     pred_var_ := pred_ }
 
 
+/--
+  Helper function for the substitution theorem.
+-/
 def I'
   (D : Type)
   (I : Interpretation D)
@@ -355,4 +367,4 @@ theorem substitution_is_valid
   apply h2
 
 
---#lint
+#lint

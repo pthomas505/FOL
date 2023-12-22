@@ -56,7 +56,7 @@ instance
 
 
 /--
-  admits σ P := True if and only if there is no free occurrence of a variable in the formula P that becomes a bound occurrence in the formula (fastReplaceFree σ P).
+  admits σ F := True if and only if there is no free occurrence of a variable in the formula F that becomes a bound occurrence in the formula (fastReplaceFree σ F).
 -/
 def admits (σ : VarName → VarName) (F : Formula) : Prop :=
   admitsAux σ ∅ F
