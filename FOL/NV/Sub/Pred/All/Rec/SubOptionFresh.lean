@@ -1,6 +1,4 @@
-import FOL.NV.Alpha
 import FOL.NV.Sub.Var.All.Rec.SubFresh
-import FOL.NV.Sub.Pred.All.Rec.SubOption
 
 
 set_option autoImplicit false
