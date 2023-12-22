@@ -87,6 +87,27 @@ def Interpretation.usingPred
     pred_var_ := pred_ }
 
 
+def I'
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (E : Env)
+  (τ : PredName → ℕ → Option (List VarName × Formula)) :
+  Interpretation D :=
+  (Interpretation.usingPred D I (
+  fun (X : PredName) (ds : List D) =>
+  let opt := τ X ds.length
+  if h : Option.isSome opt
+  then
+    let val := Option.get opt h
+    let zs := val.fst
+    let H := val.snd
+    if ds.length = zs.length
+    then Holds D I (Function.updateListITE V zs ds) E H
+    else I.pred_var_ X ds
+  else I.pred_var_ X ds) )
+
+
 example
   (D : Type)
   (I : Interpretation D)
@@ -98,27 +119,15 @@ example
   (F : Formula)
   (h1 : ∀ (x : VarName), isFreeIn x F → V' x = V (σ x))
   (h2 : ∀ (x : VarName), x ∈ F.predVarSet.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
-  let I' := (Interpretation.usingPred D I (
-    fun (X : PredName) (ds : List D) =>
-    let opt := τ X ds.length
-    if h : Option.isSome opt
-    then
-      let val := Option.get opt h
-      let zs := val.fst
-      let H := val.snd
-      if ds.length = zs.length
-      then Holds D I (Function.updateListITE V'' zs ds) E H
-      else I.pred_var_ X ds
-    else I.pred_var_ X ds) )
-  Holds D I' V' E F ↔ Holds D I V E (subPredAlphaAux c τ σ F) :=
+  Holds D (I' D I V'' E τ) V' E F ↔ Holds D I V E (subPredAlphaAux c τ σ F) :=
   by
-  intro I'
   induction F generalizing V V' σ
   case pred_const_ X xs =>
     simp only [isFreeIn] at h1
 
     simp only [subPredAlphaAux]
     simp only [Holds]
+    simp only [I']
     simp only [Interpretation.usingPred]
     simp
     congr! 1
@@ -135,6 +144,7 @@ example
 
     simp only [subPredAlphaAux]
     simp only [Holds]
+    simp only [I']
     simp only [Interpretation.usingPred]
     simp
     split_ifs
@@ -257,6 +267,7 @@ example
     simp only [predVarSet] at h2
 
     simp only [subPredAlphaAux]
+    simp only [I']
     simp only [Interpretation.usingPred]
     simp only [Holds]
 
@@ -351,6 +362,52 @@ example
           simp only [Function.updateITE]
           simp only [if_neg s1]
           exact h2 v a1
+  case def_ X xs =>
+    simp only [subPredAlphaAux]
 
-  all_goals
-    sorry
+    induction E generalizing V V' σ
+    case nil =>
+      simp only [Holds]
+    case cons E_hd E_tl E_ih =>
+      simp only [isFreeIn] at h1
+
+      simp only [Holds]
+
+      have s1 : (List.map V' xs) = (List.map (V ∘ σ) xs)
+      simp only [List.map_eq_map_iff]
+      intro x a1
+      exact h1 x a1
+      simp only [s1]
+      clear s1
+
+      congr! 1
+      case _ =>
+        simp
+      case _ c1 =>
+        have s2 : Holds D I (Function.updateListITE V' E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q ↔ Holds D I (Function.updateListITE V E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q
+        apply Holds_coincide_Var
+        intro x a1
+        apply Function.updateListITE_map_mem_ext
+        · simp
+        · simp at c1
+          tauto
+        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          simp only [← List.mem_toFinset]
+          apply Finset.mem_of_subset E_hd.h1 a1
+
+        simp
+        simp only [← s2]
+        clear s2
+
+        simp only [subPredAlphaAux] at E_ih
+
+        apply Holds_coincide_PredVar
+        simp only [I']
+        simp only [Interpretation.usingPred]
+        intro P ds a1
+        congr! 1
+        simp only [I']
+        simp only [Interpretation.usingPred]
+        sorry
+      case _ c1 =>
+        sorry
