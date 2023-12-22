@@ -13,6 +13,9 @@ namespace FOL.NV.Sub.Var.All.Rec
 open Formula
 
 
+/--
+  subFresh σ c F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v. The character c is used to generate fresh binding variables as needed to avoid free variable capture.
+-/
 def subFresh
   (σ : VarName → VarName)
   (c : Char) :
@@ -245,16 +248,19 @@ theorem substitution_theorem
 theorem substitution_is_valid
   (σ : VarName → VarName)
   (c : Char)
-  (phi : Formula)
-  (h1 : IsValid phi) :
-  IsValid (subFresh σ c phi) :=
+  (F : Formula)
+  (h1 : IsValid F) :
+  IsValid (subFresh σ c F) :=
   by
   simp only [IsValid] at h1
 
   simp only [IsValid]
-  intros D I V E
+  intro D I V E
   simp only [substitution_theorem]
   apply h1
+
+
+#lint
 
 --------------------------------------------------
 
