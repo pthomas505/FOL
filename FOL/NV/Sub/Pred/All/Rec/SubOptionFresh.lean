@@ -77,6 +77,14 @@ def subPredAlphaAux
   | def_ X xs => def_ X (xs.map σ)
 
 
+def subPredAlpha
+  (c : Char)
+  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (F : Formula) :
+  Formula :=
+  subPredAlphaAux c τ id F
+
+
 def Interpretation.usingPred
   (D : Type)
   (I : Interpretation D)
@@ -108,7 +116,7 @@ def I'
   else I.pred_var_ X ds) )
 
 
-example
+lemma substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
   (V V' V'': VarAssignment D)
@@ -421,3 +429,33 @@ example
           simp only [Interpretation.usingPred]
         · intro P ds a1
           simp only [predVarOccursIn] at a1
+
+
+theorem substitution_theorem
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (E : Env)
+  (c : Char)
+  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (F : Formula) :
+  Holds D (I' D I V E τ) V E F ↔ Holds D I V E (subPredAlpha c τ F) :=
+  by
+  apply substitution_theorem_aux
+  · simp
+  · simp
+
+
+theorem substitution_is_valid
+  (c : Char)
+  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (F : Formula)
+  (h1 : IsValid F) :
+  IsValid (subPredAlpha c τ F) :=
+  by
+  simp only [IsValid] at h1
+
+  simp only [IsValid]
+  intro D I V E
+  simp only [← substitution_theorem]
+  apply h1
