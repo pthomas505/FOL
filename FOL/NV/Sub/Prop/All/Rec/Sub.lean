@@ -52,22 +52,19 @@ lemma sub_no_predVar
   by
   induction F
   case pred_const_ X xs =>
-    unfold sub
-    rfl
+    simp only [sub]
   case pred_var_ X xs =>
-    unfold predVarSet at h1
+    simp only [predVarSet] at h1
 
     simp at h1
   case eq_ x y =>
-    unfold sub
-    rfl
+    simp only [sub]
   case true_ | false_ =>
-    unfold sub
-    rfl
+    simp only [sub]
   case not_ phi phi_ih =>
-    unfold predVarSet at h1
+    simp only [predVarSet] at h1
 
-    unfold sub
+    simp only [sub]
     congr!
     exact phi_ih h1
   case
@@ -75,24 +72,23 @@ lemma sub_no_predVar
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold predVarSet at h1
+    simp only [predVarSet] at h1
     simp only [Finset.union_eq_empty] at h1
 
     cases h1
     case intro h1_left h1_right =>
-      unfold sub
+      simp only [sub]
       congr!
       · exact phi_ih h1_left
       · exact psi_ih h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold predVarSet at h1
+    simp only [predVarSet] at h1
 
-    unfold sub
+    simp only [sub]
     congr!
     exact phi_ih h1
   case def_ X xs =>
-    unfold sub
-    rfl
+    simp only [sub]
 
 
 theorem substitution_theorem
@@ -118,29 +114,27 @@ theorem substitution_theorem
   all_goals
     induction F generalizing V
     case pred_const_ X xs =>
-      unfold sub
+      simp only [sub]
       simp only [Holds]
     case pred_var_ X xs =>
-        unfold sub
+        simp only [sub]
         split_ifs
         case pos c1 =>
           simp only [Holds]
-          unfold Interpretation.pred_var_
           simp
           simp only [if_pos c1]
         case neg c1 =>
           simp only [Holds]
-          unfold Interpretation.pred_var_
           simp
           simp only [if_neg c1]
     case eq_ x y =>
-      unfold sub
+      simp only [sub]
       simp only [Holds]
     case true_ | false_ =>
-      unfold sub
+      simp only [sub]
       simp only [Holds]
     case not_ phi phi_ih =>
-      unfold sub
+      simp only [sub]
       simp only [Holds] at phi_ih
 
       simp only [Holds]
@@ -154,7 +148,7 @@ theorem substitution_theorem
       simp only [Holds] at phi_ih
       simp only [Holds] at psi_ih
 
-      unfold sub
+      simp only [sub]
       simp only [Holds]
       congr! 1
       · apply phi_ih
@@ -162,20 +156,20 @@ theorem substitution_theorem
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
       simp only [Holds] at phi_ih
 
-      unfold sub
+      simp only [sub]
       simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intros d
       apply phi_ih
 
   case nil.def_ X xs =>
-    unfold sub
+    simp only [sub]
     simp only [Holds]
   case cons.def_ hd tl ih X xs =>
     simp only [Holds] at ih
     simp at ih
 
-    unfold sub
+    simp only [sub]
     simp only [Holds]
     split_ifs
     case _ c1 =>
@@ -184,7 +178,7 @@ theorem substitution_theorem
       apply ih
     case _ c1 =>
       specialize ih V (def_ X xs)
-      unfold sub at ih
+      simp only [sub] at ih
       exact ih
 
 
@@ -194,9 +188,9 @@ theorem substitution_is_valid
   (h1 : F.IsValid) :
   (sub τ F).IsValid :=
   by
-  unfold IsValid at h1
+  simp only [IsValid] at h1
 
-  unfold IsValid
+  simp only [IsValid]
   intro D I V E
   simp only [substitution_theorem D I V E τ F]
   apply h1
