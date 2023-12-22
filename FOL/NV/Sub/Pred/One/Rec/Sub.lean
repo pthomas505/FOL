@@ -15,7 +15,7 @@ open Formula
 /--
   The recursive simultaneous uniform substitution of a single predicate variable in a formula.
 -/
-def replacePred
+def replace
   (P : PredName)
   (zs : List VarName)
   (H : Formula) :
@@ -28,29 +28,29 @@ def replacePred
   | eq_ x y => eq_ x y
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (replacePred P zs H phi)
+  | not_ phi => not_ (replace P zs H phi)
   | imp_ phi psi =>
       imp_
-      (replacePred P zs H phi)
-      (replacePred P zs H psi)
+      (replace P zs H phi)
+      (replace P zs H psi)
   | and_ phi psi =>
       and_
-      (replacePred P zs H phi)
-      (replacePred P zs H psi)
+      (replace P zs H phi)
+      (replace P zs H psi)
   | or_ phi psi =>
       or_
-      (replacePred P zs H phi)
-      (replacePred P zs H psi)
+      (replace P zs H phi)
+      (replace P zs H psi)
   | iff_ phi psi =>
       iff_
-      (replacePred P zs H phi)
-      (replacePred P zs H psi)
-  | forall_ x phi => forall_ x (replacePred P zs H phi)
-  | exists_ x phi => exists_ x (replacePred P zs H phi)
+      (replace P zs H phi)
+      (replace P zs H psi)
+  | forall_ x phi => forall_ x (replace P zs H phi)
+  | exists_ x phi => exists_ x (replace P zs H phi)
   | def_ X xs => def_ X xs
 
 
-def admitsPredAux
+def admitsAux
   (P : PredName)
   (zs : List VarName)
   (H : Formula)
@@ -71,50 +71,59 @@ def admitsPredAux
   | eq_ _ _ => True
   | true_ => True
   | false_ => True
-  | not_ phi => admitsPredAux P zs H binders phi
+  | not_ phi => admitsAux P zs H binders phi
   | imp_ phi psi =>
-      admitsPredAux P zs H binders phi ∧
-      admitsPredAux P zs H binders psi
+      admitsAux P zs H binders phi ∧
+      admitsAux P zs H binders psi
   | and_ phi psi =>
-      admitsPredAux P zs H binders phi ∧
-      admitsPredAux P zs H binders psi
+      admitsAux P zs H binders phi ∧
+      admitsAux P zs H binders psi
   | or_ phi psi =>
-      admitsPredAux P zs H binders phi ∧
-      admitsPredAux P zs H binders psi
+      admitsAux P zs H binders phi ∧
+      admitsAux P zs H binders psi
   | iff_ phi psi =>
-      admitsPredAux P zs H binders phi ∧
-      admitsPredAux P zs H binders psi
-  | forall_ x phi => admitsPredAux P zs H (binders ∪ {x}) phi
-  | exists_ x phi => admitsPredAux P zs H (binders ∪ {x}) phi
+      admitsAux P zs H binders phi ∧
+      admitsAux P zs H binders psi
+  | forall_ x phi => admitsAux P zs H (binders ∪ {x}) phi
+  | exists_ x phi => admitsAux P zs H (binders ∪ {x}) phi
   | def_ _ _ => True
 
 
-lemma replacePred_no_predVar
+def admits
+  (P : PredName)
+  (zs : List VarName)
+  (H : Formula)
+  (F : Formula) :
+  Prop :=
+  admitsAux P zs H ∅ F
+
+
+lemma replace_no_predVar
   (P : PredName)
   (zs : List VarName)
   (H : Formula)
   (F : Formula)
   (h1 : F.predVarSet = ∅) :
-  replacePred P zs H F = F :=
+  replace P zs H F = F :=
   by
   induction F
   case pred_const_ X xs =>
-    unfold replacePred
+    unfold replace
     rfl
   case pred_var_ X xs =>
     unfold predVarSet at h1
 
     simp at h1
   case eq_ x y =>
-    unfold replacePred
+    unfold replace
     rfl
   case true_ | false_ =>
-    unfold replacePred
+    unfold replace
     rfl
   case not_ phi phi_ih =>
     unfold predVarSet at h1
 
-    unfold replacePred
+    unfold replace
     congr!
     exact phi_ih h1
   case
@@ -127,22 +136,49 @@ lemma replacePred_no_predVar
 
     cases h1
     case intro h1_left h1_right =>
-      unfold replacePred
+      unfold replace
       congr!
       · exact phi_ih h1_left
       · exact psi_ih h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     unfold predVarSet at h1
 
-    unfold replacePred
+    unfold replace
     congr!
     exact phi_ih h1
   case def_ X xs =>
-    unfold replacePred
+    unfold replace
     rfl
 
 
-theorem pred_sub_single_aux
+def Interpretation.usingPred
+  (D : Type)
+  (I : Interpretation D)
+  (pred_ : PredName → List D → Prop) :
+  Interpretation D := {
+    nonempty := I.nonempty
+    pred_const_ := I.pred_const_
+    pred_var_ := pred_ }
+
+
+def I'
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (E : Env)
+  (P : PredName)
+  (zs : List VarName)
+  (H : Formula) :
+  Interpretation D :=
+  (Interpretation.usingPred D I (
+    fun (Q : PredName) (ds : List D) =>
+      if Q = P ∧ ds.length = zs.length
+      then Holds D I (Function.updateListITE V zs ds) E H
+      else I.pred_var_ Q ds
+  ))
+
+
+theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
   (V V' : VarAssignment D)
@@ -152,31 +188,27 @@ theorem pred_sub_single_aux
   (zs : List VarName)
   (H : Formula)
   (binders : Finset VarName)
-  (h1 : admitsPredAux P zs H binders F)
+  (h1 : admitsAux P zs H binders F)
   (h2 : ∀ x : VarName, x ∉ binders → V x = V' x) :
-  Holds D
-    ⟨
-      I.nonempty,
-      I.pred_const_,
-      fun (Q : PredName) (ds : List D) =>
-        if Q = P ∧ ds.length = zs.length
-        then Holds D I (Function.updateListITE V' zs ds) E H
-        else I.pred_var_ Q ds
-    ⟩
-    V E F ↔ Holds D I V E (replacePred P zs H F) :=
+  Holds D (I' D I V' E P zs H) V E F ↔
+    Holds D I V E (replace P zs H F) :=
   by
   set E_ref := E
   induction E generalizing F binders V
   all_goals
     induction F generalizing binders V
     case pred_const_ X xs =>
-      unfold replacePred
+      unfold replace
       simp only [Holds]
+      simp only [I']
+      simp only [Interpretation.usingPred]
     case pred_var_ X xs =>
-        unfold admitsPredAux at h1
+        unfold admitsAux at h1
 
-        unfold replacePred
+        unfold replace
         simp only [Holds]
+        simp only [I']
+        simp only [Interpretation.usingPred]
         simp
         split_ifs at h1
         case pos c1 =>
@@ -225,15 +257,15 @@ theorem pred_sub_single_aux
           case neg c2 =>
             simp only [Holds]
     case eq_ x y =>
-      unfold replacePred
+      unfold replace
       simp only [Holds]
     case true_ | false_ =>
-      unfold replacePred
+      unfold replace
       simp only [Holds]
     case not_ phi phi_ih =>
-      unfold admitsPredAux at h1
+      unfold admitsAux at h1
 
-      unfold replacePred
+      unfold replace
       simp only [Holds]
       congr! 1
       exact phi_ih V binders h1 h2
@@ -242,9 +274,9 @@ theorem pred_sub_single_aux
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      unfold admitsPredAux at h1
+      unfold admitsAux at h1
 
-      unfold replacePred
+      unfold replace
       simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
@@ -252,9 +284,9 @@ theorem pred_sub_single_aux
         · exact phi_ih V binders h1_left h2
         · exact psi_ih V binders h1_right h2
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      unfold admitsPredAux at h1
+      unfold admitsAux at h1
 
-      unfold replacePred
+      unfold replace
       simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intro d
@@ -269,42 +301,62 @@ theorem pred_sub_single_aux
         exact h2 v a1_left
 
   case nil.def_ X xs =>
-    unfold replacePred
+    unfold replace
     simp only [Holds]
 
   case cons.def_ hd tl ih X xs =>
-    unfold replacePred
+    unfold replace
     simp only [Holds]
     split_ifs
     case _ c1 =>
       specialize ih (Function.updateListITE V hd.args (List.map V xs)) hd.q
-      simp only [replacePred_no_predVar P zs H hd.q hd.h2] at ih
+      simp only [replace_no_predVar P zs H hd.q hd.h2] at ih
       apply Holds_coincide_PredVar
-      · simp
+      · simp only [I']
+        simp only [Interpretation.usingPred]
       · simp only [predVarOccursIn_iff_mem_predVarSet]
         simp only [hd.h2]
         simp
     case _ c1 =>
       apply Holds_coincide_PredVar
-      · simp
+      · simp only [I']
+        simp only [Interpretation.usingPred]
       · unfold predVarOccursIn
         simp
 
 
-theorem pred_sub_single_valid
-  (phi : Formula)
+theorem substitution_theorem
+  (D : Type)
+  (I : Interpretation D)
+  (V : VarAssignment D)
+  (E : Env)
+  (F : Formula)
   (P : PredName)
   (zs : List VarName)
   (H : Formula)
-  (h1 : admitsPredAux P zs H ∅ phi)
-  (h2 : phi.IsValid) : (replacePred P zs H phi).IsValid :=
+  (h1 : admits P zs H F) :
+  Holds D (I' D I V E P zs H) V E F ↔
+    Holds D I V E (replace P zs H F) :=
+  by
+  apply substitution_theorem_aux D I V V E F P zs H ∅
+  · exact h1
+  · simp
+
+
+theorem substitution_is_valid
+  (F : Formula)
+  (P : PredName)
+  (zs : List VarName)
+  (H : Formula)
+  (h1 : admits P zs H F)
+  (h2 : F.IsValid) :
+  (replace P zs H F).IsValid :=
   by
   unfold IsValid at h2
 
   unfold IsValid
   intro D I V E
-  obtain s1 := pred_sub_single_aux D I V V E phi P zs H ∅ h1
-  simp at s1
+  obtain s1 := substitution_theorem D I V E F P zs H h1
   simp only [← s1]
   apply h2
 
