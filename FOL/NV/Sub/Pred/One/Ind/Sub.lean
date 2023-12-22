@@ -246,12 +246,13 @@ theorem isPredSub_theorem
 
 
 theorem isPredSub_valid
-  (phi phi' : Formula)
+  (F F' : Formula)
   (P : PredName)
   (zs : List VarName)
   (H : Formula)
-  (h1 : IsPredSub P zs H phi phi')
-  (h2 : phi.IsValid) : phi'.IsValid :=
+  (h1 : IsPredSub P zs H F F')
+  (h2 : F.IsValid) :
+  F'.IsValid :=
   by
   simp only [IsValid] at h2
 
@@ -264,9 +265,9 @@ theorem isPredSub_valid
         if (Q = P ∧ ds.length = zs.length)
         then Holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ Q ds }
-  obtain s1 := isPredSub_theorem D I J V E phi P zs H phi' h1
+  obtain s1 := isPredSub_theorem D I J V E F P zs H F' h1
   simp only [Interpretation.pred_var_] at s1
-  have s2 : Holds D I V E phi' ↔ Holds D J V E phi :=
+  have s2 : Holds D I V E F' ↔ Holds D J V E F :=
     by
     apply s1
     · intro Q ds a1
