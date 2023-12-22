@@ -241,7 +241,7 @@ theorem isPredSub_theorem
       case _ c1 =>
         apply Holds_coincide_PredVar
         · exact h3_const
-        · unfold predVarOccursIn
+        · simp only [predVarOccursIn]
           simp
 
 
@@ -253,9 +253,9 @@ theorem isPredSub_valid
   (h1 : IsPredSub P zs H phi phi')
   (h2 : phi.IsValid) : phi'.IsValid :=
   by
-  unfold IsValid at h2
+  simp only [IsValid] at h2
 
-  unfold IsValid
+  simp only [IsValid]
   intro D I V E
   let J : Interpretation D :=
     { nonempty := I.nonempty
