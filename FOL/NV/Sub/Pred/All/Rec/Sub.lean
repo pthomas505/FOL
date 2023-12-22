@@ -83,7 +83,7 @@ instance
   by
   induction F generalizing binders
   all_goals
-    unfold admitsPredFunAux
+    simp only [admitsPredFunAux]
     infer_instance
 
 
@@ -96,7 +96,7 @@ instance
   (F : Formula) :
   Decidable (admitsPredFun τ F) :=
   by
-  unfold admitsPredFun
+  simp only [admitsPredFun]
   infer_instance
 
 
@@ -123,10 +123,10 @@ theorem predSub_aux
   by
   induction F generalizing binders V
   case pred_const_ X xs =>
-    unfold replacePredFun
+    simp only [replacePredFun]
     simp only [Holds]
   case pred_var_ X xs =>
-    unfold admitsPredFunAux at h1
+    simp only [admitsPredFunAux] at h1
     simp at h1
 
     cases h1
@@ -162,20 +162,20 @@ theorem predSub_aux
         clear s2
 
         simp only [Holds]
-        unfold replacePredFun
+        simp only [replacePredFun]
         simp
         simp only [if_pos h1_right_right]
         exact s1
   case eq_ x y =>
-    unfold replacePredFun
+    simp only [replacePredFun]
     simp only [Holds]
   case true_ | false_ =>
-    unfold replacePredFun
+    simp only [replacePredFun]
     simp only [Holds]
   case not_ phi phi_ih =>
-    unfold admitsPredFunAux at h1
+    simp only [admitsPredFunAux] at h1
 
-    unfold replacePredFun
+    simp only [replacePredFun]
     simp only [Holds]
     congr! 1
     exact phi_ih V binders h1 h2
@@ -184,9 +184,9 @@ theorem predSub_aux
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold admitsPredFunAux at h1
+    simp only [admitsPredFunAux] at h1
 
-    unfold replacePredFun
+    simp only [replacePredFun]
     simp only [Holds]
 
     cases h1
@@ -195,15 +195,15 @@ theorem predSub_aux
       · exact phi_ih V binders h1_left h2
       · exact psi_ih V binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold admitsPredFunAux at h1
+    simp only [admitsPredFunAux] at h1
 
-    unfold replacePredFun
+    simp only [replacePredFun]
     simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
     intro v a1
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     simp at a1
     push_neg at a1
     cases a1
@@ -213,10 +213,10 @@ theorem predSub_aux
   case def_ X xs =>
     cases E
     case nil =>
-      unfold replacePredFun
+      simp only [replacePredFun]
       simp only [Holds]
     case cons hd tl =>
-      unfold replacePredFun
+      simp only [replacePredFun]
       simp only [Holds]
       split_ifs
       case _ c1 =>
@@ -228,7 +228,7 @@ theorem predSub_aux
       case _ c1 =>
         apply Holds_coincide_PredVar
         · simp
-        · unfold predVarOccursIn
+        · simp only [predVarOccursIn]
           simp
 
 
@@ -254,7 +254,7 @@ theorem predSub
       V E F ↔ Holds D I V E (replacePredFun τ F) :=
   by
   apply predSub_aux D I V V E τ ∅ F
-  · unfold admitsPredFun at h1
+  · simp only [admitsPredFun] at h1
     exact h1
   · intro X _
     rfl
@@ -267,9 +267,9 @@ theorem predSub_valid
   (h2 : phi.IsValid) :
   (replacePredFun τ phi).IsValid :=
   by
-  unfold IsValid at h2
+  simp only [IsValid] at h2
 
-  unfold IsValid
+  simp only [IsValid]
   intro D I V E
   obtain s1 := predSub D I V E τ phi h1
   simp only [← s1]
