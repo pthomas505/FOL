@@ -121,7 +121,7 @@ inductive IsSubAux :
 
 
 /--
-  IsSub σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurence of any variable v in the formula F by a free occurrence of σ v.
+  IsSub σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurrence of any variable v in the formula F by a free occurrence of σ v.
 -/
 def IsSub (σ : VarName → VarName) (F F' : Formula) : Prop := IsSubAux σ ∅ F F'
 

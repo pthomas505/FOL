@@ -11,7 +11,7 @@ open Formula
 
 
 /--
-  IsReplaceFree σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurence of any variable v in the formula F by σ v.
+  IsReplaceFree σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
 inductive IsReplaceFree : (VarName → VarName) → Formula → Formula → Prop
 
