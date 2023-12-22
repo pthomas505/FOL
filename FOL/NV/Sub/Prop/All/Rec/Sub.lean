@@ -134,9 +134,9 @@ theorem substitution_theorem
       simp only [sub]
       simp only [Holds]
     case not_ phi phi_ih =>
-      simp only [sub]
       simp only [Holds] at phi_ih
 
+      simp only [sub]
       simp only [Holds]
       congr! 1
       apply phi_ih
