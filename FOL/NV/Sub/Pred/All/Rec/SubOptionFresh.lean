@@ -412,4 +412,12 @@ example
         simp only [List.length_map] at c2
         contradiction
       case _ c1 c2 =>
-        sorry
+        obtain s2 := E_ih V V' σ
+        simp only [isFreeIn] at s2
+        specialize s2 h1 h2
+        simp only [← s2]
+        apply Holds_coincide_PredVar
+        · simp only [I']
+          simp only [Interpretation.usingPred]
+        · intro P ds a1
+          simp only [predVarOccursIn] at a1
