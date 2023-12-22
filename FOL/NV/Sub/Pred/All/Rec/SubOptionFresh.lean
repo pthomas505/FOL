@@ -380,10 +380,8 @@ example
       simp only [s1]
       clear s1
 
-      congr! 1
-      case _ =>
-        simp
-      case _ c1 =>
+      split_ifs
+      case _ c1 c2 =>
         have s2 : Holds D I (Function.updateListITE V' E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q ↔ Holds D I (Function.updateListITE V E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q
         apply Holds_coincide_Var
         intro x a1
@@ -400,7 +398,18 @@ example
         clear s2
 
         simp only [subPredAlphaAux] at E_ih
-
-        sorry
-      case _ c1 =>
+        apply Holds_coincide_PredVar
+        · simp only [I']
+          simp only [Interpretation.usingPred]
+        · intro P ds a1
+          simp only [predVarOccursIn_iff_mem_predVarSet] at a1
+          simp only [E_hd.h2] at a1
+          simp at a1
+      case _ c1 c2 =>
+        simp only [List.length_map] at c2
+        contradiction
+      case _ c1 c2 =>
+        simp only [List.length_map] at c2
+        contradiction
+      case _ c1 c2 =>
         sorry
