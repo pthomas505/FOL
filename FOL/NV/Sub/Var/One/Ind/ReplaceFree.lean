@@ -7,7 +7,6 @@ set_option autoImplicit false
 namespace FOL.NV.Sub.Var.One.Ind
 
 open Formula
-open Rec
 
 
 /--
@@ -125,11 +124,11 @@ example
   (F F' : Formula)
   (v t : VarName)
   (h1 : IsReplaceFree F v t F') :
-  fastReplaceFree v t F = F' :=
+  Rec.fastReplaceFree v t F = F' :=
   by
   induction h1
   all_goals
-    simp only [fastReplaceFree]
+    simp only [Rec.fastReplaceFree]
   case not_ phi v' t' phi' ih_1 ih_2 =>
     simp
     exact ih_2
@@ -157,13 +156,13 @@ example
 example
   (F F' : Formula)
   (v t : VarName)
-  (h1 : fastReplaceFree v t F = F') :
+  (h1 : Rec.fastReplaceFree v t F = F') :
   IsReplaceFree F v t F' :=
   by
   subst h1
   induction F
   all_goals
-    simp only [fastReplaceFree]
+    simp only [Rec.fastReplaceFree]
   case
       pred_const_ X xs
     | pred_var_ X xs
