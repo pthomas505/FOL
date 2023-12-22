@@ -1,30 +1,34 @@
+import FOL.Finset
 import FOL.FunctionUpdateITE
 import FOL.List
-import FOL.Finset
 
-import FOL.NV.Fresh
-import FOL.NV.Formula
+import FOL.NV.Alpha
 import FOL.NV.Binders
 import FOL.NV.Definition
+import FOL.NV.Formula
+import FOL.NV.Fresh
 import FOL.NV.Semantics
 
-import FOL.NV.Sub.One.Ind.SubOneInd
-import FOL.NV.Sub.One.Rec.SubOneRecReplaceFree
-import FOL.NV.Sub.One.Rec.SubOneRecAdmits
+import FOL.NV.Sub.Var.One.Rec.ReplaceFree
+import FOL.NV.Sub.Var.One.Rec.Admits
 
-import FOL.NV.Sub.All.Ind.SubAllInd
-import FOL.NV.Sub.All.Rec.SubAllRecReplaceAll
-import FOL.NV.Sub.All.Rec.SubAllRecReplaceFree
-import FOL.NV.Sub.All.Rec.SubAllRecAdmits
-import FOL.NV.Sub.All.Rec.SubAllRecFresh
+import FOL.NV.Sub.Var.One.Ind.ReplaceFree
+import FOL.NV.Sub.Var.One.Ind.Sub
 
-import FOL.NV.PropSub.All.Rec.PropSubAllRec
+import FOL.NV.Sub.Var.All.Rec.Admits
+import FOL.NV.Sub.Var.All.Rec.ReplaceAll
+import FOL.NV.Sub.Var.All.Rec.ReplaceFree
+import FOL.NV.Sub.Var.All.Rec.SubFresh
 
-import FOL.NV.PredSub.One.Ind.PredSubOneInd
-import FOL.NV.PredSub.One.Rec.PredSubOneRec
+import FOL.NV.Sub.Var.All.Ind.ReplaceFree
+import FOL.NV.Sub.Var.All.Ind.Sub
 
-/-
-import FOL.NV.PredSub.All.Rec.PredSubAllRec
-import FOL.NV.PredSub.All.Rec.PredSubAllRecFresh
-import FOL.NV.PredSub.All.Rec.PredSubAllRecOption
--/
+import FOL.NV.Sub.Prop.All.Rec.Sub
+
+import FOL.NV.Sub.Pred.One.Rec.Sub
+
+import FOL.NV.Sub.Pred.One.Ind.Sub
+
+import FOL.NV.Sub.Pred.All.Rec.Sub
+import FOL.NV.Sub.Pred.All.Rec.SubOption
+import FOL.NV.Sub.Pred.All.Rec.SubOptionFresh
