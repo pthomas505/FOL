@@ -56,14 +56,14 @@ def replaceFreeAux (σ : VarName → VarName) (binders : Finset VarName) : Formu
 
 
 /--
-  replaceFree σ F := The simultaneous replacement of each free occurence of any variable v in the formula F by σ v.
+  replaceFree σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
 def replaceFree (σ : VarName → VarName) (F : Formula) : Formula :=
   replaceFreeAux σ ∅ F
 
 
 /--
-  fastReplaceFree σ F := The simultaneous replacement of each free occurence of any variable v in the formula F by σ v.
+  fastReplaceFree σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
 def fastReplaceFree (σ : VarName → VarName) : Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map σ)

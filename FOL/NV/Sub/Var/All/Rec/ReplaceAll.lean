@@ -10,7 +10,7 @@ open Formula
 
 
 /--
-  replaceAll σ F := The simultaneous replacement of each occurence of any variable v in the formula F by σ v.
+  replaceAll σ F := The simultaneous replacement of each occurrence of any variable v in the formula F by σ v.
 -/
 def replaceAll
   (σ : VarName → VarName) :
