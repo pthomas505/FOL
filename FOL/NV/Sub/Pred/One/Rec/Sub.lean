@@ -108,22 +108,18 @@ lemma replace_no_predVar
   by
   induction F
   case pred_const_ X xs =>
-    unfold replace
-    rfl
+    simp only [replace]
   case pred_var_ X xs =>
-    unfold predVarSet at h1
-
+    simp only [predVarSet] at h1
     simp at h1
   case eq_ x y =>
-    unfold replace
-    rfl
+    simp only [replace]
   case true_ | false_ =>
-    unfold replace
-    rfl
+    simp only [replace]
   case not_ phi phi_ih =>
-    unfold predVarSet at h1
+    simp only [predVarSet] at h1
 
-    unfold replace
+    simp only [replace]
     congr!
     exact phi_ih h1
   case
@@ -131,24 +127,23 @@ lemma replace_no_predVar
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    unfold predVarSet at h1
+    simp only [predVarSet] at h1
     simp only [Finset.union_eq_empty] at h1
 
     cases h1
     case intro h1_left h1_right =>
-      unfold replace
+      simp only [replace]
       congr!
       · exact phi_ih h1_left
       · exact psi_ih h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    unfold predVarSet at h1
+    simp only [predVarSet] at h1
 
-    unfold replace
+    simp only [replace]
     congr!
     exact phi_ih h1
   case def_ X xs =>
-    unfold replace
-    rfl
+    simp only [replace]
 
 
 def Interpretation.usingPred
@@ -198,21 +193,21 @@ theorem substitution_theorem_aux
   all_goals
     induction F generalizing binders V
     case pred_const_ X xs =>
-      unfold replace
+      simp only [replace]
       simp only [Holds]
       simp only [I']
       simp only [Interpretation.usingPred]
     case pred_var_ X xs =>
-        unfold admitsAux at h1
+        simp only [admitsAux] at h1
 
-        unfold replace
+        simp only [replace]
         simp only [Holds]
         simp only [I']
         simp only [Interpretation.usingPred]
         simp
         split_ifs at h1
         case pos c1 =>
-          unfold Sub.Var.All.Rec.admits at h1
+          simp only [Sub.Var.All.Rec.admits] at h1
           simp at h1
 
           cases h1
@@ -257,15 +252,15 @@ theorem substitution_theorem_aux
           case neg c2 =>
             simp only [Holds]
     case eq_ x y =>
-      unfold replace
+      simp only [replace]
       simp only [Holds]
     case true_ | false_ =>
-      unfold replace
+      simp only [replace]
       simp only [Holds]
     case not_ phi phi_ih =>
-      unfold admitsAux at h1
+      simp only [admitsAux] at h1
 
-      unfold replace
+      simp only [replace]
       simp only [Holds]
       congr! 1
       exact phi_ih V binders h1 h2
@@ -274,9 +269,9 @@ theorem substitution_theorem_aux
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      unfold admitsAux at h1
+      simp only [admitsAux] at h1
 
-      unfold replace
+      simp only [replace]
       simp only [Holds]
       cases h1
       case intro h1_left h1_right =>
@@ -284,15 +279,15 @@ theorem substitution_theorem_aux
         · exact phi_ih V binders h1_left h2
         · exact psi_ih V binders h1_right h2
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      unfold admitsAux at h1
+      simp only [admitsAux] at h1
 
-      unfold replace
+      simp only [replace]
       simp only [Holds]
       first | apply forall_congr' | apply exists_congr
       intro d
       apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
       intro v a1
-      unfold Function.updateITE
+      simp only [Function.updateITE]
       simp at a1
       push_neg at a1
       cases a1
@@ -301,11 +296,11 @@ theorem substitution_theorem_aux
         exact h2 v a1_left
 
   case nil.def_ X xs =>
-    unfold replace
+    simp only [replace]
     simp only [Holds]
 
   case cons.def_ hd tl ih X xs =>
-    unfold replace
+    simp only [replace]
     simp only [Holds]
     split_ifs
     case _ c1 =>
@@ -321,7 +316,7 @@ theorem substitution_theorem_aux
       apply Holds_coincide_PredVar
       · simp only [I']
         simp only [Interpretation.usingPred]
-      · unfold predVarOccursIn
+      · simp only [predVarOccursIn]
         simp
 
 
@@ -352,9 +347,9 @@ theorem substitution_is_valid
   (h2 : F.IsValid) :
   (replace P zs H F).IsValid :=
   by
-  unfold IsValid at h2
+  simp only [IsValid] at h2
 
-  unfold IsValid
+  simp only [IsValid]
   intro D I V E
   simp only [← substitution_theorem D I V E F P zs H h1]
   apply h2
