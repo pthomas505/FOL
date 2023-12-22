@@ -356,8 +356,7 @@ theorem substitution_is_valid
 
   unfold IsValid
   intro D I V E
-  obtain s1 := substitution_theorem D I V E F P zs H h1
-  simp only [← s1]
+  simp only [← substitution_theorem D I V E F P zs H h1]
   apply h2
 
 
