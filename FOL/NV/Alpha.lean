@@ -197,16 +197,16 @@ theorem replace_empty_Holds
   all_goals
     induction F generalizing V
     case pred_const_ X xs | pred_var_ X xs =>
-      unfold isFreeIn at h1
+      simp only [isFreeIn] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       congr! 1
       simp
       simp only [List.map_eq_map_iff]
       intro x a1
       simp
-      unfold Function.updateITE
+      simp only [Function.updateITE]
       simp only [eq_comm]
       split_ifs
       case _ c1 c2 =>
@@ -219,24 +219,24 @@ theorem replace_empty_Holds
       case _ c1 c2 =>
         rfl
     case eq_ x y =>
-      unfold isFreeIn at h1
+      simp only [isFreeIn] at h1
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       congr! 1
-      · unfold Function.updateITE
+      · simp only [Function.updateITE]
         split_ifs <;> tauto
-      · unfold Function.updateITE
+      · simp only [Function.updateITE]
         split_ifs <;> tauto
     case true_ | false_ =>
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
     case not_ phi phi_ih =>
-      unfold isFreeIn at h1
+      simp only [isFreeIn] at h1
 
-      unfold isBoundIn at h2
+      simp only [isBoundIn] at h2
 
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       congr! 1
       exact phi_ih V h1 h2
@@ -245,40 +245,40 @@ theorem replace_empty_Holds
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      unfold isFreeIn at h1
+      simp only [isFreeIn] at h1
       push_neg at h1
 
-      unfold isBoundIn at h2
+      simp only [isBoundIn] at h2
       push_neg at h2
 
       cases h1
       case intro h1_left h1_right =>
         cases h2
         case intro h2_left h2_right =>
-          unfold fastReplaceFree
+          simp only [fastReplaceFree]
           simp only [Holds]
           congr! 1
           · exact phi_ih V h1_left h2_left
           · exact psi_ih V h1_right h2_right
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      unfold isFreeIn at h1
+      simp only [isFreeIn] at h1
       push_neg at h1
 
-      unfold isBoundIn at h2
+      simp only [isBoundIn] at h2
       push_neg at h2
 
       cases h2
       case intro h2_left h2_right =>
-        unfold fastReplaceFree
+        simp only [fastReplaceFree]
         split_ifs
         case pos c1 =>
           subst c1
           apply Holds_coincide_Var
           intro x a1
-          unfold isFreeIn at a1
+          simp only [isFreeIn] at a1
           cases a1
           case h1.intro a1_left a1_right =>
-            unfold Function.updateITE
+            simp only [Function.updateITE]
             simp only [if_neg a1_left]
             split_ifs
             case pos c2 =>
@@ -296,17 +296,17 @@ theorem replace_empty_Holds
           · exact h1 h2_left
           · exact h2_right
   case nil.def_ X xs =>
-    unfold fastReplaceFree
+    simp only [fastReplaceFree]
     simp only [Holds]
   case cons.def_ hd tl ih X xs =>
-      unfold fastReplaceFree
+      simp only [fastReplaceFree]
       simp only [Holds]
       unfold Function.updateITE
       congr! 1
       case _ =>
         simp
       case _ c1 =>
-        unfold isFreeIn at h1
+        simp only [isFreeIn] at h1
 
         apply Holds_coincide_Var
         intro v' a1
@@ -406,7 +406,7 @@ instance
   by
   induction binders
   all_goals
-    unfold isAlphaEqvVar
+    simp only [isAlphaEqvVar]
     infer_instance
 
 
@@ -436,7 +436,7 @@ instance
   all_goals
     cases ys
     all_goals
-      unfold isAlphaEqvVarList
+      simp only [isAlphaEqvVarList]
       infer_instance
 
 
@@ -503,7 +503,7 @@ instance
   all_goals
     cases F'
     all_goals
-      unfold isAlphaEqvAux
+      simp only [isAlphaEqvAux]
       infer_instance
 
 
@@ -515,7 +515,7 @@ instance
   (F F' : Formula) :
   Decidable (isAlphaEqv F F') :=
   by
-  unfold isAlphaEqv
+  simp only [isAlphaEqv]
   infer_instance
 
 
@@ -541,15 +541,14 @@ theorem aux_1
   by
   induction h1
   case nil h1_V =>
-    unfold isAlphaEqvVar at h2
+    simp only [isAlphaEqvVar] at h2
 
     subst h2
     rfl
   case cons h1_l h1_x h1_y h1_V h1_V' h1_d _ h1_ih =>
-    unfold isAlphaEqvVar at h2
-    simp at h2
+    simp only [isAlphaEqvVar] at h2
 
-    unfold Function.updateITE
+    simp only [Function.updateITE]
     cases h2
     case inl h2 =>
       cases h2
@@ -579,17 +578,13 @@ theorem aux_2
     case nil =>
       simp
     case cons ys_hd ys_tl =>
-      unfold isAlphaEqvVarList at h2
-
-      contradiction
+      simp only [isAlphaEqvVarList] at h2
   case cons xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
-      unfold isAlphaEqvVarList at h2
-
-      contradiction
+      simp only [isAlphaEqvVarList] at h2
     case cons ys_hd ys_tl =>
-      unfold isAlphaEqvVarList at h2
+      simp only [isAlphaEqvVarList] at h2
 
       simp
       constructor
@@ -614,17 +609,13 @@ lemma isAlphaEqvVarList_length
     case nil =>
       rfl
     case cons ys_hd ys_tl =>
-      unfold isAlphaEqvVarList at h1
-
-      contradiction
+      simp only [isAlphaEqvVarList] at h1
   case cons xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
-      unfold isAlphaEqvVarList at h1
-
-      contradiction
+      simp only [isAlphaEqvVarList] at h1
     case cons ys_hd ys_tl =>
-      unfold isAlphaEqvVarList at h1
+      simp only [isAlphaEqvVarList] at h1
 
       simp
       cases h1
@@ -650,14 +641,11 @@ lemma isAlphaEqv_Holds_aux
       cases F'
 
     any_goals
-      unfold isAlphaEqvAux at h2
-      contradiction
+      simp only [isAlphaEqvAux] at h2
 
     case
       pred_const_.pred_const_ X xs Y ys
     | pred_var_.pred_var_ X xs Y ys =>
-      unfold isAlphaEqvAux at h2
-
       cases h2
       case intro h2_left h2_right =>
         simp only [Holds]
@@ -666,8 +654,6 @@ lemma isAlphaEqv_Holds_aux
         exact aux_2 D binders xs ys V V' h1 h2_right
 
     case eq_.eq_ x x' y y' =>
-      unfold isAlphaEqvAux at h2
-
       cases h2
       case intro h2_left h2_right =>
         simp only [Holds]
@@ -679,8 +665,6 @@ lemma isAlphaEqv_Holds_aux
       simp only [Holds]
 
     case not_.not_ phi phi_ih phi' =>
-      unfold isAlphaEqvAux at h2
-
       simp only [Holds]
       congr! 1
       exact phi_ih V V' phi' binders h1 h2
@@ -690,8 +674,6 @@ lemma isAlphaEqv_Holds_aux
     | and_.and_ phi psi phi_ih psi_ih phi' psi'
     | or_.or_ phi psi phi_ih psi_ih phi' psi'
     | iff_.iff_ phi psi phi_ih psi_ih phi' psi' =>
-      unfold isAlphaEqvAux at h2
-
       cases h2
       case intro h2_left h2_right =>
         simp only [Holds]
@@ -702,8 +684,6 @@ lemma isAlphaEqv_Holds_aux
     case
       forall_.forall_ x phi phi_ih y phi'
     | exists_.exists_ x phi phi_ih y phi' =>
-        unfold isAlphaEqvAux at h2
-
         simp only [Holds]
         first | apply forall_congr' | apply exists_congr
         intro d
@@ -723,8 +703,6 @@ lemma isAlphaEqv_Holds_aux
   case nil.def_.def_ =>
     simp only [Holds]
   case cons.def_.def_ hd tl ih X xs Y ys =>
-    unfold isAlphaEqvAux at h2
-
     simp only [Holds]
     split_ifs
     case _ c1 c2 =>
@@ -767,7 +745,7 @@ lemma isalphaEqv_Holds
   (h1 : isAlphaEqv F F') :
   Holds D I V E F ↔ Holds D I V E F' :=
   by
-  unfold isAlphaEqv at h1
+  simp only [isAlphaEqv] at h1
 
   exact isAlphaEqv_Holds_aux D I V V E F F' [] AlphaEqvVarAssignment.nil h1
 
