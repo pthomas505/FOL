@@ -145,7 +145,7 @@ instance (v : VarName) (F : Formula) : Decidable (isFreeIn v F) :=
   by
   induction F
   all_goals
-    unfold isFreeIn
+    simp only [isFreeIn]
     infer_instance
 
 
@@ -255,7 +255,7 @@ instance
   by
   induction F generalizing binders
   all_goals
-    unfold admitsFunAux
+    simp only [admitsFunAux]
     infer_instance
 
 
@@ -268,7 +268,7 @@ instance
   (F : Formula) :
   Decidable (admitsFun σ F) :=
   by
-  unfold admitsFun
+  simp only [admitsFun]
   infer_instance
 
 
@@ -357,7 +357,7 @@ instance
   by
   induction F generalizing binders
   all_goals
-    unfold admitsPredFunAux
+    simp only [admitsPredFunAux]
     infer_instance
 
 
@@ -369,7 +369,7 @@ instance
   (F : Formula) :
   Decidable (admitsPredFun τ F) :=
   by
-  unfold admitsPredFun
+  simp only [admitsPredFun]
   infer_instance
 
 
@@ -409,7 +409,7 @@ instance (E : Env) (F : Formula) : Decidable (F.all_def_in_env E) :=
   by
   induction F
   all_goals
-    unfold Formula.all_def_in_env
+    simp only [Formula.all_def_in_env]
     infer_instance
 
 
@@ -440,7 +440,7 @@ instance
   by
   induction F
   all_goals
-    unfold admitsUnfoldDef
+    simp only [admitsUnfoldDef]
     infer_instance
 
 
