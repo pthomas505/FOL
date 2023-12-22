@@ -401,13 +401,6 @@ example
 
         simp only [subPredAlphaAux] at E_ih
 
-        apply Holds_coincide_PredVar
-        simp only [I']
-        simp only [Interpretation.usingPred]
-        intro P ds a1
-        congr! 1
-        simp only [I']
-        simp only [Interpretation.usingPred]
         sorry
       case _ c1 =>
         sorry
