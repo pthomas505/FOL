@@ -16,9 +16,11 @@ import FOL.NV.Sub.Var.One.Ind.ReplaceFree
 import FOL.NV.Sub.Var.One.Ind.Sub
 
 import FOL.NV.Sub.Var.All.Rec.Admits
-import FOL.NV.Sub.Var.All.Rec.ReplaceAll
 import FOL.NV.Sub.Var.All.Rec.ReplaceFree
-import FOL.NV.Sub.Var.All.Rec.SubFresh
+
+import FOL.NV.Sub.Var.All.Rec.Fresh.Sub
+
+import FOL.NV.Sub.Var.All.Rec.Inj.ReplaceAll
 
 import FOL.NV.Sub.Var.All.Ind.ReplaceFree
 import FOL.NV.Sub.Var.All.Ind.Sub
@@ -30,5 +32,5 @@ import FOL.NV.Sub.Pred.One.Rec.Sub
 import FOL.NV.Sub.Pred.One.Ind.Sub
 
 import FOL.NV.Sub.Pred.All.Rec.Sub
-import FOL.NV.Sub.Pred.All.Rec.SubOption
-import FOL.NV.Sub.Pred.All.Rec.SubOptionFresh
+import FOL.NV.Sub.Pred.All.Rec.Option.Sub
+import FOL.NV.Sub.Pred.All.Rec.Option.Fresh.Sub

@@ -1,4 +1,4 @@
-import FOL.NV.Sub.Var.All.Rec.SubFresh
+import FOL.NV.Sub.Var.All.Rec.Fresh.Sub
 
 
 set_option autoImplicit false
@@ -36,7 +36,7 @@ def subAux
         let zs := val.fst
         let H := val.snd
         if xs.length = zs.length
-        then Sub.Var.All.Rec.subFresh (Function.updateListITE id zs (xs.map σ)) c H
+        then Sub.Var.All.Rec.Fresh.subFresh (Function.updateListITE id zs (xs.map σ)) c H
         else pred_var_ X (xs.map σ)
       else pred_var_ X (xs.map σ)
   | eq_ x y => eq_ (σ x) (σ y)
@@ -62,13 +62,13 @@ def subAux
       (subAux c τ σ psi)
   | forall_ x phi =>
       let x' : VarName :=
-        if x ∈ ((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+        if x ∈ ((FOL.NV.Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         else x
       forall_ x' (subAux c τ (Function.updateITE σ x x') phi)
   | exists_ x phi =>
       let x' : VarName :=
-        if x ∈ ((FOL.NV.Sub.Var.All.Rec.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+        if x ∈ ((FOL.NV.Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         else x
       exists_ x' (subAux c τ (Function.updateITE σ x x') phi)
@@ -162,7 +162,7 @@ lemma substitution_theorem_aux
 
       set H := (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).2
 
-      obtain s1 := Sub.Var.All.Rec.substitution_theorem D I V E (Function.updateListITE id zs (xs.map σ)) c H
+      obtain s1 := Sub.Var.All.Rec.Fresh.substitution_theorem D I V E (Function.updateListITE id zs (xs.map σ)) c H
       simp only [Function.updateListITE_comp] at s1
 
       simp at s1
@@ -316,7 +316,7 @@ lemma substitution_theorem_aux
         · simp only [if_neg c2]
           split_ifs
           case _ c3 =>
-            obtain s1 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
+            obtain s1 := Sub.Var.All.Rec.Fresh.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
             simp only [s1] at c1
 
             simp only [← c3] at c1
@@ -341,10 +341,10 @@ lemma substitution_theorem_aux
         simp only [Function.updateITE]
         split_ifs
         case _ c2 =>
-          obtain s1 := Sub.Var.All.Rec.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
+          obtain s1 := Sub.Var.All.Rec.Fresh.freeVarSet_subFresh_eq_freeVarSet_image (Function.updateITE σ x x) c phi
           simp only [← s1] at c2
 
-          obtain s2 := fresh_not_mem x c ((freeVarSet (Var.All.Rec.subFresh (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
+          obtain s2 := fresh_not_mem x c ((freeVarSet (Var.All.Rec.Fresh.subFresh (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ)))
           simp only [← c2] at s2
           simp only [Finset.mem_union] at s2
 
