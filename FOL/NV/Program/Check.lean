@@ -1,46 +1,17 @@
+import FOL.NV.Formula
+
 import Std
-import Mathlib.Util.CompileInductive
 
 
 set_option autoImplicit false
 
 
-def LF : Char := Char.ofNat 10
-
-
-/--
-  The type of formulas.
--/
-inductive Formula : Type
-  | atom_ : String → Formula
-  | true_ : Formula
-  | false_ : Formula
-  | not_ : Formula → Formula
-  | imp_ : Formula → Formula → Formula
-  | and_ : Formula → Formula → Formula
-  | or_ : Formula → Formula → Formula
-  | iff_ : Formula → Formula → Formula
-  deriving Inhabited, DecidableEq
-
-compile_inductive% Formula
+namespace FOL.NV
 
 open Formula
 
-/--
-  The string representation of formulas.
--/
-def Formula.toString : Formula → String
-  | atom_ X => X
-  | true_ => "T"
-  | false_ => "F"
-  | not_ phi => s! "(¬ {phi.toString})"
-  | imp_ phi psi => s! "({phi.toString} → {psi.toString})"
-  | and_ phi psi => s! "({phi.toString} ∧ {psi.toString})"
-  | or_ phi psi => s! "({phi.toString} ∨ {psi.toString})"
-  | iff_ phi psi => s! "({phi.toString} ↔ {psi.toString})"
 
-instance : ToString Formula :=
-  { toString := fun F => F.toString }
+def LF : Char := Char.ofNat 10
 
 
 inductive IsDeduct : List Formula → Formula → Prop
@@ -242,7 +213,7 @@ structure Proof : Type :=
   (step_list : List Step)
 
 def Proof.toString (x : Proof) : String :=
-  s! "{x.label} : {x.assertion}{LF}{x.step_list.toLFString}"
+  s! "{x.label} : {x.assertion}{LF}{List.toLFString x.step_list}"
 
 instance : ToString Proof :=
   { toString := fun x => x.toString }
