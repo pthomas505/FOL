@@ -559,6 +559,19 @@ def checkRule
         prop := IsDeduct.pred_1_ v phi psi
       }
 
+  | pred_3_ v phi => do
+      let return_val : Sequent := {
+          hypotheses := []
+          conclusion := phi.imp_ (forall_ v phi) }
+
+      if h : ¬ isFreeIn v phi
+      then Except.ok {
+        val := return_val
+        prop := IsDeduct.pred_3_ v phi h
+      }
+      else Except.error s! "{v} must not be free in {phi}."
+
+
   | thm_ label => do
     let step ← globalContext.find label
     Except.ok step.assertion
