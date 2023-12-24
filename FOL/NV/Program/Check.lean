@@ -581,6 +581,23 @@ def checkRule
         prop := IsDeduct.eq_1_ v
       }
 
+  | eq_2_eq_ x_0 x_1 y_0 y_1 =>
+      let return_val : Sequent := {
+        hypotheses := []
+        conclusion :=
+          forall_ x_0
+            (forall_ x_1
+              (forall_ y_0
+                (forall_ y_1
+                  ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_
+                    ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))))) }
+
+      Except.ok {
+        val := return_val
+        prop := IsDeduct.eq_2_eq_ x_0 x_1 y_0 y_1
+      }
+
+
   | thm_ label => do
     let step ← globalContext.find label
     Except.ok step.assertion
