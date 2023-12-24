@@ -549,6 +549,16 @@ def checkRule
     }
     else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
+  | pred_1_ v phi psi =>
+      let return_val : Sequent := {
+        hypotheses := []
+        conclusion := ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi))) }
+
+      Except.ok {
+        val := return_val
+        prop := IsDeduct.pred_1_ v phi psi
+      }
+
   | thm_ label => do
     let step ← globalContext.find label
     Except.ok step.assertion
