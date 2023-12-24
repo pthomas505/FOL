@@ -211,6 +211,7 @@ inductive Rule : Type
   | def_iff_ : Formula → Formula → Rule
   | dt_ : List Formula → Formula → Formula → String → Rule
   | pred_1_ : VarName → Formula → Formula → Rule
+  | pred_2_ : VarName → VarName → Formula → Rule
   | pred_3_ : VarName → Formula → Rule
   | eq_1_ : VarName → Rule
   | eq_2_eq_ : VarName → VarName → VarName → VarName → Rule
@@ -235,6 +236,7 @@ def Rule.toString : Rule → String
   | def_iff_ phi psi => s! "def_iff_ {phi} {psi}"
   | dt_ Δ H phi label => s! "dt_ {Δ} {H} {phi} {label}"
   | pred_1_ v phi psi => s! "pred_1_ {v} {phi} {psi}"
+  | pred_2_ v t phi => s! "pred_2_ {v} {t} {phi}"
   | pred_3_ v phi => s! "pred_3_ {v} {phi}"
   | eq_1_ v => s! "eq_1_ {v}"
   | eq_2_eq_ x_0 x_1 y_0 y_1 => s! "eq_2_eq_ {x_0} {x_1} {y_0} {y_1}"
@@ -557,6 +559,16 @@ def checkRule
       Except.ok {
         val := return_val
         prop := IsDeduct.pred_1_ v phi psi
+      }
+
+  | pred_2_ v t phi =>
+      let return_val : Sequent := {
+        hypotheses := []
+        conclusion := ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) FreshChar phi)) }
+
+      Except.ok {
+        val := return_val
+        prop := IsDeduct.pred_2_ v t phi
       }
 
   | pred_3_ v phi => do
