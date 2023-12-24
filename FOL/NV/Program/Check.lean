@@ -1,5 +1,5 @@
 import FOL.NV.Formula
-
+import FOL.NV.Sub.Var.All.Rec.Fresh.Sub
 import Std
 
 
@@ -123,6 +123,75 @@ inductive IsDeduct : List Formula → Formula → Prop
     (phi : Formula) :
     IsDeduct (H :: Δ) phi →
     IsDeduct Δ (H.imp_ phi)
+
+  /-
+    ⊢ (∀ v (phi → psi)) → ((∀ v phi) → (∀ v psi))
+  -/
+  | pred_1_
+    (v : VarName)
+    (phi psi : Formula) :
+    IsDeduct [] ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi)))
+
+  /-
+    ⊢ (∀ v phi) → phi(t/v)  provided phi admits t for v
+  -/
+  /-
+  | pred_2_
+    (v t : VarName)
+    (phi phi' : Formula) :
+    Sub.Var.One.Rec.fastAdmits v t phi →
+    Sub.Var.One.Rec.fastReplaceFree v t phi = phi' →
+    IsAxiom ((forall_ v phi).imp_ phi')
+  -/
+  /-
+    ⊢ phi → (∀ v phi)  provided v is not free in phi
+  -/
+  | pred_3_
+    (v : VarName)
+    (phi : Formula) :
+    ¬ isFreeIn v phi →
+    IsDeduct [] (phi.imp_ (forall_ v phi))
+
+  /-
+    ⊢ ∀ v (v = v)
+  -/
+  | eq_1_ (v : VarName) :
+    IsDeduct [] (forall_ v (eq_ v v))
+
+  /-
+    ⊢ ∀ x_0 ... ∀ x_n ∀ y_0 ... y_n ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) →((pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n]))
+  -/
+  | eq_2_pred_const_
+    (name : PredName)
+    (n : ℕ)
+    (xs ys : Fin n → VarName) :
+    IsDeduct []
+      (Forall_ (List.ofFn xs)
+        (Forall_ (List.ofFn ys)
+          ((And_ (List.ofFn fun i : Fin n => eq_ (xs i) (ys i))).imp_
+            ((pred_const_ name (List.ofFn xs)).iff_ (pred_const_ name (List.ofFn ys))))))
+
+  /-
+    ⊢ ∀ x_0 ∀ x_1 ∀ y_0 ∀ y_1 ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
+  -/
+  | eq_2_eq_
+    (x_0 x_1 y_0 y_1 : VarName) :
+    IsDeduct []
+      (forall_ x_0
+        (forall_ x_1
+          (forall_ y_0
+            (forall_ y_1
+              ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_
+                ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))))))
+
+  /-
+    ⊢ phi ⇒ ⊢ ∀ v phi
+  -/
+  | gen_
+    (v : VarName)
+    (phi : Formula) :
+    IsDeduct [] phi →
+    IsDeduct [] (forall_ v phi)
 
 
 inductive Rule : Type
