@@ -141,7 +141,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     (phi phi' : Formula) :
     Sub.Var.One.Rec.fastAdmits v t phi →
     Sub.Var.One.Rec.fastReplaceFree v t phi = phi' →
-    IsAxiom ((forall_ v phi).imp_ phi')
+    IsDeduct ((forall_ v phi).imp_ phi')
   -/
   /-
     ⊢ phi → (∀ v phi)  provided v is not free in phi
