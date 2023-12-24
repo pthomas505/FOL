@@ -155,7 +155,8 @@ inductive IsDeduct : List Formula → Formula → Prop
   /-
     ⊢ ∀ v (v = v)
   -/
-  | eq_1_ (v : VarName) :
+  | eq_1_
+    (v : VarName) :
     IsDeduct [] (forall_ v (eq_ v v))
 
   /-
@@ -209,6 +210,11 @@ inductive Rule : Type
   | def_or_ : Formula → Formula → Rule
   | def_iff_ : Formula → Formula → Rule
   | dt_ : List Formula → Formula → Formula → String → Rule
+  | pred_1_ : VarName → Formula → Formula → Rule
+  | pred_3_ : VarName → Formula → Rule
+  | eq_1_ : VarName → Rule
+  | eq_2_eq_ : VarName → VarName → VarName → VarName → Rule
+  | gen_ : VarName → Formula → String → Rule
   | thm_ : String → Rule
 
 open Rule
@@ -228,6 +234,11 @@ def Rule.toString : Rule → String
   | def_or_ phi psi => s! "def_or_ {phi} {psi}"
   | def_iff_ phi psi => s! "def_iff_ {phi} {psi}"
   | dt_ Δ H phi label => s! "dt_ {Δ} {H} {phi} {label}"
+  | pred_1_ v phi psi => s! "pred_1_ {v} {phi} {psi}"
+  | pred_3_ v phi => s! "pred_3_ {v} {phi}"
+  | eq_1_ v => s! "eq_1_ {v}"
+  | eq_2_eq_ x_0 x_1 y_0 y_1 => s! "eq_2_eq_ {x_0} {x_1} {y_0} {y_1}"
+  | gen_ v phi label_1 => s! "gen_ {v} {phi} {label_1}"
   | thm_ label => s! "thm_ {label}"
 
 instance : ToString Rule :=
