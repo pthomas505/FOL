@@ -1,5 +1,6 @@
 import FOL.NV.Formula
 import FOL.NV.Sub.Var.All.Rec.Fresh.Sub
+
 import Std
 
 
@@ -10,6 +11,8 @@ namespace FOL.NV
 
 open Formula
 
+
+def FreshChar : Char := '+'
 
 def LF : Char := Char.ofNat 10
 
@@ -135,14 +138,11 @@ inductive IsDeduct : List Formula → Formula → Prop
   /-
     ⊢ (∀ v phi) → phi(t/v)  provided phi admits t for v
   -/
-  /-
   | pred_2_
     (v t : VarName)
-    (phi phi' : Formula) :
-    Sub.Var.One.Rec.fastAdmits v t phi →
-    Sub.Var.One.Rec.fastReplaceFree v t phi = phi' →
-    IsDeduct [] ((forall_ v phi).imp_ phi')
-  -/
+    (phi : Formula) :
+    IsDeduct [] ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) FreshChar phi))
+
   /-
     ⊢ phi → (∀ v phi)  provided v is not free in phi
   -/
