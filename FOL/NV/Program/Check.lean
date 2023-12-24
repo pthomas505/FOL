@@ -571,6 +571,15 @@ def checkRule
       }
       else Except.error s! "{v} must not be free in {phi}."
 
+  | eq_1_ v =>
+      let return_val : Sequent := {
+        hypotheses := []
+        conclusion := forall_ v (eq_ v v) }
+
+      Except.ok {
+        val := return_val
+        prop := IsDeduct.eq_1_ v
+      }
 
   | thm_ label => do
     let step ← globalContext.find label
