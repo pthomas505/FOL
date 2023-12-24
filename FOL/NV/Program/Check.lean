@@ -597,6 +597,28 @@ def checkRule
         prop := IsDeduct.eq_2_eq_ x_0 x_1 y_0 y_1
       }
 
+  | gen_ v phi label => do
+      let found ← localContext.find label
+
+      let expected_val : Sequent := {
+        hypotheses := []
+        conclusion := phi }
+
+      let return_val : Sequent := {
+          hypotheses := []
+          conclusion := forall_ v phi }
+
+      if h : found.assertion.val = expected_val
+      then Except.ok {
+        val := return_val
+        prop := by {
+          apply IsDeduct.gen_ v phi
+          obtain s1 := found.assertion.prop
+          simp only [h] at s1
+          exact s1
+        }
+      }
+      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | thm_ label => do
     let step ← globalContext.find label
