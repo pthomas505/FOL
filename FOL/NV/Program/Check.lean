@@ -444,8 +444,8 @@ def checkRule
 
   | prop_3_ phi psi =>
       let return_val : Sequent := {
-      hypotheses := []
-      conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
+        hypotheses := []
+        conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
       Except.ok {
         val := return_val
@@ -465,8 +465,8 @@ def checkRule
         conclusion := phi }
 
       let return_val : Sequent := {
-          hypotheses := Δ
-          conclusion := psi }
+        hypotheses := Δ
+        conclusion := psi }
 
       if h1 : found_1.assertion.val = expected_val_1
       then
@@ -561,8 +561,8 @@ def checkRule
 
   | pred_3_ v phi => do
       let return_val : Sequent := {
-          hypotheses := []
-          conclusion := phi.imp_ (forall_ v phi) }
+        hypotheses := []
+        conclusion := phi.imp_ (forall_ v phi) }
 
       if h : ¬ isFreeIn v phi
       then Except.ok {
@@ -605,8 +605,8 @@ def checkRule
         conclusion := phi }
 
       let return_val : Sequent := {
-          hypotheses := []
-          conclusion := forall_ v phi }
+        hypotheses := []
+        conclusion := forall_ v phi }
 
       if h : found.assertion.val = expected_val
       then Except.ok {
