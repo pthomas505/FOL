@@ -87,36 +87,6 @@ inductive IsDeduct : List Formula → Formula → Prop
     IsDeduct Δ psi
 
   /-
-    ⊢ ⊥ ↔ ¬ ⊤
-  -/
-  | def_false_ :
-    IsDeduct [] (false_.iff_ (not_ true_))
-
-  /-
-    ⊢ (phi ∧ psi) ↔ ¬ (phi → ¬ psi)
-  -/
-  | def_and_
-    (phi psi : Formula) :
-    IsDeduct [] ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
-
-  /-
-    ⊢ (phi ∨ psi) ↔ ((¬ phi) → psi)
-  -/
-  | def_or_
-    (phi psi : Formula) :
-    IsDeduct [] ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
-
-  /-
-    ⊢ (phi ↔ psi) ↔ ((phi → psi) ∧ (psi → phi))
-    ⊢ (phi ↔ psi) ↔ ¬ ((phi → psi) → ¬ (psi → phi))
-    ⊢ ((phi ↔ psi) → (¬ ((phi → psi) → ¬ (psi → phi)))) ∧ (¬ ((phi → psi) → ¬ (psi → phi)) → (phi ↔ psi))
-    ⊢ ¬ (((phi ↔ psi) → (¬ ((phi → psi) → ¬ (psi → phi)))) → ¬ (¬ ((phi → psi) → ¬ (psi → phi)) → (phi ↔ psi)))
-  -/
-  | def_iff_
-    (phi psi : Formula) :
-    IsDeduct [] (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
-
-  /-
     H :: Δ ⊢ phi ⇒
     Δ ⊢ H → phi
   -/
@@ -151,6 +121,15 @@ inductive IsDeduct : List Formula → Formula → Prop
     (phi : Formula) :
     ¬ isFreeIn v phi →
     IsDeduct [] (phi.imp_ (forall_ v phi))
+
+  /-
+    ⊢ phi ⇒ ⊢ ∀ v phi
+  -/
+  | gen_
+    (v : VarName)
+    (phi : Formula) :
+    IsDeduct [] phi →
+    IsDeduct [] (forall_ v phi)
 
   /-
     ⊢ ∀ v (v = v)
@@ -188,13 +167,34 @@ inductive IsDeduct : List Formula → Formula → Prop
                 ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))))))
 
   /-
-    ⊢ phi ⇒ ⊢ ∀ v phi
+    ⊢ ⊥ ↔ ¬ ⊤
   -/
-  | gen_
-    (v : VarName)
-    (phi : Formula) :
-    IsDeduct [] phi →
-    IsDeduct [] (forall_ v phi)
+  | def_false_ :
+    IsDeduct [] (false_.iff_ (not_ true_))
+
+  /-
+    ⊢ (phi ∧ psi) ↔ ¬ (phi → ¬ psi)
+  -/
+  | def_and_
+    (phi psi : Formula) :
+    IsDeduct [] ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+
+  /-
+    ⊢ (phi ∨ psi) ↔ ((¬ phi) → psi)
+  -/
+  | def_or_
+    (phi psi : Formula) :
+    IsDeduct [] ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+
+  /-
+    ⊢ (phi ↔ psi) ↔ ((phi → psi) ∧ (psi → phi))
+    ⊢ (phi ↔ psi) ↔ ¬ ((phi → psi) → ¬ (psi → phi))
+    ⊢ ((phi ↔ psi) → (¬ ((phi → psi) → ¬ (psi → phi)))) ∧ (¬ ((phi → psi) → ¬ (psi → phi)) → (phi ↔ psi))
+    ⊢ ¬ (((phi ↔ psi) → (¬ ((phi → psi) → ¬ (psi → phi)))) → ¬ (¬ ((phi → psi) → ¬ (psi → phi)) → (phi ↔ psi)))
+  -/
+  | def_iff_
+    (phi psi : Formula) :
+    IsDeduct [] (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
   /-
     ⊢ (∃ v phi) ↔ ¬ (∀ v ¬ phi)
@@ -215,17 +215,17 @@ inductive Rule : Type
   | prop_2_ : Formula → Formula → Formula → Rule
   | prop_3_ : Formula → Formula → Rule
   | mp_ : List Formula → Formula → Formula → String → String → Rule
-  | def_false_ : Rule
-  | def_and_ : Formula → Formula → Rule
-  | def_or_ : Formula → Formula → Rule
-  | def_iff_ : Formula → Formula → Rule
   | dt_ : List Formula → Formula → Formula → String → Rule
   | pred_1_ : VarName → Formula → Formula → Rule
   | pred_2_ : VarName → VarName → Formula → Rule
   | pred_3_ : VarName → Formula → Rule
+  | gen_ : VarName → Formula → String → Rule
   | eq_1_ : VarName → Rule
   | eq_2_eq_ : VarName → VarName → VarName → VarName → Rule
-  | gen_ : VarName → Formula → String → Rule
+  | def_false_ : Rule
+  | def_and_ : Formula → Formula → Rule
+  | def_or_ : Formula → Formula → Rule
+  | def_iff_ : Formula → Formula → Rule
   | def_exists_ : VarName → Formula → Rule
   | thm_ : String → Rule
 
@@ -241,17 +241,17 @@ def Rule.toString : Rule → String
   | prop_2_ phi psi chi => s! "prop_2_ {phi} {psi} {chi}"
   | prop_3_ phi psi => s! "prop_3_ {phi} {psi}"
   | mp_ Δ phi psi label_1 label_2 => s! "mp_ {Δ} {phi} {psi} {label_1} {label_2}"
-  | def_false_ => s! "def_false_"
-  | def_and_ phi psi => s! "def_and_ {phi} {psi}"
-  | def_or_ phi psi => s! "def_or_ {phi} {psi}"
-  | def_iff_ phi psi => s! "def_iff_ {phi} {psi}"
   | dt_ Δ H phi label => s! "dt_ {Δ} {H} {phi} {label}"
   | pred_1_ v phi psi => s! "pred_1_ {v} {phi} {psi}"
   | pred_2_ v t phi => s! "pred_2_ {v} {t} {phi}"
   | pred_3_ v phi => s! "pred_3_ {v} {phi}"
+  | gen_ v phi label_1 => s! "gen_ {v} {phi} {label_1}"
   | eq_1_ v => s! "eq_1_ {v}"
   | eq_2_eq_ x_0 x_1 y_0 y_1 => s! "eq_2_eq_ {x_0} {x_1} {y_0} {y_1}"
-  | gen_ v phi label_1 => s! "gen_ {v} {phi} {label_1}"
+  | def_false_ => s! "def_false_"
+  | def_and_ phi psi => s! "def_and_ {phi} {psi}"
+  | def_or_ phi psi => s! "def_or_ {phi} {psi}"
+  | def_iff_ phi psi => s! "def_iff_ {phi} {psi}"
   | def_exists_ v phi => s! "def_exists_ {v} {phi}"
   | thm_ label => s! "thm_ {label}"
 
@@ -500,46 +500,6 @@ def checkRule
         else Except.error s! "Expected :{LF}{expected_val_2}{LF}Found :{LF}{found_2.assertion.val}"
       else Except.error s! "Expected :{LF}{expected_val_1}{LF}Found :{LF}{found_1.assertion.val}"
 
-  | def_false_ =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := false_.iff_ (not_ true_) }
-
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.def_false_
-      }
-
-  | def_and_ phi psi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi)))) }
-
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.def_and_ phi psi
-      }
-
-  | def_or_ phi psi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := ((phi.or_ psi).iff_ ((not_ phi).imp_ psi)) }
-
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.def_or_ phi psi
-      }
-
-  | def_iff_ phi psi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi))))) }
-
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.def_iff_ phi psi
-      }
-
   | dt_ Δ H phi label => do
     let found ← localContext.find label
 
@@ -595,6 +555,29 @@ def checkRule
       }
       else Except.error s! "{v} must not be free in {phi}."
 
+  | gen_ v phi label => do
+      let found ← localContext.find label
+
+      let expected_val : Sequent := {
+        hypotheses := []
+        conclusion := phi }
+
+      let return_val : Sequent := {
+        hypotheses := []
+        conclusion := forall_ v phi }
+
+      if h : found.assertion.val = expected_val
+      then Except.ok {
+        val := return_val
+        prop := by {
+          apply IsDeduct.gen_ v phi
+          obtain s1 := found.assertion.prop
+          simp only [h] at s1
+          exact s1
+        }
+      }
+      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+
   | eq_1_ v =>
       let return_val : Sequent := {
         hypotheses := []
@@ -621,28 +604,45 @@ def checkRule
         prop := IsDeduct.eq_2_eq_ x_0 x_1 y_0 y_1
       }
 
-  | gen_ v phi label => do
-      let found ← localContext.find label
-
-      let expected_val : Sequent := {
-        hypotheses := []
-        conclusion := phi }
-
+  | def_false_ =>
       let return_val : Sequent := {
         hypotheses := []
-        conclusion := forall_ v phi }
+        conclusion := false_.iff_ (not_ true_) }
 
-      if h : found.assertion.val = expected_val
-      then Except.ok {
+      Except.ok {
         val := return_val
-        prop := by {
-          apply IsDeduct.gen_ v phi
-          obtain s1 := found.assertion.prop
-          simp only [h] at s1
-          exact s1
-        }
+        prop := IsDeduct.def_false_
       }
-      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+
+  | def_and_ phi psi =>
+      let return_val : Sequent := {
+        hypotheses := []
+        conclusion := ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi)))) }
+
+      Except.ok {
+        val := return_val
+        prop := IsDeduct.def_and_ phi psi
+      }
+
+  | def_or_ phi psi =>
+      let return_val : Sequent := {
+        hypotheses := []
+        conclusion := ((phi.or_ psi).iff_ ((not_ phi).imp_ psi)) }
+
+      Except.ok {
+        val := return_val
+        prop := IsDeduct.def_or_ phi psi
+      }
+
+  | def_iff_ phi psi =>
+      let return_val : Sequent := {
+        hypotheses := []
+        conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi))))) }
+
+      Except.ok {
+        val := return_val
+        prop := IsDeduct.def_iff_ phi psi
+      }
 
   | def_exists_ v phi =>
       let return_val : Sequent := {
@@ -785,22 +785,6 @@ example
       exact a1 H' a2
     · apply ih_minor
       exact a1
-  case def_false_ =>
-    intro D I V E _
-    simp only [Holds]
-    tauto
-  case def_and_ phi psi =>
-    intro D I V E _
-    simp only [Holds]
-    tauto
-  case def_or_ phi psi =>
-    intro D I V E _
-    simp only [Holds]
-    tauto
-  case def_iff_ phi psi =>
-    intro D I V E _
-    simp only [Holds]
-    tauto
   case dt_ Δ' H phi _ ih_2 =>
     intro D I V E a1
     simp only [Holds]
@@ -846,6 +830,12 @@ example
 
     simp only [s1]
     exact a2
+  case gen_ v phi _ ih_2 =>
+    intro D I V E _
+    simp only [Holds]
+    intro d
+    apply ih_2
+    simp
   case eq_1_ v =>
     intro D I V E _
     simp only [Holds]
@@ -865,13 +855,23 @@ example
       tauto
     any_goals
       aesop
+  case def_false_ =>
+    intro D I V E _
+    simp only [Holds]
+    tauto
+  case def_and_ phi psi =>
+    intro D I V E _
+    simp only [Holds]
+    tauto
+  case def_or_ phi psi =>
+    intro D I V E _
+    simp only [Holds]
+    tauto
+  case def_iff_ phi psi =>
+    intro D I V E _
+    simp only [Holds]
+    tauto
   case def_exists_ v phi =>
     intro D I V E _
     simp only [Holds]
-    simp
-  case gen_ v phi _ ih_2 =>
-    intro D I V E _
-    simp only [Holds]
-    intro d
-    apply ih_2
     simp
