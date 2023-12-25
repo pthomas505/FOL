@@ -162,6 +162,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   /-
     ⊢ ∀ x_0 ... ∀ x_n ∀ y_0 ... y_n ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) →((pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n]))
   -/
+/-
   | eq_2_pred_const_
     (name : PredName)
     (n : ℕ)
@@ -171,6 +172,7 @@ inductive IsDeduct : List Formula → Formula → Prop
         (Forall_ (List.ofFn ys)
           ((And_ (List.ofFn fun i : Fin n => eq_ (xs i) (ys i))).imp_
             ((pred_const_ name (List.ofFn xs)).iff_ (pred_const_ name (List.ofFn ys))))))
+-/
 
   /-
     ⊢ ∀ x_0 ∀ x_1 ∀ y_0 ∀ y_1 ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
