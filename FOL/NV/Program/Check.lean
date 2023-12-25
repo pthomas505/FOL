@@ -824,3 +824,24 @@ example
 
     simp only [s1]
     exact a2
+  case eq_1_ v =>
+    intro D I V E a1
+    simp only [Holds]
+    simp
+  case eq_2_eq_ x_0 x_1 y_0 y_1 =>
+    intro D I V E a1
+    simp only [Holds]
+    intro x_0_d x_1_d y_0_d y_1_d a2
+    simp only [Function.updateITE] at *
+    simp at *
+    split_ifs at *
+    any_goals
+      tauto
+    any_goals
+      aesop
+  case gen_ v phi ih_1 ih_2 =>
+    intro D I V E a1
+    simp only [Holds]
+    intro d
+    apply ih_2
+    simp
