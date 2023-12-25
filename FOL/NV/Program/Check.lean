@@ -696,3 +696,111 @@ def checkProofList
   (proofList : List Proof) :
   Except String Unit :=
   checkProofListAux {} proofList
+
+
+example
+  (Δ : List Formula)
+  (F : Formula)
+  (h1 : IsDeduct Δ F) :
+  ∀ (D : Type) (I : Interpretation D) (V : VarAssignment D) (E : Env),
+  ((∀ (H : Formula), H ∈ Δ → Holds D I V E H) → Holds D I V E F) :=
+  by
+  induction h1
+  case struct_1_ Δ' H phi ih_1 ih_2 =>
+    intro D I V E a1
+    apply ih_2
+    intro H' a2
+    simp at a1
+    cases a1
+    case _ a1_left a1_right =>
+      exact a1_right H' a2
+  case struct_2_ Δ' H phi ih_1 ih_2 =>
+    intro D I V E a1
+    apply ih_2
+    intro H' a2
+    simp at a1
+    cases a1
+    case _ a1_left a1_right =>
+      simp at a2
+      cases a2
+      case _ a2 =>
+        simp only [a2]
+        exact a1_left
+      case _ a2 =>
+        exact a1_right H' a2
+  case struct_3_ Δ_1 Δ_2 H_1 H_2 phi ih_1 ih_2 =>
+    intro D I V E a1
+    apply ih_2
+    intro H' a2
+    simp at a1
+    apply a1
+    simp at a2
+    tauto
+  case assume_ phi =>
+    intro D I V E a1
+    simp at a1
+    exact a1
+  case prop_0_ =>
+    intro D I V E a1
+    simp only [Holds]
+  case prop_1_ phi psi =>
+    intro D I V E a1
+    simp only [Holds]
+    tauto
+  case prop_2_ phi psi chi =>
+    intro D I V E a1
+    simp only [Holds]
+    tauto
+  case prop_3_ phi psi =>
+    intro D I V E a1
+    simp only [Holds]
+    tauto
+  case mp_ Δ' phi psi ih_major_1 ih_minor_1 ih_major_2 ih_minor_2 =>
+    intro D I V E a1
+    simp only [Holds] at ih_major_2
+    apply ih_major_2
+    · intro H' a2
+      exact a1 H' a2
+    · apply ih_minor_2
+      exact a1
+  case def_false_ =>
+    intro D I V E a1
+    simp only [Holds]
+    tauto
+  case def_and_ phi psi =>
+    intro D I V E a1
+    simp only [Holds]
+    tauto
+  case def_or_ phi psi =>
+    intro D I V E a1
+    simp only [Holds]
+    tauto
+  case def_iff_ phi psi =>
+    intro D I V E a1
+    simp only [Holds]
+    tauto
+  case dt_ Δ' H phi ih_1 ih_2 =>
+    intro D I V E a1
+    simp only [Holds]
+    intro a2
+    apply ih_2
+    simp
+    constructor
+    · exact a2
+    · exact a1
+  case pred_1_ v phi psi =>
+    intro D I V E a1
+    simp only [Holds]
+    intro a2 a3 d
+    apply a2 d
+    exact a3 d
+  case pred_2_ v t phi =>
+    intro D I V E a1
+    obtain s1 := FOL.NV.Sub.Var.All.Rec.Fresh.substitution_theorem D I V E (Function.updateITE id v t) FreshChar phi
+
+    simp only [Holds]
+    intro a2
+    simp only [s1]
+    simp only [Function.updateITE_comp_left]
+    simp
+    exact a2 (V t)
