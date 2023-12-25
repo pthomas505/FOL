@@ -804,3 +804,23 @@ example
     simp only [Function.updateITE_comp_left]
     simp
     exact a2 (V t)
+  case pred_3_ v phi ih =>
+    intro D I V E a1
+    simp only [Holds]
+    intro a2 d
+
+    have s1 : Holds D I (Function.updateITE V v d) E phi ↔ Holds D I V E phi
+    {
+      apply Holds_coincide_Var
+      intro v' a1
+      simp only [Function.updateITE]
+      split_ifs
+      case _ c1 =>
+        subst c1
+        contradiction
+      case _ c1 =>
+        rfl
+    }
+
+    simp only [s1]
+    exact a2
