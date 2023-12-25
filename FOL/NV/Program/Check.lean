@@ -708,7 +708,7 @@ example
   ((∀ (H : Formula), H ∈ Δ → Holds D I V E H) → Holds D I V E F) :=
   by
   induction h1
-  case struct_1_ Δ' H phi ih_1 ih_2 =>
+  case struct_1_ Δ' H _ _ ih_2 =>
     intro D I V E a1
     apply ih_2
     intro H' a2
@@ -716,7 +716,7 @@ example
     cases a1
     case _ a1_left a1_right =>
       exact a1_right H' a2
-  case struct_2_ Δ' H phi ih_1 ih_2 =>
+  case struct_2_ Δ' H _ _ ih_2 =>
     intro D I V E a1
     apply ih_2
     intro H' a2
@@ -730,7 +730,7 @@ example
         exact a1_left
       case _ a2 =>
         exact a1_right H' a2
-  case struct_3_ Δ_1 Δ_2 H_1 H_2 phi ih_1 ih_2 =>
+  case struct_3_ Δ_1 Δ_2 H_1 H_2 _ _ ih_2 =>
     intro D I V E a1
     apply ih_2
     intro H' a2
@@ -743,45 +743,45 @@ example
     simp at a1
     exact a1
   case prop_0_ =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
   case prop_1_ phi psi =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     tauto
   case prop_2_ phi psi chi =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     tauto
   case prop_3_ phi psi =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     tauto
-  case mp_ Δ' phi psi ih_major_1 ih_minor_1 ih_major_2 ih_minor_2 =>
+  case mp_ Δ' phi psi _ _ ih_major ih_minor =>
     intro D I V E a1
-    simp only [Holds] at ih_major_2
-    apply ih_major_2
+    simp only [Holds] at ih_major
+    apply ih_major
     · intro H' a2
       exact a1 H' a2
-    · apply ih_minor_2
+    · apply ih_minor
       exact a1
   case def_false_ =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     tauto
   case def_and_ phi psi =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     tauto
   case def_or_ phi psi =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     tauto
   case def_iff_ phi psi =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     tauto
-  case dt_ Δ' H phi ih_1 ih_2 =>
+  case dt_ Δ' H phi _ ih_2 =>
     intro D I V E a1
     simp only [Holds]
     intro a2
@@ -791,13 +791,13 @@ example
     · exact a2
     · exact a1
   case pred_1_ v phi psi =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     intro a2 a3 d
     apply a2 d
     exact a3 d
   case pred_2_ v t phi =>
-    intro D I V E a1
+    intro D I V E _
     obtain s1 := FOL.NV.Sub.Var.All.Rec.Fresh.substitution_theorem D I V E (Function.updateITE id v t) FreshChar phi
 
     simp only [Holds]
@@ -807,7 +807,7 @@ example
     simp
     exact a2 (V t)
   case pred_3_ v phi ih =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     intro a2 d
 
@@ -827,22 +827,26 @@ example
     simp only [s1]
     exact a2
   case eq_1_ v =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     simp
   case eq_2_eq_ x_0 x_1 y_0 y_1 =>
-    intro D I V E a1
+    intro D I V E _
     simp only [Holds]
     intro x_0_d x_1_d y_0_d y_1_d a2
-    simp only [Function.updateITE] at *
-    simp at *
+    simp only [Function.updateITE] at a2
+    simp at a2
+
+    simp only [Function.updateITE]
+    simp
+
     split_ifs at *
     any_goals
       tauto
     any_goals
       aesop
-  case gen_ v phi ih_1 ih_2 =>
-    intro D I V E a1
+  case gen_ v phi _ ih_2 =>
+    intro D I V E _
     simp only [Holds]
     intro d
     apply ih_2
