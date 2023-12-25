@@ -196,6 +196,14 @@ inductive IsDeduct : List Formula → Formula → Prop
     IsDeduct [] phi →
     IsDeduct [] (forall_ v phi)
 
+  /-
+    ⊢ (∃ v phi) ↔ ¬ (∀ v ¬ phi)
+  -/
+  | def_exists_
+    (v : VarName)
+    (phi : Formula) :
+    IsDeduct [] ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
+
 
 inductive Rule : Type
   | struct_1_ : List Formula → Formula → Formula → String → Rule
@@ -218,6 +226,7 @@ inductive Rule : Type
   | eq_1_ : VarName → Rule
   | eq_2_eq_ : VarName → VarName → VarName → VarName → Rule
   | gen_ : VarName → Formula → String → Rule
+  | def_exists_ : VarName → Formula → Rule
   | thm_ : String → Rule
 
 open Rule
@@ -243,6 +252,7 @@ def Rule.toString : Rule → String
   | eq_1_ v => s! "eq_1_ {v}"
   | eq_2_eq_ x_0 x_1 y_0 y_1 => s! "eq_2_eq_ {x_0} {x_1} {y_0} {y_1}"
   | gen_ v phi label_1 => s! "gen_ {v} {phi} {label_1}"
+  | def_exists_ v phi => s! "def_exists_ {v} {phi}"
   | thm_ label => s! "thm_ {label}"
 
 instance : ToString Rule :=
@@ -634,6 +644,16 @@ def checkRule
       }
       else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
+  | def_exists_ v phi =>
+      let return_val : Sequent := {
+        hypotheses := []
+        conclusion := (exists_ v phi).iff_ (not_ (forall_ v (not_ phi))) }
+
+      Except.ok {
+        val := return_val
+        prop := IsDeduct.def_exists_ v phi
+      }
+
   | thm_ label => do
     let step ← globalContext.find label
     Except.ok step.assertion
@@ -845,6 +865,10 @@ example
       tauto
     any_goals
       aesop
+  case def_exists_ v phi =>
+    intro D I V E _
+    simp only [Holds]
+    simp
   case gen_ v phi _ ih_2 =>
     intro D I V E _
     simp only [Holds]
