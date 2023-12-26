@@ -715,19 +715,18 @@ def checkProof
 
 
 def checkProofListAux
-  (globalContext : GlobalContext)
-  (checkedProofList : List checkedProof) :
-  List Proof → Except String (List checkedProof)
-  | [] => Except.ok checkedProofList
+  (globalContext : GlobalContext) :
+  List Proof → Except String Unit
+  | [] => Except.ok ()
   | hd :: tl => do
   let checkedProof ← checkProof globalContext hd
     |>.mapError fun message => s! "proof label : {hd.label}{LF}{message}"
-  checkProofListAux (globalContext.insert checkedProof.label checkedProof) (checkedProofList.append [checkedProof]) tl
+  checkProofListAux (globalContext.insert checkedProof.label checkedProof) tl
 
 def checkProofList
   (proofList : List Proof) :
-  Except String (List checkedProof) :=
-  checkProofListAux {} [] proofList
+  Except String Unit :=
+  checkProofListAux {} proofList
 
 
 example
@@ -936,18 +935,17 @@ lemma meh
 example
   (proofList : List Proof)
   (globalContext : GlobalContext)
-  (acc : List checkedProof)
-  (h1 : (checkProofListAux globalContext acc proofList).isOk) :
+  (h1 : (checkProofListAux globalContext proofList).isOk) :
   ∀ (proof : Proof), proof ∈ proofList → IsDeduct proof.assertion.hypotheses proof.assertion.conclusion :=
   by
   intro proof a1
+
   have s1 : ∃ (checkedProof : checkedProof), checkedProof.assertion.val = proof.assertion
-  induction proofList generalizing globalContext acc
+  induction proofList generalizing globalContext
   case _ =>
     simp at a1
   case _ hd tl ih =>
     simp only [checkProofListAux] at h1
-    simp at h1
 
     simp at a1
     cases a1
@@ -955,9 +953,10 @@ example
       subst a1
       sorry
     case _ a1 =>
-      apply ih sorry sorry
+      apply ih sorry
       · sorry
       · exact a1
+
   apply Exists.elim s1
   intro a a2
   simp only [← a2]
