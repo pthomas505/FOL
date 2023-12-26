@@ -887,12 +887,81 @@ example
     simp
 
 
+lemma blah
+  {ε : Type _}
+  {α : Type _}
+  {β : Type _}
+  (x : Except ε α)
+  (f : α → Except ε β)
+  (a : β):
+  (Except.bind x f = .ok a) ↔ ∃ b, x = .ok b ∧ f b = .ok a :=
+  by
+  cases x
+  case error x =>
+    simp only [Except.bind]
+    simp
+  case ok x =>
+    simp only [Except.bind]
+    simp
+
+
+lemma meh
+  (globalContext : GlobalContext)
+  (proof : Proof)
+  (h1 : (checkProof globalContext proof).isOk) :
+  ∃ (x : checkedProof), x.assertion.val = proof.assertion :=
+  by
+  cases e : checkProof globalContext proof
+  case _ _ =>
+    simp only [e] at h1
+    simp only [Except.isOk] at h1
+    simp only [Except.toBool] at h1
+  case _ a =>
+    apply Exists.intro a
+    simp only [checkProof] at e
+    simp only [bind] at e
+    simp only [blah] at e
+    apply Exists.elim e
+    intro b a1
+    clear e
+    cases a1
+    case _ a1_left a1_right =>
+      split_ifs at a1_right
+      case _ c1 =>
+        simp at a1_right
+        simp only [← a1_right]
+        exact c1
+
+
 example
   (proofList : List Proof)
-  (h1 : (checkProofList proofList).isOk) :
+  (globalContext : GlobalContext)
+  (acc : List checkedProof)
+  (h1 : (checkProofListAux globalContext acc proofList).isOk) :
   ∀ (proof : Proof), proof ∈ proofList → IsDeduct proof.assertion.hypotheses proof.assertion.conclusion :=
   by
-  sorry
+  intro proof a1
+  have s1 : ∃ (checkedProof : checkedProof), checkedProof.assertion.val = proof.assertion
+  induction proofList generalizing globalContext acc
+  case _ =>
+    simp at a1
+  case _ hd tl ih =>
+    simp only [checkProofListAux] at h1
+    simp at h1
+
+    simp at a1
+    cases a1
+    case _ a1 =>
+      subst a1
+      sorry
+    case _ a1 =>
+      apply ih sorry sorry
+      · sorry
+      · exact a1
+  apply Exists.elim s1
+  intro a a2
+  simp only [← a2]
+  exact a.assertion.prop
 
 
 #eval checkProofList []
