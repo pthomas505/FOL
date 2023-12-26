@@ -275,6 +275,9 @@ structure checkedSequent : Type :=
   (val : Sequent)
   (prop : IsDeduct val.hypotheses val.conclusion)
 
+instance : ToString checkedSequent :=
+  { toString := fun x => x.val.toString }
+
 
 structure Step : Type :=
   (label : String)
@@ -316,6 +319,12 @@ instance : ToString Proof :=
 structure checkedProof : Type :=
   (label : String)
   (assertion : checkedSequent)
+
+def checkedProof.toString (x : checkedProof) : String :=
+  s! "{x.label} : {x.assertion}"
+
+instance : ToString checkedProof :=
+  { toString := fun x => x.toString }
 
 
 abbrev GlobalContext : Type := Std.HashMap String checkedProof
@@ -706,18 +715,19 @@ def checkProof
 
 
 def checkProofListAux
-  (globalContext : GlobalContext):
-  List Proof → Except String Unit
-  | [] => Except.ok Unit.unit
+  (globalContext : GlobalContext)
+  (checkedProofList : List checkedProof) :
+  List Proof → Except String (List checkedProof)
+  | [] => Except.ok checkedProofList
   | hd :: tl => do
   let checkedProof ← checkProof globalContext hd
     |>.mapError fun message => s! "proof label : {hd.label}{LF}{message}"
-  checkProofListAux (globalContext.insert checkedProof.label checkedProof) tl
+  checkProofListAux (globalContext.insert checkedProof.label checkedProof) (checkedProofList.append [checkedProof]) tl
 
 def checkProofList
   (proofList : List Proof) :
-  Except String Unit :=
-  checkProofListAux {} proofList
+  Except String (List checkedProof) :=
+  checkProofListAux {} [] proofList
 
 
 example
@@ -875,3 +885,55 @@ example
     intro D I V E _
     simp only [Holds]
     simp
+
+
+example
+  (proofList : List Proof)
+  (h1 : (checkProofList proofList).isOk) :
+  ∀ (proof : Proof), proof ∈ proofList → IsDeduct proof.assertion.hypotheses proof.assertion.conclusion :=
+  by
+  sorry
+
+
+#eval checkProofList []
+
+def P := pred_var_ (PredName.mk "P") []
+
+#eval checkProofList [
+  {
+    label := "id"
+    assertion := { hypotheses := [], conclusion := imp_ P P },
+    step_list :=
+    [
+      {
+        label := "s1",
+        assertion := { hypotheses := [], conclusion := (imp_ (imp_ P (imp_ (imp_ P P) P)) (imp_ (imp_ P (imp_ P P)) (imp_ P P))) },
+        rule := (prop_2_ P (P.imp_ P) P),
+      },
+
+      {
+        label := "s2",
+        assertion := { hypotheses := [], conclusion := (imp_ P (imp_ (imp_ P P) P)) },
+        rule := (prop_1_ P (P.imp_ P))
+      },
+
+      {
+        label := "s3",
+        assertion := { hypotheses := [], conclusion := (imp_ (imp_ P (imp_ P P)) (imp_ P P)) },
+        rule := (mp_ [] (imp_ P (imp_ (imp_ P P) P)) (imp_ (imp_ P (imp_ P P)) (imp_ P P)) "s1" "s2")
+      },
+
+      {
+        label := "s4",
+        assertion := { hypotheses := [], conclusion := (imp_ P (imp_ P P)) },
+        rule := (prop_1_ P P)
+      },
+
+      {
+        label := "s5",
+        assertion := { hypotheses := [], conclusion := (imp_ P P) },
+        rule := (mp_ [] (imp_ P (imp_ P P)) (imp_ P P) "s3" "s4")
+      }
+    ]
+  }
+]
