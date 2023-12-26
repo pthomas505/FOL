@@ -937,3 +937,55 @@ def P := pred_var_ (PredName.mk "P") []
     ]
   }
 ]
+
+
+abbrev Context : Type := Std.HashMap String Step
+
+def Context.find
+  (context : Context)
+  (label : String) :
+  Except String Step :=
+  let opt := context.find? label
+  if h : Option.isSome opt
+  then Except.ok (Option.get opt h)
+  else Except.error s! "{label} not found in local context."
+
+
+def prop_1_
+  (label : String)
+  (phi psi : Formula) :
+  Step := {
+    label := label
+    assertion := {
+      hypotheses := []
+      conclusion := (phi.imp_ (psi.imp_ phi))
+    }
+    rule := Rule.prop_1_ phi psi
+  }
+
+
+def mp_
+  (label : String)
+  (context : Context)
+  (major_step_label : String)
+  (minor_step_label : String) :
+  Except String Step := do
+    let major_step ← context.find major_step_label
+    let minor_step ← context.find minor_step_label
+
+    if let (imp_ major_left major_right) := major_step.assertion.conclusion
+    then
+      if major_step.assertion.hypotheses = minor_step.assertion.hypotheses
+      then
+        if major_left = minor_step.assertion.conclusion
+        then Except.ok {
+          label := label
+          assertion := {
+            hypotheses := major_step.assertion.hypotheses
+            conclusion := major_right
+          }
+          rule := Rule.mp_ major_step.assertion.hypotheses major_left major_right major_step_label minor_step_label
+        }
+        else Except.error s! "minor does match major antecedent."
+      else Except.error "minor hypotheses do not match major hypotheses."
+    else Except.error s! "{major_step_label} is not an implication."
