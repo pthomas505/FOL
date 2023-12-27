@@ -4,7 +4,7 @@ import FOL.NV.Sub.Var.All.Rec.Fresh.Sub
 set_option autoImplicit false
 
 
-namespace FOL.NV.Sub.Pred.All.Rec
+namespace FOL.NV.Sub.Pred.All.Rec.Option.Fresh
 
 open Formula
 

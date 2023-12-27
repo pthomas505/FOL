@@ -1,5 +1,6 @@
 import FOL.NV.Formula
 import FOL.NV.Sub.Var.All.Rec.Fresh.Sub
+import FOL.NV.Sub.Pred.All.Rec.Option.Fresh.Sub
 
 import Std
 
@@ -204,6 +205,13 @@ inductive IsDeduct : List Formula → Formula → Prop
     (phi : Formula) :
     IsDeduct [] ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
+  | sub_
+    (Δ : List Formula)
+    (phi : Formula)
+    (τ : PredName → ℕ → Option (List VarName × Formula)) :
+    IsDeduct Δ phi →
+    IsDeduct (Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub FreshChar τ)) (Sub.Pred.All.Rec.Option.Fresh.sub FreshChar τ phi)
+
 
 inductive Rule : Type
   | struct_1_ : List Formula → Formula → Formula → String → Rule
@@ -227,6 +235,7 @@ inductive Rule : Type
   | def_or_ : Formula → Formula → Rule
   | def_iff_ : Formula → Formula → Rule
   | def_exists_ : VarName → Formula → Rule
+  | sub_ : List Formula → Formula → (PredName → ℕ → Option (List VarName × Formula)) → String → Rule
   | thm_ : String → Rule
 
 open Rule
@@ -253,6 +262,7 @@ def Rule.toString : Rule → String
   | def_or_ phi psi => s! "def_or_ {phi} {psi}"
   | def_iff_ phi psi => s! "def_iff_ {phi} {psi}"
   | def_exists_ v phi => s! "def_exists_ {v} {phi}"
+  | sub_ Δ phi τ label => s! "sub_ {Δ} {phi} ? {label}"
   | thm_ label => s! "thm_ {label}"
 
 instance : ToString Rule :=
@@ -663,6 +673,30 @@ def checkRule
         prop := IsDeduct.def_exists_ v phi
       }
 
+  | sub_ Δ phi τ label => do
+      let found ← localContext.find label
+
+      let expected_val : Sequent := {
+        hypotheses := Δ
+        conclusion := phi }
+
+      let return_val : Sequent := {
+        hypotheses := Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub FreshChar τ)
+        conclusion := Sub.Pred.All.Rec.Option.Fresh.sub FreshChar τ phi }
+
+      if h : found.assertion.val = expected_val
+      then
+      Except.ok {
+        val := return_val
+        prop := by {
+          apply IsDeduct.sub_
+          obtain s1 := found.assertion.prop
+          simp only [h] at s1
+          exact s1
+        }
+      }
+      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+
   | thm_ label => do
     let step ← globalContext.find label
     Except.ok step.assertion
@@ -884,6 +918,16 @@ example
     intro D I V E _
     simp only [Holds]
     simp
+  case sub_ Δ' phi τ _ ih_2 =>
+    intro D I V E a1
+    simp at a1
+
+    obtain s1 := Sub.Pred.All.Rec.Option.Fresh.substitution_theorem D I V E FreshChar τ
+    simp only [← s1] at a1
+    simp only [← s1]
+
+    apply ih_2
+    exact a1
 
 
 #eval checkProofList []
