@@ -930,7 +930,7 @@ theorem soundness
     exact a1
 
 
-theorem Except.bind_eq_some
+theorem Except.bind_eq_ok
   {ε : Type _}
   {α : Type _}
   {β : Type _}
@@ -963,7 +963,7 @@ example :
   intro P b a1 a2
   simp only [checkProof] at a2
   simp only [bind] at a2
-  simp only [Except.bind_eq_some] at a2
+  simp only [Except.bind_eq_ok] at a2
   apply Exists.elim a2
   intro b' a3
   clear a2
@@ -989,7 +989,7 @@ example
   by
   simp only [checkProof] at h1
   simp only [bind] at h1
-  simp only [Except.bind_eq_some] at h1
+  simp only [Except.bind_eq_ok] at h1
   apply Exists.elim h1
   intro b' a2
   clear h1
