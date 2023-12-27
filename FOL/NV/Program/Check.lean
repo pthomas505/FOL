@@ -1001,6 +1001,7 @@ example
   case neg c1 =>
     simp at a2
 
+-------------------------------------------------
 
 #eval checkProofList []
 
@@ -1045,6 +1046,7 @@ def P := pred_var_ (PredName.mk "P") []
   }
 ]
 
+-------------------------------------------------
 
 abbrev Context : Type := Std.HashMap String Step
 
