@@ -763,7 +763,7 @@ def checkProofList
   checkProofListAux {} proofList
 
 
-example
+theorem soundness
   (Δ : List Formula)
   (F : Formula)
   (h1 : IsDeduct Δ F) :
@@ -928,6 +928,78 @@ example
 
     apply ih_2
     exact a1
+
+
+theorem Except.bind_eq_some
+  {ε : Type _}
+  {α : Type _}
+  {β : Type _}
+  (x : Except ε α)
+  (f : α → Except ε β)
+  (a : β):
+  (Except.bind x f = .ok a) ↔ ∃ b, x = .ok b ∧ f b = .ok a :=
+  by
+  cases x
+  case error x =>
+    simp only [Except.bind]
+    simp
+  case ok x =>
+    simp only [Except.bind]
+    simp
+
+
+lemma not_IsDeduct_false :
+  ¬ IsDeduct [] false_ :=
+  by
+  intro contra
+  obtain s1 := soundness [] false_ contra default default default default
+  simp at s1
+  simp only [Holds] at s1
+
+
+example :
+  ∀ (P : Proof) (b : checkedProof), P.assertion.hypotheses = [] ∧ P.assertion.conclusion = false_ → checkProof {} P = .ok b -> False :=
+  by
+  intro P b a1 a2
+  simp only [checkProof] at a2
+  simp only [bind] at a2
+  simp only [Except.bind_eq_some] at a2
+  apply Exists.elim a2
+  intro b' a3
+  clear a2
+  cases a3
+  case _ a3_left a3_right =>
+    split_ifs at a3_right
+    case _ c1 =>
+      obtain s1 := b'.assertion.prop
+      simp only [c1] at s1
+      cases a1
+      case _ a1_left a1_right =>
+        simp only [a1_left] at s1
+        simp only [a1_right] at s1
+        simp only [not_IsDeduct_false] at s1
+
+
+example
+  (globalContext : GlobalContext)
+  (P : Proof)
+  (b : checkedProof)
+  (h1 : checkProof globalContext P = .ok b) :
+  IsDeduct P.assertion.hypotheses P.assertion.conclusion :=
+  by
+  simp only [checkProof] at h1
+  simp only [bind] at h1
+  simp only [Except.bind_eq_some] at h1
+  apply Exists.elim h1
+  intro b' a2
+  clear h1
+  split_ifs at a2
+  case pos c1 =>
+    obtain s1 := b'.assertion.prop
+    simp only [c1] at s1
+    exact s1
+  case neg c1 =>
+    simp at a2
 
 
 #eval checkProofList []
