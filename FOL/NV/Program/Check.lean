@@ -1006,6 +1006,9 @@ example
 #eval checkProofList []
 
 def P := pred_var_ (PredName.mk "P") []
+def Q := pred_var_ (PredName.mk "Q") []
+def R := pred_var_ (PredName.mk "R") []
+def S := pred_var_ (PredName.mk "S") []
 
 #eval checkProofList [
   {
@@ -1059,6 +1062,54 @@ def Context.find
   then Except.ok (Option.get opt h)
   else Except.error s! "{label} not found in local context."
 
+
+-- index of first item is 0
+#eval [1, 2].length
+#eval List.take 0 [1, 2]
+#eval List.drop 2 [1, 2]
+#eval [1, 2][0]
+#eval [1, 2][1]
+
+
+def shift_hypothesis_left
+  (step : Step)
+  (label : String)
+  (index : ℕ) :
+  Except String Step :=
+  let hypotheses := step.assertion.hypotheses
+  let conclusion := step.assertion.conclusion
+
+  if h1 : index < hypotheses.length
+  then
+    if h2 : index > 0
+    then
+      have : index - 1 < hypotheses.length := tsub_lt_of_lt h1
+      let Δ_1 := List.take (index - 1) hypotheses
+      let Δ_2 := List.drop (index + 1) hypotheses
+      let H_1 := hypotheses[index - 1]
+      let H_2 := hypotheses[index]
+
+      Except.ok {
+        label := label
+        assertion := {
+          hypotheses := (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2)
+          conclusion := conclusion }
+        rule := struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step.label
+      }
+    else Except.error "index must be greater than zero"
+  else Except.error "index out of range"
+
+
+def test_step : Step := {
+  label := "1"
+  assertion := {
+    hypotheses := [P, Q, R, S]
+    conclusion := P
+  }
+  rule := assume_ P
+}
+
+#eval shift_hypothesis_left test_step "2" 1
 
 def prop_1_
   (label : String)
