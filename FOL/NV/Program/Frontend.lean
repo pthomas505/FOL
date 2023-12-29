@@ -160,6 +160,7 @@ def mp_
 inductive Command : Type
   | shift_hypothesis_left_ : ℕ → ℕ → Command
   | assume_ : Formula → Command
+  | prop_1_ : Formula → Formula → Command
 
 
 open Command
@@ -196,13 +197,22 @@ def createStepList
       else Except.error "index out of range"
 
   | assume_ phi =>
-    Except.ok [{
-      assertion := {
-        hypotheses := [phi]
-        conclusion := phi
-      }
-      rule := Backend.Rule.assume_ phi
-    }]
+      Except.ok [{
+        assertion := {
+          hypotheses := [phi]
+          conclusion := phi
+        }
+        rule := Backend.Rule.assume_ phi
+      }]
+
+  | prop_1_ phi psi =>
+      Except.ok [{
+        assertion := {
+          hypotheses := []
+          conclusion := (phi.imp_ (psi.imp_ phi))
+        }
+        rule := Backend.Rule.prop_1_ phi psi
+      }]
 
 
 def createProofStepListAux
