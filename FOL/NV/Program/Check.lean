@@ -8,7 +8,7 @@ import Std
 set_option autoImplicit false
 
 
-namespace FOL.NV
+namespace FOL.NV.Program.Backend
 
 open Formula
 
@@ -1048,104 +1048,3 @@ def S := pred_var_ (PredName.mk "S") []
     ]
   }
 ]
-
--------------------------------------------------
-
-abbrev Context : Type := Std.HashMap String Step
-
-def Context.find
-  (context : Context)
-  (label : String) :
-  Except String Step :=
-  let opt := context.find? label
-  if h : Option.isSome opt
-  then Except.ok (Option.get opt h)
-  else Except.error s! "{label} not found in local context."
-
-
--- index of first item is 0
-#eval [1, 2].length
-#eval List.take 0 [1, 2]
-#eval List.drop 2 [1, 2]
-#eval [1, 2][0]
-#eval [1, 2][1]
-
-
-def shift_hypothesis_left
-  (step : Step)
-  (label : String)
-  (index : ℕ) :
-  Except String Step :=
-  let hypotheses := step.assertion.hypotheses
-  let conclusion := step.assertion.conclusion
-
-  if h1 : index < hypotheses.length
-  then
-    if h2 : index > 0
-    then
-      have : index - 1 < hypotheses.length := tsub_lt_of_lt h1
-      let Δ_1 := List.take (index - 1) hypotheses
-      let Δ_2 := List.drop (index + 1) hypotheses
-      let H_1 := hypotheses[index - 1]
-      let H_2 := hypotheses[index]
-
-      Except.ok {
-        label := label
-        assertion := {
-          hypotheses := (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2)
-          conclusion := conclusion }
-        rule := struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step.label
-      }
-    else Except.error "index must be greater than zero"
-  else Except.error "index out of range"
-
-
-def test_step : Step := {
-  label := "1"
-  assertion := {
-    hypotheses := [P, Q, R, S]
-    conclusion := P
-  }
-  rule := assume_ P
-}
-
-#eval shift_hypothesis_left test_step "2" 1
-
-def prop_1_
-  (label : String)
-  (phi psi : Formula) :
-  Step := {
-    label := label
-    assertion := {
-      hypotheses := []
-      conclusion := (phi.imp_ (psi.imp_ phi))
-    }
-    rule := Rule.prop_1_ phi psi
-  }
-
-
-def mp_
-  (label : String)
-  (context : Context)
-  (major_step_label : String)
-  (minor_step_label : String) :
-  Except String Step := do
-    let major_step ← context.find major_step_label
-    let minor_step ← context.find minor_step_label
-
-    if let (imp_ major_left major_right) := major_step.assertion.conclusion
-    then
-      if major_step.assertion.hypotheses = minor_step.assertion.hypotheses
-      then
-        if major_left = minor_step.assertion.conclusion
-        then Except.ok {
-          label := label
-          assertion := {
-            hypotheses := major_step.assertion.hypotheses
-            conclusion := major_right
-          }
-          rule := Rule.mp_ major_step.assertion.hypotheses major_left major_right major_step_label minor_step_label
-        }
-        else Except.error s! "minor does match major antecedent."
-      else Except.error "minor hypotheses do not match major hypotheses."
-    else Except.error s! "{major_step_label} is not an implication."
