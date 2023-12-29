@@ -254,6 +254,13 @@ def createProof
   else Except.error "The step list has no steps."
 
 
+def checkProof
+  (proof : Except String Backend.Proof) :
+  Except String Backend.checkedProof := do
+  let proof' ← proof
+  Backend.checkProof {} proof'
+
+
 def P := pred_var_ (PredName.mk "P") []
 
-#eval (createProof [] "id" [assume_ P, assume_ P])
+#eval checkProof (createProof [] "id" [assume_ P, assume_ P])
