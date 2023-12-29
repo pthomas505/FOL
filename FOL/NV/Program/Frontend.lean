@@ -161,6 +161,7 @@ inductive Command : Type
   | shift_hypothesis_left_ : ℕ → ℕ → Command
   | assume_ : Formula → Command
   | prop_1_ : Formula → Formula → Command
+  | prop_2_ : Formula → Formula → Formula → Command
   | mp_ : ℕ → ℕ → Command
 
 
@@ -213,6 +214,15 @@ def createStepList
           conclusion := (phi.imp_ (psi.imp_ phi))
         }
         rule := Backend.Rule.prop_1_ phi psi
+      }]
+
+  | prop_2_ phi psi chi =>
+      Except.ok [{
+        assertion := {
+          hypotheses := []
+          conclusion := ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi)))
+        }
+        rule := Backend.Rule.prop_2_ phi psi chi
       }]
 
   | mp_ major_step_index minor_step_index => do
@@ -294,4 +304,4 @@ def checkProof
 
 def P := pred_var_ (PredName.mk "P") []
 
-#eval checkProof (createProof [] "id" [assume_ P, assume_ P])
+#eval checkProof (createProof [] "id" [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3])
