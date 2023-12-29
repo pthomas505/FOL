@@ -155,22 +155,22 @@ def mp_
     else Except.error s! "{major_step_label} is not an implication."
 -/
 
-inductive Rule : Type
-  | shift_hypothesis_left : ℕ → ℕ → Rule
-  | assume_ : Formula → Rule
-  | prop_0_ : Rule
-  | prop_1_ : Formula → Formula → Rule
-  | prop_2_ : Formula → Formula → Formula → Rule
-  | prop_3_ : Formula → Formula → Rule
-  | mp_ : ℕ → ℕ → Rule
+inductive Command : Type
+  | shift_hypothesis_left : ℕ → ℕ → Command
+  | assume_ : Formula → Command
+  | prop_0_ : Command
+  | prop_1_ : Formula → Formula → Command
+  | prop_2_ : Formula → Formula → Formula → Command
+  | prop_3_ : Formula → Formula → Command
+  | mp_ : ℕ → ℕ → Command
 
-open Rule
+open Command
 
 
 def createStepList
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
-  Rule → Except String (List Step)
+  Command → Except String (List Step)
 
   | shift_hypothesis_left step_index index => do
       let step ← localContext.get step_index
@@ -196,3 +196,14 @@ def createStepList
           }]
         else Except.error "index must be greater than zero"
       else Except.error "index out of range"
+
+
+def createProofStepListAux
+  (globalContext : GlobalContext)
+  (localContext : LocalContext) :
+  List Command → Except String (List Step)
+  | [] => Except.ok localContext
+  | hd :: tl => do
+      let step_list ← createStepList globalContext localContext hd
+
+      createProofStepListAux globalContext (localContext ++ step_list) tl
