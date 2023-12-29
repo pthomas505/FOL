@@ -66,6 +66,7 @@ def GlobalContext.get
   else Except.error s! "{index} not found in global context."
 
 
+/-
 -- index of first item is 0
 #eval [1, 2].length
 #eval List.take 0 [1, 2]
@@ -152,32 +153,16 @@ def mp_
         else Except.error s! "minor does match major antecedent."
       else Except.error "minor hypotheses do not match major hypotheses."
     else Except.error s! "{major_step_label} is not an implication."
-
+-/
 
 inductive Rule : Type
-  | struct_1_ : List Formula → Formula → Formula → String → Rule
-  | struct_2_ : List Formula → Formula → Formula → String → Rule
   | shift_hypothesis_left : ℕ → ℕ → Rule
   | assume_ : Formula → Rule
   | prop_0_ : Rule
   | prop_1_ : Formula → Formula → Rule
   | prop_2_ : Formula → Formula → Formula → Rule
   | prop_3_ : Formula → Formula → Rule
-  | mp_ : List Formula → Formula → Formula → String → String → Rule
-  | dt_ : List Formula → Formula → Formula → String → Rule
-  | pred_1_ : VarName → Formula → Formula → Rule
-  | pred_2_ : VarName → VarName → Formula → Rule
-  | pred_3_ : VarName → Formula → Rule
-  | gen_ : VarName → Formula → String → Rule
-  | eq_1_ : VarName → Rule
-  | eq_2_eq_ : VarName → VarName → VarName → VarName → Rule
-  | def_false_ : Rule
-  | def_and_ : Formula → Formula → Rule
-  | def_or_ : Formula → Formula → Rule
-  | def_iff_ : Formula → Formula → Rule
-  | def_exists_ : VarName → Formula → Rule
-  | sub_ : List Formula → Formula → (PredName → ℕ → Option (List VarName × Formula)) → String → Rule
-  | thm_ : String → Rule
+  | mp_ : ℕ → ℕ → Rule
 
 open Rule
 
@@ -203,12 +188,11 @@ def createStepList
           let H_1 := hypotheses[index - 1]
           let H_2 := hypotheses[index]
 
-          Except.ok {
-            label := label
+          Except.ok [{
             assertion := {
               hypotheses := (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2)
               conclusion := conclusion }
-            rule := struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step.label
-          }
+            rule := Backend.Rule.struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step_index.repr
+          }]
         else Except.error "index must be greater than zero"
       else Except.error "index out of range"
