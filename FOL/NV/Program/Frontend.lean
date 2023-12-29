@@ -6,6 +6,8 @@ set_option autoImplicit false
 
 namespace FOL.NV.Program.Frontend
 
+open Formula
+
 
 def FreshChar : Char := '+'
 
@@ -156,13 +158,9 @@ def mp_
 -/
 
 inductive Command : Type
-  | shift_hypothesis_left : ℕ → ℕ → Command
+  | shift_hypothesis_left_ : ℕ → ℕ → Command
   | assume_ : Formula → Command
-  | prop_0_ : Command
-  | prop_1_ : Formula → Formula → Command
-  | prop_2_ : Formula → Formula → Formula → Command
-  | prop_3_ : Formula → Formula → Command
-  | mp_ : ℕ → ℕ → Command
+
 
 open Command
 
@@ -172,7 +170,7 @@ def createStepList
   (localContext : LocalContext) :
   Command → Except String (List Step)
 
-  | shift_hypothesis_left step_index index => do
+  | shift_hypothesis_left_ step_index index => do
       let step ← localContext.get step_index
 
       let hypotheses := step.assertion.hypotheses
@@ -197,6 +195,15 @@ def createStepList
         else Except.error "index must be greater than zero"
       else Except.error "index out of range"
 
+  | assume_ phi =>
+    Except.ok [{
+      assertion := {
+        hypotheses := [phi]
+        conclusion := phi
+      }
+      rule := Backend.Rule.assume_ phi
+    }]
+
 
 def createProofStepListAux
   (globalContext : GlobalContext)
@@ -207,3 +214,46 @@ def createProofStepListAux
       let step_list ← createStepList globalContext localContext hd
 
       createProofStepListAux globalContext (localContext ++ step_list) tl
+
+
+def createProofStepList
+  (globalContext : GlobalContext)
+  (commands : List Command) :
+  Except String (List Step) :=
+  createProofStepListAux globalContext [] commands
+
+
+def createProofLabeledStepListAux
+  (index : ℕ) :
+  List Step → List Backend.Step
+  | [] => []
+  | hd :: tl =>
+    let step : Backend.Step := {
+      label := index.repr
+      assertion := hd.assertion
+      rule := hd.rule
+    }
+    step :: (createProofLabeledStepListAux (index + 1) tl)
+
+
+def createProof
+  (globalContext : GlobalContext)
+  (label : String)
+  (commands : List Command) :
+  Except String Backend.Proof := do
+  let step_list ← createProofStepList globalContext commands
+
+  let labeled_step_list := createProofLabeledStepListAux 0 step_list
+
+  if let Option.some last_step := step_list.getLast?
+  then Except.ok {
+    label := label
+    assertion := last_step.assertion
+    step_list := labeled_step_list
+  }
+  else Except.error "The step list has no steps."
+
+
+def P := pred_var_ (PredName.mk "P") []
+
+#eval (createProof [] "id" [assume_ P, assume_ P])
