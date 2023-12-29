@@ -161,6 +161,7 @@ inductive Command : Type
   | shift_hypothesis_left_ : ℕ → ℕ → Command
   | assume_ : Formula → Command
   | prop_1_ : Formula → Formula → Command
+  | mp_ : ℕ → ℕ → Command
 
 
 open Command
@@ -213,6 +214,26 @@ def createStepList
         }
         rule := Backend.Rule.prop_1_ phi psi
       }]
+
+  | mp_ major_step_index minor_step_index => do
+    let major_step ← localContext.get major_step_index
+    let minor_step ← localContext.get minor_step_index
+
+    if let (imp_ major_left major_right) := major_step.assertion.conclusion
+    then
+      if major_step.assertion.hypotheses = minor_step.assertion.hypotheses
+      then
+        if major_left = minor_step.assertion.conclusion
+        then Except.ok [{
+          assertion := {
+            hypotheses := major_step.assertion.hypotheses
+            conclusion := major_right
+          }
+          rule := Backend.Rule.mp_ major_step.assertion.hypotheses major_left major_right major_step_index.repr minor_step_index.repr
+        }]
+        else Except.error s! "minor does match major antecedent."
+      else Except.error "minor hypotheses do not match major hypotheses."
+    else Except.error s! "{major_step} is not an implication."
 
 
 def createProofStepListAux
