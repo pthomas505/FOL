@@ -931,9 +931,9 @@ theorem soundness
 
 
 theorem Except.bind_eq_ok
-  {ε : Type _}
-  {α : Type _}
-  {β : Type _}
+  {ε : Type}
+  {α : Type}
+  {β : Type}
   (x : Except ε α)
   (f : α → Except ε β)
   (a : β):
