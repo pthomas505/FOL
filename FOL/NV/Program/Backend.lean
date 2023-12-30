@@ -12,7 +12,7 @@ namespace FOL.NV.Program.Backend
 open Formula
 
 
-def FreshChar : Char := '+'
+def freshChar : Char := '+'
 
 def LF : Char := Char.ofNat 10
 
@@ -111,7 +111,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   | pred_2_
     (v t : VarName)
     (phi : Formula) :
-    IsDeduct [] ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) FreshChar phi))
+    IsDeduct [] ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) freshChar phi))
 
   /-
     ⊢ phi → (∀ v phi)  provided v is not free in phi
@@ -141,7 +141,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   /-
     ⊢ ∀ x_0 ... ∀ x_n ∀ y_0 ... y_n ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) →((pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n]))
   -/
-/-
+  /-
   | eq_2_pred_const_
     (name : PredName)
     (n : ℕ)
@@ -151,7 +151,7 @@ inductive IsDeduct : List Formula → Formula → Prop
         (Forall_ (List.ofFn ys)
           ((And_ (List.ofFn fun i : Fin n => eq_ (xs i) (ys i))).imp_
             ((pred_const_ name (List.ofFn xs)).iff_ (pred_const_ name (List.ofFn ys))))))
--/
+  -/
 
   /-
     ⊢ ∀ x_0 ∀ x_1 ∀ y_0 ∀ y_1 ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
@@ -209,7 +209,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     (phi : Formula)
     (τ : PredName → ℕ → Option (List VarName × Formula)) :
     IsDeduct Δ phi →
-    IsDeduct (Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub FreshChar τ)) (Sub.Pred.All.Rec.Option.Fresh.sub FreshChar τ phi)
+    IsDeduct (Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)) (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi)
 
 
 inductive Rule : Type
@@ -265,7 +265,7 @@ def Rule.toString : Rule → String
   | thm_ label => s! "thm_ {label}"
 
 instance : ToString Rule :=
-  { toString := fun x => x.toString }
+  { toString := fun (x : Rule) => x.toString }
 
 
 structure Sequent : Type :=
@@ -277,15 +277,15 @@ def Sequent.toString (x : Sequent) : String :=
   s! "{x.hypotheses} ⊢ {x.conclusion}"
 
 instance : ToString Sequent :=
-  { toString := fun x => x.toString }
+  { toString := fun (x : Sequent) => x.toString }
 
 
-structure checkedSequent : Type :=
+structure CheckedSequent : Type :=
   (val : Sequent)
   (prop : IsDeduct val.hypotheses val.conclusion)
 
-instance : ToString checkedSequent :=
-  { toString := fun x => x.val.toString }
+instance : ToString CheckedSequent :=
+  { toString := fun (x : CheckedSequent) => x.val.toString }
 
 
 structure Step : Type :=
@@ -297,12 +297,12 @@ def Step.toString (x : Step) : String :=
   s! "{x.label}. {x.assertion} : {x.rule}"
 
 instance : ToString Step :=
-  { toString := fun x => x.toString }
+  { toString := fun (x : Step) => x.toString }
 
 
-structure checkedStep : Type :=
+structure CheckedStep : Type :=
   (label : String)
-  (assertion : checkedSequent)
+  (assertion : CheckedSequent)
 
 
 def List.toLFString
@@ -327,7 +327,7 @@ instance : ToString Proof :=
 
 structure checkedProof : Type :=
   (label : String)
-  (assertion : checkedSequent)
+  (assertion : CheckedSequent)
 
 def checkedProof.toString (x : checkedProof) : String :=
   s! "{x.label} : {x.assertion}"
@@ -348,12 +348,12 @@ def GlobalContext.find
   else Except.error s! "{label} not found in global context."
 
 
-abbrev LocalContext : Type := Std.HashMap String checkedStep
+abbrev LocalContext : Type := Std.HashMap String CheckedStep
 
 def LocalContext.find
   (context : LocalContext)
   (label : String) :
-  Except String checkedStep :=
+  Except String CheckedStep :=
   let opt := context.find? label
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
@@ -363,7 +363,7 @@ def LocalContext.find
 def checkRule
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
-  Rule → Except String checkedSequent
+  Rule → Except String CheckedSequent
 
   | struct_1_ Δ H phi label => do
       let found ← localContext.find label
@@ -554,7 +554,7 @@ def checkRule
   | pred_2_ v t phi =>
       let return_val : Sequent := {
         hypotheses := []
-        conclusion := ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) FreshChar phi)) }
+        conclusion := ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) freshChar phi)) }
 
       Except.ok {
         val := return_val
@@ -680,8 +680,8 @@ def checkRule
         conclusion := phi }
 
       let return_val : Sequent := {
-        hypotheses := Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub FreshChar τ)
-        conclusion := Sub.Pred.All.Rec.Option.Fresh.sub FreshChar τ phi }
+        hypotheses := Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)
+        conclusion := Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi }
 
       if h : found.assertion.val = expected_val
       then
@@ -705,33 +705,33 @@ def checkStep
   (globalContext : GlobalContext)
   (localContext : LocalContext)
   (step : Step) :
-  Except String checkedStep := do
-  let checkedSequent ← checkRule globalContext localContext step.rule
-  if checkedSequent.val = step.assertion
+  Except String CheckedStep := do
+  let CheckedSequent ← checkRule globalContext localContext step.rule
+  if CheckedSequent.val = step.assertion
   then Except.ok {
     label := step.label
-    assertion := checkedSequent }
-  else Except.error s! "Step assertion :{LF}{step.assertion}{LF}Rule assertion :{LF}{checkedSequent.val}"
+    assertion := CheckedSequent }
+  else Except.error s! "Step assertion :{LF}{step.assertion}{LF}Rule assertion :{LF}{CheckedSequent.val}"
 
 
 def checkStepListAux
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
-  List Step → Except String checkedStep
+  List Step → Except String CheckedStep
   | [] => Except.error "The step list has no steps."
   | [last] => do
-    let checkedStep ← checkStep globalContext localContext last
+    let CheckedStep ← checkStep globalContext localContext last
       |>.mapError fun message => s! "step label : {last.label}{LF}rule : {last.rule}{LF}{message}"
-    Except.ok checkedStep
+    Except.ok CheckedStep
   | hd :: tl => do
-    let checkedStep ← checkStep globalContext localContext hd
+    let CheckedStep ← checkStep globalContext localContext hd
       |>.mapError fun message => s! "step label : {hd.label}{LF}rule : {hd.rule}{LF}{message}"
-    checkStepListAux globalContext (localContext.insert checkedStep.label checkedStep) tl
+    checkStepListAux globalContext (localContext.insert CheckedStep.label CheckedStep) tl
 
 def checkStepList
   (globalContext : GlobalContext)
   (stepList : List Step) :
-  Except String checkedStep :=
+  Except String CheckedStep :=
   checkStepListAux globalContext {} stepList
 
 
@@ -844,7 +844,7 @@ theorem soundness
     exact a3 d
   case pred_2_ v t phi =>
     intro D I V E _
-    obtain s1 := FOL.NV.Sub.Var.All.Rec.Fresh.substitution_theorem D I V E (Function.updateITE id v t) FreshChar phi
+    obtain s1 := FOL.NV.Sub.Var.All.Rec.Fresh.substitution_theorem D I V E (Function.updateITE id v t) freshChar phi
 
     simp only [Holds]
     intro a2
@@ -921,7 +921,7 @@ theorem soundness
     intro D I V E a1
     simp at a1
 
-    obtain s1 := Sub.Pred.All.Rec.Option.Fresh.substitution_theorem D I V E FreshChar τ
+    obtain s1 := Sub.Pred.All.Rec.Option.Fresh.substitution_theorem D I V E freshChar τ
     simp only [← s1] at a1
     simp only [← s1]
 
