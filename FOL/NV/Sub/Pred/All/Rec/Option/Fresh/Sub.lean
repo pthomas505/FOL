@@ -61,16 +61,22 @@ def subAux
       (subAux c τ σ phi)
       (subAux c τ σ psi)
   | forall_ x phi =>
+      let S : Finset VarName := (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+
       let x' : VarName :=
-        if x ∈ (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
-        then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+        if x ∈ S
+        then fresh x c S
         else x
+
       forall_ x' (subAux c τ (Function.updateITE σ x x') phi)
   | exists_ x phi =>
+      let S : Finset VarName := (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+
       let x' : VarName :=
-        if x ∈ (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
-        then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+        if x ∈ S
+        then fresh x c S
         else x
+
       exists_ x' (subAux c τ (Function.updateITE σ x x') phi)
   | def_ X xs => def_ X (xs.map σ)
 
