@@ -14,7 +14,7 @@ open Formula
 /--
   The recursive simultaneous uniform substitution of all of the predicate variables in a formula.
 -/
-def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formula → Formula
+def replace (τ : PredName → ℕ → (List VarName × Formula)) : Formula → Formula
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
       let zs := (τ X xs.length).fst
@@ -25,29 +25,29 @@ def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formu
   | eq_ x y => eq_ x y
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (replacePredFun τ phi)
+  | not_ phi => not_ (replace τ phi)
   | imp_ phi psi =>
       imp_
-      (replacePredFun τ phi)
-      (replacePredFun τ psi)
+      (replace τ phi)
+      (replace τ psi)
   | and_ phi psi =>
       and_
-      (replacePredFun τ phi)
-      (replacePredFun τ psi)
+      (replace τ phi)
+      (replace τ psi)
   | or_ phi psi =>
       or_
-      (replacePredFun τ phi)
-      (replacePredFun τ psi)
+      (replace τ phi)
+      (replace τ psi)
   | iff_ phi psi =>
       iff_
-      (replacePredFun τ phi)
-      (replacePredFun τ psi)
-  | forall_ x phi => forall_ x (replacePredFun τ phi)
-  | exists_ x phi => exists_ x (replacePredFun τ phi)
+      (replace τ phi)
+      (replace τ psi)
+  | forall_ x phi => forall_ x (replace τ phi)
+  | exists_ x phi => exists_ x (replace τ phi)
   | def_ X xs => def_ X xs
 
 
-def admitsPredFunAux
+def admitsAux
   (τ : PredName → ℕ → List VarName × Formula)
   (binders : Finset VarName) : Formula → Prop
   | pred_const_ _ _ => True
@@ -58,49 +58,49 @@ def admitsPredFunAux
   | true_ => True
   | false_ => True
   | eq_ _ _ => True
-  | not_ phi => admitsPredFunAux τ binders phi
+  | not_ phi => admitsAux τ binders phi
   | imp_ phi psi =>
-      admitsPredFunAux τ binders phi ∧
-      admitsPredFunAux τ binders psi
+      admitsAux τ binders phi ∧
+      admitsAux τ binders psi
   | and_ phi psi =>
-      admitsPredFunAux τ binders phi ∧
-      admitsPredFunAux τ binders psi
+      admitsAux τ binders phi ∧
+      admitsAux τ binders psi
   | or_ phi psi =>
-      admitsPredFunAux τ binders phi ∧
-      admitsPredFunAux τ binders psi
+      admitsAux τ binders phi ∧
+      admitsAux τ binders psi
   | iff_ phi psi =>
-      admitsPredFunAux τ binders phi ∧
-      admitsPredFunAux τ binders psi
-  | forall_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
-  | exists_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
+      admitsAux τ binders phi ∧
+      admitsAux τ binders psi
+  | forall_ x phi => admitsAux τ (binders ∪ {x}) phi
+  | exists_ x phi => admitsAux τ (binders ∪ {x}) phi
   | def_ _ _ => True
 
 instance
   (τ : PredName → ℕ → List VarName × Formula)
   (binders : Finset VarName)
   (F : Formula) :
-  Decidable (admitsPredFunAux τ binders F) :=
+  Decidable (admitsAux τ binders F) :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admitsPredFunAux]
+    simp only [admitsAux]
     infer_instance
 
 
-def admitsPredFun (τ : PredName → ℕ → List VarName × Formula) (F : Formula) : Prop :=
-  admitsPredFunAux τ ∅ F
+def admits (τ : PredName → ℕ → List VarName × Formula) (F : Formula) : Prop :=
+  admitsAux τ ∅ F
 
 
 instance
   (τ : PredName → ℕ → List VarName × Formula)
   (F : Formula) :
-  Decidable (admitsPredFun τ F) :=
+  Decidable (admits τ F) :=
   by
-  simp only [admitsPredFun]
+  simp only [admits]
   infer_instance
 
 
-theorem predSub_aux
+theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
   (V V' : VarAssignment D)
@@ -108,7 +108,7 @@ theorem predSub_aux
   (τ : PredName → ℕ → List VarName × Formula)
   (binders : Finset VarName)
   (F : Formula)
-  (h1 : admitsPredFunAux τ binders F)
+  (h1 : admitsAux τ binders F)
   (h2 : ∀ x : VarName, x ∉ binders → V x = V' x) :
   Holds D
     ⟨
@@ -119,14 +119,14 @@ theorem predSub_aux
         then Holds D I (Function.updateListITE V' (τ X ds.length).fst ds) E (τ X ds.length).snd
         else I.pred_var_ X ds
       ⟩
-      V E F ↔ Holds D I V E (replacePredFun τ F) :=
+      V E F ↔ Holds D I V E (replace τ F) :=
   by
   induction F generalizing binders V
   case pred_const_ X xs =>
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
   case pred_var_ X xs =>
-    simp only [admitsPredFunAux] at h1
+    simp only [admitsAux] at h1
     simp at h1
 
     cases h1
@@ -162,20 +162,20 @@ theorem predSub_aux
         clear s2
 
         simp only [Holds]
-        simp only [replacePredFun]
+        simp only [replace]
         simp
         simp only [if_pos h1_right_right]
         exact s1
   case eq_ x y =>
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
   case true_ | false_ =>
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
   case not_ phi phi_ih =>
-    simp only [admitsPredFunAux] at h1
+    simp only [admitsAux] at h1
 
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
     congr! 1
     exact phi_ih V binders h1 h2
@@ -184,9 +184,9 @@ theorem predSub_aux
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [admitsPredFunAux] at h1
+    simp only [admitsAux] at h1
 
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
 
     cases h1
@@ -195,9 +195,9 @@ theorem predSub_aux
       · exact phi_ih V binders h1_left h2
       · exact psi_ih V binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [admitsPredFunAux] at h1
+    simp only [admitsAux] at h1
 
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
@@ -213,10 +213,10 @@ theorem predSub_aux
   case def_ X xs =>
     cases E
     case nil =>
-      simp only [replacePredFun]
+      simp only [replace]
       simp only [Holds]
     case cons hd tl =>
-      simp only [replacePredFun]
+      simp only [replace]
       simp only [Holds]
       split_ifs
       case _ c1 =>
@@ -232,14 +232,14 @@ theorem predSub_aux
           simp
 
 
-theorem predSub
+theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D)
   (E : Env)
   (τ : PredName → ℕ → List VarName × Formula)
   (F : Formula)
-  (h1 : admitsPredFun τ F) :
+  (h1 : admits τ F) :
   Holds D
     ⟨
       I.nonempty,
@@ -251,27 +251,27 @@ theorem predSub
         then Holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ X ds
       ⟩
-      V E F ↔ Holds D I V E (replacePredFun τ F) :=
+      V E F ↔ Holds D I V E (replace τ F) :=
   by
-  apply predSub_aux D I V V E τ ∅ F
-  · simp only [admitsPredFun] at h1
+  apply substitution_theorem_aux D I V V E τ ∅ F
+  · simp only [admits] at h1
     exact h1
   · intro X _
     rfl
 
 
-theorem predSub_valid
+theorem substitution_is_valid
   (phi : Formula)
   (τ : PredName → ℕ → List VarName × Formula)
-  (h1 : admitsPredFun τ phi)
+  (h1 : admits τ phi)
   (h2 : phi.IsValid) :
-  (replacePredFun τ phi).IsValid :=
+  (replace τ phi).IsValid :=
   by
   simp only [IsValid] at h2
 
   simp only [IsValid]
   intro D I V E
-  obtain s1 := predSub D I V E τ phi h1
+  obtain s1 := substitution_theorem D I V E τ phi h1
   simp only [← s1]
   apply h2
 
