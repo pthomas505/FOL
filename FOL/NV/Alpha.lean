@@ -392,7 +392,7 @@ theorem Holds_iff_alphaEqv_Holds
 def isAlphaEqvVar : List (VarName × VarName) → VarName → VarName → Prop
   | [], x, y => x = y
 
-  | hd::tl, x, y =>
+  | hd :: tl, x, y =>
       (x = hd.fst ∧ y = hd.snd) ∨
         ((¬ x = hd.fst ∧ ¬ y = hd.snd) ∧ isAlphaEqvVar tl x y)
 
@@ -418,7 +418,7 @@ def isAlphaEqvVarList
   List VarName → List VarName → Prop
   | [], [] => True
 
-  | x_hd::x_tl, y_hd::y_tl =>
+  | x_hd :: x_tl, y_hd :: y_tl =>
       isAlphaEqvVar binders x_hd y_hd ∧
         isAlphaEqvVarList binders x_tl y_tl
 
