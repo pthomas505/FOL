@@ -149,7 +149,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     IsDeduct []
       (Forall_ (List.ofFn xs)
         (Forall_ (List.ofFn ys)
-          ((And_ (List.ofFn fun i : Fin n => eq_ (xs i) (ys i))).imp_
+          ((And_ (List.ofFn fun (i : Fin n) => eq_ (xs i) (ys i))).imp_
             ((pred_const_ name (List.ofFn xs)).iff_ (pred_const_ name (List.ofFn ys))))))
   -/
 
@@ -721,11 +721,11 @@ def checkStepListAux
   | [] => Except.error "The step list has no steps."
   | [last] => do
     let checkedStep : CheckedStep ← checkStep globalContext localContext last
-      |>.mapError fun message => s! "step label : {last.label}{LF}rule : {last.rule}{LF}{message}"
+      |>.mapError fun (message : String) => s! "step label : {last.label}{LF}rule : {last.rule}{LF}{message}"
     Except.ok checkedStep
   | hd :: tl => do
     let CheckedStep : CheckedStep ← checkStep globalContext localContext hd
-      |>.mapError fun message => s! "step label : {hd.label}{LF}rule : {hd.rule}{LF}{message}"
+      |>.mapError fun (message : String) => s! "step label : {hd.label}{LF}rule : {hd.rule}{LF}{message}"
     checkStepListAux globalContext (localContext.insert CheckedStep.label CheckedStep) tl
 
 def checkStepList
@@ -754,7 +754,7 @@ def checkProofListAux
   | [] => Except.ok ()
   | hd :: tl => do
   let checkedProof : CheckedProof ← checkProof globalContext hd
-    |>.mapError fun message => s! "proof label : {hd.label}{LF}{message}"
+    |>.mapError fun (message : String) => s! "proof label : {hd.label}{LF}{message}"
   checkProofListAux (globalContext.insert checkedProof.label checkedProof) tl
 
 def checkProofList
