@@ -322,26 +322,26 @@ def Proof.toString (x : Proof) : String :=
   s! "{x.label} : {x.assertion}{LF}{List.toLFString x.step_list}"
 
 instance : ToString Proof :=
-  { toString := fun x => x.toString }
+  { toString := fun (x : Proof) => x.toString }
 
 
-structure checkedProof : Type :=
+structure CheckedProof : Type :=
   (label : String)
   (assertion : CheckedSequent)
 
-def checkedProof.toString (x : checkedProof) : String :=
+def CheckedProof.toString (x : CheckedProof) : String :=
   s! "{x.label} : {x.assertion}"
 
-instance : ToString checkedProof :=
-  { toString := fun x => x.toString }
+instance : ToString CheckedProof :=
+  { toString := fun (x : CheckedProof) => x.toString }
 
 
-abbrev GlobalContext : Type := Std.HashMap String checkedProof
+abbrev GlobalContext : Type := Std.HashMap String CheckedProof
 
 def GlobalContext.find
   (context : GlobalContext)
   (label : String) :
-  Except String checkedProof :=
+  Except String CheckedProof :=
   let opt := context.find? label
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
@@ -366,7 +366,7 @@ def checkRule
   Rule → Except String CheckedSequent
 
   | struct_1_ Δ H phi label => do
-      let found ← localContext.find label
+      let found : CheckedStep ← localContext.find label
 
       let expected_val : Sequent := {
         hypotheses := Δ
@@ -389,7 +389,7 @@ def checkRule
       else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | struct_2_ Δ H phi label => do
-      let found ← localContext.find label
+      let found : CheckedStep ← localContext.find label
 
       let expected_val : Sequent := {
         hypotheses := H :: H :: Δ
@@ -412,7 +412,7 @@ def checkRule
       else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | struct_3_ Δ_1 Δ_2 H_1 H_2 phi label => do
-      let found ← localContext.find label
+      let found : CheckedStep ← localContext.find label
 
       let expected_val : Sequent := {
         hypotheses := Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2
@@ -485,8 +485,8 @@ def checkRule
       }
 
   | mp_ Δ phi psi label_1 label_2 => do
-      let found_1 ← localContext.find label_1
-      let found_2 ← localContext.find label_2
+      let found_1 : CheckedStep ← localContext.find label_1
+      let found_2 : CheckedStep ← localContext.find label_2
 
       let expected_val_1 : Sequent := {
         hypotheses := Δ
@@ -519,27 +519,27 @@ def checkRule
       else Except.error s! "Expected :{LF}{expected_val_1}{LF}Found :{LF}{found_1.assertion.val}"
 
   | dt_ Δ H phi label => do
-    let found ← localContext.find label
+      let found : CheckedStep ← localContext.find label
 
-    let expected_val : Sequent := {
-      hypotheses := H :: Δ
-      conclusion := phi }
+      let expected_val : Sequent := {
+        hypotheses := H :: Δ
+        conclusion := phi }
 
-    let return_val : Sequent := {
-      hypotheses := Δ
-      conclusion := H.imp_ phi }
+      let return_val : Sequent := {
+        hypotheses := Δ
+        conclusion := H.imp_ phi }
 
-    if h : found.assertion.val = expected_val
-    then Except.ok {
-      val := return_val
-      prop := by {
-        apply IsDeduct.dt_ Δ H phi
-        obtain s1 := found.assertion.prop
-        simp only [h] at s1
-        exact s1
+      if h : found.assertion.val = expected_val
+      then Except.ok {
+        val := return_val
+        prop := by {
+          apply IsDeduct.dt_ Δ H phi
+          obtain s1 := found.assertion.prop
+          simp only [h] at s1
+          exact s1
+        }
       }
-    }
-    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | pred_1_ v phi psi =>
       let return_val : Sequent := {
@@ -561,7 +561,7 @@ def checkRule
         prop := IsDeduct.pred_2_ v t phi
       }
 
-  | pred_3_ v phi => do
+  | pred_3_ v phi =>
       let return_val : Sequent := {
         hypotheses := []
         conclusion := phi.imp_ (forall_ v phi) }
@@ -574,7 +574,7 @@ def checkRule
       else Except.error s! "{v} must not be free in {phi}."
 
   | gen_ v phi label => do
-      let found ← localContext.find label
+      let found : CheckedStep ← localContext.find label
 
       let expected_val : Sequent := {
         hypotheses := []
@@ -673,7 +673,7 @@ def checkRule
       }
 
   | sub_ Δ phi τ label => do
-      let found ← localContext.find label
+      let found : CheckedStep ← localContext.find label
 
       let expected_val : Sequent := {
         hypotheses := Δ
@@ -684,8 +684,7 @@ def checkRule
         conclusion := Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi }
 
       if h : found.assertion.val = expected_val
-      then
-      Except.ok {
+      then Except.ok {
         val := return_val
         prop := by {
           apply IsDeduct.sub_
@@ -697,7 +696,7 @@ def checkRule
       else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | thm_ label => do
-    let step ← globalContext.find label
+    let step : CheckedProof ← globalContext.find label
     Except.ok step.assertion
 
 
@@ -706,12 +705,13 @@ def checkStep
   (localContext : LocalContext)
   (step : Step) :
   Except String CheckedStep := do
-  let CheckedSequent ← checkRule globalContext localContext step.rule
-  if CheckedSequent.val = step.assertion
+  let checkedSequent : CheckedSequent ← checkRule globalContext localContext step.rule
+
+  if checkedSequent.val = step.assertion
   then Except.ok {
     label := step.label
-    assertion := CheckedSequent }
-  else Except.error s! "Step assertion :{LF}{step.assertion}{LF}Rule assertion :{LF}{CheckedSequent.val}"
+    assertion := checkedSequent }
+  else Except.error s! "Step assertion :{LF}{step.assertion}{LF}Rule assertion :{LF}{checkedSequent.val}"
 
 
 def checkStepListAux
@@ -720,11 +720,11 @@ def checkStepListAux
   List Step → Except String CheckedStep
   | [] => Except.error "The step list has no steps."
   | [last] => do
-    let CheckedStep ← checkStep globalContext localContext last
+    let checkedStep : CheckedStep ← checkStep globalContext localContext last
       |>.mapError fun message => s! "step label : {last.label}{LF}rule : {last.rule}{LF}{message}"
-    Except.ok CheckedStep
+    Except.ok checkedStep
   | hd :: tl => do
-    let CheckedStep ← checkStep globalContext localContext hd
+    let CheckedStep : CheckedStep ← checkStep globalContext localContext hd
       |>.mapError fun message => s! "step label : {hd.label}{LF}rule : {hd.rule}{LF}{message}"
     checkStepListAux globalContext (localContext.insert CheckedStep.label CheckedStep) tl
 
@@ -738,8 +738,9 @@ def checkStepList
 def checkProof
   (globalContext : GlobalContext)
   (proof : Proof) :
-  Except String checkedProof := do
-  let lastCheckedStep ← checkStepList globalContext proof.step_list
+  Except String CheckedProof := do
+  let lastCheckedStep : CheckedStep ← checkStepList globalContext proof.step_list
+
   if lastCheckedStep.assertion.val = proof.assertion
   then Except.ok {
     label := proof.label
@@ -752,7 +753,7 @@ def checkProofListAux
   List Proof → Except String Unit
   | [] => Except.ok ()
   | hd :: tl => do
-  let checkedProof ← checkProof globalContext hd
+  let checkedProof : CheckedProof ← checkProof globalContext hd
     |>.mapError fun message => s! "proof label : {hd.label}{LF}{message}"
   checkProofListAux (globalContext.insert checkedProof.label checkedProof) tl
 
@@ -957,7 +958,7 @@ lemma not_IsDeduct_false :
 
 
 example :
-  ∀ (P : Proof) (b : checkedProof), P.assertion.hypotheses = [] ∧ P.assertion.conclusion = false_ → checkProof {} P = .ok b -> False :=
+  ∀ (P : Proof) (b : CheckedProof), P.assertion.hypotheses = [] ∧ P.assertion.conclusion = false_ → checkProof {} P = .ok b -> False :=
   by
   intro P b a1 a2
   simp only [checkProof] at a2
@@ -982,7 +983,7 @@ example :
 example
   (globalContext : GlobalContext)
   (P : Proof)
-  (b : checkedProof)
+  (b : CheckedProof)
   (h1 : checkProof globalContext P = .ok b) :
   IsDeduct P.assertion.hypotheses P.assertion.conclusion :=
   by
