@@ -297,7 +297,7 @@ def createProof
 
 def checkProof
   (proof : Except String Backend.Proof) :
-  Except String Backend.checkedProof := do
+  Except String Backend.CheckedProof := do
   let proof' ← proof
   Backend.checkProof {} proof'
 
