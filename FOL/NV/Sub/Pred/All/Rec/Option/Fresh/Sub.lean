@@ -62,13 +62,13 @@ def subAux
       (subAux c τ σ psi)
   | forall_ x phi =>
       let x' : VarName :=
-        if x ∈ ((FOL.NV.Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+        if x ∈ (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         else x
       forall_ x' (subAux c τ (Function.updateITE σ x x') phi)
   | exists_ x phi =>
       let x' : VarName :=
-        if x ∈ ((FOL.NV.Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE σ x x) c phi).freeVarSet ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+        if x ∈ (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         then fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
         else x
       exists_ x' (subAux c τ (Function.updateITE σ x x') phi)
