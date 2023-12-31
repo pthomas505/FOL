@@ -342,7 +342,8 @@ def GlobalContext.find
   (context : GlobalContext)
   (label : String) :
   Except String CheckedProof :=
-  let opt := context.find? label
+  let opt : Option CheckedProof := context.find? label
+
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
   else Except.error s! "{label} not found in global context."
@@ -354,7 +355,8 @@ def LocalContext.find
   (context : LocalContext)
   (label : String) :
   Except String CheckedStep :=
-  let opt := context.find? label
+  let opt : Option CheckedStep := context.find? label
+
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
   else Except.error s! "{label} not found in local context."
@@ -366,334 +368,334 @@ def checkRule
   Rule → Except String CheckedSequent
 
   | struct_1_ Δ H phi label => do
-      let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.find label
 
-      let expected_val : Sequent := {
-        hypotheses := Δ
-        conclusion := phi }
+    let expected_val : Sequent := {
+      hypotheses := Δ
+      conclusion := phi }
 
-      let return_val : Sequent := {
-        hypotheses := H :: Δ
-        conclusion := phi }
+    let return_val : Sequent := {
+      hypotheses := H :: Δ
+      conclusion := phi }
 
-      if h : found.assertion.val = expected_val
-      then Except.ok {
-        val := return_val
-        prop := by {
-          apply IsDeduct.struct_1_ Δ H phi
-          obtain s1 := found.assertion.prop
-          simp only [h] at s1
-          exact s1
-        }
+    if h : found.assertion.val = expected_val
+    then Except.ok {
+      val := return_val
+      prop := by {
+        apply IsDeduct.struct_1_ Δ H phi
+        obtain s1 := found.assertion.prop
+        simp only [h] at s1
+        exact s1
       }
-      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    }
+    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | struct_2_ Δ H phi label => do
-      let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.find label
 
-      let expected_val : Sequent := {
-        hypotheses := H :: H :: Δ
-        conclusion := phi }
+    let expected_val : Sequent := {
+      hypotheses := H :: H :: Δ
+      conclusion := phi }
 
-      let return_val : Sequent := {
-        hypotheses := H :: Δ
-        conclusion := phi }
+    let return_val : Sequent := {
+      hypotheses := H :: Δ
+      conclusion := phi }
 
-      if h : found.assertion.val = expected_val
-      then Except.ok {
-        val := return_val
-        prop := by {
-          apply IsDeduct.struct_2_ Δ H phi
-          obtain s1 := found.assertion.prop
-          simp only [h] at s1
-          exact s1
-        }
+    if h : found.assertion.val = expected_val
+    then Except.ok {
+      val := return_val
+      prop := by {
+        apply IsDeduct.struct_2_ Δ H phi
+        obtain s1 := found.assertion.prop
+        simp only [h] at s1
+        exact s1
       }
-      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    }
+    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | struct_3_ Δ_1 Δ_2 H_1 H_2 phi label => do
-      let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.find label
 
-      let expected_val : Sequent := {
-        hypotheses := Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2
-        conclusion := phi }
+    let expected_val : Sequent := {
+      hypotheses := Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2
+      conclusion := phi }
 
-      let return_val : Sequent := {
-        hypotheses := Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2
-        conclusion := phi }
+    let return_val : Sequent := {
+      hypotheses := Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2
+      conclusion := phi }
 
-      if h : found.assertion.val = expected_val
-      then Except.ok {
-        val := return_val
-        prop := by {
-          apply IsDeduct.struct_3_ Δ_1 Δ_2 H_1 H_2 phi
-          obtain s1 := found.assertion.prop
-          simp only [h] at s1
-          exact s1
-        }
+    if h : found.assertion.val = expected_val
+    then Except.ok {
+      val := return_val
+      prop := by {
+        apply IsDeduct.struct_3_ Δ_1 Δ_2 H_1 H_2 phi
+        obtain s1 := found.assertion.prop
+        simp only [h] at s1
+        exact s1
       }
-      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    }
+    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | assume_ phi =>
-      let return_val : Sequent := {
-        hypotheses := [phi]
-        conclusion := phi }
+    let return_val : Sequent := {
+      hypotheses := [phi]
+      conclusion := phi }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.assume_ phi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.assume_ phi
+    }
 
   | prop_0_ =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := true_ }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := true_ }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.prop_0_
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.prop_0_
+    }
 
   | prop_1_ phi psi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := (phi.imp_ (psi.imp_ phi)) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := (phi.imp_ (psi.imp_ phi)) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.prop_1_ phi psi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.prop_1_ phi psi
+    }
 
   | prop_2_ phi psi chi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi))) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi))) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.prop_2_ phi psi chi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.prop_2_ phi psi chi
+    }
 
   | prop_3_ phi psi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi)) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.prop_3_ phi psi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.prop_3_ phi psi
+    }
 
   | mp_ Δ phi psi label_1 label_2 => do
-      let found_1 : CheckedStep ← localContext.find label_1
-      let found_2 : CheckedStep ← localContext.find label_2
+    let found_1 : CheckedStep ← localContext.find label_1
+    let found_2 : CheckedStep ← localContext.find label_2
 
-      let expected_val_1 : Sequent := {
-        hypotheses := Δ
-        conclusion := phi.imp_ psi }
+    let expected_val_1 : Sequent := {
+      hypotheses := Δ
+      conclusion := phi.imp_ psi }
 
-      let expected_val_2 : Sequent := {
-        hypotheses := Δ
-        conclusion := phi }
+    let expected_val_2 : Sequent := {
+      hypotheses := Δ
+      conclusion := phi }
 
-      let return_val : Sequent := {
-        hypotheses := Δ
-        conclusion := psi }
+    let return_val : Sequent := {
+      hypotheses := Δ
+      conclusion := psi }
 
-      if h1 : found_1.assertion.val = expected_val_1
-      then
-        if h2 : found_2.assertion.val = expected_val_2
-        then Except.ok {
-          val := return_val
-          prop := by {
-            apply IsDeduct.mp_ Δ phi psi
-            · obtain s1 := found_1.assertion.prop
-              simp only [h1] at s1
-              exact s1
-            · obtain s2 := found_2.assertion.prop
-              simp only [h2] at s2
-              exact s2
-          }
+    if h1 : found_1.assertion.val = expected_val_1
+    then
+      if h2 : found_2.assertion.val = expected_val_2
+      then Except.ok {
+        val := return_val
+        prop := by {
+          apply IsDeduct.mp_ Δ phi psi
+          · obtain s1 := found_1.assertion.prop
+            simp only [h1] at s1
+            exact s1
+          · obtain s2 := found_2.assertion.prop
+            simp only [h2] at s2
+            exact s2
         }
-        else Except.error s! "Expected :{LF}{expected_val_2}{LF}Found :{LF}{found_2.assertion.val}"
-      else Except.error s! "Expected :{LF}{expected_val_1}{LF}Found :{LF}{found_1.assertion.val}"
+      }
+      else Except.error s! "Expected :{LF}{expected_val_2}{LF}Found :{LF}{found_2.assertion.val}"
+    else Except.error s! "Expected :{LF}{expected_val_1}{LF}Found :{LF}{found_1.assertion.val}"
 
   | dt_ Δ H phi label => do
-      let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.find label
 
-      let expected_val : Sequent := {
-        hypotheses := H :: Δ
-        conclusion := phi }
+    let expected_val : Sequent := {
+      hypotheses := H :: Δ
+      conclusion := phi }
 
-      let return_val : Sequent := {
-        hypotheses := Δ
-        conclusion := H.imp_ phi }
+    let return_val : Sequent := {
+      hypotheses := Δ
+      conclusion := H.imp_ phi }
 
-      if h : found.assertion.val = expected_val
-      then Except.ok {
-        val := return_val
-        prop := by {
-          apply IsDeduct.dt_ Δ H phi
-          obtain s1 := found.assertion.prop
-          simp only [h] at s1
-          exact s1
-        }
+    if h : found.assertion.val = expected_val
+    then Except.ok {
+      val := return_val
+      prop := by {
+        apply IsDeduct.dt_ Δ H phi
+        obtain s1 := found.assertion.prop
+        simp only [h] at s1
+        exact s1
       }
-      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    }
+    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | pred_1_ v phi psi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi))) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi))) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.pred_1_ v phi psi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.pred_1_ v phi psi
+    }
 
   | pred_2_ v t phi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) freshChar phi)) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) freshChar phi)) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.pred_2_ v t phi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.pred_2_ v t phi
+    }
 
   | pred_3_ v phi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := phi.imp_ (forall_ v phi) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := phi.imp_ (forall_ v phi) }
 
-      if h : ¬ isFreeIn v phi
-      then Except.ok {
-        val := return_val
-        prop := IsDeduct.pred_3_ v phi h
-      }
-      else Except.error s! "{v} must not be free in {phi}."
+    if h : ¬ isFreeIn v phi
+    then Except.ok {
+      val := return_val
+      prop := IsDeduct.pred_3_ v phi h
+    }
+    else Except.error s! "{v} must not be free in {phi}."
 
   | gen_ v phi label => do
-      let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.find label
 
-      let expected_val : Sequent := {
-        hypotheses := []
-        conclusion := phi }
+    let expected_val : Sequent := {
+      hypotheses := []
+      conclusion := phi }
 
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := forall_ v phi }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := forall_ v phi }
 
-      if h : found.assertion.val = expected_val
-      then Except.ok {
-        val := return_val
-        prop := by {
-          apply IsDeduct.gen_ v phi
-          obtain s1 := found.assertion.prop
-          simp only [h] at s1
-          exact s1
-        }
+    if h : found.assertion.val = expected_val
+    then Except.ok {
+      val := return_val
+      prop := by {
+        apply IsDeduct.gen_ v phi
+        obtain s1 := found.assertion.prop
+        simp only [h] at s1
+        exact s1
       }
-      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    }
+    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | eq_1_ v =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := forall_ v (eq_ v v) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := forall_ v (eq_ v v) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.eq_1_ v
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.eq_1_ v
+    }
 
   | eq_2_eq_ x_0 x_1 y_0 y_1 =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion :=
-          forall_ x_0
-            (forall_ x_1
-              (forall_ y_0
-                (forall_ y_1
-                  ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_
-                    ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))))) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion :=
+        forall_ x_0
+          (forall_ x_1
+            (forall_ y_0
+              (forall_ y_1
+                ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_
+                  ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))))) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.eq_2_eq_ x_0 x_1 y_0 y_1
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.eq_2_eq_ x_0 x_1 y_0 y_1
+    }
 
   | def_false_ =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := false_.iff_ (not_ true_) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := false_.iff_ (not_ true_) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.def_false_
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.def_false_
+    }
 
   | def_and_ phi psi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi)))) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi)))) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.def_and_ phi psi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.def_and_ phi psi
+    }
 
   | def_or_ phi psi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := ((phi.or_ psi).iff_ ((not_ phi).imp_ psi)) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := ((phi.or_ psi).iff_ ((not_ phi).imp_ psi)) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.def_or_ phi psi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.def_or_ phi psi
+    }
 
   | def_iff_ phi psi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi))))) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi))))) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.def_iff_ phi psi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.def_iff_ phi psi
+    }
 
   | def_exists_ v phi =>
-      let return_val : Sequent := {
-        hypotheses := []
-        conclusion := (exists_ v phi).iff_ (not_ (forall_ v (not_ phi))) }
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := (exists_ v phi).iff_ (not_ (forall_ v (not_ phi))) }
 
-      Except.ok {
-        val := return_val
-        prop := IsDeduct.def_exists_ v phi
-      }
+    Except.ok {
+      val := return_val
+      prop := IsDeduct.def_exists_ v phi
+    }
 
   | sub_ Δ phi τ label => do
-      let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.find label
 
-      let expected_val : Sequent := {
-        hypotheses := Δ
-        conclusion := phi }
+    let expected_val : Sequent := {
+      hypotheses := Δ
+      conclusion := phi }
 
-      let return_val : Sequent := {
-        hypotheses := Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)
-        conclusion := Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi }
+    let return_val : Sequent := {
+      hypotheses := Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)
+      conclusion := Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi }
 
-      if h : found.assertion.val = expected_val
-      then Except.ok {
-        val := return_val
-        prop := by {
-          apply IsDeduct.sub_
-          obtain s1 := found.assertion.prop
-          simp only [h] at s1
-          exact s1
-        }
+    if h : found.assertion.val = expected_val
+    then Except.ok {
+      val := return_val
+      prop := by {
+        apply IsDeduct.sub_
+        obtain s1 := found.assertion.prop
+        simp only [h] at s1
+        exact s1
       }
-      else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    }
+    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | thm_ label => do
     let step : CheckedProof ← globalContext.find label
