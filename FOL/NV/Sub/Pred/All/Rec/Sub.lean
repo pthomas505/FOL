@@ -14,7 +14,9 @@ open Formula
 /--
   The recursive simultaneous uniform substitution of all of the predicate variables in a formula.
 -/
-def replace (τ : PredName → ℕ → (List VarName × Formula)) : Formula → Formula
+def replace
+  (τ : PredName → ℕ → (List VarName × Formula)) :
+  Formula → Formula
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
       let zs := (τ X xs.length).fst
@@ -49,7 +51,8 @@ def replace (τ : PredName → ℕ → (List VarName × Formula)) : Formula → 
 
 def admitsAux
   (τ : PredName → ℕ → List VarName × Formula)
-  (binders : Finset VarName) : Formula → Prop
+  (binders : Finset VarName) :
+  Formula → Prop
   | pred_const_ _ _ => True
   | pred_var_ X xs =>
     let zs := (τ X xs.length).fst
@@ -87,7 +90,10 @@ instance
     infer_instance
 
 
-def admits (τ : PredName → ℕ → List VarName × Formula) (F : Formula) : Prop :=
+def admits
+  (τ : PredName → ℕ → List VarName × Formula)
+  (F : Formula) :
+  Prop :=
   admitsAux τ ∅ F
 
 
@@ -261,17 +267,17 @@ theorem substitution_theorem
 
 
 theorem substitution_is_valid
-  (phi : Formula)
+  (F : Formula)
   (τ : PredName → ℕ → List VarName × Formula)
-  (h1 : admits τ phi)
-  (h2 : phi.IsValid) :
-  (replace τ phi).IsValid :=
+  (h1 : admits τ F)
+  (h2 : F.IsValid) :
+  (replace τ F).IsValid :=
   by
   simp only [IsValid] at h2
 
   simp only [IsValid]
   intro D I V E
-  obtain s1 := substitution_theorem D I V E τ phi h1
+  obtain s1 := substitution_theorem D I V E τ F h1
   simp only [← s1]
   apply h2
 
