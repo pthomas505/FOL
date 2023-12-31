@@ -11,9 +11,9 @@ open Formula
 /--
   The inductive simultaneous uniform substitution of a single predicate variable in a formula.
 
-  IsPredSub A P zs H B := The formula A is said to be transformed into the formula B by a substitution of H* for P z₁ ... zₙ, abbreviated: Sub A (P zⁿ / H*) B, iff B is obtained from A upon replacing in A each occurrence of a derivative of the name form P z₁ ... zₙ by the corresponding derivative of the substituend H*, provided that: (i) P does not occur in a component formula (∀ x A₁) of A if x is a parameter of H*, and (ii) the name variable zₖ, k = 1, ..., n, is not free in a component formula (∀ x H) of H* if P t₁ ... tₙ occurs in A with x occurring in tₖ. If conditions (i) and (ii) are not satisfied, then the indicated substitution for predicate variables is left undefined.
+  IsSub A P zs H B := The formula A is said to be transformed into the formula B by a substitution of H* for P z₁ ... zₙ, abbreviated: Sub A (P zⁿ / H*) B, iff B is obtained from A upon replacing in A each occurrence of a derivative of the name form P z₁ ... zₙ by the corresponding derivative of the substituend H*, provided that: (i) P does not occur in a component formula (∀ x A₁) of A if x is a parameter of H*, and (ii) the name variable zₖ, k = 1, ..., n, is not free in a component formula (∀ x H) of H* if P t₁ ... tₙ occurs in A with x occurring in tₖ. If conditions (i) and (ii) are not satisfied, then the indicated substitution for predicate variables is left undefined.
 -/
-inductive IsPredSub
+inductive IsSub
   (P : PredName)
   (zs : List VarName)
   (H : Formula) :
@@ -22,7 +22,7 @@ inductive IsPredSub
   | pred_const_
     (X : PredName)
     (xs : List VarName) :
-    IsPredSub P zs H (pred_const_ X xs) (pred_const_ X xs)
+    IsSub P zs H (pred_const_ X xs) (pred_const_ X xs)
 
 /-
   If A is an atomic formula not containing P then Sub A (P zⁿ / H*) A.
@@ -32,7 +32,7 @@ inductive IsPredSub
     (X : PredName)
     (xs : List VarName) :
     ¬ (X = P ∧ xs.length = zs.length) →
-    IsPredSub P zs H (pred_var_ X xs) (pred_var_ X xs)
+    IsSub P zs H (pred_var_ X xs) (pred_var_ X xs)
 
   /-
   If A = P t₁ ... tₙ and Sf H* (zⁿ / tⁿ) B, then Sub A (P zⁿ / H*) B.
@@ -47,16 +47,16 @@ inductive IsPredSub
     (ts : List VarName) :
     X = P ∧ ts.length = zs.length →
     Sub.Var.All.Rec.admits (Function.updateListITE id zs ts) H →
-    IsPredSub P zs H (pred_var_ P ts)
+    IsSub P zs H (pred_var_ P ts)
     (Sub.Var.All.Rec.fastReplaceFree (Function.updateListITE id zs ts) H)
 
   | eq_
     (x y : VarName) :
-    IsPredSub P zs H (eq_ x y) (eq_ x y)
+    IsSub P zs H (eq_ x y) (eq_ x y)
 
-  | true_ : IsPredSub P zs H true_ true_
+  | true_ : IsSub P zs H true_ true_
 
-  | false_ : IsPredSub P zs H false_ false_
+  | false_ : IsSub P zs H false_ false_
 
 /-
   If A = (¬ A₁) and Sub A₁ (P zⁿ / H*) B₁, then Sub A (P zⁿ / H*) (¬ B₁).
@@ -64,8 +64,8 @@ inductive IsPredSub
   | not_
     (phi : Formula)
     (phi' : Formula) :
-    IsPredSub P zs H phi phi' →
-    IsPredSub P zs H phi.not_ phi'.not_
+    IsSub P zs H phi phi' →
+    IsSub P zs H phi.not_ phi'.not_
 
 /-
   If A = (A₁ → A₂), Sub A₁ (P zⁿ / H*) B₁, and Sub A₂ (P zⁿ / H*) B₂, then Sub A (P zⁿ / H*) (B₁ → B₁).
@@ -74,30 +74,30 @@ inductive IsPredSub
   | imp_
     (phi psi : Formula)
     (phi' psi' : Formula) :
-    IsPredSub P zs H phi phi' →
-    IsPredSub P zs H psi psi' →
-    IsPredSub P zs H (phi.imp_ psi) (phi'.imp_ psi')
+    IsSub P zs H phi phi' →
+    IsSub P zs H psi psi' →
+    IsSub P zs H (phi.imp_ psi) (phi'.imp_ psi')
 
   | and_
     (phi psi : Formula)
     (phi' psi' : Formula) :
-    IsPredSub P zs H phi phi' →
-    IsPredSub P zs H psi psi' →
-    IsPredSub P zs H (phi.and_ psi) (phi'.and_ psi')
+    IsSub P zs H phi phi' →
+    IsSub P zs H psi psi' →
+    IsSub P zs H (phi.and_ psi) (phi'.and_ psi')
 
   | or_
     (phi psi : Formula)
     (phi' psi' : Formula) :
-    IsPredSub P zs H phi phi' →
-    IsPredSub P zs H psi psi' →
-    IsPredSub P zs H (phi.or_ psi) (phi'.or_ psi')
+    IsSub P zs H phi phi' →
+    IsSub P zs H psi psi' →
+    IsSub P zs H (phi.or_ psi) (phi'.or_ psi')
 
   | iff_
     (phi psi : Formula)
     (phi' psi' : Formula) :
-    IsPredSub P zs H phi phi' →
-    IsPredSub P zs H psi psi' →
-    IsPredSub P zs H (phi.iff_ psi) (phi'.iff_ psi')
+    IsSub P zs H phi phi' →
+    IsSub P zs H psi psi' →
+    IsSub P zs H (phi.iff_ psi) (phi'.iff_ psi')
 
 
 /-
@@ -111,24 +111,24 @@ inductive IsPredSub
     (phi : Formula)
     (phi' : Formula) :
     ¬ isFreeIn x H →
-    IsPredSub P zs H phi phi' →
-    IsPredSub P zs H (forall_ x phi) (forall_ x phi')
+    IsSub P zs H phi phi' →
+    IsSub P zs H (forall_ x phi) (forall_ x phi')
 
   | exists_
     (x : VarName)
     (phi : Formula)
     (phi' : Formula) :
     ¬ isFreeIn x H →
-    IsPredSub P zs H phi phi' →
-    IsPredSub P zs H (exists_ x phi) (exists_ x phi')
+    IsSub P zs H phi phi' →
+    IsSub P zs H (exists_ x phi) (exists_ x phi')
 
   | def_
     (X : DefName)
     (xs : List VarName) :
-    IsPredSub P zs H (def_ X xs) (def_ X xs)
+    IsSub P zs H (def_ X xs) (def_ X xs)
 
 
-theorem isPredSub_theorem
+theorem substitution_theorem
   (D : Type)
   (I J : Interpretation D)
   (V : VarAssignment D)
@@ -138,7 +138,7 @@ theorem isPredSub_theorem
   (zs : List VarName)
   (H : Formula)
   (B : Formula)
-  (h1 : IsPredSub P zs H A B)
+  (h1 : IsSub P zs H A B)
   (h2 : ∀ (Q : PredName) (ds : List D),
     Q = P ∧ ds.length = zs.length →
       (Holds D I (Function.updateListITE V zs ds) E H ↔ J.pred_var_ P ds))
@@ -245,12 +245,12 @@ theorem isPredSub_theorem
           simp
 
 
-theorem isPredSub_valid
+theorem substitution_is_valid
   (F F' : Formula)
   (P : PredName)
   (zs : List VarName)
   (H : Formula)
-  (h1 : IsPredSub P zs H F F')
+  (h1 : IsSub P zs H F F')
   (h2 : F.IsValid) :
   F'.IsValid :=
   by
@@ -265,7 +265,7 @@ theorem isPredSub_valid
         if (Q = P ∧ ds.length = zs.length)
         then Holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ Q ds }
-  obtain s1 := isPredSub_theorem D I J V E F P zs H F' h1
+  obtain s1 := substitution_theorem D I J V E F P zs H F' h1
   simp only [Interpretation.pred_var_] at s1
   have s2 : Holds D I V E F' ↔ Holds D J V E F :=
     by
