@@ -75,13 +75,13 @@ open Formula
 -/
 def Formula.toString : Formula → String
   | pred_const_ X xs =>
-      if xs.isEmpty
-      then s! "{X}"
-      else s! "({X} {xs})"
+    if xs.isEmpty
+    then s! "{X}"
+    else s! "({X} {xs})"
   | pred_var_ X xs =>
-      if xs.isEmpty
-      then s! "{X}"
-      else s! "({X} {xs})"
+    if xs.isEmpty
+    then s! "{X}"
+    else s! "({X} {xs})"
   | eq_ x y => s! "({x} = {y})"
   | true_ => "T"
   | false_ => "F"
