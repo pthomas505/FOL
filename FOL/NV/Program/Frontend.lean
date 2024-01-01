@@ -56,16 +56,17 @@ def LocalContext.get
   else Except.error s! "{index} not found in local context."
 
 
-abbrev GlobalContext : Type := List Proof
+abbrev GlobalContext : Type := Std.HashMap String Backend.Proof
 
-def GlobalContext.get
+def GlobalContext.find
   (context : GlobalContext)
-  (index : ℕ) :
-  Except String Proof :=
-  let opt := context.get? index
+  (label : String) :
+  Except String Backend.Proof :=
+  let opt : Option Backend.Proof := context.find? label
+
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
-  else Except.error s! "{index} not found in global context."
+  else Except.error s! "{label} not found in global context."
 
 
 inductive Command : Type
@@ -75,6 +76,8 @@ inductive Command : Type
   | prop_2_ : Formula → Formula → Formula → Command
   | mp_ : ℕ → ℕ → Command
   | sub_ : ℕ → List (PredName × (List VarName × Formula)) → Command
+  | thm_ : String → Command
+
 
 open Command
 
@@ -207,6 +210,19 @@ def sub
     rule := Backend.Rule.sub_ hypotheses conclusion τ step_index.repr
   }
 
+def thm
+  (globalContext : GlobalContext)
+  (label : String) :
+  Except String Step := do
+  let step ← globalContext.find label
+
+  Except.ok {
+    assertion := {
+      hypotheses := step.assertion.hypotheses
+      conclusion := step.assertion.conclusion
+    }
+    rule := Backend.Rule.thm_ label
+  }
 
 def createStepList
   (globalContext : GlobalContext)
@@ -236,6 +252,11 @@ def createStepList
   | sub_ step_index a => do
     let step ← sub localContext step_index a
     Except.ok [step]
+
+  | thm_ label => do
+    let step ← thm globalContext label
+    Except.ok [step]
+
 
 def createProofStepListAux
   (globalContext : GlobalContext)
@@ -286,13 +307,41 @@ def createProof
   else Except.error "The step list has no steps."
 
 
+def createProofListAux
+  (globalContext : GlobalContext)
+  (acc : List Backend.Proof) :
+  List (String × (List Command)) → Except String (List Backend.Proof)
+  | [] => Except.ok acc
+  | (label, commands) :: tl => do
+    let proof ← createProof globalContext label commands
+    createProofListAux (globalContext.insert label proof) (acc ++ [proof]) tl
+
+def createProofList
+  (labeled_command_list : List (String × (List Command))) :
+  Except String (List Backend.Proof) :=
+  createProofListAux {} [] labeled_command_list
+
+
 def checkProof
   (proof : Except String Backend.Proof) :
   Except String Backend.CheckedProof := do
   let proof' ← proof
   Backend.checkProof {} proof'
 
+def checkProofList
+  (proof_list : Except String (List Backend.Proof)) :
+  Except String Unit := do
+  let proof_list' ← proof_list
+  Backend.checkProofList proof_list'
 
 def P := pred_var_ (PredName.mk "P") []
 
-#eval checkProof (createProof [] "id" [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3])
+def Q := pred_var_ (PredName.mk "Q") []
+
+
+#eval checkProof (createProof {} "id" [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3])
+
+#eval createProofList [
+  ("id", [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3]),
+  ("id'", [thm_ "id", sub_ 0 [(PredName.mk "P", ([], Q)) ] ])
+  ]
