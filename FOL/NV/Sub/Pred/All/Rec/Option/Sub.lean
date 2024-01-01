@@ -87,7 +87,7 @@ def admitsAux
   | def_ _ _ => True
 
 
-theorem predSub_aux
+theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
   (V V' : VarAssignment D)
