@@ -22,7 +22,7 @@ def replacePredFun
         let zs := val.fst
         let H := val.snd
         if xs.length = zs.length
-        then Sub.Var.All.Rec.Fresh.subFresh (Function.updateListITE id zs xs) c H
+        then Sub.Var.All.Rec.Fresh.sub (Function.updateListITE id zs xs) c H
         else pred_var_ X xs
       else pred_var_ X xs
   | eq_ x y => eq_ x y
