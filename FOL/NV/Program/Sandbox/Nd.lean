@@ -174,9 +174,9 @@ inductive IsDeduct : Finset Formula → Formula → Prop
     (phi : Formula)
     (τ : PredName → ℕ → List VarName × Formula) :
     IsDeduct Δ phi →
-    Sub.Pred.All.Rec.admitsPredFun τ phi →
-    (∀ H : Formula, H ∈ Δ → Sub.Pred.All.Rec.admitsPredFun τ H) →
-    IsDeduct (Δ.image (Sub.Pred.All.Rec.replacePredFun τ)) (Sub.Pred.All.Rec.replacePredFun τ phi)
+    Sub.Pred.All.Rec.admits τ phi →
+    (∀ H : Formula, H ∈ Δ → Sub.Pred.All.Rec.admits τ H) →
+    IsDeduct (Δ.image (Sub.Pred.All.Rec.replace τ)) (Sub.Pred.All.Rec.replace τ phi)
 
   | weaken_
     (Δ Δ' : Finset Formula)

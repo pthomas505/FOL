@@ -111,7 +111,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   | pred_2_
     (v t : VarName)
     (phi : Formula) :
-    IsDeduct [] ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) freshChar phi))
+    IsDeduct [] ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.sub (Function.updateITE id v t) freshChar phi))
 
   /-
     ⊢ phi → (∀ v phi)  provided v is not free in phi
@@ -556,7 +556,7 @@ def checkRule
   | pred_2_ v t phi =>
     let return_val : Sequent := {
       hypotheses := []
-      conclusion := ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.subFresh (Function.updateITE id v t) freshChar phi)) }
+      conclusion := ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.sub (Function.updateITE id v t) freshChar phi)) }
 
     Except.ok {
       val := return_val
