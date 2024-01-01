@@ -9,8 +9,6 @@ namespace FOL.NV.Program.Frontend
 open Formula
 
 
-def freshChar : Char := '+'
-
 def LF : Char := Char.ofNat 10
 
 
@@ -67,19 +65,6 @@ def GlobalContext.find
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
   else Except.error s! "{label} not found in global context."
-
-
-inductive Command : Type
-  | shift_hypothesis_left_ : ℕ → ℕ → Command
-  | assume_ : Formula → Command
-  | prop_1_ : Formula → Formula → Command
-  | prop_2_ : Formula → Formula → Formula → Command
-  | mp_ : ℕ → ℕ → Command
-  | sub_ : ℕ → List (PredName × (List VarName × Formula)) → Command
-  | thm_ : String → Command
-
-
-open Command
 
 
 def shift_hypothesis_left
@@ -186,29 +171,30 @@ def Function.updateITE_
   if a' = a ∧ b' = b then c else f a' b'
 
 
-def blah : (List (PredName × ((List VarName) × Formula))) → (PredName → ℕ → Option ((List VarName) × Formula))
+def PredReplaceListToFun : (List (PredName × ((List VarName) × Formula))) → (PredName → ℕ → Option ((List VarName) × Formula))
   | [] => fun (_ : PredName) (_ : ℕ) => Option.none
-  | (P, (zs, H)) :: tl => Function.updateITE_ (blah tl) P zs.length (Option.some (zs, H))
+  | (P, (zs, H)) :: tl => Function.updateITE_ (PredReplaceListToFun tl) P zs.length (Option.some (zs, H))
 
 
 def sub
   (localContext : LocalContext)
   (step_index : ℕ)
-  (a : List (PredName × (List VarName × Formula))) :
+  (pred_replace_list : List (PredName × (List VarName × Formula))) :
   Except String Step := do
   let step ← localContext.get step_index
 
   let hypotheses := step.assertion.hypotheses
   let conclusion := step.assertion.conclusion
 
-  let τ : PredName → ℕ → Option (List VarName × Formula) := blah a
+  let τ : PredName → ℕ → Option (List VarName × Formula) := PredReplaceListToFun pred_replace_list
   Except.ok {
     assertion := {
-      hypotheses := hypotheses.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)
-      conclusion := Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ conclusion
+      hypotheses := hypotheses.map (Sub.Pred.All.Rec.Option.Fresh.sub Backend.freshChar τ)
+      conclusion := Sub.Pred.All.Rec.Option.Fresh.sub Backend.freshChar τ conclusion
     }
     rule := Backend.Rule.sub_ hypotheses conclusion τ step_index.repr
   }
+
 
 def thm
   (globalContext : GlobalContext)
@@ -223,6 +209,20 @@ def thm
     }
     rule := Backend.Rule.thm_ label
   }
+
+
+inductive Command : Type
+  | shift_hypothesis_left_ : ℕ → ℕ → Command
+  | assume_ : Formula → Command
+  | prop_1_ : Formula → Formula → Command
+  | prop_2_ : Formula → Formula → Formula → Command
+  | mp_ : ℕ → ℕ → Command
+  | sub_ : ℕ → List (PredName × (List VarName × Formula)) → Command
+  | thm_ : String → Command
+
+
+open Command
+
 
 def createStepList
   (globalContext : GlobalContext)
@@ -322,24 +322,15 @@ def createProofList
   createProofListAux {} [] labeled_command_list
 
 
-def checkProof
-  (proof : Except String Backend.Proof) :
-  Except String Backend.CheckedProof := do
-  let proof' ← proof
-  Backend.checkProof {} proof'
-
 def checkProofList
   (proof_list : Except String (List Backend.Proof)) :
   Except String Unit := do
   let proof_list' ← proof_list
   Backend.checkProofList proof_list'
 
+
 def P := pred_var_ (PredName.mk "P") []
-
 def Q := pred_var_ (PredName.mk "Q") []
-
-
-#eval checkProof (createProof {} "id" [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3])
 
 #eval createProofList [
   ("id", [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3]),
