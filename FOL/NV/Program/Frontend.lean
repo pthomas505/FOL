@@ -157,23 +157,9 @@ def mp
   else Except.error s! "{major_step} is not an implication."
 
 
-def Function.updateITE_
-  {α β γ : Type}
-  [DecidableEq α]
-  [DecidableEq β]
-  (f : α → β → γ)
-  (a : α)
-  (b : β)
-  (c : γ)
-  (a' : α)
-  (b' : β) :
-  γ :=
-  if a' = a ∧ b' = b then c else f a' b'
-
-
 def PredReplaceListToFun : (List (PredName × ((List VarName) × Formula))) → (PredName → ℕ → Option ((List VarName) × Formula))
   | [] => fun (_ : PredName) (_ : ℕ) => Option.none
-  | (P, (zs, H)) :: tl => Function.updateITE_ (PredReplaceListToFun tl) P zs.length (Option.some (zs, H))
+  | (X, zs, H) :: tl => fun (P : PredName) (n : ℕ) => if P = X ∧ n = zs.length then Option.some (zs, H) else PredReplaceListToFun tl P n
 
 
 def sub
