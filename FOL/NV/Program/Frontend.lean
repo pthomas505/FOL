@@ -107,6 +107,7 @@ def assume (phi : Formula) :
       rule := Backend.Rule.assume_ phi
     }
 
+
 def prop_1
   (phi : Formula)
   (psi : Formula) :
@@ -118,6 +119,7 @@ def prop_1
       }
       rule := Backend.Rule.prop_1_ phi psi
     }
+
 
 def prop_2
   (phi : Formula)
@@ -131,6 +133,7 @@ def prop_2
       }
       rule := Backend.Rule.prop_2_ phi psi chi
     }
+
 
 def mp
   (localContext : LocalContext)
