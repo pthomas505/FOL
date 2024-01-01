@@ -168,82 +168,120 @@ inductive Command : Type
 open Command
 
 
+def shift_hypothesis_left
+  (localContext : LocalContext)
+  (step_index : ℕ)
+  (index : ℕ) :
+  Except String Step := do
+  let step ← localContext.get step_index
+
+  let hypotheses := step.assertion.hypotheses
+  let conclusion := step.assertion.conclusion
+
+  if h1 : index < hypotheses.length
+  then
+    if h2 : index > 0
+    then
+      have : index - 1 < hypotheses.length := tsub_lt_of_lt h1
+      let Δ_1 := List.take (index - 1) hypotheses
+      let Δ_2 := List.drop (index + 1) hypotheses
+      let H_1 := hypotheses[index - 1]
+      let H_2 := hypotheses[index]
+
+      Except.ok {
+        assertion := {
+          hypotheses := (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2)
+          conclusion := conclusion }
+        rule := Backend.Rule.struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step_index.repr
+      }
+    else Except.error "index must be greater than zero"
+  else Except.error "index out of range"
+
+
+def assume (phi : Formula) :
+  Except String Step :=
+    Except.ok {
+      assertion := {
+        hypotheses := [phi]
+        conclusion := phi
+      }
+      rule := Backend.Rule.assume_ phi
+    }
+
+def prop_1
+  (phi : Formula)
+  (psi : Formula) :
+  Except String Step :=
+    Except.ok {
+      assertion := {
+        hypotheses := []
+        conclusion := (phi.imp_ (psi.imp_ phi))
+      }
+      rule := Backend.Rule.prop_1_ phi psi
+    }
+
+def prop_2
+  (phi : Formula)
+  (psi : Formula)
+  (chi : Formula) :
+  Except String Step :=
+    Except.ok {
+      assertion := {
+        hypotheses := []
+        conclusion := ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi)))
+      }
+      rule := Backend.Rule.prop_2_ phi psi chi
+    }
+
+def mp
+  (localContext : LocalContext)
+  (major_step_index : ℕ)
+  (minor_step_index : ℕ) :
+  Except String Step := do
+  let major_step ← localContext.get major_step_index
+  let minor_step ← localContext.get minor_step_index
+
+  if let (imp_ major_left major_right) := major_step.assertion.conclusion
+  then
+    if major_step.assertion.hypotheses = minor_step.assertion.hypotheses
+    then
+      if major_left = minor_step.assertion.conclusion
+      then Except.ok {
+        assertion := {
+          hypotheses := major_step.assertion.hypotheses
+          conclusion := major_right
+        }
+        rule := Backend.Rule.mp_ major_step.assertion.hypotheses major_left major_right major_step_index.repr minor_step_index.repr
+      }
+      else Except.error s! "minor does match major antecedent."
+    else Except.error "minor hypotheses do not match major hypotheses."
+  else Except.error s! "{major_step} is not an implication."
+
+
 def createStepList
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
   Command → Except String (List Step)
 
   | shift_hypothesis_left_ step_index index => do
-      let step ← localContext.get step_index
+    let step ← shift_hypothesis_left localContext step_index index
+    Except.ok [step]
 
-      let hypotheses := step.assertion.hypotheses
-      let conclusion := step.assertion.conclusion
+  | assume_ phi => do
+    let step ← assume phi
+    Except.ok [step]
 
-      if h1 : index < hypotheses.length
-      then
-        if h2 : index > 0
-        then
-          have : index - 1 < hypotheses.length := tsub_lt_of_lt h1
-          let Δ_1 := List.take (index - 1) hypotheses
-          let Δ_2 := List.drop (index + 1) hypotheses
-          let H_1 := hypotheses[index - 1]
-          let H_2 := hypotheses[index]
+  | prop_1_ phi psi => do
+    let step ← prop_1 phi psi
+    Except.ok [step]
 
-          Except.ok [{
-            assertion := {
-              hypotheses := (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2)
-              conclusion := conclusion }
-            rule := Backend.Rule.struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step_index.repr
-          }]
-        else Except.error "index must be greater than zero"
-      else Except.error "index out of range"
-
-  | assume_ phi =>
-      Except.ok [{
-        assertion := {
-          hypotheses := [phi]
-          conclusion := phi
-        }
-        rule := Backend.Rule.assume_ phi
-      }]
-
-  | prop_1_ phi psi =>
-      Except.ok [{
-        assertion := {
-          hypotheses := []
-          conclusion := (phi.imp_ (psi.imp_ phi))
-        }
-        rule := Backend.Rule.prop_1_ phi psi
-      }]
-
-  | prop_2_ phi psi chi =>
-      Except.ok [{
-        assertion := {
-          hypotheses := []
-          conclusion := ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi)))
-        }
-        rule := Backend.Rule.prop_2_ phi psi chi
-      }]
+  | prop_2_ phi psi chi => do
+    let step ← prop_2 phi psi chi
+    Except.ok [step]
 
   | mp_ major_step_index minor_step_index => do
-    let major_step ← localContext.get major_step_index
-    let minor_step ← localContext.get minor_step_index
-
-    if let (imp_ major_left major_right) := major_step.assertion.conclusion
-    then
-      if major_step.assertion.hypotheses = minor_step.assertion.hypotheses
-      then
-        if major_left = minor_step.assertion.conclusion
-        then Except.ok [{
-          assertion := {
-            hypotheses := major_step.assertion.hypotheses
-            conclusion := major_right
-          }
-          rule := Backend.Rule.mp_ major_step.assertion.hypotheses major_left major_right major_step_index.repr minor_step_index.repr
-        }]
-        else Except.error s! "minor does match major antecedent."
-      else Except.error "minor hypotheses do not match major hypotheses."
-    else Except.error s! "{major_step} is not an implication."
+      let step ← mp localContext major_step_index minor_step_index
+      Except.ok [step]
 
 
 def createProofStepListAux
