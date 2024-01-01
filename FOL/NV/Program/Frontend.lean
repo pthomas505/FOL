@@ -157,9 +157,13 @@ def mp
   else Except.error s! "{major_step} is not an implication."
 
 
-def PredReplaceListToFun : (List (PredName × ((List VarName) × Formula))) → (PredName → ℕ → Option ((List VarName) × Formula))
+def PredReplaceListToFun : List (PredName × (List VarName) × Formula) → PredName → ℕ → Option ((List VarName) × Formula)
   | [] => fun (_ : PredName) (_ : ℕ) => Option.none
-  | (X, zs, H) :: tl => fun (P : PredName) (n : ℕ) => if P = X ∧ n = zs.length then Option.some (zs, H) else PredReplaceListToFun tl P n
+  | (X, zs, H) :: tl =>
+    fun (P : PredName) (n : ℕ) =>
+      if P = X ∧ n = zs.length
+      then Option.some (zs, H)
+      else PredReplaceListToFun tl P n
 
 
 def sub
