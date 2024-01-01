@@ -74,7 +74,7 @@ inductive Command : Type
   | prop_1_ : Formula → Formula → Command
   | prop_2_ : Formula → Formula → Formula → Command
   | mp_ : ℕ → ℕ → Command
-
+  | sub_ : ℕ → List (PredName × (List VarName × Formula)) → Command
 
 open Command
 
@@ -169,6 +169,45 @@ def mp
   else Except.error s! "{major_step} is not an implication."
 
 
+def Function.updateITE_
+  {α β γ : Type}
+  [DecidableEq α]
+  [DecidableEq β]
+  (f : α → β → γ)
+  (a : α)
+  (b : β)
+  (c : γ)
+  (a' : α)
+  (b' : β) :
+  γ :=
+  if a' = a ∧ b' = b then c else f a' b'
+
+
+def blah : (List (PredName × ((List VarName) × Formula))) → (PredName → ℕ → Option ((List VarName) × Formula))
+  | [] => fun (_ : PredName) (_ : ℕ) => Option.none
+  | (P, (zs, H)) :: tl => Function.updateITE_ (blah tl) P zs.length (Option.some (zs, H))
+
+
+def sub
+  (localContext : LocalContext)
+  (step_index : ℕ)
+  (a : List (PredName × (List VarName × Formula))) :
+  Except String Step := do
+  let step ← localContext.get step_index
+
+  let hypotheses := step.assertion.hypotheses
+  let conclusion := step.assertion.conclusion
+
+  let τ : PredName → ℕ → Option (List VarName × Formula) := blah a
+  Except.ok {
+    assertion := {
+      hypotheses := hypotheses.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)
+      conclusion := Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ conclusion
+    }
+    rule := Backend.Rule.sub_ hypotheses conclusion τ step_index.repr
+  }
+
+
 def createStepList
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
@@ -194,6 +233,9 @@ def createStepList
     let step ← mp localContext major_step_index minor_step_index
     Except.ok [step]
 
+  | sub_ step_index a => do
+    let step ← sub localContext step_index a
+    Except.ok [step]
 
 def createProofStepListAux
   (globalContext : GlobalContext)
