@@ -9,7 +9,7 @@ namespace FOL.NV.Sub.Pred.All.Rec.Option
 open Formula
 
 
-def replacePredFun
+def replace
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula)) :
   Formula → Formula
@@ -28,29 +28,29 @@ def replacePredFun
   | eq_ x y => eq_ x y
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (replacePredFun c τ phi)
+  | not_ phi => not_ (replace c τ phi)
   | imp_ phi psi =>
       imp_
-      (replacePredFun c τ phi)
-      (replacePredFun c τ psi)
+      (replace c τ phi)
+      (replace c τ psi)
   | and_ phi psi =>
       and_
-      (replacePredFun c τ phi)
-      (replacePredFun c τ psi)
+      (replace c τ phi)
+      (replace c τ psi)
   | or_ phi psi =>
       or_
-      (replacePredFun c τ phi)
-      (replacePredFun c τ psi)
+      (replace c τ phi)
+      (replace c τ psi)
   | iff_ phi psi =>
       iff_
-      (replacePredFun c τ phi)
-      (replacePredFun c τ psi)
-  | forall_ x phi => forall_ x (replacePredFun c τ phi)
-  | exists_ x phi => exists_ x (replacePredFun c τ phi)
+      (replace c τ phi)
+      (replace c τ psi)
+  | forall_ x phi => forall_ x (replace c τ phi)
+  | exists_ x phi => exists_ x (replace c τ phi)
   | def_ X xs => def_ X xs
 
 
-def admitsPredFunAux
+def admitsAux
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (binders : Finset VarName) : Formula → Prop
   | pred_const_ _ _ => True
@@ -69,21 +69,21 @@ def admitsPredFunAux
   | true_ => True
   | false_ => True
   | eq_ _ _ => True
-  | not_ phi => admitsPredFunAux τ binders phi
+  | not_ phi => admitsAux τ binders phi
   | imp_ phi psi =>
-      admitsPredFunAux τ binders phi ∧
-      admitsPredFunAux τ binders psi
+      admitsAux τ binders phi ∧
+      admitsAux τ binders psi
   | and_ phi psi =>
-      admitsPredFunAux τ binders phi ∧
-      admitsPredFunAux τ binders psi
+      admitsAux τ binders phi ∧
+      admitsAux τ binders psi
   | or_ phi psi =>
-      admitsPredFunAux τ binders phi ∧
-      admitsPredFunAux τ binders psi
+      admitsAux τ binders phi ∧
+      admitsAux τ binders psi
   | iff_ phi psi =>
-      admitsPredFunAux τ binders phi ∧
-      admitsPredFunAux τ binders psi
-  | forall_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
-  | exists_ x phi => admitsPredFunAux τ (binders ∪ {x}) phi
+      admitsAux τ binders phi ∧
+      admitsAux τ binders psi
+  | forall_ x phi => admitsAux τ (binders ∪ {x}) phi
+  | exists_ x phi => admitsAux τ (binders ∪ {x}) phi
   | def_ _ _ => True
 
 
@@ -96,7 +96,7 @@ theorem predSub_aux
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (binders : Finset VarName)
   (F : Formula)
-  (h1 : admitsPredFunAux τ binders F)
+  (h1 : admitsAux τ binders F)
   (h2 : ∀ x : VarName, x ∉ binders → V' x = V x) :
   Holds D
     ⟨
@@ -114,17 +114,17 @@ theorem predSub_aux
         else I.pred_var_ X ds
       else I.pred_var_ X ds
     ⟩
-    V E F ↔ Holds D I V E (replacePredFun c τ F) :=
+    V E F ↔ Holds D I V E (replace c τ F) :=
   by
   induction F generalizing binders V
   case pred_const_ X xs =>
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
   case pred_var_ X xs =>
-    simp only [admitsPredFunAux] at h1
+    simp only [admitsAux] at h1
     simp at h1
 
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
     simp
     split_ifs
@@ -166,15 +166,15 @@ theorem predSub_aux
       simp only [Holds]
 
   case eq_ x y =>
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
   case true_ | false_ =>
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
   case not_ phi phi_ih =>
-    simp only [admitsPredFunAux] at h1
+    simp only [admitsAux] at h1
 
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
     congr! 1
     exact phi_ih V binders h1 h2
@@ -183,9 +183,9 @@ theorem predSub_aux
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [admitsPredFunAux] at h1
+    simp only [admitsAux] at h1
 
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
 
     cases h1
@@ -194,9 +194,9 @@ theorem predSub_aux
       · exact phi_ih V binders h1_left h2
       · exact psi_ih V binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [admitsPredFunAux] at h1
+    simp only [admitsAux] at h1
 
-    simp only [replacePredFun]
+    simp only [replace]
     simp only [Holds]
     first | apply forall_congr' | apply exists_congr
     intro d
@@ -212,10 +212,10 @@ theorem predSub_aux
   case def_ X xs =>
     cases E
     case nil =>
-      simp only [replacePredFun]
+      simp only [replace]
       simp only [Holds]
     case cons hd tl =>
-      simp only [replacePredFun]
+      simp only [replace]
       simp only [Holds]
       split_ifs
       case _ c1 =>
