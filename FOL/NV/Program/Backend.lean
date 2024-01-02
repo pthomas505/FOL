@@ -1,3 +1,4 @@
+import FOL.Except
 import FOL.NV.Sub.Var.All.Rec.Fresh.Sub
 import FOL.NV.Sub.Pred.All.Rec.Option.Fresh.Sub
 
@@ -207,20 +208,20 @@ inductive IsDeduct : List Formula → Formula → Prop
 
 
 inductive Rule : Type
-  | struct_1_ : List Formula → Formula → Formula → String → Rule
-  | struct_2_ : List Formula → Formula → Formula → String → Rule
-  | struct_3_ : List Formula → List Formula → Formula → Formula → Formula → String → Rule
+  | struct_1_ : List Formula → Formula → Formula → ℕ → Rule
+  | struct_2_ : List Formula → Formula → Formula → ℕ → Rule
+  | struct_3_ : List Formula → List Formula → Formula → Formula → Formula → ℕ → Rule
   | assume_ : Formula → Rule
   | prop_0_ : Rule
   | prop_1_ : Formula → Formula → Rule
   | prop_2_ : Formula → Formula → Formula → Rule
   | prop_3_ : Formula → Formula → Rule
-  | mp_ : List Formula → Formula → Formula → String → String → Rule
-  | dt_ : List Formula → Formula → Formula → String → Rule
+  | mp_ : List Formula → Formula → Formula → ℕ → ℕ → Rule
+  | dt_ : List Formula → Formula → Formula → ℕ → Rule
   | pred_1_ : VarName → Formula → Formula → Rule
   | pred_2_ : VarName → VarName → Formula → Rule
   | pred_3_ : VarName → Formula → Rule
-  | gen_ : VarName → Formula → String → Rule
+  | gen_ : VarName → Formula → ℕ → Rule
   | eq_1_ : VarName → Rule
   | eq_2_eq_ : VarName → VarName → VarName → VarName → Rule
   | def_false_ : Rule
@@ -228,7 +229,7 @@ inductive Rule : Type
   | def_or_ : Formula → Formula → Rule
   | def_iff_ : Formula → Formula → Rule
   | def_exists_ : VarName → Formula → Rule
-  | sub_ : List Formula → Formula → List (PredName × (List VarName) × Formula) → String → Rule
+  | sub_ : List Formula → Formula → List (PredName × (List VarName) × Formula) → ℕ → Rule
   | thm_ : String → Rule
 
 open Rule
@@ -278,33 +279,49 @@ structure CheckedSequent : Type :=
   (val : Sequent)
   (prop : IsDeduct val.hypotheses val.conclusion)
 
+def CheckedSequent.toString (x : CheckedSequent) : String := x.val.toString
+
 instance : ToString CheckedSequent :=
-  { toString := fun (x : CheckedSequent) => x.val.toString }
+  { toString := fun (x : CheckedSequent) => x.toString }
 
 
 structure Step : Type :=
-  (label : String)
   (assertion : Sequent)
   (rule : Rule)
 
 def Step.toString (x : Step) : String :=
-  s! "{x.label}. {x.assertion} : {x.rule}"
+  s! "{x.assertion} : {x.rule}"
 
 instance : ToString Step :=
   { toString := fun (x : Step) => x.toString }
 
 
 structure CheckedStep : Type :=
-  (label : String)
   (assertion : CheckedSequent)
+  (rule : Rule)
 
+def CheckedStep.toString (x : CheckedStep) : String :=
+  s! "{x.assertion} : {x.rule}"
+
+instance : ToString CheckedStep :=
+  { toString := fun (x : CheckedStep) => x.toString }
+
+
+def List.toLFStringAux
+  {α : Type}
+  [ToString α]
+  (i : ℕ) :
+  List α → String
+  | [] => ""
+  | hd :: tl =>
+    let x := List.toLFStringAux (i + 1) tl
+    s! "{i}. {hd}\n{x}"
 
 def List.toLFString
   {α : Type}
-  [ToString α] :
-  List α → String
-  | [] => ""
-  | hd :: tl => toString hd ++ LF.toString ++ List.toLFString tl
+  [ToString α]
+  (xs : List α) :
+  String := List.toLFStringAux 0 xs
 
 
 structure Proof : Type :=
@@ -322,9 +339,10 @@ instance : ToString Proof :=
 structure CheckedProof : Type :=
   (label : String)
   (assertion : CheckedSequent)
+  (step_list : List CheckedStep)
 
 def CheckedProof.toString (x : CheckedProof) : String :=
-  s! "{x.label} : {x.assertion}"
+  s! "{x.label} : {x.assertion}{LF}{List.toLFString x.step_list}"
 
 instance : ToString CheckedProof :=
   { toString := fun (x : CheckedProof) => x.toString }
@@ -337,23 +355,17 @@ def GlobalContext.find
   (label : String) :
   Except String CheckedProof :=
   let opt : Option CheckedProof := context.find? label
-
-  if h : Option.isSome opt
-  then Except.ok (Option.get opt h)
-  else Except.error s! "{label} not found in global context."
+  opt.toExcept s! "{label} not found in global context."
 
 
-abbrev LocalContext : Type := Std.HashMap String CheckedStep
+abbrev LocalContext : Type := Array CheckedStep
 
-def LocalContext.find
+def LocalContext.get
   (context : LocalContext)
-  (label : String) :
+  (index : ℕ) :
   Except String CheckedStep :=
-  let opt : Option CheckedStep := context.find? label
-
-  if h : Option.isSome opt
-  then Except.ok (Option.get opt h)
-  else Except.error s! "{label} not found in local context."
+  let opt : Option CheckedStep := context.get? index
+  opt.toExcept s! "index must be less than {context.size}."
 
 
 def PredReplaceListToFun : List (PredName × (List VarName) × Formula) → PredName → ℕ → Option ((List VarName) × Formula)
@@ -371,7 +383,7 @@ def checkRule
   Rule → Except String CheckedSequent
 
   | struct_1_ Δ H phi label => do
-    let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.get label
 
     let expected_val : Sequent := {
       hypotheses := Δ
@@ -394,7 +406,7 @@ def checkRule
     else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | struct_2_ Δ H phi label => do
-    let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.get label
 
     let expected_val : Sequent := {
       hypotheses := H :: H :: Δ
@@ -417,7 +429,7 @@ def checkRule
     else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
 
   | struct_3_ Δ_1 Δ_2 H_1 H_2 phi label => do
-    let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.get label
 
     let expected_val : Sequent := {
       hypotheses := Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2
@@ -490,8 +502,8 @@ def checkRule
     }
 
   | mp_ Δ phi psi label_1 label_2 => do
-    let found_1 : CheckedStep ← localContext.find label_1
-    let found_2 : CheckedStep ← localContext.find label_2
+    let found_1 : CheckedStep ← localContext.get label_1
+    let found_2 : CheckedStep ← localContext.get label_2
 
     let expected_val_1 : Sequent := {
       hypotheses := Δ
@@ -524,7 +536,7 @@ def checkRule
     else Except.error s! "Expected :{LF}{expected_val_1}{LF}Found :{LF}{found_1.assertion.val}"
 
   | dt_ Δ H phi label => do
-    let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.get label
 
     let expected_val : Sequent := {
       hypotheses := H :: Δ
@@ -579,7 +591,7 @@ def checkRule
     else Except.error s! "{v} must not be free in {phi}."
 
   | gen_ v phi label => do
-    let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.get label
 
     let expected_val : Sequent := {
       hypotheses := []
@@ -674,7 +686,7 @@ def checkRule
   | sub_ Δ phi xs label => do
     let τ : PredName → ℕ → Option ((List VarName) × Formula) := PredReplaceListToFun xs
 
-    let found : CheckedStep ← localContext.find label
+    let found : CheckedStep ← localContext.get label
 
     let expected_val : Sequent := {
       hypotheses := Δ
@@ -710,58 +722,62 @@ def checkStep
 
   if checkedSequent.val = step.assertion
   then Except.ok {
-    label := step.label
-    assertion := checkedSequent }
+    assertion := checkedSequent
+    rule := step.rule
+  }
   else Except.error s! "Step assertion :{LF}{step.assertion}{LF}Rule assertion :{LF}{checkedSequent.val}"
 
 
 def checkStepListAux
   (globalContext : GlobalContext)
-  (localContext : LocalContext) :
-  List Step → Except String CheckedStep
-  | [] => Except.error "The step list has no steps."
-  | [last] => do
-    let checkedStep : CheckedStep ← checkStep globalContext localContext last
-      |>.mapError fun (message : String) => s! "step label : {last.label}{LF}rule : {last.rule}{LF}{message}"
-    Except.ok checkedStep
+  (localContext : LocalContext)
+  (acc : List CheckedStep) :
+  List Step → Except String (List CheckedStep)
+  | [] => Except.ok acc
   | hd :: tl => do
-    let CheckedStep : CheckedStep ← checkStep globalContext localContext hd
-      |>.mapError fun (message : String) => s! "step label : {hd.label}{LF}rule : {hd.rule}{LF}{message}"
-    checkStepListAux globalContext (localContext.insert CheckedStep.label CheckedStep) tl
+    let checkedStep : CheckedStep ← checkStep globalContext localContext hd
+      |>.mapError fun (message : String) => s! "rule : {hd.rule}{LF}{message}"
+    checkStepListAux globalContext (localContext.push checkedStep) (acc.append [checkedStep]) tl
 
 def checkStepList
   (globalContext : GlobalContext)
-  (stepList : List Step) :
-  Except String CheckedStep :=
-  checkStepListAux globalContext {} stepList
+  (step_list : List Step) :
+  Except String (List CheckedStep) :=
+  checkStepListAux globalContext #[] [] step_list
 
 
 def checkProof
   (globalContext : GlobalContext)
   (proof : Proof) :
   Except String CheckedProof := do
-  let lastCheckedStep : CheckedStep ← checkStepList globalContext proof.step_list
+  let checkedStepList : List CheckedStep ← checkStepList globalContext proof.step_list
 
-  if lastCheckedStep.assertion.val = proof.assertion
+  let opt := checkedStepList.getLast?
+  let last ← opt.toExcept "The step list has no steps."
+
+  if last.assertion.val = proof.assertion
   then Except.ok {
     label := proof.label
-    assertion := lastCheckedStep.assertion }
-  else Except.error s! "Proof assertion :{LF}{proof.assertion}{LF}Last step assertion :{LF}{lastCheckedStep.assertion.val}"
+    assertion := last.assertion
+    step_list := checkedStepList
+  }
+  else Except.error s! "Proof assertion :{LF}{proof.assertion}{LF}Last step assertion :{LF}{last.assertion.val}"
 
 
 def checkProofListAux
-  (globalContext : GlobalContext) :
-  List Proof → Except String Unit
-  | [] => Except.ok ()
+  (globalContext : GlobalContext)
+  (acc : List CheckedProof) :
+  List Proof → Except String (List CheckedProof)
+  | [] => Except.ok acc
   | hd :: tl => do
   let checkedProof : CheckedProof ← checkProof globalContext hd
     |>.mapError fun (message : String) => s! "proof label : {hd.label}{LF}{message}"
-  checkProofListAux (globalContext.insert checkedProof.label checkedProof) tl
+  checkProofListAux (globalContext.insert checkedProof.label checkedProof) (acc.append [checkedProof]) tl
 
 def checkProofList
   (proofList : List Proof) :
-  Except String Unit :=
-  checkProofListAux {} proofList
+  Except String (List CheckedProof) :=
+  checkProofListAux {} [] proofList
 
 
 theorem soundness
@@ -924,24 +940,6 @@ theorem soundness
     exact a1
 
 
-theorem Except.bind_eq_ok
-  {ε : Type}
-  {α : Type}
-  {β : Type}
-  (x : Except ε α)
-  (f : α → Except ε β)
-  (a : β):
-  (Except.bind x f = .ok a) ↔ ∃ b, x = .ok b ∧ f b = .ok a :=
-  by
-  cases x
-  case error x =>
-    simp only [Except.bind]
-    simp
-  case ok x =>
-    simp only [Except.bind]
-    simp
-
-
 lemma not_IsDeduct_false :
   ¬ IsDeduct [] false_ :=
   by
@@ -959,19 +957,24 @@ example :
   simp only [bind] at a2
   simp only [Except.bind_eq_ok] at a2
   apply Exists.elim a2
-  intro b' a3
+  intro xs a3
   clear a2
   cases a3
   case _ a3_left a3_right =>
-    split_ifs at a3_right
-    case _ c1 =>
-      obtain s1 := b'.assertion.prop
-      simp only [c1] at s1
-      cases a1
-      case _ a1_left a1_right =>
-        simp only [a1_left] at s1
-        simp only [a1_right] at s1
-        simp only [not_IsDeduct_false] at s1
+    apply Exists.elim a3_right
+    intro last a4
+    clear a3_right
+    cases a4
+    case _ a4_left a4_right =>
+      split_ifs at a4_right
+      case _ c1 =>
+        obtain s1 := last.assertion.prop
+        simp only [c1] at s1
+        cases a1
+        case _ a1_left a1_right =>
+          simp only [a1_left] at s1
+          simp only [a1_right] at s1
+          simp only [not_IsDeduct_false] at s1
 
 
 example
@@ -985,12 +988,17 @@ example
   simp only [bind] at h1
   simp only [Except.bind_eq_ok] at h1
   apply Exists.elim h1
-  intro b' a2
+  intro xs a2
   clear h1
-  split_ifs at a2
-  case pos c1 =>
-    obtain s1 := b'.assertion.prop
-    simp only [c1] at s1
-    exact s1
-  case neg c1 =>
-    simp at a2
+  cases a2
+  case _ a2_left a2_right =>
+    apply Exists.elim a2_right
+    intro last a3
+    clear a2_right
+    cases a3
+    case _ a3_left a3_right =>
+      split_ifs at a3_right
+      case _ c1 =>
+        obtain s1 := last.assertion.prop
+        simp only [c1] at s1
+        exact s1

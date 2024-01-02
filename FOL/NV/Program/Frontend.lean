@@ -12,14 +12,6 @@ open Formula
 def LF : Char := Char.ofNat 10
 
 
-def List.toLFString
-  {α : Type}
-  [ToString α] :
-  List α → String
-  | [] => ""
-  | hd :: tl => toString hd ++ LF.toString ++ List.toLFString tl
-
-
 structure Step : Type :=
   (assertion : Backend.Sequent)
   (rule : Backend.Rule)
@@ -36,7 +28,7 @@ structure Proof : Type :=
   (step_list : List Step)
 
 def Proof.toString (x : Proof) : String :=
-  s! "{x.assertion}{LF}{List.toLFString x.step_list}"
+  s! "{x.assertion}{LF}{Backend.List.toLFString x.step_list}"
 
 instance : ToString Proof :=
   { toString := fun x => x.toString }
@@ -91,7 +83,7 @@ def shift_hypothesis_left
         assertion := {
           hypotheses := (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2)
           conclusion := conclusion }
-        rule := Backend.Rule.struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step_index.repr
+        rule := Backend.Rule.struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step_index
       }
     else Except.error "index must be greater than zero"
   else Except.error "index out of range"
@@ -153,7 +145,7 @@ def mp
           hypotheses := major_step.assertion.hypotheses
           conclusion := major_right
         }
-        rule := Backend.Rule.mp_ major_step.assertion.hypotheses major_left major_right major_step_index.repr minor_step_index.repr
+        rule := Backend.Rule.mp_ major_step.assertion.hypotheses major_left major_right major_step_index minor_step_index
       }
       else Except.error s! "minor does match major antecedent."
     else Except.error "minor hypotheses do not match major hypotheses."
@@ -177,7 +169,7 @@ def sub
       hypotheses := hypotheses.map (Sub.Pred.All.Rec.Option.Fresh.sub Backend.freshChar τ)
       conclusion := Sub.Pred.All.Rec.Option.Fresh.sub Backend.freshChar τ conclusion
     }
-    rule := Backend.Rule.sub_ hypotheses conclusion xs step_index.repr
+    rule := Backend.Rule.sub_ hypotheses conclusion xs step_index
   }
 
 
@@ -267,7 +259,6 @@ def createProofLabeledStepListAux
   | [] => []
   | hd :: tl =>
     let step : Backend.Step := {
-      label := index.repr
       assertion := hd.assertion
       rule := hd.rule
     }
@@ -309,7 +300,7 @@ def createProofList
 
 def checkProofList
   (proof_list : Except String (List Backend.Proof)) :
-  Except String Unit := do
+  Except String (List Backend.CheckedProof) := do
   let proof_list' ← proof_list
   Backend.checkProofList proof_list'
 
@@ -317,7 +308,8 @@ def checkProofList
 def P := pred_var_ (PredName.mk "P") []
 def Q := pred_var_ (PredName.mk "Q") []
 
-#eval createProofList [
+#eval checkProofList (createProofList [
   ("id", [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3]),
   ("id'", [thm_ "id", sub_ 0 [(PredName.mk "P", ([], Q))]])
   ]
+)
