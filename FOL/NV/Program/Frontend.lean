@@ -9,9 +9,6 @@ namespace FOL.NV.Program.Frontend
 open Formula
 
 
-def LF : Char := Char.ofNat 10
-
-
 structure Step : Type :=
   (assertion : Backend.Sequent)
   (rule : Backend.Rule)
@@ -28,7 +25,7 @@ structure Proof : Type :=
   (step_list : List Step)
 
 def Proof.toString (x : Proof) : String :=
-  s! "{x.assertion}{LF}{Backend.List.toLFString x.step_list}"
+  s! "{x.assertion}\n{Backend.List.toLFString x.step_list}"
 
 instance : ToString Proof :=
   { toString := fun x => x.toString }

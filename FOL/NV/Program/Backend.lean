@@ -15,8 +15,6 @@ open Formula
 
 def freshChar : Char := '+'
 
-def LF : Char := Char.ofNat 10
-
 
 inductive IsDeduct : List Formula → Formula → Prop
   | struct_1_
@@ -330,7 +328,7 @@ structure Proof : Type :=
   (step_list : List Step)
 
 def Proof.toString (x : Proof) : String :=
-  s! "{x.label} : {x.assertion}{LF}{List.toLFString x.step_list}"
+  s! "{x.label} : {x.assertion}\n{List.toLFString x.step_list}"
 
 instance : ToString Proof :=
   { toString := fun (x : Proof) => x.toString }
@@ -342,7 +340,7 @@ structure CheckedProof : Type :=
   (step_list : List CheckedStep)
 
 def CheckedProof.toString (x : CheckedProof) : String :=
-  s! "{x.label} : {x.assertion}{LF}{List.toLFString x.step_list}"
+  s! "{x.label} : {x.assertion}\n{List.toLFString x.step_list}"
 
 instance : ToString CheckedProof :=
   { toString := fun (x : CheckedProof) => x.toString }
@@ -403,7 +401,7 @@ def checkRule
         exact s1
       }
     }
-    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    else Except.error s! "Expected :\n{expected_val}\nFound :\n{found.assertion.val}"
 
   | struct_2_ Δ H phi label => do
     let found : CheckedStep ← localContext.get label
@@ -426,7 +424,7 @@ def checkRule
         exact s1
       }
     }
-    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    else Except.error s! "Expected :\n{expected_val}\nFound :\n{found.assertion.val}"
 
   | struct_3_ Δ_1 Δ_2 H_1 H_2 phi label => do
     let found : CheckedStep ← localContext.get label
@@ -449,7 +447,7 @@ def checkRule
         exact s1
       }
     }
-    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    else Except.error s! "Expected :\n{expected_val}\nFound :\n{found.assertion.val}"
 
   | assume_ phi =>
     let return_val : Sequent := {
@@ -532,8 +530,8 @@ def checkRule
             exact s2
         }
       }
-      else Except.error s! "Expected :{LF}{expected_val_2}{LF}Found :{LF}{found_2.assertion.val}"
-    else Except.error s! "Expected :{LF}{expected_val_1}{LF}Found :{LF}{found_1.assertion.val}"
+      else Except.error s! "Expected :\n{expected_val_2}\nFound :\n{found_2.assertion.val}"
+    else Except.error s! "Expected :\n{expected_val_1}\nFound :\n{found_1.assertion.val}"
 
   | dt_ Δ H phi label => do
     let found : CheckedStep ← localContext.get label
@@ -556,7 +554,7 @@ def checkRule
         exact s1
       }
     }
-    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    else Except.error s! "Expected :\n{expected_val}\nFound :\n{found.assertion.val}"
 
   | pred_1_ v phi psi =>
     let return_val : Sequent := {
@@ -611,7 +609,7 @@ def checkRule
         exact s1
       }
     }
-    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    else Except.error s! "Expected :\n{expected_val}\nFound :\n{found.assertion.val}"
 
   | eq_1_ v =>
     let return_val : Sequent := {
@@ -706,7 +704,7 @@ def checkRule
         exact s1
       }
     }
-    else Except.error s! "Expected :{LF}{expected_val}{LF}Found :{LF}{found.assertion.val}"
+    else Except.error s! "Expected :\n{expected_val}\nFound :\n{found.assertion.val}"
 
   | thm_ label => do
     let step : CheckedProof ← globalContext.find label
@@ -725,7 +723,7 @@ def checkStep
     assertion := checkedSequent
     rule := step.rule
   }
-  else Except.error s! "Step assertion :{LF}{step.assertion}{LF}Rule assertion :{LF}{checkedSequent.val}"
+  else Except.error s! "Step assertion :\n{step.assertion}\nRule assertion :\n{checkedSequent.val}"
 
 
 def checkStepListAux
@@ -736,7 +734,7 @@ def checkStepListAux
   | [] => Except.ok acc
   | hd :: tl => do
     let checkedStep : CheckedStep ← checkStep globalContext localContext hd
-      |>.mapError fun (message : String) => s! "rule : {hd.rule}{LF}{message}"
+      |>.mapError fun (message : String) => s! "rule : {hd.rule}\n{message}"
     checkStepListAux globalContext (localContext.push checkedStep) (acc.append [checkedStep]) tl
 
 def checkStepList
@@ -761,7 +759,7 @@ def checkProof
     assertion := last.assertion
     step_list := checkedStepList
   }
-  else Except.error s! "Proof assertion :{LF}{proof.assertion}{LF}Last step assertion :{LF}{last.assertion.val}"
+  else Except.error s! "Proof assertion :\n{proof.assertion}\nLast step assertion :\n{last.assertion.val}"
 
 
 def checkProofListAux
@@ -771,7 +769,7 @@ def checkProofListAux
   | [] => Except.ok acc
   | hd :: tl => do
   let checkedProof : CheckedProof ← checkProof globalContext hd
-    |>.mapError fun (message : String) => s! "proof label : {hd.label}{LF}{message}"
+    |>.mapError fun (message : String) => s! "proof label : {hd.label}\n{message}"
   checkProofListAux (globalContext.insert checkedProof.label checkedProof) (acc.append [checkedProof]) tl
 
 def checkProofList
