@@ -132,11 +132,11 @@ inductive IsDeduct : List Formula → Formula → Prop
     IsDeduct [] (forall_ v phi)
 
   /-
-    ⊢ ∀ v (v = v)
+    ⊢ v = v
   -/
   | eq_1_
     (v : VarName) :
-    IsDeduct [] (forall_ v (eq_ v v))
+    IsDeduct [] (eq_ v v)
 
   /-
     ⊢ ∀ x_0 ... ∀ x_n ∀ y_0 ... y_n ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) →((pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n]))
@@ -154,17 +154,11 @@ inductive IsDeduct : List Formula → Formula → Prop
   -/
 
   /-
-    ⊢ ∀ x_0 ∀ x_1 ∀ y_0 ∀ y_1 ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
+    ⊢ ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
   -/
   | eq_2_eq_
     (x_0 x_1 y_0 y_1 : VarName) :
-    IsDeduct []
-      (forall_ x_0
-        (forall_ x_1
-          (forall_ y_0
-            (forall_ y_1
-              ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_
-                ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))))))
+    IsDeduct [] ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_ ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))
 
   /-
     ⊢ ⊥ ↔ ¬ ⊤
@@ -610,7 +604,7 @@ def checkRule
   | eq_1_ v =>
     let return_val : Sequent := {
       hypotheses := []
-      conclusion := forall_ v (eq_ v v) }
+      conclusion := eq_ v v }
 
     Except.ok {
       val := return_val
@@ -620,13 +614,7 @@ def checkRule
   | eq_2_eq_ x_0 x_1 y_0 y_1 =>
     let return_val : Sequent := {
       hypotheses := []
-      conclusion :=
-        forall_ x_0
-          (forall_ x_1
-            (forall_ y_0
-              (forall_ y_1
-                ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_
-                  ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))))) }
+      conclusion := ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_ ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1))) }
 
     Except.ok {
       val := return_val
@@ -895,22 +883,15 @@ theorem soundness
   case eq_1_ v =>
     intro D I V E _
     simp only [Holds]
-    simp
   case eq_2_eq_ x_0 x_1 y_0 y_1 =>
     intro D I V E _
     simp only [Holds]
-    intro x_0_d x_1_d y_0_d y_1_d a2
-    simp only [Function.updateITE] at a2
-    simp at a2
+    intro a2
 
-    simp only [Function.updateITE]
-    simp
-
-    split_ifs at *
-    any_goals
-      tauto
-    any_goals
-      aesop
+    cases a2
+    case _ a2_left a2_right =>
+      simp only [a2_left]
+      simp only [a2_right]
   case def_false_ =>
     intro D I V E _
     simp only [Holds]
