@@ -89,15 +89,6 @@ def sub
   subAux c τ id F
 
 
-def PredReplaceListToFun : List (PredName × (List VarName) × Formula) → PredName → ℕ → Option ((List VarName) × Formula)
-  | [] => fun (_ : PredName) (_ : ℕ) => Option.none
-  | (X, zs, H) :: tl =>
-    fun (P : PredName) (n : ℕ) =>
-      if P = X ∧ n = zs.length
-      then Option.some (zs, H)
-      else PredReplaceListToFun tl P n
-
-
 def Interpretation.usingPred
   (D : Type)
   (I : Interpretation D)

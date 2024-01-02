@@ -362,6 +362,15 @@ def LocalContext.find
   else Except.error s! "{label} not found in local context."
 
 
+def PredReplaceListToFun : List (PredName × (List VarName) × Formula) → PredName → ℕ → Option ((List VarName) × Formula)
+  | [] => fun (_ : PredName) (_ : ℕ) => Option.none
+  | (X, zs, H) :: tl =>
+    fun (P : PredName) (n : ℕ) =>
+      if P = X ∧ n = zs.length
+      then Option.some (zs, H)
+      else PredReplaceListToFun tl P n
+
+
 def checkRule
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
@@ -675,7 +684,7 @@ def checkRule
     }
 
   | sub_ Δ phi xs label => do
-    let τ : PredName → ℕ → Option ((List VarName) × Formula) := (Sub.Pred.All.Rec.Option.Fresh.PredReplaceListToFun xs)
+    let τ : PredName → ℕ → Option ((List VarName) × Formula) := PredReplaceListToFun xs
 
     let found : CheckedStep ← localContext.find label
 

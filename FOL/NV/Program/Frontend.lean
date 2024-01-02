@@ -160,15 +160,6 @@ def mp
   else Except.error s! "{major_step} is not an implication."
 
 
-def PredReplaceListToFun : List (PredName × (List VarName) × Formula) → PredName → ℕ → Option ((List VarName) × Formula)
-  | [] => fun (_ : PredName) (_ : ℕ) => Option.none
-  | (X, zs, H) :: tl =>
-    fun (P : PredName) (n : ℕ) =>
-      if P = X ∧ n = zs.length
-      then Option.some (zs, H)
-      else PredReplaceListToFun tl P n
-
-
 def sub
   (localContext : LocalContext)
   (step_index : ℕ)
@@ -179,7 +170,7 @@ def sub
   let hypotheses := step.assertion.hypotheses
   let conclusion := step.assertion.conclusion
 
-  let τ : PredName → ℕ → Option (List VarName × Formula) := PredReplaceListToFun xs
+  let τ : PredName → ℕ → Option (List VarName × Formula) := Backend.PredReplaceListToFun xs
 
   Except.ok {
     assertion := {
