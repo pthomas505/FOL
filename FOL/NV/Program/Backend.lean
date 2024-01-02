@@ -234,7 +234,7 @@ inductive Rule : Type
   | def_or_ : Formula → Formula → Rule
   | def_iff_ : Formula → Formula → Rule
   | def_exists_ : VarName → Formula → Rule
-  | sub_ : List Formula → Formula → (PredName → ℕ → Option (List VarName × Formula)) → String → Rule
+  | sub_ : List Formula → Formula → List (PredName × (List VarName) × Formula) → String → Rule
   | thm_ : String → Rule
 
 open Rule
@@ -261,7 +261,7 @@ def Rule.toString : Rule → String
   | def_or_ phi psi => s! "def_or_ {phi} {psi}"
   | def_iff_ phi psi => s! "def_iff_ {phi} {psi}"
   | def_exists_ v phi => s! "def_exists_ {v} {phi}"
-  | sub_ Δ phi τ label => s! "sub_ {Δ} {phi} ? {label}"
+  | sub_ Δ phi xs label => s! "sub_ {Δ} {phi} {xs} {label}"
   | thm_ label => s! "thm_ {label}"
 
 instance : ToString Rule :=
@@ -674,7 +674,9 @@ def checkRule
       prop := IsDeduct.def_exists_ v phi
     }
 
-  | sub_ Δ phi τ label => do
+  | sub_ Δ phi xs label => do
+    let τ : PredName → ℕ → Option ((List VarName) × Formula) := (Sub.Pred.All.Rec.Option.Fresh.PredReplaceListToFun xs)
+
     let found : CheckedStep ← localContext.find label
 
     let expected_val : Sequent := {

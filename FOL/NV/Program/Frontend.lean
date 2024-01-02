@@ -172,20 +172,21 @@ def PredReplaceListToFun : List (PredName × (List VarName) × Formula) → Pred
 def sub
   (localContext : LocalContext)
   (step_index : ℕ)
-  (pred_replace_list : List (PredName × (List VarName × Formula))) :
+  (xs : List (PredName × (List VarName × Formula))) :
   Except String Step := do
   let step ← localContext.get step_index
 
   let hypotheses := step.assertion.hypotheses
   let conclusion := step.assertion.conclusion
 
-  let τ : PredName → ℕ → Option (List VarName × Formula) := PredReplaceListToFun pred_replace_list
+  let τ : PredName → ℕ → Option (List VarName × Formula) := PredReplaceListToFun xs
+
   Except.ok {
     assertion := {
       hypotheses := hypotheses.map (Sub.Pred.All.Rec.Option.Fresh.sub Backend.freshChar τ)
       conclusion := Sub.Pred.All.Rec.Option.Fresh.sub Backend.freshChar τ conclusion
     }
-    rule := Backend.Rule.sub_ hypotheses conclusion τ step_index.repr
+    rule := Backend.Rule.sub_ hypotheses conclusion xs step_index.repr
   }
 
 
