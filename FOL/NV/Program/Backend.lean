@@ -15,13 +15,6 @@ open Formula
 
 def freshChar : Char := '+'
 
-def blah
-  (xs ys : List VarName) :
-  Formula :=
-  let pairs := List.zip xs ys
-  let eq_pairs := pairs.map (fun p => eq_ p.1 p.2)
-  List.foldr and_ true_ eq_pairs
-
 
 inductive IsDeduct : List Formula → Formula → Prop
   | struct_1_
@@ -145,15 +138,14 @@ inductive IsDeduct : List Formula → Formula → Prop
     IsDeduct [] (eq_ v v)
 
   /-
-    ⊢ ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) → (pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n])
+    ⊢ ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) → (pred_var_ name [x_0 ... x_n] ↔ pred_var_ name [y_0 ... y_n])
   -/
   | eq_2_pred_var_
     (name : PredName)
     (xs ys : List VarName) :
     xs.length = ys.length →
-    IsDeduct [] ((blah xs ys).imp_ ((pred_var_ name xs).iff_ (pred_var_ name ys)))
+    IsDeduct [] ((List.foldr and_ true_ (List.zipWith eq_ xs ys)).imp_ ((pred_var_ name xs).iff_ (pred_var_ name ys)))
 
--- ((And_ (List.ofFn fun (i : Fin n) => eq_ (xs i) (ys i)))
   /-
     ⊢ ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
   -/
@@ -911,7 +903,6 @@ theorem soundness
   case eq_2_pred_var_ X xs ys ih_1 =>
     intro D I V E _
 
-    simp only [blah]
     simp only [Holds]
     intro a1
     congr! 1
