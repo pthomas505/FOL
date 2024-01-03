@@ -1,3 +1,4 @@
+import FOL.Except
 import FOL.NV.Program.Backend
 
 
@@ -9,40 +10,6 @@ namespace FOL.NV.Program.Frontend
 open Formula
 
 
-structure Step : Type :=
-  (assertion : Backend.Sequent)
-  (rule : Backend.Rule)
-
-def Step.toString (x : Step) : String :=
-  s! "{x.assertion} : {x.rule}"
-
-instance : ToString Step :=
-  { toString := fun x => x.toString }
-
-
-structure Proof : Type :=
-  (assertion : Backend.Sequent)
-  (step_list : List Step)
-
-def Proof.toString (x : Proof) : String :=
-  s! "{x.assertion}\n{Backend.List.toLFString x.step_list}"
-
-instance : ToString Proof :=
-  { toString := fun x => x.toString }
-
-
-abbrev LocalContext : Type := List Step
-
-def LocalContext.get
-  (context : LocalContext)
-  (index : ℕ) :
-  Except String Step :=
-  let opt := context.get? index
-  if h : Option.isSome opt
-  then Except.ok (Option.get opt h)
-  else Except.error s! "{index} not found in local context."
-
-
 abbrev GlobalContext : Type := Std.HashMap String Backend.Proof
 
 def GlobalContext.find
@@ -50,17 +17,24 @@ def GlobalContext.find
   (label : String) :
   Except String Backend.Proof :=
   let opt : Option Backend.Proof := context.find? label
+  opt.toExcept s! "{label} not found in global context."
 
-  if h : Option.isSome opt
-  then Except.ok (Option.get opt h)
-  else Except.error s! "{label} not found in global context."
+
+abbrev LocalContext : Type := Array Backend.Step
+
+def LocalContext.get
+  (context : LocalContext)
+  (index : ℕ) :
+  Except String Backend.Step :=
+  let opt : Option Backend.Step := context.get? index
+  opt.toExcept s! "index must be less than {context.size}."
 
 
 def shift_hypothesis_left
   (localContext : LocalContext)
   (step_index : ℕ)
   (index : ℕ) :
-  Except String Step := do
+  Except String Backend.Step := do
   let step ← localContext.get step_index
 
   let hypotheses := step.assertion.hypotheses
@@ -87,7 +61,7 @@ def shift_hypothesis_left
 
 
 def assume (phi : Formula) :
-  Except String Step :=
+  Except String Backend.Step :=
     Except.ok {
       assertion := {
         hypotheses := [phi]
@@ -100,7 +74,7 @@ def assume (phi : Formula) :
 def prop_1
   (phi : Formula)
   (psi : Formula) :
-  Except String Step :=
+  Except String Backend.Step :=
     Except.ok {
       assertion := {
         hypotheses := []
@@ -114,7 +88,7 @@ def prop_2
   (phi : Formula)
   (psi : Formula)
   (chi : Formula) :
-  Except String Step :=
+  Except String Backend.Step :=
     Except.ok {
       assertion := {
         hypotheses := []
@@ -128,7 +102,7 @@ def mp
   (localContext : LocalContext)
   (major_step_index : ℕ)
   (minor_step_index : ℕ) :
-  Except String Step := do
+  Except String Backend.Step := do
   let major_step ← localContext.get major_step_index
   let minor_step ← localContext.get minor_step_index
 
@@ -153,7 +127,7 @@ def sub
   (localContext : LocalContext)
   (step_index : ℕ)
   (xs : List (PredName × (List VarName × Formula))) :
-  Except String Step := do
+  Except String Backend.Step := do
   let step ← localContext.get step_index
 
   let hypotheses := step.assertion.hypotheses
@@ -173,7 +147,7 @@ def sub
 def thm
   (globalContext : GlobalContext)
   (label : String) :
-  Except String Step := do
+  Except String Backend.Step := do
   let step ← globalContext.find label
 
   Except.ok {
@@ -201,7 +175,7 @@ open Command
 def createStepList
   (globalContext : GlobalContext)
   (localContext : LocalContext) :
-  Command → Except String (List Step)
+  Command → Except String (List Backend.Step)
 
   | shift_hypothesis_left_ step_index index => do
     let step ← shift_hypothesis_left localContext step_index index
@@ -234,32 +208,21 @@ def createStepList
 
 def createProofStepListAux
   (globalContext : GlobalContext)
-  (localContext : LocalContext) :
-  List Command → Except String (List Step)
-  | [] => Except.ok localContext
+  (localContext : LocalContext)
+  (acc : List Backend.Step) :
+  List Command → Except String (List Backend.Step)
+  | [] => Except.ok acc
   | hd :: tl => do
       let step_list ← createStepList globalContext localContext hd
 
-      createProofStepListAux globalContext (localContext ++ step_list) tl
+      createProofStepListAux globalContext (localContext ++ step_list) (acc.append step_list) tl
 
 
 def createProofStepList
   (globalContext : GlobalContext)
   (commands : List Command) :
-  Except String (List Step) :=
-  createProofStepListAux globalContext [] commands
-
-
-def createProofLabeledStepListAux
-  (index : ℕ) :
-  List Step → List Backend.Step
-  | [] => []
-  | hd :: tl =>
-    let step : Backend.Step := {
-      assertion := hd.assertion
-      rule := hd.rule
-    }
-    step :: (createProofLabeledStepListAux (index + 1) tl)
+  Except String (List Backend.Step) :=
+  createProofStepListAux globalContext #[] [] commands
 
 
 def createProof
@@ -269,15 +232,14 @@ def createProof
   Except String Backend.Proof := do
   let step_list ← createProofStepList globalContext commands
 
-  let labeled_step_list := createProofLabeledStepListAux 0 step_list
+  let opt := step_list.getLast?
+  let last ← opt.toExcept "The step list has no steps."
 
-  if let Option.some last_step := step_list.getLast?
-  then Except.ok {
+  Except.ok {
     label := label
-    assertion := last_step.assertion
-    step_list := labeled_step_list
+    assertion := last.assertion
+    step_list := step_list
   }
-  else Except.error "The step list has no steps."
 
 
 def createProofListAux
@@ -287,6 +249,7 @@ def createProofListAux
   | [] => Except.ok acc
   | (label, commands) :: tl => do
     let proof ← createProof globalContext label commands
+
     createProofListAux (globalContext.insert label proof) (acc ++ [proof]) tl
 
 def createProofList
