@@ -42,21 +42,18 @@ def shift_hypothesis_left
 
   if h1 : index < hypotheses.length
   then
-    if h2 : index > 0
-    then
-      have : index - 1 < hypotheses.length := tsub_lt_of_lt h1
-      let Δ_1 := List.take (index - 1) hypotheses
-      let Δ_2 := List.drop (index + 1) hypotheses
-      let H_1 := hypotheses[index - 1]
-      let H_2 := hypotheses[index]
+    have : index - 1 < hypotheses.length := tsub_lt_of_lt h1
+    let Δ_1 := List.take (index - 1) hypotheses
+    let Δ_2 := List.drop (index + 1) hypotheses
+    let H_1 := hypotheses[index - 1]
+    let H_2 := hypotheses[index]
 
-      Except.ok {
-        assertion := {
-          hypotheses := (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2)
-          conclusion := conclusion }
-        rule := Backend.Rule.struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step_index
-      }
-    else Except.error "index must be greater than zero"
+    Except.ok {
+      assertion := {
+        hypotheses := (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2)
+        conclusion := conclusion }
+      rule := Backend.Rule.struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step_index
+    }
   else Except.error "index out of range"
 
 
