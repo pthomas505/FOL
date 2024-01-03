@@ -778,6 +778,7 @@ def checkProofListAux
   | hd :: tl => do
   let checkedProof : CheckedProof ← checkProof globalContext hd
     |>.mapError fun (message : String) => s! "proof label : {hd.label}\n{message}"
+
   checkProofListAux (globalContext.insert checkedProof.label checkedProof) (acc.append [checkedProof]) tl
 
 def checkProofList
