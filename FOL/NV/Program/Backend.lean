@@ -15,6 +15,13 @@ open Formula
 
 def freshChar : Char := '+'
 
+def blah
+  (xs ys : List VarName) :
+  Formula :=
+  let pairs := List.zip xs ys
+  let eq_pairs := pairs.map (fun p => eq_ p.1 p.2)
+  List.foldr and_ true_ eq_pairs
+
 
 inductive IsDeduct : List Formula → Formula → Prop
   | struct_1_
@@ -138,20 +145,15 @@ inductive IsDeduct : List Formula → Formula → Prop
     IsDeduct [] (eq_ v v)
 
   /-
-    ⊢ ∀ x_0 ... ∀ x_n ∀ y_0 ... y_n ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) →((pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n]))
+    ⊢ ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) → (pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n])
   -/
-  /-
-  | eq_2_pred_const_
+  | eq_2_pred_var_
     (name : PredName)
-    (n : ℕ)
-    (xs ys : Fin n → VarName) :
-    IsDeduct []
-      (Forall_ (List.ofFn xs)
-        (Forall_ (List.ofFn ys)
-          ((And_ (List.ofFn fun (i : Fin n) => eq_ (xs i) (ys i))).imp_
-            ((pred_const_ name (List.ofFn xs)).iff_ (pred_const_ name (List.ofFn ys))))))
-  -/
+    (xs ys : List VarName) :
+    xs.length = ys.length →
+    IsDeduct [] ((blah xs ys).imp_ ((pred_var_ name xs).iff_ (pred_var_ name ys)))
 
+-- ((And_ (List.ofFn fun (i : Fin n) => eq_ (xs i) (ys i)))
   /-
     ⊢ ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
   -/
@@ -906,6 +908,36 @@ theorem soundness
     case _ a2_left a2_right =>
       simp only [a2_left]
       simp only [a2_right]
+  case eq_2_pred_var_ X xs ys ih_1 =>
+    intro D I V E _
+
+    simp only [blah]
+    simp only [Holds]
+    intro a1
+    congr! 1
+
+    induction xs generalizing ys
+    case _ =>
+      cases ys
+      case _ =>
+        simp only [Holds]
+      case cons ys_hd ys_tl =>
+        simp at ih_1
+    case _ xs_hd xs_tl xs_ih =>
+      cases ys
+      case nil =>
+        simp at ih_1
+      case cons ys_hd ys_tl =>
+        simp at ih_1
+
+        simp at a1
+        simp only [Holds] at a1
+        cases a1
+        case _ a1_left a1_right =>
+          simp
+          constructor
+          · exact a1_left
+          · apply xs_ih ys_tl ih_1 a1_right
   case def_false_ =>
     intro D I V E _
     simp only [Holds]
