@@ -216,6 +216,7 @@ inductive Rule : Type
   | gen_ : VarName → Formula → ℕ → Rule
   | eq_1_ : VarName → Rule
   | eq_2_eq_ : VarName → VarName → VarName → VarName → Rule
+  | eq_2_pred_var_ : PredName → List VarName → List VarName → Rule
   | def_false_ : Rule
   | def_and_ : Formula → Formula → Rule
   | def_or_ : Formula → Formula → Rule
@@ -243,6 +244,7 @@ def Rule.toString : Rule → String
   | gen_ v phi label_1 => s! "gen_ {v} {phi} {label_1}"
   | eq_1_ v => s! "eq_1_ {v}"
   | eq_2_eq_ x_0 x_1 y_0 y_1 => s! "eq_2_eq_ {x_0} {x_1} {y_0} {y_1}"
+  | eq_2_pred_var_ name xs ys => s! "eq_2_pred_var_ {name} {xs} {ys}"
   | def_false_ => s! "def_false_"
   | def_and_ phi psi => s! "def_and_ {phi} {psi}"
   | def_or_ phi psi => s! "def_or_ {phi} {psi}"
@@ -624,6 +626,18 @@ def checkRule
       val := return_val
       prop := IsDeduct.eq_2_eq_ x_0 x_1 y_0 y_1
     }
+
+  | eq_2_pred_var_ name xs ys =>
+    let return_val : Sequent := {
+      hypotheses := []
+      conclusion := ((List.foldr and_ true_ (List.zipWith eq_ xs ys)).imp_ ((pred_var_ name xs).iff_ (pred_var_ name ys))) }
+
+    if h : xs.length = ys.length
+    then Except.ok {
+        val := return_val
+        prop := IsDeduct.eq_2_pred_var_ name xs ys h
+      }
+    else Except.error "The lists of variables must have the same length."
 
   | def_false_ =>
     let return_val : Sequent := {
