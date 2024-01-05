@@ -301,6 +301,11 @@ instance : ToString CheckedStep :=
   { toString := fun (x : CheckedStep) => x.toString }
 
 
+structure Proof : Type :=
+  (label : String)
+  (assertion : Sequent)
+  (step_list : List Step)
+
 def List.toLFStringAux
   {α : Type}
   [ToString α]
@@ -316,12 +321,6 @@ def List.toLFString
   [ToString α]
   (xs : List α) :
   String := List.toLFStringAux 0 xs
-
-
-structure Proof : Type :=
-  (label : String)
-  (assertion : Sequent)
-  (step_list : List Step)
 
 def Proof.toString (x : Proof) : String :=
   s! "{x.label} : {x.assertion}\n{List.toLFString x.step_list}"
