@@ -758,7 +758,7 @@ def checkProof
   let checkedStepList : List CheckedStep ← checkStepList globalContext proof.step_list
 
   let opt := checkedStepList.getLast?
-  let last ← opt.toExcept "The step list has no steps."
+  let last ← opt.toExcept "The step list is empty."
 
   if last.assertion.val = proof.assertion
   then Except.ok {

@@ -54,7 +54,7 @@ def shift_hypothesis_left
         conclusion := conclusion }
       rule := Backend.Rule.struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step_index
     }
-  else Except.error "hypothesis index out of range"
+  else Except.error "The hypothesis index is out of range."
 
 
 def assume (phi : Formula) :
@@ -115,9 +115,9 @@ def mp
         }
         rule := Backend.Rule.mp_ major_step.assertion.hypotheses major_left major_right major_step_index minor_step_index
       }
-      else Except.error s! "minor does match major antecedent."
-    else Except.error "minor hypotheses do not match major hypotheses."
-  else Except.error s! "{major_step} is not an implication."
+      else Except.error s! "The minor formula does not match the antecedent of the major formula."
+    else Except.error "The minor hypotheses do not match the major hypotheses."
+  else Except.error s! "The major step is not an implication."
 
 
 def sub
@@ -174,8 +174,8 @@ def createStepList
   (localContext : LocalContext) :
   Command → Except String (List Backend.Step)
 
-  | shift_hypothesis_left_ step_index index => do
-    let step ← shift_hypothesis_left localContext step_index index
+  | shift_hypothesis_left_ step_index hypothesis_index => do
+    let step ← shift_hypothesis_left localContext step_index hypothesis_index
     Except.ok [step]
 
   | assume_ phi => do
@@ -230,7 +230,7 @@ def createProof
   let step_list ← createProofStepList globalContext commands
 
   let opt := step_list.getLast?
-  let last ← opt.toExcept "The step list has no steps."
+  let last ← opt.toExcept "The step list is empty."
 
   Except.ok {
     label := label
