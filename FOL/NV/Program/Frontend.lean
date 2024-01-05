@@ -255,6 +255,13 @@ def createProofList
   createProofListAux {} [] labeled_command_list
 
 
+def createJsonProofList
+  (labeled_command_list : List (String × (List Command))) :
+  Except String Lean.Json := do
+  let proof_list ← createProofList labeled_command_list
+  Except.ok (Lean.toJson proof_list)
+
+
 def checkProofList
   (proof_list : Except String (List Backend.Proof)) :
   Except String (List Backend.CheckedProof) := do
@@ -270,3 +277,8 @@ def Q := pred_var_ (PredName.mk "Q") []
   ("id'", [thm_ "id", sub_ 0 [(PredName.mk "P", ([], Q))]])
   ]
 )
+
+#eval createJsonProofList [
+  ("id", [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3]),
+  ("id'", [thm_ "id", sub_ 0 [(PredName.mk "P", ([], Q))]])
+  ]
