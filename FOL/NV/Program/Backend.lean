@@ -358,7 +358,7 @@ def LocalContext.get
   (index : ℕ) :
   Except String CheckedStep :=
   let opt : Option CheckedStep := context.get? index
-  opt.toExcept s! "index must be less than {context.size}."
+  opt.toExcept s! "{index} not found in local context."
 
 
 def PredReplaceListToFun : List (PredName × (List VarName) × Formula) → PredName → ℕ → Option ((List VarName) × Formula)
