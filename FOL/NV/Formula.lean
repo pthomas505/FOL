@@ -43,7 +43,7 @@ instance : Repr PredName :=
   { reprPrec := fun (X : PredName) _ => X.toString.toFormat }
 
 instance : Lean.ToJson PredName :=
-  { toJson := fun (x : PredName) => Lean.toJson x.toString }
+  { toJson := fun (X : PredName) => Lean.toJson X.toString }
 
 instance : Lean.FromJson PredName :=
   { fromJson? := fun (json : Lean.Json) => do
@@ -64,7 +64,7 @@ instance : Repr DefName :=
   { reprPrec := fun (X : DefName) _ => X.toString.toFormat }
 
 instance : Lean.ToJson DefName :=
-  { toJson := fun (x : DefName) => Lean.toJson x.toString }
+  { toJson := fun (X : DefName) => Lean.toJson X.toString }
 
 instance : Lean.FromJson DefName :=
   { fromJson? := fun (json : Lean.Json) => do
