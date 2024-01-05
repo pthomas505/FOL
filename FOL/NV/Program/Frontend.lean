@@ -27,7 +27,7 @@ def LocalContext.get
   (index : ℕ) :
   Except String Backend.Step :=
   let opt : Option Backend.Step := context.get? index
-  opt.toExcept s! "index must be less than {context.size}."
+  opt.toExcept s! "{index} not found in local context."
 
 
 def shift_hypothesis_left
