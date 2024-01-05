@@ -1,5 +1,6 @@
 import Std.Tactic.Lint.Frontend
 import Mathlib.Util.CompileInductive
+import Lean.Data.Json.Basic
 
 
 set_option autoImplicit false
@@ -20,6 +21,14 @@ instance : ToString VarName :=
 instance : Repr VarName :=
   { reprPrec := fun (x : VarName) _ => x.toString.toFormat }
 
+instance : Lean.ToJson VarName :=
+  { toJson := fun (x : VarName) => Lean.toJson x.toString }
+
+instance : Lean.FromJson VarName :=
+  { fromJson? := fun (json : Lean.Json) => do
+    let str ← Lean.fromJson? json
+    Except.ok (VarName.mk str) }
+
 
 /--
   The type of predicate names.
@@ -33,6 +42,14 @@ instance : ToString PredName :=
 instance : Repr PredName :=
   { reprPrec := fun (X : PredName) _ => X.toString.toFormat }
 
+instance : Lean.ToJson PredName :=
+  { toJson := fun (x : PredName) => Lean.toJson x.toString }
+
+instance : Lean.FromJson PredName :=
+  { fromJson? := fun (json : Lean.Json) => do
+    let str ← Lean.fromJson? json
+    Except.ok (PredName.mk str) }
+
 
 /--
   The type of definition names.
@@ -45,6 +62,14 @@ instance : ToString DefName :=
 
 instance : Repr DefName :=
   { reprPrec := fun (X : DefName) _ => X.toString.toFormat }
+
+instance : Lean.ToJson DefName :=
+  { toJson := fun (x : DefName) => Lean.toJson x.toString }
+
+instance : Lean.FromJson DefName :=
+  { fromJson? := fun (json : Lean.Json) => do
+    let str ← Lean.fromJson? json
+    Except.ok (DefName.mk str) }
 
 
 /--
@@ -64,7 +89,7 @@ inductive Formula : Type
   | forall_ : VarName → Formula → Formula
   | exists_ : VarName → Formula → Formula
   | def_ : DefName → List VarName → Formula
-  deriving Inhabited, DecidableEq
+  deriving Inhabited, DecidableEq, Lean.ToJson, Lean.FromJson
 
 compile_inductive% Formula
 

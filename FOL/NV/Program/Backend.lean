@@ -224,6 +224,7 @@ inductive Rule : Type
   | def_exists_ : VarName → Formula → Rule
   | sub_ : List Formula → Formula → List (PredName × (List VarName) × Formula) → ℕ → Rule
   | thm_ : String → Rule
+  deriving Lean.ToJson, Lean.FromJson
 
 open Rule
 
@@ -260,7 +261,7 @@ instance : ToString Rule :=
 structure Sequent : Type :=
   (hypotheses : List Formula)
   (conclusion : Formula)
-  deriving Inhabited, DecidableEq
+  deriving Inhabited, DecidableEq, Lean.ToJson, Lean.FromJson
 
 def Sequent.toString (x : Sequent) : String :=
   s! "{x.hypotheses} ⊢ {x.conclusion}"
@@ -282,6 +283,7 @@ instance : ToString CheckedSequent :=
 structure Step : Type :=
   (assertion : Sequent)
   (rule : Rule)
+  deriving Lean.ToJson, Lean.FromJson
 
 def Step.toString (x : Step) : String :=
   s! "{x.assertion} : {x.rule}"
@@ -305,6 +307,8 @@ structure Proof : Type :=
   (label : String)
   (assertion : Sequent)
   (step_list : List Step)
+  deriving Lean.ToJson, Lean.FromJson
+
 
 def List.toLFStringAux
   {α : Type}
