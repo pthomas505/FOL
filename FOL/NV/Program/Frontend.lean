@@ -33,20 +33,20 @@ def LocalContext.get
 def shift_hypothesis_left
   (localContext : LocalContext)
   (step_index : ℕ)
-  (index : ℕ) :
+  (hypothesis_index : ℕ) :
   Except String Backend.Step := do
   let step ← localContext.get step_index
 
   let hypotheses := step.assertion.hypotheses
   let conclusion := step.assertion.conclusion
 
-  if h1 : index < hypotheses.length
+  if h1 : hypothesis_index < hypotheses.length
   then
-    have : index - 1 < hypotheses.length := tsub_lt_of_lt h1
-    let Δ_1 := List.take (index - 1) hypotheses
-    let Δ_2 := List.drop (index + 1) hypotheses
-    let H_1 := hypotheses[index - 1]
-    let H_2 := hypotheses[index]
+    have : hypothesis_index - 1 < hypotheses.length := tsub_lt_of_lt h1
+    let Δ_1 := List.take (hypothesis_index - 1) hypotheses
+    let Δ_2 := List.drop (hypothesis_index + 1) hypotheses
+    let H_1 := hypotheses[hypothesis_index - 1]
+    let H_2 := hypotheses[hypothesis_index]
 
     Except.ok {
       assertion := {
@@ -54,7 +54,7 @@ def shift_hypothesis_left
         conclusion := conclusion }
       rule := Backend.Rule.struct_3_ Δ_1 Δ_2 H_1 H_2 conclusion step_index
     }
-  else Except.error "index out of range"
+  else Except.error "hypothesis index out of range"
 
 
 def assume (phi : Formula) :
