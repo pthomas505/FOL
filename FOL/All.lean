@@ -37,6 +37,11 @@ import FOL.NV.Sub.Pred.All.Rec.Option.Sub
 
 import FOL.NV.Sub.Pred.All.Rec.Option.Fresh.Sub
 
+import FOL.NV.Program.Frontend
+import FOL.NV.Program.Backend
+
 import FOL.NV.Margaris.Deduct
 import FOL.NV.Margaris.Prop
 import FOL.NV.Margaris.Fol
+
+import FOL.MM0.MM0
