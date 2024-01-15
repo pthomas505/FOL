@@ -311,8 +311,7 @@ example
           all_goals
             cases h2
             all_goals
-              try contradiction
-              try simp only [and_self]
+              first | contradiction | simp only [and_self]
       all_goals
         sorry
 
