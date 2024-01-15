@@ -258,4 +258,31 @@ lemma PrefixAppend
   exact List.prefix_append xs ys
 
 
+/-
+  Theorem: If (e, x) ⇒ (n, y), then y is a prefix of x: ∃z(x = yz).
+-/
+theorem InterpretationPrefix
+  (V_N V_T : Type)
+  (R : V_N → PE V_N V_T)
+  (e : PE V_N V_T)
+  (xs ys : List V_T)
+  (n : Nat)
+  (h1 : Interpretation V_N V_T R (e, xs) (n, Option.some ys)) :
+  List.IsPrefix ys xs :=
+  by
+  induction n using Nat.strongInductionOn generalizing e
+  case ind n ih =>
+  cases h1
+  any_goals
+    first | apply EmptyStringPrefix | apply CharPrefix | apply PrefixAppend
+  case nonTerminal A n ih_1 =>
+    specialize ih n _ (R A)
+    · omega
+    · exact ih ih_1
+  case choice_2 e1 e2 n1 n2 ih_1 ih_2 =>
+    specialize ih n2 _ e2
+    · omega
+    · exact ih ih_2
+
+
 #lint
