@@ -285,4 +285,35 @@ theorem InterpretationPrefix
     · exact ih ih_2
 
 
+example
+  (V_N V_T : Type)
+  (R : V_N → PE V_N V_T)
+  (e : PE V_N V_T)
+  (xs : List V_T)
+  (n1 n2 : Nat)
+  (o1 o2 : Option (List V_T))
+  (h1 : Interpretation V_N V_T R (e, xs) (n1, o1))
+  (h2 : Interpretation V_N V_T R (e, xs) (n2, o2)) :
+  n1 = n2 ∧ o1 = o2 :=
+  by
+  induction n1 using Nat.strongInductionOn generalizing e
+  case ind n1 ih_n1 =>
+    induction n2 using Nat.strongInductionOn generalizing e
+    case ind n2 ih_n2 =>
+      induction e
+      case empty =>
+        cases h1
+        cases h2
+        simp
+      case terminal =>
+        all_goals
+          cases h1
+          all_goals
+            cases h2
+            all_goals
+              try contradiction
+              try simp only [and_self]
+      all_goals
+        sorry
+
 #lint
