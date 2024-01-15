@@ -21,7 +21,6 @@ set_option autoImplicit false
 -/
 inductive PE (V_N V_T : Type) : Type
   | empty : PE V_N V_T
-  | any : PE V_N V_T
   | terminal : V_T → PE V_N V_T
   | nonTerminal : V_N → PE V_N V_T
   | seq : PE V_N V_T → PE V_N V_T → PE V_N V_T
