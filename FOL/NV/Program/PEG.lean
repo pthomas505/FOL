@@ -233,4 +233,13 @@ lemma InterpretationSteps
     omega
 
 
+lemma EmptyStringPrefix
+  (α : Type)
+  (xs : List α) :
+  List.IsPrefix [] xs :=
+  by
+  exact List.nil_prefix xs
+
+
+
 #lint
