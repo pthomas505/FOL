@@ -1,5 +1,5 @@
 /-
-  https://bford.info/pub/lang/peg.pdf
+  [1] https://bford.info/pub/lang/peg.pdf
 
   https://github.com/jayhardee9/peg-formalization/blob/master/peg.v
 -/
@@ -39,8 +39,13 @@ open PE
 
   V_N is a finite set of nonterminal symbols.
   V_T is a finite set of terminal symbols.
-
   R is a finite set of rules.
+
+  Section 3.3 of [1]:
+  "Definition: To formalize the syntactic meaning of a grammar G = (V_N, V_T, R, eS), we define a relation ⇒G from pairs of the form (e, x) to pairs of the form (n, o), where e is a parsing expression, x ∈ V_T* is an input string to be recognized, n ≥ 0 serves as a “step counter,” and o ∈ V_T* ∪ { f } indicates the result of a recognition attempt. The “output” o of a successful match is the portion of the input string recognized and “consumed,” while a distinguished symbol f ∉ V_T indicates failure. For ((e, x), (n, o)) ∈ ⇒G we will write (e, x) ⇒ (n, o), with the reference to G being implied. We define ⇒G inductively as follows:"
+
+  V_T* is translated as `List V_T`.
+  V_T* ∪ { f } is translated as `Option (List V_T)`.
 -/
 inductive Interpretation
   (V_N V_T : Type)
