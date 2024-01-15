@@ -198,3 +198,6 @@ inductive Interpretation
     (n : Nat) :
     Interpretation V_N V_T R (e, xs) (n, Option.none) →
     Interpretation V_N V_T R (notP e, xs) (n + 1, Option.some [])
+
+
+#lint
