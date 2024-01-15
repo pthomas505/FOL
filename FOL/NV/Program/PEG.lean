@@ -24,7 +24,7 @@ inductive PE (V_N V_T : Type) : Type
   | terminal : V_T → PE V_N V_T
   | nonTerminal : V_N → PE V_N V_T
   | seq : PE V_N V_T → PE V_N V_T → PE V_N V_T
-  | prior : PE V_N V_T → PE V_N V_T → PE V_N V_T
+  | choice : PE V_N V_T → PE V_N V_T → PE V_N V_T
   | star : PE V_N V_T → PE V_N V_T
   | notP : PE V_N V_T → PE V_N V_T
   deriving Inhabited, DecidableEq
@@ -133,26 +133,26 @@ inductive Interpretation
 
       Alternative e1 is first tested, and if it succeeds, the expression e1/e2 succeeds without testing e2.
     -/
-  | prior_1
+  | choice_1
     (e1 e2 : PE V_N V_T)
     (xs ys : List V_T)
     (n : Nat) :
     Interpretation V_N V_T R (e1, xs ++ ys) (n, Option.some xs) →
-    Interpretation V_N V_T R (prior e1 e2, xs ++ ys) (n + 1, Option.some xs)
+    Interpretation V_N V_T R (choice e1 e2, xs ++ ys) (n + 1, Option.some xs)
 
     /-
       Alternation (case 2)
 
       If e1 fails, then e2 is tested and its result is used instead.
     -/
-  | prior_2
+  | choice_2
     (e1 e2 : PE V_N V_T)
     (xs : List V_T)
     (n1 n2 : Nat)
     (o : Option (List V_T)) :
     Interpretation V_N V_T R (e1, xs) (n1, Option.none) →
     Interpretation V_N V_T R (e2, xs) (n2, o) →
-    Interpretation V_N V_T R (prior e1 e2, xs) (n1 + n2 + 1, o)
+    Interpretation V_N V_T R (choice e1 e2, xs) (n1 + n2 + 1, o)
 
     /-
       Zero-or-more repetitions (repetition case)
