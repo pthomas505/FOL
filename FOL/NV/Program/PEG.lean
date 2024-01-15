@@ -48,26 +48,41 @@ inductive Interpretation
   (R : V_N → PE V_N V_T) :
   (PE V_N V_T × List V_T) → (Nat × Option (List V_T)) → Prop
 
+    /-
+      Empty
+    -/
   | empty
     (xs : List V_T) :
     Interpretation V_N V_T R (empty, xs) (1, Option.some [])
 
+    /-
+      Terminal (success case)
+    -/
   | terminal_success
     (a : V_T)
     (xs : List V_T) :
     Interpretation V_N V_T R (terminal a, a :: xs) (1, Option.some [a])
 
+    /-
+      Terminal (failure case)
+    -/
   | terminal_failure_1
     (a b : V_T)
     (xs : List V_T) :
     ¬ a = b →
     Interpretation V_N V_T R (terminal a, b :: xs) (1, Option.none)
 
+    /-
+      Terminal (failure case)
+    -/
   | terminal_failure_2
     (a b : V_T)
     (xs : List V_T) :
     Interpretation V_N V_T R (terminal a, []) (1, Option.none)
 
+    /-
+      Nonterminal
+    -/
   | nonTerminal
     (A : V_N)
     (xs : List V_T)
@@ -76,6 +91,11 @@ inductive Interpretation
     Interpretation V_N V_T R (R A, xs) (n, o) →
     Interpretation V_N V_T R (nonTerminal A, xs) ((n + 1), o)
 
+    /-
+      Sequence (success case)
+
+      Expressions e1 and e2 are matched in sequence, and if each succeeds and consumes input portions x1 and x2 respectively, then the sequence succeeds and consumes the string x1 x2.
+    -/
   | seq_success
     (e1 e2 : PE V_N V_T)
     (xs_1 xs_2 ys : List V_T)
@@ -84,6 +104,11 @@ inductive Interpretation
     Interpretation V_N V_T R (e2, xs_2 ++ ys) (n2, Option.some xs_2) →
     Interpretation V_N V_T R (seq e1 e2, xs_1 ++ xs_2 ++ ys) (n1 + n2 + 1, Option.some (xs_1 ++ xs_2))
 
+    /-
+      Sequence (failure case 1)
+
+      If e1 is tested and fails, then the sequence e1 e2 fails without attempting e2.
+    -/
   | seq_failure_1
     (e1 e2 : PE V_N V_T)
     (xs : List V_T)
@@ -91,6 +116,11 @@ inductive Interpretation
     Interpretation V_N V_T R (e1, xs) (n1, Option.none) →
     Interpretation V_N V_T R (seq e1 e2, xs) (n1 + 1, Option.none)
 
+    /-
+      Sequence (failure case 2)
+
+      If e1 succeeds but e2 fails, then the sequence expression fails.
+    -/
   | seq_failure_2
     (e1 e2 : PE V_N V_T)
     (xs_1 ys : List V_T)
@@ -99,6 +129,11 @@ inductive Interpretation
     Interpretation V_N V_T R (e2, ys) (n2, Option.none) →
     Interpretation V_N V_T R (seq e1 e2, xs_1 ++ ys) (n1 + n2 + 1, Option.none)
 
+    /-
+      Alternation (case 1)
+
+      Alternative e1 is first tested, and if it succeeds, the expression e1/e2 succeeds without testing e2.
+    -/
   | prior_1
     (e1 e2 : PE V_N V_T)
     (xs ys : List V_T)
@@ -106,6 +141,11 @@ inductive Interpretation
     Interpretation V_N V_T R (e1, xs ++ ys) (n1, Option.some xs) →
     Interpretation V_N V_T R (prior e1 e2, xs ++ ys) (n1 + 1, Option.some xs)
 
+    /-
+      Alternation (case 2)
+
+      If e1 fails, then e2 is tested and its result is used instead.
+    -/
   | prior_2
     (e1 e2 : PE V_N V_T)
     (xs : List V_T)
@@ -115,6 +155,9 @@ inductive Interpretation
     Interpretation V_N V_T R (e2, xs) (n2, o) →
     Interpretation V_N V_T R (prior e1 e2, xs) (n1 + n2 + 1, o)
 
+    /-
+      Zero-or-more repetitions (repetition case)
+    -/
   | star_repetition
     (e : PE V_N V_T)
     (xs_1 xs_2 ys : List V_T)
@@ -123,6 +166,9 @@ inductive Interpretation
     Interpretation V_N V_T R (star e, xs_2 ++ ys) (n2, Option.some xs_2) →
     Interpretation V_N V_T R (star e, xs_1 ++ xs_2 ++ ys) (n1 + n2 + 1, Option.some (xs_1 ++ xs_2))
 
+    /-
+      Zero-or-more repetitions (termination case)
+    -/
   | star_termination
     (e : PE V_N V_T)
     (xs : List V_T)
@@ -130,6 +176,11 @@ inductive Interpretation
     Interpretation V_N V_T R (e, xs) (n1, Option.none) →
     Interpretation V_N V_T R (star e, xs) (n1 + 1, Option.some [])
 
+    /-
+      Not-predicate (case 1)
+
+      If expression e succeeds consuming input x, then the syntactic predicate !e fails.
+    -/
   | notP_1
     (e : PE V_N V_T)
     (xs ys : List V_T)
@@ -137,6 +188,11 @@ inductive Interpretation
     Interpretation V_N V_T R (e, xs ++ ys) (n, Option.some xs) →
     Interpretation V_N V_T R (notP e, xs ++ ys) (n + 1, Option.none)
 
+    /-
+      Not-predicate (case 2)
+
+      If e fails, then !e succeeds but consumes nothing.
+    -/
   | notP_2
     (e : PE V_N V_T)
     (xs : List V_T)
