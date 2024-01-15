@@ -76,7 +76,7 @@ inductive Interpretation
       Terminal (failure case)
     -/
   | terminal_failure_2
-    (a b : V_T)
+    (a : V_T)
     (xs : List V_T) :
     Interpretation V_N V_T R (terminal a, []) (1, Option.none)
 
