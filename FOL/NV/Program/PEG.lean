@@ -34,14 +34,6 @@ compile_inductive% PE
 open PE
 
 
-structure G
-  (V_N V_T : Type)
-  [Finite V_N]
-  [Finite V_T] : Type :=
-  (R : V_N → PE V_N V_T)
-  (e_S : PE V_N V_T)
-
-
 inductive Interpretation
   (V_N V_T : Type)
   (R : V_N → PE V_N V_T) :
