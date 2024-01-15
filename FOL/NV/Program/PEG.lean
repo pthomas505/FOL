@@ -112,9 +112,9 @@ inductive Interpretation
   | seq_failure_1
     (e1 e2 : PE V_N V_T)
     (xs : List V_T)
-    (n1 : Nat) :
-    Interpretation V_N V_T R (e1, xs) (n1, Option.none) →
-    Interpretation V_N V_T R (seq e1 e2, xs) (n1 + 1, Option.none)
+    (n : Nat) :
+    Interpretation V_N V_T R (e1, xs) (n, Option.none) →
+    Interpretation V_N V_T R (seq e1 e2, xs) (n + 1, Option.none)
 
     /-
       Sequence (failure case 2)
@@ -123,11 +123,11 @@ inductive Interpretation
     -/
   | seq_failure_2
     (e1 e2 : PE V_N V_T)
-    (xs_1 ys : List V_T)
+    (xs ys : List V_T)
     (n1 n2 : Nat) :
-    Interpretation V_N V_T R (e1, xs_1 ++ ys) (n1, Option.some xs_1) →
+    Interpretation V_N V_T R (e1, xs ++ ys) (n1, Option.some xs) →
     Interpretation V_N V_T R (e2, ys) (n2, Option.none) →
-    Interpretation V_N V_T R (seq e1 e2, xs_1 ++ ys) (n1 + n2 + 1, Option.none)
+    Interpretation V_N V_T R (seq e1 e2, xs ++ ys) (n1 + n2 + 1, Option.none)
 
     /-
       Alternation (case 1)
@@ -137,9 +137,9 @@ inductive Interpretation
   | prior_1
     (e1 e2 : PE V_N V_T)
     (xs ys : List V_T)
-    (n1 n2 : Nat) :
-    Interpretation V_N V_T R (e1, xs ++ ys) (n1, Option.some xs) →
-    Interpretation V_N V_T R (prior e1 e2, xs ++ ys) (n1 + 1, Option.some xs)
+    (n : Nat) :
+    Interpretation V_N V_T R (e1, xs ++ ys) (n, Option.some xs) →
+    Interpretation V_N V_T R (prior e1 e2, xs ++ ys) (n + 1, Option.some xs)
 
     /-
       Alternation (case 2)
@@ -172,9 +172,9 @@ inductive Interpretation
   | star_termination
     (e : PE V_N V_T)
     (xs : List V_T)
-    (n1 : Nat) :
-    Interpretation V_N V_T R (e, xs) (n1, Option.none) →
-    Interpretation V_N V_T R (star e, xs) (n1 + 1, Option.some [])
+    (n : Nat) :
+    Interpretation V_N V_T R (e, xs) (n, Option.none) →
+    Interpretation V_N V_T R (star e, xs) (n + 1, Option.some [])
 
     /-
       Not-predicate (case 1)
