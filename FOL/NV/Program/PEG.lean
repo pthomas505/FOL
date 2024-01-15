@@ -241,5 +241,13 @@ lemma EmptyStringPrefix
   exact List.nil_prefix xs
 
 
+lemma CharPrefix
+  (α : Type)
+  (x : α)
+  (xs : List α) :
+  List.IsPrefix [x] (x :: xs) :=
+  by
+  exact List.prefix_iff_eq_take.mpr rfl
+
 
 #lint
