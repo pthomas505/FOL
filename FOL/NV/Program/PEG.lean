@@ -34,6 +34,14 @@ compile_inductive% PE
 open PE
 
 
+/--
+  The interpretation of a grammar.
+
+  V_N is a finite set of nonterminal symbols.
+  V_T is a finite set of terminal symbols.
+
+  R is a finite set of rules.
+-/
 inductive Interpretation
   (V_N V_T : Type)
   (R : V_N → PE V_N V_T) :
