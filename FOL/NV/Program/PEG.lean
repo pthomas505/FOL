@@ -205,4 +205,32 @@ inductive Interpretation
     Interpretation V_N V_T R (notP e, xs) (n + 1, Option.some [])
 
 
+lemma InterpretationEmpty
+  (V_N V_T : Type)
+  (R : V_N → PE V_N V_T)
+  (n : ℕ)
+  (xs : List V_T)
+  (o : Option (List V_T))
+  (h1 : Interpretation V_N V_T R (empty, xs) (n, o)) :
+  n = 1 ∧ o = (Option.some []) :=
+  by
+  cases h1
+  simp
+
+
+lemma InterpretationSteps
+  (V_N V_T : Type)
+  (R : V_N → PE V_N V_T)
+  (e : PE V_N V_T)
+  (xs : List V_T)
+  (o : Option (List V_T))
+  (n : Nat)
+  (h1 : Interpretation V_N V_T R (e, xs) (n, o)) :
+  n > 0 :=
+  by
+  cases h1
+  all_goals
+    omega
+
+
 #lint
