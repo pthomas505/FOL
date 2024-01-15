@@ -250,4 +250,12 @@ lemma CharPrefix
   exact List.prefix_iff_eq_take.mpr rfl
 
 
+lemma PrefixAppend
+  (α : Type)
+  (xs ys : List α) :
+  List.IsPrefix xs (xs ++ ys) :=
+  by
+  exact List.prefix_append xs ys
+
+
 #lint
