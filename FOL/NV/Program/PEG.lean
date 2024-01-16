@@ -298,9 +298,9 @@ example
   by
   induction n1 using Nat.strongInductionOn generalizing e n2
   case ind n1 ih_n1 =>
-    induction n2 using Nat.strongInductionOn
+    induction n2 using Nat.strongInductionOn generalizing e n1
     case ind n2 ih_n2 =>
-      induction e
+      induction e generalizing n1 n2
       case empty =>
         cases h1
         cases h2
@@ -318,7 +318,10 @@ example
           simp
           apply ih_n1 n1 _ (R A) n2 ih_1 ih_2
           omega
+      case seq e1 e2 ih_1 ih_2 =>
+        sorry
       all_goals
         sorry
+
 
 #lint
