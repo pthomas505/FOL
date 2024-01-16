@@ -296,9 +296,9 @@ example
   (h2 : Interpretation V_N V_T R (e, xs) (n2, o2)) :
   n1 = n2 ∧ o1 = o2 :=
   by
-  induction n1 using Nat.strongInductionOn generalizing e
+  induction n1 using Nat.strongInductionOn generalizing e n2
   case ind n1 ih_n1 =>
-    induction n2 using Nat.strongInductionOn generalizing e
+    induction n2 using Nat.strongInductionOn
     case ind n2 ih_n2 =>
       induction e
       case empty =>
@@ -306,13 +306,22 @@ example
         cases h2
         simp
       case terminal =>
+        cases h1
         all_goals
-          cases h1
+          cases h2
           all_goals
-            cases h2
-            all_goals
-              first | contradiction | simp only [and_self]
+            first | contradiction | simp only [and_self]
+      case nonTerminal A =>
+        cases h1
+        cases h2
+        case nonTerminal.nonTerminal n1 ih_1 n2 ih_2 =>
+          specialize ih_n1 n1
+          simp at ih_n1
+          specialize ih_n1 (R A) n2 ih_1 ih_2
+          simp
+          exact ih_n1
       all_goals
         sorry
+
 
 #lint
