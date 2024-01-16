@@ -93,7 +93,7 @@ inductive Interpretation
     (n : Nat)
     (o : Option (List V_T)) :
     Interpretation V_N V_T R (R A, xs) (n, o) →
-    Interpretation V_N V_T R (nonTerminal A, xs) ((n + 1), o)
+    Interpretation V_N V_T R (nonTerminal A, xs) (n + 1, o)
 
     /-
       Sequence (success case)
