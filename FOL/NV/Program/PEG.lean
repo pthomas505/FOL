@@ -315,13 +315,10 @@ example
         cases h1
         cases h2
         case nonTerminal.nonTerminal n1 ih_1 n2 ih_2 =>
-          specialize ih_n1 n1
-          simp at ih_n1
-          specialize ih_n1 (R A) n2 ih_1 ih_2
           simp
-          exact ih_n1
+          apply ih_n1 n1 _ (R A) n2 ih_1 ih_2
+          omega
       all_goals
         sorry
-
 
 #lint
