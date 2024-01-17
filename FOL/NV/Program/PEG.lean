@@ -324,4 +324,74 @@ example
         sorry
 
 
-#lint
+inductive O : Type
+  | zero : O
+  | one : O
+  | f : O
+
+
+inductive relation
+  (V_N V_T : Type)
+  (R : V_N → PE V_N V_T) :
+  PE V_N V_T → O → Prop
+
+  | empty_ :
+    relation V_N V_T R PE.empty O.zero
+
+  | terminal_1
+    (a : V_T) :
+    relation V_N V_T R (PE.terminal a) O.one
+
+  | terminal_2
+    (a : V_T) :
+    relation V_N V_T R (PE.terminal a) O.f
+
+  | nonTerminal
+    (A : V_N)
+    (o : O) :
+    relation V_N V_T R (R A) o →
+    relation V_N V_T R (nonTerminal A) o
+
+  | seq_success_zero_zero
+    (e1 e2 : PE V_N V_T) :
+    relation V_N V_T R e1 O.zero →
+    relation V_N V_T R e2 O.zero →
+    relation V_N V_T R (seq e1 e2) O.zero
+
+  | seq_success_one_zero
+    (e1 e2 : PE V_N V_T) :
+    relation V_N V_T R e1 O.one →
+    relation V_N V_T R e2 O.zero →
+    relation V_N V_T R (seq e1 e2) O.one
+
+  | seq_success_zero_one
+    (e1 e2 : PE V_N V_T) :
+    relation V_N V_T R e1 O.zero →
+    relation V_N V_T R e2 O.one →
+    relation V_N V_T R (seq e1 e2) O.one
+
+  | seq_success_one_one
+    (e1 e2 : PE V_N V_T) :
+    relation V_N V_T R e1 O.one →
+    relation V_N V_T R e2 O.one →
+    relation V_N V_T R (seq e1 e2) O.one
+
+  | seq_failure_1
+    (e1 e2 : PE V_N V_T) :
+    relation V_N V_T R e1 O.f →
+    relation V_N V_T R (seq e1 e2) O.f
+
+  | seq_failure_2
+    (e1 e2 : PE V_N V_T) :
+    relation V_N V_T R e1 O.zero →
+    relation V_N V_T R e2 O.f →
+    relation V_N V_T R (seq e1 e2) O.f
+
+  | seq_failure_3
+    (e1 e2 : PE V_N V_T) :
+    relation V_N V_T R e1 O.one →
+    relation V_N V_T R e2 O.f →
+    relation V_N V_T R (seq e1 e2) O.f
+
+
+--#lint
