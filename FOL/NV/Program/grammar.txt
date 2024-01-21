@@ -4,7 +4,7 @@ notation = ?
 
 definition = ?
 
-theorem = 'theorem' name? ':' '[' (hypothesis (',' hypothesis)*)? ']' '|-' formula '{' ((name '.')? tactic ';')* '}'
+theorem = 'theorem' name? ':' '[' (hypothesis (',' hypothesis)*)? ']' '|-' formula '{' (instruction ';')* '}'
 
 hypothesis = name ':' formula
 
@@ -29,7 +29,7 @@ name = letter (letter | digit | '_' | ''')*
 letter = ('a' | ... | 'z' | 'A' | ... | 'Z')
 digit = '0' | ... | '9'
 
-tactic = ?
+instruction = ?
 
 -----
 
