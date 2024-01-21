@@ -1,0 +1,64 @@
+start = notation* definition* theorem*
+
+notation = ?
+
+definition = ?
+
+theorem = 'theorem' name? ':' '[' (hypothesis (',' hypothesis)*)? ']' '|-' formula '{' ((name '.')? tactic ';')* '}'
+
+hypothesis = name ':' formula
+
+formula = pred | eq | in | true | false | not | imp | and | or | iff | forall | exists | def
+
+def = name '(' (name (',' name)*)? ')'
+pred = name '(' (name (',' name)*)? ')'
+eq = name '=' name
+in = name 'in' name
+true = 'T'
+false = 'F'
+not = '~' formula
+imp = '(' formula '->' formula ')'
+and = '(' formula '/\' formula ')'
+or = '(' formula '\/' formula ')'
+iff = '(' formula '<->' formula ')'
+forall = '(' 'A' name '.' formula ')'
+exists = '(' 'E' name '.' formula ')'
+
+name = letter (letter | digit | '_' | ''')*
+
+letter = ('a' | ... | 'z' | 'A' | ... | 'Z')
+digit = '0' | ... | '9'
+
+tactic = ?
+
+-----
+
+theorem prop_id : [] |- (P() -> P())
+{
+  1. prop_2 P() (P() -> P()) P();
+  2. prop_1 P() (P() -> P());
+  3. mp 1 2;
+  4. prop_1 P() P();
+  5. mp 3 4;
+}
+
+theorem : [] |- (Q() -> Q())
+{
+  sub prop_id [P() -> Q()]
+}
+
+theorem : [] |- (P() -> P())
+{
+  intro a1;
+  a1;
+}
+
+theorem : [h1 : P()] |- P()
+{
+  h1;
+}
+
+
+(A x. x = x)
+((A x. (E y. x = y)) -> y = z)
+
