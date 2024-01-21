@@ -16,7 +16,7 @@ eq = name '=' name
 in = name 'in' name
 true = 'T'
 false = 'F'
-not = '~' formula
+not = '(' '~' formula ')'
 imp = '(' formula '->' formula ')'
 and = '(' formula '/\' formula ')'
 or = '(' formula '\/' formula ')'
@@ -61,4 +61,4 @@ theorem : [h1 : P()] |- P()
 
 (A x. x = x)
 ((A x. (E y. x = y)) -> y = z)
-
+((~ P()) -> P())
