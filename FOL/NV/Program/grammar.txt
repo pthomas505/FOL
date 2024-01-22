@@ -4,7 +4,7 @@ notation = ?
 
 definition = ?
 
-theorem = 'theorem' '{' (name ':')? '[' (hypothesis (',' hypothesis)*)? ']' '|-' outer_formula '}' '{' (instruction ';')* '}'
+theorem = 'theorem' '{' (name ':')? ( '[' hypothesis (',' hypothesis)* ']' )? '|-' outer_formula '}' '{' (instruction ';')* '}'
 
 hypothesis = name ':' outer_formula
 
@@ -35,7 +35,7 @@ instruction = ?
 
 -----
 
-theorem { prop_id : [] |- P -> P }
+theorem { prop_id : |- P -> P }
 {
   1. prop_2 P (P -> P) P;
   2. prop_1 P (P -> P);
@@ -44,18 +44,23 @@ theorem { prop_id : [] |- P -> P }
   5. mp 3 4;
 }
 
-theorem { [] |- Q -> Q }
+theorem { |- Q -> Q }
 {
   prop_id [P -> Q]
 }
 
-theorem { [] |- P -> P }
+theorem { |- P -> P }
 {
   intro a1;
   a1;
 }
 
-theorem { [h1 : P] |- P }
+theorem { [h1 : P, h2 : Q] |- P }
+{
+  h1;
+}
+
+theorem prop_id { [h1 : P] |- P }
 {
   h1;
 }
