@@ -52,7 +52,7 @@ theorem ( prop_id : |- (P() -> P()) )
 
 theorem ( |- (Q() -> Q()) )
 (
-  prop_id [P() -> Q()]
+  prop_id [P() -> Q()];
 )
 
 theorem ( |- (P() -> P()) )
