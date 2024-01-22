@@ -4,13 +4,13 @@ notation = ?
 
 definition = ?
 
-theorem = 'theorem' header body
+theorem = 'theorem' '(' (name ':')? sequent ')' body
 
-header =  '(' (name ':')? hypothesis* '|-' formula ')'
+sequent = hypothesis* '|-' formula
 
 hypothesis = '(' name ':' formula ')'
 
-body = '{' (instruction ';')* '}'
+body = '(' (instruction ';')* ')'
 
 formula = pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
 
@@ -37,29 +37,29 @@ instruction = ?
 -----
 
 theorem ( prop_id : |- (P() -> P()) )
-{
+(
   1. prop_2 P() (P() -> P()) P();
   2. prop_1 P() (P() -> P());
   3. mp 1 2;
   4. prop_1 P() P();
   5. mp 3 4;
-}
+)
 
 theorem ( |- (Q() -> Q()) )
-{
+(
   prop_id [P() -> Q()]
-}
+)
 
 theorem ( |- (P() -> P()) )
-{
+(
   intro a1;
   a1;
-}
+)
 
 theorem ( (h1 : P()) (h2 : Q()) |- P() )
-{
+(
   h1;
-}
+)
 
 theorem ( prop_id : (h1 : P()) |- P() )
 (
