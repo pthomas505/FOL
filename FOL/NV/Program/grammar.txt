@@ -14,17 +14,17 @@ def = name '(' (name (',' name)*)? ')'
 pred = name '(' (name (',' name)*)? ')'
 eq = name '=' name
 in = name 'in' name
-true = 'T'
-false = 'F'
+true = 'T.'
+false = 'F.'
 not = '(' '~' formula ')'
 imp = '(' formula '->' formula ')'
 and = '(' formula '/\' formula ')'
 or = '(' formula '\/' formula ')'
 iff = '(' formula '<->' formula ')'
-forall = '(' 'A' name '.' formula ')'
-exists = '(' 'E' name '.' formula ')'
+forall = '(' 'A.' name formula ')'
+exists = '(' 'E.' name formula ')'
 
-name = letter (letter | digit | '_' | ''')*
+name = letter (letter | digit | '_')*
 
 letter = ('a' | ... | 'z' | 'A' | ... | 'Z')
 digit = '0' | ... | '9'
@@ -60,5 +60,5 @@ theorem : [h1 : P()] |- P()
 
 
 (A x. x = x)
-((A x. (E y. x = y)) -> y = z)
+((A. x (E. y x = y)) -> y = z)
 ((~ P()) -> P())
