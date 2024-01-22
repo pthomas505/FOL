@@ -60,28 +60,20 @@ theorem { [h1 : P, h2 : Q] |- P }
   h1;
 }
 
-theorem prop_id { [h1 : P] |- P }
+theorem { prop_id : [h1 : P] |- P }
 {
   h1;
 }
 
 -----
 
-($ex x P())
-(\E x P())
-(\A x. x \in x)
-((\A x (\E y x \eq y)) \imp y \in z)
-((\A x (\E y x \eq y)) -> y \in z)
-(A. x P())
-(A. x , x = x)
-(A. x (~ (x = x)))
-(A. x (x = x))
-(A. x, x = x)
+(A. x P)
+(A. x P(x))
+(A. x P(x, y))
 (A. x x = x)
+(A. x (~ x = x))
 (A. x (~ x in. x))
 (A. x x in. x)
 ((A. x (E. y x = y)) -> y in. z)
-((~ P()) -> P())
-(~ (P() -> (P() -> P())))
+((~ P) -> P)
 (~ (P -> (P -> P)))
-(~ P -> (P -> P))
