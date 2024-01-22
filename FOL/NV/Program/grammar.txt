@@ -1,8 +1,11 @@
 start = notation* definition* theorem*
 
-notation = ?
+
+notation = 'notation' '(' name ':' '(' id* ')' expr '=>' formula ')'
+
 
 definition = ?
+
 
 theorem = 'theorem' '(' (name ':')? sequent ')' body
 
@@ -11,6 +14,7 @@ sequent = hypothesis* '|-' formula
 hypothesis = '(' name ':' formula ')'
 
 body = '(' (instruction ';')* ')'
+
 
 formula = pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
 
@@ -31,6 +35,7 @@ name = letter (letter | digit | '_')*
 
 letter = ('a' | ... | 'z' | 'A' | ... | 'Z')
 digit = '0' | ... | '9'
+
 
 instruction = ?
 
