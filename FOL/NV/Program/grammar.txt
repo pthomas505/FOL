@@ -59,6 +59,8 @@ theorem : [h1 : P()] |- P()
 }
 
 
-(A x. x = x)
+(A. x P())
+(A. x x = x)
+(A. x (~ x = x))
 ((A. x (E. y x = y)) -> y = z)
 ((~ P()) -> P())
