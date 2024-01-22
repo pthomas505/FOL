@@ -4,25 +4,27 @@ notation = ?
 
 definition = ?
 
-theorem = 'theorem' name? ':' '[' (hypothesis (',' hypothesis)*)? ']' '|-' formula '{' (instruction ';')* '}'
+theorem = 'theorem' name? ':' '[' (hypothesis (',' hypothesis)*)? ']' '|-' outer_formula '{' (instruction ';')* '}'
 
-hypothesis = name ':' formula
+hypothesis = name ':' outer_formula
 
-formula = def | pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
+outer_formula = def | pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
 
-def = name '(' (name (',' name)*)? ')'
-pred = name '(' (name (',' name)*)? ')'
+def = name ( '(' name (',' name)* ')' )?
+pred = name ( '(' name (',' name)* ')' )?
 eq = name '=' name
 in = name 'in.' name
 true = 'T.'
 false = 'F.'
-not = '(' '~' formula ')'
-imp = '(' formula '->' formula ')'
-and = '(' formula '/\' formula ')'
-or = '(' formula '\/' formula ')'
-iff = '(' formula '<->' formula ')'
-forall = '(' 'A.' name formula ')'
-exists = '(' 'E.' name formula ')'
+not = '~' inner_formula
+imp = inner_formula '->' inner_formula
+and = inner_formula '/\' inner_formula
+or = inner_formula '\/' inner_formula
+iff = inner_formula '<->' inner_formula
+forall = 'A.' name inner_formula
+exists = 'E.' name inner_formula
+
+inner_formula = def | pred | eq | in | true | false | '(' not ')' | '(' imp ')' | '(' and ')' | '(' or ')' | '(' iff ')' | '(' forall ')' | '(' exists ')'
 
 name = letter (letter | digit | '_')*
 
@@ -33,34 +35,48 @@ instruction = ?
 
 -----
 
-theorem prop_id : [] |- (P() -> P())
+theorem prop_id : [] |- P -> P
 {
-  1. prop_2 P() (P() -> P()) P();
-  2. prop_1 P() (P() -> P());
+  1. prop_2 P (P -> P) P;
+  2. prop_1 P (P -> P);
   3. mp 1 2;
-  4. prop_1 P() P();
+  4. prop_1 P P;
   5. mp 3 4;
 }
 
-theorem : [] |- (Q() -> Q())
+theorem : [] |- Q -> Q
 {
-  prop_id [P() -> Q()]
+  prop_id [P -> Q]
 }
 
-theorem : [] |- (P() -> P())
+theorem : [] |- P -> P
 {
   intro a1;
   a1;
 }
 
-theorem : [h1 : P()] |- P()
+theorem : [h1 : P] |- P
 {
   h1;
 }
 
+-----
 
+($ex x P())
+(\E x P())
+(\A x. x \in x)
+((\A x (\E y x \eq y)) \imp y \in z)
+((\A x (\E y x \eq y)) -> y \in z)
 (A. x P())
+(A. x , x = x)
+(A. x (~ (x = x)))
+(A. x (x = x))
+(A. x, x = x)
 (A. x x = x)
-(A. x (~ x = x))
-((A. x (E. y x = y)) -> y = z)
+(A. x (~ x in. x))
+(A. x x in. x)
+((A. x (E. y x = y)) -> y in. z)
 ((~ P()) -> P())
+(~ (P() -> (P() -> P())))
+(~ (P -> (P -> P)))
+(~ P -> (P -> P))
