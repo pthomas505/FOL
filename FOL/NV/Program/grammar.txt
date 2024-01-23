@@ -14,20 +14,21 @@ hypothesis = '(' name ':' formula ')'
 body = '(' (instruction ';')* ')'
 
 
-formula = pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
+formula = '(' formula ')' | pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
 
 pred = name '(' name* ')'
 eq = name '=' name
 in = name 'in.' name
 true = 'T.'
 false = 'F.'
-not = '(' '~' formula ')'
+not = '~' formula
 imp = '(' formula '->' formula ')'
 and = '(' formula '/\' formula ')'
 or = '(' formula '\/' formula ')'
 iff = '(' formula '<->' formula ')'
-forall = '(' 'A.' name formula ')'
-exists = '(' 'E.' name formula ')'
+forall = 'A.' name formula
+exists = 'E.' name formula
+
 
 name = letter (letter | digit | '_')*
 
