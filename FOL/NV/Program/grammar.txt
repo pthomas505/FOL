@@ -69,6 +69,11 @@ theorem. prop_id (h1 : P()) P()
   h1;
 )
 
+theorem. eq_id x = x
+(
+  admit;
+)
+
 -----
 
 (A. x P())
