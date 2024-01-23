@@ -75,6 +75,11 @@ theorem. eq_id x = x
   admit;
 )
 
+theorem. eq_id A. x x = x
+(
+  admit;
+)
+
 -----
 
 (A. x P())
