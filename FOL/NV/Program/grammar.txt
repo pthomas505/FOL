@@ -1,10 +1,10 @@
-start = notation* definition* theorem*
+start = definition* notation* theorem*
 
 
-notation = 'notation' '(' name ':' '(' id* ')' expr '=>' formula ')'
+definition = 'definition' '(' name ':' '(' name* ')' formula ')'
 
 
-definition = ?
+notation = 'notation' '(' ascii+ ':' name ')'
 
 
 theorem = 'theorem' '(' (name ':')? sequent ')' body
