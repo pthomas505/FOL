@@ -1,10 +1,11 @@
 start = definition* notation* theorem*
 
 
-definition = 'definition.' name '(' name* ')' formula
+definition = 'definition.' name '(' name* ')' ':' formula ';'
 
+notation = 'notation.' name '(' name* ')' ':' name* '(' notation_char+ ')' name* ';'
 
-notation = 'notation.' '(' ascii+ ')' name
+notation_char = some character from a restricted set of ascii characters
 
 
 theorem = 'theorem.' name? hypothesis* formula body
