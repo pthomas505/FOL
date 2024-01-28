@@ -34,6 +34,9 @@ def DA.evalFrom
   List.foldl D.step startingState
 
 
+/--
+  `DA.eval D cs` := Returns the final state that the deterministic automaton `D` transitions to if it starts at `D.startingState` and consumes the list of characters `cs`.
+-/
 def DA.eval
   {α : Type}
   {σ : Type}
@@ -83,6 +86,9 @@ def NA.evalFrom
   List.foldl N.stepSet startingStates
 
 
+/--
+  `NA.eval N cs` := Returns the final set of states that the nondeterministic automaton `N` transitions to if it starts at `N.startingStates` and consumes the list of characters `cs`.
+-/
 def NA.eval
   {α : Type}
   {σ : Type}
