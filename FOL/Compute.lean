@@ -63,7 +63,7 @@ def DA.accepts
 
   Transitions from one set of states to another set of states on each input character. The set of states that it transitions to is permitted to be the same set of states that it transitioned from.
 
-  If the nondeterministic automaton `N` is at the set of states `S` and the input sequence is `c :: cs` then `N` transitions to the set of states given by `⋃ s ∈ S, N.step s c` and the input sequence becomes `cs`.
+  If the nondeterministic automaton `N` is at the set of states `S` and the input sequence is `c :: cs` then `N` transitions to the set of states given by `⋃ s ∈ S, N.step s c` and the input sequence becomes `cs`. If `s1 ∈ S` and `s2 ∈ S` then `⋃ s ∈ S, N.step s c` includes `(N.step s1 c) ∪ (N.step s2 c)`.
 -/
 structure NA (α : Type) (σ : Type) : Type :=
   (step : σ → α → Set σ)
