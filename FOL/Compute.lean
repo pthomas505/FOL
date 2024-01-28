@@ -29,9 +29,9 @@ def DA.evalFrom
   {α : Type}
   {σ : Type}
   (D : DA α σ)
-  (startState : σ) :
+  (startingState : σ) :
   List α → σ :=
-  List.foldl D.step startState
+  List.foldl D.step startingState
 
 
 def DA.eval
