@@ -4,7 +4,7 @@ start = definition* notation* theorem*
 definition = 'definition' name '(' name* ')' ':' formula ';'
 
 notation = 'notation' name '(' name* ')' ':' literal+ ';'
-literal = name | '$' notation_char* '$'
+literal = name | '$' notation_char+ '$'
 notation_char = some character from a restricted set of ascii characters
 
 
