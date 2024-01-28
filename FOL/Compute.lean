@@ -78,9 +78,9 @@ def NA.evalFrom
   {α : Type}
   {σ : Type}
   (N : NA α σ)
-  (startState : Set σ) :
+  (startingStates : Set σ) :
   List α → Set σ :=
-  List.foldl N.stepSet startState
+  List.foldl N.stepSet startingStates
 
 
 def NA.eval
