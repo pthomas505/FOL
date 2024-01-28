@@ -97,7 +97,7 @@ def NA.accepts
   (N : NA α σ)
   (input : List α) :
   Prop :=
-  ∃ (S : σ), S ∈ N.eval input ∧ S ∈ N.acceptingStates
+  ∃ (s : σ), s ∈ N.eval input ∧ s ∈ N.acceptingStates
 
 
 /--
@@ -137,8 +137,8 @@ lemma NA.memAccepts
   (N : NA α σ)
   (input : List α) :
   N.accepts input ↔
-    ∃ (S : σ), S ∈ N.evalFrom N.startingStates input ∧
-      S ∈ N.acceptingStates := by rfl
+    ∃ (s : σ), s ∈ N.evalFrom N.startingStates input ∧
+      s ∈ N.acceptingStates := by rfl
 
 
 /--
@@ -150,7 +150,7 @@ theorem NAtoDAisEquiv
   (N : NA α σ) :
   N.toDA.accepts = N.accepts :=
   by
-  ext xs
+  ext cs
   simp only [DA.memAccepts]
   simp only [NA.memAccepts]
   simp only [NA.toDA]
@@ -158,6 +158,6 @@ theorem NAtoDAisEquiv
   constructor
   all_goals
     simp
-    intro x a1 a2
-    apply Exists.intro x
+    intro s a1 a2
+    apply Exists.intro s
     tauto
