@@ -56,7 +56,7 @@ def DA.accepts
   `α` is the type of input characters.
   `σ` is the type of states.
 
-  If the nondeterministic automaton `N` is at the set of states `S` and the input sequence is `c :: cs` then `N` transitions to the set of states given by `⋃ s ∈ S, N.step s a` and the input sequence becomes `cs`.
+  If the nondeterministic automaton `N` is at the set of states `S` and the input sequence is `c :: cs` then `N` transitions to the set of states given by `⋃ s ∈ S, N.step s c` and the input sequence becomes `cs`.
 -/
 structure NA (α : Type) (σ : Type) : Type :=
   (step : σ → α → Set σ)
@@ -69,9 +69,9 @@ def NA.stepSet
   {σ : Type}
   (N : NA α σ)
   (S : Set σ)
-  (a : α) :
+  (c : α) :
   Set σ :=
-  ⋃ s ∈ S, N.step s a
+  ⋃ s ∈ S, N.step s c
 
 
 def NA.evalFrom
