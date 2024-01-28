@@ -17,6 +17,8 @@ import Mathlib.Data.Set.Lattice
   `α` is the type of input characters.
   `σ` is the type of states.
 
+  Transitions from one state to another state on each input character. The state that it transitions to is permitted to be the same state that it transitioned from.
+
   If the deterministic automaton `D` is at state `s` and the input sequence is `c :: cs` then `D` transitions to the state given by `D.step s c` and the input sequence becomes `cs`.
 -/
 structure DA (α : Type) (σ : Type) : Type :=
@@ -59,6 +61,8 @@ def DA.accepts
   `α` is the type of input characters.
   `σ` is the type of states.
 
+  Transitions from one set of states to another set of states on each input character. The set of states that it transitions to is permitted to be the same set of states that it transitioned from.
+
   If the nondeterministic automaton `N` is at the set of states `S` and the input sequence is `c :: cs` then `N` transitions to the set of states given by `⋃ s ∈ S, N.step s c` and the input sequence becomes `cs`.
 -/
 structure NA (α : Type) (σ : Type) : Type :=
@@ -67,6 +71,9 @@ structure NA (α : Type) (σ : Type) : Type :=
   (acceptingStates : Set σ)
 
 
+/--
+  `NA.stepSet N S c` := Returns the set of states that the nondeterministic automaton `N` transitions to if it starts at the set of states `S` and consumes the character `c`.
+-/
 def NA.stepSet
   {α : Type}
   {σ : Type}
