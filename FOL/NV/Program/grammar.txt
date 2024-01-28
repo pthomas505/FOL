@@ -1,25 +1,25 @@
 start = definition* notation* theorem*
 
 
-definition = 'definition.' name '(' name* ')' ':' formula ';'
+definition = 'definition' name '(' name* ')' ':' formula ';'
 
-notation = 'notation.' name '(' name* ')' ':' name* '(' notation_char+ ')' name* ';'
-
+notation = 'notation' name '(' name* ')' ':' literal+ ';'
+literal = name | '$' notation_char* '$'
 notation_char = some character from a restricted set of ascii characters
 
 
-theorem = 'theorem.' name? hypothesis* formula body
+theorem = 'theorem' name? hypothesis* formula proof
 
 hypothesis = '(' name ':' formula ')'
 
-body = '(' (instruction ';')* ')'
+proof = '(' (instruction ';')* ')'
 
 
 formula = '(' formula ')' | pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
 
 pred = name '(' name* ')'
-eq = name '=' name
-in = name 'in.' name
+eq = '(' name '=' name ')'
+in = '(' name 'in.' name ')'
 true = 'T.'
 false = 'F.'
 not = '~' formula
@@ -31,7 +31,7 @@ forall = 'A.' name formula
 exists = 'E.' name formula
 
 
-name = letter (letter | digit | '_')*
+name = (letter | '_') (letter | digit | '_')*
 
 letter = ('a' | ... | 'z' | 'A' | ... | 'Z')
 digit = '0' | ... | '9'
@@ -41,7 +41,7 @@ instruction = ?
 
 -----
 
-theorem. prop_id (P() -> P())
+theorem prop_id (P() -> P())
 (
   1. prop_2 P() (P() -> P()) P();
   2. prop_1 P() (P() -> P());
@@ -50,46 +50,46 @@ theorem. prop_id (P() -> P())
   5. mp 3 4;
 )
 
-theorem. (Q() -> Q())
+theorem (Q() -> Q())
 (
   prop_id [P() -> Q()];
 )
 
-theorem. (P() -> P())
+theorem (P() -> P())
 (
   intro a1;
   a1;
 )
 
-theorem. (h1 : P()) (h2 : Q()) P()
+theorem (h1 : P()) (h2 : Q()) P()
 (
   h1;
 )
 
-theorem. prop_id (h1 : P()) P()
+theorem prop_id (h1 : P()) P()
 (
   h1;
 )
 
-theorem. eq_id x = x
+theorem eq_id (x = x)
 (
   admit;
 )
 
-theorem. eq_id A. x x = x
+theorem eq_id A. x (x = x)
 (
   admit;
 )
 
 -----
 
-(A. x P())
-(A. x P(x))
-(A. x P(x y))
-(A. x x = x)
-(A. x x in. x)
-(A. x (~ x = x))
-(A. x (~ x in. x))
-((A. x (E. y x = y)) -> y in. z)
-((~ P()) -> P())
-(~ (P() -> (P() -> P())))
+A. x P()
+A. x P(x)
+A. x P(x y)
+A. x (x = x)
+A. x (x in. x)
+A. x ~ (x = x)
+A. x ~ (x in. x)
+(A. x E. y (x = y) -> (y in. z))
+(~ P() -> P())
+~ (P() -> (P() -> P()))
