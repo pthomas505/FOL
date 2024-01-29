@@ -176,12 +176,17 @@ theorem NAtoDAisEquiv
     tauto
 
 
+/--
+  union R S = (R | S)
+  closure R = R*
+-/
 inductive RegExp (α : Type) : Type
   | char : α → RegExp α
   | epsilon : RegExp α
   | zero : RegExp α
   | union : RegExp α → RegExp α → RegExp α
   | concat : RegExp α → RegExp α → RegExp α
+  | closure : RegExp α → RegExp α
 
 
 def RegExp.languageOf (α : Type) : RegExp α → Set (List α)
@@ -190,3 +195,4 @@ def RegExp.languageOf (α : Type) : RegExp α → Set (List α)
   | zero => ∅
   | union R S => R.languageOf ∪ S.languageOf
   | concat R S => { r ++ s | (r ∈ R.languageOf) (s ∈ S.languageOf) }
+  | closure R => sorry
