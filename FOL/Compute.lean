@@ -174,3 +174,19 @@ theorem NAtoDAisEquiv
     intro s a1 a2
     apply Exists.intro s
     tauto
+
+
+inductive RegExp (α : Type) : Type
+  | char : α → RegExp α
+  | epsilon : RegExp α
+  | zero : RegExp α
+  | union : RegExp α → RegExp α → RegExp α
+  | concat : RegExp α → RegExp α → RegExp α
+
+
+def RegExp.languageOf (α : Type) : RegExp α → Set (List α)
+  | char x => { [x] }
+  | epsilon => { [] }
+  | zero => ∅
+  | union R S => R.languageOf ∪ S.languageOf
+  | concat R S => { r ++ s | (r ∈ R.languageOf) (s ∈ S.languageOf) }
