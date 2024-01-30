@@ -227,3 +227,78 @@ example
   by
   simp only [RegExp.languageOf]
   simp
+
+
+example
+  {α : Type}
+  (R S : RegExp α) :
+  (RegExp.union R S).languageOf = (RegExp.union S R).languageOf :=
+  by
+  simp only [RegExp.languageOf]
+  exact Set.union_comm (RegExp.languageOf α R) (RegExp.languageOf α S)
+
+
+example
+  {α : Type}
+  (R S T : RegExp α) :
+  (RegExp.union (RegExp.union R S) T).languageOf =
+    (RegExp.union R (RegExp.union S T)).languageOf :=
+  by
+  simp only [RegExp.languageOf]
+  exact Set.union_assoc (RegExp.languageOf α R) (RegExp.languageOf α S) (RegExp.languageOf α T)
+
+
+example
+  {α : Type}
+  (R S T : RegExp α) :
+  (RegExp.concat (RegExp.concat R S) T).languageOf =
+    (RegExp.concat R (RegExp.concat S T)).languageOf :=
+  by
+  simp only [RegExp.languageOf]
+  simp
+
+
+example
+  {α : Type}
+  (R S T : RegExp α) :
+  (RegExp.concat R (RegExp.union S T)).languageOf =
+    (RegExp.union (RegExp.concat R S) (RegExp.concat R T)).languageOf :=
+  by
+  simp only [RegExp.languageOf]
+  ext cs
+  constructor
+  · simp
+    intro xs a1 ys a2 a3
+    subst a3
+    cases a2
+    case _ c1 =>
+      left
+      apply Exists.intro xs
+      constructor
+      · exact a1
+      · apply Exists.intro ys
+        tauto
+    case _ c1 =>
+      right
+      apply Exists.intro xs
+      constructor
+      · exact a1
+      · apply Exists.intro ys
+        tauto
+  · simp
+    intro a1
+    cases a1
+    all_goals
+      case _ c1 =>
+        apply Exists.elim c1
+        intro xs a2
+        clear c1
+        cases a2
+        case _ a2_left a2_right =>
+          apply Exists.elim a2_right
+          intro ys a3
+          apply Exists.intro xs
+          constructor
+          · tauto
+          · apply Exists.intro ys
+            tauto
