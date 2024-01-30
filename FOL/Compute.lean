@@ -217,3 +217,13 @@ example
   by
   simp only [RegExp.languageOf]
   simp
+
+
+example
+  {α : Type}
+  (R : RegExp α) :
+  (RegExp.concat R RegExp.zero).languageOf = RegExp.zero.languageOf ∧
+    (RegExp.concat RegExp.zero R).languageOf = RegExp.zero.languageOf :=
+  by
+  simp only [RegExp.languageOf]
+  simp
