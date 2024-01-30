@@ -302,3 +302,13 @@ example
           · tauto
           · apply Exists.intro ys
             tauto
+
+
+example
+  {α : Type}
+  (R S T : RegExp α) :
+  (RegExp.concat (RegExp.union S T) R).languageOf =
+    (RegExp.union (RegExp.concat S R) (RegExp.concat T R)).languageOf :=
+  by
+  simp only [RegExp.languageOf]
+  aesop
