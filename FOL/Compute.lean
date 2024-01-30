@@ -1,4 +1,5 @@
 import Mathlib.Data.Set.Lattice
+import Mathlib.Data.Finset.Basic
 
 
 /-
@@ -196,3 +197,23 @@ def RegExp.languageOf (α : Type) : RegExp α → Set (List α)
   | union R S => R.languageOf ∪ S.languageOf
   | concat R S => { r ++ s | (r ∈ R.languageOf) (s ∈ S.languageOf) }
   | closure R => sorry
+
+
+example
+  {α : Type}
+  (R : RegExp α) :
+  (RegExp.union R RegExp.zero).languageOf = R.languageOf ∧
+    (RegExp.union RegExp.zero R).languageOf = R.languageOf :=
+  by
+  simp only [RegExp.languageOf]
+  simp
+
+
+example
+  {α : Type}
+  (R : RegExp α) :
+  (RegExp.concat R RegExp.epsilon).languageOf = R.languageOf ∧
+    (RegExp.concat RegExp.epsilon R).languageOf = R.languageOf :=
+  by
+  simp only [RegExp.languageOf]
+  simp
