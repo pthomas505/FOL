@@ -312,3 +312,16 @@ example
   by
   simp only [RegExp.languageOf]
   aesop
+
+
+example
+  {α : Type} :
+  (RegExp.closure RegExp.zero).languageOf α = RegExp.epsilon.languageOf := sorry
+
+
+example
+  {α : Type}
+  (R : RegExp α) :
+  (RegExp.concat R (RegExp.closure R)).languageOf = (RegExp.concat (RegExp.closure R) R).languageOf :=
+  by
+  sorry
