@@ -90,7 +90,7 @@ def one_or_more (p : Parser) : Parser :=
 def compose_list (ps : List Parser) : Parser :=
   if ps.isEmpty
   then fun _ => Except.error "Empty parser list."
-  else List.foldl compose (fun (s : String) => Except.ok { consumed := "", remaining := s }) ps
+  else List.foldl compose empty ps
 
 
 -- one of list of parsers
@@ -135,14 +135,18 @@ def match_identifier : Parser :=
 
 #eval parse (choice (match_one 'e') (match_one 'a')) "abc"
 
-#eval parse (zero_or_more (match_one 'a')) "aaa"
+#eval parse (zero_or_more (match_one 'a')) "aaabc"
 
 #eval parse match_alpha "a"
 
-#eval parse match_digit "0"
+#eval parse match_digit ""
+
+#eval parse (compose_list []) "a"
 
 #eval parse (compose_list [match_digit]) "a"
 
 #eval parse (choice_list []) "a"
+
+#eval parse (compose match_identifier eoi) "a_019a"
 
 #eval parse (compose match_identifier eoi) "a_019a"
