@@ -38,9 +38,30 @@ instance (i e : Type) : Functor (Parser i e) :=
   {
     map := fun {α β : Type} (f : α → β) (p : Parser i e α) =>
       {
+        runParser := fun (input : List i) =>
+          match p.runParser input with
+          | Except.error err => Except.error err
+          | Except.ok (output, rest) => Except.ok (f output, rest)
+      }
+  }
+
+
+instance (i e : Type) : Applicative (Parser i e) :=
+  {
+    pure := fun {α : Type} (a : α) =>
+      {
+        runParser := fun (input : List i) => Except.ok (a, input)
+      }
+
+    seq := fun {α β : Type} (f : Parser i e (α → β)) (p : Unit → Parser i e α) =>
+      {
         runParser := fun (input : List i) => do
-          let (output, rest) ← p.runParser input
-          return (f output, rest)
+        match f.runParser input with
+        | Except.error err => Except.error err
+        | Except.ok (f', rest) =>
+          match (p ()).runParser rest with
+          | Except.error err => Except.error err
+          | Except.ok (output, rest') => Except.ok (f' output, rest')
       }
   }
 
