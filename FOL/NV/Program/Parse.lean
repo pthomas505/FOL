@@ -1,4 +1,52 @@
+-- https://serokell.io/blog/parser-combinators-in-haskell
 
+/-
+  i : The input stream. For most cases this is going to be Char.
+  e : The type of custom error messages.
+  a : The type of the structure parsed from the consumed input.
+-/
+
+inductive Error (i e : Type) : Type
+  | EndOfInput : Error i e
+  | Unexpected : i → Error i e
+  | CustomError : e → Error i e
+  | Empty : Error i e
+  deriving DecidableEq, Repr
+
+structure Parser (i e a : Type) : Type :=
+  (runParser : List i → Except (List (Error i e)) (a × List i))
+
+
+def satisfy (i e : Type) (predicate : i → Bool) : Parser i e i := { runParser :=
+  fun (input : List i) =>
+    match input with
+    | [] => Except.error [Error.EndOfInput]
+    | hd :: rest =>
+      if predicate hd
+      then Except.ok (hd, rest)
+      else Except.error [Error.Unexpected hd] }
+
+
+def char (i e : Type) [DecidableEq i] (c : i) : Parser i e i := satisfy i e (· = c)
+
+#eval (char Char Unit 'h').runParser "hello".data
+#eval (char Char Unit 'h').runParser "greetings".data
+#eval (char Char Unit 'h').runParser "".data
+
+
+instance (i e : Type) : Functor (Parser i e) :=
+  {
+    map := fun {α β : Type} (f : α → β) (p : Parser i e α) =>
+      {
+        runParser := fun (input : List i) =>
+          match p.runParser input with
+          | Except.error err => Except.error err
+          | Except.ok (output, rest) => Except.ok (f output, rest)
+      }
+  }
+
+
+/-
 structure State : Type :=
   (consumed : String)
   (remaining : String)
@@ -150,3 +198,4 @@ def match_identifier : Parser :=
 #eval parse (compose match_identifier eoi) "a_019a"
 
 #eval parse (compose match_identifier eoi) "a_019a"
+-/
