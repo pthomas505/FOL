@@ -38,10 +38,9 @@ instance (i e : Type) : Functor (Parser i e) :=
   {
     map := fun {α β : Type} (f : α → β) (p : Parser i e α) =>
       {
-        runParser := fun (input : List i) =>
-          match p.runParser input with
-          | Except.error err => Except.error err
-          | Except.ok (output, rest) => Except.ok (f output, rest)
+        runParser := fun (input : List i) => do
+          let (output, rest) ← p.runParser input
+          return (f output, rest)
       }
   }
 
