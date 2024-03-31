@@ -1,10 +1,5 @@
 -- https://serokell.io/blog/parser-combinators-in-haskell
 
-/-
-  i : The input stream. For most cases this is going to be Char.
-  e : The type of custom error messages.
-  a : The type of the structure parsed from the consumed input.
--/
 
 inductive Error (i e : Type) : Type
   | EndOfInput : Error i e
@@ -13,18 +8,30 @@ inductive Error (i e : Type) : Type
   | Empty : Error i e
   deriving DecidableEq, Repr
 
+
+/-
+  i : The input stream. For most cases this is going to be Char.
+  e : The type of custom error messages.
+  a : The type of the structure parsed from the consumed input.
+-/
 structure Parser (i e a : Type) : Type :=
   (runParser : List i → Except (List (Error i e)) (a × List i))
 
 
-def satisfy (i e : Type) (predicate : i → Bool) : Parser i e i := { runParser :=
-  fun (input : List i) =>
-    match input with
-    | [] => Except.error [Error.EndOfInput]
-    | hd :: rest =>
-      if predicate hd
-      then Except.ok (hd, rest)
-      else Except.error [Error.Unexpected hd] }
+def satisfy
+  (i e : Type)
+  (predicate : i → Bool) :
+  Parser i e i :=
+    {
+      runParser :=
+        fun (input : List i) =>
+          match input with
+          | [] => Except.error [Error.EndOfInput]
+          | hd :: rest =>
+            if predicate hd
+            then Except.ok (hd, rest)
+            else Except.error [Error.Unexpected hd]
+    }
 
 
 def char (i e : Type) [DecidableEq i] (c : i) : Parser i e i := satisfy i e (· = c)
@@ -55,7 +62,7 @@ instance (i e : Type) : Applicative (Parser i e) :=
 
     seq := fun {α β : Type} (f : Parser i e (α → β)) (p : Unit → Parser i e α) =>
       {
-        runParser := fun (input : List i) => do
+        runParser := fun (input : List i) =>
         match f.runParser input with
         | Except.error err => Except.error err
         | Except.ok (f', rest) =>
