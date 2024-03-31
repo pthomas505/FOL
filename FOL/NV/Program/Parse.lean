@@ -34,7 +34,8 @@ def satisfy
     }
 
 
-def char (i e : Type) [DecidableEq i] (c : i) : Parser i e i := satisfy i e (· = c)
+def char (i e : Type) [DecidableEq i] (c : i) : Parser i e i :=
+  satisfy i e (· = c)
 
 #eval (char Char Unit 'h').runParser "hello".data
 #eval (char Char Unit 'h').runParser "greetings".data
