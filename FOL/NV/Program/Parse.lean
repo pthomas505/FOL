@@ -108,6 +108,12 @@ def eof
     }
 
 
+def parse (i e a : Type) (p : Parser i e a) (input : List i) : Except (List (Error i e)) a :=
+  match p.runParser input 0 with
+  | Except.error e => Except.error e
+  | Except.ok { offset := _offset, output := output, rest := _rest } => Except.ok output
+
+
 instance (i e : Type) : Functor (Parser i e) :=
   {
     map := fun {α β : Type} (f : α → β) (p : Parser i e α) =>
