@@ -1,11 +1,31 @@
 -- https://serokell.io/blog/parser-combinators-in-haskell
 
 
-inductive Error (i e : Type) : Type
-  | EndOfInput : Error i e
-  | Unexpected : i → Error i e
-  | CustomError : e → Error i e
-  | Empty : Error i e
+inductive ErrorType (i e : Type) : Type
+  | EndOfInput : ErrorType i e
+  | Unexpected : i → ErrorType i e
+  | Expected : i → i → ErrorType i e
+  | ExpectedEndOfFile : i → ErrorType i e
+  | CustomError : e → ErrorType i e
+  | Empty : ErrorType i e
+  deriving DecidableEq, Repr
+
+open ErrorType
+
+
+abbrev Offset : Type := Int
+
+
+structure Error (i e : Type) : Type :=
+  (offset : Offset)
+  (error : ErrorType i e)
+  deriving DecidableEq, Repr
+
+
+structure State (i a : Type) : Type :=
+  (offset : Offset)
+  (output : a)
+  (rest : List i)
   deriving DecidableEq, Repr
 
 
@@ -15,41 +35,95 @@ inductive Error (i e : Type) : Type
   a : The type of the structure parsed from the consumed input.
 --/
 structure Parser (i e a : Type) : Type :=
-  (runParser : List i → Except (List (Error i e)) (a × List i))
+  (runParser :
+    List i →
+    Offset →
+    Except (List (Error i e)) (State i a))
 
 
-def satisfy
-  (i e : Type)
+def token
+  {i e : Type}
+  (mkErr : i → ErrorType i e)
   (predicate : i → Bool) :
   Parser i e i :=
     {
       runParser :=
-        fun (input : List i) =>
+        fun (input : List i) (offset: Offset) =>
           match input with
-          | [] => Except.error [Error.EndOfInput]
-          | hd :: rest =>
+          | [] => Except.error [
+            {
+              offset := offset
+              error := EndOfInput
+            } ]
+          | hd :: tl =>
             if predicate hd
-            then Except.ok (hd, rest)
-            else Except.error [Error.Unexpected hd]
+            then Except.ok {
+              offset := offset + 1
+              output := hd,
+              rest := tl
+            }
+            else Except.error [
+              {
+                offset := offset,
+                error := mkErr hd
+              } ]
     }
 
 
-def char (i e : Type) [BEq i] (c : i) : Parser i e i :=
-  satisfy i e (· == c)
+def satisfy (i e : Type) :
+  (i → Bool) →
+  Parser i e i :=
+  token Unexpected
 
-#eval (char Char Unit 'h').runParser "hello".data
-#eval (char Char Unit 'h').runParser "greetings".data
-#eval (char Char Unit 'h').runParser "".data
+
+def char
+  (i e : Type) [BEq i]
+  (c : i) :
+  Parser i e i :=
+  token (Expected c) (· == c)
+
+
+#eval (char Char Unit 'h').runParser "hello".data 0
+#eval (char Char Unit 'h').runParser "greetings".data 0
+#eval (char Char Unit 'h').runParser "".data 0
+
+
+def eof
+  (i e : Type) :
+  Parser i e Unit :=
+    {
+      runParser :=
+        fun (input : List i) (offset: Offset) =>
+          match input with
+          | [] => Except.ok {
+              offset := offset,
+              output := (),
+              rest := []
+            }
+          | hd :: _ => Except.error [
+              {
+                offset := offset,
+                error := ExpectedEndOfFile hd
+              } ]
+    }
 
 
 instance (i e : Type) : Functor (Parser i e) :=
   {
     map := fun {α β : Type} (f : α → β) (p : Parser i e α) =>
       {
-        runParser := fun (input : List i) =>
-          match p.runParser input with
+        runParser := fun (input : List i) (offset : Offset) =>
+          match p.runParser input offset with
           | Except.error err => Except.error err
-          | Except.ok (output, rest) => Except.ok (f output, rest)
+          | Except.ok {
+              offset := offset',
+              output := output,
+              rest := rest
+            } => Except.ok {
+                offset := offset',
+                output := f output,
+                rest := rest
+              }
       }
   }
 
@@ -58,18 +132,21 @@ instance (i e : Type) : Applicative (Parser i e) :=
   {
     pure := fun {α : Type} (a : α) =>
       {
-        runParser := fun (input : List i) => Except.ok (a, input)
+        runParser := fun (input : List i) (offset: Offset) => Except.ok {
+          offset := offset,
+          output := a,
+          rest := input }
       }
 
     seq := fun {α β : Type} (f : Parser i e (α → β)) (p : Unit → Parser i e α) =>
       {
-        runParser := fun (input : List i) =>
-        match f.runParser input with
+        runParser := fun (input : List i) (offset : Offset) =>
+        match f.runParser input offset with
         | Except.error err => Except.error err
-        | Except.ok (f', rest) =>
-          match (p ()).runParser rest with
+        | Except.ok {offset := offset', output := f', rest := rest } =>
+          match (p ()).runParser rest offset' with
           | Except.error err => Except.error err
-          | Except.ok (output, rest') => Except.ok (f' output, rest')
+          | Except.ok {offset := offset'', output := output, rest := rest'} => Except.ok { offset := offset'', output := f' output, rest := rest' }
       }
   }
 
@@ -80,12 +157,12 @@ instance (i e : Type) : Monad (Parser i e) :=
 
     bind := fun {α β : Type} (p : Parser i e α) (k : α → Parser i e β) =>
       {
-        runParser := fun (input : List i) =>
-          match p.runParser input with
+        runParser := fun (input : List i) (offset : Offset) =>
+          match p.runParser input offset with
           | Except.error err => Except.error err
-          | Except.ok (output, rest) =>
+          | Except.ok { offset := offset', output := output, rest := rest } =>
             let p' : Parser i e β := k output
-            p'.runParser rest
+            p'.runParser rest offset'
       }
   }
 
@@ -98,32 +175,32 @@ def string (i e : Type) [BEq i] : List i → Parser i e (List i)
     return (y :: ys)
 
 
-#eval (string Char String "Haskell".data).runParser "Haskell".data
-#eval (string Char String "Haskell".data).runParser "Halloween".data
+#eval (string Char String "Haskell".data).runParser "Haskell".data 0
+#eval (string Char String "Haskell".data).runParser "Halloween".data 0
 
 
 instance (i e : Type) [BEq (Error i e)] : Alternative (Parser i e) :=
   {
-    failure := { runParser := fun (_ : List i) => Except.error [] }
+    failure := { runParser := fun (_ : List i) (_ : Offset) => Except.error [] }
 
     orElse := fun {α : Type} (l : Parser i e α) (r : Unit → Parser i e α) => {
-      runParser := fun (input : List i) =>
-        match l.runParser input with
+      runParser := fun (input : List i) (offset : Offset) =>
+        match l.runParser input offset with
         | Except.error err =>
-          match (r ()).runParser input with
+          match (r ()).runParser input offset with
           | Except.error err' => Except.error (List.eraseDups (err ++ err'))
-          | Except.ok (output, rest) => Except.ok (output, rest)
-        | Except.ok (output, rest) => Except.ok (output, rest)
+          | Except.ok result => Except.ok result
+        | Except.ok result => Except.ok result
     }
   }
 
-#eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "hello, world".data
+#eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "hello, world".data 0
 
-#eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "greetings, world".data
+#eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "greetings, world".data 0
 
-#eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "bye, world".data
+#eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "bye, world".data 0
 
-#eval ((string Char String "hello".data *> string Char String ", globe".data) <|> string Char String "greetings".data).runParser "hello, world".data
+#eval ((string Char String "hello".data *> string Char String ", globe".data) <|> string Char String "greetings".data).runParser "hello, world".data 0
 
 
 /-
