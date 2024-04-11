@@ -83,11 +83,9 @@ def parse
 instance (i e : Type) : Functor (Parser i e) := {
   map :=
     fun {α β : Type} (f : α → β) (p : Parser i e α) => {
-      runParser := fun (input : List i) (offset : Offset) =>
-        match p.runParser input offset with
-        | Except.error err => Except.error err
-        | Except.ok (offset', output, rest)
-            => Except.ok (offset', f output, rest) } }
+      runParser := fun (input : List i) (offset : Offset) => do
+        let (offset', output, rest) ← p.runParser input offset
+        pure (offset', f output, rest) } }
 
 
 instance (i e : Type) : Applicative (Parser i e) := {
@@ -97,14 +95,10 @@ instance (i e : Type) : Applicative (Parser i e) := {
 
   seq :=
     fun {α β : Type} (f : Parser i e (α → β)) (p : Unit → Parser i e α) => {
-      runParser := fun (input : List i) (offset : Offset) =>
-        match f.runParser input offset with
-        | Except.error err => Except.error err
-        | Except.ok (offset', f', rest) =>
-            match (p ()).runParser rest offset' with
-            | Except.error err => Except.error err
-            | Except.ok (offset'', output, rest') =>
-                Except.ok (offset'', f' output, rest') } }
+      runParser := fun (input : List i) (offset : Offset) => do
+        let (offset', f', rest) ← f.runParser input offset
+        let (offset'', output, rest') ← (p ()).runParser rest offset'
+        pure (offset'', f' output, rest') } }
 
 
 instance (i e : Type) : Monad (Parser i e) := {
@@ -112,12 +106,10 @@ instance (i e : Type) : Monad (Parser i e) := {
 
   bind :=
     fun {α β : Type} (p : Parser i e α) (k : α → Parser i e β) => {
-      runParser := fun (input : List i) (offset : Offset) =>
-        match p.runParser input offset with
-        | Except.error err => Except.error err
-        | Except.ok (offset', output, rest) =>
-            let p' : Parser i e β := k output
-            p'.runParser rest offset' } }
+      runParser := fun (input : List i) (offset : Offset) => do
+        let (offset', output, rest) ← p.runParser input offset
+        let p' : Parser i e β := k output
+        p'.runParser rest offset' } }
 
 
 def string
