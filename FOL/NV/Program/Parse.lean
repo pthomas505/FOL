@@ -32,7 +32,7 @@ def token
   (predicate : i → Bool) :
   Parser i e i := {
     runParser :=
-      fun (input : List i) (offset: Offset) =>
+      fun (input : List i) (offset : Offset) =>
         match input with
         | [] => Except.error [(offset, EndOfInput)]
         | hd :: tl =>
@@ -42,9 +42,10 @@ def token
 
 
 def satisfy
-  {i e : Type} :
-  (i → Bool) → Parser i e i :=
-  token Unexpected
+  (i e : Type)
+  (predicate : i → Bool) :
+  Parser i e i :=
+  token Unexpected predicate
 
 
 def char
