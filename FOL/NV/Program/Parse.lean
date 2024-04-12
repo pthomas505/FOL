@@ -1,4 +1,5 @@
 -- https://serokell.io/blog/parser-combinators-in-haskell
+-- https://gist.github.com/heitor-lassarote/3e7314956e86b8227f6f6040e69aca9d
 
 
 inductive Error (i e : Type) : Type
@@ -147,6 +148,10 @@ instance (i e : Type) [BEq (Error i e)] : Alternative (Parser i e) := {
 #eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "greetings, world".data 0
 
 #eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "bye, world".data 0
+
+#eval Parser.runParser ((failure <|> pure ()) : Parser Char Unit Unit) "".data 0
+
+#eval Parser.runParser ((pure () <|> failure) : Parser Char Unit Unit) "".data 0
 
 #eval ((string Char String "hello".data *> string Char String ", globe".data) <|> string Char String "greetings".data).runParser "hello, world".data 0
 
