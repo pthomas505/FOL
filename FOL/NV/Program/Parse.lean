@@ -156,6 +156,35 @@ instance (i e : Type) [BEq (Error i e)] : Alternative (Parser i e) := {
 #eval ((string Char String "hello".data *> string Char String ", globe".data) <|> string Char String "greetings".data).runParser "hello, world".data 0
 
 
+partial def zero_or_more_aux
+  {i e a : Type}
+  (p : Parser i e a)
+  (acc : List a)
+  (input : List i)
+  (offset : Offset):
+  Except (List (Offset × Error i e)) (Offset × (List a) × List i) :=
+  match p.runParser input offset with
+  | Except.ok (offset, output, rest) => zero_or_more_aux p (output :: acc) rest (offset + 1)
+  | Except.error _ => Except.ok (offset + 1, acc, input)
+
+def zero_or_more {i e a : Type} (p : Parser i e a) : Parser i e (List a) := {
+  runParser := fun (input : List i) (offset : Offset) =>
+    zero_or_more_aux p [] input offset
+}
+
+
+def alpha := satisfy Char Unit Char.isAlpha
+def digit := satisfy Char Unit Char.isDigit
+
+def name : Parser Char Unit String := do
+  let hd ← (alpha <|> char Char Unit '_')
+  let tl ← zero_or_more (alpha <|> digit <|> char Char Unit '_')
+  return (hd :: tl).asString
+
+
+#eval name.runParser "a".data 0
+
+
 /-
 def eoi (i e : Type) : Parser i e Unit :=
   {
