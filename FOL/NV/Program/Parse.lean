@@ -219,12 +219,12 @@ def ident : Parser Char String String := do
   let tl ← zero_or_more (alpha <|> digit <|> underscore)
   return (hd :: tl).asString
 
-#eval parse ident "abc".data
+#eval parse ident "_abc_0".data
 
 
 def ident_list := do
   let hd ← ident
-  let tl ← (zero_or_more (whitespace *> ident))
+  let tl ← (zero_or_more ((zero_or_more whitespace) *> ident))
   return hd :: tl
 
 
@@ -242,6 +242,8 @@ def pred := do
   | Option.none =>
       return Formula.pred_var_ (PredName.mk pred_name) []
 
+#eval parse pred "P(a b c)".data
+
 
 def eq := do
   let _ ← left_paren *> zero_or_more whitespace
@@ -251,8 +253,6 @@ def eq := do
   let _ ← zero_or_more whitespace *> right_paren
   return Formula.eq_ (VarName.mk x) (VarName.mk y)
 
-
-#eval parse pred "P(a b)".data
 #eval parse eq "(a = b)".data
 
 
