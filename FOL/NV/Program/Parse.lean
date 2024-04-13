@@ -213,6 +213,9 @@ def left_paren :=
 def right_paren :=
   token (fun (c : Char) => CustomError s! "Expected right parenthesis. Found '{c}'.") (· == ')')
 
+def comma :=
+  token (fun (c : Char) => CustomError s! "Expected comma. Found '{c}'.") (· == ',')
+
 
 def ident : Parser Char String String := do
   let hd ← (alpha <|> underscore)
@@ -224,7 +227,7 @@ def ident : Parser Char String String := do
 
 def ident_list := do
   let hd ← ident
-  let tl ← (zero_or_more ((zero_or_more whitespace) *> ident))
+  let tl ← zero_or_more (zero_or_more whitespace *> comma *> zero_or_more whitespace *> ident)
   return hd :: tl
 
 
@@ -236,13 +239,11 @@ def pred := do
   let _ ← zero_or_more whitespace *> left_paren *> zero_or_more whitespace
   let ident_list_option ← zero_or_one ident_list
   let _ ← zero_or_more whitespace *> right_paren
-  match ident_list_option with
-  | Option.some ident_list =>
-      return Formula.pred_var_ (PredName.mk pred_name) (ident_list.map VarName.mk)
-  | Option.none =>
-      return Formula.pred_var_ (PredName.mk pred_name) []
+  if let Option.some ident_list := ident_list_option
+  then return Formula.pred_var_ (PredName.mk pred_name) (ident_list.map VarName.mk)
+  else return Formula.pred_var_ (PredName.mk pred_name) []
 
-#eval parse pred "P(a b c)".data
+#eval parse pred "P(a, b, c)".data
 
 
 def eq := do
