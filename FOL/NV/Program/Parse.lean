@@ -1,6 +1,8 @@
 -- https://serokell.io/blog/parser-combinators-in-haskell
 -- https://gist.github.com/heitor-lassarote/3e7314956e86b8227f6f6040e69aca9d
 
+import FOL.NV.Formula
+
 
 inductive Error (i e : Type) : Type
   | EndOfInput : Error i e
@@ -25,6 +27,14 @@ abbrev Offset : Type := Int
 structure Parser (i e a : Type) : Type :=
   (runParser : List i → Offset →
     Except (List (Offset × Error i e)) (Offset × a × List i))
+
+
+def parse
+  {i e a : Type}
+  (p : Parser i e a)
+  (input : List i) :
+  Except (List (Offset × Error i e)) (Offset × a × List i) :=
+  p.runParser input 0
 
 
 def token
@@ -57,29 +67,19 @@ def char
   token (Expected c) (· == c)
 
 
-#eval (char Char Unit 'h').runParser "hello".data 0
-#eval (char Char Unit 'h').runParser "greetings".data 0
-#eval (char Char Unit 'h').runParser "".data 0
+#eval parse (char Char Unit 'h') "hello".data
+#eval parse (char Char Unit 'h') "greetings".data
+#eval parse (char Char Unit 'h') "".data
 
 
 def eof
   (i e : Type) :
   Parser i e Unit := {
     runParser :=
-      fun (input : List i) (offset: Offset) =>
+      fun (input : List i) (offset : Offset) =>
         match input with
         | [] => Except.ok (offset, (), [])
         | hd :: _ => Except.error [(offset, ExpectedEndOfFile hd)] }
-
-
-def parse
-  {i e a : Type}
-  (p : Parser i e a)
-  (input : List i) :
-  Except (List (Offset × Error i e)) a :=
-    match p.runParser input 0 with
-    | Except.error err => Except.error err
-    | Except.ok (_, output, _) => Except.ok output
 
 
 instance (i e : Type) : Functor (Parser i e) := {
@@ -87,7 +87,7 @@ instance (i e : Type) : Functor (Parser i e) := {
     fun {α β : Type} (f : α → β) (p : Parser i e α) => {
       runParser := fun (input : List i) (offset : Offset) => do
         let (offset', output, rest) ← p.runParser input offset
-        pure (offset', f output, rest) } }
+        return (offset', f output, rest) } }
 
 
 instance (i e : Type) : Applicative (Parser i e) := {
@@ -100,7 +100,7 @@ instance (i e : Type) : Applicative (Parser i e) := {
       runParser := fun (input : List i) (offset : Offset) => do
         let (offset', f', rest) ← f.runParser input offset
         let (offset'', output, rest') ← (p ()).runParser rest offset'
-        pure (offset'', f' output, rest') } }
+        return (offset'', f' output, rest') } }
 
 
 instance (i e : Type) : Monad (Parser i e) := {
@@ -125,8 +125,8 @@ def string
     return (y :: ys)
 
 
-#eval (string Char String "Haskell".data).runParser "Haskell".data 0
-#eval (string Char String "Haskell".data).runParser "Halloween".data 0
+#eval parse (string Char String "Haskell".data) "Haskell".data
+#eval parse (string Char String "Haskell".data) "Halloween".data
 
 
 instance (i e : Type) [BEq (Error i e)] : Alternative (Parser i e) := {
@@ -143,17 +143,27 @@ instance (i e : Type) [BEq (Error i e)] : Alternative (Parser i e) := {
       | Except.ok result => Except.ok result } }
 
 
-#eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "hello, world".data 0
+#eval parse (string Char String "hello".data <|> string Char String "greetings".data) "hello, world".data
 
-#eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "greetings, world".data 0
+#eval parse (string Char String "hello".data <|> string Char String "greetings".data) "greetings, world".data
 
-#eval (string Char String "hello".data <|> string Char String "greetings".data).runParser "bye, world".data 0
+#eval parse (string Char String "hello".data <|> string Char String "greetings".data) "bye, world".data
 
-#eval Parser.runParser ((failure <|> pure ()) : Parser Char Unit Unit) "".data 0
+#eval parse ((failure <|> pure ()) : Parser Char Unit Unit) "".data
 
-#eval Parser.runParser ((pure () <|> failure) : Parser Char Unit Unit) "".data 0
+#eval parse ((pure () <|> failure) : Parser Char Unit Unit) "".data
 
-#eval ((string Char String "hello".data *> string Char String ", globe".data) <|> string Char String "greetings".data).runParser "hello, world".data 0
+#eval parse ((string Char String "hello".data *> string Char String ", globe".data) <|> string Char String "greetings".data) "hello, world".data
+
+
+def zero_or_one
+  {i e a : Type}
+  (p : Parser i e a) :
+  Parser i e (Option a) := {
+    runParser := fun (input : List i) (offset : Offset) =>
+      match p.runParser input offset with
+      | Except.ok (offset, output, rest) => Except.ok (offset + 1, Option.some output, rest)
+      | Except.error _ => Except.ok (offset, Option.none, input) }
 
 
 partial def zero_or_more_aux
@@ -161,28 +171,89 @@ partial def zero_or_more_aux
   (p : Parser i e a)
   (acc : List a)
   (input : List i)
-  (offset : Offset):
+  (offset : Offset) :
   Except (List (Offset × Error i e)) (Offset × (List a) × List i) :=
   match p.runParser input offset with
-  | Except.ok (offset, output, rest) => zero_or_more_aux p (output :: acc) rest (offset + 1)
-  | Except.error _ => Except.ok (offset + 1, acc, input)
+  | Except.ok (offset, output, rest) => zero_or_more_aux p (acc ++ [output]) rest (offset + 1)
+  | Except.error _ => Except.ok (offset, acc, input)
 
-def zero_or_more {i e a : Type} (p : Parser i e a) : Parser i e (List a) := {
-  runParser := fun (input : List i) (offset : Offset) =>
-    zero_or_more_aux p [] input offset
-}
+def zero_or_more
+  {i e a : Type}
+  (p : Parser i e a) :
+  Parser i e (List a) := {
+    runParser := fun (input : List i) (offset : Offset) =>
+      zero_or_more_aux p [] input offset }
 
 
-def alpha := satisfy Char Unit Char.isAlpha
-def digit := satisfy Char Unit Char.isDigit
+def one_or_more
+  {i e a : Type}
+  (p : Parser i e a) :
+  Parser i e (List a) := {
+    runParser := fun (input : List i) (offset : Offset) => do
+      let (offset', hd, rest) ← p.runParser input offset
+      let (offset'', tl, rest') ← (zero_or_more p).runParser rest (offset' + 1)
+      return (offset'', (hd :: tl), rest') }
 
-def name : Parser Char Unit String := do
-  let hd ← (alpha <|> char Char Unit '_')
-  let tl ← zero_or_more (alpha <|> digit <|> char Char Unit '_')
+
+def whitespace :=
+  token (fun (c : Char) => CustomError s! "Expected whitespace. Found '{c}'.") Char.isWhitespace
+
+def alpha :=
+  token (fun (c : Char) => CustomError s! "Expected alpha. Found '{c}'.") Char.isAlpha
+
+def digit :=
+  token (fun (c : Char) => CustomError s! "Expected digit. Found '{c}'.") Char.isDigit
+
+def underscore :=
+  token (fun (c : Char) => CustomError s! "Expected underscore. Found '{c}'.") (· == '_')
+
+def left_paren :=
+  token (fun (c : Char) => CustomError s! "Expected left parenthesis. Found '{c}'.") (· == '(')
+
+def right_paren :=
+  token (fun (c : Char) => CustomError s! "Expected right parenthesis. Found '{c}'.") (· == ')')
+
+
+def ident : Parser Char String String := do
+  let hd ← (alpha <|> underscore)
+  let tl ← zero_or_more (alpha <|> digit <|> underscore)
   return (hd :: tl).asString
 
+#eval parse ident "abc".data
 
-#eval name.runParser "a".data 0
+
+def ident_list := do
+  let hd ← ident
+  let tl ← (zero_or_more (whitespace *> ident))
+  return hd :: tl
+
+
+open FOL.NV
+
+
+def pred := do
+  let pred_name ← ident
+  let _ ← zero_or_more whitespace *> left_paren *> zero_or_more whitespace
+  let ident_list_option ← zero_or_one ident_list
+  let _ ← zero_or_more whitespace *> right_paren
+  match ident_list_option with
+  | Option.some ident_list =>
+      return Formula.pred_var_ (PredName.mk pred_name) (ident_list.map VarName.mk)
+  | Option.none =>
+      return Formula.pred_var_ (PredName.mk pred_name) []
+
+
+def eq := do
+  let _ ← left_paren *> zero_or_more whitespace
+  let x ← ident
+  let _ ← zero_or_more whitespace *> char Char String '=' *> zero_or_more whitespace
+  let y ← ident
+  let _ ← zero_or_more whitespace *> right_paren
+  return Formula.eq_ (VarName.mk x) (VarName.mk y)
+
+
+#eval parse pred "P(a b)".data
+#eval parse eq "(a = b)".data
 
 
 /-
