@@ -234,7 +234,7 @@ def ident_list := do
 open FOL.NV
 
 
-def pred := do
+def pred_ := do
   let pred_name ← ident
   let _ ← zero_or_more whitespace *> left_paren *> zero_or_more whitespace
   let ident_list_option ← zero_or_one ident_list
@@ -243,10 +243,10 @@ def pred := do
   then return Formula.pred_var_ (PredName.mk pred_name) (ident_list.map VarName.mk)
   else return Formula.pred_var_ (PredName.mk pred_name) []
 
-#eval parse pred "P(a, b, c)".data
+#eval parse pred_ "P(a, b, c)".data
 
 
-def eq := do
+def eq_ := do
   let _ ← left_paren *> zero_or_more whitespace
   let x ← ident
   let _ ← zero_or_more whitespace *> char Char String '=' *> zero_or_more whitespace
@@ -254,7 +254,26 @@ def eq := do
   let _ ← zero_or_more whitespace *> right_paren
   return Formula.eq_ (VarName.mk x) (VarName.mk y)
 
-#eval parse eq "(a = b)".data
+#eval parse eq_ "(a = b)".data
+
+
+def true_ := do
+  _ ← string Char String "T.".data
+  return Formula.true_
+
+#eval parse true_ "T.".data
+
+
+def false_ := do
+  _ ← string Char String "F.".data
+  return Formula.false_
+
+#eval parse false_ "F.".data
+
+
+def formula := pred_ <|> eq_ <|> true_ <|> false_
+
+#eval parse formula "P(a,b)".data
 
 
 /-
