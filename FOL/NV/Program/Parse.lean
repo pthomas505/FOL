@@ -198,9 +198,9 @@ def one_or_more
 def sep_list
   {i e a1 a2 : Type}
   [BEq i]
-  (sep : Parser i e a2)
-  (p : Parser i e a1) :
-  Parser i e (List a1) := do
+  (sep : Parser i e a1)
+  (p : Parser i e a2) :
+  Parser i e (List a2) := do
   let opt_hd ← zero_or_one p
   if let Option.some hd := opt_hd
   then
@@ -250,47 +250,78 @@ def ws : Parser Char String (List Char) :=
 open FOL.NV
 
 
-def pred_ := do
-  let pred_name ← ident
-  let _ ← ws *> left_paren *> ws
-  let ident_list ← (sep_list (ws *> comma *> ws) ident)
-  let _ ← ws *> right_paren
-  return Formula.pred_var_ (PredName.mk pred_name) (ident_list.map (VarName.mk ∘ toString))
+mutual
+  partial def takeFormula :=
+    takePred <|>
+    takeEq <|>
+    takeTrue <|>
+    takeFalse <|>
+    takeNot <|>
+    takeBin
 
 
-#eval parse pred_ "P()".data
-#eval parse pred_ "P(a, b, c)".data
+  partial def takePred := do
+    let pred_name ← ident
+    let _ ← ws *> left_paren *> ws
+    let ident_list ← (sep_list (ws *> comma *> ws) ident)
+    let _ ← ws *> right_paren
+    return Formula.pred_var_ (PredName.mk pred_name) (ident_list.map (VarName.mk ∘ toString))
 
 
-
-def eq_ := do
-  let _ ← left_paren *> zero_or_more whitespace
-  let x ← ident
-  let _ ← zero_or_more whitespace *> char Char String '=' *> zero_or_more whitespace
-  let y ← ident
-  let _ ← zero_or_more whitespace *> right_paren
-  return Formula.eq_ (VarName.mk x) (VarName.mk y)
-
-#eval parse eq_ "(a = b)".data
+  partial def takeEq := do
+    let _ ← left_paren *> ws
+    let x ← ident
+    let _ ← ws *> char Char String '=' *> ws
+    let y ← ident
+    let _ ← ws *> right_paren
+    return Formula.eq_ (VarName.mk x) (VarName.mk y)
 
 
-def true_ := do
-  _ ← string Char String "T.".data
-  return Formula.true_
-
-#eval parse true_ "T.".data
+  partial def takeTrue := do
+    _ ← string Char String "T.".data
+    return Formula.true_
 
 
-def false_ := do
-  _ ← string Char String "F.".data
-  return Formula.false_
-
-#eval parse false_ "F.".data
+  partial def takeFalse := do
+    _ ← string Char String "F.".data
+    return Formula.false_
 
 
-def formula := pred_ <|> eq_ <|> true_ <|> false_
+  partial def takeNot := do
+    _ ← string Char String "~".data *> ws
+    let phi ← takeFormula
+    pure (Formula.not_ phi)
 
-#eval parse formula "P(a,b)".data
+
+  partial def takeBin := do
+    _ ← left_paren *> ws
+    let phi ← takeFormula
+    _ ← ws
+    let op ← string Char String "->".data <|> string Char String "/\\".data <|> string Char String "\\/".data <|> string Char String "<->".data
+    _ ← ws
+    let psi ← takeFormula
+    _ ← ws *> right_paren
+    match op.toString with
+    | "->" => pure (Formula.imp_ phi psi)
+    | "/\\" => pure (Formula.and_ phi psi)
+    | "\\/" => pure (Formula.or_ phi psi)
+    | "<->" => pure (Formula.iff_ phi psi)
+    | _ => failure
+
+
+  partial def takeForall := do
+    let name ← string Char String "A.".data *> ws *> ident
+    _ ← ws
+    let phi ← takeFormula
+    return Formula.forall_ (VarName.mk name) phi
+
+
+  partial def takeExists := do
+    let name ← string Char String "E.".data *> ws *> ident
+    _ ← ws
+    let phi ← takeFormula
+    return Formula.exists_ (VarName.mk name) phi
+end
 
 
 /-
