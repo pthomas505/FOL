@@ -195,6 +195,21 @@ def one_or_more
       return (offset'', (hd :: tl), rest') }
 
 
+def sep_list
+  {i e a1 a2 : Type}
+  [BEq i]
+  (sep : Parser i e a2)
+  (p : Parser i e a1) :
+  Parser i e (List a1) := do
+  let opt_hd ← zero_or_one p
+  if let Option.some hd := opt_hd
+  then
+    let tl ← zero_or_more (sep *> p)
+    return hd :: tl
+  else
+    return []
+
+
 def whitespace :=
   token (fun (c : Char) => CustomError s! "Expected whitespace. Found '{c}'.") Char.isWhitespace
 
@@ -225,10 +240,11 @@ def ident : Parser Char String String := do
 #eval parse ident "_abc_0".data
 
 
-def ident_list := do
-  let hd ← ident
-  let tl ← zero_or_more (zero_or_more whitespace *> comma *> zero_or_more whitespace *> ident)
-  return hd :: tl
+def ws : Parser Char String (List Char) :=
+  zero_or_more whitespace
+
+
+#eval parse (sep_list (ws *> comma *> ws) ident) "a,b,c".data
 
 
 open FOL.NV
@@ -236,14 +252,15 @@ open FOL.NV
 
 def pred_ := do
   let pred_name ← ident
-  let _ ← zero_or_more whitespace *> left_paren *> zero_or_more whitespace
-  let ident_list_option ← zero_or_one ident_list
-  let _ ← zero_or_more whitespace *> right_paren
-  if let Option.some ident_list := ident_list_option
-  then return Formula.pred_var_ (PredName.mk pred_name) (ident_list.map VarName.mk)
-  else return Formula.pred_var_ (PredName.mk pred_name) []
+  let _ ← ws *> left_paren *> ws
+  let ident_list ← (sep_list (ws *> comma *> ws) ident)
+  let _ ← ws *> right_paren
+  return Formula.pred_var_ (PredName.mk pred_name) (ident_list.map (VarName.mk ∘ toString))
 
+
+#eval parse pred_ "P()".data
 #eval parse pred_ "P(a, b, c)".data
+
 
 
 def eq_ := do
