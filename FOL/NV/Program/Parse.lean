@@ -257,7 +257,9 @@ mutual
     takeTrue <|>
     takeFalse <|>
     takeNot <|>
-    takeBin
+    takeBin <|>
+    takeForall <|>
+    takeExists
 
 
   partial def takePred := do
