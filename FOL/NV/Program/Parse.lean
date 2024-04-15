@@ -304,6 +304,54 @@ def name := do
 open FOL.NV
 
 
+def takePred := do
+  let pred_name ← name
+  _ ← zero_or_more whitespace
+  _ ← char String '('
+  _ ← zero_or_more whitespace
+  let delimiter := zero_or_more whitespace *> char String ',' *> zero_or_more whitespace
+  let xs ← zero_or_more_delimited delimiter name
+  _ ← zero_or_more whitespace
+  _ ← char String ')'
+
+  return Formula.pred_var_ (PredName.mk pred_name) (xs.toList.map (VarName.mk ∘ toString))
+
+#eval parseStr takePred "P()"
+#eval parseStr takePred "P(x)"
+#eval parseStr takePred "P(x, y)"
+
+
+def takeEq := do
+  _ ← zero_or_more whitespace
+  _ ← char String '('
+  _ ← zero_or_more whitespace
+  let x ← name
+  _ ← zero_or_more whitespace
+  _ ← char String '='
+  _ ← zero_or_more whitespace
+  let y ← name
+  _ ← zero_or_more whitespace
+  _ ← char String ')'
+
+  return Formula.eq_ (VarName.mk x) (VarName.mk y)
+
+#eval parseStr takeEq "(x = y)"
+
+
+def takeTrue := do
+  _ ← str String "T."
+  return Formula.true_
+
+#eval parseStr takeTrue "T."
+
+
+def takeFalse := do
+  _ ← str String "F."
+  return Formula.false_
+
+#eval parseStr takeFalse "F."
+
+
 mutual
   def takeFormula := do
     takePred <|>
@@ -314,44 +362,6 @@ mutual
     takeBin <|>
     takeForall <|>
     takeExists
-
-
-  def takePred := do
-    let pred_name ← name
-    _ ← zero_or_more whitespace
-    _ ← char String '('
-    _ ← zero_or_more whitespace
-    let delimiter := zero_or_more whitespace *> char String ',' *> zero_or_more whitespace
-    let xs ← zero_or_more_delimited delimiter name
-    _ ← zero_or_more whitespace
-    _ ← char String ')'
-
-    return Formula.pred_var_ (PredName.mk pred_name) (xs.toList.map (VarName.mk ∘ toString))
-
-
-  def takeEq := do
-    _ ← zero_or_more whitespace
-    _ ← char String '('
-    _ ← zero_or_more whitespace
-    let x ← name
-    _ ← zero_or_more whitespace
-    _ ← char String '='
-    _ ← zero_or_more whitespace
-    let y ← name
-    _ ← zero_or_more whitespace
-    _ ← char String ')'
-
-    return Formula.eq_ (VarName.mk x) (VarName.mk y)
-
-
-  def takeTrue := do
-    _ ← str String "T."
-    return Formula.true_
-
-
-  def takeFalse := do
-    _ ← str String "F."
-    return Formula.false_
 
 
   def takeNot := do
