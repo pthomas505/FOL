@@ -27,55 +27,55 @@ abbrev Offset : Type := Int
   e : The type of custom error messages.
   a : The type of the structure parsed from the consumed input.
 --/
-structure Parser (i e a : Type) : Type :=
-  (runParser : List i → Offset →
-    Except (List (Offset × Error i e)) (Offset × a × List i))
+def Parser (i e a : Type) : Type :=
+  List i → Offset →
+    Except (List (Offset × Error i e)) (Offset × a × List i)
 
 
 instance (i e : Type) : Functor (Parser i e) := {
   map :=
-    fun {α β : Type} (f : α → β) (p : Parser i e α) => {
-      runParser := fun (input : List i) (offset : Offset) => do
-        let (offset', output, rest) ← p.runParser input offset
-        return (offset', f output, rest) } }
+    fun {α β : Type} (f : α → β) (p : Parser i e α) =>
+      fun (input : List i) (offset : Offset) => do
+        let (offset', output, rest) ← p input offset
+        return (offset', f output, rest) }
 
 
 instance (i e : Type) : Applicative (Parser i e) := {
   pure :=
-    fun {α : Type} (a : α) => {
-      runParser := fun (input : List i) (offset : Offset) => Except.ok (offset, a, input) },
+    fun {α : Type} (a : α) =>
+      fun (input : List i) (offset : Offset) => Except.ok (offset, a, input),
 
   seq :=
-    fun {α β : Type} (f : Parser i e (α → β)) (p : Unit → Parser i e α) => {
-      runParser := fun (input : List i) (offset : Offset) => do
-        let (offset', f', rest) ← f.runParser input offset
-        let (offset'', output, rest') ← (p ()).runParser rest offset'
-        return (offset'', f' output, rest') } }
+    fun {α β : Type} (f : Parser i e (α → β)) (p : Unit → Parser i e α) =>
+      fun (input : List i) (offset : Offset) => do
+        let (offset', f', rest) ← f input offset
+        let (offset'', output, rest') ← (p ()) rest offset'
+        return (offset'', f' output, rest') }
 
 
 instance (i e : Type) : Monad (Parser i e) := {
   pure := pure
 
   bind :=
-    fun {α β : Type} (p : Parser i e α) (k : α → Parser i e β) => {
-      runParser := fun (input : List i) (offset : Offset) => do
-        let (offset', output, rest) ← p.runParser input offset
+    fun {α β : Type} (p : Parser i e α) (k : α → Parser i e β) =>
+      fun (input : List i) (offset : Offset) => do
+        let (offset', output, rest) ← p input offset
         let p' : Parser i e β := k output
-        p'.runParser rest offset' } }
+        p' rest offset' }
 
 
 instance (i e : Type) [BEq i] [BEq e] : Alternative (Parser i e) := {
-  failure := { runParser := fun (_ : List i) (_ : Offset) => Except.error [] }
+  failure := fun (_ : List i) (_ : Offset) => Except.error []
 
-  orElse := fun {α : Type} (l : Parser i e α) (r : Unit → Parser i e α) => {
-    runParser := fun (input : List i) (offset : Offset) =>
-      match l.runParser input offset with
+  orElse := fun {α : Type} (l : Parser i e α) (r : Unit → Parser i e α) =>
+    fun (input : List i) (offset : Offset) =>
+      match l input offset with
       | Except.error err =>
-          match (r ()).runParser input offset with
+          match (r ()) input offset with
           | Except.error err' =>
               Except.error (List.eraseDups (err ++ err'))
           | Except.ok result => Except.ok result
-      | Except.ok result => Except.ok result } }
+      | Except.ok result => Except.ok result }
 
 
 def parse
@@ -83,7 +83,7 @@ def parse
   (p : Parser i e a)
   (input : List i) :
   Except (List (Offset × Error i e)) (Offset × a × List i) :=
-  p.runParser input 0
+  p input 0
 
 def parseStr
   {e a : Type}
@@ -95,27 +95,25 @@ def parseStr
 
 def eof
   (i e : Type) :
-  Parser i e Unit := {
-    runParser :=
+  Parser i e Unit :=
       fun (input : List i) (offset : Offset) =>
         match input with
         | [] => Except.ok (offset, (), [])
-        | hd :: _ => Except.error [(offset, ExpectedEndOfFile hd)] }
+        | hd :: _ => Except.error [(offset, ExpectedEndOfFile hd)]
 
 
 def satisfy
   {i e : Type}
   (mkErr : i → Error i e)
   (predicate : i → Bool) :
-  Parser i e i := {
-    runParser :=
+  Parser i e i :=
       fun (input : List i) (offset : Offset) =>
         match input with
         | [] => Except.error [(offset, EndOfInput)]
         | hd :: tl =>
             if predicate hd
             then Except.ok (offset + 1, hd, tl)
-            else Except.error [(offset, mkErr hd)] }
+            else Except.error [(offset, mkErr hd)]
 
 
 def exact_one
@@ -353,7 +351,7 @@ def takeFalse := do
 
 
 mutual
-  def takeFormula := do
+  partial def takeFormula := do
     takePred <|>
     takeEq <|>
     takeTrue <|>
@@ -364,7 +362,7 @@ mutual
     takeExists
 
 
-  def takeNot := do
+  partial def takeNot := do
     _ ← char String '~'
     _ ← zero_or_more whitespace
     let phi ← takeFormula
@@ -372,26 +370,24 @@ mutual
     return (Formula.not_ phi)
 
 
-  def takeBin := do
+  partial def takeBin := do
     _ ← char String '('
     _ ← zero_or_more whitespace
     let phi ← takeFormula
     _ ← zero_or_more whitespace
-    let op ← str String "->" <|> str String "/\\" <|> str String "\\/" <|> str String "<->"
+    let op ←
+      (str String "->" *> pure Formula.imp_) <|>
+      (str String "/\\" *> pure Formula.and_) <|>
+      (str String "\\/" *> pure Formula.or_) <|>
+      (str String "<->" *> pure Formula.iff_)
     _ ← zero_or_more whitespace
     let psi ← takeFormula
     _ ← zero_or_more whitespace
     _ ← char String ')'
-
-    match op with
-    | "->" => return Formula.imp_ phi psi
-    | "/\\" => return Formula.and_ phi psi
-    | "\\/" => return Formula.or_ phi psi
-    | "<->" => return Formula.iff_ phi psi
-    | _ => sorry
+    return op phi psi
 
 
-  def takeForall := do
+  partial def takeForall := do
     _ ← str String "A."
     _ ← zero_or_more whitespace
     let x ← name
@@ -401,7 +397,7 @@ mutual
     return Formula.forall_ (VarName.mk x) phi
 
 
-  def takeExists := do
+  partial def takeExists := do
     _ ← str String "E."
     _ ← zero_or_more whitespace
     let x ← name
@@ -410,6 +406,12 @@ mutual
 
     return Formula.exists_ (VarName.mk x) phi
 end
+
+
+#eval parseStr takeFormula "P()"
+#eval parseStr takeFormula "P(x)"
+#eval parseStr takeFormula "P(x, y)"
+#eval parseStr takeFormula "A. x ~ ~ (P(x, y) -> P(x))"
 
 
 /-
