@@ -404,7 +404,6 @@ mutual
     let phi ← takeFormula
 
     return Formula.exists_ (VarName.mk x) phi
-
 end
 
 
