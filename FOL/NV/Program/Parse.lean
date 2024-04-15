@@ -340,6 +340,7 @@ mutual
     _ ← zero_or_more whitespace
     let y ← name
     _ ← zero_or_more whitespace
+    _ ← char String ')'
 
     return Formula.eq_ (VarName.mk x) (VarName.mk y)
 
