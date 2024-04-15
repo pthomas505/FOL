@@ -280,14 +280,6 @@ def zero_or_more_delimited
   then pure a
   else pure #[]
 
-def zero_or_more_delimited_str
-  {e a : Type}
-  [BEq e]
-  (delimiter : Parser Char e a)
-  (p : Parser Char e String) :
-  Parser Char e (Array String) :=
-  zero_or_more_delimited delimiter p
-
 
 def whitespace :=
   satisfy (fun (c : Char) => Custom s! "Expected whitespace. Found '{c}'.") Char.isWhitespace
@@ -307,7 +299,7 @@ def name := do
 #eval parseStr name "_abc_0"
 
 
-#eval parseStr (zero_or_more_delimited_str ((zero_or_more whitespace) *> char String ',' *> (zero_or_more whitespace)) name) "a , b , c"
+#eval parseStr (zero_or_more_delimited ((zero_or_more whitespace) *> char String ',' *> (zero_or_more whitespace)) name) "a , b , c"
 
 
 open FOL.NV
@@ -331,7 +323,7 @@ mutual
     _ ← char String '('
     _ ← zero_or_more whitespace
     let delimiter := zero_or_more whitespace *> char String ',' *> zero_or_more whitespace
-    let xs ← zero_or_more_delimited_str delimiter name
+    let xs ← zero_or_more_delimited delimiter name
     _ ← zero_or_more whitespace
     _ ← char String ')'
 
