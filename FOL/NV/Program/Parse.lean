@@ -352,6 +352,7 @@ def takeFalse := do
 
 mutual
   partial def takeFormula := do
+    takeParen <|>
     takePred <|>
     takeEq <|>
     takeTrue <|>
@@ -360,6 +361,16 @@ mutual
     takeBin <|>
     takeForall <|>
     takeExists
+
+
+  partial def takeParen := do
+    _ ← char String '('
+    _ ← zero_or_more whitespace
+    let phi ← takeFormula
+    _ ← zero_or_more whitespace
+    _ ← char String ')'
+
+    return phi
 
 
   partial def takeNot := do
@@ -411,4 +422,4 @@ end
 #eval parseStr takeFormula "P()"
 #eval parseStr takeFormula "P(x)"
 #eval parseStr takeFormula "P(x, y)"
-#eval parseStr takeFormula "A. x ~ ~ (P(x, y) -> P(x))"
+#eval parseStr takeFormula "A. x ~ (~ (P(x, y) -> P(x)))"
