@@ -161,7 +161,6 @@ def str
   let cs ← char_list e s.data
   return cs.asString
 
-
 #eval parseStr (str Unit "") ""
 #eval parseStr (str Unit "") "a"
 #eval parseStr (str Unit "a") "a"
@@ -306,7 +305,7 @@ open FOL.NV
 
 
 mutual
-  partial def takeFormula := do
+  def takeFormula := do
     takePred <|>
     takeEq <|>
     takeTrue <|>
@@ -317,7 +316,7 @@ mutual
     takeExists
 
 
-  partial def takePred := do
+  def takePred := do
     let pred_name ← name
     _ ← zero_or_more whitespace
     _ ← char String '('
@@ -330,7 +329,7 @@ mutual
     return Formula.pred_var_ (PredName.mk pred_name) (xs.toList.map (VarName.mk ∘ toString))
 
 
-  partial def takeEq := do
+  def takeEq := do
     _ ← zero_or_more whitespace
     _ ← char String '('
     _ ← zero_or_more whitespace
@@ -345,24 +344,24 @@ mutual
     return Formula.eq_ (VarName.mk x) (VarName.mk y)
 
 
-  partial def takeTrue := do
+  def takeTrue := do
     _ ← str String "T."
     return Formula.true_
 
 
-  partial def takeFalse := do
+  def takeFalse := do
     _ ← str String "F."
     return Formula.false_
 
 
-  partial def takeNot := do
+  def takeNot := do
     _ ← char String '~'
     _ ← zero_or_more whitespace
     let phi ← takeFormula
     return (Formula.not_ phi)
 
 
-  partial def takeBin := do
+  def takeBin := do
     _ ← char String '('
     _ ← zero_or_more whitespace
     let phi ← takeFormula
@@ -381,7 +380,7 @@ mutual
     | _ => sorry
 
 
-  partial def takeForall := do
+  def takeForall := do
     _ ← str String "A."
     _ ← zero_or_more whitespace
     let x ← name
@@ -391,7 +390,7 @@ mutual
     return Formula.forall_ (VarName.mk x) phi
 
 
-  partial def takeExists := do
+  def takeExists := do
     _ ← str String "E."
     _ ← zero_or_more whitespace
     let x ← name
