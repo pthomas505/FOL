@@ -302,7 +302,7 @@ def name := do
   let tl ← zero_or_more (alpha <|> digit <|> char String '_')
   return (Array.toList { data := hd :: tl.data }).asString
 
-#eval parseStr name "0_abc_0"
+#eval parseStr name "_abc_0"
 
 
 #eval parseStr (zero_or_more_delimited_str ((zero_or_more whitespace) *> char String ',' *> (zero_or_more whitespace)) name) "a , b , c"
