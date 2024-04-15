@@ -244,6 +244,7 @@ def one_or_more_char
 
 #eval parseStr (one_or_more_char Unit 'a') ""
 #eval parseStr (one_or_more_char Unit 'a') "b"
+#eval parseStr (one_or_more_char Unit 'a') "bb"
 #eval parseStr (one_or_more_char Unit 'a') "a"
 #eval parseStr (one_or_more_char Unit 'a') "aa"
 #eval parseStr (one_or_more_char Unit 'a') "ab"
