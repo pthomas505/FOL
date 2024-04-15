@@ -358,6 +358,7 @@ mutual
     _ ← char String '~'
     _ ← zero_or_more whitespace
     let phi ← takeFormula
+
     return (Formula.not_ phi)
 
 
