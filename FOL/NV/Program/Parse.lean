@@ -219,6 +219,7 @@ def zero_or_more_char
 #eval parseStr (zero_or_more_char Unit 'a') "b"
 #eval parseStr (zero_or_more_char Unit 'a') "bb"
 #eval parseStr (zero_or_more_char Unit 'a') "a"
+#eval parseStr (zero_or_more_char Unit 'a') "aa"
 #eval parseStr (zero_or_more_char Unit 'a') "ab"
 #eval parseStr (zero_or_more_char Unit 'a') "abb"
 
