@@ -142,7 +142,7 @@ def exact_list
   [BEq i]
   (e : Type) :
   List i → Parser i e (List i)
-  | [] => pure []
+  | [] => return []
   | x :: xs => do
     let y <- exact_one e x
     let ys <- exact_list e xs
@@ -159,7 +159,7 @@ def str
   (s : String) :
   Parser Char e String := do
   let cs ← char_list e s.data
-  pure cs.asString
+  return cs.asString
 
 
 #eval parseStr (str Unit "") ""
@@ -186,8 +186,8 @@ def zero_or_one_char
   (c : Char) :
   Parser Char e String := do
   if let Option.some a ← zero_or_one (char e c)
-  then pure a.toString
-  else pure ""
+  then return a.toString
+  else return ""
 
 #eval parseStr (zero_or_one_char Unit 'a') ""
 #eval parseStr (zero_or_one_char Unit 'a') "b"
@@ -203,7 +203,7 @@ partial def zero_or_more
   Parser i e (Array a) := do
   let rec go (acc : Array a) := do
     match ← try? p with
-    | none => pure acc
+    | none => return acc
     | some a => go (acc.push a)
   go #[]
 
@@ -232,7 +232,7 @@ def one_or_more
   Parser i e (Array a) := do
     let hd ← p
     let tl ← zero_or_more p
-    pure { data := hd :: tl.data }
+    return { data := hd :: tl.data }
 
 def one_or_more_char
   (e : Type)
@@ -268,7 +268,7 @@ def one_or_more_delimited
   Parser i e (Array a2) := do
   let hd ← p
   let tl ← zero_or_more (delimiter *> p)
-  pure { data := hd :: tl.data }
+  return { data := hd :: tl.data }
 
 def zero_or_more_delimited
   {i e a1 a2 : Type}
@@ -277,8 +277,8 @@ def zero_or_more_delimited
   (delimiter : Parser i e a1)
   (p : Parser i e a2) := do
   if let Option.some a ← zero_or_one (one_or_more_delimited delimiter p)
-  then pure a
-  else pure #[]
+  then return a
+  else return #[]
 
 
 def whitespace :=
@@ -359,7 +359,7 @@ mutual
     _ ← char String '~'
     _ ← zero_or_more whitespace
     let phi ← takeFormula
-    pure (Formula.not_ phi)
+    return (Formula.not_ phi)
 
 
   partial def takeBin := do
@@ -374,10 +374,10 @@ mutual
     _ ← char String ')'
 
     match op with
-    | "->" => pure (Formula.imp_ phi psi)
-    | "/\\" => pure (Formula.and_ phi psi)
-    | "\\/" => pure (Formula.or_ phi psi)
-    | "<->" => pure (Formula.iff_ phi psi)
+    | "->" => return Formula.imp_ phi psi
+    | "/\\" => return Formula.and_ phi psi
+    | "\\/" => return Formula.or_ phi psi
+    | "<->" => return Formula.iff_ phi psi
     | _ => sorry
 
 
