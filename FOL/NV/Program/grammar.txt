@@ -112,10 +112,10 @@ seq -> item seq | .
 
 formula -> pred | eq | not | imp .
 
-pred -> name "(" seq ")" .
+pred -> name "(" name_seq ")" .
 eq -> "(" name "=" name ")" .
 not -> "~" formula .
 imp -> "(" formula "->" formula ")" .
 
-seq -> non_empty_seq | .
-non_empty_seq -> name | name comma non_empty_seq .
+name_seq -> non_empty_name_seq | .
+non_empty_name_seq -> name | name comma non_empty_name_seq .
