@@ -17,9 +17,6 @@ proof = '(' (instruction ';')* ')'
 
 formula = '(' formula ')' | pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
 
-seq -> empty | non_empty_seq .
-empty -> .
-non_empty_seq -> item | item comma non_empty_seq .
 
 pred = name '(' (name (',' name)*)? ')'
 eq = '(' name '=' name ')'
@@ -97,3 +94,28 @@ A. x ~ (x in. x)
 (A. x E. y (x = y) -> (y in. z))
 (~ P() -> P())
 ~ (P() -> (P() -> P()))
+
+-----
+
+zero or more comma separated terminals:
+
+seq -> non_empty_seq | .
+non_empty_seq -> item | item comma non_empty_seq .
+
+-----
+
+zero or more terminals:
+
+seq -> item seq | .
+
+-----
+
+formula -> pred | eq | not | imp .
+
+pred -> name "(" seq ")" .
+eq -> "(" name "=" name ")" .
+not -> "~" formula .
+imp -> "(" formula "->" formula ")" .
+
+seq -> non_empty_seq | .
+non_empty_seq -> name | name comma non_empty_seq .
