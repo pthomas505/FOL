@@ -99,8 +99,8 @@ A. x ~ (x in. x)
 
 # zero or more comma separated terminals
 
-seq -> non_empty_seq | .
-non_empty_seq -> item | item "," non_empty_seq .
+seq -> item remainder | "EOF" .
+remainder -> "," item remainder | "EOF" .
 
 -----
 
@@ -112,10 +112,11 @@ seq -> item seq | .
 
 formula -> pred | eq | not | imp .
 
-pred -> name "(" name_seq ")" .
+pred -> name "(" name_seq .
+name_seq -> name name_seq_remainder | ")" .
+name_seq_remainder -> "," name name_seq_remainder | ")" .
+
 eq -> "(" name "=" name ")" .
 not -> "~" formula .
 imp -> "(" formula "->" formula ")" .
 
-name_seq -> non_empty_name_seq | .
-non_empty_name_seq -> name | name "," non_empty_name_seq .
