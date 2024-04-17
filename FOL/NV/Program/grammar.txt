@@ -17,7 +17,7 @@ proof = '(' (instruction ';')* ')'
 
 formula = '(' formula ')' | pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
 
-pred = name '(' name* ')'
+pred = name '(' (name (',' name)*)? ')'
 eq = '(' name '=' name ')'
 in = '(' name 'in.' name ')'
 true = 'T.'
