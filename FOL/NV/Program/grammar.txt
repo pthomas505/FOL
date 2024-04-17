@@ -17,6 +17,10 @@ proof = '(' (instruction ';')* ')'
 
 formula = '(' formula ')' | pred | eq | in | true | false | not | imp | and | or | iff | forall | exists
 
+seq -> empty | non_empty_seq .
+empty -> .
+non_empty_seq -> item | item comma non_empty_seq .
+
 pred = name '(' (name (',' name)*)? ')'
 eq = '(' name '=' name ')'
 in = '(' name 'in.' name ')'
