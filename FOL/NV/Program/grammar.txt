@@ -100,7 +100,7 @@ A. x ~ (x in. x)
 # zero or more comma separated terminals
 
 seq -> non_empty_seq | .
-non_empty_seq -> item | item comma non_empty_seq .
+non_empty_seq -> item | item "," non_empty_seq .
 
 -----
 
@@ -118,4 +118,4 @@ not -> "~" formula .
 imp -> "(" formula "->" formula ")" .
 
 name_seq -> non_empty_name_seq | .
-non_empty_name_seq -> name | name comma non_empty_name_seq .
+non_empty_name_seq -> name | name "," non_empty_name_seq .
