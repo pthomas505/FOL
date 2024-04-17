@@ -97,14 +97,14 @@ A. x ~ (x in. x)
 
 -----
 
-zero or more comma separated terminals:
+# zero or more comma separated terminals
 
 seq -> non_empty_seq | .
 non_empty_seq -> item | item comma non_empty_seq .
 
 -----
 
-zero or more terminals:
+# zero or more terminals
 
 seq -> item seq | .
 
