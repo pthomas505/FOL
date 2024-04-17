@@ -106,7 +106,7 @@ remainder -> "," item remainder | "EOF" .
 
 # zero or more terminals
 
-seq -> item seq | .
+seq -> item seq | EOF .
 
 -----
 
