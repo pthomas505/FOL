@@ -116,6 +116,8 @@ def NA.accepts
 
 /--
   The subset construction of a deterministic automaton from a nondeterministic automaton.
+
+  Each state in the deterministic automaton is a subset of the states of the nondeterministic automaton.
 -/
 def NA.toDA
   {α : Type}

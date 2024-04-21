@@ -99,24 +99,103 @@ A. x ~ (x in. x)
 
 # zero or more comma separated terminals
 
-seq -> item remainder | "EOF" .
-remainder -> "," item remainder | "EOF" .
+seq -> item remainder | EOI .
+remainder -> "," item remainder | EOI .
 
 -----
 
 # zero or more terminals
 
-seq -> item seq | EOF .
+seq -> item seq | EOI .
 
 -----
 
-formula -> pred | eq | not | imp .
+formula -> name afterName | kwFormula .
 
-pred -> name "(" name_seq .
+afterName -> "(" name_seq .
 name_seq -> name name_seq_remainder | ")" .
 name_seq_remainder -> "," name name_seq_remainder | ")" .
 
+kwFormula -> "(" afterParen | "T." | "F." | "~" formula | "A." name formula | "E." name formula .
+
+afterParen -> name afterParenName | kwFormula afterParenFormula .
+
+afterParenName -> afterName afterParenFormula | "=" name ")" | "in." name ")" .
+
+afterParenFormula -> ")" | "->" formula ")" | "/\\" formula ")" | "\\/" formula ")" | "<->" formula ")" .
+
+
+-----
+
+
+formula -> "(" formula ")" | pred | eq | in | true | false | not | imp | and | or | iff | forall | exists .
+
+pred -> name "(" name_seq ")" .
+name_seq -> name name_seq_remainder | .
+name_seq_remainder -> "," name name_seq_remainder | .
+
 eq -> "(" name "=" name ")" .
+in -> "(" name "in." name ")" .
+true -> "T." .
+false -> "F." .
 not -> "~" formula .
 imp -> "(" formula "->" formula ")" .
+and -> "(" formula "/\\" formula ")" .
+or -> "(" formula "\/" formula ")" .
+iff -> "(" formula "<->" formula ")" .
+forall -> "A." name formula .
+exists -> "E." name formula .
 
+
+-----
+
+
+formula -> formula_100 | formula_200 | formula_300 .
+
+formula_100 -> true | false | not | forall | exists .
+
+true -> "T." .
+false -> "F." .
+not -> "~" formula .
+forall -> "A." name formula .
+exists -> "E." name formula .
+
+formula_200 -> name "(" name_seq .
+name_seq -> name name_seq_remainder | ")" .
+name_seq_remainder -> "," name name_seq_remainder | ")" .
+
+
+formula_300 -> "(" formula_400 .
+formula_400 -> formula ")" | formula_500 | formula_600 .
+
+
+formula_500 -> eq | in .
+
+eq -> "=" name ")" .
+in -> "in" name ")" .
+
+
+formula_600 -> imp | and | or | iff .
+
+imp -> "->" formula ")" .
+and -> "/\\" formula ")" .
+or -> "\\/" formula ")" .
+iff -> "<->" formula ")" .
+
+
+name -> name_head_char name_tail .
+name_tail -> name_tail_char name_tail | EOI .
+
+name_head_char -> alpha | underscore .
+name_tail_char -> alpha | digit | underscore .
+
+
+alpha -> lower_case | upper_case .
+
+lower_case -> "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" .
+
+upper_case -> "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" .
+
+digit -> "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .
+
+underscore -> "_" .
