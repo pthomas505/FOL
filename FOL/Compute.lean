@@ -351,6 +351,22 @@ structure CFG :=
   (S : N)
 
 
+
+inductive is_derive
+(g : CFG) :
+List (g.N ⊕ g.T) → List (g.N ⊕ g.T) → Prop
+
+| refl
+  (sf : List (g.N ⊕ g.T)) :
+  is_derive g sf sf
+
+| step
+  (s1 s2 s3 : List (g.N ⊕ g.T))
+  (subject : g.N) :
+  is_derive g s1 (s2 ++ (Sum.inl subject :: s3)) →
+  is_derive g s1 (s2 ++ g.P subject ++ s3)
+
+
 def direct_derive
   (G : CFG) :
   List (G.N ⊕ G.T) → List (G.N ⊕ G.T)
