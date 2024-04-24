@@ -2,6 +2,9 @@ import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finset.Basic
 
 
+set_option autoImplicit false
+
+
 /-
   References:
 
@@ -352,8 +355,8 @@ structure CFG :=
 
 
 inductive derives
-(g : CFG) :
-List (g.N ⊕ g.T) → List (g.N ⊕ g.T) → Prop
+  (g : CFG) :
+  List (g.N ⊕ g.T) → List (g.N ⊕ g.T) → Prop
 
 | refl
   (sf : List (g.N ⊕ g.T)) :
@@ -368,11 +371,19 @@ List (g.N ⊕ g.T) → List (g.N ⊕ g.T) → Prop
 
 def CFG.generates
   (g : CFG)
-  (s : List (g.N ⊕ g.T)) :=
+  (s : List (g.N ⊕ g.T)) :
+  Prop :=
   derives g [Sum.inl g.S] s
 
 
 def CFG.produces
   (g : CFG)
-  (s : List g.T) :=
+  (s : List g.T) :
+  Prop :=
   derives g [Sum.inl g.S] (s.map Sum.inr)
+
+
+def CFG.languageOf
+  (g : CFG) :
+  Set (List g.T) :=
+  { s : List g.T | g.produces s }
