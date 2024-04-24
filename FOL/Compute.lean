@@ -351,7 +351,6 @@ structure CFG :=
   (S : N)
 
 
-
 inductive derives
 (g : CFG) :
 List (g.N ⊕ g.T) → List (g.N ⊕ g.T) → Prop
@@ -367,9 +366,13 @@ List (g.N ⊕ g.T) → List (g.N ⊕ g.T) → Prop
   derives g s1 (s2 ++ g.P subject ++ s3)
 
 
-def direct_derive
-  (G : CFG) :
-  List (G.N ⊕ G.T) → List (G.N ⊕ G.T)
-  | [] => []
-  | (Sum.inl x) :: xs => G.P x ++ direct_derive G xs
-  | x :: xs => x :: direct_derive G xs
+def CFG.generates
+  (g : CFG)
+  (s : List (g.N ⊕ g.T)) :=
+  derives g [Sum.inl g.S] s
+
+
+def CFG.produces
+  (g : CFG)
+  (s : List g.T) :=
+  derives g [Sum.inl g.S] (s.map Sum.inr)
