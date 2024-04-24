@@ -344,7 +344,7 @@ example
   P ⊆ N × (N ∪ T)* is a set of productions.
   S ∈ N is the start symbol.
 -/
-structure CFG (Symbol : Type) :=
+structure CFG :=
   (N : Type)
   (T : Type)
   (P : N → List (N ⊕ T))
