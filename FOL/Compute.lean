@@ -347,5 +347,5 @@ example
 structure CFG :=
   (N : Type)
   (T : Type)
-  (P : N → List (N ⊕ T))
+  (P : N → List (N ⊕ T) → Prop)
   (S : N)
