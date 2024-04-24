@@ -327,3 +327,25 @@ example
   (RegExp.concat R (RegExp.closure R)).languageOf = (RegExp.concat (RegExp.closure R) R).languageOf :=
   by
   sorry
+
+
+-----
+
+-- https://arxiv.org/pdf/1509.02032.pdf
+
+/-
+  The definition of a context free grammar.
+
+  An alphabet Σ is a finite, non-empty set of indivisible symbols.
+  A string over an alphabet Σ is a finite sequence of members of Σ.
+
+  N is a non-terminal alphabet.
+  T is a terminal alphabet such that N ∩ T = ∅.
+  P ⊆ N × (N ∪ T)* is a set of productions.
+  S ∈ N is the start symbol.
+-/
+structure CFG (Symbol : Type) :=
+  (N : Type)
+  (T : Type)
+  (P : N → List (N ⊕ T))
+  (S : N)
