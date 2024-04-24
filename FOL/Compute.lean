@@ -347,5 +347,13 @@ example
 structure CFG :=
   (N : Type)
   (T : Type)
-  (P : N → List (N ⊕ T) → Prop)
+  (P : N → List (N ⊕ T))
   (S : N)
+
+
+def direct_derive
+  (G : CFG) :
+  List (G.N ⊕ G.T) → List (G.N ⊕ G.T)
+  | [] => []
+  | (Sum.inl x) :: xs => G.P x ++ direct_derive G xs
+  | x :: xs => x :: direct_derive G xs
