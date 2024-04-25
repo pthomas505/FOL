@@ -384,5 +384,21 @@ def CFG.produces
 
 
 inductive LabeledTree (α : Type) : Type
-  | root : α → LabeledTree α
-  | descendents (n : ℕ) : (Fin n → LabeledTree α) → LabeledTree α
+  | descendents (root : α) (n : ℕ) : (Fin n → LabeledTree α) → LabeledTree α
+
+open LabeledTree
+
+
+def LabeledTree.isLeaf
+  {α : Type} :
+  LabeledTree α → Prop
+  | descendents _ n _ => n = 0
+
+
+def LabeledTree.frontier
+  {α : Type} :
+  LabeledTree α → List α
+  | descendents root n xs =>
+    if n = 0
+    then [root]
+    else (List.ofFn (fun i : Fin n => (xs i).frontier)).join
