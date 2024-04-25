@@ -381,9 +381,3 @@ def CFG.produces
   (s : List g.T) :
   Prop :=
   derives g [Sum.inl g.S] (s.map Sum.inr)
-
-
-def CFG.languageOf
-  (g : CFG) :
-  Set (List g.T) :=
-  { s : List g.T | g.produces s }
