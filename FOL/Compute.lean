@@ -383,6 +383,12 @@ def CFG.produces
   derives g [Sum.inl g.S] (s.map Sum.inr)
 
 
+def CFG.languageOf
+  (g : CFG) :
+  Set (List g.T) :=
+  { s : List g.T | g.produces s }
+
+
 inductive LabeledTree (α : Type) : Type
   | descendents (root : α) (n : ℕ) : (Fin n → LabeledTree α) → LabeledTree α
 
