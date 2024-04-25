@@ -381,3 +381,8 @@ def CFG.produces
   (s : List g.T) :
   Prop :=
   derives g [Sum.inl g.S] (s.map Sum.inr)
+
+
+inductive LabeledTree (α : Type) : Type
+  | root : α → LabeledTree α
+  | descendents (n : ℕ) : (Fin n → LabeledTree α) → LabeledTree α
