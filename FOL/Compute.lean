@@ -452,7 +452,7 @@ inductive isPartialDerivationTree
   (g : CFG) :
   g.N → List (g.N ⊕ g.T) → LabeledTree (g.N ⊕ g.T) → Prop
 
-  | blah
+  | mk
     (A : g.N)
     (w : List (g.N ⊕ g.T))
     (T : LabeledTree (g.N ⊕ g.T)) :
