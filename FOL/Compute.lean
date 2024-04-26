@@ -446,3 +446,18 @@ def LabeledTree.frontier
     if n = 0
     then [root]
     else (List.ofFn (fun i : Fin n => (xs i).frontier)).join
+
+
+inductive isPartialDerivationTree
+  (g : CFG) :
+  g.N → List (g.N ⊕ g.T) → LabeledTree (g.N ⊕ g.T) → Prop
+
+  | blah
+    (A : g.N)
+    (w : List (g.N ⊕ g.T))
+    (T : LabeledTree (g.N ⊕ g.T)) :
+    T.root = Sum.inl A →
+    T.frontier = w →
+    (A, (T.descendentList.map LabeledTree.root)) ∈ g.P →
+    (∀ (d : LabeledTree (g.N ⊕ g.T)), d ∈ T.descendentList → (h : d.root.isLeft) → isPartialDerivationTree g (d.root.getLeft h) d.frontier d) →
+    isPartialDerivationTree g A w T
