@@ -1,3 +1,4 @@
+import Mathlib.Util.CompileInductive
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finset.Basic
 
@@ -392,21 +393,43 @@ def CFG.languageOf
 
 
 inductive LabeledTree (α : Type) : Type
-  | descendents (root : α) (n : ℕ) : (Fin n → LabeledTree α) → LabeledTree α
+  | descendents (root : α) (k : ℕ) :
+      (Fin k → LabeledTree α) → LabeledTree α
+
+compile_inductive% LabeledTree
 
 open LabeledTree
-
-
-def LabeledTree.isLeaf
-  {α : Type} :
-  LabeledTree α → Prop
-  | descendents _ n _ => n = 0
 
 
 def LabeledTree.root
   {α : Type} :
   LabeledTree α → α
   | descendents root _ _ => root
+
+
+def LabeledTree.order
+  {α : Type} :
+  LabeledTree α → ℕ
+  | descendents _ k _ => k
+
+
+def LabeledTree.descendentList
+  {α : Type} :
+  LabeledTree α → List (LabeledTree α)
+  | descendents _ _ ds => List.ofFn ds
+
+
+def LabeledTree.isLeaf
+  {α : Type}
+  (T : LabeledTree α) :
+  Prop :=
+  T.order = 0
+
+instance (α : Type) (T : LabeledTree α) : Decidable (isLeaf T) :=
+  by
+  induction T
+  simp only [isLeaf]
+  infer_instance
 
 
 def LabeledTree.frontier
