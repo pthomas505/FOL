@@ -355,8 +355,11 @@ structure CFG :=
   (T : Type)
   (T_finite : Finite T)
   (T_nonempty: Nonempty T)
-  (P : Set (N × List (N ⊕ T)))
+  (P : Set (N × (List (N ⊕ T))))
   (S : N)
+
+def g_1 : CFG := ⟨ Char, sorry, by infer_instance, Char, sorry, by infer_instance, {('S', [Sum.inl 'a'])}, 'S' ⟩
+
 
 
 inductive derives
