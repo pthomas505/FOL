@@ -350,7 +350,7 @@ example
 structure CFG :=
   (N : Type)
   (T : Type)
-  (P : N → List (N ⊕ T))
+  (P : N → List (N ⊕ T) → Prop)
   (S : N)
 
 
@@ -364,9 +364,11 @@ inductive derives
 
 | step
   (s1 s2 s3 : List (g.N ⊕ g.T))
-  (subject : g.N) :
+  (subject : g.N)
+  (rhs : List (g.N ⊕ g.T)) :
   derives g s1 (s2 ++ (Sum.inl subject :: s3)) →
-  derives g s1 (s2 ++ g.P subject ++ s3)
+  g.P subject rhs →
+  derives g s1 (s2 ++ rhs ++ s3)
 
 
 def CFG.generates
@@ -399,6 +401,12 @@ def LabeledTree.isLeaf
   {α : Type} :
   LabeledTree α → Prop
   | descendents _ n _ => n = 0
+
+
+def LabeledTree.root
+  {α : Type} :
+  LabeledTree α → α
+  | descendents root _ _ => root
 
 
 def LabeledTree.frontier
