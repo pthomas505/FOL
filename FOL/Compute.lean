@@ -464,3 +464,11 @@ inductive isPartialDerivationTree
     (A, (T.descendentList.map LabeledTree.root)) ∈ g.P →
     (∀ (d : LabeledTree (g.N ⊕ g.T)), d ∈ T.descendentList → (h : d.root.isLeft) → isPartialDerivationTree g (d.root.getLeft h) d.frontier d) →
     isPartialDerivationTree g A w T
+
+
+def isDerivationTree
+  (g : CFG)
+  (w : List (g.N ⊕ g.T))
+  (T : LabeledTree (g.N ⊕ g.T)) :
+  Prop :=
+  isPartialDerivationTree g g.S w T
