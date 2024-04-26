@@ -439,13 +439,16 @@ instance (α : Type) (T : LabeledTree α) : Decidable (isLeaf T) :=
   infer_instance
 
 
+/--
+  The roots of all of the leaves.
+-/
 def LabeledTree.frontier
   {α : Type} :
   LabeledTree α → List α
-  | descendents root n xs =>
+  | descendents root n ds =>
     if n = 0
     then [root]
-    else (List.ofFn (fun i : Fin n => (xs i).frontier)).join
+    else (List.ofFn (fun i : Fin n => (ds i).frontier)).join
 
 
 inductive isPartialDerivationTree
