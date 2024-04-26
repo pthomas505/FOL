@@ -350,8 +350,12 @@ example
 -/
 structure CFG :=
   (N : Type)
+  (N_finite : Finite N)
+  (N_nonempty: Nonempty N)
   (T : Type)
-  (P : N → List (N ⊕ T) → Prop)
+  (T_finite : Finite T)
+  (T_nonempty: Nonempty T)
+  (P : Set (N × List (N ⊕ T)))
   (S : N)
 
 
@@ -368,7 +372,7 @@ inductive derives
   (subject : g.N)
   (rhs : List (g.N ⊕ g.T)) :
   derives g s1 (s2 ++ (Sum.inl subject :: s3)) →
-  g.P subject rhs →
+  (subject, rhs) ∈ g.P  →
   derives g s1 (s2 ++ rhs ++ s3)
 
 
