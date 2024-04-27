@@ -458,3 +458,36 @@ def LabeledTree.frontier
     if order = 0
     then [label]
     else (List.ofFn (fun i : Fin order => (children i).frontier)).join
+
+
+inductive isDerivationNode
+  (g : CFG) :
+  LabeledTree (g.N ⊕ g.T) → Prop
+
+  | non_terminal
+    (T : LabeledTree (g.N ⊕ g.T))
+    (h : T.label.isLeft) :
+    ¬ T.isLeaf →
+    (T.label.getLeft h, (List.ofFn T.children).map label) ∈ g.P →
+    (∀ (i : Fin T.order), isDerivationNode g (T.children i)) →
+    isDerivationNode g T
+
+  | terminal
+    (T : LabeledTree (g.N ⊕ g.T)) :
+    T.label.isRight →
+    T.isLeaf →
+    isDerivationNode g T
+
+
+
+
+theorem thm_2_1
+  (g : CFG)
+  (A : g.N)
+  (w : List (g.N ⊕ g.T))
+  (T : LabeledTree (g.N ⊕ g.T))
+  (h1 : isPartialDerivationTree g T) :
+  derives g [Sum.inl A] w :=
+  by
+  induction T
+  case node label order children ih
