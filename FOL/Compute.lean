@@ -358,10 +358,10 @@ structure CFG :=
   (P : Set (N × (List (N ⊕ T))))
   (S : N)
 
-def g_1 : CFG := ⟨ Char, sorry, by infer_instance, Char, sorry, by infer_instance, {('S', [Sum.inl 'a'])}, 'S' ⟩
 
-
-
+/--
+  derives g a b := b  a =>_g^* b
+-/
 inductive derives
   (g : CFG) :
   List (g.N ⊕ g.T) → List (g.N ⊕ g.T) → Prop
@@ -400,30 +400,39 @@ def CFG.languageOf
 
 
 inductive LabeledTree (α : Type) : Type
-  | descendents (root : α) (k : ℕ) :
-      (Fin k → LabeledTree α) → LabeledTree α
+  | node
+    (label : α)
+    (order : ℕ)
+    (children : Fin order → LabeledTree α) :
+    LabeledTree α
 
 compile_inductive% LabeledTree
 
 open LabeledTree
 
 
-def LabeledTree.root
-  {α : Type} :
-  LabeledTree α → α
-  | descendents root _ _ => root
+def LabeledTree.label
+  {α : Type}
+  (T : LabeledTree α) :
+  α :=
+  match T with
+  | node label _ _ => label
 
 
 def LabeledTree.order
-  {α : Type} :
-  LabeledTree α → ℕ
-  | descendents _ k _ => k
+  {α : Type}
+  (T : LabeledTree α) :
+  ℕ :=
+  match T with
+  | node _ order _ => order
 
 
-def LabeledTree.descendentList
-  {α : Type} :
-  LabeledTree α → List (LabeledTree α)
-  | descendents _ _ ds => List.ofFn ds
+def LabeledTree.children
+  {α : Type}
+  (T : LabeledTree α) :
+  Fin T.order → LabeledTree α :=
+  match T with
+  | node _ _ children => children
 
 
 def LabeledTree.isLeaf
@@ -440,35 +449,12 @@ instance (α : Type) (T : LabeledTree α) : Decidable (isLeaf T) :=
 
 
 /--
-  The roots of all of the leaves.
+  The leaves of the tree from left to right.
 -/
 def LabeledTree.frontier
   {α : Type} :
   LabeledTree α → List α
-  | descendents root n ds =>
-    if n = 0
-    then [root]
-    else (List.ofFn (fun i : Fin n => (ds i).frontier)).join
-
-
-inductive isPartialDerivationTree
-  (g : CFG) :
-  g.N → List (g.N ⊕ g.T) → LabeledTree (g.N ⊕ g.T) → Prop
-
-  | mk
-    (A : g.N)
-    (w : List (g.N ⊕ g.T))
-    (T : LabeledTree (g.N ⊕ g.T)) :
-    T.root = Sum.inl A →
-    T.frontier = w →
-    (A, (T.descendentList.map LabeledTree.root)) ∈ g.P →
-    (∀ (d : LabeledTree (g.N ⊕ g.T)), d ∈ T.descendentList → (h : d.root.isLeft) → isPartialDerivationTree g (d.root.getLeft h) d.frontier d) →
-    isPartialDerivationTree g A w T
-
-
-def isDerivationTree
-  (g : CFG)
-  (w : List (g.N ⊕ g.T))
-  (T : LabeledTree (g.N ⊕ g.T)) :
-  Prop :=
-  isPartialDerivationTree g g.S w T
+  | node label order children =>
+    if order = 0
+    then [label]
+    else (List.ofFn (fun i : Fin order => (children i).frontier)).join
