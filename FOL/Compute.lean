@@ -194,6 +194,15 @@ inductive RegExp (α : Type) : Type
   | union : RegExp α → RegExp α → RegExp α
   | concat : RegExp α → RegExp α → RegExp α
   | closure : RegExp α → RegExp α
+  deriving Repr
+
+
+def RegExp.concat_n {α : Type} (R : RegExp α) : ℕ → RegExp α
+  | 0 => RegExp.epsilon
+  | (n + 1) => RegExp.concat R (RegExp.concat_n R n)
+
+#eval RegExp.concat_n (RegExp.char 'a') 0
+#eval RegExp.concat_n (RegExp.char 'a') 1
 
 
 def RegExp.languageOf (α : Type) : RegExp α → Set (List α)
@@ -201,8 +210,12 @@ def RegExp.languageOf (α : Type) : RegExp α → Set (List α)
   | epsilon => { [] }
   | zero => ∅
   | union R S => R.languageOf ∪ S.languageOf
+
+  -- For each string r in L(R) and each string s in L(S), the string rs, the concatenation of strings r and s, is in L(RS).
   | concat R S => { r ++ s | (r ∈ R.languageOf) (s ∈ S.languageOf) }
-  | closure R => sorry
+
+  -- l is the concatenation of a list of strings, each of which is in L(R).
+  | closure R => { l | ∃ rs : List (List α), (∀ (r : List α), r ∈ rs → r ∈ R.languageOf) ∧ rs.join = l }
 
 
 example
@@ -333,10 +346,20 @@ example
   sorry
 
 
+/--
+  The Brzozowski derivative u^{-1}S of a set S of strings and a string u is the set of all strings obtainable from a string in S by cutting off the prefix u.
+-/
+def Brzozowski_derivative
+  (S : Set (String))
+  (u : String) :
+  Set String :=
+  { v : String | u ++ v ∈ S }
+
+
 -----
 
 -- https://arxiv.org/pdf/1509.02032.pdf
-
+/-
 /-
   The definition of a context free grammar.
 
@@ -477,3 +500,51 @@ inductive isParseNode
     T.label.isRight →
     T.isLeaf →
     isParseNode g T
+-/
+
+
+
+/-
+structure Grammar (Symbol : Type) [DecidableEq Symbol] :=
+  -- The set of nonterminal symbols.
+  (N : Finset Symbol)
+  (N_nonempty : Nonempty N)
+
+  -- The set of terminal symbols.
+  (T : Finset Symbol)
+  (T_nonempty : Nonempty T)
+
+  (N_T_disjoint : Disjoint N T)
+
+  -- The set of productions.
+  (P : Finset (N × (List (N ⊕ T))))
+
+  -- The start symbol.
+  (S : N)
+
+
+inductive SententialForm (Symbol : Type) [DecidableEq Symbol] (G : Grammar Symbol) : Prop
+  | start : G.S → SententialForm Symbol G
+  | derive (subject : SententialForm Symbol G) :
+-/
+
+/-
+Our definition of a language L is a set of finite-length strings over some finite alphabet Σ.
+-/
+
+
+/-
+  An alphabet Σ is a finite, non-empty set of indivisible symbols.
+  A string over an alphabet Σ is a finite sequence of members of Σ.
+  The set of all strings over an alphabet Σ is denoted Σ*.
+  A language L is a set of strings over some alphabet Σ. Hence L is a subset of Σ*.
+
+  A grammar is a 4-tuple G = (N, Σ, P, S) where
+  (1) N is a finite set of nonterminal symbols (sometimes called variables or
+syntactic categories).
+  (2) Σ is a finite set of terminal symbols, disjoint from N.
+  (3) P is a finite subset of (N ∪ Σ)* N (N ∪ Σ)* x (N ∪ Σ)*.
+  An element (α, β) in P will be written α → β and called a production.
+  (4) S is a distinguished symbol in N called the sentence (or start) symbol.
+
+-/
