@@ -360,7 +360,23 @@ example
   (R : RegExp α) :
   (RegExp.concat R (RegExp.closure R)).languageOf = (RegExp.concat (RegExp.closure R) R).languageOf :=
   by
-  sorry
+  simp only [RegExp.languageOf]
+  ext cs
+  simp
+  constructor
+  · intro a1
+    apply Exists.elim a1
+    intro r a2
+    clear a1
+    cases a2
+    case _ a2_left a2_right =>
+      apply Exists.elim a2_right
+      intro rs a3
+      clear a2_right
+      cases a3
+      case _ a3_left a3_right =>
+        sorry
+  · sorry
 
 
 /--
