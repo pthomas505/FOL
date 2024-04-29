@@ -335,7 +335,24 @@ example
 
 example
   {α : Type} :
-  (RegExp.closure RegExp.zero).languageOf α = RegExp.epsilon.languageOf := sorry
+  (RegExp.closure RegExp.zero).languageOf α = RegExp.epsilon.languageOf :=
+  by
+  simp only [RegExp.languageOf]
+  ext cs
+  simp
+  constructor
+  · intro a1
+    apply Exists.elim a1
+    intro rs a2
+    cases a2
+    case _ a2_left a2_right =>
+      simp only [← a2_right]
+      simp only [← List.eq_nil_iff_forall_not_mem] at a2_left
+      simp only [a2_left]
+      simp
+  · intro a1
+    apply Exists.intro []
+    tauto
 
 
 example
