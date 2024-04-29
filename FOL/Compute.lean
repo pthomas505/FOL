@@ -355,6 +355,13 @@ example
     tauto
 
 
+lemma blah
+  (α : Type)
+  (r : α)
+  (rs : List α) :
+  ∃ (r' : α) (rs' : List α), r :: rs = rs' ++ [r'] :=
+  by sorry
+
 example
   {α : Type}
   (R : RegExp α) :
@@ -375,7 +382,35 @@ example
       clear a2_right
       cases a3
       case _ a3_left a3_right =>
-        sorry
+        · have s1 : ∀ s ∈ r :: rs, s ∈ RegExp.languageOf α R
+          simp
+          tauto
+          have s2 := blah _ r rs
+          apply Exists.elim s2
+          intro r' a4
+          apply Exists.elim a4
+          intro rs' a5
+          simp only [a5] at s1
+          simp at s1
+          clear s2
+          clear a4
+          apply Exists.intro rs'
+          constructor
+          · intro s a6
+            apply s1
+            tauto
+          · apply Exists.intro r'
+            constructor
+            · apply s1
+              simp
+            · have s3 : r ++ List.join rs = List.join (r :: rs)
+              simp
+              simp only [s3] at a3_right
+              have s4 : List.join rs' ++ r' = List.join (rs' ++ [r'])
+              simp
+              simp only [s4]
+              simp only [← a5]
+              exact a3_right
   · sorry
 
 
