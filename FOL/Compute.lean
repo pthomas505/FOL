@@ -340,17 +340,6 @@ example
     simp only [a1]
 
 
-lemma blah
-  (α : Type)
-  (r : α)
-  (rs : List α) :
-  ∃ (r' : α) (rs' : List α), r :: rs = rs' ++ [r'] :=
-  by
-  obtain s1 := List.eq_nil_or_concat (r :: rs)
-  simp at s1
-  aesop
-
-
 example
   {α : Type}
   (R : RegExp α) :
@@ -364,42 +353,57 @@ example
     apply Exists.elim a1
     intro r a2
     clear a1
+
     cases a2
     case _ a2_left a2_right =>
       apply Exists.elim a2_right
       intro rs a3
       clear a2_right
+
       cases a3
       case _ a3_left a3_right =>
-        · have s1 : ∀ s ∈ r :: rs, s ∈ RegExp.languageOf α R
+        · have s1 := List.eq_nil_or_concat (r :: rs)
+          simp at s1
+
+          apply Exists.elim s1
+          intro rs' a4
+          clear s1
+
+          apply Exists.elim a4
+          intro r' a5
+          clear a4
+
+          have s2 : ∀ (x : List α), x ∈ (r :: rs) → x ∈ RegExp.languageOf α R
           simp
           tauto
-          have s2 := blah _ r rs
-          apply Exists.elim s2
-          intro r' a4
-          apply Exists.elim a4
-          intro rs' a5
-          simp only [a5] at s1
-          simp at s1
-          clear s2
-          clear a4
+
           apply Exists.intro rs'
           constructor
-          · intro s a6
-            apply s1
-            tauto
+          · intro x a6
+            apply s2
+            simp only [a5]
+            simp
+            left
+            exact a6
+
           · apply Exists.intro r'
             constructor
-            · apply s1
+            · apply s2
+              simp only [a5]
               simp
-            · have s3 : r ++ List.join rs = List.join (r :: rs)
+            · simp only [← a3_right]
+
+              have s3 : List.join rs' ++ r' = List.join (rs' ++ [r'])
               simp
-              simp only [s3] at a3_right
-              have s4 : List.join rs' ++ r' = List.join (rs' ++ [r'])
+
+              simp only [s3]
+
+              have s4 : r ++ List.join rs = List.join (r :: rs)
               simp
+
               simp only [s4]
-              simp only [← a5]
-              exact a3_right
+
+              simp only [a5]
   · sorry
 
 
