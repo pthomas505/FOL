@@ -404,7 +404,54 @@ example
               simp only [s4]
 
               simp only [a5]
-  · sorry
+  · intro a1
+    apply Exists.elim a1
+    intro rs a2
+    clear a1
+    cases a2
+    case _ a2_left a2_right =>
+      apply Exists.elim a2_right
+      intro r a3
+      clear a2_right
+      cases a3
+      case _ a3_left a3_right =>
+        subst a3_right
+
+        have s2 : List.join rs ++ r = List.join (rs ++ [r])
+        simp
+
+        simp only [s2]
+        clear s2
+
+        have s3 : r ++ List.join rs = List.join ([r] ++ rs)
+        simp
+
+        cases rs
+        case nil =>
+          apply Exists.intro r
+          constructor
+          · exact a3_left
+          · apply Exists.intro []
+            simp
+        case cons hd tl =>
+          simp at a2_left
+          cases a2_left
+          case _ a2_left_left a2_left_right =>
+            apply Exists.intro hd
+            constructor
+            · exact a2_left_left
+            · apply Exists.intro (tl ++ [r])
+              constructor
+              · simp
+                intro r' a4
+                cases a4
+                case _ a4_left =>
+                  apply a2_left_right
+                  exact a4_left
+                case _ a4_right =>
+                  subst a4_right
+                  exact a3_left
+              · simp
 
 
 /--
