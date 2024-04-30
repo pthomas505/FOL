@@ -197,14 +197,6 @@ inductive RegExp (α : Type) : Type
   deriving Repr
 
 
-def RegExp.concat_n {α : Type} (R : RegExp α) : ℕ → RegExp α
-  | 0 => RegExp.epsilon
-  | (n + 1) => RegExp.concat R (RegExp.concat_n R n)
-
-#eval RegExp.concat_n (RegExp.char 'a') 0
-#eval RegExp.concat_n (RegExp.char 'a') 1
-
-
 def RegExp.languageOf (α : Type) : RegExp α → Set (List α)
   | char x => { [x] }
   | epsilon => { [] }
@@ -341,18 +333,11 @@ example
   ext cs
   simp
   constructor
-  · intro a1
-    apply Exists.elim a1
-    intro rs a2
-    cases a2
-    case _ a2_left a2_right =>
-      simp only [← a2_right]
-      simp only [← List.eq_nil_iff_forall_not_mem] at a2_left
-      simp only [a2_left]
-      simp
+  · aesop
   · intro a1
     apply Exists.intro []
-    tauto
+    simp
+    simp only [a1]
 
 
 lemma blah
@@ -360,7 +345,11 @@ lemma blah
   (r : α)
   (rs : List α) :
   ∃ (r' : α) (rs' : List α), r :: rs = rs' ++ [r'] :=
-  by sorry
+  by
+  obtain s1 := List.eq_nil_or_concat (r :: rs)
+  simp at s1
+  aesop
+
 
 example
   {α : Type}
