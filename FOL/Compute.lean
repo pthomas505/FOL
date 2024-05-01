@@ -536,13 +536,57 @@ example
     simp only [RegExp.languageOf]
     simp
   case union r s r_ih s_ih =>
-    simp only [RegExp.Brzozowski_derivative_set]
-    simp only [RegExp.Brzozowski_derivative]
     simp only [RegExp.languageOf]
     simp
     simp only [← r_ih]
     simp only [← s_ih]
+    simp only [RegExp.Brzozowski_derivative_set]
+    simp only [RegExp.languageOf]
+    simp
+  case concat r s r_ih s_ih =>
+    simp only [RegExp.Brzozowski_derivative_set] at r_ih
+    simp at r_ih
 
+    simp only [RegExp.Brzozowski_derivative_set] at s_ih
+    simp at s_ih
+
+    simp only [RegExp.Brzozowski_derivative_set]
+    simp
+
+    simp only [RegExp.Brzozowski_derivative]
+
+    simp only [RegExp.languageOf]
+    simp
+
+    constructor
+    · intro a1
+      apply Exists.elim a1
+      intro r' a2
+      clear a1
+      cases a2
+      case _ a2_left a2_right =>
+        apply Exists.elim a2_right
+        intro s' a3
+        clear a2_right
+        cases a3
+        case _ a3_left a3_right =>
+          sorry
+    · intro a1
+      cases a1
+      case _ a1_left =>
+        apply Exists.elim a1_left
+        intro r' a2
+        clear a1_left
+        cases a2
+        case _ a2_left a2_right =>
+          apply Exists.elim a2_right
+          intro s' a3
+          clear a2_right
+          cases a3
+          case _ a3_left a3_right =>
+            sorry
+      case _ a1_right =>
+        sorry
 
 
 -----
