@@ -480,6 +480,15 @@ def RegExp.delta
   | closure _ => RegExp.epsilon
 
 
+def RegExp.Brzozowski_derivative_set
+  {α : Type}
+  [DecidableEq α]
+  (r : RegExp α)
+  (a : α) :
+  Set (List α) :=
+  {w : List α | (a :: w) ∈ r.languageOf}
+
+
 def RegExp.Brzozowski_derivative
   {α : Type}
   [DecidableEq α]
@@ -491,6 +500,49 @@ def RegExp.Brzozowski_derivative
   | union r s => RegExp.union (r.Brzozowski_derivative a) (s.Brzozowski_derivative a)
   | concat r s => RegExp.union (RegExp.concat (r.Brzozowski_derivative a) s) (RegExp.concat r.delta (s.Brzozowski_derivative a))
   | closure r => RegExp.concat (r.Brzozowski_derivative a) r.closure
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (r : RegExp α)
+  (a : α) :
+  RegExp.Brzozowski_derivative_set r a = (r.Brzozowski_derivative a).languageOf :=
+  by
+  ext cs
+  induction r generalizing a
+  case char a b =>
+    simp only [RegExp.Brzozowski_derivative_set]
+    simp only [RegExp.Brzozowski_derivative]
+    split_ifs
+    case pos c1 =>
+      simp only [RegExp.languageOf]
+      simp
+      intro _
+      exact c1
+    case neg c1 =>
+      simp only [RegExp.languageOf]
+      simp
+      intro contra
+      contradiction
+  case epsilon =>
+    simp only [RegExp.Brzozowski_derivative_set]
+    simp only [RegExp.Brzozowski_derivative]
+    simp only [RegExp.languageOf]
+    simp
+  case zero =>
+    simp only [RegExp.Brzozowski_derivative_set]
+    simp only [RegExp.Brzozowski_derivative]
+    simp only [RegExp.languageOf]
+    simp
+  case union r s r_ih s_ih =>
+    simp only [RegExp.Brzozowski_derivative_set]
+    simp only [RegExp.Brzozowski_derivative]
+    simp only [RegExp.languageOf]
+    simp
+    simp only [← r_ih]
+    simp only [← s_ih]
+
 
 
 -----
