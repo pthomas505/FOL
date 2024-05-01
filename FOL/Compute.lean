@@ -464,6 +464,35 @@ def Brzozowski_derivative
   { v : String | u ++ v ∈ S }
 
 
+/-
+The derivative, D_a(r) of a regular expression r by alphabet letter a is defined as D_a(r) = {w : aw ∈ r}. The derivative represents the set of continuations after letter a that the regular expression r can match.
+-/
+
+
+def RegExp.delta
+  {α : Type} :
+  RegExp α → RegExp α
+  | char _ => RegExp.zero
+  | epsilon => RegExp.epsilon
+  | zero => RegExp.zero
+  | union r s => RegExp.union r.delta s.delta
+  | concat r s => RegExp.concat r.delta s.delta
+  | closure _ => RegExp.epsilon
+
+
+def RegExp.Brzozowski_derivative
+  {α : Type}
+  [DecidableEq α]
+  (a : α) :
+  RegExp α → RegExp α
+  | char b => if a = b then RegExp.epsilon else RegExp.zero
+  | epsilon => RegExp.zero
+  | zero => RegExp.zero
+  | union r s => RegExp.union (r.Brzozowski_derivative a) (s.Brzozowski_derivative a)
+  | concat r s => RegExp.union (RegExp.concat (r.Brzozowski_derivative a) s) (RegExp.concat r.delta (s.Brzozowski_derivative a))
+  | closure r => RegExp.concat (r.Brzozowski_derivative a) r.closure
+
+
 -----
 
 -- https://arxiv.org/pdf/1509.02032.pdf
