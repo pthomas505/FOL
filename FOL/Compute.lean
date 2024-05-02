@@ -196,6 +196,10 @@ inductive RegExp (α : Type) : Type
   | closure : RegExp α → RegExp α
   deriving Repr
 
+compile_inductive% RegExp
+
+open RegExp
+
 
 def RegExp.languageOf (α : Type) : RegExp α → Set (List α)
   | char x => { [x] }
@@ -454,6 +458,25 @@ example
               · simp
 
 
+def RegExpToNAAux
+  {α : Type} :
+  (List ℕ × RegExp α × List ℕ) → Set (List ℕ × RegExp α × List ℕ)
+  | (q, char x, p) => {(q, char x, p)}
+  | (q, epsilon, p) => {(q, epsilon, p)}
+  | (q, zero, p) => {(q, zero, p)}
+  | (q, union R S, p) =>
+      RegExpToNAAux (q, R, p) ∪ RegExpToNAAux (q, S, p)
+  | (q, concat R S, p) =>
+      let q1 := q ++ p
+      RegExpToNAAux (q, R, q1) ∪ RegExpToNAAux (q1, S, p)
+  | (q, closure R, p) =>
+      let q1 := q ++ p
+      let p1 := p ++ q
+      RegExpToNAAux (q, epsilon, p) ∪ RegExpToNAAux (q, epsilon, q1) ∪ RegExpToNAAux (q1, R, p1) ∪ RegExpToNAAux (p1, epsilon, q1) ∪ RegExpToNAAux (p1, epsilon, p)
+  termination_by _ _ r => r
+  decreasing_by sorry
+
+
 /--
   The Brzozowski derivative u^{-1}S of a set S of strings and a string u is the set of all strings obtainable from a string in S by cutting off the prefix u.
 -/
@@ -510,7 +533,7 @@ example
   RegExp.Brzozowski_derivative_set r a = (r.Brzozowski_derivative a).languageOf :=
   by
   ext cs
-  induction r generalizing a
+  induction r
   case char a b =>
     simp only [RegExp.Brzozowski_derivative_set]
     simp only [RegExp.Brzozowski_derivative]
@@ -587,7 +610,35 @@ example
             sorry
       case _ a1_right =>
         sorry
+  case closure r r_ih =>
+    simp only [RegExp.Brzozowski_derivative_set] at r_ih
+    simp at r_ih
 
+    simp only [RegExp.Brzozowski_derivative_set]
+    simp only [RegExp.Brzozowski_derivative]
+    simp only [RegExp.languageOf]
+    simp
+    constructor
+    · intro a1
+      apply Exists.elim a1
+      intro rs a2
+      clear a1
+      cases a2
+      case _ a2_left a2_right =>
+        simp only [← a2_right] at r_ih
+        cases r_ih
+        case _ mp mpr =>
+          cases rs
+          case nil =>
+            simp at a2_right
+          case cons hd tl =>
+            simp at a2_left
+            cases a2_left
+            case _ a2_left_left a2_left_right =>
+              simp at a2_right
+              apply Exists.intro cs
+              sorry
+    · sorry
 
 -----
 
