@@ -458,25 +458,6 @@ example
               · simp
 
 
-def RegExpToNAAux
-  {α : Type} :
-  (List ℕ × RegExp α × List ℕ) → Set (List ℕ × RegExp α × List ℕ)
-  | (q, char x, p) => {(q, char x, p)}
-  | (q, epsilon, p) => {(q, epsilon, p)}
-  | (q, zero, p) => {(q, zero, p)}
-  | (q, union R S, p) =>
-      RegExpToNAAux (q, R, p) ∪ RegExpToNAAux (q, S, p)
-  | (q, concat R S, p) =>
-      let q1 := q ++ p
-      RegExpToNAAux (q, R, q1) ∪ RegExpToNAAux (q1, S, p)
-  | (q, closure R, p) =>
-      let q1 := q ++ p
-      let p1 := p ++ q
-      RegExpToNAAux (q, epsilon, p) ∪ RegExpToNAAux (q, epsilon, q1) ∪ RegExpToNAAux (q1, R, p1) ∪ RegExpToNAAux (p1, epsilon, q1) ∪ RegExpToNAAux (p1, epsilon, p)
-  termination_by _ _ r => r
-  decreasing_by sorry
-
-
 /--
   The Brzozowski derivative u^{-1}S of a set S of strings and a string u is the set of all strings obtainable from a string in S by cutting off the prefix u.
 -/
