@@ -481,9 +481,9 @@ inductive RegExp (α : Type) [DecidableEq α] : Type
 
   `symbolSet` is the set of all of the symbols that the automaton can step from one state in `stateSet` to another on.
 
-  If the automaton `e` is at state `s` and the input sequence is `c :: cs` and there is a step `(s, Option.some c, S)` in `e.stepList`, then `e` simultaneously transitions to each of the states in `S` and the input sequence becomes `cs`.
+  If the automaton `e` is at state `s` and the input sequence is `c :: cs` and there is a step `((s, Option.some c), S)` in `e.stepList`, then `e` simultaneously transitions to each of the states in `S` and the input sequence becomes `cs`.
 
-  If the automation `e` is at state `s` and the input sequence is `cs` and there is a step `(s, Option.none, S)` in `e.stepList`, then `e` simultaneously transitions to each of the states in `S` and the input sequence remains `cs`.
+  If the automation `e` is at state `s` and the input sequence is `cs` and there is a step `((s, Option.none), S)` in `e.stepList`, then `e` simultaneously transitions to each of the states in `S` and the input sequence remains `cs`.
 
   `startingStateList` is the list of states that the automaton starts at.
 
