@@ -502,6 +502,44 @@ structure NDA
   (acceptingStateSet : Set σ)
 
 
+def stepListToFunAux
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (stepList : List (σ × Option α × Set σ))
+  (acc : Set σ)
+  (s : σ)
+  (c : α) :
+  Set σ :=
+  match stepList with
+  | [] => acc
+  | (state, Option.some symbol, state_set) :: tl =>
+    let S :=
+      if state = s ∧ symbol = c
+      then state_set
+      else {}
+    stepListToFunAux tl (acc ∪ S) s c
+  | (state, Option.none, state_set) :: tl =>
+    let S :=
+      if state = s
+      then state_set
+      else {}
+    stepListToFunAux tl (acc ∪ S) s c
+
+
+def stepListToFun
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (stepList : List (σ × Option α × Set σ))
+  (state : σ)
+  (symbol : α) :
+  Set σ :=
+  stepListToFunAux stepList {} state symbol
+
+
 def NDA.wrapLeft
   {α : Type}
   [DecidableEq α]
