@@ -538,7 +538,7 @@ def NDA.wrapRight
   }
 
 
-def charNDA
+def match_char_NDA
   (α : Type)
   [DecidableEq α]
   (c : α) :
@@ -552,7 +552,7 @@ def charNDA
   }
 
 
-def epsilonNDA
+def match_epsilon_NDA
   (α : Type)
   [DecidableEq α] :
   NDA α ℕ :=
@@ -565,7 +565,7 @@ def epsilonNDA
   }
 
 
-def zeroNDA
+def match_zero_NDA
   (α : Type)
   [DecidableEq α] :
   NDA α ℕ :=
@@ -578,7 +578,7 @@ def zeroNDA
   }
 
 
-def unionNDA
+def match_union_NDA
   (α : Type)
   [DecidableEq α]
   (σ_0 σ_1 : Type)
@@ -609,7 +609,7 @@ def unionNDA
   }
 
 
-def concatNDA
+def match_concat_NDA
   (α : Type)
   [DecidableEq α]
   (σ_0 σ_1 : Type)
@@ -632,7 +632,7 @@ def concatNDA
   }
 
 
-def closureNDA
+def match_closure_NDA
   (α : Type)
   [DecidableEq α]
   (σ : Type)
