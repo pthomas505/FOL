@@ -509,23 +509,23 @@ def stepListToFunAux
   [DecidableEq σ]
   (stepList : List (σ × Option α × Set σ))
   (acc : Set σ)
-  (s : σ)
-  (c : α) :
+  (lookup_state : σ)
+  (lookup_symbol : α) :
   Set σ :=
   match stepList with
   | [] => acc
   | (state, Option.some symbol, state_set) :: tl =>
     let S :=
-      if state = s ∧ symbol = c
+      if state = lookup_state ∧ symbol = lookup_symbol
       then state_set
       else {}
-    stepListToFunAux tl (acc ∪ S) s c
+    stepListToFunAux tl (acc ∪ S) lookup_state lookup_symbol
   | (state, Option.none, state_set) :: tl =>
     let S :=
-      if state = s
+      if state = lookup_state
       then state_set
       else {}
-    stepListToFunAux tl (acc ∪ S) s c
+    stepListToFunAux tl (acc ∪ S) lookup_state lookup_symbol
 
 
 def stepListToFun
@@ -534,10 +534,10 @@ def stepListToFun
   {σ : Type}
   [DecidableEq σ]
   (stepList : List (σ × Option α × Set σ))
-  (state : σ)
-  (symbol : α) :
+  (lookup_state : σ)
+  (lookup_symbol : α) :
   Set σ :=
-  stepListToFunAux stepList {} state symbol
+  stepListToFunAux stepList {} lookup_state lookup_symbol
 
 
 def NDA.wrapLeft
