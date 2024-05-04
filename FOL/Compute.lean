@@ -481,13 +481,13 @@ inductive RegExp (α : Type) [DecidableEq α] : Type
 
   `symbolSet` is the set of all of the symbols that the automaton can step from one state in `stateSet` to another on.
 
-  If the automaton `e` is at state `s` and the input sequence is `c :: cs` and there is a step `(s, Option.some c, S)` in `e.stepSet`, then `e` simultaneously transitions to each of the states in `S` and the input sequence becomes `cs`.
+  If the automaton `e` is at state `s` and the input sequence is `c :: cs` and there is a step `(s, Option.some c, S)` in `e.stepList`, then `e` simultaneously transitions to each of the states in `S` and the input sequence becomes `cs`.
 
-  If the automation `e` is at state `s` and the input sequence is `cs` and there is a step `(s, Option.none, S)` in `e.stepSet`, then `e` simultaneously transitions to each of the states in `S` and the input sequence remains `cs`.
+  If the automation `e` is at state `s` and the input sequence is `cs` and there is a step `(s, Option.none, S)` in `e.stepList`, then `e` simultaneously transitions to each of the states in `S` and the input sequence remains `cs`.
 
   `startingState` is the state that the automaton starts at.
 
-  If the automaton `e` is at a state in `e.acceptingStateSet` and there are no remaining symbols in the input sequence, then `e` accepts the input sequence.
+  If the automaton `e` is at a state in `e.acceptingStateList` and there are no remaining symbols in the input sequence, then `e` accepts the input sequence.
 -/
 structure NDA
   (α : Type)
@@ -499,8 +499,8 @@ structure NDA
   (stateSet : Set σ)
   (symbolSet : Set α)
 -/
-  (stepList : List (σ × Option α × Set σ))
-  (startingState : σ)
+  (stepList : List (σ × Option α × List σ))
+  (startingStateList : List σ)
   (acceptingStateList : List σ)
 
 
@@ -575,8 +575,8 @@ def NDA.wrapLeft
     stateSet := e.stateSet.image Sum.inl
     symbolSet := e.symbolSet
 -/
-    stepList := e.stepList.map (fun (step : (σ_l × Option α × Set σ_l)) => (Sum.inl step.fst, step.snd.fst, step.snd.snd.image Sum.inl))
-    startingState := Sum.inl e.startingState
+    stepList := e.stepList.map (fun (step : (σ_l × Option α × List σ_l)) => (Sum.inl step.fst, step.snd.fst, step.snd.snd.map Sum.inl))
+    startingStateList := e.startingStateList.map Sum.inl
     acceptingStateList := e.acceptingStateList.map Sum.inl
   }
 
@@ -595,8 +595,8 @@ def NDA.wrapRight
     stateSet := e.stateSet.image Sum.inr
     symbolSet := e.symbolSet
 -/
-    stepList := e.stepList.map (fun (step : (σ_r × Option α × Set σ_r)) => (Sum.inr step.fst, step.snd.fst, step.snd.snd.image Sum.inr))
-    startingState := Sum.inr e.startingState
+    stepList := e.stepList.map (fun (step : (σ_r × Option α × List σ_r)) => (Sum.inr step.fst, step.snd.fst, step.snd.snd.map Sum.inr))
+    startingStateList := e.startingStateList.map Sum.inr
     acceptingStateList := e.acceptingStateList.map Sum.inr
   }
 
@@ -611,8 +611,8 @@ def match_char_NDA
     stateSet := {0, 1}
     symbolSet := {c}
 -/
-    stepList := [(0, Option.some c, {1})]
-    startingState := 0
+    stepList := [(0, Option.some c, [1])]
+    startingStateList := [0]
     acceptingStateList := [1]
   }
 
@@ -627,7 +627,7 @@ def match_epsilon_NDA
     symbolSet := {}
 -/
     stepList := []
-    startingState := 0
+    startingStateList := [0]
     acceptingStateList := [0]
   }
 
@@ -642,7 +642,7 @@ def match_zero_NDA
     symbolSet := {}
 -/
     stepList := []
-    startingState := 0
+    startingStateList := [0]
     acceptingStateList := []
   }
 
@@ -667,7 +667,7 @@ def match_union_NDA
   let new_starting_state : ℕ ⊕ (σ_0 ⊕ σ_1) := Sum.inl 0
 
   -- A step on epsilon (represented as Option.none) from the new starting state to both the starting state of e1'' and the starting state of e2''.
-  let new_starting_step : (ℕ ⊕ (σ_0 ⊕ σ_1)) × Option α × Set (ℕ ⊕ (σ_0 ⊕ σ_1)) := (new_starting_state, Option.none, {e1''.startingState, e2''.startingState})
+  let new_starting_step : (ℕ ⊕ (σ_0 ⊕ σ_1)) × Option α × List (ℕ ⊕ (σ_0 ⊕ σ_1)) := (new_starting_state, Option.none, List.dedup (e1''.startingStateList ++ e2''.startingStateList))
 
   {
 /-
@@ -675,7 +675,7 @@ def match_union_NDA
     symbolSet := e1''.symbolSet ∪ e2''.symbolSet
 -/
     stepList := new_starting_step :: e1''.stepList ++ e2''.stepList
-    startingState := new_starting_state
+    startingStateList := [new_starting_state]
     acceptingStateList := List.dedup (e1''.acceptingStateList ++ e2''.acceptingStateList)
   }
 
@@ -697,9 +697,9 @@ def match_concat_NDA
     symbolSet := e1'.symbolSet ∪ e2'.symbolSet
 -/
     -- Steps on epsilon from each of the accepting states of e1' to the starting state of e2'.
-    stepList := e1'.acceptingStateList.map (fun (state : σ_0 ⊕ σ_1) => (state, Option.none, {e2'.startingState}))
+    stepList := e1'.acceptingStateList.map (fun (state : σ_0 ⊕ σ_1) => (state, Option.none, e2'.startingStateList))
 
-    startingState := e1'.startingState
+    startingStateList := e1'.startingStateList
     acceptingStateList := e2'.acceptingStateList
   }
 
@@ -717,10 +717,10 @@ def match_closure_NDA
   let new_starting_state : ℕ ⊕ σ := Sum.inl 0
 
   -- A step on epsilon from the new starting state to the starting state of e'.
-  let new_starting_step : (ℕ ⊕ σ) × Option α × Set (ℕ ⊕ σ) := (new_starting_state, Option.none, {e'.startingState})
+  let new_starting_step : (ℕ ⊕ σ) × Option α × List (ℕ ⊕ σ) := (new_starting_state, Option.none, e'.startingStateList)
 
   -- Steps on epsilon from each of the accepting states of e' to the new starting state.
-  let new_step_list := e'.acceptingStateList.map (fun (state : ℕ ⊕ σ) => (state, Option.none, {new_starting_state}))
+  let new_step_list := e'.acceptingStateList.map (fun (state : ℕ ⊕ σ) => (state, Option.none, [new_starting_state]))
 
   {
 /-
@@ -728,7 +728,7 @@ def match_closure_NDA
     symbolSet := e'.symbolSet
 -/
     stepList := new_starting_step :: new_step_list
-    startingState := new_starting_state
+    startingStateList := [new_starting_state]
     acceptingStateList := new_starting_state :: e'.acceptingStateList
   }
 
