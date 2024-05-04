@@ -499,7 +499,7 @@ structure NDA
   (stateSet : Set σ)
   (symbolSet : Set α)
 -/
-  (stepList : List (σ × Option α × List σ))
+  (stepList : List ((σ × Option α) × List σ))
   (startingStateList : List σ)
   (acceptingStateList : List σ)
   deriving Repr
@@ -513,7 +513,7 @@ def stepListToFunAux
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
-  (stepList : List (σ × Option α × List σ))
+  (stepList : List ((σ × Option α) × List σ))
   (stateArg : σ)
   (symbolArg : α)
   -- The accumulated results of all of the steps that have the state and symbol arguments as a pair.
@@ -521,13 +521,13 @@ def stepListToFunAux
   List σ :=
   match stepList with
   | [] => List.dedup imageAcc
-  | (state, Option.some symbol, state_list) :: tl =>
+  | ((state, Option.some symbol), state_list) :: tl =>
     let image : List σ :=
       if state = stateArg ∧ symbol = symbolArg
       then state_list
       else []
     stepListToFunAux tl stateArg symbolArg (imageAcc ++ image)
-  | (state, Option.none, state_list) :: tl =>
+  | ((state, Option.none), state_list) :: tl =>
     let image : List σ :=
       if state = stateArg
       then state_list
@@ -543,30 +543,30 @@ def stepListToFun
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
-  (stepList : List (σ × Option α × List σ))
+  (stepList : List ((σ × Option α) × List σ))
   (stateArg : σ)
   (symbolArg : α) :
   List σ :=
   stepListToFunAux stepList stateArg symbolArg []
 
 
-example : stepListToFun ([] : List (ℕ × Option Char × List ℕ)) 0 'a' == [] := by rfl
+example : stepListToFun ([] : List ((ℕ × Option Char) × List ℕ)) 0 'a' == [] := by rfl
 
-example : stepListToFun [(0, Option.some 'a', [1])] 0 'a' == [1] := by rfl
+example : stepListToFun [((0, Option.some 'a'), [1])] 0 'a' == [1] := by rfl
 
-example : stepListToFun [(0, Option.some 'a', [1])] 0 'b' == [] := by rfl
+example : stepListToFun [((0, Option.some 'a'), [1])] 0 'b' == [] := by rfl
 
-example : stepListToFun [(0, Option.none, [1])] 0 'a' == [1] := by rfl
+example : stepListToFun [((0, Option.none), [1])] 0 'a' == [1] := by rfl
 
-example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [1])] 0 'a' == [1] := by rfl
+example : stepListToFun [((0, Option.some 'a'), [1]), ((0, Option.some 'b'), [1])] 0 'a' == [1] := by rfl
 
-example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [1])] 0 'b' == [1] := by rfl
+example : stepListToFun [((0, Option.some 'a'), [1]), ((0, Option.some 'b'), [1])] 0 'b' == [1] := by rfl
 
-example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [2])] 0 'a' == [1] := by rfl
+example : stepListToFun [((0, Option.some 'a'), [1]), ((0, Option.some 'b'), [2])] 0 'a' == [1] := by rfl
 
-example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [2])] 0 'b' == [2] := by rfl
+example : stepListToFun [((0, Option.some 'a'), [1]), ((0, Option.some 'b'), [2])] 0 'b' == [2] := by rfl
 
-example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'a', [2])] 0 'a' == [1, 2] := by rfl
+example : stepListToFun [((0, Option.some 'a'), [1]), ((0, Option.some 'a'), [2])] 0 'a' == [1, 2] := by rfl
 
 
 def NDA.wrapLeft
@@ -583,7 +583,7 @@ def NDA.wrapLeft
     stateSet := e.stateSet.image Sum.inl
     symbolSet := e.symbolSet
 -/
-    stepList := e.stepList.map (fun (step : (σ_l × Option α × List σ_l)) => (Sum.inl step.fst, step.snd.fst, step.snd.snd.map Sum.inl))
+    stepList := e.stepList.map (fun (step : ((σ_l × Option α) × List σ_l)) => ((Sum.inl step.fst.fst, step.fst.snd), step.snd.map Sum.inl))
     startingStateList := e.startingStateList.map Sum.inl
     acceptingStateList := e.acceptingStateList.map Sum.inl
   }
@@ -603,7 +603,7 @@ def NDA.wrapRight
     stateSet := e.stateSet.image Sum.inr
     symbolSet := e.symbolSet
 -/
-    stepList := e.stepList.map (fun (step : (σ_r × Option α × List σ_r)) => (Sum.inr step.fst, step.snd.fst, step.snd.snd.map Sum.inr))
+    stepList := e.stepList.map (fun (step : ((σ_r × Option α) × List σ_r)) => ((Sum.inr step.fst.fst, step.fst.snd), step.snd.map Sum.inr))
     startingStateList := e.startingStateList.map Sum.inr
     acceptingStateList := e.acceptingStateList.map Sum.inr
   }
@@ -619,7 +619,7 @@ def match_char_NDA
     stateSet := {0, 1}
     symbolSet := {c}
 -/
-    stepList := [(0, Option.some c, [1])]
+    stepList := [((0, Option.some c), [1])]
     startingStateList := [0]
     acceptingStateList := [1]
   }
@@ -675,7 +675,7 @@ def match_union_NDA
   let new_starting_state : ℕ ⊕ (σ_0 ⊕ σ_1) := Sum.inl 0
 
   -- A step on epsilon (represented as Option.none) from the new starting state to both the starting state of e1'' and the starting state of e2''.
-  let new_starting_step : (ℕ ⊕ (σ_0 ⊕ σ_1)) × Option α × List (ℕ ⊕ (σ_0 ⊕ σ_1)) := (new_starting_state, Option.none, List.dedup (e1''.startingStateList ++ e2''.startingStateList))
+  let new_starting_step : ((ℕ ⊕ (σ_0 ⊕ σ_1)) × Option α) × List (ℕ ⊕ (σ_0 ⊕ σ_1)) := ((new_starting_state, Option.none), List.dedup (e1''.startingStateList ++ e2''.startingStateList))
 
   {
 /-
@@ -705,7 +705,7 @@ def match_concat_NDA
     symbolSet := e1'.symbolSet ∪ e2'.symbolSet
 -/
     -- Steps on epsilon from each of the accepting states of e1' to the starting state of e2'.
-    stepList := e1'.acceptingStateList.map (fun (state : σ_0 ⊕ σ_1) => (state, Option.none, e2'.startingStateList))
+    stepList := e1'.acceptingStateList.map (fun (state : σ_0 ⊕ σ_1) => ((state, Option.none), e2'.startingStateList))
 
     startingStateList := e1'.startingStateList
     acceptingStateList := e2'.acceptingStateList
@@ -725,10 +725,10 @@ def match_closure_NDA
   let new_starting_state : ℕ ⊕ σ := Sum.inl 0
 
   -- A step on epsilon from the new starting state to the starting state of e'.
-  let new_starting_step : (ℕ ⊕ σ) × Option α × List (ℕ ⊕ σ) := (new_starting_state, Option.none, e'.startingStateList)
+  let new_starting_step : ((ℕ ⊕ σ) × Option α) × List (ℕ ⊕ σ) := ((new_starting_state, Option.none), e'.startingStateList)
 
   -- Steps on epsilon from each of the accepting states of e' to the new starting state.
-  let new_step_list := e'.acceptingStateList.map (fun (state : ℕ ⊕ σ) => (state, Option.none, [new_starting_state]))
+  let new_step_list := e'.acceptingStateList.map (fun (state : ℕ ⊕ σ) => ((state, Option.none), [new_starting_state]))
 
   {
 /-
