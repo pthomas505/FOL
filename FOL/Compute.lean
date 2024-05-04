@@ -495,11 +495,11 @@ structure NDA
   (σ : Type)
   [DecidableEq σ] :
   Type :=
-  (stateSet : Finset σ)
-  (symbolSet : Finset α)
-  (stepSet : Finset (σ × Option α × Finset σ))
+  (stateSet : Set σ)
+  (symbolSet : Set α)
+  (stepSet : Set (σ × Option α × Set σ))
   (startingState : σ)
-  (acceptingStateSet : Finset σ)
+  (acceptingStateSet : Set σ)
 
 
 def NDA.wrapLeft
@@ -514,7 +514,7 @@ def NDA.wrapLeft
   {
     stateSet := e.stateSet.image Sum.inl
     symbolSet := e.symbolSet
-    stepSet := e.stepSet.image (fun (step : (σ_l × Option α × Finset σ_l)) => (Sum.inl step.fst, step.snd.fst, step.snd.snd.image Sum.inl))
+    stepSet := e.stepSet.image (fun (step : (σ_l × Option α × Set σ_l)) => (Sum.inl step.fst, step.snd.fst, step.snd.snd.image Sum.inl))
     startingState := Sum.inl e.startingState
     acceptingStateSet := e.acceptingStateSet.image Sum.inl
   }
@@ -532,7 +532,7 @@ def NDA.wrapRight
   {
     stateSet := e.stateSet.image Sum.inr
     symbolSet := e.symbolSet
-    stepSet := e.stepSet.image (fun (step : (σ_r × Option α × Finset σ_r)) => (Sum.inr step.fst, step.snd.fst, step.snd.snd.image Sum.inr))
+    stepSet := e.stepSet.image (fun (step : (σ_r × Option α × Set σ_r)) => (Sum.inr step.fst, step.snd.fst, step.snd.snd.image Sum.inr))
     startingState := Sum.inr e.startingState
     acceptingStateSet := e.acceptingStateSet.image Sum.inr
   }
@@ -604,6 +604,26 @@ def unionNDA
     stepSet := {initial_step} ∪ e1''.stepSet ∪ e2''.stepSet
     startingState := Sum.inl 0
     acceptingStateSet := e1''.acceptingStateSet ∪ e2''.acceptingStateSet
+  }
+
+
+def concatNDA
+  (α : Type)
+  [DecidableEq α]
+  (σ_0 σ_1 : Type)
+  [DecidableEq σ_0]
+  [DecidableEq σ_1]
+  (e1 : NDA α σ_0)
+  (e2 : NDA α σ_1) :
+  NDA α (Sum σ_0 σ_1) :=
+  let e1' : NDA α (Sum σ_0 σ_1) := e1.wrapLeft σ_1
+  let e2' : NDA α (Sum σ_0 σ_1) := e2.wrapRight σ_0
+  {
+    stateSet := e1'.stateSet ∪ e2'.stateSet
+    symbolSet := e1'.symbolSet ∪ e2'.symbolSet
+    stepSet := { (s, Option.none, {e2'.startingState}) | s ∈ e1'.acceptingStateSet } ∪ e1'.stepSet ∪ e2'.stepSet
+    startingState := e1'.startingState
+    acceptingStateSet := e2'.acceptingStateSet
   }
 
 
