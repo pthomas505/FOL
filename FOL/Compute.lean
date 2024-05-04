@@ -509,25 +509,25 @@ def stepListToFunAux
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
-  (stepList : List (σ × Option α × Set σ))
-  (acc : Set σ)
+  (stepList : List (σ × Option α × List σ))
+  (acc : List σ)
   (lookup_state : σ)
   (lookup_symbol : α) :
-  Set σ :=
+  List σ :=
   match stepList with
-  | [] => acc
+  | [] => List.dedup acc
   | (state, Option.some symbol, state_set) :: tl =>
     let S :=
       if state = lookup_state ∧ symbol = lookup_symbol
       then state_set
-      else {}
-    stepListToFunAux tl (acc ∪ S) lookup_state lookup_symbol
+      else []
+    stepListToFunAux tl (acc ++ S) lookup_state lookup_symbol
   | (state, Option.none, state_set) :: tl =>
     let S :=
       if state = lookup_state
       then state_set
       else {}
-    stepListToFunAux tl (acc ∪ S) lookup_state lookup_symbol
+    stepListToFunAux tl (acc ++ S) lookup_state lookup_symbol
 
 
 def stepListToFun
@@ -535,11 +535,29 @@ def stepListToFun
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
-  (stepList : List (σ × Option α × Set σ))
+  (stepList : List (σ × Option α × List σ))
   (lookup_state : σ)
   (lookup_symbol : α) :
-  Set σ :=
+  List σ :=
   stepListToFunAux stepList {} lookup_state lookup_symbol
+
+
+#eval stepListToFun ([] : List (ℕ × Option Char × List ℕ)) 0 'a'
+
+#eval stepListToFun [(0, Option.some 'a', {1})] 0 'a'
+#eval stepListToFun [(0, Option.some 'a', {1})] 0 'b'
+
+#eval stepListToFun [(0, Option.none, {1})] 0 'a'
+
+#eval stepListToFun [(0, Option.some 'a', {1}), (0, Option.some 'b', {1})] 0 'a'
+
+#eval stepListToFun [(0, Option.some 'a', {1}), (0, Option.some 'b', {1})] 0 'b'
+
+#eval stepListToFun [(0, Option.some 'a', {1}), (0, Option.some 'b', {2})] 0 'a'
+
+#eval stepListToFun [(0, Option.some 'a', {1}), (0, Option.some 'b', {2})] 0 'b'
+
+#eval stepListToFun [(0, Option.some 'a', {1}), (0, Option.some 'a', {2})] 0 'a'
 
 
 def NDA.wrapLeft
