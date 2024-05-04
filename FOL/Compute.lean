@@ -542,22 +542,23 @@ def stepListToFun
   stepListToFunAux stepList {} lookup_state lookup_symbol
 
 
-#eval stepListToFun ([] : List (ℕ × Option Char × List ℕ)) 0 'a' == []
+example : stepListToFun ([] : List (ℕ × Option Char × List ℕ)) 0 'a' == [] := by rfl
 
-#eval stepListToFun [(0, Option.some 'a', [1])] 0 'a' == [1]
-#eval stepListToFun [(0, Option.some 'a', [1])] 0 'b' == []
+example : stepListToFun [(0, Option.some 'a', [1])] 0 'a' == [1] := by rfl
 
-#eval stepListToFun [(0, Option.none, [1])] 0 'a' == [1]
+example : stepListToFun [(0, Option.some 'a', [1])] 0 'b' == [] := by rfl
 
-#eval stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [1])] 0 'a' == [1]
+example : stepListToFun [(0, Option.none, [1])] 0 'a' == [1] := by rfl
 
-#eval stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [1])] 0 'b' == [1]
+example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [1])] 0 'a' == [1] := by rfl
 
-#eval stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [2])] 0 'a' == [1]
+example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [1])] 0 'b' == [1] := by rfl
 
-#eval stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [2])] 0 'b' == [2]
+example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [2])] 0 'a' == [1] := by rfl
 
-#eval stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'a', [2])] 0 'a' == [1, 2]
+example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'b', [2])] 0 'b' == [2] := by rfl
+
+example : stepListToFun [(0, Option.some 'a', [1]), (0, Option.some 'a', [2])] 0 'a' == [1, 2] := by rfl
 
 
 def NDA.wrapLeft
