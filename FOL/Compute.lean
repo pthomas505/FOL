@@ -510,7 +510,7 @@ def NDA.wrapLeft
   (σ_r : Type)
   [DecidableEq σ_r]
   (e : NDA α σ_l) :
-  NDA α (Sum σ_l σ_r) :=
+  NDA α (σ_l ⊕ σ_r) :=
   {
     stateSet := e.stateSet.image Sum.inl
     symbolSet := e.symbolSet
@@ -528,7 +528,7 @@ def NDA.wrapRight
   {σ_r : Type}
   [DecidableEq σ_r]
   (e : NDA α σ_r) :
-  NDA α (Sum σ_l σ_r) :=
+  NDA α (σ_l ⊕ σ_r) :=
   {
     stateSet := e.stateSet.image Sum.inr
     symbolSet := e.symbolSet
@@ -586,19 +586,19 @@ def unionNDA
   [DecidableEq σ_1]
   (e1 : NDA α σ_0)
   (e2 : NDA α σ_1) :
-  NDA α (Sum ℕ (Sum σ_0 σ_1)) :=
-  -- The states of e1 need to be made disjoint from the states of e2. Therefore the states of e1 are made Sum.inl instances of (Sum σ_0 σ_1) and the states of e2 are made Sum.inr instances of (Sum σ_0 σ_1).
-  let e1' : NDA α (Sum σ_0 σ_1) := e1.wrapLeft σ_1
-  let e2' : NDA α (Sum σ_0 σ_1) := e2.wrapRight σ_0
+  NDA α (ℕ ⊕ (σ_0 ⊕ σ_1)) :=
+  -- The states of e1 need to be made disjoint from the states of e2. Therefore the states of e1 are made Sum.inl instances of (σ_0 ⊕ σ_1) and the states of e2 are made Sum.inr instances of (σ_0 ⊕ σ_1).
+  let e1' : NDA α (σ_0 ⊕ σ_1) := e1.wrapLeft σ_1
+  let e2' : NDA α (σ_0 ⊕ σ_1) := e2.wrapRight σ_0
 
-  -- The new NDA needs to have a new starting state that is disjoint from the states of e1' and e2'. Therefore it is made a Sum.inl instance of (Sum ℕ (Sum σ_0 σ_1)) and the states of e1' and e2' are made Sum.inr instances of (Sum ℕ (Sum σ_0 σ_1)).
-  let e1'' : NDA α (Sum ℕ (Sum σ_0 σ_1)) := e1'.wrapRight ℕ
-  let e2'' : NDA α (Sum ℕ (Sum σ_0 σ_1)) := e2'.wrapRight ℕ
+  -- The new NDA needs to have a new starting state that is disjoint from the states of e1' and e2'. Therefore it is made a Sum.inl instance of (ℕ ⊕ (σ_0 ⊕ σ_1)) and the states of e1' and e2' are made Sum.inr instances of (ℕ ⊕ (σ_0 ⊕ σ_1)).
+  let e1'' : NDA α (ℕ ⊕ (σ_0 ⊕ σ_1)) := e1'.wrapRight ℕ
+  let e2'' : NDA α (ℕ ⊕ (σ_0 ⊕ σ_1)) := e2'.wrapRight ℕ
 
-  let new_starting_state : (Sum ℕ (Sum σ_0 σ_1)) := Sum.inl 0
+  let new_starting_state : ℕ ⊕ (σ_0 ⊕ σ_1) := Sum.inl 0
 
   -- A step on epsilon (represented as Option.none) from the new starting state to both the starting state of e1'' and the starting state of e2''.
-  let new_starting_step : (ℕ ⊕ σ_0 ⊕ σ_1) × Option α × Set (ℕ ⊕ σ_0 ⊕ σ_1) := (new_starting_state, Option.none, {e1''.startingState, e2''.startingState})
+  let new_starting_step : (ℕ ⊕ (σ_0 ⊕ σ_1)) × Option α × Set (ℕ ⊕ (σ_0 ⊕ σ_1)) := (new_starting_state, Option.none, {e1''.startingState, e2''.startingState})
 
   {
     stateSet := {new_starting_state} ∪ e1''.stateSet ∪ e2''.stateSet
@@ -617,9 +617,9 @@ def concatNDA
   [DecidableEq σ_1]
   (e1 : NDA α σ_0)
   (e2 : NDA α σ_1) :
-  NDA α (Sum σ_0 σ_1) :=
-  let e1' : NDA α (Sum σ_0 σ_1) := e1.wrapLeft σ_1
-  let e2' : NDA α (Sum σ_0 σ_1) := e2.wrapRight σ_0
+  NDA α (σ_0 ⊕ σ_1) :=
+  let e1' : NDA α (σ_0 ⊕ σ_1) := e1.wrapLeft σ_1
+  let e2' : NDA α (σ_0 ⊕ σ_1) := e2.wrapRight σ_0
   {
     stateSet := e1'.stateSet ∪ e2'.stateSet
     symbolSet := e1'.symbolSet ∪ e2'.symbolSet
@@ -638,7 +638,7 @@ def closureNDA
   (σ : Type)
   [DecidableEq σ]
   (e : NDA α σ) :
-  NDA α (Sum ℕ σ) :=
+  NDA α (ℕ ⊕ σ) :=
 
   let e' : NDA α (ℕ ⊕ σ) := e.wrapRight ℕ
 
