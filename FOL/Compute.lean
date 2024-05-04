@@ -2,6 +2,8 @@ import Mathlib.Util.CompileInductive
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finset.Basic
 
+import FOL.FunctionUpdateITE
+
 
 set_option autoImplicit false
 
@@ -456,6 +458,158 @@ example
                   subst a4_right
                   exact a3_left
               · simp
+
+-----
+
+namespace RegExpToNDA
+
+
+inductive RegExp (α : Type) [DecidableEq α] : Type
+  | char : α → RegExp α
+  | epsilon : RegExp α
+  | zero : RegExp α
+  | union : RegExp α → RegExp α → RegExp α
+  | concat : RegExp α → RegExp α → RegExp α
+  | closure : RegExp α → RegExp α
+  deriving Repr
+
+
+/--
+  The type of nondeterministic automatons.
+  `α` is the type of input symbols.
+  `σ` is the type of states.
+
+  `symbolSet` is the set of all of the symbols that the automaton can step from one state in `stateSet` to another on.
+
+  If the automaton `e` is at state `s` and the input sequence is `c :: cs` and there is a step `(s, Option.some c, S)` in `e.stepSet`, then `e` simultaneously transitions to each of the states in `S` and the input sequence becomes `cs`.
+
+  If the automation `e` is at state `s` and the input sequence is `cs` and there is a step `(s, Option.none, S)` in `e.stepSet`, then `e` simultaneously transitions to each of the states in `S` and the input sequence remains `cs`.
+
+  `startingState` is the state that the automaton starts at.
+
+  If the automaton `e` is at a state in `e.acceptingStateSet` and there are no remaining symbols in the input sequence, then `e` accepts the input sequence.
+-/
+structure NDA
+  (α : Type)
+  [DecidableEq α]
+  (σ : Type)
+  [DecidableEq σ] :
+  Type :=
+  (stateSet : Finset σ)
+  (symbolSet : Finset α)
+  (stepSet : Finset (σ × Option α × Finset σ))
+  (startingState : σ)
+  (acceptingStateSet : Finset σ)
+
+
+def NDA.wrapLeft
+  {α : Type}
+  [DecidableEq α]
+  {σ_l : Type}
+  [DecidableEq σ_l]
+  (σ_r : Type)
+  [DecidableEq σ_r]
+  (e : NDA α σ_l) :
+  NDA α (Sum σ_l σ_r) :=
+  {
+    stateSet := e.stateSet.image Sum.inl
+    symbolSet := e.symbolSet
+    stepSet := e.stepSet.image (fun (step : (σ_l × Option α × Finset σ_l)) => (Sum.inl step.fst, step.snd.fst, step.snd.snd.image Sum.inl))
+    startingState := Sum.inl e.startingState
+    acceptingStateSet := e.acceptingStateSet.image Sum.inl
+  }
+
+
+def NDA.wrapRight
+  {α : Type}
+  [DecidableEq α]
+  (σ_l : Type)
+  [DecidableEq σ_l]
+  {σ_r : Type}
+  [DecidableEq σ_r]
+  (e : NDA α σ_r) :
+  NDA α (Sum σ_l σ_r) :=
+  {
+    stateSet := e.stateSet.image Sum.inr
+    symbolSet := e.symbolSet
+    stepSet := e.stepSet.image (fun (step : (σ_r × Option α × Finset σ_r)) => (Sum.inr step.fst, step.snd.fst, step.snd.snd.image Sum.inr))
+    startingState := Sum.inr e.startingState
+    acceptingStateSet := e.acceptingStateSet.image Sum.inr
+  }
+
+
+def charNDA
+  (α : Type)
+  [DecidableEq α]
+  (c : α) :
+  NDA α ℕ :=
+  {
+    stateSet := {0, 1}
+    symbolSet := {c}
+    stepSet := {(0, Option.some c, {1})}
+    startingState := 0
+    acceptingStateSet := {1}
+  }
+
+
+def epsilonNDA
+  (α : Type)
+  [DecidableEq α] :
+  NDA α ℕ :=
+  {
+    stateSet := {0}
+    symbolSet := {}
+    stepSet := {}
+    startingState := 0
+    acceptingStateSet := {0}
+  }
+
+
+def zeroNDA
+  (α : Type)
+  [DecidableEq α] :
+  NDA α ℕ :=
+  {
+    stateSet := {0}
+    symbolSet := {}
+    stepSet := {}
+    startingState := 0
+    acceptingStateSet := {}
+  }
+
+
+def unionNDA
+  (α : Type)
+  [DecidableEq α]
+  (σ_0 σ_1 : Type)
+  [DecidableEq σ_0]
+  [DecidableEq σ_1]
+  (e1 : NDA α σ_0)
+  (e2 : NDA α σ_1) :
+  NDA α (Sum ℕ (Sum σ_0 σ_1)) :=
+  -- The states of e1 need to be made disjoint from the states of e2. Therefore the states of e1 are made Sum.inl instances of (Sum σ_0 σ_1) and the states of e2 are made Sum.inr instances of (Sum σ_0 σ_1).
+  let e1' : NDA α (Sum σ_0 σ_1) := e1.wrapLeft σ_1
+  let e2' : NDA α (Sum σ_0 σ_1) := e2.wrapRight σ_0
+
+  -- The new NDA needs to have a new starting state that is disjoint from the states of e1' and e2'. Therefore it is made a Sum.inl instance of (Sum ℕ (Sum σ_0 σ_1)) and the states of e1' and e2' are made Sum.inr instances of (Sum ℕ (Sum σ_0 σ_1)).
+  let e1'' : NDA α (Sum ℕ (Sum σ_0 σ_1)) := e1'.wrapRight ℕ
+  let e2'' : NDA α (Sum ℕ (Sum σ_0 σ_1)) := e2'.wrapRight ℕ
+
+  -- A step on the label epsilon (represented as Option.none) from the new starting state to both the starting state of e1'' and the starting state of e2''.
+  let initial_step := (Sum.inl 0, Option.none, {e1''.startingState, e2''.startingState})
+
+  {
+    stateSet := {Sum.inl 0} ∪ e1''.stateSet ∪ e2''.stateSet
+    symbolSet := e1''.symbolSet ∪ e2''.symbolSet
+    stepSet := {initial_step} ∪ e1''.stepSet ∪ e2''.stepSet
+    startingState := Sum.inl 0
+    acceptingStateSet := e1''.acceptingStateSet ∪ e2''.acceptingStateSet
+  }
+
+
+end RegExpToNDA
+
+-----
 
 
 /--
