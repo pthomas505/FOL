@@ -485,7 +485,7 @@ inductive RegExp (α : Type) [DecidableEq α] : Type
 
   If the automation `e` is at state `s` and the input sequence is `cs` and there is a step `(s, Option.none, S)` in `e.stepList`, then `e` simultaneously transitions to each of the states in `S` and the input sequence remains `cs`.
 
-  `startingState` is the state that the automaton starts at.
+  `startingStateList` is the list of states that the automaton starts at.
 
   If the automaton `e` is at a state in `e.acceptingStateList` and there are no remaining symbols in the input sequence, then `e` accepts the input sequence.
 -/
@@ -502,44 +502,52 @@ structure NDA
   (stepList : List (σ × Option α × List σ))
   (startingStateList : List σ)
   (acceptingStateList : List σ)
+  deriving Repr
 
 
+/--
+  Helper function for stepListToFun.
+-/
 def stepListToFunAux
   {α : Type}
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (stepList : List (σ × Option α × List σ))
-  (acc : List σ)
-  (lookup_state : σ)
-  (lookup_symbol : α) :
+  (stateArg : σ)
+  (symbolArg : α)
+  -- The accumulated results of all of the steps that have the state and symbol arguments as a pair.
+  (imageAcc : List σ) :
   List σ :=
   match stepList with
-  | [] => List.dedup acc
-  | (state, Option.some symbol, state_set) :: tl =>
-    let S :=
-      if state = lookup_state ∧ symbol = lookup_symbol
-      then state_set
+  | [] => List.dedup imageAcc
+  | (state, Option.some symbol, state_list) :: tl =>
+    let image : List σ :=
+      if state = stateArg ∧ symbol = symbolArg
+      then state_list
       else []
-    stepListToFunAux tl (acc ++ S) lookup_state lookup_symbol
-  | (state, Option.none, state_set) :: tl =>
-    let S :=
-      if state = lookup_state
-      then state_set
-      else {}
-    stepListToFunAux tl (acc ++ S) lookup_state lookup_symbol
+    stepListToFunAux tl stateArg symbolArg (imageAcc ++ image)
+  | (state, Option.none, state_list) :: tl =>
+    let image : List σ :=
+      if state = stateArg
+      then state_list
+      else []
+    stepListToFunAux tl stateArg symbolArg (imageAcc ++ image)
 
 
+/--
+  Recursively iterates through the step list and returns the accumulated results of all of the steps that have the state and symbol arguments as a pair.
+-/
 def stepListToFun
   {α : Type}
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (stepList : List (σ × Option α × List σ))
-  (lookup_state : σ)
-  (lookup_symbol : α) :
+  (stateArg : σ)
+  (symbolArg : α) :
   List σ :=
-  stepListToFunAux stepList {} lookup_state lookup_symbol
+  stepListToFunAux stepList stateArg symbolArg []
 
 
 example : stepListToFun ([] : List (ℕ × Option Char × List ℕ)) 0 'a' == [] := by rfl
