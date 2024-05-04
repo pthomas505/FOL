@@ -595,14 +595,16 @@ def unionNDA
   let e1'' : NDA α (Sum ℕ (Sum σ_0 σ_1)) := e1'.wrapRight ℕ
   let e2'' : NDA α (Sum ℕ (Sum σ_0 σ_1)) := e2'.wrapRight ℕ
 
-  -- A step on the label epsilon (represented as Option.none) from the new starting state to both the starting state of e1'' and the starting state of e2''.
-  let initial_step := (Sum.inl 0, Option.none, {e1''.startingState, e2''.startingState})
+  let new_starting_state : (Sum ℕ (Sum σ_0 σ_1)) := Sum.inl 0
+
+  -- A step on epsilon (represented as Option.none) from the new starting state to both the starting state of e1'' and the starting state of e2''.
+  let new_starting_step : (ℕ ⊕ σ_0 ⊕ σ_1) × Option α × Set (ℕ ⊕ σ_0 ⊕ σ_1) := (new_starting_state, Option.none, {e1''.startingState, e2''.startingState})
 
   {
-    stateSet := {Sum.inl 0} ∪ e1''.stateSet ∪ e2''.stateSet
+    stateSet := {new_starting_state} ∪ e1''.stateSet ∪ e2''.stateSet
     symbolSet := e1''.symbolSet ∪ e2''.symbolSet
-    stepSet := {initial_step} ∪ e1''.stepSet ∪ e2''.stepSet
-    startingState := Sum.inl 0
+    stepSet := {new_starting_step} ∪ e1''.stepSet ∪ e2''.stepSet
+    startingState := new_starting_state
     acceptingStateSet := e1''.acceptingStateSet ∪ e2''.acceptingStateSet
   }
 
@@ -621,7 +623,10 @@ def concatNDA
   {
     stateSet := e1'.stateSet ∪ e2'.stateSet
     symbolSet := e1'.symbolSet ∪ e2'.symbolSet
+
+    -- Steps on epsilon from each of the accepting states of e1' to the starting state of e2'.
     stepSet := { (s, Option.none, {e2'.startingState}) | s ∈ e1'.acceptingStateSet } ∪ e1'.stepSet ∪ e2'.stepSet
+
     startingState := e1'.startingState
     acceptingStateSet := e2'.acceptingStateSet
   }
@@ -634,13 +639,23 @@ def closureNDA
   [DecidableEq σ]
   (e : NDA α σ) :
   NDA α (Sum ℕ σ) :=
-  let e' : NDA α (Sum ℕ σ) := e.wrapRight ℕ
+
+  let e' : NDA α (ℕ ⊕ σ) := e.wrapRight ℕ
+
+  let new_starting_state : ℕ ⊕ σ := Sum.inl 0
+
+  -- A step on epsilon from the new starting state to the starting state of e'.
+  let new_starting_step : (ℕ ⊕ σ) × Option α × Set (ℕ ⊕ σ) := (new_starting_state, Option.none, {e'.startingState})
+
+  -- Steps on epsilon from each of the accepting states of e' to the new starting state.
+  let new_step_set : Set ((ℕ ⊕ σ) × Option α × Set (ℕ ⊕ σ)) := { (s, Option.none, {new_starting_state}) | s ∈ e'.acceptingStateSet }
+
   {
-    stateSet := {Sum.inl 0} ∪ e'.stateSet
+    stateSet := {new_starting_state} ∪ e'.stateSet
     symbolSet := e'.symbolSet
-    stepSet := {(Sum.inl 0, Option.none, {e'.startingState})} ∪ { (s, Option.none, {Sum.inl 0}) | s ∈ e'.acceptingStateSet }
-    startingState := Sum.inl 0
-    acceptingStateSet := {Sum.inl 0} ∪ e'.acceptingStateSet
+    stepSet := {new_starting_step} ∪ new_step_set
+    startingState := new_starting_state
+    acceptingStateSet := {new_starting_state} ∪ e'.acceptingStateSet
   }
 
 
