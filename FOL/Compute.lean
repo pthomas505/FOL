@@ -627,6 +627,23 @@ def concatNDA
   }
 
 
+def closureNDA
+  (α : Type)
+  [DecidableEq α]
+  (σ : Type)
+  [DecidableEq σ]
+  (e : NDA α σ) :
+  NDA α (Sum ℕ σ) :=
+  let e' : NDA α (Sum ℕ σ) := e.wrapRight ℕ
+  {
+    stateSet := {Sum.inl 0} ∪ e'.stateSet
+    symbolSet := e'.symbolSet
+    stepSet := {(Sum.inl 0, Option.none, {e'.startingState})} ∪ { (s, Option.none, {Sum.inl 0}) | s ∈ e'.acceptingStateSet }
+    startingState := Sum.inl 0
+    acceptingStateSet := {Sum.inl 0} ∪ e'.acceptingStateSet
+  }
+
+
 end RegExpToNDA
 
 -----
