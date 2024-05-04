@@ -497,9 +497,9 @@ structure NDA
   Type :=
   (stateSet : Set σ)
   (symbolSet : Set α)
-  (stepSet : Set (σ × Option α × Set σ))
+  (stepList : List (σ × Option α × Set σ))
   (startingState : σ)
-  (acceptingStateSet : Set σ)
+  (acceptingStateList : List σ)
 
 
 def stepListToFunAux
@@ -552,9 +552,9 @@ def NDA.wrapLeft
   {
     stateSet := e.stateSet.image Sum.inl
     symbolSet := e.symbolSet
-    stepSet := e.stepSet.image (fun (step : (σ_l × Option α × Set σ_l)) => (Sum.inl step.fst, step.snd.fst, step.snd.snd.image Sum.inl))
+    stepList := e.stepList.map (fun (step : (σ_l × Option α × Set σ_l)) => (Sum.inl step.fst, step.snd.fst, step.snd.snd.image Sum.inl))
     startingState := Sum.inl e.startingState
-    acceptingStateSet := e.acceptingStateSet.image Sum.inl
+    acceptingStateList := e.acceptingStateList.map Sum.inl
   }
 
 
@@ -570,9 +570,9 @@ def NDA.wrapRight
   {
     stateSet := e.stateSet.image Sum.inr
     symbolSet := e.symbolSet
-    stepSet := e.stepSet.image (fun (step : (σ_r × Option α × Set σ_r)) => (Sum.inr step.fst, step.snd.fst, step.snd.snd.image Sum.inr))
+    stepList := e.stepList.map (fun (step : (σ_r × Option α × Set σ_r)) => (Sum.inr step.fst, step.snd.fst, step.snd.snd.image Sum.inr))
     startingState := Sum.inr e.startingState
-    acceptingStateSet := e.acceptingStateSet.image Sum.inr
+    acceptingStateList := e.acceptingStateList.map Sum.inr
   }
 
 
@@ -584,9 +584,9 @@ def match_char_NDA
   {
     stateSet := {0, 1}
     symbolSet := {c}
-    stepSet := {(0, Option.some c, {1})}
+    stepList := [(0, Option.some c, {1})]
     startingState := 0
-    acceptingStateSet := {1}
+    acceptingStateList := [1]
   }
 
 
@@ -597,9 +597,9 @@ def match_epsilon_NDA
   {
     stateSet := {0}
     symbolSet := {}
-    stepSet := {}
+    stepList := []
     startingState := 0
-    acceptingStateSet := {0}
+    acceptingStateList := [0]
   }
 
 
@@ -610,9 +610,9 @@ def match_zero_NDA
   {
     stateSet := {0}
     symbolSet := {}
-    stepSet := {}
+    stepList := []
     startingState := 0
-    acceptingStateSet := {}
+    acceptingStateList := []
   }
 
 
@@ -641,9 +641,9 @@ def match_union_NDA
   {
     stateSet := {new_starting_state} ∪ e1''.stateSet ∪ e2''.stateSet
     symbolSet := e1''.symbolSet ∪ e2''.symbolSet
-    stepSet := {new_starting_step} ∪ e1''.stepSet ∪ e2''.stepSet
+    stepList := new_starting_step :: e1''.stepList ++ e2''.stepList
     startingState := new_starting_state
-    acceptingStateSet := e1''.acceptingStateSet ∪ e2''.acceptingStateSet
+    acceptingStateList := List.dedup (e1''.acceptingStateList ++ e2''.acceptingStateList)
   }
 
 
@@ -663,10 +663,10 @@ def match_concat_NDA
     symbolSet := e1'.symbolSet ∪ e2'.symbolSet
 
     -- Steps on epsilon from each of the accepting states of e1' to the starting state of e2'.
-    stepSet := { (s, Option.none, {e2'.startingState}) | s ∈ e1'.acceptingStateSet } ∪ e1'.stepSet ∪ e2'.stepSet
+    stepList := e1'.acceptingStateList.map (fun (state : σ_0 ⊕ σ_1) => (state, Option.none, {e2'.startingState}))
 
     startingState := e1'.startingState
-    acceptingStateSet := e2'.acceptingStateSet
+    acceptingStateList := e2'.acceptingStateList
   }
 
 
@@ -686,14 +686,14 @@ def match_closure_NDA
   let new_starting_step : (ℕ ⊕ σ) × Option α × Set (ℕ ⊕ σ) := (new_starting_state, Option.none, {e'.startingState})
 
   -- Steps on epsilon from each of the accepting states of e' to the new starting state.
-  let new_step_set : Set ((ℕ ⊕ σ) × Option α × Set (ℕ ⊕ σ)) := { (s, Option.none, {new_starting_state}) | s ∈ e'.acceptingStateSet }
+  let new_step_list := e'.acceptingStateList.map (fun (state : ℕ ⊕ σ) => (state, Option.none, {new_starting_state}))
 
   {
     stateSet := {new_starting_state} ∪ e'.stateSet
     symbolSet := e'.symbolSet
-    stepSet := {new_starting_step} ∪ new_step_set
+    stepList := new_starting_step :: new_step_list
     startingState := new_starting_state
-    acceptingStateSet := {new_starting_state} ∪ e'.acceptingStateSet
+    acceptingStateList := new_starting_state :: e'.acceptingStateList
   }
 
 
@@ -701,6 +701,7 @@ end RegExpToNDA
 
 -----
 
+-- Take the set of strings in S that start with u and then remove the u from them.
 
 /--
   The Brzozowski derivative u^{-1}S of a set S of strings and a string u is the set of all strings obtainable from a string in S by cutting off the prefix u.
