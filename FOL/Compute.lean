@@ -901,6 +901,19 @@ def match_zero_NDA
   }
 
 
+example
+  (α : Type)
+  [DecidableEq α]
+  (xs : List α) :
+  ¬ (match_zero_NDA α).accepts xs :=
+  by
+  simp only [match_zero_NDA]
+  simp only [NDA.accepts]
+  simp only [NDA.eval]
+  simp only [NDA.evalFrom]
+  simp
+
+
 def match_union_NDA
   (α : Type)
   [DecidableEq α]
