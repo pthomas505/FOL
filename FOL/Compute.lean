@@ -632,6 +632,21 @@ def NDA.accepts
   ∃ (s : σ), s ∈ N.eval input ∧ s ∈ N.acceptingStateList
 
 
+instance
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (N : NDA α σ)
+  (input : List α) :
+  Decidable (N.accepts input) :=
+  by
+  induction input
+  all_goals
+    simp only [NDA.accepts]
+    infer_instance
+
+
 def NDA.wrapLeft
   {α : Type}
   [DecidableEq α]
@@ -686,6 +701,52 @@ def match_char_NDA
     startingStateList := [0]
     acceptingStateList := [1]
   }
+
+
+example : (match_char_NDA 'a').eval [] = [0] := by rfl
+example : (match_char_NDA 'a').eval ['a'] = [1] := by rfl
+example : (match_char_NDA 'a').eval ['b'] = [] := by rfl
+example : (match_char_NDA 'a').eval ['a', 'b'] = [] := by rfl
+example : (match_char_NDA 'a').eval ['b', 'a'] = [] := by rfl
+
+example : ¬ (match_char_NDA 'a').accepts [] :=
+  by
+  simp only [match_char_NDA]
+  simp only [NDA.accepts]
+  simp only [NDA.eval]
+  simp only [NDA.evalFrom]
+  simp
+
+example : (match_char_NDA 'a').accepts ['a'] :=
+  by
+  simp only [match_char_NDA]
+  simp only [NDA.accepts]
+  simp only [NDA.eval]
+  simp only [NDA.evalFrom]
+  simp
+  simp only [NDA.evalOne]
+  simp
+  simp only [stepListToFun]
+  simp only [stepListToFunAux]
+  simp
+
+example : ¬ (match_char_NDA 'a').accepts ['b'] :=
+  by
+  simp only [match_char_NDA]
+  simp only [NDA.accepts]
+  tauto
+
+example : ¬ (match_char_NDA 'a').accepts ['a', 'b'] :=
+  by
+  simp only [match_char_NDA]
+  simp only [NDA.accepts]
+  tauto
+
+example : ¬ (match_char_NDA 'a').accepts ['b', 'a'] :=
+  by
+  simp only [match_char_NDA]
+  simp only [NDA.accepts]
+  tauto
 
 
 example
