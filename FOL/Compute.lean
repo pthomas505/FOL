@@ -474,6 +474,19 @@ inductive RegExp (α : Type) [DecidableEq α] : Type
   deriving Repr
 
 
+def RegExp.languageOf (α : Type) [DecidableEq α] : RegExp α → Set (List α)
+  | char x => { [x] }
+  | epsilon => { [] }
+  | zero => ∅
+  | union R S => R.languageOf ∪ S.languageOf
+
+  -- For each string r in L(R) and each string s in L(S), the string rs, the concatenation of strings r and s, is in L(RS).
+  | concat R S => { r ++ s | (r ∈ R.languageOf) (s ∈ S.languageOf) }
+
+  -- l is the concatenation of a list of strings, each of which is in L(R).
+  | closure R => { l | ∃ rs : List (List α), (∀ (r : List α), r ∈ rs → r ∈ R.languageOf) ∧ rs.join = l }
+
+
 /--
   The type of nondeterministic automatons.
   `α` is the type of input symbols.
@@ -523,13 +536,13 @@ def stepListToFunAux
   | [] => List.dedup imageAcc
   | ((state, Option.some symbol), state_list) :: tl =>
     let image : List σ :=
-      if state = stateArg ∧ symbol = symbolArg
+      if stateArg = state ∧ symbolArg = symbol
       then state_list
       else []
     stepListToFunAux tl stateArg symbolArg (imageAcc ++ image)
   | ((state, Option.none), state_list) :: tl =>
     let image : List σ :=
-      if state = stateArg
+      if stateArg = state
       then state_list
       else []
     stepListToFunAux tl stateArg symbolArg (imageAcc ++ image)
@@ -660,7 +673,7 @@ def NDA.wrapRight
 
 
 def match_char_NDA
-  (α : Type)
+  {α : Type}
   [DecidableEq α]
   (c : α) :
   NDA α ℕ :=
@@ -673,6 +686,32 @@ def match_char_NDA
     startingStateList := [0]
     acceptingStateList := [1]
   }
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (c : α)
+  (x : α) :
+  (match_char_NDA c).accepts [x] ↔ x = c :=
+  by
+  simp only [match_char_NDA]
+  simp only [NDA.accepts]
+  simp only [NDA.eval]
+  simp only [NDA.evalFrom]
+  simp
+  simp only [NDA.evalOne]
+  simp
+  simp only [stepListToFun]
+  simp only [stepListToFunAux]
+  simp
+  split
+  case _ c1 =>
+    simp
+    exact c1
+  case _ c1 =>
+    simp
+    exact c1
 
 
 def match_epsilon_NDA
