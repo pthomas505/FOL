@@ -787,7 +787,7 @@ example
   cases xs
   case nil =>
     simp at h1
-  case cons hd tl =>
+  case cons xs_hd xs_tl =>
     simp only [match_char_NDA]
     simp only [NDA.accepts]
     simp only [NDA.eval]
@@ -798,35 +798,35 @@ example
     simp only [stepListToFun]
     simp only [stepListToFunAux]
     simp
-    induction tl
+    induction xs_tl
     case nil =>
       split
       case _ c1 =>
         simp
       case _ c1 =>
         simp
-    case cons hd tl ih =>
+    case cons xs_tl_hd xs_tl_tl xs_tl_ih =>
       split
       case _ c1 =>
         subst c1
-        simp at ih
+        simp at xs_tl_ih
 
         simp
         simp only [NDA.evalOne]
         simp only [stepListToFun]
         simp only [stepListToFunAux]
         simp
-        exact ih
+        exact xs_tl_ih
       case _ c1 =>
-        simp only [c1] at ih
-        simp at ih
+        simp only [c1] at xs_tl_ih
+        simp at xs_tl_ih
 
         simp
         simp only [NDA.evalOne]
         simp only [stepListToFun]
         simp only [stepListToFunAux]
         simp
-        exact ih
+        exact xs_tl_ih
 
 
 def match_epsilon_NDA
@@ -899,6 +899,38 @@ example
       simp only [NDA.evalOne]
       simp
       exact ih
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (xs : List α)
+  (h1 : ¬ xs = []):
+  ¬ (match_epsilon_NDA α).accepts xs :=
+  by
+    cases xs
+    case nil =>
+      simp at h1
+    case cons xs_hd xs_tl =>
+      simp only [match_epsilon_NDA]
+      simp only [NDA.accepts]
+      simp only [NDA.eval]
+      simp only [NDA.evalFrom]
+      simp
+      simp only [NDA.evalOne]
+      simp
+      simp only [stepListToFun]
+      simp only [stepListToFunAux]
+      simp
+      induction xs_tl
+      case nil =>
+        simp
+      case cons xs_tl_hd xs_tl_tl xs_tl_ih =>
+        simp
+        simp only [NDA.evalOne]
+        simp
+        simp at xs_tl_ih
+        exact xs_tl_ih
 
 
 def match_zero_NDA
