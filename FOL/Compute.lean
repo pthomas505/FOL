@@ -859,8 +859,8 @@ example
 example
   (α : Type)
   [DecidableEq α]
-  (c : α) :
-  ¬ (match_epsilon_NDA α).accepts [c] :=
+  (x : α) :
+  ¬ (match_epsilon_NDA α).accepts [x] :=
   by
   simp only [match_epsilon_NDA]
   simp only [NDA.accepts]
@@ -872,6 +872,33 @@ example
   simp only [stepListToFun]
   simp only [stepListToFunAux]
   simp
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (x : α)
+  (xs : List α) :
+  ¬ (match_epsilon_NDA α).accepts (x :: xs) :=
+  by
+    simp only [match_epsilon_NDA]
+    simp only [NDA.accepts]
+    simp only [NDA.eval]
+    simp only [NDA.evalFrom]
+    simp
+    simp only [NDA.evalOne]
+    simp
+    simp only [stepListToFun]
+    simp only [stepListToFunAux]
+    simp
+    induction xs
+    case nil =>
+      simp
+    case cons hd tl ih =>
+      simp
+      simp only [NDA.evalOne]
+      simp
+      exact ih
 
 
 def match_zero_NDA
