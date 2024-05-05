@@ -933,6 +933,48 @@ example
         exact xs_tl_ih
 
 
+example
+  (α : Type)
+  [DecidableEq α]
+  (xs : List α) :
+  (match_epsilon_NDA α).accepts xs ↔ xs = [] :=
+  by
+  constructor
+  · intro a1
+    cases xs
+    case _ =>
+      rfl
+    case _ xs_hd xs_tl =>
+      simp only [match_epsilon_NDA] at a1
+      simp only [NDA.accepts] at a1
+      simp only [NDA.eval] at a1
+      simp only [NDA.evalFrom] at a1
+      simp at a1
+      simp only [NDA.evalOne] at a1
+      simp at a1
+      simp only [stepListToFun] at a1
+      simp only [stepListToFunAux] at a1
+      simp at a1
+      induction xs_tl
+      case nil =>
+        simp at a1
+      case cons xs_tl_hd xs_tl_tl xs_tl_ih =>
+        simp at a1
+        simp only [NDA.evalOne] at a1
+        simp at a1
+        simp at xs_tl_ih
+        simp
+        apply xs_tl_ih
+        exact a1
+  · intro a1
+    subst a1
+    simp only [match_epsilon_NDA]
+    simp only [NDA.accepts]
+    simp only [NDA.eval]
+    simp only [NDA.evalFrom]
+    simp
+
+
 def match_zero_NDA
   (α : Type)
   [DecidableEq α] :
