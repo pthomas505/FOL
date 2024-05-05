@@ -775,6 +775,55 @@ example
     exact c1
 
 
+example
+  (α : Type)
+  [DecidableEq α]
+  (c : α)
+  (x y : α)
+  (xs : List α):
+  ¬ (match_char_NDA c).accepts (x :: y :: xs) :=
+  by
+  simp only [match_char_NDA]
+  simp only [NDA.accepts]
+  simp only [NDA.eval]
+  simp only [NDA.evalFrom]
+  simp
+  simp only [NDA.evalOne]
+  simp
+  simp only [stepListToFun]
+  simp only [stepListToFunAux]
+  simp
+  induction xs
+  case nil =>
+    split
+    case _ c1 =>
+      simp
+    case _ c1 =>
+      simp
+  case cons hd tl ih =>
+    split
+    case _ c1 =>
+      subst c1
+      simp at ih
+
+      simp
+      simp only [NDA.evalOne]
+      simp only [stepListToFun]
+      simp only [stepListToFunAux]
+      simp
+      exact ih
+    case _ c1 =>
+      simp only [c1] at ih
+      simp at ih
+
+      simp
+      simp only [NDA.evalOne]
+      simp only [stepListToFun]
+      simp only [stepListToFunAux]
+      simp
+      exact ih
+
+
 def match_epsilon_NDA
   (α : Type)
   [DecidableEq α] :
