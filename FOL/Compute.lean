@@ -729,6 +729,18 @@ def match_epsilon_NDA
   }
 
 
+example
+  (α : Type)
+  [DecidableEq α] :
+  (match_epsilon_NDA α).accepts [] :=
+  by
+  simp only [match_epsilon_NDA]
+  simp only [NDA.accepts]
+  simp only [NDA.eval]
+  simp only [NDA.evalFrom]
+  simp
+
+
 def match_zero_NDA
   (α : Type)
   [DecidableEq α] :
