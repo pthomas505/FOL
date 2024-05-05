@@ -569,6 +569,56 @@ example : stepListToFun [((0, Option.some 'a'), [1]), ((0, Option.some 'b'), [2]
 example : stepListToFun [((0, Option.some 'a'), [1]), ((0, Option.some 'a'), [2])] 0 'a' == [1, 2] := by rfl
 
 
+/--
+  `NDA.evalOne e l c` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the list of states `l` and consumes the symbol `c`.
+-/
+def NDA.evalOne
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : NDA α σ)
+  (stateList : List σ)
+  (symbol : α) :
+  List σ :=
+  (stateList.map (fun (state : σ) => stepListToFun e.stepList state symbol)).join.dedup
+
+
+def NDA.evalFrom
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : NDA α σ)
+  (startingStateList : List σ) :
+  List α → List σ :=
+  List.foldl e.evalOne startingStateList
+
+
+/--
+  `NA.eval N cs` := Returns the final list of states that the nondeterministic automaton `N` transitions to if it starts at `N.startingStateList` and consumes the list of symbols `cs`.
+-/
+def NDA.eval
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (N : NDA α σ) :
+  List α → List σ :=
+  N.evalFrom N.startingStateList
+
+
+def NDA.accepts
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (N : NDA α σ)
+  (input : List α) :
+  Prop :=
+  ∃ (s : σ), s ∈ N.eval input ∧ s ∈ N.acceptingStateList
+
+
 def NDA.wrapLeft
   {α : Type}
   [DecidableEq α]
