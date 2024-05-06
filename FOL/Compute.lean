@@ -667,6 +667,57 @@ def NDA.wrapLeft
   }
 
 
+example
+  (α : Type)
+  [DecidableEq α]
+  (σ_l σ_r : Type)
+  [DecidableEq σ_l]
+  [DecidableEq σ_r]
+  (e : NDA α σ_l)
+  (xs : List α) :
+  e.accepts xs ↔ (e.wrapLeft σ_r).accepts xs :=
+  by
+  simp only [NDA.accepts]
+  simp only [NDA.eval]
+  simp only [NDA.evalFrom]
+  simp
+  constructor
+  · intro a1
+    left
+    apply Exists.elim a1
+    intro s a2
+    clear a1
+    cases a2
+    case _ a2_left a2_right =>
+      apply Exists.intro s
+      simp only [NDA.wrapLeft]
+      constructor
+      · sorry
+      · simp
+        exact a2_right
+  · intro a1
+    cases a1
+    case _ c1 =>
+      apply Exists.elim c1
+      intro s a2
+      clear c1
+      simp only [NDA.wrapLeft] at a2
+      cases a2
+      case _ a2_left a2_right =>
+        apply Exists.intro s
+        constructor
+        · sorry
+        · simp at a2_right
+          exact a2_right
+    case _ c1 =>
+      apply Exists.elim c1
+      intro s a2
+      clear c1
+      simp only [NDA.wrapLeft] at a2
+      simp at a2
+
+
+
 def NDA.wrapRight
   {α : Type}
   [DecidableEq α]
@@ -915,9 +966,9 @@ example
 
 
 def match_union_NDA
-  (α : Type)
+  {α : Type}
   [DecidableEq α]
-  (σ_0 σ_1 : Type)
+  {σ_0 σ_1 : Type}
   [DecidableEq σ_0]
   [DecidableEq σ_1]
   (e1 : NDA α σ_0)
@@ -945,6 +996,20 @@ def match_union_NDA
     startingStateList := [new_starting_state]
     acceptingStateList := List.dedup (e1''.acceptingStateList ++ e2''.acceptingStateList)
   }
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (σ_0 σ_1 : Type)
+  [DecidableEq σ_0]
+  [DecidableEq σ_1]
+  (e1 : NDA α σ_0)
+  (e2 : NDA α σ_1)
+  (xs : List α)
+  (h1 : e1.accepts xs) :
+  (match_union_NDA e1 e2).accepts xs :=
+  by sorry
 
 
 def match_concat_NDA
