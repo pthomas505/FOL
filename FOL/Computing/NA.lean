@@ -67,7 +67,10 @@ def breadth_first_traversal
 
 
 #eval breadth_first_traversal [] 0 = [0]
+#eval breadth_first_traversal [(0, 0)] 0 = [0]
+#eval breadth_first_traversal [(1, 1)] 0 = [0]
 #eval breadth_first_traversal [(0, 1)] 0 = [0, 1]
+#eval breadth_first_traversal [(0, 1), (1, 1)] 0 = [0, 1]
 #eval breadth_first_traversal [(0, 1), (1, 0)] 0 = [0, 1]
 #eval breadth_first_traversal [(0, 1), (1, 2)] 0 = [0, 1, 2]
 #eval breadth_first_traversal [(0, 1), (1, 2), (2, 0)] 0 = [0, 1, 2]
