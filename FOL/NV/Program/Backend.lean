@@ -983,7 +983,7 @@ lemma not_IsDeduct_false :
   ¬ IsDeduct [] false_ :=
   by
   intro contra
-  obtain s1 := soundness [] false_ contra default default default default
+  obtain s1 := soundness [] false_ contra Unit default default default
   simp at s1
   simp only [Holds] at s1
 
