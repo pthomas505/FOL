@@ -55,7 +55,7 @@ def breadth_first_traversal_aux
 
 
 /--
-  `breadth_first_traversal V E start` := All of the vertices in `V` that are reachable from the vertex `start` by following a sequence of zero or more edges in `E`.
+  `breadth_first_traversal E start` := All of the vertices that are reachable from the vertex `start` by following a sequence of zero or more edges in `E`.
 -/
 def breadth_first_traversal
   {Vertex : Type}
