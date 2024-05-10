@@ -2,7 +2,7 @@ import FOL.Except
 import FOL.NV.Sub.Var.All.Rec.Fresh.Sub
 import FOL.NV.Sub.Pred.All.Rec.Option.Fresh.Sub
 
-import Std
+import Batteries
 
 
 set_option autoImplicit false
@@ -345,7 +345,7 @@ instance : ToString CheckedProof :=
   { toString := fun (x : CheckedProof) => x.toString }
 
 
-abbrev GlobalContext : Type := Std.HashMap String CheckedProof
+abbrev GlobalContext : Type := Batteries.HashMap String CheckedProof
 
 def GlobalContext.find
   (context : GlobalContext)

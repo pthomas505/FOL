@@ -4,7 +4,7 @@
   https://github.com/jayhardee9/peg-formalization/blob/master/peg.v
 -/
 
-import Std
+import Batteries
 import Mathlib.Util.CompileInductive
 
 import Mathlib.Data.Finset.Basic

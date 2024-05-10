@@ -181,8 +181,7 @@ lemma substitution_theorem_aux
       · apply Function.updateListITE_map_mem_ext
         · simp
           exact h1
-        · simp at c2
-          simp only [← c2]
+        · simp only [← c2]
         · exact c3
       · simp only [Function.updateListITE_not_mem V'' x zs (List.map V' xs) c3]
         simp only [Function.updateListITE_not_mem V x zs (List.map (V ∘ σ ) xs) c3]

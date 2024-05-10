@@ -1,6 +1,6 @@
-import Std.Data.HashMap.Basic
-import Std.Data.HashMap.WF
-import Std.Data.Option.Basic
+import Batteries.Data.HashMap.Basic
+import Batteries.Data.HashMap.WF
+import Mathlib.Data.Option.Basic
 import Mathlib.Util.CompileInductive
 
 set_option autoImplicit false
@@ -91,4 +91,3 @@ def NVToLN (F : NV.Formula) : LN.Formula :=
   NVToLNAux Std.HashMap.empty F
 
 #eval NVToLN (NV.Formula.Abs "x" (NV.Formula.Abs "x" (NV.Formula.Var "x")))
-

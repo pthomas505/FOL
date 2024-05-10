@@ -1,4 +1,4 @@
-import Std.Tactic.Lint.Frontend
+import Batteries.Tactic.Lint.Frontend
 import Mathlib.Util.CompileInductive
 import Lean.Data.Json.Basic
 

@@ -63,7 +63,7 @@ def fresh
       simp
   fresh (VarName.mk (x.toString ++ c.toString)) c xs
   else x
-  termination_by fresh x _ xs => finset_var_name_max_len xs + 1 - x.length
+  termination_by finset_var_name_max_len xs + 1 - x.length
 
 
 lemma fresh_not_mem
@@ -88,7 +88,7 @@ lemma fresh_not_mem
     simp
     simp [if_neg h]
     exact h
-  termination_by fresh_not_mem x _ xs => finset_var_name_max_len xs + 1 - x.length
+  termination_by finset_var_name_max_len xs + 1 - x.length
 
 
 #lint

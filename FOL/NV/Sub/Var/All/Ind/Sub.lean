@@ -217,14 +217,11 @@ theorem substitution_theorem_aux
         simp
       · simp only [Function.updateITE] at a1
         simp only [if_neg c1] at a1
-        push_neg at a1
-
         simp only [Function.updateITE]
         simp only [if_neg c1]
-        cases a1
-        case _ a1_left a1_right =>
-          simp only [if_neg a1_right]
-          apply h3 v a1_left
+        intro a2
+        simp only [if_neg a2]
+        apply h3 v a1
     · intro v a1
       simp only [Function.updateITE]
       split_ifs

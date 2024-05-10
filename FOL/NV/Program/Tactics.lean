@@ -1,4 +1,4 @@
-import Std
+import Batteries
 
 
 set_option autoImplicit false
@@ -58,8 +58,8 @@ structure Sequent : Type :=
 
 
 structure State : Type :=
-  (term_meta_to_term_map : Std.HashMap Nat Term)
-  (formula_meta_to_formula_map : Std.HashMap Nat Formula)
-  (proof_meta_to_sequent_map : Std.HashMap Nat Sequent)
-  (proof_meta_to_proof_map : Std.HashMap Nat Proof)
+  (term_meta_to_term_map : Batteries.HashMap Nat Term)
+  (formula_meta_to_formula_map : Batteries.HashMap Nat Formula)
+  (proof_meta_to_sequent_map : Batteries.HashMap Nat Sequent)
+  (proof_meta_to_proof_map : Batteries.HashMap Nat Proof)
   (remaining_goal_list : List Nat)

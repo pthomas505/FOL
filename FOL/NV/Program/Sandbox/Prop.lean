@@ -248,7 +248,7 @@ instance : ToString Proof :=
   { toString := fun x => x.toString }
 
 
-abbrev GlobalContext : Type := Std.HashMap String Proof
+abbrev GlobalContext : Type := Batteries.HashMap String Proof
 
 def GlobalContext.find
   (context : GlobalContext)
@@ -260,7 +260,7 @@ def GlobalContext.find
   else Except.error s! "{label} not found in global context."
 
 
-abbrev LocalContext : Type := Std.HashMap String Step
+abbrev LocalContext : Type := Batteries.HashMap String Step
 
 def LocalContext.find
   (context : LocalContext)

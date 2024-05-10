@@ -494,7 +494,7 @@ def Holds
     if name = d.name ∧ args.length = d.args.length
     then Holds D I (Function.updateListITE V d.args (List.map V args)) M E d.F
     else Holds D I V M E (def_ name args)
-termination_by _ E phi => (E.length, phi)
+termination_by E phi => (E.length, phi)
 
 
 /-
@@ -1485,7 +1485,7 @@ theorem holds_sub
       simp only [Holds]
       simp only [Function.comp.assoc]
       simp only [h2_left]
-      simp only [Function.comp.right_id]
+      simp only [Function.comp_id]
   case pred_ X xs =>
     unfold sub
     simp only [Holds]
@@ -2152,7 +2152,7 @@ theorem holds_is_proof
       specialize s3 (V' ∘ σ')
       simp only [Function.comp.assoc] at s3
       simp only [a1.right] at s3
-      simp only [Function.comp.right_id] at s3
+      simp only [Function.comp_id] at s3
       exact s3
   case conv h1_Γ h1_Δ h1_phi h1_phi' h1_1 h1_2 h1_3 h1_ih =>
     intro V

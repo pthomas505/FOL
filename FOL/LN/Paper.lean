@@ -357,11 +357,13 @@ lemma VarOpenFreeVarSet'
     split_ifs
     case _ c1 =>
       simp only [Var.freeVarSet]
+      simp
     case _ c1 c2 =>
       simp only [Var.freeVarSet]
       simp
     case _ c1 c2 =>
       simp only [Var.freeVarSet]
+      simp
 
 
 lemma FormulaOpenFreeVarSet'

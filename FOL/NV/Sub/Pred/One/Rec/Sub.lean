@@ -309,10 +309,12 @@ theorem substitution_theorem_aux
 
   case nil.def_ X xs =>
     simp only [replace]
+    simp only [E_ref]
     simp only [Holds]
 
   case cons.def_ hd tl ih X xs =>
     simp only [replace]
+    simp only [E_ref]
     simp only [Holds]
     split_ifs
     case _ c1 =>

@@ -1,6 +1,6 @@
 import FOL.NV.Program.Sandbox.Editor
 
-import Std.Data.String.Basic
+import Batteries.Data.String.Basic
 import Mathlib.Control.Basic
 
 

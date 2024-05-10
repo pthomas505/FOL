@@ -1088,11 +1088,9 @@ theorem substitution_theorem_aux
           simp only [Function.updateITE]
           simp
           push_neg
-          intros v' a1
-          cases a1
-          case intro a1_left a1_right =>
-            simp only [if_neg a1_right]
-            exact h2 v' a1_left
+          intros v' a1 a2
+          simp only [if_neg a2]
+          exact h2 v' a1
 
   case cons.def_ hd tl ih X xs =>
     unfold Function.updateITE

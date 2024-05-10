@@ -86,7 +86,7 @@ def Holds
     if name = d.name ∧ args.length = d.args.length
     then Holds D I (Function.updateListITE V d.args (List.map V args)) E d.q
     else Holds D I V E (def_ name args)
-  termination_by _ E phi => (E.length, phi)
+  termination_by E phi => (E.length, phi)
 
 
 /--
