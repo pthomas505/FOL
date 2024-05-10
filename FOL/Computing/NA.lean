@@ -48,8 +48,9 @@ def breadth_first_traversal_aux
   List Vertex :=
   match queue.dequeue? with
   | Option.some (current, queue) =>
-    let adjacent := ((edges.filter (fun (e : Vertex × Vertex) => e.fst = current)).map Prod.snd) \ visited
-    breadth_first_traversal_aux edges (visited ++ adjacent) (queue.enqueueAll adjacent)
+    let frontier := (edges.filter (fun (e : Vertex × Vertex) => e.fst = current ∧ e.snd ∉ visited)).map Prod.snd
+
+    breadth_first_traversal_aux edges (visited ++ frontier) (queue.enqueueAll frontier)
   | Option.none => visited
 
 
@@ -64,4 +65,9 @@ def breadth_first_traversal
   List Vertex :=
   breadth_first_traversal_aux edges [start] (Std.Queue.empty.enqueue start)
 
-#eval breadth_first_traversal [(1, 0), (0, 1), (1, 2), (2, 0)] 0
+
+#eval breadth_first_traversal [] 0 = [0]
+#eval breadth_first_traversal [(0, 1)] 0 = [0, 1]
+#eval breadth_first_traversal [(0, 1), (1, 0)] 0 = [0, 1]
+#eval breadth_first_traversal [(0, 1), (1, 2)] 0 = [0, 1, 2]
+#eval breadth_first_traversal [(0, 1), (1, 2), (2, 0)] 0 = [0, 1, 2]
