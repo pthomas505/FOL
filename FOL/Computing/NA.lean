@@ -38,53 +38,20 @@ structure NDFA
   deriving Repr
 
 
-
--- Not efficient but simpler to understand.
-partial
-def simple_breadth_first_traversal_aux
-  {Vertex : Type}
-  [DecidableEq Vertex]
-  (outside : List Vertex)
-  (inside : List Vertex)
-  (edges : List (Vertex × Vertex)) :
-  List Vertex :=
-  -- All of the vertices that are outside and adjacent to at least one vertex inside.
-  let next : List Vertex := List.filter (fun (out : Vertex) => ∃ (b : Vertex), b ∈ inside ∧ (b, out) ∈ edges) outside
-  if next = []
-  then inside
-  else simple_breadth_first_traversal_aux (outside \ next) (inside ∪ next) edges
-
-/--
-  `simple_breadth_first_traversal V E start` := All of the vertices in `V` that are reachable from the vertex `start` by following a sequence of zero or more edges in `E`.
--/
-def simple_breadth_first_traversal
-  {Vertex : Type}
-  [DecidableEq Vertex]
-  (vertices : List Vertex)
-  (edges : List (Vertex × Vertex))
-  (start : Vertex) :
-  List Vertex :=
-  simple_breadth_first_traversal_aux vertices [start] edges
-
-#eval simple_breadth_first_traversal [0, 1, 2, 3] [(0, 1), (0, 2)] 0
-
-
-
-
 partial
 def breadth_first_traversal_aux
   {Vertex : Type}
   [DecidableEq Vertex]
-  (outside : List Vertex)
-  (boundary : List Vertex)
-  (inside : List Vertex)
-  (edges : List (Vertex × Vertex)) :
+  (edges : List (Vertex × Vertex))
+  (visited : List Vertex)
+  (queue : Std.Queue Vertex) :
   List Vertex :=
-  -- All of the vertices that are outside and adjacent to at least one vertex in the boundary.
-  let next : List Vertex := List.filter (fun (out : Vertex) => ∃ (b : Vertex), b ∈ boundary ∧ (b, out) ∈ edges) outside
-  if next = []
-  then inside ∪ boundary
-  else breadth_first_traversal_aux (outside \ next) next (inside ∪ next) edges
+  match queue.dequeue? with
+  | Option.some (current, queue) =>
+    let adjacent := ((edges.filter (fun (e : Vertex × Vertex) => e.fst = current)).map Prod.snd) \ visited
+    breadth_first_traversal_aux edges (visited ++ adjacent) (queue.enqueueAll adjacent)
+  | Option.none => visited
+
 
 /--
   `breadth_first_traversal V E start` := All of the vertices in `V` that are reachable from the vertex `start` by following a sequence of zero or more edges in `E`.
@@ -92,10 +59,9 @@ def breadth_first_traversal_aux
 def breadth_first_traversal
   {Vertex : Type}
   [DecidableEq Vertex]
-  (vertices : List Vertex)
   (edges : List (Vertex × Vertex))
   (start : Vertex) :
   List Vertex :=
-  breadth_first_traversal_aux vertices [start] [start] edges
+  breadth_first_traversal_aux edges [start] (Std.Queue.empty.enqueue start)
 
-#eval breadth_first_traversal [0, 1, 2, 3] [(0, 1), (0, 1), (0, 2)] 0
+#eval breadth_first_traversal [(1, 0), (0, 1), (1, 2), (2, 0)] 0
