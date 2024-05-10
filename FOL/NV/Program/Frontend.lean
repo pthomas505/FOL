@@ -10,7 +10,7 @@ namespace FOL.NV.Program.Frontend
 open Formula
 
 
-abbrev GlobalContext : Type := Std.HashMap String Backend.Proof
+abbrev GlobalContext : Type := Batteries.HashMap String Backend.Proof
 
 def GlobalContext.find
   (context : GlobalContext)
