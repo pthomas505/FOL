@@ -147,19 +147,14 @@ theorem substitution_theorem_aux
       · simp only [Function.updateListITE_not_mem V v zs (List.map V xs) c3]
         simp only [Function.updateListITE_not_mem V' v zs (List.map V xs) c3]
         apply h2
-        split_ifs at h1
-        cases h1
-        case _ h1_c1 h1_c2 =>
-          contradiction
-        case _ h1_c1 h1_c2 =>
-          intro contra
-          simp only [isFreeIn_iff_mem_freeVarSet] at a1
-          simp only [Finset.eq_empty_iff_forall_not_mem] at h1_c2
-          simp at h1_c2
-          specialize h1_c2 v contra a1
-          contradiction
-        case _ h1_c1 =>
-          contradiction
+        intro contra
+        simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        simp only [Finset.eq_empty_iff_forall_not_mem] at h1
+        simp only [c1] at h1
+        simp only [← c2] at h1
+        simp at h1
+        specialize h1 v contra a1
+        contradiction
     case _ c1 c2 =>
       simp only [Holds]
     case _ c1 =>
