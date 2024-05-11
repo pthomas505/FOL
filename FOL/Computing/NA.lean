@@ -97,7 +97,7 @@ def Graph.nodes_of
   g.map Prod.fst ∪ g.map Prod.snd
 
 
-example
+lemma not_in_nodes_imp_nexts_empty
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -149,7 +149,7 @@ def dfs_aux
   | x :: xs =>
     if x ∈ visited
     then dfs_aux g xs visited
-    else dfs_aux g (nexts g x) (x :: visited)
+    else dfs_aux g (nexts g x ++ xs) (x :: visited)
 
 def dfs
   {Node : Type}
