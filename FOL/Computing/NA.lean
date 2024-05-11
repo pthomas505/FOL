@@ -137,6 +137,39 @@ example
 
 
 partial
+def dfs_aux
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node)
+  (visited : List Node) :
+  List Node :=
+  match stack with
+  | [] => visited
+  | x :: xs =>
+    if x ∈ visited
+    then dfs_aux g xs visited
+    else dfs_aux g (nexts g x) (x :: visited)
+
+def dfs
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (start : Node) :
+  List Node :=
+  dfs_aux g [start] []
+
+#eval dfs [] 0 = [0]
+#eval dfs [(0, 0)] 0 = [0]
+#eval dfs [(1, 1)] 0 = [0]
+#eval dfs [(0, 1)] 0 = [1, 0]
+#eval dfs [(0, 1), (1, 1)] 0 = [1, 0]
+#eval dfs [(0, 1), (1, 0)] 0 = [1, 0]
+#eval dfs [(0, 1), (1, 2)] 0 = [2, 1, 0]
+#eval dfs [(0, 1), (1, 2), (2, 0)] 0 = [2, 1, 0]
+
+
+partial
 def breadth_first_traversal_aux
   {Vertex : Type}
   [DecidableEq Vertex]
