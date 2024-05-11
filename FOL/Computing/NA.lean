@@ -56,7 +56,7 @@ def nexts
     else nexts es n
 
 
-example
+lemma nexts_set
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node) :
