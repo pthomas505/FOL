@@ -179,7 +179,7 @@ def dfs_aux
     by_cases c2 : x ∈ g.nodes_of
     case pos =>
       obtain s1 := List.erase_diff_len_lt_diff_len g.nodes_of visited x c2 c1
-      sorry
+      exact Prod.Lex.left ((nexts g x).length + xs.length) (xs.length + 1) s1
     case neg =>
       have s1 : (g.nodes_of.erase x) = g.nodes_of := by
         exact List.erase_of_not_mem c2
