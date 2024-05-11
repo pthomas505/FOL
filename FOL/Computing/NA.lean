@@ -89,6 +89,9 @@ lemma nexts_set
         tauto
 
 
+-- https://www.isa-afp.org/entries/Depth-First-Search.html
+
+
 def Graph.nodes_of
   {Node : Type}
   [DecidableEq Node]
