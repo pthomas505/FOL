@@ -136,7 +136,7 @@ lemma not_in_nodes_imp_nexts_empty
             tauto
 
 
-example
+lemma List.erase_diff_len_lt_diff_len
   (α : Type)
   [DecidableEq α]
   (l1 l2 : List α)
@@ -176,7 +176,6 @@ def dfs_aux
     decreasing_trivial
   case _ c1 =>
     simp_wf
-
     sorry
 
 
