@@ -137,7 +137,7 @@ lemma not_in_nodes_imp_nexts_empty
 
 
 lemma List.erase_diff_len_lt_diff_len
-  (α : Type)
+  {α : Type}
   [DecidableEq α]
   (l1 l2 : List α)
   (x : α)
@@ -176,7 +176,20 @@ def dfs_aux
     decreasing_trivial
   case _ c1 =>
     simp_wf
-    sorry
+    by_cases c2 : x ∈ g.nodes_of
+    case pos =>
+      have s1 : ((g.nodes_of.erase x).diff visited).length < (g.nodes_of.diff visited).length :=
+      by
+        exact List.erase_diff_len_lt_diff_len g.nodes_of visited x c2 c1
+      sorry
+    case neg =>
+      have s1 : (g.nodes_of.erase x) = g.nodes_of := by
+        exact List.erase_of_not_mem c2
+      simp only [s1]
+
+      simp only [not_in_nodes_imp_nexts_empty g x c2]
+      simp
+      sorry
 
 
 def dfs
