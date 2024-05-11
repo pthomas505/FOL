@@ -38,6 +38,57 @@ structure NDFA
   deriving Repr
 
 
+abbrev Graph
+  (Node : Type)
+  [DecidableEq Node] :
+  Type :=
+  List (Node × Node)
+
+
+def nexts
+  {Node : Type}
+  [DecidableEq Node] :
+  Graph Node → Node → List Node
+  | [], _ => []
+  | e :: es, n =>
+    if e.fst = n
+    then e.snd :: (nexts es n)
+    else nexts es n
+
+
+example
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node) :
+  ∀ (x y : Node), y ∈ nexts g x ↔ (x, y) ∈ g :=
+  by
+  induction g
+  case nil =>
+    simp only [nexts]
+    simp
+  case cons hd tl ih =>
+    simp only [nexts]
+    intro x y
+    split
+    case inl c1 =>
+      subst c1
+      simp only [List.mem_cons]
+      simp only [ih]
+      constructor
+      · tauto
+      · intro a1
+        simp only [Prod.eq_iff_fst_eq_snd_eq] at a1
+        tauto
+    case inr c1 =>
+      simp only [List.mem_cons]
+      simp only [ih]
+      constructor
+      · tauto
+      · intro a1
+        simp only [Prod.eq_iff_fst_eq_snd_eq] at a1
+        tauto
+
+
 partial
 def breadth_first_traversal_aux
   {Vertex : Type}
