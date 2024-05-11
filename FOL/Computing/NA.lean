@@ -171,7 +171,7 @@ def dfs_aux
 
   termination_by ((g.nodes_of.diff visited).length, stack.length)
   decreasing_by
-  case _ c1 =>
+  case _ _ =>
     simp_wf
     decreasing_trivial
   case _ c1 =>
@@ -187,8 +187,8 @@ def dfs_aux
 
       simp only [not_in_nodes_imp_nexts_empty g x c2]
       simp
-      sorry
-
+      apply Prod.Lex.right (g.nodes_of.diff visited).length
+      exact Nat.lt.base xs.length
 
 def dfs
   {Node : Type}
