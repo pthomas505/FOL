@@ -136,7 +136,6 @@ lemma not_in_nodes_imp_nexts_empty
             tauto
 
 
-partial
 def dfs_aux
   {Node : Type}
   [DecidableEq Node]
@@ -150,6 +149,16 @@ def dfs_aux
     if x ∈ visited
     then dfs_aux g xs visited
     else dfs_aux g (nexts g x ++ xs) (x :: visited)
+
+  termination_by (stack.length, (g.nodes_of.diff visited).length)
+  decreasing_by
+  case _ c1 =>
+    simp_wf
+    decreasing_trivial
+  case _ c1 =>
+    simp_wf
+    sorry
+
 
 def dfs
   {Node : Type}
