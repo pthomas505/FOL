@@ -169,7 +169,7 @@ def dfs_aux
     then dfs_aux g xs visited
     else dfs_aux g (nexts g x ++ xs) (x :: visited)
 
-  termination_by (stack.length, (g.nodes_of.diff visited).length)
+  termination_by ((g.nodes_of.diff visited).length, stack.length)
   decreasing_by
   case _ c1 =>
     simp_wf
