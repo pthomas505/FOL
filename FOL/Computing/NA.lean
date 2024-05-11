@@ -89,6 +89,53 @@ lemma nexts_set
         tauto
 
 
+def Graph.nodes_of
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node) :
+  List Node :=
+  g.map Prod.fst ∪ g.map Prod.snd
+
+
+example
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (x : Node)
+  (h1 : x ∉ g.nodes_of) :
+  nexts g x = [] :=
+  by
+  induction g
+  case nil =>
+    simp only [nexts]
+  case cons hd tl ih =>
+    simp only [Graph.nodes_of] at ih
+    simp only [List.mem_union_iff] at ih
+    push_neg at ih
+
+    simp only [Graph.nodes_of] at h1
+    simp only [List.mem_union_iff] at h1
+    push_neg at h1
+    cases h1
+    case _ h1_left h1_right =>
+      simp only [List.map_cons, List.mem_cons] at h1_left
+      push_neg at h1_left
+      simp only [ne_eq] at h1_left
+      cases h1_left
+      case _ h1_left_left h1_left_right =>
+        simp only [List.map_cons, List.mem_cons] at h1_right
+        push_neg at h1_right
+        simp only [ne_eq] at h1_right
+        cases h1_right
+        case _ h1_right_left h1_right_right =>
+          simp only [nexts]
+          split
+          case _ c1 =>
+            tauto
+          case _ c1 =>
+            tauto
+
+
 partial
 def breadth_first_traversal_aux
   {Vertex : Type}
