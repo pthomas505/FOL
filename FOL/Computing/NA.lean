@@ -136,6 +136,25 @@ lemma not_in_nodes_imp_nexts_empty
             tauto
 
 
+example
+  (α : Type)
+  [DecidableEq α]
+  (l1 l2 : List α)
+  (x : α)
+  (h1 : x ∈ l1)
+  (h2 : x ∉ l2) :
+  ((l1.erase x).diff l2).length < (l1.diff l2).length :=
+  by
+  obtain s1 := List.mem_diff_of_mem h1 h2
+  obtain s2 := List.length_erase_of_mem s1
+  obtain s3 := List.length_pos_of_mem s1
+  obtain s4 := Nat.pred_lt' s3
+  simp only [← s2] at s4
+  obtain s5 := List.diff_erase l1 l2 x
+  simp only [← s5]
+  exact s4
+
+
 def dfs_aux
   {Node : Type}
   [DecidableEq Node]
@@ -157,6 +176,7 @@ def dfs_aux
     decreasing_trivial
   case _ c1 =>
     simp_wf
+
     sorry
 
 
