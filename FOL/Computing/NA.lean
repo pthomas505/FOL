@@ -178,9 +178,7 @@ def dfs_aux
     simp_wf
     by_cases c2 : x ∈ g.nodes_of
     case pos =>
-      have s1 : ((g.nodes_of.erase x).diff visited).length < (g.nodes_of.diff visited).length :=
-      by
-        exact List.erase_diff_len_lt_diff_len g.nodes_of visited x c2 c1
+      obtain s1 := List.erase_diff_len_lt_diff_len g.nodes_of visited x c2 c1
       sorry
     case neg =>
       have s1 : (g.nodes_of.erase x) = g.nodes_of := by
