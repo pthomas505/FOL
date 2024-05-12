@@ -38,6 +38,9 @@ structure NDFA
   deriving Repr
 
 
+-- https://www.isa-afp.org/entries/Depth-First-Search.html
+
+
 abbrev Graph
   (Node : Type)
   [DecidableEq Node] :
@@ -45,6 +48,9 @@ abbrev Graph
   List (Node × Node)
 
 
+/--
+  nexts g x := The image of x under g if g is treated as a binary relation.
+-/
 def nexts
   {Node : Type}
   [DecidableEq Node] :
@@ -54,6 +60,18 @@ def nexts
     if e.fst = n
     then e.snd :: (nexts es n)
     else nexts es n
+
+
+/--
+  nextss g xs := The image of xs under g if g is treated as a binary relation.
+-/
+def nextss
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs : List Node) :
+  Set Node :=
+  {y | ∃ x, x ∈ xs ∧ (x, y) ∈ g}
 
 
 lemma nexts_set
@@ -87,9 +105,6 @@ lemma nexts_set
       · intro a1
         simp only [Prod.eq_iff_fst_eq_snd_eq] at a1
         tauto
-
-
--- https://www.isa-afp.org/entries/Depth-First-Search.html
 
 
 def Graph.nodes_of
@@ -209,6 +224,39 @@ example : dfs [(0, 1), (1, 1)] 0 = [1, 0] := by rfl
 example : dfs [(0, 1), (1, 0)] 0 = [1, 0] := by rfl
 example : dfs [(0, 1), (1, 2)] 0 = [2, 1, 0] := by rfl
 example : dfs [(0, 1), (1, 2), (2, 0)] 0 = [2, 1, 0] := by rfl
+
+
+example
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (visited : List Node) :
+  dfs_aux g [] visited = visited :=
+  by simp only [dfs_aux]
+
+
+example
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node)
+  (visited : List Node)
+  (x : Node)
+  (h1 : x ∈ visited) :
+  dfs_aux g stack visited = dfs_aux g (x :: stack) visited :=
+  by
+    simp only [dfs_aux]
+    simp only [if_pos h1]
+
+
+lemma dfs_app
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs ys : List Node)
+  (zs : List Node) :
+  dfs_aux g (xs ++ ys) zs = dfs_aux g ys (dfs_aux g xs zs) :=
+  by sorry
 
 
 partial
