@@ -292,6 +292,40 @@ lemma visit_subset_dfs
     · exact ih
 
 
+lemma next_subset_dfs
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node)
+  (visited : List Node) :
+  stack ⊆ dfs_aux g stack visited :=
+  by
+  induction stack, visited using dfs_aux.induct g
+  case _ visited =>
+    simp only [dfs_aux]
+    simp
+  case _ visited x stack c1 ih =>
+    simp only [dfs_aux]
+    simp only [if_pos c1]
+    obtain s1 := visit_subset_dfs g stack visited
+    simp
+    constructor
+    case left =>
+      apply Set.mem_of_subset_of_mem s1 c1
+    case right =>
+      exact ih
+  case _ visited x stack c1 ih =>
+    simp only [dfs_aux]
+    simp only [if_neg c1]
+    obtain s1 := visit_subset_dfs g (nexts g x ++ stack) (x :: visited)
+    simp
+    constructor
+    · have s2 : x ∈ x :: visited :=
+      by simp
+      apply Set.mem_of_subset_of_mem s1 s2
+    · trans (nexts g x) ++ stack
+      · simp
+      · exact ih
 
 
 #lint
