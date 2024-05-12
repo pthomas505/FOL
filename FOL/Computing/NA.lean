@@ -1,5 +1,3 @@
-import Mathlib.Data.Finset.Basic
-import Mathlib.Data.List.Defs
 
 
 structure Step
