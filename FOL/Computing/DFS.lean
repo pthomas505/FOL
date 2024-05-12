@@ -328,4 +328,51 @@ lemma next_subset_dfs
       · exact ih
 
 
+lemma nextss_closed_dfs'
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node)
+  (visited : List Node)
+  (h1 : nextss g visited ⊆ stack.toFinset ∪ visited.toFinset) :
+  nextss g (dfs_aux g stack visited) ⊆ (dfs_aux g stack visited).toFinset :=
+  by
+  induction stack, visited using dfs_aux.induct g
+  case _ visited =>
+    simp at h1
+    simp only [dfs_aux]
+    simp
+    exact h1
+  case _ visited x stack c1 ih =>
+    simp only [dfs_aux]
+    simp only [if_pos c1]
+    apply ih
+    trans ↑(x :: stack).toFinset ∪ ↑visited.toFinset
+    · exact h1
+    · simp only [List.toFinset_cons, Finset.coe_insert]
+      simp only [Set.insert_union]
+      have s1 : x ∈ (stack.toFinset.toSet ∪ visited.toFinset.toSet) := by {
+        simp
+        right
+        exact c1
+      }
+      obtain s2 := Set.insert_eq_of_mem s1
+      simp only [s2]
+      simp
+  case _ visited x stack c1 ih =>
+    simp only [dfs_aux]
+    simp only [if_neg c1]
+    apply ih
+    simp only [nextss_cons]
+    simp only [Set.union_subset_iff]
+    constructor
+    · simp only [List.toFinset_append, Finset.coe_union]
+      apply Set.subset_union_of_subset_left
+      apply Set.subset_union_left
+    · simp only [List.toFinset_append, Finset.coe_union, List.toFinset_cons, Set.union_insert]
+      simp only [List.toFinset_cons] at h1
+      simp only [Set.union_assoc]
+      apply Set.subset_union_of_subset_right
+      sorry
+
 #lint
