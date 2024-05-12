@@ -107,6 +107,20 @@ lemma nexts_set
         tauto
 
 
+lemma nextss_cons
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (x : Node)
+  (xs : List Node) :
+  nextss g (x :: xs) = (nexts g x).toFinset.toSet ∪ nextss g xs :=
+  by
+    simp only [nextss]
+    simp only [← nexts_set]
+    simp
+    rfl
+
+
 def Graph.nodes_of
   {Node : Type}
   [DecidableEq Node]
