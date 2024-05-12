@@ -334,8 +334,8 @@ lemma nextss_closed_dfs'
   (g : Graph Node)
   (stack : List Node)
   (visited : List Node)
-  (h1 : nextss g visited ⊆ stack.toFinset ∪ visited.toFinset) :
-  nextss g (dfs_aux g stack visited) ⊆ (dfs_aux g stack visited).toFinset :=
+  (h1 : nextss g visited ⊆ stack.toFinset ∪ visited.toFinset.toSet) :
+  nextss g (dfs_aux g stack visited) ⊆ (dfs_aux g stack visited).toFinset.toSet :=
   by
   induction stack, visited using dfs_aux.induct g
   case _ visited =>
@@ -374,5 +374,18 @@ lemma nextss_closed_dfs'
       simp only [Set.union_assoc]
       apply Set.subset_union_of_subset_right
       sorry
+
+
+lemma nextss_closed_dfs
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node) :
+  nextss g (dfs_aux g stack []) ⊆ (dfs_aux g stack []).toFinset.toSet :=
+  by
+    apply nextss_closed_dfs'
+    simp only [nextss]
+    simp
+
 
 #lint
