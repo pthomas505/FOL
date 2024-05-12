@@ -284,7 +284,28 @@ lemma dfs_app
   (xs ys : List Node)
   (zs : List Node) :
   dfs_aux g (xs ++ ys) zs = dfs_aux g ys (dfs_aux g xs zs) :=
-  by sorry
+  by
+  induction xs, zs using dfs_aux.induct g
+  case _ visited =>
+    simp only [dfs_aux]
+    simp
+  case _ visited x xs c1 ih =>
+    simp only [dfs_aux]
+    simp
+    simp only [c1]
+    simp
+    simp only [← ih]
+    simp only [dfs_aux]
+    simp only [c1]
+    simp
+  case _ visited x xs c1 ih =>
+    simp only [dfs_aux]
+    simp only [c1]
+    simp
+    simp only [← ih]
+    simp only [dfs_aux]
+    simp only [c1]
+    simp
 
 
 partial
