@@ -268,4 +268,30 @@ lemma dfs_app
     simp only [if_neg c1]
 
 
+lemma visit_subset_dfs
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node)
+  (visited : List Node) :
+  visited ⊆ dfs_aux g stack visited :=
+  by
+  induction stack, visited using dfs_aux.induct g
+  case _ visited =>
+    simp only [dfs_aux]
+    simp
+  case _ visited x stack c1 ih =>
+    simp only [dfs_aux]
+    simp only [if_pos c1]
+    exact ih
+  case _ visited x stack c1 ih =>
+    simp only [dfs_aux]
+    simp only [if_neg c1]
+    trans (x :: visited)
+    · simp
+    · exact ih
+
+
+
+
 #lint
