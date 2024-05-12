@@ -10,8 +10,7 @@ import Mathlib.Data.Finset.Basic
   The adjacency list representation of a graph.
 -/
 abbrev Graph
-  (Node : Type)
-  [DecidableEq Node] :
+  (Node : Type) :
   Type :=
   List (Node × Node)
 
@@ -35,7 +34,6 @@ def nexts
 -/
 def nextss
   {Node : Type}
-  [DecidableEq Node]
   (g : Graph Node)
   (xs : List Node) :
   Set Node :=
@@ -241,8 +239,6 @@ example
     simp only [dfs_aux]
     simp only [if_pos h1]
 
-
-#check dfs_aux.induct
 
 lemma dfs_app
   {Node : Type}
