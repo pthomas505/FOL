@@ -216,6 +216,7 @@ def dfs
   List Node :=
   dfs_aux g [start] []
 
+
 example : dfs [] 0 = [0] := by rfl
 example : dfs [(0, 0)] 0 = [0] := by rfl
 example : dfs [(1, 1)] 0 = [0] := by rfl
