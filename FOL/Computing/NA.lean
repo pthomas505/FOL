@@ -41,6 +41,9 @@ structure NDFA
 -- https://www.isa-afp.org/entries/Depth-First-Search.html
 
 
+/--
+  The adjacency list representation of a graph.
+-/
 abbrev Graph
   (Node : Type)
   [DecidableEq Node] :
@@ -49,7 +52,7 @@ abbrev Graph
 
 
 /--
-  nexts g x := The image of x under g if g is treated as a binary relation.
+  `nexts g x` := The image of `x` under `g`. The neighbors of `x`.
 -/
 def nexts
   {Node : Type}
@@ -63,7 +66,7 @@ def nexts
 
 
 /--
-  nextss g xs := The image of xs under g if g is treated as a binary relation.
+  `nextss g xs` := The image of `xs` under `g`. The neighbors of `xs`.
 -/
 def nextss
   {Node : Type}
@@ -121,6 +124,9 @@ lemma nextss_cons
     rfl
 
 
+/--
+  `Graph.nodes_of g` := The nodes of `g`.
+-/
 def Graph.nodes_of
   {Node : Type}
   [DecidableEq Node]
@@ -187,6 +193,9 @@ lemma List.erase_diff_len_lt_diff_len
   exact s4
 
 
+/--
+  Helper function for `dfs`.
+-/
 def dfs_aux
   {Node : Type}
   [DecidableEq Node]
@@ -222,6 +231,10 @@ def dfs_aux
       apply Prod.Lex.right (g.nodes_of.diff visited).length
       exact Nat.lt.base xs.length
 
+
+/--
+  `dfs g start` := The depth first traversal of `g` from `start`. The nodes in `g` that are reachable from `start`.
+-/
 def dfs
   {Node : Type}
   [DecidableEq Node]
