@@ -233,7 +233,7 @@ def dfs_aux
 
 
 /--
-  `dfs g start` := The depth first traversal of `g` from `start`. The nodes in `g` that are reachable from `start`.
+  `dfs g start` := The depth first traversal of `g` from `start`. The nodes of `g` that are reachable from `start`.
 -/
 def dfs
   {Node : Type}
