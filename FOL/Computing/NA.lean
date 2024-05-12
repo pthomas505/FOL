@@ -277,6 +277,8 @@ example
     simp only [if_pos h1]
 
 
+#check dfs_aux.induct
+
 lemma dfs_app
   {Node : Type}
   [DecidableEq Node]
@@ -291,21 +293,18 @@ lemma dfs_app
     simp
   case _ visited x xs c1 ih =>
     simp only [dfs_aux]
-    simp
-    simp only [c1]
-    simp
+    simp only [if_pos c1]
     simp only [← ih]
-    simp only [dfs_aux]
-    simp only [c1]
     simp
+    simp only [dfs_aux]
+    simp only [if_pos c1]
   case _ visited x xs c1 ih =>
     simp only [dfs_aux]
-    simp only [c1]
-    simp
+    simp only [if_neg c1]
     simp only [← ih]
-    simp only [dfs_aux]
-    simp only [c1]
     simp
+    simp only [dfs_aux]
+    simp only [if_neg c1]
 
 
 partial
