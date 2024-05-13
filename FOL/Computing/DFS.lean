@@ -379,11 +379,19 @@ lemma nextss_closed_dfs'
     · simp only [List.toFinset_append, Finset.coe_union]
       apply Set.subset_union_of_subset_left
       apply Set.subset_union_left
-    · simp only [List.toFinset_append, Finset.coe_union, List.toFinset_cons, Set.union_insert]
-      simp only [List.toFinset_cons] at h1
+    · simp only [List.toFinset_cons] at h1
+      simp at h1
+
+      simp only [List.toFinset_cons]
+      simp only [List.toFinset_append, Finset.coe_union, List.toFinset_cons, Set.union_insert]
       simp only [Set.union_assoc]
       apply Set.subset_union_of_subset_right
-      sorry
+
+      have s1 : (insert x stack.toFinset.toSet) ∪ visited.toFinset.toSet = stack.toFinset.toSet ∪ (insert x visited.toFinset).toSet := by aesop
+      simp only [<- s1]
+
+      simp
+      exact h1
 
 
 lemma nextss_closed_dfs
