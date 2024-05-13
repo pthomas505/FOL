@@ -88,6 +88,18 @@ lemma nextss_cons
 
 
 /--
+  `reachable g xs` := The reflexive transitive closure of `xs` under `g`. The union of the nodes that are reachable from each node in `xs` through a sequence of zero or more edges in `g`.
+-/
+inductive reachable
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs : Set Node) : Set Node
+  | base (x : Node) : x ∈ xs → reachable g xs x
+  | step (e : (Node × Node)) : e ∈ g → reachable g xs e.fst → reachable g xs e.snd
+
+
+/--
   `Graph.nodes_of g` := The nodes of `g`.
 -/
 def Graph.nodes_of
