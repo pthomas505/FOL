@@ -88,18 +88,6 @@ lemma nextss_cons
 
 
 /--
-  `reachable g xs` := The reflexive transitive closure of `xs` under `g`. The union of the nodes that are reachable from each node in `xs` through a sequence of zero or more edges in `g`.
--/
-inductive reachable
-  {Node : Type}
-  [DecidableEq Node]
-  (g : Graph Node)
-  (xs : Set Node) : Set Node
-  | base (x : Node) : x ∈ xs → reachable g xs x
-  | step (e : (Node × Node)) : e ∈ g → reachable g xs e.fst → reachable g xs e.snd
-
-
-/--
   `Graph.nodes_of g` := The nodes of `g`.
 -/
 def Graph.nodes_of
@@ -459,6 +447,26 @@ lemma image_closed_trancl
     · intro a1
       apply refl_trans_closure.base
       exact a1
+
+
+/--
+  `reachable g xs` := The reflexive transitive closure of `xs` under `g`. The union of the nodes that are reachable from each node in `xs` through a sequence of zero or more edges in `g`.
+-/
+inductive reachable
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs : List Node) : Set Node
+  | base (x : Node) : x ∈ xs → reachable g xs x
+  | step (e : (Node × Node)) : e ∈ g → reachable g xs e.fst → reachable g xs e.snd
+
+
+lemma reachable_closed_dfs
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node) :
+  reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet := sorry
 
 
 #lint
