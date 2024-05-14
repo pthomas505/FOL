@@ -406,4 +406,59 @@ lemma nextss_closed_dfs
     simp
 
 
+inductive refl_trans_closure
+  {α : Type}
+  [DecidableEq α]
+  (S : Set α)
+  (r : Set (α × α)) :
+  Set α
+  | base
+    (x : α) :
+    x ∈ S →
+    refl_trans_closure S r x
+
+  | step
+    (x y : α) :
+    (x, y) ∈ r →
+    refl_trans_closure S r x →
+    refl_trans_closure S r y
+
+
+def relation_image
+  {α : Type}
+  [DecidableEq α]
+  (r : Set (α × α))
+  (S : Set α) :=
+  {y | ∃ x, x ∈ S ∧ (x, y) ∈ r}
+
+
+lemma image_closed_trancl
+  (α : Type)
+  [DecidableEq α]
+  (r : Set (α × α))
+  (S : Set α)
+  (h1 : relation_image r S ⊆ S) :
+  refl_trans_closure S r = S :=
+  by
+    simp only [relation_image] at h1
+    have s1 : ∀ (x y : α), x ∈ S → (x, y) ∈ r → y ∈ S :=
+    by
+      intro x y a1 a2
+      apply Set.mem_of_subset_of_mem h1
+      simp
+      apply Exists.intro x
+      tauto
+    ext a
+    constructor
+    · intro a1
+      induction a1
+      case _ x _ ih =>
+        exact ih
+      case _ x y ih_1 _ ih_3 =>
+        exact s1 x y ih_3 ih_1
+    · intro a1
+      apply refl_trans_closure.base
+      exact a1
+
+
 #lint
