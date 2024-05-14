@@ -461,12 +461,37 @@ inductive reachable
   | step (e : (Node × Node)) : e ∈ g → reachable g xs e.fst → reachable g xs e.snd
 
 
+lemma reachable_mono
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs ys : List Node)
+  (h1 : xs ⊆ ys) :
+  reachable g xs ⊆ reachable g ys :=
+  by
+    intro x a1
+    induction a1
+    case base a ih =>
+      apply reachable.base
+      apply Set.mem_of_subset_of_mem h1
+      exact ih
+    case step e ih_1 _ ih_3 =>
+      apply reachable.step e ih_1 ih_3
+
+
 lemma reachable_closed_dfs
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (stack : List Node) :
-  reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet := sorry
+  reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet :=
+  by
+    obtain s1 := next_subset_dfs g stack []
+    have s2 : reachable g stack ⊆ reachable g (dfs_aux g stack []) := reachable_mono g stack (dfs_aux g stack []) s1
+
+    sorry
+
+
 
 
 #lint
