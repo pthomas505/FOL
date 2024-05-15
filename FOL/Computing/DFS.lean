@@ -399,19 +399,19 @@ lemma nextss_closed_dfs
 inductive refl_trans_closure
   {α : Type}
   [DecidableEq α]
-  (S : Set α)
-  (r : Set (α × α)) :
+  (r : Set (α × α))
+  (S : Set α) :
   Set α
   | base
     (x : α) :
     x ∈ S →
-    refl_trans_closure S r x
+    refl_trans_closure r S x
 
   | step
     (x y : α) :
     (x, y) ∈ r →
-    refl_trans_closure S r x →
-    refl_trans_closure S r y
+    refl_trans_closure r S x →
+    refl_trans_closure r S y
 
 
 def relation_image
@@ -429,7 +429,7 @@ lemma image_closed_trancl
   (r : Set (α × α))
   (S : Set α)
   (h1 : relation_image r S ⊆ S) :
-  refl_trans_closure S r = S :=
+  refl_trans_closure r S = S :=
   by
     simp only [relation_image] at h1
     have s1 : ∀ (x y : α), x ∈ S → (x, y) ∈ r → y ∈ S :=
@@ -491,6 +491,35 @@ lemma reachable_mono
       apply reachable.step e ih_1 ih_3
 
 
+lemma refl_trans_closure_eq_reachable
+  {α : Type}
+  [DecidableEq α]
+  (g : Graph α)
+  (xs : List α) :
+  refl_trans_closure g.toFinset.toSet xs.toFinset.toSet = reachable g xs :=
+  by
+    ext a
+    constructor
+    · intro a1
+      induction a1
+      case _ x ih =>
+        simp at ih
+        exact reachable.base x ih
+      case _ x y ih_1 _ ih_3 =>
+        simp at ih_1
+        apply reachable.step (x, y) ih_1 ih_3
+    · intro a1
+      induction a1
+      case _ x ih =>
+        simp
+        exact refl_trans_closure.base x ih
+      case _ e ih_1 _ ih_3 =>
+        apply refl_trans_closure.step e.1
+        · simp
+          exact ih_1
+        · exact ih_3
+
+
 lemma reachable_closed_dfs
   {Node : Type}
   [DecidableEq Node]
@@ -512,11 +541,14 @@ lemma reachable_closed_dfs
         simp only [nextss] at s4
         aesop
 
-      obtain s5 := image_closed_trancl g.toFinset.toSet
-      sorry
-    sorry
+      obtain s5 := image_closed_trancl g.toFinset.toSet (dfs_aux g stack []).toFinset.toSet
+      specialize s5 s3
 
+      rw [← s5]
+      simp only [refl_trans_closure_eq_reachable]
 
+    simp only [← s2]
+    exact s1
 
 
 --#lint
