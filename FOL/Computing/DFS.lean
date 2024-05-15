@@ -459,9 +459,18 @@ inductive reachable
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
-  (xs : List Node) : Set Node
-  | base (x : Node) : x ∈ xs → reachable g xs x
-  | step (e : (Node × Node)) : e ∈ g → reachable g xs e.fst → reachable g xs e.snd
+  (xs : List Node) :
+  Set Node
+  | base
+    (x : Node) :
+    x ∈ xs →
+    reachable g xs x
+
+  | step
+    (e : (Node × Node)) :
+    e ∈ g →
+    reachable g xs e.fst →
+    reachable g xs e.snd
 
 
 lemma reachable_mono
