@@ -620,8 +620,47 @@ lemma dfs_subset_reachable_visit_nodes
   (g : Graph Node)
   (stack : List Node)
   (visited : List Node) :
-  (dfs_aux g stack visited).toFinset.toSet ⊆ reachable g stack ∪ visited.toFinset.toSet := sorry
+  (dfs_aux g stack visited).toFinset.toSet ⊆ reachable g stack ∪ visited.toFinset.toSet :=
+  by
+    induction stack, visited using dfs_aux.induct g
+    case _ visited =>
+      simp only [dfs_aux]
+      simp
+    case _ visited x stack c1 ih =>
+      simp only [dfs_aux]
+      simp only [if_pos c1]
+      have s1 : reachable g stack ⊆ reachable g (x :: stack) :=
+      by
+        apply reachable_mono
+        simp
+      have s2 : reachable g stack ∪ ↑visited.toFinset ⊆ reachable g (x :: stack) ∪ ↑visited.toFinset :=
+      by
+        exact Set.union_subset_union_left (↑visited.toFinset) s1
+      exact fun ⦃a⦄ a_1 => s2 (ih a_1)
+    case _ visited x stack c1 ih =>
+      simp only [dfs_aux]
+      simp only [if_neg c1]
 
+      obtain s1 := reachable_nexts g x
 
+      have s2 : reachable g (nexts g x ++ stack) ⊆ reachable g (x :: stack) :=
+      by
+        obtain s3 := reachable_append g (nexts g x) stack
+        simp only [s3]
+        clear s3
+
+        have s4 : reachable g (nexts g x) ∪ reachable g stack ⊆ reachable g [x] ∪ reachable g stack :=
+        by
+          exact Set.union_subset_union_left (reachable g stack) s1
+
+        obtain s5 := reachable_append g [x] stack
+        simp at s5
+        simp only [s5]
+        clear s5
+        exact s4
+
+      have s3 : (dfs_aux g (x :: stack) visited).toFinset.toSet ⊆ reachable g (x :: stack) ∪ visited.toFinset.toSet :=
+      by
+        sorry
 
 --#lint
