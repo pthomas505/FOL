@@ -551,4 +551,25 @@ lemma reachable_closed_dfs
     exact s1
 
 
+lemma reachable_nexts
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (x : Node) :
+  reachable g (nexts g x) ⊆ reachable g [x] :=
+  by
+    intro a a1
+    induction a1
+    case _ x y ih =>
+      obtain s1 := nexts_set g x y
+      apply reachable.step (x, y)
+      · simp only [← s1]
+        exact ih
+      · simp
+        apply reachable.base x
+        simp
+    case _ e ih_1 _ ih_3 =>
+      apply reachable.step e ih_1 ih_3
+
+
 --#lint
