@@ -641,8 +641,6 @@ lemma dfs_subset_reachable_visit_nodes
       simp only [dfs_aux]
       simp only [if_neg c1]
 
-      obtain s1 := reachable_nexts g x
-
       have s2 : reachable g (nexts g x ++ stack) ⊆ reachable g (x :: stack) :=
       by
         obtain s3 := reachable_append g (nexts g x) stack
@@ -651,7 +649,7 @@ lemma dfs_subset_reachable_visit_nodes
 
         have s4 : reachable g (nexts g x) ∪ reachable g stack ⊆ reachable g [x] ∪ reachable g stack :=
         by
-          exact Set.union_subset_union_left (reachable g stack) s1
+          exact Set.union_subset_union_left (reachable g stack) (reachable_nexts g x)
 
         obtain s5 := reachable_append g [x] stack
         simp at s5
@@ -661,6 +659,36 @@ lemma dfs_subset_reachable_visit_nodes
 
       have s3 : (dfs_aux g (x :: stack) visited).toFinset.toSet ⊆ reachable g (x :: stack) ∪ visited.toFinset.toSet :=
       by
-        sorry
+        have s4 : reachable g (nexts g x ++ stack) ∪ ↑(x :: visited).toFinset ⊆ reachable g (x :: stack) ∪ ↑(x :: visited).toFinset :=
+        by
+          exact Set.union_subset_union_left (↑(x :: visited).toFinset) s2
+
+        have s5 : (dfs_aux g (x :: stack) visited).toFinset.toSet ⊆ (dfs_aux g (nexts g x ++ stack) (x :: visited)).toFinset.toSet :=
+        by
+          simp only [dfs_aux]
+          simp only [if_neg c1]
+          simp
+
+        have s6 : (dfs_aux g (x :: stack) visited).toFinset.toSet ⊆ reachable g (nexts g x ++ stack) ∪ (x :: visited).toFinset.toSet :=
+        by
+          exact fun ⦃a⦄ a_1 => ih (s5 a_1)
+
+        have s7 : (dfs_aux g (x :: stack) visited).toFinset.toSet ⊆ reachable g (x :: stack) ∪ ↑(x :: visited).toFinset.toSet :=
+        by
+          exact fun ⦃a⦄ a_1 => s4 (s6 a_1)
+
+        have s8 : reachable g (x :: stack) ∪ ↑(x :: visited).toFinset = reachable g (x :: stack) ∪ ↑visited.toFinset
+        :=
+        by
+          have s9 : x ∈ reachable g (x :: stack) :=
+          by
+            apply reachable.base x
+            simp
+          simp
+          left
+          exact s9
+        simp only [← s8]
+        exact s7
+
 
 --#lint
