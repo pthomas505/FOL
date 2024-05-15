@@ -690,7 +690,27 @@ lemma dfs_subset_reachable_visit_nodes
         simp only [← s8]
         exact s7
 
+      have s4 : reachable g (nexts g x ++ stack) ∪ (x :: visited).toFinset.toSet ⊆ reachable g (x :: stack) ∪ (x :: visited).toFinset.toSet :=
+      by
+        exact Set.union_subset_union_left (↑(x :: visited).toFinset) s2
 
+
+      have s9 : x ∈ reachable g (x :: stack) :=
+      by
+        apply reachable.base x
+        simp
+
+      have s10 : reachable g (x :: stack) ∪ (x :: visited).toFinset.toSet = reachable g (x :: stack) ∪ visited.toFinset.toSet :=
+      by
+        simp
+        left
+        exact s9
+
+
+      trans (reachable g (nexts g x ++ stack) ∪ ↑(x :: visited).toFinset)
+      · exact ih
+      · simp only [← s10]
+        exact s4
 
 
 --#lint
