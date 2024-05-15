@@ -424,7 +424,7 @@ def relation_image
 
 
 lemma image_closed_trancl
-  (α : Type)
+  {α : Type}
   [DecidableEq α]
   (r : Set (α × α))
   (S : Set α)
@@ -498,19 +498,21 @@ lemma reachable_closed_dfs
   (stack : List Node) :
   reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet :=
   by
-    obtain s1 := next_subset_dfs g stack []
-    have s2 : reachable g stack ⊆ reachable g (dfs_aux g stack []) := reachable_mono g stack (dfs_aux g stack []) s1
-
-    have s3 : reachable g (dfs_aux g stack []) = (dfs_aux g stack []).toFinset.toSet :=
+    have s1 : reachable g stack ⊆ reachable g (dfs_aux g stack []) :=
     by
-      obtain s4 := nextss_closed_dfs g stack
-      simp only [nextss] at s4
+      apply reachable_mono g stack (dfs_aux g stack [])
+      exact next_subset_dfs g stack []
 
-      have s5 : relation_image g.toFinset.toSet (dfs_aux g stack []).toFinset.toSet ⊆ (dfs_aux g stack []).toFinset.toSet :=
+    have s2 : reachable g (dfs_aux g stack []) = (dfs_aux g stack []).toFinset.toSet :=
+    by
+      have s3 : relation_image g.toFinset.toSet (dfs_aux g stack []).toFinset.toSet ⊆ (dfs_aux g stack []).toFinset.toSet :=
       by
         simp only [relation_image]
+        obtain s4 := nextss_closed_dfs g stack
+        simp only [nextss] at s4
         aesop
-      simp only [relation_image] at s5
+
+      obtain s5 := image_closed_trancl g.toFinset.toSet
       sorry
     sorry
 
