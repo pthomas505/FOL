@@ -501,16 +501,16 @@ lemma reachable_closed_dfs
     obtain s1 := next_subset_dfs g stack []
     have s2 : reachable g stack ⊆ reachable g (dfs_aux g stack []) := reachable_mono g stack (dfs_aux g stack []) s1
 
-    have s2_5 : reachable g (dfs_aux g stack []) = (dfs_aux g stack []).toFinset.toSet :=
+    have s3 : reachable g (dfs_aux g stack []) = (dfs_aux g stack []).toFinset.toSet :=
     by
-      obtain s3 := nextss_closed_dfs g stack
-      simp only [nextss] at s3
+      obtain s4 := nextss_closed_dfs g stack
+      simp only [nextss] at s4
 
-      have s4 : relation_image g.toFinset.toSet (dfs_aux g stack []).toFinset.toSet ⊆ (dfs_aux g stack []).toFinset.toSet :=
+      have s5 : relation_image g.toFinset.toSet (dfs_aux g stack []).toFinset.toSet ⊆ (dfs_aux g stack []).toFinset.toSet :=
       by
         simp only [relation_image]
         aesop
-      simp only [relation_image] at s4
+      simp only [relation_image] at s5
       sorry
     sorry
 
