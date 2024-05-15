@@ -572,4 +572,46 @@ lemma reachable_nexts
       apply reachable.step e ih_1 ih_3
 
 
+lemma reachable_append
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs ys : List Node) :
+  reachable g (xs ++ ys) = reachable g xs ∪ reachable g ys :=
+  by
+    ext a
+    simp
+    constructor
+    · intro a1
+      induction a1
+      case _ x ih =>
+        simp at ih
+        cases ih
+        case inl c1 =>
+          left
+          exact reachable.base x c1
+        case inr c1 =>
+          right
+          exact reachable.base x c1
+      case _ e ih_1 _ ih_3 =>
+        simp at ih_3
+        cases ih_3
+        case _ c1 =>
+          left
+          apply reachable.step e ih_1 c1
+        case _ c1 =>
+          right
+          apply reachable.step e ih_1 c1
+    · intro a1
+      cases a1
+      case _ c1 =>
+        apply reachable_mono g xs (xs ++ ys)
+        simp
+        exact c1
+      case _ c1 =>
+        apply reachable_mono g ys (xs ++ ys)
+        simp
+        exact c1
+
+
 --#lint
