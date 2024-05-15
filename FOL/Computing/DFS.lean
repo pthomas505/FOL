@@ -614,4 +614,14 @@ lemma reachable_append
         exact c1
 
 
+lemma dfs_subset_reachable_visit_nodes
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node)
+  (visited : List Node) :
+  (dfs_aux g stack visited).toFinset.toSet ⊆ reachable g stack ∪ visited.toFinset.toSet := sorry
+
+
+
 --#lint
