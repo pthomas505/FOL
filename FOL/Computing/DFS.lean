@@ -155,30 +155,17 @@ lemma not_in_nodes_imp_nexts_empty
       simp only [nexts]
     case cons hd tl ih =>
       simp only [Graph.nodes_of] at ih
-      simp only [List.mem_union_iff] at ih
-      push_neg at ih
+      simp at ih
 
       simp only [Graph.nodes_of] at h1
-      simp only [List.mem_union_iff] at h1
-      push_neg at h1
-      cases h1
-      case _ h1_left h1_right =>
-        simp only [List.map_cons, List.mem_cons] at h1_left
-        push_neg at h1_left
-        simp only [ne_eq] at h1_left
-        cases h1_left
-        case _ h1_left_left h1_left_right =>
-          simp only [List.map_cons, List.mem_cons] at h1_right
-          push_neg at h1_right
-          simp only [ne_eq] at h1_right
-          cases h1_right
-          case _ h1_right_left h1_right_right =>
-            simp only [nexts]
-            split
-            case _ c1 =>
-              tauto
-            case _ c1 =>
-              tauto
+      simp at h1
+
+      simp only [nexts]
+      split_ifs
+      case pos c1 =>
+        tauto
+      case neg c1 =>
+        tauto
 
 
 lemma List.erase_diff_len_lt_diff_len
