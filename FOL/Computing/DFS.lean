@@ -63,6 +63,17 @@ lemma nexts_set
           tauto
 
 
+example
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (x : Node) :
+  (nexts g x).toFinset.toSet = {y | (x, y) ∈ g} :=
+  by
+    simp
+    simp only [nexts_set]
+
+
 /--
   `nextss g xs` := The image of `xs` under `g`. The neighbors of `xs`.
 -/
@@ -72,6 +83,16 @@ def nextss
   (xs : List Node) :
   Set Node :=
   {y | ∃ (x : Node), x ∈ xs ∧ (x, y) ∈ g}
+
+
+example
+  {Node : Type}
+  (g : Graph Node) :
+  ∀ (xs : List Node) (y : Node), y ∈ nextss g xs ↔
+    ∃ (x : Node), x ∈ xs ∧ (x, y) ∈ g :=
+  by
+    simp only [nextss]
+    simp
 
 
 lemma nextss_cons
