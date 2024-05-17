@@ -101,7 +101,7 @@ def nextss_list
   (g : Graph Node)
   (xs : List Node) :
   List Node :=
-  List.join (List.map (fun (x : Node) => nexts g x) xs)
+  List.join (xs.map (fun (x : Node) => nexts g x))
 
 
 example
