@@ -30,17 +30,6 @@ def nexts
     else nexts es n
 
 
-/--
-  `nextss g xs` := The image of `xs` under `g`. The neighbors of `xs`.
--/
-def nextss
-  {Node : Type}
-  (g : Graph Node)
-  (xs : List Node) :
-  Set Node :=
-  {y | ∃ (x : Node), x ∈ xs ∧ (x, y) ∈ g}
-
-
 lemma nexts_set
   {Node : Type}
   [DecidableEq Node]
@@ -72,6 +61,17 @@ lemma nexts_set
         · intro a1
           simp only [Prod.eq_iff_fst_eq_snd_eq] at a1
           tauto
+
+
+/--
+  `nextss g xs` := The image of `xs` under `g`. The neighbors of `xs`.
+-/
+def nextss
+  {Node : Type}
+  (g : Graph Node)
+  (xs : List Node) :
+  Set Node :=
+  {y | ∃ (x : Node), x ∈ xs ∧ (x, y) ∈ g}
 
 
 lemma nextss_cons
