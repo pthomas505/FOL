@@ -95,6 +95,28 @@ example
     simp
 
 
+def nextss_list
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs : List Node) :
+  List Node :=
+  List.join (List.map (fun (x : Node) => nexts g x) xs)
+
+
+example
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs : List Node) :
+  nextss g xs = (nextss_list g xs).toFinset.toSet :=
+  by
+    simp only [nextss]
+    simp only [nextss_list]
+    simp
+    simp only [nexts_set]
+
+
 lemma nextss_cons
   {Node : Type}
   [DecidableEq Node]
