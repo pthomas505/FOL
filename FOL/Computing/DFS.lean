@@ -177,14 +177,15 @@ lemma List.erase_diff_len_lt_diff_len
   (h2 : x ∉ l2) :
   ((l1.erase x).diff l2).length < (l1.diff l2).length :=
   by
-    obtain s1 := List.mem_diff_of_mem h1 h2
-    obtain s2 := List.length_erase_of_mem s1
-    obtain s3 := List.length_pos_of_mem s1
-    obtain s4 := Nat.pred_lt' s3
-    simp only [← s2] at s4
-    obtain s5 := List.diff_erase l1 l2 x
-    simp only [← s5]
-    exact s4
+    simp only [← List.diff_erase]
+
+    have s1 : x ∈ l1.diff l2 := List.mem_diff_of_mem h1 h2
+
+    have s2 : ((l1.diff l2).erase x).length = (l1.diff l2).length.pred := List.length_erase_of_mem s1
+    simp only [s2]
+
+    have s3 : 0 < (l1.diff l2).length := List.length_pos_of_mem s1
+    exact Nat.pred_lt' s3
 
 
 /--
