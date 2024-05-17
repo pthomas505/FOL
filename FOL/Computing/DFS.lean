@@ -17,7 +17,7 @@ abbrev Graph
 
 /--
   `nexts g x` := The image of `x` under `g`. The neighbors of `x`.
-  `nexts g x = {y | (x, y) ∈ g}`
+  `(nexts g x).toFinset.toSet = {y | (x, y) ∈ g}`
 -/
 def nexts
   {Node : Type}
