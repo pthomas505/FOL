@@ -577,14 +577,22 @@ lemma dfs_subset_reachable_visit_nodes
     case _ visited x stack c1 ih =>
       simp only [dfs_aux]
       simp only [if_pos c1]
-      have s1 : reachable g stack ⊆ reachable g (x :: stack) :=
+
+      intro a a1
+      simp at a1
+
+      have s1 : a ∈ reachable g stack ∪ visited.toFinset.toSet :=
+      by
+        apply Set.mem_of_subset_of_mem ih
+        simp
+        exact a1
+
+      have s2 : reachable g stack ⊆ reachable g (x :: stack) :=
       by
         apply reachable_mono
         simp
-      have s2 : reachable g stack ∪ ↑visited.toFinset ⊆ reachable g (x :: stack) ∪ ↑visited.toFinset :=
-      by
-        exact Set.union_subset_union_left (↑visited.toFinset) s1
-      exact fun ⦃a⦄ a_1 => s2 (ih a_1)
+
+      aesop
     case _ visited x stack c1 ih =>
       simp only [dfs_aux]
       simp only [if_neg c1]
