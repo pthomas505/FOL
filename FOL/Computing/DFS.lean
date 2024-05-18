@@ -384,7 +384,19 @@ lemma nextss_closed_dfs'
       · intro a a1
         simp at a1
         simp
-        aesop
+        cases a1
+        case _ c1 =>
+          cases c1
+          case _ c2 =>
+            subst c2
+            right
+            exact c1
+          case _ c2 =>
+            left
+            exact c2
+        case _ c1 =>
+          right
+          exact c1
     case _ visited x stack c1 ih =>
       simp only [dfs_aux]
       simp only [if_neg c1]
