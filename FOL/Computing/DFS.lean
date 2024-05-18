@@ -358,7 +358,7 @@ lemma next_subset_dfs
         · exact ih
 
 
-lemma nextss_closed_dfs'
+lemma nextss_closed_dfs_aux
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -412,7 +412,7 @@ lemma nextss_closed_dfs
   (stack : List Node) :
   nextss g (dfs_aux g stack []) ⊆ (dfs_aux g stack []).toFinset.toSet :=
   by
-    apply nextss_closed_dfs'
+    apply nextss_closed_dfs_aux
     simp only [nextss]
     simp
 
@@ -438,6 +438,18 @@ inductive reachable
     reachable g xs e.snd
 
 
+lemma subset_of_reachable_is_reachable
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs : List Node) :
+  xs.toFinset.toSet ⊆ reachable g xs :=
+  by
+    intro x a1
+    simp at a1
+    exact reachable.base x a1
+
+
 lemma nextss_closed_reachable
   {α : Type}
   [DecidableEq α]
@@ -453,8 +465,7 @@ lemma nextss_closed_reachable
     constructor
     · intro a1
       simp at a1
-      apply reachable.base
-      exact a1
+      exact reachable.base a a1
     · intro a1
       simp
       induction a1
@@ -476,10 +487,9 @@ lemma reachable_mono
     induction a1
     case base a ih =>
       apply reachable.base
-      apply Set.mem_of_subset_of_mem h1
-      exact ih
+      apply Set.mem_of_subset_of_mem h1 ih
     case step e ih_1 _ ih_3 =>
-      apply reachable.step e ih_1 ih_3
+      exact reachable.step e ih_1 ih_3
 
 
 lemma reachable_closed_dfs
@@ -597,43 +607,38 @@ lemma dfs_subset_reachable_visit_nodes
       simp only [dfs_aux]
       simp only [if_neg c1]
 
+      have s1 : x ∈ reachable g (x :: stack) :=
+      by
+        have s1_1 : (x :: stack).toFinset.toSet ⊆ reachable g (x :: stack) :=
+        by
+          exact subset_of_reachable_is_reachable g (x :: stack)
+
+        apply Set.mem_of_subset_of_mem s1_1
+        simp
+
       have s2 : reachable g (nexts g x ++ stack) ⊆ reachable g (x :: stack) :=
       by
-        obtain s3 := reachable_append g (nexts g x) stack
-        simp only [s3]
-        clear s3
+        have s2_1 : reachable g (nexts g x ++ stack) = reachable g (nexts g x) ∪ reachable g stack := reachable_append g (nexts g x) stack
 
-        have s4 : reachable g (nexts g x) ∪ reachable g stack ⊆ reachable g [x] ∪ reachable g stack :=
-        by
-          exact Set.union_subset_union_left (reachable g stack) (reachable_nexts g x)
+        have s2_2 : reachable g (x :: stack) = reachable g [x] ∪ reachable g stack := reachable_append g [x] stack
 
-        obtain s5 := reachable_append g [x] stack
-        simp at s5
-        simp only [s5]
-        clear s5
-        exact s4
+        have s2_3 : reachable g (nexts g x) ⊆ reachable g [x] := reachable_nexts g x
 
-      have s4 : reachable g (nexts g x ++ stack) ∪ (x :: visited).toFinset.toSet ⊆ reachable g (x :: stack) ∪ (x :: visited).toFinset.toSet :=
+        simp only [s2_1, s2_2]
+        exact Set.union_subset_union_left (reachable g stack) s2_3
+
+      have s3 : (dfs_aux g (nexts g x ++ stack) (x :: visited)).toFinset.toSet ⊆ reachable g (x :: stack) ∪ (x :: visited).toFinset.toSet :=
       by
-        exact Set.union_subset_union_left (↑(x :: visited).toFinset) s2
+        trans (reachable g (nexts g x ++ stack) ∪ (x :: visited).toFinset.toSet)
+        · exact ih
+        · exact Set.union_subset_union_left (x :: visited).toFinset.toSet s2
 
-
-      have s9 : x ∈ reachable g (x :: stack) :=
-      by
-        apply reachable.base x
+      trans (reachable g (x :: stack) ∪ ↑(x :: visited).toFinset)
+      · exact s3
+      · intro a a1
+        simp at a1
         simp
-
-      have s10 : reachable g (x :: stack) ∪ (x :: visited).toFinset.toSet = reachable g (x :: stack) ∪ visited.toFinset.toSet :=
-      by
-        simp
-        left
-        exact s9
-
-
-      trans (reachable g (nexts g x ++ stack) ∪ ↑(x :: visited).toFinset)
-      · exact ih
-      · simp only [← s10]
-        exact s4
+        aesop
 
 
 --#lint
