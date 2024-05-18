@@ -642,4 +642,18 @@ lemma dfs_subset_reachable_visit_nodes
         aesop
 
 
+theorem dfs_eq_reachable
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node) :
+  (dfs_aux g stack []).toFinset.toSet = reachable g stack :=
+  by
+    have s1 : (dfs_aux g stack []).toFinset.toSet ⊆ reachable g stack ∪ [].toFinset.toSet := dfs_subset_reachable_visit_nodes g stack []
+
+    have s2 : reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet := reachable_closed_dfs g stack
+
+    aesop
+
+
 --#lint
