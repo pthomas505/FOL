@@ -656,4 +656,15 @@ theorem dfs_eq_reachable
     aesop
 
 
+theorem dfs_eq_reachable_singleton
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (start : Node) :
+  (dfs g start).toFinset.toSet = reachable g [start] :=
+  by
+    simp only [dfs]
+    exact dfs_eq_reachable g [start]
+
+
 --#lint
