@@ -381,35 +381,28 @@ lemma nextss_closed_dfs'
 
       trans (x :: stack).toFinset.toSet ∪ visited.toFinset.toSet
       · exact h1
-      · simp
-        apply Set.insert_subset
-        · simp
-          right
-          exact c1
-        · simp
+      · intro a a1
+        simp at a1
+        simp
+        aesop
     case _ visited x stack c1 ih =>
       simp only [dfs_aux]
       simp only [if_neg c1]
       apply ih
       simp only [nextss_cons]
-      simp only [Set.union_subset_iff]
-      constructor
-      · simp only [List.toFinset_append, Finset.coe_union]
-        apply Set.subset_union_of_subset_left
-        apply Set.subset_union_left
-      · simp only [List.toFinset_cons] at h1
-        simp at h1
-
-        simp only [List.toFinset_cons]
-        simp only [List.toFinset_append, Finset.coe_union, List.toFinset_cons, Set.union_insert]
-        simp only [Set.union_assoc]
-        apply Set.subset_union_of_subset_right
-
-        have s1 : (insert x stack.toFinset.toSet) ∪ visited.toFinset.toSet = stack.toFinset.toSet ∪ (insert x visited.toFinset).toSet := by aesop
-        simp only [<- s1]
-
+      simp only [List.toFinset_append]
+      apply Set.union_subset
+      · intro a a1
+        simp at a1
         simp
-        exact h1
+        tauto
+      · intro a a1
+
+        have s1 : a ∈ (x :: stack).toFinset.toSet ∪ visited.toFinset.toSet := by exact h1 a1
+
+        simp at s1
+        simp
+        tauto
 
 
 lemma nextss_closed_dfs
