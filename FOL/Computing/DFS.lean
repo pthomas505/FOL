@@ -342,18 +342,16 @@ lemma next_subset_dfs
       simp only [if_pos c1]
       simp
       constructor
-      case left =>
-        obtain s1 := visit_subset_dfs g stack visited
+      · have s1 : visited ⊆ dfs_aux g stack visited := visit_subset_dfs g stack visited
         apply Set.mem_of_subset_of_mem s1 c1
-      case right =>
-        exact ih
+      · exact ih
     case _ visited x stack c1 ih =>
       simp only [dfs_aux]
       simp only [if_neg c1]
       simp
       constructor
-      · have s2 : x ∈ x :: visited := by { simp }
-        obtain s1 := visit_subset_dfs g (nexts g x ++ stack) (x :: visited)
+      · have s1 : x :: visited ⊆ dfs_aux g (nexts g x ++ stack) (x :: visited) := visit_subset_dfs g (nexts g x ++ stack) (x :: visited)
+        have s2 : x ∈ x :: visited := by { simp }
         apply Set.mem_of_subset_of_mem s1 s2
       · trans (nexts g x) ++ stack
         · simp
