@@ -3,7 +3,7 @@ import Mathlib.Data.Finset.Basic
 
 -- Depth First Search
 
--- https://www.isa-afp.org/entries/Depth-First-Search.html
+-- Translated from https://www.isa-afp.org/entries/Depth-First-Search.html.
 
 
 /--
