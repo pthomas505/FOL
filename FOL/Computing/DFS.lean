@@ -166,7 +166,8 @@ lemma not_in_nodes_imp_nexts_empty
       simp only [nexts]
       split_ifs
       case pos c1 =>
-        tauto
+        subst c1
+        simp at h1
       case neg c1 =>
         tauto
 
