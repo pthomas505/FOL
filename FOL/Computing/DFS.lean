@@ -444,7 +444,7 @@ lemma nextss_closed_reachable
   (g : Graph α)
   (xs : List α)
   (h1 : nextss g xs ⊆ xs.toFinset.toSet) :
-  reachable g xs = xs.toFinset.toSet :=
+  xs.toFinset.toSet = reachable g xs :=
   by
     simp only [nextss] at h1
     simp at h1
@@ -452,16 +452,16 @@ lemma nextss_closed_reachable
     ext a
     constructor
     · intro a1
+      simp at a1
+      apply reachable.base
+      exact a1
+    · intro a1
       simp
       induction a1
       case _ x _ ih =>
         exact ih
       case _ x y ih_1 _ ih_3 =>
         exact h1 y.2 y.1 ih_3 ih_1
-    · intro a1
-      simp at a1
-      apply reachable.base
-      exact a1
 
 
 lemma reachable_mono
@@ -489,12 +489,12 @@ lemma reachable_closed_dfs
   (stack : List Node) :
   reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet :=
   by
-    have s1 : reachable g (dfs_aux g stack []) = (dfs_aux g stack []).toFinset.toSet :=
+    have s1 : (dfs_aux g stack []).toFinset.toSet = reachable g (dfs_aux g stack []) :=
     by
       apply nextss_closed_reachable g (dfs_aux g stack [])
       exact nextss_closed_dfs g stack
 
-    simp only [← s1]
+    simp only [s1]
     apply reachable_mono g stack (dfs_aux g stack [])
     exact next_subset_dfs g stack []
 
