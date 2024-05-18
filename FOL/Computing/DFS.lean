@@ -489,18 +489,14 @@ lemma reachable_closed_dfs
   (stack : List Node) :
   reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet :=
   by
-    have s1 : reachable g stack ⊆ reachable g (dfs_aux g stack []) :=
-    by
-      apply reachable_mono g stack (dfs_aux g stack [])
-      exact next_subset_dfs g stack []
-
-    have s2 : reachable g (dfs_aux g stack []) = (dfs_aux g stack []).toFinset.toSet :=
+    have s1 : reachable g (dfs_aux g stack []) = (dfs_aux g stack []).toFinset.toSet :=
     by
       apply nextss_closed_reachable g (dfs_aux g stack [])
       exact nextss_closed_dfs g stack
 
-    simp only [← s2]
-    exact s1
+    simp only [← s1]
+    apply reachable_mono g stack (dfs_aux g stack [])
+    exact next_subset_dfs g stack []
 
 
 lemma reachable_nexts
