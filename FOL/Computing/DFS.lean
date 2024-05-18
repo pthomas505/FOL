@@ -494,6 +494,32 @@ inductive reachable
     reachable g xs e.snd
 
 
+lemma nextss_closed_reachable
+  {α : Type}
+  [DecidableEq α]
+  (g : Graph α)
+  (xs : List α)
+  (h1 : nextss g xs ⊆ xs.toFinset.toSet) :
+  reachable g xs = xs.toFinset.toSet :=
+  by
+    simp only [nextss] at h1
+    simp at h1
+
+    ext a
+    constructor
+    · intro a1
+      simp
+      induction a1
+      case _ x _ ih =>
+        exact ih
+      case _ x y ih_1 _ ih_3 =>
+        exact h1 y.2 y.1 ih_3 ih_1
+    · intro a1
+      simp at a1
+      apply reachable.base
+      exact a1
+
+
 lemma reachable_mono
   {Node : Type}
   [DecidableEq Node]
