@@ -364,12 +364,13 @@ lemma nextss_closed_dfs'
   (g : Graph Node)
   (stack : List Node)
   (visited : List Node)
-  (h1 : nextss g visited ⊆ stack.toFinset ∪ visited.toFinset.toSet) :
+  (h1 : nextss g visited ⊆ stack.toFinset.toSet ∪ visited.toFinset.toSet) :
   nextss g (dfs_aux g stack visited) ⊆ (dfs_aux g stack visited).toFinset.toSet :=
   by
     induction stack, visited using dfs_aux.induct g
     case _ visited =>
       simp at h1
+
       simp only [dfs_aux]
       simp
       exact h1
@@ -377,17 +378,15 @@ lemma nextss_closed_dfs'
       simp only [dfs_aux]
       simp only [if_pos c1]
       apply ih
-      trans ↑(x :: stack).toFinset ∪ ↑visited.toFinset
+
+      trans (x :: stack).toFinset.toSet ∪ visited.toFinset.toSet
       · exact h1
-      · simp only [List.toFinset_cons, Finset.coe_insert]
-        simp only [Set.insert_union]
-
-        have s1 : x ∈ (stack.toFinset.toSet ∪ visited.toFinset.toSet) :=
-        by { simp; right; exact c1 }
-
-        obtain s2 := Set.insert_eq_of_mem s1
-        simp only [s2]
-        simp
+      · simp
+        apply Set.insert_subset
+        · simp
+          right
+          exact c1
+        · simp
     case _ visited x stack c1 ih =>
       simp only [dfs_aux]
       simp only [if_neg c1]
