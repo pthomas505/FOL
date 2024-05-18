@@ -96,7 +96,7 @@ example
 
 
 /--
-  This is an equivalent definition of nextss for clarification of its meaning.
+  A constructive definition of nextss.
 -/
 def nextss_list
   {Node : Type}
