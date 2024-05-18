@@ -605,39 +605,6 @@ lemma dfs_subset_reachable_visit_nodes
         clear s5
         exact s4
 
-      have s3 : (dfs_aux g (x :: stack) visited).toFinset.toSet ⊆ reachable g (x :: stack) ∪ visited.toFinset.toSet :=
-      by
-        have s4 : reachable g (nexts g x ++ stack) ∪ ↑(x :: visited).toFinset ⊆ reachable g (x :: stack) ∪ ↑(x :: visited).toFinset :=
-        by
-          exact Set.union_subset_union_left (↑(x :: visited).toFinset) s2
-
-        have s5 : (dfs_aux g (x :: stack) visited).toFinset.toSet ⊆ (dfs_aux g (nexts g x ++ stack) (x :: visited)).toFinset.toSet :=
-        by
-          simp only [dfs_aux]
-          simp only [if_neg c1]
-          simp
-
-        have s6 : (dfs_aux g (x :: stack) visited).toFinset.toSet ⊆ reachable g (nexts g x ++ stack) ∪ (x :: visited).toFinset.toSet :=
-        by
-          exact fun ⦃a⦄ a_1 => ih (s5 a_1)
-
-        have s7 : (dfs_aux g (x :: stack) visited).toFinset.toSet ⊆ reachable g (x :: stack) ∪ ↑(x :: visited).toFinset.toSet :=
-        by
-          exact fun ⦃a⦄ a_1 => s4 (s6 a_1)
-
-        have s8 : reachable g (x :: stack) ∪ ↑(x :: visited).toFinset = reachable g (x :: stack) ∪ ↑visited.toFinset
-        :=
-        by
-          have s9 : x ∈ reachable g (x :: stack) :=
-          by
-            apply reachable.base x
-            simp
-          simp
-          left
-          exact s9
-        simp only [← s8]
-        exact s7
-
       have s4 : reachable g (nexts g x ++ stack) ∪ (x :: visited).toFinset.toSet ⊆ reachable g (x :: stack) ∪ (x :: visited).toFinset.toSet :=
       by
         exact Set.union_subset_union_left (↑(x :: visited).toFinset) s2
