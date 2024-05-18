@@ -95,6 +95,9 @@ example
     simp
 
 
+/--
+  This is an equivalent definition of nextss for clarification of its meaning.
+-/
 def nextss_list
   {Node : Type}
   [DecidableEq Node]
@@ -667,4 +670,4 @@ theorem dfs_eq_reachable_singleton
     exact dfs_eq_reachable g [start]
 
 
---#lint
+#lint
