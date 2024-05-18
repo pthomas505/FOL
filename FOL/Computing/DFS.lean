@@ -578,7 +578,8 @@ lemma dfs_subset_reachable_visit_nodes
   (g : Graph Node)
   (stack : List Node)
   (visited : List Node) :
-  (dfs_aux g stack visited).toFinset.toSet ⊆ reachable g stack ∪ visited.toFinset.toSet :=
+  (dfs_aux g stack visited).toFinset.toSet ⊆
+    reachable g stack ∪ visited.toFinset.toSet :=
   by
     induction stack, visited using dfs_aux.induct g
     case _ visited =>
