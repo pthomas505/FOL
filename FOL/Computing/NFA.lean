@@ -165,3 +165,17 @@ structure NFA
   (starting_state_list : List σ)
   (accepting_state_list : List σ)
   deriving Repr
+
+
+def epsilon_nfa_to_nfa
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (epsilon_nfa : EpsilonNFA α σ) :
+  NFA α σ :=
+  ⟨
+    epsilon_nfa.symbol_step_list.map (symbol_step_epsilon_closure epsilon_nfa.epsilon_step_list),
+    epsilon_closure epsilon_nfa.epsilon_step_list epsilon_nfa.starting_state_list,
+    epsilon_nfa.accepting_state_list
+  ⟩
