@@ -7,47 +7,10 @@ structure SymbolStepMultiple
   (σ : Type)
   [DecidableEq σ] :
   Type :=
-  (from_state : σ)
+  (start_state : σ)
   (symbol : α)
-  (to_state_list : List σ)
+  (stop_state_list : List σ)
   deriving Repr
-
-
-structure SymbolStepSingle
-  (α : Type)
-  [DecidableEq α]
-  (σ : Type)
-  [DecidableEq σ] :
-  Type :=
-  (from_state : σ)
-  (symbol : α)
-  (to_state : σ)
-  deriving Repr
-
-
-def symbol_step_multiple_to_symbol_step_single_list
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (step : SymbolStepMultiple α σ) :
-  List (SymbolStepSingle α σ) :=
-  step.to_state_list.map (fun (to_state : σ) =>
-    ⟨
-      step.from_state,
-      step.symbol,
-      to_state
-    ⟩ )
-
-
-def symbol_step_multiple_list_to_symbol_step_single_list
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (step_list : List (SymbolStepMultiple α σ)) :
-  List (SymbolStepSingle α σ) :=
-  (step_list.map (fun (step : SymbolStepMultiple α σ) => symbol_step_multiple_to_symbol_step_single_list step)).join
 
 
 structure EpsilonStepMultiple
@@ -56,8 +19,8 @@ structure EpsilonStepMultiple
   (σ : Type)
   [DecidableEq σ] :
   Type :=
-  (from_state : σ)
-  (to_state_list : List σ)
+  (start_state : σ)
+  (stop_state_list : List σ)
   deriving Repr
 
 
@@ -67,8 +30,8 @@ structure EpsilonStepSingle
   (σ : Type)
   [DecidableEq σ] :
   Type :=
-  (from_state : σ)
-  (to_state : σ)
+  (start_state : σ)
+  (stop_state : σ)
   deriving Repr
 
 
@@ -79,10 +42,10 @@ def epsilon_step_multiple_to_epsilon_step_single_list
   [DecidableEq σ]
   (step : EpsilonStepMultiple α σ) :
   List (EpsilonStepSingle α σ) :=
-  step.to_state_list.map (fun (to_state : σ) =>
+  step.stop_state_list.map (fun (stop_state : σ) =>
     ⟨
-      step.from_state,
-      to_state
+      step.start_state,
+      stop_state
     ⟩ )
 
 
@@ -103,7 +66,7 @@ def epsilon_step_single_list_to_graph
   [DecidableEq σ]
   (step_list : List (EpsilonStepSingle α σ)) :
   Graph σ :=
-    step_list.map (fun (step : (EpsilonStepSingle α σ)) => (step.from_state, step.to_state))
+    step_list.map (fun (step : (EpsilonStepSingle α σ)) => (step.start_state, step.stop_state))
 
 
 def epsilon_step_multiple_list_to_graph
@@ -136,9 +99,9 @@ def symbol_step_epsilon_closure
   (symbol_step : SymbolStepMultiple α σ) :
   SymbolStepMultiple α σ :=
     ⟨
-      symbol_step.from_state,
+      symbol_step.start_state,
       symbol_step.symbol,
-      epsilon_closure epsilon_step_list symbol_step.to_state_list
+      epsilon_closure epsilon_step_list symbol_step.stop_state_list
     ⟩
 
 
