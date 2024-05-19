@@ -142,3 +142,57 @@ def epsilon_nfa_to_nfa
     epsilon_closure epsilon_nfa.epsilon_step_list epsilon_nfa.starting_state_list,
     epsilon_nfa.accepting_state_list
   ⟩
+
+
+/--
+  Helper function for symbol_step_multiple_list_to_fun.
+-/
+def symbol_step_multiple_list_to_fun_aux
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (state_arg : σ)
+  (symbol_arg : α)
+  -- The accumulated results of all of the steps that have the state and symbol arguments as a pair.
+  (image_acc : List σ) :
+  List (SymbolStepMultiple α σ) → List σ
+  | [] => List.dedup image_acc
+  | ⟨ start_state, symbol, stop_state_list ⟩  :: tl =>
+    let image : List σ :=
+      if state_arg = start_state ∧ symbol_arg = symbol
+      then stop_state_list
+      else []
+    symbol_step_multiple_list_to_fun_aux state_arg symbol_arg (image_acc ++ image) tl
+
+
+/--
+  Recursively iterates through the step list and returns the accumulated results of all of the steps that have the state and symbol arguments as a pair.
+-/
+def symbol_step_multiple_list_to_fun
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (step_list : List (SymbolStepMultiple α σ))
+  (state_arg : σ)
+  (symbol_arg : α) :
+  List σ :=
+  symbol_step_multiple_list_to_fun_aux state_arg symbol_arg [] step_list
+
+
+example : symbol_step_multiple_list_to_fun ([] : List (SymbolStepMultiple Char Nat)) 0 'a' == [] := by rfl
+
+example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩] 0 'a' == [1] := by rfl
+
+example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩] 0 'b' == [] := by rfl
+
+example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩] 0 'a' == [1] := by rfl
+
+example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩] 0 'b' == [1] := by rfl
+
+example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩] 0 'a' == [1] := by rfl
+
+example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩] 0 'b' == [2] := by rfl
+
+example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩] 0 'a' == [1, 2] := by rfl
