@@ -116,42 +116,6 @@ def epsilon_step_multiple_list_to_graph
   epsilon_step_single_list_to_graph (epsilon_step_multiple_list_to_epsilon_step_single_list step_list)
 
 
-
-structure NFA
-  (α : Type)
-  [DecidableEq α]
-  (σ : Type)
-  [DecidableEq σ] :
-  Type :=
-  (symbol_step_list : List (SymbolStepMultiple α σ))
-  (starting_state_list : List σ)
-  (accepting_state_list : List σ)
-  deriving Repr
-
-
-structure EpsilonNFA
-  (α : Type)
-  [DecidableEq α]
-  (σ : Type)
-  [DecidableEq σ] :
-  Type :=
-  (symbol_step_list : List (SymbolStepMultiple α σ))
-  (epsilon_step_list : List (EpsilonStepMultiple α σ))
-  (starting_state_list : List σ)
-  (accepting_state_list : List σ)
-  deriving Repr
-
-
-def epsilon_step_list_to_graph
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (epsilon_step_list : List (EpsilonStepMultiple α σ)) :
-  Graph σ :=
-    (epsilon_step_multiple_list_to_epsilon_step_single_list epsilon_step_list).map (fun (step : (EpsilonStepSingle α σ)) => (step.from_state, step.to_state))
-
-
 def epsilon_closure
   {α : Type}
   [DecidableEq α]
@@ -160,7 +124,7 @@ def epsilon_closure
   (epsilon_step_list : List (EpsilonStepMultiple α σ))
   (state_list : List σ) :
   List σ :=
-    dfs_aux (epsilon_step_list_to_graph epsilon_step_list) state_list []
+    dfs_aux (epsilon_step_multiple_list_to_graph epsilon_step_list) state_list []
 
 
 def symbol_step_epsilon_closure
@@ -176,3 +140,28 @@ def symbol_step_epsilon_closure
       symbol_step.symbol,
       epsilon_closure epsilon_step_list symbol_step.to_state_list
     ⟩
+
+
+structure EpsilonNFA
+  (α : Type)
+  [DecidableEq α]
+  (σ : Type)
+  [DecidableEq σ] :
+  Type :=
+  (symbol_step_list : List (SymbolStepMultiple α σ))
+  (epsilon_step_list : List (EpsilonStepMultiple α σ))
+  (starting_state_list : List σ)
+  (accepting_state_list : List σ)
+  deriving Repr
+
+
+structure NFA
+  (α : Type)
+  [DecidableEq α]
+  (σ : Type)
+  [DecidableEq σ] :
+  Type :=
+  (symbol_step_list : List (SymbolStepMultiple α σ))
+  (starting_state_list : List σ)
+  (accepting_state_list : List σ)
+  deriving Repr
