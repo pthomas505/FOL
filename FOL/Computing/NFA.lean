@@ -78,12 +78,23 @@ def symbol_step_epsilon_closure
   (epsilon_step_list : List (EpsilonStep α σ))
   (symbol_step : SymbolStep α σ) :
   List (SymbolStep α σ) :=
-  let to_state_list := dfs_aux (epsilon_step_list_to_graph epsilon_step_list) [symbol_step.to_state] []
+  let to_state_list := epsilon_closure epsilon_step_list [symbol_step.to_state]
 
   to_state_list.map (fun (to_state : σ) =>
-    {
-      from_state := symbol_step.from_state,
-      symbol := symbol_step.symbol,
-      to_state := to_state
-    }
+    ⟨
+      symbol_step.from_state,
+      symbol_step.symbol,
+      to_state
+    ⟩
   )
+
+
+def symbol_step_list_epsilon_closure
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (epsilon_step_list : List (EpsilonStep α σ))
+  (symbol_step_list : List (SymbolStep α σ)) :
+  List (SymbolStep α σ) :=
+  (symbol_step_list.map (fun (symbol_step : SymbolStep α σ) => symbol_step_epsilon_closure epsilon_step_list symbol_step)).join
