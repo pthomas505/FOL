@@ -1,7 +1,19 @@
 import FOL.Computing.DFS
 
 
-structure SymbolStep
+structure SymbolStepMultiple
+  (α : Type)
+  [DecidableEq α]
+  (σ : Type)
+  [DecidableEq σ] :
+  Type :=
+  (from_state : σ)
+  (symbol : α)
+  (to_state_list : List σ)
+  deriving Repr
+
+
+structure SymbolStepSingle
   (α : Type)
   [DecidableEq α]
   (σ : Type)
@@ -13,7 +25,43 @@ structure SymbolStep
   deriving Repr
 
 
-structure EpsilonStep
+def symbol_step_multiple_to_symbol_step_single_list
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (step : SymbolStepMultiple α σ) :
+  List (SymbolStepSingle α σ) :=
+  step.to_state_list.map (fun (to_state : σ) =>
+    ⟨
+      step.from_state,
+      step.symbol,
+      to_state
+    ⟩ )
+
+
+def symbol_step_multiple_list_to_symbol_step_single_list
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (step_list : List (SymbolStepMultiple α σ)) :
+  List (SymbolStepSingle α σ) :=
+  (step_list.map (fun (step : SymbolStepMultiple α σ) => symbol_step_multiple_to_symbol_step_single_list step)).join
+
+
+structure EpsilonStepMultiple
+  (α : Type)
+  [DecidableEq α]
+  (σ : Type)
+  [DecidableEq σ] :
+  Type :=
+  (from_state : σ)
+  (to_state_list : List σ)
+  deriving Repr
+
+
+structure EpsilonStepSingle
   (α : Type)
   [DecidableEq α]
   (σ : Type)
@@ -24,13 +72,37 @@ structure EpsilonStep
   deriving Repr
 
 
+def epsilon_step_multiple_to_epsilon_step_single_list
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (step : EpsilonStepMultiple α σ) :
+  List (EpsilonStepSingle α σ) :=
+  step.to_state_list.map (fun (to_state : σ) =>
+    ⟨
+      step.from_state,
+      to_state
+    ⟩ )
+
+
+def epsilon_step_multiple_list_to_epsilon_step_single_list
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (step_list : List (EpsilonStepMultiple α σ)) :
+  List (EpsilonStepSingle α σ) :=
+  (step_list.map (fun (step : EpsilonStepMultiple α σ) => epsilon_step_multiple_to_epsilon_step_single_list step)).join
+
+
 structure NFA
   (α : Type)
   [DecidableEq α]
   (σ : Type)
   [DecidableEq σ] :
   Type :=
-  (symbol_step_list : List (SymbolStep α σ))
+  (symbol_step_list : List (SymbolStepMultiple α σ))
   (starting_state_list : List σ)
   (accepting_state_list : List σ)
   deriving Repr
@@ -42,8 +114,8 @@ structure EpsilonNFA
   (σ : Type)
   [DecidableEq σ] :
   Type :=
-  (symbol_step_list : List (SymbolStep α σ))
-  (epsilon_step_list : List (EpsilonStep α σ))
+  (symbol_step_list : List (SymbolStepMultiple α σ))
+  (epsilon_step_list : List (EpsilonStepMultiple α σ))
   (starting_state_list : List σ)
   (accepting_state_list : List σ)
   deriving Repr
@@ -54,9 +126,9 @@ def epsilon_step_list_to_graph
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
-  (epsilon_step_list : List (EpsilonStep α σ)) :
+  (epsilon_step_list : List (EpsilonStepMultiple α σ)) :
   Graph σ :=
-    epsilon_step_list.map (fun (step : (EpsilonStep α σ)) => (step.from_state, step.to_state))
+    (epsilon_step_multiple_list_to_epsilon_step_single_list epsilon_step_list).map (fun (step : (EpsilonStepSingle α σ)) => (step.from_state, step.to_state))
 
 
 def epsilon_closure
@@ -64,7 +136,7 @@ def epsilon_closure
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
-  (epsilon_step_list : List (EpsilonStep α σ))
+  (epsilon_step_list : List (EpsilonStepMultiple α σ))
   (state_list : List σ) :
   List σ :=
     dfs_aux (epsilon_step_list_to_graph epsilon_step_list) state_list []
@@ -75,26 +147,11 @@ def symbol_step_epsilon_closure
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
-  (epsilon_step_list : List (EpsilonStep α σ))
-  (symbol_step : SymbolStep α σ) :
-  List (SymbolStep α σ) :=
-  let to_state_list := epsilon_closure epsilon_step_list [symbol_step.to_state]
-
-  to_state_list.map (fun (to_state : σ) =>
+  (epsilon_step_list : List (EpsilonStepMultiple α σ))
+  (symbol_step : SymbolStepMultiple α σ) :
+  SymbolStepMultiple α σ :=
     ⟨
       symbol_step.from_state,
       symbol_step.symbol,
-      to_state
+      epsilon_closure epsilon_step_list symbol_step.to_state_list
     ⟩
-  )
-
-
-def symbol_step_list_epsilon_closure
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (epsilon_step_list : List (EpsilonStep α σ))
-  (symbol_step_list : List (SymbolStep α σ)) :
-  List (SymbolStep α σ) :=
-  (symbol_step_list.map (fun (symbol_step : SymbolStep α σ) => symbol_step_epsilon_closure epsilon_step_list symbol_step)).join
