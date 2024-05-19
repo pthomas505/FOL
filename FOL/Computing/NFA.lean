@@ -145,7 +145,7 @@ def epsilon_nfa_to_nfa
 
 
 /--
-  The accumulated stop states of all of the steps that have a start state matching the given state and a symbol matching the given symbol.
+  The accumulated stop states of all of the steps in the list that have a start state and symbol matching the given state and symbol.
 -/
 def symbol_step_multiple_list_to_fun
   {α : Type}
