@@ -145,29 +145,7 @@ def epsilon_nfa_to_nfa
 
 
 /--
-  Helper function for symbol_step_multiple_list_to_fun.
--/
-def symbol_step_multiple_list_to_fun_aux
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (state_arg : σ)
-  (symbol_arg : α)
-  -- The accumulated results of all of the steps that have the state and symbol arguments as a pair.
-  (image_acc : List σ) :
-  List (SymbolStepMultiple α σ) → List σ
-  | [] => List.dedup image_acc
-  | ⟨ start_state, symbol, stop_state_list ⟩  :: tl =>
-    let image : List σ :=
-      if state_arg = start_state ∧ symbol_arg = symbol
-      then stop_state_list
-      else []
-    symbol_step_multiple_list_to_fun_aux state_arg symbol_arg (image_acc ++ image) tl
-
-
-/--
-  Recursively iterates through the step list and returns the accumulated results of all of the steps that have the state and symbol arguments as a pair.
+  The accumulated stop states of all of the steps that have a start state matching the given state and a symbol matching the given symbol.
 -/
 def symbol_step_multiple_list_to_fun
   {α : Type}
@@ -175,10 +153,13 @@ def symbol_step_multiple_list_to_fun
   {σ : Type}
   [DecidableEq σ]
   (step_list : List (SymbolStepMultiple α σ))
-  (state_arg : σ)
-  (symbol_arg : α) :
+  (state : σ)
+  (symbol : α) :
   List σ :=
-  symbol_step_multiple_list_to_fun_aux state_arg symbol_arg [] step_list
+  (step_list.filterMap (fun (step : SymbolStepMultiple α σ) =>
+    if step.start_state = state ∧ step.symbol = symbol
+    then Option.some step.stop_state_list
+    else Option.none)).join
 
 
 example : symbol_step_multiple_list_to_fun ([] : List (SymbolStepMultiple Char Nat)) 0 'a' == [] := by rfl
