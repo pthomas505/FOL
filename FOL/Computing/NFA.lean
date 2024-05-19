@@ -35,7 +35,7 @@ structure EpsilonStepSingle
   deriving Repr
 
 
-def epsilon_step_multiple_to_epsilon_step_single_list
+def epsilon_step_multiple_to_single_list
   {α : Type}
   [DecidableEq α]
   {σ : Type}
@@ -49,14 +49,14 @@ def epsilon_step_multiple_to_epsilon_step_single_list
     ⟩ )
 
 
-def epsilon_step_multiple_list_to_epsilon_step_single_list
+def epsilon_step_multiple_list_to_single_list
   {α : Type}
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (step_list : List (EpsilonStepMultiple α σ)) :
   List (EpsilonStepSingle α σ) :=
-  (step_list.map (fun (step : EpsilonStepMultiple α σ) => epsilon_step_multiple_to_epsilon_step_single_list step)).join
+  (step_list.map (fun (step : EpsilonStepMultiple α σ) => epsilon_step_multiple_to_single_list step)).join
 
 
 def epsilon_step_single_list_to_graph
@@ -76,7 +76,7 @@ def epsilon_step_multiple_list_to_graph
   [DecidableEq σ]
   (step_list : List (EpsilonStepMultiple α σ)) :
   Graph σ :=
-  epsilon_step_single_list_to_graph (epsilon_step_multiple_list_to_epsilon_step_single_list step_list)
+  epsilon_step_single_list_to_graph (epsilon_step_multiple_list_to_single_list step_list)
 
 
 def epsilon_closure
