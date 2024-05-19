@@ -58,7 +58,7 @@ def epsilon_step_multiple_list_to_single_list
 
 
 /--
-  Translates a list of steps that are each from a single state to a single state to an adjacency list representation of a graph.
+  Translates a list of steps that are each from a single state to a single state, to an adjacency list representation of a graph.
 -/
 def epsilon_step_single_list_to_graph
   {σ : Type}
