@@ -96,6 +96,27 @@ def epsilon_step_multiple_list_to_epsilon_step_single_list
   (step_list.map (fun (step : EpsilonStepMultiple α σ) => epsilon_step_multiple_to_epsilon_step_single_list step)).join
 
 
+def epsilon_step_single_list_to_graph
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (step_list : List (EpsilonStepSingle α σ)) :
+  Graph σ :=
+    step_list.map (fun (step : (EpsilonStepSingle α σ)) => (step.from_state, step.to_state))
+
+
+def epsilon_step_multiple_list_to_graph
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (step_list : List (EpsilonStepMultiple α σ)) :
+  Graph σ :=
+  epsilon_step_single_list_to_graph (epsilon_step_multiple_list_to_epsilon_step_single_list step_list)
+
+
+
 structure NFA
   (α : Type)
   [DecidableEq α]
