@@ -235,7 +235,21 @@ def NFA.eval
   e.evalFrom e.starting_state_list
 
 
-#eval NFA.eval ⟨ [⟨0, 'a', [1]⟩], [0], [1] ⟩ ['a']
+example : NFA.eval ⟨ [], [0], [1] ⟩ ['a'] == [] := by rfl
+
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩], [0], [1] ⟩ ['a'] == [1] := by rfl
+
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩], [0], [1] ⟩ ['b'] == [] := by rfl
+
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [0], [1] ⟩ ['a'] == [1] := by rfl
+
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [0], [1] ⟩ ['b'] == [1] := by rfl
+
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [0], [1] ⟩ ['a'] == [1] := by rfl
+
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [0], [1] ⟩ ['b'] == [2] := by rfl
+
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩], [0], [1] ⟩ ['a'] == [1, 2] := by rfl
 
 
 def NFA.accepts
