@@ -80,7 +80,7 @@ def epsilon_step_multiple_list_to_graph
 
 
 /--
-  Takes a list of epsilon steps that are each from a single state to a list of states and calculates the epsilon closure of a set of states with respect to that list.
+  Takes a list of epsilon steps that are each from a single state to a list of states and calculates the epsilon closure of a set of states with respect to the graph generated from the list of epsilon steps.
 -/
 def epsilon_closure
   {σ : Type}
