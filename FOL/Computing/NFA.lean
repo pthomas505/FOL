@@ -122,7 +122,7 @@ structure EpsilonNFA
   deriving Repr
 
 
-structure NFA_aux
+structure NFA
   (α : Type)
   [DecidableEq α]
   (σ : Type)
@@ -134,13 +134,13 @@ structure NFA_aux
   deriving Repr
 
 
-def epsilon_nfa_to_nfa_aux
+def epsilon_nfa_to_nfa
   {α : Type}
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (epsilon_nfa : EpsilonNFA α σ) :
-  NFA_aux α σ :=
+  NFA α σ :=
   ⟨
     epsilon_nfa.symbol_step_list.map (symbol_step_epsilon_closure epsilon_nfa.epsilon_step_list),
     epsilon_closure epsilon_nfa.epsilon_step_list epsilon_nfa.starting_state_list,
@@ -148,17 +148,17 @@ def epsilon_nfa_to_nfa_aux
   ⟩
 
 
-#eval epsilon_nfa_to_nfa_aux ⟨ [⟨0, 'a', [1]⟩], [⟨1, [2]⟩], [0], [1] ⟩
+#eval epsilon_nfa_to_nfa ⟨ [⟨0, 'a', [1]⟩], [⟨1, [2]⟩], [0], [1] ⟩
 
-#eval epsilon_nfa_to_nfa_aux ⟨ [⟨0, 'a', [1]⟩], [⟨1, [2]⟩, ⟨0, [2]⟩], [0], [1] ⟩
+#eval epsilon_nfa_to_nfa ⟨ [⟨0, 'a', [1]⟩], [⟨1, [2]⟩, ⟨0, [2]⟩], [0], [1] ⟩
 
-#eval epsilon_nfa_to_nfa_aux ⟨ [⟨0, 'a', [1]⟩], [⟨1, [2]⟩, ⟨1, [2]⟩], [0], [1] ⟩
+#eval epsilon_nfa_to_nfa ⟨ [⟨0, 'a', [1]⟩], [⟨1, [2]⟩, ⟨1, [2]⟩], [0], [1] ⟩
 
-#eval epsilon_nfa_to_nfa_aux ⟨ [⟨0, 'a', [1, 2]⟩], [⟨1, [2]⟩, ⟨0, [2]⟩], [0], [1] ⟩
+#eval epsilon_nfa_to_nfa ⟨ [⟨0, 'a', [1, 2]⟩], [⟨1, [2]⟩, ⟨0, [2]⟩], [0], [1] ⟩
 
-#eval epsilon_nfa_to_nfa_aux ⟨ [⟨0, 'a', [1, 2]⟩, ⟨1, 'b', [3]⟩], [⟨1, [2]⟩, ⟨2, [5]⟩], [0], [1] ⟩
+#eval epsilon_nfa_to_nfa ⟨ [⟨0, 'a', [1, 2]⟩, ⟨1, 'b', [3]⟩], [⟨1, [2]⟩, ⟨2, [5]⟩], [0], [1] ⟩
 
-#eval epsilon_nfa_to_nfa_aux ⟨ [⟨0, 'a', [1, 2]⟩, ⟨1, 'b', [3]⟩], [⟨1, [2]⟩, ⟨2, [5]⟩], [0, 3, 3], [1] ⟩
+#eval epsilon_nfa_to_nfa ⟨ [⟨0, 'a', [1, 2]⟩, ⟨1, 'b', [3]⟩], [⟨1, [2]⟩, ⟨2, [5]⟩], [0, 3, 3], [1] ⟩
 
 
 /--
@@ -194,51 +194,3 @@ example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩
 example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩] 0 'b' == [2] := by rfl
 
 example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩] 0 'a' == [1, 2] := by rfl
-
-
-/--
-  The type of nondeterministic automatons.
-  `α` is the type of input symbols.
-  `σ` is the type of states.
-
-  Transitions from one set of states to another set of states on each input symbol. The set of states that it transitions to is permitted to be the same set of states that it transitioned from.
-
-  If the nondeterministic automaton `N` is at the list of states `l` and the input sequence is `c :: cs` then `N` transitions to the list of states given by `⋃ s ∈ l, N.step s c` and the input sequence becomes `cs`. If `s1 ∈ l` and `s2 ∈ l` then `⋃ s ∈ l, N.step s c` includes `(N.step s1 c) ∪ (N.step s2 c)`.
--/
-structure NFA
-  (α : Type)
-  [DecidableEq α]
-  (σ : Type)
-  [DecidableEq σ] :
-  Type :=
-  (step : σ → α → List σ)
-  (starting_state_list : List σ)
-  (accepting_state_list : List σ)
-
-
-def nfa_aux_to_nfa
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (nfa_aux : NFA_aux α σ) :
-  NFA α σ :=
-  ⟨
-    symbol_step_multiple_list_to_fun nfa_aux.symbol_step_list,
-    nfa_aux.starting_state_list,
-    nfa_aux.accepting_state_list
-  ⟩
-
-
-/--
-  `NA.step_list N l c` := Returns the list of states that the nondeterministic automaton `N` transitions to if it starts at the list of states `l` and consumes the symbol `c`.
--/
-def NFA.step_list
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (N : NFA α σ)
-  (l : List σ)
-  (c : α) :=
-  (l.map (fun (state : σ) => N.step state c)).join
