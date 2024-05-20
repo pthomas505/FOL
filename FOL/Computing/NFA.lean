@@ -158,6 +158,8 @@ def epsilon_nfa_to_nfa_aux
 
 #eval epsilon_nfa_to_nfa_aux ⟨ [⟨0, 'a', [1, 2]⟩, ⟨1, 'b', [3]⟩], [⟨1, [2]⟩, ⟨2, [5]⟩], [0], [1] ⟩
 
+#eval epsilon_nfa_to_nfa_aux ⟨ [⟨0, 'a', [1, 2]⟩, ⟨1, 'b', [3]⟩], [⟨1, [2]⟩, ⟨2, [5]⟩], [0, 3, 3], [1] ⟩
+
 
 /--
   The accumulated stop states of all of the steps in the list that have a start state and symbol matching the given state and symbol.
