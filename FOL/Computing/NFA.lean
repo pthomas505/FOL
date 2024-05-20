@@ -32,7 +32,7 @@ structure EpsilonStepSingle
 
 
 /--
-  Translates a step that is from a single state to a list of states, to a list of steps that are each from a single state to a single state.
+  Translates an epsilon step that is from a single state to a list of states, to a list of epsilon steps that are each from a single state to a single state.
 -/
 def epsilon_step_multiple_to_single_list
   {σ : Type}
@@ -47,7 +47,7 @@ def epsilon_step_multiple_to_single_list
 
 
 /--
-  Translates a list of steps that are each from a single state to a list of states, to a list of steps that are each from a single state to a single state.
+  Translates a list of epsilon steps that are each from a single state to a list of states, to a list of epsilon steps that are each from a single state to a single state.
 -/
 def epsilon_step_multiple_list_to_single_list
   {σ : Type}
@@ -58,7 +58,7 @@ def epsilon_step_multiple_list_to_single_list
 
 
 /--
-  Translates a list of steps that are each from a single state to a single state, to an adjacency list representation of a graph.
+  Translates a list of epsilon steps that are each from a single state to a single state, to an adjacency list representation of a graph.
 -/
 def epsilon_step_single_list_to_graph
   {σ : Type}
@@ -68,6 +68,9 @@ def epsilon_step_single_list_to_graph
     step_list.map (fun (step : (EpsilonStepSingle σ)) => (step.start_state, step.stop_state))
 
 
+/--
+  Translates a list of epsilon steps that are each from a single state to a list of states, to an adjacency list representation of a graph.
+-/
 def epsilon_step_multiple_list_to_graph
   {σ : Type}
   [DecidableEq σ]
@@ -76,6 +79,9 @@ def epsilon_step_multiple_list_to_graph
   epsilon_step_single_list_to_graph (epsilon_step_multiple_list_to_single_list step_list)
 
 
+/--
+  Takes a list of epsilon steps that are each from a single state to a list of states and calculates the epsilon closure of a set of states with respect to that list.
+-/
 def epsilon_closure
   {σ : Type}
   [DecidableEq σ]
@@ -85,6 +91,9 @@ def epsilon_closure
     dfs_aux (epsilon_step_multiple_list_to_graph epsilon_step_list) state_list []
 
 
+/--
+  Replaces the image of a symbol step with the epsilon closure of that image.
+-/
 def symbol_step_epsilon_closure
   {α : Type}
   [DecidableEq α]
