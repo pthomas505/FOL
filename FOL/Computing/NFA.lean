@@ -196,6 +196,15 @@ example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩
 example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩] 0 'a' == [1, 2] := by rfl
 
 
+/--
+  The type of nondeterministic automatons.
+  `α` is the type of input symbols.
+  `σ` is the type of states.
+
+  Transitions from one set of states to another set of states on each input symbol. The set of states that it transitions to is permitted to be the same set of states that it transitioned from.
+
+  If the nondeterministic automaton `N` is at the list of states `l` and the input sequence is `c :: cs` then `N` transitions to the list of states given by `⋃ s ∈ l, N.step s c` and the input sequence becomes `cs`. If `s1 ∈ l` and `s2 ∈ l` then `⋃ s ∈ l, N.step s c` includes `(N.step s1 c) ∪ (N.step s2 c)`.
+-/
 structure NFA
   (α : Type)
   [DecidableEq α]
