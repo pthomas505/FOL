@@ -122,7 +122,7 @@ structure EpsilonNFA
   deriving Repr
 
 
-structure NFA
+structure NFA_aux
   (α : Type)
   [DecidableEq α]
   (σ : Type)
@@ -134,13 +134,13 @@ structure NFA
   deriving Repr
 
 
-def epsilon_nfa_to_nfa
+def epsilon_nfa_to_nfa_aux
   {α : Type}
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (epsilon_nfa : EpsilonNFA α σ) :
-  NFA α σ :=
+  NFA_aux α σ :=
   ⟨
     epsilon_nfa.symbol_step_list.map (symbol_step_epsilon_closure epsilon_nfa.epsilon_step_list),
     epsilon_closure epsilon_nfa.epsilon_step_list epsilon_nfa.starting_state_list,
@@ -181,3 +181,28 @@ example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩
 example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩] 0 'b' == [2] := by rfl
 
 example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩] 0 'a' == [1, 2] := by rfl
+
+
+structure NFA
+  (α : Type)
+  [DecidableEq α]
+  (σ : Type)
+  [DecidableEq σ] :
+  Type :=
+  (step : σ → α → List σ)
+  (starting_state_list : List σ)
+  (accepting_state_list : List σ)
+
+
+def nfa_aux_to_nfa
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (nfa_aux : NFA_aux α σ) :
+  NFA α σ :=
+  ⟨
+    symbol_step_multiple_list_to_fun nfa_aux.symbol_step_list,
+    nfa_aux.starting_state_list,
+    nfa_aux.accepting_state_list
+  ⟩
