@@ -228,3 +228,17 @@ def nfa_aux_to_nfa
     nfa_aux.starting_state_list,
     nfa_aux.accepting_state_list
   ⟩
+
+
+/--
+  `NA.step_list N l c` := Returns the list of states that the nondeterministic automaton `N` transitions to if it starts at the list of states `l` and consumes the symbol `c`.
+-/
+def NFA.step_list
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (N : NFA α σ)
+  (l : List σ)
+  (c : α) :=
+  (l.map (fun (state : σ) => N.step state c)).join
