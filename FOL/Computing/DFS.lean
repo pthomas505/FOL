@@ -425,7 +425,7 @@ lemma nextss_closed_dfs
 
 
 /--
-  `reachable g xs` := The reflexive transitive closure of `xs` under `g`. The union of the nodes that are reachable from each node in `xs` through a sequence of zero or more edges in `g`.
+  `reachable g xs` := The reflexive transitive closure of `xs` under `g`. The union of the nodes that are reachable from each node in `xs` through a sequence of zero or more directed edges in `g`.
 -/
 inductive reachable
   {Node : Type}
