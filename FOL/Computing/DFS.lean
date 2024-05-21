@@ -8,6 +8,7 @@ import Mathlib.Data.Finset.Basic
 
 /--
   The adjacency list representation of a graph.
+  If `(x, y)` is in the list then there is a directed edge from `x` to `y`.
 -/
 abbrev Graph
   (Node : Type) :
