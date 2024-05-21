@@ -190,6 +190,7 @@ lemma List.erase_diff_len_lt_diff_len
     simp only [s2]
 
     have s3 : 0 < (l1.diff l2).length := List.length_pos_of_mem s1
+
     exact Nat.pred_lt' s3
 
 
