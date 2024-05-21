@@ -134,6 +134,26 @@ structure NFA
   deriving Repr
 
 
+def SymbolStepMultiple.nodes_of
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (step : SymbolStepMultiple α σ) :
+  List σ :=
+  { step.start_state } ∪ step.stop_state_list
+
+
+def NFA.nodes_of
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : NFA α σ) :
+  List σ :=
+  (e.symbol_step_list.map SymbolStepMultiple.nodes_of).join
+
+
 def epsilon_nfa_to_nfa
   {α : Type}
   [DecidableEq α]
@@ -197,9 +217,9 @@ example : symbol_step_multiple_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩
 
 
 /--
-  `NFA.evalOne e l c` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the list of states `l` and consumes the symbol `c`.
+  `NFA.eval_one e l c` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the list of states `l` and consumes the symbol `c`.
 -/
-def NFA.evalOne
+def NFA.eval_one
   {α : Type}
   [DecidableEq α]
   {σ : Type}
@@ -211,15 +231,15 @@ def NFA.evalOne
   (state_list.map (fun (state : σ) => symbol_step_multiple_list_to_fun e.symbol_step_list state symbol)).join
 
 
-def NFA.evalFrom
+def NFA.eval_from
   {α : Type}
   [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (e : NFA α σ)
-  (startingStateList : List σ) :
+  (starting_state_list : List σ) :
   List α → List σ :=
-  List.foldl e.evalOne startingStateList
+  List.foldl e.eval_one starting_state_list
 
 
 /--
@@ -232,7 +252,7 @@ def NFA.eval
   [DecidableEq σ]
   (e : NFA α σ) :
   List α → List σ :=
-  e.evalFrom e.starting_state_list
+  e.eval_from e.starting_state_list
 
 
 example : NFA.eval ⟨ [], [0], [1] ⟩ ['a'] == [] := by rfl

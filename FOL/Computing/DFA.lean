@@ -1,3 +1,5 @@
+import FOL.Computing.NFA
+
 import Mathlib.Data.List.Basic
 
 
@@ -57,3 +59,82 @@ def DFA.accepts
   (input : List α) :
   Prop :=
   D.eval input ∈ D.accepting_state_list
+
+
+/--
+  The subset construction of a deterministic automaton from a nondeterministic automaton.
+
+  Each state in the deterministic automaton is a subset of the states of the nondeterministic automaton.
+-/
+def NFA.to_DFA
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (N : NFA α σ) :
+  DFA α (List σ) :=
+  {
+    step := N.eval_one
+    starting_state := N.starting_state_list
+    accepting_state_list := sorry
+  }
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (N : NFA α σ) :
+  (NFA.to_DFA N).starting_state = N.starting_state_list :=
+  by rfl
+
+
+lemma DFA.mem_accepts
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (D : DFA α σ)
+  (input : List α) :
+  D.accepts input ↔
+    D.eval_from D.starting_state input ∈ D.accepting_state_list := by rfl
+
+
+lemma NFA.mem_accepts
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (N : NFA α σ)
+  (input : List α) :
+  N.accepts input ↔
+    ∃ (s : σ), s ∈ N.eval_from N.starting_state_list input ∧
+      s ∈ N.accepting_state_list := by rfl
+
+
+/--
+  The subset construction of a deterministic automaton from a nondeterministic automaton yields a deterministic automaton that is equivalent to the nondeterministic automaton.
+-/
+theorem NFA_to_DFA_is_equiv
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (N : NFA α σ) :
+  N.to_DFA.accepts = N.accepts :=
+  by
+  ext cs
+  simp only [DFA.mem_accepts]
+  simp only [NFA.mem_accepts]
+  simp only [NFA.to_DFA]
+  sorry
+/-
+  simp
+  constructor
+  all_goals
+    simp
+    intro s a1 a2
+    apply Exists.intro s
+    tauto
+-/
