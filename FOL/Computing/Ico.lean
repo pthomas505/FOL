@@ -149,3 +149,75 @@ example
           · constructor
             · exact le_of_not_lt c1
             · exact right
+
+
+-- I < J
+def Ico_lt_Ico
+  {α : Type}
+  [Preorder α]
+  [PredOrder α]
+  (I J : Ico α) :
+  Prop :=
+  I.max <= J.min
+
+
+-- I > J
+def Ico_gt_Ico
+  {α : Type}
+  [LinearOrder α]
+  (I J : Ico α) :
+  Prop :=
+  J.max <= I.min
+
+
+-- I <= J
+def Ico_lte_Ico
+  {α : Type}
+  [LinearOrder α]
+  (I J : Ico α) :
+  Prop :=
+  J.max <= I.max
+
+
+-- I >= J
+def Ico_gte_Ico
+  {α : Type}
+  [LinearOrder α]
+  (I J : Ico α) :
+  Prop :=
+  I.min <= J.min
+
+
+/-
+  If I < J then every member of I is less than every member of J.
+-/
+example
+  {α : Type}
+  [Preorder α]
+  [PredOrder α]
+  [NoMinOrder α]
+  (I J : Ico α) :
+  Ico_lt_Ico I J ↔
+    ∀ (i j : α), (I.mem i ∧ J.mem j) → i < j :=
+  by
+    simp only [Ico_lt_Ico]
+    simp only [Ico.mem]
+    constructor
+    · intro a1 i j a2
+      cases a2
+      case _ left right =>
+        cases left
+        case _ left_left left_right =>
+          cases right
+          case _ right_left right_right =>
+            exact gt_of_ge_of_gt right_left (gt_of_ge_of_gt a1 left_right)
+    · intro a1
+      apply Order.le_of_pred_lt
+      apply a1
+      constructor
+      · constructor
+        · exact PredOrder.le_pred_of_lt I.min_lt_max
+        · exact Order.pred_lt I.max
+      · constructor
+        · exact Preorder.le_refl J.min
+        · exact J.min_lt_max
