@@ -42,7 +42,7 @@ def Ico.gt
 
 
 /-
-  I is less than x if and only if every member of y is less than x.
+  I is less than x if and only if every member of I is less than x.
 -/
 example
   {α : Type}
@@ -69,7 +69,7 @@ example
 
 
 /-
-  I is greater than x if and only if every member of y is greater than x.
+  I is greater than x if and only if every member of I is greater than x.
 -/
 example
   {α : Type}
