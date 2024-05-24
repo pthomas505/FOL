@@ -41,6 +41,9 @@ def Ico.gt
   x < I.min
 
 
+/-
+  I is less than x if and only if every member of y is less than x.
+-/
 example
   {α : Type}
   [Preorder α]
@@ -65,6 +68,9 @@ example
       · exact Order.pred_lt I.max
 
 
+/-
+  I is greater than x if and only if every member of y is greater than x.
+-/
 example
   {α : Type}
   [Preorder α]
