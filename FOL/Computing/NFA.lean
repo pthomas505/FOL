@@ -154,6 +154,16 @@ def NFA.nodes_of
   (e.symbol_step_list.map SymbolStepMultiple.nodes_of).join
 
 
+def NFA.symbols_of
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : NFA α σ) :
+  List α :=
+  (e.symbol_step_list.map (fun (step : SymbolStepMultiple α σ) => step.symbol))
+
+
 def epsilon_nfa_to_nfa
   {α : Type}
   [DecidableEq α]
