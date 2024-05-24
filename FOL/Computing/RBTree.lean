@@ -14,6 +14,7 @@ structure Ico
   (min : α)
   (max : α)
   (min_lt_max : min < max)
+  deriving Repr, DecidableEq
 
 
 /--
@@ -148,15 +149,3 @@ example
           · constructor
             · exact le_of_not_lt c1
             · exact right
-
-
-inductive Color
-  | Red : Color
-  | Black : Color
-  deriving Inhabited, DecidableEq
-
-inductive RBTree : Type
-  | leaf : RBTree
-  | node : Color → RBTree → Int → RBTree → RBTree
-
-  deriving Inhabited, DecidableEq
