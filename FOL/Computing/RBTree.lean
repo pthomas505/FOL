@@ -16,6 +16,9 @@ structure Ico
   (min_lt_max : min < max)
 
 
+/--
+  x is a member of I
+-/
 def Ico.mem
   {α : Type}
   [Preorder α]
@@ -24,6 +27,10 @@ def Ico.mem
   Prop :=
   I.min <= x ∧ x < I.max
 
+
+/--
+  I is less than x
+-/
 def Ico.lt
   {α : Type}
   [Preorder α]
@@ -32,6 +39,9 @@ def Ico.lt
   Prop :=
   I.max <= x
 
+/--
+  I is greater than x
+-/
 def Ico.gt
   {α : Type}
   [Preorder α]
@@ -92,6 +102,9 @@ example
       · exact I.min_lt_max
 
 
+/-
+  I and J are not disjoint if and only if J.min < I.max /\ I.min < J.max.
+-/
 example
   {α : Type}
   [LinearOrder α]
