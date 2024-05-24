@@ -103,13 +103,13 @@ example
 
 
 /-
-  I and J are not disjoint if and only if J.min < I.max /\ I.min < J.max.
+  I and J are not disjoint if and only if J.min < I.max ∧ I.min < J.max.
 -/
 example
   {α : Type}
   [LinearOrder α]
   (I J : Ico α) :
-  (∃ (x : α), I.mem x ∧ J.mem x) ↔ J.min < I.max /\ I.min < J.max :=
+  (∃ (x : α), I.mem x ∧ J.mem x) ↔ J.min < I.max ∧ I.min < J.max :=
   by
     simp only [Ico.mem]
     constructor
