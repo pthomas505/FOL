@@ -1,7 +1,5 @@
 import FOL.Computing.NFA
 
-import Mathlib.Data.List.Basic
-
 
 set_option autoImplicit false
 
@@ -61,30 +59,6 @@ def DFA.accepts
   D.eval input ∈ D.accepting_state_list
 
 
-def EpsilonNFA.to_DFA_aux
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (epsilon_step_list : List (EpsilonStepMultiple σ))
-  (Sigma : List α)
-  (Delta : List σ → α → List σ)
-  (DFA_state_list_acc : List (List σ))
-  (DFA_step_list_acc : List (List σ × α × List σ))
-  (state_list_stack : List (List σ)) :
-  List (List σ × α × List σ) :=
-  match state_list_stack with
-  | [] => DFA_step_list_acc
-  | q :: qs =>
-    match Sigma with
-    | [] => EpsilonNFA.to_DFA_aux epsilon_step_list Sigma Delta DFA_state_list_acc DFA_step_list_acc qs
-    | c :: cs =>
-      let t := epsilon_closure epsilon_step_list (Delta q c)
-      if t ∈ DFA_state_list_acc
-      then EpsilonNFA.to_DFA_aux epsilon_step_list cs Delta DFA_state_list_acc DFA_step_list_acc (q :: qs)
-      else EpsilonNFA.to_DFA_aux epsilon_step_list cs Delta (t :: DFA_state_list_acc) ((q, c, t) :: DFA_step_list_acc) (t :: qs)
-
-
 /--
   The subset construction of a deterministic automaton from a nondeterministic automaton.
 
@@ -123,18 +97,6 @@ lemma DFA.mem_accepts
   (input : List α) :
   D.accepts input ↔
     D.eval_from D.starting_state input ∈ D.accepting_state_list := by rfl
-
-
-lemma NFA.mem_accepts
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (N : NFA α σ)
-  (input : List α) :
-  N.accepts input ↔
-    ∃ (s : σ), s ∈ N.eval_from N.starting_state_list input ∧
-      s ∈ N.accepting_state_list := by rfl
 
 
 /--

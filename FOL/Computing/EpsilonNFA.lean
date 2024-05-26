@@ -1,6 +1,9 @@
 import FOL.Computing.DFS
 
 
+set_option autoImplicit false
+
+
 structure SymbolStepMultiple
   (α : Type)
   [DecidableEq α]

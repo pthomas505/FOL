@@ -1,6 +1,9 @@
 import FOL.Computing.EpsilonNFA
 
 
+set_option autoImplicit false
+
+
 structure NFA
   (α : Type)
   [DecidableEq α]
@@ -52,21 +55,21 @@ def NFA.eval
   e.eval_from e.starting_state_list
 
 
-example : NFA.eval ⟨ [], [0], [1] ⟩ ['a'] == [] := by rfl
+example : NFA.eval ⟨ [], [0], [1] ⟩ ['a'] = [] := by rfl
 
-example : NFA.eval ⟨ [⟨0, 'a', [1]⟩], [0], [1] ⟩ ['a'] == [1] := by rfl
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩], [0], [1] ⟩ ['a'] = [1] := by rfl
 
-example : NFA.eval ⟨ [⟨0, 'a', [1]⟩], [0], [1] ⟩ ['b'] == [] := by rfl
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩], [0], [1] ⟩ ['b'] = [] := by rfl
 
-example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [0], [1] ⟩ ['a'] == [1] := by rfl
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [0], [1] ⟩ ['a'] = [1] := by rfl
 
-example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [0], [1] ⟩ ['b'] == [1] := by rfl
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [0], [1] ⟩ ['b'] = [1] := by rfl
 
-example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [0], [1] ⟩ ['a'] == [1] := by rfl
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [0], [1] ⟩ ['a'] = [1] := by rfl
 
-example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [0], [1] ⟩ ['b'] == [2] := by rfl
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [0], [1] ⟩ ['b'] = [2] := by rfl
 
-example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩], [0], [1] ⟩ ['a'] == [1, 2] := by rfl
+example : NFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩], [0], [1] ⟩ ['a'] = [1, 2] := by rfl
 
 
 def NFA.accepts
@@ -93,3 +96,15 @@ instance
   all_goals
     simp only [NFA.accepts]
     infer_instance
+
+
+lemma NFA.mem_accepts
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : NFA α σ)
+  (input : List α) :
+  e.accepts input ↔
+    ∃ (s : σ), s ∈ e.eval_from e.starting_state_list input ∧
+      s ∈ e.accepting_state_list := by rfl
