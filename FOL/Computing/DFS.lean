@@ -674,4 +674,23 @@ theorem dfs_eq_reachable_singleton
     exact dfs_eq_reachable g [start]
 
 
+example
+  {Node : Type}
+  [DecidableEq Node]
+  (xs : List Node) :
+  reachable [] xs = xs.toFinset.toSet :=
+  by
+    ext x
+    simp
+    constructor
+    · intro a1
+      induction a1
+      case _ _ a2 =>
+        exact a2
+      case _ e ih_1 ih_2 _ =>
+        simp at ih_1
+    · intro a1
+      exact reachable.base x a1
+
+
 #lint

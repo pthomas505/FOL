@@ -294,3 +294,408 @@ example
                     subst a4_right
                     exact a3_left
                 · simp
+
+
+def EpsilonNFA.wrapLeft
+  {α : Type}
+  [DecidableEq α]
+  {σ_l : Type}
+  [DecidableEq σ_l]
+  (σ_r : Type)
+  [DecidableEq σ_r]
+  (e : EpsilonNFA α σ_l) :
+  EpsilonNFA α (σ_l ⊕ σ_r) :=
+  {
+    symbol_step_list := e.symbol_step_list.map (fun (step : SymbolStepMultiple α σ_l) => ⟨
+      Sum.inl step.start_state,
+      step.symbol,
+      step.stop_state_list.map Sum.inl
+    ⟩),
+    epsilon_step_list := e.epsilon_step_list.map (fun (step : EpsilonStepMultiple σ_l) => ⟨
+      Sum.inl step.start_state,
+      step.stop_state_list.map Sum.inl
+    ⟩),
+    starting_state_list := e.starting_state_list.map Sum.inl,
+    accepting_state_list := e.accepting_state_list.map Sum.inl
+  }
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (σ_l σ_r : Type)
+  [DecidableEq σ_l]
+  [DecidableEq σ_r]
+  (e : EpsilonNFA α σ_l)
+  (xs : List α) :
+  e.accepts xs ↔ (e.wrapLeft σ_r).accepts xs :=
+  by
+  simp only [EpsilonNFA.accepts]
+  simp only [EpsilonNFA.eval]
+  simp only [EpsilonNFA.eval_from]
+  simp
+  constructor
+  · intro a1
+    left
+    apply Exists.elim a1
+    intro s a2
+    clear a1
+    cases a2
+    case _ a2_left a2_right =>
+      apply Exists.intro s
+      simp only [EpsilonNFA.wrapLeft]
+      constructor
+      · sorry
+      · simp
+        exact a2_right
+  · intro a1
+    cases a1
+    case _ c1 =>
+      apply Exists.elim c1
+      intro s a2
+      clear c1
+      simp only [EpsilonNFA.wrapLeft] at a2
+      cases a2
+      case _ a2_left a2_right =>
+        apply Exists.intro s
+        constructor
+        · sorry
+        · simp at a2_right
+          exact a2_right
+    case _ c1 =>
+      apply Exists.elim c1
+      intro s a2
+      clear c1
+      simp only [EpsilonNFA.wrapLeft] at a2
+      simp at a2
+
+
+def EpsilonNFA.wrapRight
+  {α : Type}
+  [DecidableEq α]
+  {σ_l : Type}
+  [DecidableEq σ_l]
+  (σ_r : Type)
+  [DecidableEq σ_r]
+  (e : EpsilonNFA α σ_r) :
+  EpsilonNFA α (σ_l ⊕ σ_r) :=
+  {
+    symbol_step_list := e.symbol_step_list.map (fun (step : SymbolStepMultiple α σ_r) => ⟨
+      Sum.inr step.start_state,
+      step.symbol,
+      step.stop_state_list.map Sum.inr
+    ⟩),
+    epsilon_step_list := e.epsilon_step_list.map (fun (step : EpsilonStepMultiple σ_r) => ⟨
+      Sum.inr step.start_state,
+      step.stop_state_list.map Sum.inr
+    ⟩),
+    starting_state_list := e.starting_state_list.map Sum.inr,
+    accepting_state_list := e.accepting_state_list.map Sum.inr
+  }
+
+
+def match_char_EpsilonNFA
+  {α : Type}
+  [DecidableEq α]
+  (c : α) :
+  EpsilonNFA α ℕ :=
+  {
+/-
+    stateSet := {0, 1}
+    symbolSet := {c}
+-/
+    symbol_step_list := [⟨0, c, [1]⟩]
+    epsilon_step_list := []
+    starting_state_list := [0]
+    accepting_state_list := [1]
+  }
+
+
+example : (match_char_EpsilonNFA 'a').eval [] = [0] := by rfl
+example : (match_char_EpsilonNFA 'a').eval ['a'] = [1] := by rfl
+example : (match_char_EpsilonNFA 'a').eval ['b'] = [] := by rfl
+example : (match_char_EpsilonNFA 'a').eval ['a', 'b'] = [] := by rfl
+example : (match_char_EpsilonNFA 'a').eval ['b', 'a'] = [] := by rfl
+
+example : ¬ (match_char_EpsilonNFA 'a').accepts [] :=
+  by
+  simp only [match_char_EpsilonNFA]
+  simp only [EpsilonNFA.accepts]
+  simp only [EpsilonNFA.eval]
+  simp only [EpsilonNFA.eval_from]
+  simp
+
+example : (match_char_EpsilonNFA 'a').accepts ['a'] :=
+  by
+  simp only [match_char_EpsilonNFA]
+
+  simp only [EpsilonNFA.accepts]
+  simp only [EpsilonNFA.eval]
+  simp only [EpsilonNFA.eval_from]
+  simp
+  apply List.mem_of_elem_eq_true
+  exact rfl
+
+example : ¬ (match_char_EpsilonNFA 'a').accepts ['b'] :=
+  by
+  simp only [match_char_EpsilonNFA]
+  simp only [EpsilonNFA.accepts]
+  tauto
+
+example : ¬ (match_char_EpsilonNFA 'a').accepts ['a', 'b'] :=
+  by
+  simp only [match_char_EpsilonNFA]
+  simp only [EpsilonNFA.accepts]
+  tauto
+
+example : ¬ (match_char_EpsilonNFA 'a').accepts ['b', 'a'] :=
+  by
+  simp only [match_char_EpsilonNFA]
+  simp only [EpsilonNFA.accepts]
+  tauto
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (c : α)
+  (x : α) :
+  (match_char_EpsilonNFA c).accepts [x] ↔ c = x :=
+  by
+  simp only [match_char_EpsilonNFA]
+  sorry
+/-
+  split_ifs
+  case _ c1 =>
+    simp only [c1]
+    simp
+    apply List.mem_of_elem_eq_true
+    exact rfl
+  case _ c1 =>
+    simp only [c1]
+    simp
+    exact List.count_eq_zero.mp rfl
+-/
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (c : α)
+  (x : α)
+  (xs : List α)
+  (h1 : ¬ xs = []) :
+  ¬ (match_char_EpsilonNFA c).accepts (x :: xs) :=
+  by
+  simp only [match_char_EpsilonNFA]
+  simp only [EpsilonNFA.accepts]
+  simp
+  simp only [EpsilonNFA.eval]
+  simp only [EpsilonNFA.eval_from]
+  simp
+  simp only [EpsilonNFA.eval_one]
+  simp
+  simp only [epsilon_closure]
+  simp only [epsilon_step_multiple_list_to_graph]
+  simp only [epsilon_step_multiple_list_to_single_list]
+  simp
+  simp only [epsilon_step_single_list_to_graph]
+  simp
+  simp only [symbol_step_multiple_list_to_fun]
+  cases xs
+  case nil =>
+    simp at h1
+  case cons xs_hd xs_tl =>
+    simp
+    split_ifs
+    case _ c1 =>
+      simp
+      sorry
+    case _ c1 =>
+      sorry
+
+
+/-
+def match_epsilon_EpsilonNFA
+  (α : Type)
+  [DecidableEq α] :
+  EpsilonNFA α ℕ :=
+  {
+/-
+    stateSet := {0}
+    symbolSet := {}
+-/
+    stepList := []
+    startingStateList := [0]
+    acceptingStateList := [0]
+  }
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (xs : List α) :
+  (match_epsilon_EpsilonNFA α).accepts xs ↔ xs = [] :=
+  by
+  constructor
+  · intro a1
+    cases xs
+    case _ =>
+      rfl
+    case _ xs_hd xs_tl =>
+      simp only [match_epsilon_EpsilonNFA] at a1
+      simp only [EpsilonNFA.accepts] at a1
+      simp only [EpsilonNFA.eval] at a1
+      simp only [EpsilonNFA.evalFrom] at a1
+      simp at a1
+      simp only [EpsilonNFA.evalOne] at a1
+      simp at a1
+      simp only [stepListToFun] at a1
+      simp only [stepListToFunAux] at a1
+      simp at a1
+      induction xs_tl
+      case nil =>
+        simp at a1
+      case cons xs_tl_hd xs_tl_tl xs_tl_ih =>
+        simp at a1
+        simp only [EpsilonNFA.evalOne] at a1
+        simp at a1
+        simp at xs_tl_ih
+        simp
+        apply xs_tl_ih
+        exact a1
+  · intro a1
+    subst a1
+    simp only [match_epsilon_EpsilonNFA]
+    simp only [EpsilonNFA.accepts]
+    simp only [EpsilonNFA.eval]
+    simp only [EpsilonNFA.evalFrom]
+    simp
+
+
+def match_zero_EpsilonNFA
+  (α : Type)
+  [DecidableEq α] :
+  EpsilonNFA α ℕ :=
+  {
+/-
+    stateSet := {0}
+    symbolSet := {}
+-/
+    stepList := []
+    startingStateList := [0]
+    acceptingStateList := []
+  }
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (xs : List α) :
+  ¬ (match_zero_EpsilonNFA α).accepts xs :=
+  by
+  simp only [match_zero_EpsilonNFA]
+  simp only [EpsilonNFA.accepts]
+  simp only [EpsilonNFA.eval]
+  simp only [EpsilonNFA.evalFrom]
+  simp
+
+
+def match_union_EpsilonNFA
+  {α : Type}
+  [DecidableEq α]
+  {σ_0 σ_1 : Type}
+  [DecidableEq σ_0]
+  [DecidableEq σ_1]
+  (e1 : EpsilonNFA α σ_0)
+  (e2 : EpsilonNFA α σ_1) :
+  EpsilonNFA α (ℕ ⊕ (σ_0 ⊕ σ_1)) :=
+  -- The states of e1 need to be made disjoint from the states of e2. Therefore the states of e1 are made Sum.inl instances of (σ_0 ⊕ σ_1) and the states of e2 are made Sum.inr instances of (σ_0 ⊕ σ_1).
+  let e1' : EpsilonNFA α (σ_0 ⊕ σ_1) := e1.wrapLeft σ_1
+  let e2' : EpsilonNFA α (σ_0 ⊕ σ_1) := e2.wrapRight σ_0
+
+  -- The new EpsilonNFA needs to have a new starting state that is disjoint from the states of e1' and e2'. Therefore it is made a Sum.inl instance of (ℕ ⊕ (σ_0 ⊕ σ_1)) and the states of e1' and e2' are made Sum.inr instances of (ℕ ⊕ (σ_0 ⊕ σ_1)).
+  let e1'' : EpsilonNFA α (ℕ ⊕ (σ_0 ⊕ σ_1)) := e1'.wrapRight ℕ
+  let e2'' : EpsilonNFA α (ℕ ⊕ (σ_0 ⊕ σ_1)) := e2'.wrapRight ℕ
+
+  let new_starting_state : ℕ ⊕ (σ_0 ⊕ σ_1) := Sum.inl 0
+
+  -- A step on epsilon (represented as Option.none) from the new starting state to both the starting state of e1'' and the starting state of e2''.
+  let new_starting_step : ((ℕ ⊕ (σ_0 ⊕ σ_1)) × Option α) × List (ℕ ⊕ (σ_0 ⊕ σ_1)) := ((new_starting_state, Option.none), List.dedup (e1''.startingStateList ++ e2''.startingStateList))
+
+  {
+/-
+    stateSet := {new_starting_state} ∪ e1''.stateSet ∪ e2''.stateSet
+    symbolSet := e1''.symbolSet ∪ e2''.symbolSet
+-/
+    stepList := new_starting_step :: e1''.stepList ++ e2''.stepList
+    startingStateList := [new_starting_state]
+    acceptingStateList := List.dedup (e1''.acceptingStateList ++ e2''.acceptingStateList)
+  }
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (σ_0 σ_1 : Type)
+  [DecidableEq σ_0]
+  [DecidableEq σ_1]
+  (e1 : EpsilonNFA α σ_0)
+  (e2 : EpsilonNFA α σ_1)
+  (xs : List α)
+  (h1 : e1.accepts xs) :
+  (match_union_EpsilonNFA e1 e2).accepts xs :=
+  by sorry
+
+
+def match_concat_EpsilonNFA
+  (α : Type)
+  [DecidableEq α]
+  (σ_0 σ_1 : Type)
+  [DecidableEq σ_0]
+  [DecidableEq σ_1]
+  (e1 : EpsilonNFA α σ_0)
+  (e2 : EpsilonNFA α σ_1) :
+  EpsilonNFA α (σ_0 ⊕ σ_1) :=
+  let e1' : EpsilonNFA α (σ_0 ⊕ σ_1) := e1.wrapLeft σ_1
+  let e2' : EpsilonNFA α (σ_0 ⊕ σ_1) := e2.wrapRight σ_0
+  {
+/-
+    stateSet := e1'.stateSet ∪ e2'.stateSet
+    symbolSet := e1'.symbolSet ∪ e2'.symbolSet
+-/
+    -- Steps on epsilon from each of the accepting states of e1' to the starting state of e2'.
+    stepList := e1'.acceptingStateList.map (fun (state : σ_0 ⊕ σ_1) => ((state, Option.none), e2'.startingStateList))
+
+    startingStateList := e1'.startingStateList
+    acceptingStateList := e2'.acceptingStateList
+  }
+
+
+def match_closure_EpsilonNFA
+  (α : Type)
+  [DecidableEq α]
+  (σ : Type)
+  [DecidableEq σ]
+  (e : EpsilonNFA α σ) :
+  EpsilonNFA α (ℕ ⊕ σ) :=
+
+  let e' : EpsilonNFA α (ℕ ⊕ σ) := e.wrapRight ℕ
+
+  let new_starting_state : ℕ ⊕ σ := Sum.inl 0
+
+  -- A step on epsilon from the new starting state to the starting state of e'.
+  let new_starting_step : ((ℕ ⊕ σ) × Option α) × List (ℕ ⊕ σ) := ((new_starting_state, Option.none), e'.startingStateList)
+
+  -- Steps on epsilon from each of the accepting states of e' to the new starting state.
+  let new_step_list := e'.acceptingStateList.map (fun (state : ℕ ⊕ σ) => ((state, Option.none), [new_starting_state]))
+
+  {
+/-
+    stateSet := {new_starting_state} ∪ e'.stateSet
+    symbolSet := e'.symbolSet
+-/
+    stepList := new_starting_step :: new_step_list
+    startingStateList := [new_starting_state]
+    acceptingStateList := new_starting_state :: e'.acceptingStateList
+  }
+-/
