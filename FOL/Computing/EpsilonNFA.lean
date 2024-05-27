@@ -200,6 +200,9 @@ example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [], [0], [
 example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩], [], [0], [1] ⟩ ['a'] = [2, 1] := by rfl
 
 
+#eval EpsilonNFA.eval ⟨ [], [⟨ 0, [1] ⟩ ], [0], [1] ⟩ ['a']
+
+
 def EpsilonNFA.accepts
   {α : Type}
   [DecidableEq α]

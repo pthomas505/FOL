@@ -402,10 +402,6 @@ def match_char_EpsilonNFA
   (c : α) :
   EpsilonNFA α ℕ :=
   {
-/-
-    stateSet := {0, 1}
-    symbolSet := {c}
--/
     symbol_step_list := [⟨0, c, [1]⟩]
     epsilon_step_list := []
     starting_state_list := [0]
@@ -507,13 +503,11 @@ example
   simp
   simp only [EpsilonNFA.eval_one]
   simp
+  simp only [symbol_step_multiple_list_to_fun]
   simp only [epsilon_closure]
   simp only [epsilon_step_multiple_list_to_graph]
   simp only [epsilon_step_multiple_list_to_single_list]
-  simp
   simp only [epsilon_step_single_list_to_graph]
-  simp
-  simp only [symbol_step_multiple_list_to_fun]
   cases xs
   case nil =>
     simp at h1
@@ -521,69 +515,49 @@ example
     simp
     split_ifs
     case _ c1 =>
+      simp only [c1]
       simp
       sorry
     case _ c1 =>
+      simp only [c1]
+      simp
       sorry
 
 
-/-
+
 def match_epsilon_EpsilonNFA
   (α : Type)
   [DecidableEq α] :
   EpsilonNFA α ℕ :=
   {
-/-
-    stateSet := {0}
-    symbolSet := {}
--/
-    stepList := []
-    startingStateList := [0]
-    acceptingStateList := [0]
+    symbol_step_list := []
+    epsilon_step_list := [⟨ 0, [1] ⟩]
+    starting_state_list := [0]
+    accepting_state_list := [1]
   }
 
-
+/-
 example
   (α : Type)
-  [DecidableEq α]
-  (xs : List α) :
-  (match_epsilon_EpsilonNFA α).accepts xs ↔ xs = [] :=
+  [DecidableEq α] :
+  (match_epsilon_EpsilonNFA α).accepts [] :=
   by
-  constructor
-  · intro a1
-    cases xs
-    case _ =>
-      rfl
-    case _ xs_hd xs_tl =>
-      simp only [match_epsilon_EpsilonNFA] at a1
-      simp only [EpsilonNFA.accepts] at a1
-      simp only [EpsilonNFA.eval] at a1
-      simp only [EpsilonNFA.evalFrom] at a1
-      simp at a1
-      simp only [EpsilonNFA.evalOne] at a1
-      simp at a1
-      simp only [stepListToFun] at a1
-      simp only [stepListToFunAux] at a1
-      simp at a1
-      induction xs_tl
-      case nil =>
-        simp at a1
-      case cons xs_tl_hd xs_tl_tl xs_tl_ih =>
-        simp at a1
-        simp only [EpsilonNFA.evalOne] at a1
-        simp at a1
-        simp at xs_tl_ih
-        simp
-        apply xs_tl_ih
-        exact a1
-  · intro a1
-    subst a1
-    simp only [match_epsilon_EpsilonNFA]
-    simp only [EpsilonNFA.accepts]
-    simp only [EpsilonNFA.eval]
-    simp only [EpsilonNFA.evalFrom]
-    simp
+  simp only [match_epsilon_EpsilonNFA]
+  simp only [EpsilonNFA.accepts]
+  simp
+  simp only [EpsilonNFA.eval]
+  simp only [EpsilonNFA.eval_from]
+  simp
+  simp only [EpsilonNFA.eval_one]
+  simp
+  simp only [symbol_step_multiple_list_to_fun]
+  simp only [epsilon_closure]
+  simp only [epsilon_step_multiple_list_to_graph]
+  simp only [epsilon_step_multiple_list_to_single_list]
+  simp only [epsilon_step_single_list_to_graph]
+-/
 
+/-
 
 def match_zero_EpsilonNFA
   (α : Type)

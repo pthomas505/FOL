@@ -158,7 +158,7 @@ def Graph.nodes_of
   g.map Prod.fst ∪ g.map Prod.snd
 
 
-lemma not_in_nodes_imp_direct_succ_list_empty
+lemma not_mem_imp_no_direct_succ
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -240,7 +240,7 @@ def dfs_aux
           exact List.erase_of_not_mem c2
         simp only [s1]
 
-        simp only [not_in_nodes_imp_direct_succ_list_empty g x c2]
+        simp only [not_mem_imp_no_direct_succ g x c2]
         simp
         apply Prod.Lex.right (g.nodes_of.diff visited).length
         exact Nat.lt.base xs.length
@@ -292,7 +292,7 @@ example
     simp only [if_pos h1]
 
 
-lemma dfs_app
+example
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -320,7 +320,7 @@ lemma dfs_app
       simp only [if_neg c1]
 
 
-lemma visited_subset_dfs
+lemma visited_subset_dfs_aux
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -344,7 +344,7 @@ lemma visited_subset_dfs
       · exact ih
 
 
-lemma stack_subset_dfs
+lemma stack_subset_dfs_aux
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -361,7 +361,7 @@ lemma stack_subset_dfs
       simp only [if_pos c1]
       simp
       constructor
-      · have s1 : visited ⊆ dfs_aux g stack visited := visited_subset_dfs g stack visited
+      · have s1 : visited ⊆ dfs_aux g stack visited := visited_subset_dfs_aux g stack visited
         apply Set.mem_of_subset_of_mem s1 c1
       · exact ih
     case _ visited x stack c1 ih =>
@@ -369,7 +369,7 @@ lemma stack_subset_dfs
       simp only [if_neg c1]
       simp
       constructor
-      · have s1 : x :: visited ⊆ dfs_aux g (direct_succ_list g x ++ stack) (x :: visited) := visited_subset_dfs g (direct_succ_list g x ++ stack) (x :: visited)
+      · have s1 : x :: visited ⊆ dfs_aux g (direct_succ_list g x ++ stack) (x :: visited) := visited_subset_dfs_aux g (direct_succ_list g x ++ stack) (x :: visited)
         have s2 : x ∈ x :: visited := by { simp }
         apply Set.mem_of_subset_of_mem s1 s2
       · trans (direct_succ_list g x) ++ stack
@@ -511,7 +511,7 @@ lemma reachable_mono
       exact reachable.step e ih_1 ih_3
 
 
-lemma reachable_direct_succ_list
+lemma reachable_direct_succ_list_is_subset_of_reachable
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -532,7 +532,7 @@ lemma reachable_direct_succ_list
       apply reachable.step e ih_1 ih_3
 
 
-lemma reachable_append
+lemma reachable_of_append
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -574,7 +574,7 @@ lemma reachable_append
         exact c1
 
 
-lemma dfs_subset_reachable_visit_nodes
+lemma dfs_aux_is_subset_of_reachable_and_visited
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -612,20 +612,18 @@ lemma dfs_subset_reachable_visit_nodes
 
       have s1 : x ∈ reachable g (x :: stack) :=
       by
-        have s1_1 : (x :: stack).toFinset.toSet ⊆ reachable g (x :: stack) :=
-        by
-          exact subset_of_reachable_is_reachable g (x :: stack)
+        have s1_1 : (x :: stack).toFinset.toSet ⊆ reachable g (x :: stack) := subset_of_reachable_is_reachable g (x :: stack)
 
         apply Set.mem_of_subset_of_mem s1_1
         simp
 
       have s2 : reachable g (direct_succ_list g x ++ stack) ⊆ reachable g (x :: stack) :=
       by
-        have s2_1 : reachable g (direct_succ_list g x ++ stack) = reachable g (direct_succ_list g x) ∪ reachable g stack := reachable_append g (direct_succ_list g x) stack
+        have s2_1 : reachable g (direct_succ_list g x ++ stack) = reachable g (direct_succ_list g x) ∪ reachable g stack := reachable_of_append g (direct_succ_list g x) stack
 
-        have s2_2 : reachable g (x :: stack) = reachable g [x] ∪ reachable g stack := reachable_append g [x] stack
+        have s2_2 : reachable g (x :: stack) = reachable g [x] ∪ reachable g stack := reachable_of_append g [x] stack
 
-        have s2_3 : reachable g (direct_succ_list g x) ⊆ reachable g [x] := reachable_direct_succ_list g x
+        have s2_3 : reachable g (direct_succ_list g x) ⊆ reachable g [x] := reachable_direct_succ_list_is_subset_of_reachable g x
 
         simp only [s2_1, s2_2]
         exact Set.union_subset_union_left (reachable g stack) s2_3
@@ -658,7 +656,7 @@ lemma reachable_closed_dfs
 
     simp only [s1]
     apply reachable_mono g stack (dfs_aux g stack [])
-    exact stack_subset_dfs g stack []
+    exact stack_subset_dfs_aux g stack []
 
 
 theorem dfs_eq_reachable
@@ -668,7 +666,7 @@ theorem dfs_eq_reachable
   (stack : List Node) :
   (dfs_aux g stack []).toFinset.toSet = reachable g stack :=
   by
-    have s1 : (dfs_aux g stack []).toFinset.toSet ⊆ reachable g stack ∪ [].toFinset.toSet := dfs_subset_reachable_visit_nodes g stack []
+    have s1 : (dfs_aux g stack []).toFinset.toSet ⊆ reachable g stack ∪ [].toFinset.toSet := dfs_aux_is_subset_of_reachable_and_visited g stack []
 
     have s2 : reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet := reachable_closed_dfs g stack
 
