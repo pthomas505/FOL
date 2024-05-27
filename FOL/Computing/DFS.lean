@@ -344,7 +344,7 @@ lemma visited_subset_dfs
       · exact ih
 
 
-lemma _subset_dfs
+lemma stack_subset_dfs
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -658,7 +658,7 @@ lemma reachable_closed_dfs
 
     simp only [s1]
     apply reachable_mono g stack (dfs_aux g stack [])
-    exact _subset_dfs g stack []
+    exact stack_subset_dfs g stack []
 
 
 theorem dfs_eq_reachable
@@ -686,7 +686,7 @@ theorem dfs_eq_reachable_singleton
     exact dfs_eq_reachable g [start]
 
 
-example
+lemma reachable_nil_graph
   {Node : Type}
   [DecidableEq Node]
   (xs : List Node) :

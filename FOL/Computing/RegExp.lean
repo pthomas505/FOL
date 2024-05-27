@@ -330,6 +330,7 @@ example
   (xs : List α) :
   e.accepts xs ↔ (e.wrapLeft σ_r).accepts xs :=
   by
+  set e_left := e.wrapLeft σ_r
   simp only [EpsilonNFA.accepts]
   simp only [EpsilonNFA.eval]
   simp only [EpsilonNFA.eval_from]
@@ -343,10 +344,12 @@ example
     cases a2
     case _ a2_left a2_right =>
       apply Exists.intro s
-      simp only [EpsilonNFA.wrapLeft]
       constructor
-      · sorry
-      · simp
+      · simp only [e_left]
+        sorry
+      · simp only [e_left]
+        simp only [EpsilonNFA.wrapLeft]
+        simp
         exact a2_right
   · intro a1
     cases a1
@@ -354,18 +357,17 @@ example
       apply Exists.elim c1
       intro s a2
       clear c1
-      simp only [EpsilonNFA.wrapLeft] at a2
       cases a2
       case _ a2_left a2_right =>
         apply Exists.intro s
         constructor
         · sorry
-        · simp at a2_right
-          exact a2_right
+        · sorry
     case _ c1 =>
       apply Exists.elim c1
       intro s a2
       clear c1
+      simp only [e_left] at a2
       simp only [EpsilonNFA.wrapLeft] at a2
       simp at a2
 
@@ -463,19 +465,30 @@ example
   (match_char_EpsilonNFA c).accepts [x] ↔ c = x :=
   by
   simp only [match_char_EpsilonNFA]
-  sorry
-/-
+  simp only [EpsilonNFA.accepts]
+  simp
+  simp only [EpsilonNFA.eval]
+  simp only [EpsilonNFA.eval_from]
+  simp
+  simp only [EpsilonNFA.eval_one]
+  simp
+  simp only [symbol_step_multiple_list_to_fun]
+  simp only [epsilon_closure]
+  simp only [epsilon_step_multiple_list_to_graph]
+  simp only [epsilon_step_multiple_list_to_single_list]
+  simp only [epsilon_step_single_list_to_graph]
+  simp
   split_ifs
-  case _ c1 =>
+  case pos c1 =>
     simp only [c1]
     simp
     apply List.mem_of_elem_eq_true
     exact rfl
-  case _ c1 =>
+  case neg c1 =>
     simp only [c1]
     simp
     exact List.count_eq_zero.mp rfl
--/
+
 
 example
   (α : Type)
