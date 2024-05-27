@@ -7,8 +7,8 @@ import Mathlib.Data.Finset.Basic
 
 
 /--
-  The adjacency list representation of a graph.
-  If `(x, y)` is in the list then there is a directed edge from `x` to `y`.
+  The representation of a directed graph as a list of directed edges.
+  `(x, y)` is in the list if and only if there is a directed edge from `x` to `y`.
 -/
 abbrev Graph
   (Node : Type) :
@@ -17,45 +17,55 @@ abbrev Graph
 
 
 /--
-  `nexts g x` := The image of `x` under `g`. The neighbors of `x`.
-  `(nexts g x).toFinset.toSet = {y | (x, y) ∈ g}`
+  `direct_succ_list g x` := The image of `x` under `g`. The direct successors of `x` as a list.
 -/
-def nexts
+def direct_succ_list
   {Node : Type}
   [DecidableEq Node] :
   Graph Node → Node → List Node
   | [], _ => []
   | e :: es, n =>
     if e.fst = n
-    then e.snd :: (nexts es n)
-    else nexts es n
+    then e.snd :: direct_succ_list es n
+    else direct_succ_list es n
 
 
-lemma nexts_set
+/--
+  `direct_succ_set g x` := The image of `x` under `g`. The direct successors of `x` as a set.
+-/
+def direct_succ_set
+  {Node : Type}
+  (g : Graph Node)
+  (x : Node) :
+  Set Node :=
+  {y : Node | (x, y) ∈ g}
+
+
+lemma mem_direct_succ_list_iff
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node) :
-  ∀ (x y : Node), y ∈ nexts g x ↔ (x, y) ∈ g :=
+  ∀ (x y : Node), y ∈ direct_succ_list g x ↔ (x, y) ∈ g :=
   by
     induction g
     case nil =>
-      simp only [nexts]
+      simp only [direct_succ_list]
       simp
     case cons hd tl ih =>
-      simp only [nexts]
+      simp only [direct_succ_list]
       intro x y
-      split
-      case inl c1 =>
+      split_ifs
+      case pos c1 =>
         subst c1
-        simp only [List.mem_cons]
+        simp
         simp only [ih]
         constructor
         · tauto
         · intro a1
           simp only [Prod.eq_iff_fst_eq_snd_eq] at a1
           tauto
-      case inr c1 =>
-        simp only [List.mem_cons]
+      case neg c1 =>
+        simp
         simp only [ih]
         constructor
         · tauto
@@ -64,73 +74,75 @@ lemma nexts_set
           tauto
 
 
-example
+lemma direct_succ_list_set_equiv
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (x : Node) :
-  (nexts g x).toFinset.toSet = {y | (x, y) ∈ g} :=
+  (direct_succ_list g x).toFinset.toSet = direct_succ_set g x :=
   by
+    ext a
+    simp only [direct_succ_set]
     simp
-    simp only [nexts_set]
+    simp only [mem_direct_succ_list_iff]
 
 
 /--
-  `nextss g xs` := The image of `xs` under `g`. The neighbors of `xs`.
+  `list_direct_succ_list g xs` := The image of `xs` under `g`. The direct successors of `xs` as a list.
 -/
-def nextss
-  {Node : Type}
-  (g : Graph Node)
-  (xs : List Node) :
-  Set Node :=
-  {y | ∃ (x : Node), x ∈ xs ∧ (x, y) ∈ g}
-
-
-example
-  {Node : Type}
-  (g : Graph Node) :
-  ∀ (xs : List Node) (y : Node), y ∈ nextss g xs ↔
-    ∃ (x : Node), x ∈ xs ∧ (x, y) ∈ g :=
-  by
-    simp only [nextss]
-    simp
-
-
-/--
-  A constructive definition of nextss.
--/
-def nextss_list
+def list_direct_succ_list
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (xs : List Node) :
   List Node :=
-  List.join (xs.map (fun (x : Node) => nexts g x))
+  List.join (xs.map (fun (x : Node) => direct_succ_list g x))
 
 
-example
+/--
+  `list_direct_succ_set g xs` := The image of `xs` under `g`. The direct successors of `xs` as a set.
+-/
+def list_direct_succ_set
+  {Node : Type}
+  (g : Graph Node)
+  (xs : List Node) :
+  Set Node :=
+  {y : Node | ∃ (x : Node), x ∈ xs ∧ (x, y) ∈ g}
+
+
+lemma mem_list_direct_succ_list_iff
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node) :
+  ∀ (xs : List Node) (y : Node), y ∈ list_direct_succ_list g xs ↔ ∃ (x : Node), x ∈ xs ∧ (x, y) ∈ g :=
+  by
+    simp only [list_direct_succ_list]
+    simp only [← mem_direct_succ_list_iff]
+    simp
+
+
+lemma list_direct_succ_list_set_equiv
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (xs : List Node) :
-  nextss g xs = (nextss_list g xs).toFinset.toSet :=
+  (list_direct_succ_list g xs).toFinset.toSet = list_direct_succ_set g xs :=
   by
-    simp only [nextss]
-    simp only [nextss_list]
+    simp only [list_direct_succ_set]
+    simp only [← mem_list_direct_succ_list_iff]
     simp
-    simp only [nexts_set]
 
 
-lemma nextss_cons
+lemma list_direct_succ_set_cons
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (x : Node)
   (xs : List Node) :
-  nextss g (x :: xs) = (nexts g x).toFinset.toSet ∪ nextss g xs :=
+  list_direct_succ_set g (x :: xs) = (direct_succ_list g x).toFinset.toSet ∪ list_direct_succ_set g xs :=
   by
-    simp only [nextss]
-    simp only [← nexts_set]
+    simp only [list_direct_succ_set]
+    simp only [← mem_direct_succ_list_iff]
     simp
     rfl
 
@@ -146,17 +158,17 @@ def Graph.nodes_of
   g.map Prod.fst ∪ g.map Prod.snd
 
 
-lemma not_in_nodes_imp_nexts_empty
+lemma not_in_nodes_imp_direct_succ_list_empty
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (x : Node)
   (h1 : x ∉ g.nodes_of) :
-  nexts g x = [] :=
+  direct_succ_list g x = [] :=
   by
     induction g
     case nil =>
-      simp only [nexts]
+      simp only [direct_succ_list]
     case cons hd tl ih =>
       simp only [Graph.nodes_of] at ih
       simp at ih
@@ -164,7 +176,7 @@ lemma not_in_nodes_imp_nexts_empty
       simp only [Graph.nodes_of] at h1
       simp at h1
 
-      simp only [nexts]
+      simp only [direct_succ_list]
       split_ifs
       case pos c1 =>
         subst c1
@@ -209,7 +221,7 @@ def dfs_aux
   | x :: xs =>
     if x ∈ visited
     then dfs_aux g xs visited
-    else dfs_aux g (nexts g x ++ xs) (x :: visited)
+    else dfs_aux g (direct_succ_list g x ++ xs) (x :: visited)
 
   termination_by ((g.nodes_of.diff visited).length, stack.length)
   decreasing_by
@@ -222,13 +234,13 @@ def dfs_aux
       case pos =>
         have s1 : ((g.nodes_of.erase x).diff visited).length < (g.nodes_of.diff visited).length := List.erase_diff_len_lt_diff_len g.nodes_of visited x c2 c1
 
-        exact Prod.Lex.left ((nexts g x).length + xs.length) (xs.length + 1) s1
+        exact Prod.Lex.left ((direct_succ_list g x).length + xs.length) (xs.length + 1) s1
       case neg =>
         have s1 : (g.nodes_of.erase x) = g.nodes_of := by
           exact List.erase_of_not_mem c2
         simp only [s1]
 
-        simp only [not_in_nodes_imp_nexts_empty g x c2]
+        simp only [not_in_nodes_imp_direct_succ_list_empty g x c2]
         simp
         apply Prod.Lex.right (g.nodes_of.diff visited).length
         exact Nat.lt.base xs.length
@@ -308,7 +320,7 @@ lemma dfs_app
       simp only [if_neg c1]
 
 
-lemma visit_subset_dfs
+lemma visited_subset_dfs
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -332,7 +344,7 @@ lemma visit_subset_dfs
       · exact ih
 
 
-lemma next_subset_dfs
+lemma _subset_dfs
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -349,7 +361,7 @@ lemma next_subset_dfs
       simp only [if_pos c1]
       simp
       constructor
-      · have s1 : visited ⊆ dfs_aux g stack visited := visit_subset_dfs g stack visited
+      · have s1 : visited ⊆ dfs_aux g stack visited := visited_subset_dfs g stack visited
         apply Set.mem_of_subset_of_mem s1 c1
       · exact ih
     case _ visited x stack c1 ih =>
@@ -357,22 +369,22 @@ lemma next_subset_dfs
       simp only [if_neg c1]
       simp
       constructor
-      · have s1 : x :: visited ⊆ dfs_aux g (nexts g x ++ stack) (x :: visited) := visit_subset_dfs g (nexts g x ++ stack) (x :: visited)
+      · have s1 : x :: visited ⊆ dfs_aux g (direct_succ_list g x ++ stack) (x :: visited) := visited_subset_dfs g (direct_succ_list g x ++ stack) (x :: visited)
         have s2 : x ∈ x :: visited := by { simp }
         apply Set.mem_of_subset_of_mem s1 s2
-      · trans (nexts g x) ++ stack
+      · trans (direct_succ_list g x) ++ stack
         · simp
         · exact ih
 
 
-lemma nextss_closed_dfs_aux
+lemma list_direct_succ_set_closed_dfs_aux
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (stack : List Node)
   (visited : List Node)
-  (h1 : nextss g visited ⊆ stack.toFinset.toSet ∪ visited.toFinset.toSet) :
-  nextss g (dfs_aux g stack visited) ⊆ (dfs_aux g stack visited).toFinset.toSet :=
+  (h1 : list_direct_succ_set g visited ⊆ stack.toFinset.toSet ∪ visited.toFinset.toSet) :
+  list_direct_succ_set g (dfs_aux g stack visited) ⊆ (dfs_aux g stack visited).toFinset.toSet :=
   by
     induction stack, visited using dfs_aux.induct g
     case _ visited =>
@@ -396,7 +408,7 @@ lemma nextss_closed_dfs_aux
       simp only [dfs_aux]
       simp only [if_neg c1]
       apply ih
-      simp only [nextss_cons]
+      simp only [list_direct_succ_set_cons]
       simp only [List.toFinset_append]
       apply Set.union_subset
       · intro a a1
@@ -412,15 +424,15 @@ lemma nextss_closed_dfs_aux
         tauto
 
 
-lemma nextss_closed_dfs
+lemma list_direct_succ_set_closed_dfs
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (stack : List Node) :
-  nextss g (dfs_aux g stack []) ⊆ (dfs_aux g stack []).toFinset.toSet :=
+  list_direct_succ_set g (dfs_aux g stack []) ⊆ (dfs_aux g stack []).toFinset.toSet :=
   by
-    apply nextss_closed_dfs_aux
-    simp only [nextss]
+    apply list_direct_succ_set_closed_dfs_aux
+    simp only [list_direct_succ_set]
     simp
 
 
@@ -457,15 +469,15 @@ lemma subset_of_reachable_is_reachable
     exact reachable.base x a1
 
 
-lemma nextss_closed_reachable
+lemma list_direct_succ_set_closed_reachable
   {α : Type}
   [DecidableEq α]
   (g : Graph α)
   (xs : List α)
-  (h1 : nextss g xs ⊆ xs.toFinset.toSet) :
+  (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
   xs.toFinset.toSet = reachable g xs :=
   by
-    simp only [nextss] at h1
+    simp only [list_direct_succ_set] at h1
     simp at h1
 
     ext a
@@ -499,34 +511,17 @@ lemma reachable_mono
       exact reachable.step e ih_1 ih_3
 
 
-lemma reachable_closed_dfs
-  {Node : Type}
-  [DecidableEq Node]
-  (g : Graph Node)
-  (stack : List Node) :
-  reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet :=
-  by
-    have s1 : (dfs_aux g stack []).toFinset.toSet = reachable g (dfs_aux g stack []) :=
-    by
-      apply nextss_closed_reachable g (dfs_aux g stack [])
-      exact nextss_closed_dfs g stack
-
-    simp only [s1]
-    apply reachable_mono g stack (dfs_aux g stack [])
-    exact next_subset_dfs g stack []
-
-
-lemma reachable_nexts
+lemma reachable_direct_succ_list
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (x : Node) :
-  reachable g (nexts g x) ⊆ reachable g [x] :=
+  reachable g (direct_succ_list g x) ⊆ reachable g [x] :=
   by
     intro a a1
     induction a1
     case _ x y ih =>
-      obtain s1 := nexts_set g x y
+      obtain s1 := mem_direct_succ_list_iff g x y
       apply reachable.step (x, y)
       · simp only [← s1]
         exact ih
@@ -624,20 +619,20 @@ lemma dfs_subset_reachable_visit_nodes
         apply Set.mem_of_subset_of_mem s1_1
         simp
 
-      have s2 : reachable g (nexts g x ++ stack) ⊆ reachable g (x :: stack) :=
+      have s2 : reachable g (direct_succ_list g x ++ stack) ⊆ reachable g (x :: stack) :=
       by
-        have s2_1 : reachable g (nexts g x ++ stack) = reachable g (nexts g x) ∪ reachable g stack := reachable_append g (nexts g x) stack
+        have s2_1 : reachable g (direct_succ_list g x ++ stack) = reachable g (direct_succ_list g x) ∪ reachable g stack := reachable_append g (direct_succ_list g x) stack
 
         have s2_2 : reachable g (x :: stack) = reachable g [x] ∪ reachable g stack := reachable_append g [x] stack
 
-        have s2_3 : reachable g (nexts g x) ⊆ reachable g [x] := reachable_nexts g x
+        have s2_3 : reachable g (direct_succ_list g x) ⊆ reachable g [x] := reachable_direct_succ_list g x
 
         simp only [s2_1, s2_2]
         exact Set.union_subset_union_left (reachable g stack) s2_3
 
-      have s3 : (dfs_aux g (nexts g x ++ stack) (x :: visited)).toFinset.toSet ⊆ reachable g (x :: stack) ∪ (x :: visited).toFinset.toSet :=
+      have s3 : (dfs_aux g (direct_succ_list g x ++ stack) (x :: visited)).toFinset.toSet ⊆ reachable g (x :: stack) ∪ (x :: visited).toFinset.toSet :=
       by
-        trans (reachable g (nexts g x ++ stack) ∪ (x :: visited).toFinset.toSet)
+        trans (reachable g (direct_succ_list g x ++ stack) ∪ (x :: visited).toFinset.toSet)
         · exact ih
         · exact Set.union_subset_union_left (x :: visited).toFinset.toSet s2
 
@@ -647,6 +642,23 @@ lemma dfs_subset_reachable_visit_nodes
         simp at a1
         simp
         aesop
+
+
+lemma reachable_closed_dfs
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (stack : List Node) :
+  reachable g stack ⊆ (dfs_aux g stack []).toFinset.toSet :=
+  by
+    have s1 : (dfs_aux g stack []).toFinset.toSet = reachable g (dfs_aux g stack []) :=
+    by
+      apply list_direct_succ_set_closed_reachable g (dfs_aux g stack [])
+      exact list_direct_succ_set_closed_dfs g stack
+
+    simp only [s1]
+    apply reachable_mono g stack (dfs_aux g stack [])
+    exact _subset_dfs g stack []
 
 
 theorem dfs_eq_reachable
