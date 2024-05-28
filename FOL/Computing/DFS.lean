@@ -253,19 +253,19 @@ def dfs
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
-  (start : Node) :
+  (start : List Node) :
   List Node :=
-  dfs_aux g [start] []
+  dfs_aux g start []
 
 
-example : dfs [] 0 = [0] := by rfl
-example : dfs [(0, 0)] 0 = [0] := by rfl
-example : dfs [(1, 1)] 0 = [0] := by rfl
-example : dfs [(0, 1)] 0 = [1, 0] := by rfl
-example : dfs [(0, 1), (1, 1)] 0 = [1, 0] := by rfl
-example : dfs [(0, 1), (1, 0)] 0 = [1, 0] := by rfl
-example : dfs [(0, 1), (1, 2)] 0 = [2, 1, 0] := by rfl
-example : dfs [(0, 1), (1, 2), (2, 0)] 0 = [2, 1, 0] := by rfl
+example : dfs [] [0] = [0] := by rfl
+example : dfs [(0, 0)] [0] = [0] := by rfl
+example : dfs [(1, 1)] [0] = [0] := by rfl
+example : dfs [(0, 1)] [0] = [1, 0] := by rfl
+example : dfs [(0, 1), (1, 1)] [0] = [1, 0] := by rfl
+example : dfs [(0, 1), (1, 0)] [0] = [1, 0] := by rfl
+example : dfs [(0, 1), (1, 2)] [0] = [2, 1, 0] := by rfl
+example : dfs [(0, 1), (1, 2), (2, 0)] [0] = [2, 1, 0] := by rfl
 
 
 example
@@ -677,11 +677,11 @@ theorem dfs_eq_reachable_singleton
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
-  (start : Node) :
-  (dfs g start).toFinset.toSet = reachable g [start] :=
+  (start : List Node) :
+  (dfs g start).toFinset.toSet = reachable g start :=
   by
     simp only [dfs]
-    exact dfs_eq_reachable g [start]
+    exact dfs_eq_reachable g start
 
 
 lemma reachable_nil_graph
