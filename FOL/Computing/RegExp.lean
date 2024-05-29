@@ -7,8 +7,7 @@ set_option autoImplicit false
 
 
 inductive RegExp
-  (α : Type)
-  [DecidableEq α] :
+  (α : Type) :
   Type
   | char : α → RegExp α
   | epsilon : RegExp α
@@ -20,8 +19,7 @@ inductive RegExp
 
 
 def RegExp.languageOf
-  (α : Type)
-  [DecidableEq α] :
+  (α : Type) :
   RegExp α → Set (List α)
   | char x => { [x] }
   | epsilon => { [] }
@@ -37,7 +35,6 @@ def RegExp.languageOf
 
 example
   {α : Type}
-  [DecidableEq α]
   (R : RegExp α) :
   (RegExp.union R RegExp.zero).languageOf = R.languageOf ∧
     (RegExp.union RegExp.zero R).languageOf = R.languageOf :=
@@ -48,7 +45,6 @@ example
 
 example
   {α : Type}
-  [DecidableEq α]
   (R : RegExp α) :
   (RegExp.concat R RegExp.epsilon).languageOf = R.languageOf ∧
     (RegExp.concat RegExp.epsilon R).languageOf = R.languageOf :=
@@ -59,7 +55,6 @@ example
 
 example
   {α : Type}
-  [DecidableEq α]
   (R : RegExp α) :
   (RegExp.concat R RegExp.zero).languageOf = RegExp.zero.languageOf ∧
     (RegExp.concat RegExp.zero R).languageOf = RegExp.zero.languageOf :=
@@ -70,7 +65,6 @@ example
 
 example
   {α : Type}
-  [DecidableEq α]
   (R S : RegExp α) :
   (RegExp.union R S).languageOf = (RegExp.union S R).languageOf :=
   by
@@ -80,7 +74,6 @@ example
 
 example
   {α : Type}
-  [DecidableEq α]
   (R S T : RegExp α) :
   (RegExp.union (RegExp.union R S) T).languageOf =
     (RegExp.union R (RegExp.union S T)).languageOf :=
@@ -91,7 +84,6 @@ example
 
 example
   {α : Type}
-  [DecidableEq α]
   (R S T : RegExp α) :
   (RegExp.concat (RegExp.concat R S) T).languageOf =
     (RegExp.concat R (RegExp.concat S T)).languageOf :=
@@ -102,7 +94,6 @@ example
 
 example
   {α : Type}
-  [DecidableEq α]
   (R S T : RegExp α) :
   (RegExp.concat R (RegExp.union S T)).languageOf =
     (RegExp.union (RegExp.concat R S) (RegExp.concat R T)).languageOf :=
@@ -149,7 +140,6 @@ example
 
 example
   {α : Type}
-  [DecidableEq α]
   (R S T : RegExp α) :
   (RegExp.concat (RegExp.union S T) R).languageOf =
     (RegExp.union (RegExp.concat S R) (RegExp.concat T R)).languageOf :=
@@ -159,8 +149,7 @@ example
 
 
 example
-  {α : Type}
-  [DecidableEq α] :
+  {α : Type} :
   (RegExp.closure RegExp.zero).languageOf α = RegExp.epsilon.languageOf :=
   by
   simp only [RegExp.languageOf]
@@ -176,7 +165,6 @@ example
 
 example
   {α : Type}
-  [DecidableEq α]
   (R : RegExp α) :
   (RegExp.concat R (RegExp.closure R)).languageOf =
     (RegExp.concat (RegExp.closure R) R).languageOf :=

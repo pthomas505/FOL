@@ -6,9 +6,7 @@ set_option autoImplicit false
 
 structure SymbolArrow
   (α : Type)
-  [DecidableEq α]
-  (σ : Type)
-  [DecidableEq σ] :
+  (σ : Type) :
   Type :=
   (start_state : σ)
   (symbol : α)
@@ -69,7 +67,6 @@ structure EpsilonNFA
 @[simp]
 def EpsilonNFA.epsilon_closure
   {α : Type}
-  [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
@@ -84,7 +81,6 @@ def EpsilonNFA.epsilon_closure
 @[simp]
 def EpsilonNFA.eval_one
   {α : Type}
-  [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
@@ -97,7 +93,6 @@ def EpsilonNFA.eval_one
 @[simp]
 def EpsilonNFA.eval_from
   {α : Type}
-  [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
@@ -110,7 +105,6 @@ def EpsilonNFA.eval_from
 @[simp]
 def EpsilonNFA.eval
   {α : Type}
-  [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
@@ -122,7 +116,6 @@ def EpsilonNFA.eval
 @[simp]
 def EpsilonNFA.accepts
   {α : Type}
-  [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
@@ -133,7 +126,6 @@ def EpsilonNFA.accepts
 
 instance
   {α : Type}
-  [DecidableEq α]
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
