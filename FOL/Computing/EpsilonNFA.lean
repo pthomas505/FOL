@@ -15,7 +15,7 @@ structure SymbolArrow
 
 
 /--
-  The accumulated stop states of all of the steps in the list that have a start state and symbol matching the given state and symbol.
+  The accumulated stop states of all of the arrows in the list that have a start state and symbol matching the given state and symbol.
 -/
 @[simp]
 def symbol_arrow_list_to_fun
@@ -24,11 +24,11 @@ def symbol_arrow_list_to_fun
   {σ : Type}
   [DecidableEq σ]
   (symbol_arrow_list : List (SymbolArrow α σ))
-  (state : σ)
+  (start_state : σ)
   (symbol : α) :
   List σ :=
   (symbol_arrow_list.filterMap (fun (arrow : SymbolArrow α σ) =>
-    if arrow.start_state = state ∧ arrow.symbol = symbol
+    if arrow.start_state = start_state ∧ arrow.symbol = symbol
     then Option.some arrow.stop_state
     else Option.none)).dedup
 
