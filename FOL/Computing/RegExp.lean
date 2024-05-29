@@ -296,6 +296,133 @@ example
                 · simp
 
 
+@[simp]
+def match_char_EpsilonNFA
+  {α : Type}
+  [DecidableEq α]
+  (c : α) :
+  EpsilonNFA α ℕ :=
+  {
+    symbol_arrow_fun := symbol_arrow_list_to_fun [⟨0, c, 1⟩]
+    epsilon_arrow_list := []
+    starting_state_list := [0]
+    accepting_state_list := [1]
+  }
+
+
+example : (match_char_EpsilonNFA 'a').eval [] = [0] := by rfl
+example : (match_char_EpsilonNFA 'a').eval ['a'] = [1] := by rfl
+example : (match_char_EpsilonNFA 'a').eval ['b'] = [] := by rfl
+example : (match_char_EpsilonNFA 'a').eval ['a', 'b'] = [] := by rfl
+example : (match_char_EpsilonNFA 'a').eval ['b', 'a'] = [] := by rfl
+
+
+example : ¬ (match_char_EpsilonNFA 'a').accepts [] :=
+  by decide
+
+
+example : (match_char_EpsilonNFA 'a').accepts ['a'] :=
+  by
+    simp
+    decide
+
+example : ¬ (match_char_EpsilonNFA 'a').accepts ['b'] :=
+  by decide
+
+
+example : ¬ (match_char_EpsilonNFA 'a').accepts ['a', 'b'] :=
+  by decide
+
+
+example : ¬ (match_char_EpsilonNFA 'a').accepts ['b', 'a'] :=
+  by decide
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (c : α)
+  (x : α) :
+  (match_char_EpsilonNFA c).accepts [x] ↔ c = x :=
+  by
+    by_cases c1 : c = x
+    case pos =>
+      simp only [c1]
+      simp
+      decide
+    case neg =>
+      simp
+      simp only [c1]
+      decide
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (c : α)
+  (x y : α) :
+  ¬ (match_char_EpsilonNFA c).accepts [x, y] :=
+  by
+  by_cases c1 : c = x
+  case pos =>
+    simp only [c1]
+    simp
+    decide
+  case neg =>
+    simp
+    split_ifs
+    case pos c2 =>
+      contradiction
+    case neg c2 =>
+      simp
+      decide
+
+
+def match_epsilon_EpsilonNFA
+  (α : Type)
+  [DecidableEq α] :
+  EpsilonNFA α ℕ :=
+  {
+    symbol_arrow_fun := symbol_arrow_list_to_fun []
+    epsilon_arrow_list := [⟨0, 1⟩]
+    starting_state_list := [0]
+    accepting_state_list := [1]
+  }
+
+
+example
+  (α : Type)
+  [DecidableEq α] :
+  (match_epsilon_EpsilonNFA α).accepts [] :=
+  by
+    simp
+    apply Exists.intro 1
+    tauto
+
+
+def match_zero_EpsilonNFA
+  (α : Type)
+  [DecidableEq α] :
+  EpsilonNFA α ℕ :=
+  {
+    symbol_arrow_fun := symbol_arrow_list_to_fun []
+    epsilon_arrow_list := []
+    starting_state_list := [0]
+    accepting_state_list := []
+  }
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (xs : List α) :
+  ¬ (match_zero_EpsilonNFA α).accepts xs :=
+  by
+    simp
+    tauto
+
+
+/-
 def EpsilonNFA.wrapLeft
   {α : Type}
   [DecidableEq α]
@@ -394,197 +521,6 @@ def EpsilonNFA.wrapRight
     starting_state_list := e.starting_state_list.map Sum.inr,
     accepting_state_list := e.accepting_state_list.map Sum.inr
   }
-
-
-def match_char_EpsilonNFA
-  {α : Type}
-  [DecidableEq α]
-  (c : α) :
-  EpsilonNFA α ℕ :=
-  {
-    symbol_step_list := [⟨0, c, [1]⟩]
-    epsilon_step_list := []
-    starting_state_list := [0]
-    accepting_state_list := [1]
-  }
-
-
-example : (match_char_EpsilonNFA 'a').eval [] = [0] := by rfl
-example : (match_char_EpsilonNFA 'a').eval ['a'] = [1] := by rfl
-example : (match_char_EpsilonNFA 'a').eval ['b'] = [] := by rfl
-example : (match_char_EpsilonNFA 'a').eval ['a', 'b'] = [] := by rfl
-example : (match_char_EpsilonNFA 'a').eval ['b', 'a'] = [] := by rfl
-
-example : ¬ (match_char_EpsilonNFA 'a').accepts [] :=
-  by
-  simp only [match_char_EpsilonNFA]
-  simp only [EpsilonNFA.accepts]
-  simp only [EpsilonNFA.eval]
-  simp only [EpsilonNFA.eval_from]
-  simp
-
-example : (match_char_EpsilonNFA 'a').accepts ['a'] :=
-  by
-  simp only [match_char_EpsilonNFA]
-
-  simp only [EpsilonNFA.accepts]
-  simp only [EpsilonNFA.eval]
-  simp only [EpsilonNFA.eval_from]
-  simp
-  apply List.mem_of_elem_eq_true
-  exact rfl
-
-example : ¬ (match_char_EpsilonNFA 'a').accepts ['b'] :=
-  by
-  simp only [match_char_EpsilonNFA]
-  simp only [EpsilonNFA.accepts]
-  tauto
-
-example : ¬ (match_char_EpsilonNFA 'a').accepts ['a', 'b'] :=
-  by
-  simp only [match_char_EpsilonNFA]
-  simp only [EpsilonNFA.accepts]
-  tauto
-
-example : ¬ (match_char_EpsilonNFA 'a').accepts ['b', 'a'] :=
-  by
-  simp only [match_char_EpsilonNFA]
-  simp only [EpsilonNFA.accepts]
-  tauto
-
-
-example
-  (α : Type)
-  [DecidableEq α]
-  (c : α)
-  (x : α) :
-  (match_char_EpsilonNFA c).accepts [x] ↔ c = x :=
-  by
-  simp only [match_char_EpsilonNFA]
-  simp only [EpsilonNFA.accepts]
-  simp
-  simp only [EpsilonNFA.eval]
-  simp only [EpsilonNFA.eval_from]
-  simp
-  simp only [EpsilonNFA.eval_one]
-  simp
-  simp only [symbol_step_multiple_list_to_fun]
-  simp only [epsilon_closure]
-  simp only [epsilon_step_multiple_list_to_graph]
-  simp only [epsilon_step_multiple_list_to_single_list]
-  simp only [epsilon_step_single_list_to_graph]
-  simp
-  split_ifs
-  case pos c1 =>
-    simp only [c1]
-    simp
-    apply List.mem_of_elem_eq_true
-    exact rfl
-  case neg c1 =>
-    simp only [c1]
-    simp
-    exact List.count_eq_zero.mp rfl
-
-
-example
-  (α : Type)
-  [DecidableEq α]
-  (c : α)
-  (x : α)
-  (xs : List α)
-  (h1 : ¬ xs = []) :
-  ¬ (match_char_EpsilonNFA c).accepts (x :: xs) :=
-  by
-  simp only [match_char_EpsilonNFA]
-  simp only [EpsilonNFA.accepts]
-  simp
-  simp only [EpsilonNFA.eval]
-  simp only [EpsilonNFA.eval_from]
-  simp
-  simp only [EpsilonNFA.eval_one]
-  simp
-  simp only [symbol_step_multiple_list_to_fun]
-  simp only [epsilon_closure]
-  simp only [epsilon_step_multiple_list_to_graph]
-  simp only [epsilon_step_multiple_list_to_single_list]
-  simp only [epsilon_step_single_list_to_graph]
-  cases xs
-  case nil =>
-    simp at h1
-  case cons xs_hd xs_tl =>
-    simp
-    split_ifs
-    case _ c1 =>
-      simp only [c1]
-      simp
-      sorry
-    case _ c1 =>
-      simp only [c1]
-      simp
-      sorry
-
-
-
-def match_epsilon_EpsilonNFA
-  (α : Type)
-  [DecidableEq α] :
-  EpsilonNFA α ℕ :=
-  {
-    symbol_step_list := []
-    epsilon_step_list := [⟨ 0, [1] ⟩]
-    starting_state_list := [0]
-    accepting_state_list := [1]
-  }
-
-/-
-example
-  (α : Type)
-  [DecidableEq α] :
-  (match_epsilon_EpsilonNFA α).accepts [] :=
-  by
-  simp only [match_epsilon_EpsilonNFA]
-  simp only [EpsilonNFA.accepts]
-  simp
-  simp only [EpsilonNFA.eval]
-  simp only [EpsilonNFA.eval_from]
-  simp
-  simp only [EpsilonNFA.eval_one]
-  simp
-  simp only [symbol_step_multiple_list_to_fun]
-  simp only [epsilon_closure]
-  simp only [epsilon_step_multiple_list_to_graph]
-  simp only [epsilon_step_multiple_list_to_single_list]
-  simp only [epsilon_step_single_list_to_graph]
--/
-
-/-
-
-def match_zero_EpsilonNFA
-  (α : Type)
-  [DecidableEq α] :
-  EpsilonNFA α ℕ :=
-  {
-/-
-    stateSet := {0}
-    symbolSet := {}
--/
-    stepList := []
-    startingStateList := [0]
-    acceptingStateList := []
-  }
-
-
-example
-  (α : Type)
-  [DecidableEq α]
-  (xs : List α) :
-  ¬ (match_zero_EpsilonNFA α).accepts xs :=
-  by
-  simp only [match_zero_EpsilonNFA]
-  simp only [EpsilonNFA.accepts]
-  simp only [EpsilonNFA.eval]
-  simp only [EpsilonNFA.evalFrom]
-  simp
 
 
 def match_union_EpsilonNFA
