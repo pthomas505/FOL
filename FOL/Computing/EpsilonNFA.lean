@@ -138,6 +138,8 @@ instance
     infer_instance
 
 
+example : EpsilonNFA.eval_from ⟨ symbol_arrow_list_to_fun [⟨0, 'a', 1⟩], [⟨ 0, 1 ⟩], [0], [1] ⟩ [] ([] : List Char) = [] := by rfl
+
 example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [], [], [0], [1] ⟩ ([] : List Char) = [0] := by rfl
 
 example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [], [], [0], [1] ⟩ ['a'] = [] := by rfl
