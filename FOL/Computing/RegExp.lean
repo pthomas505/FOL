@@ -285,6 +285,7 @@ example
                 · simp
 
 
+@[reducible]
 def RegExp.State
   (α : Type)
   [DecidableEq α] :
