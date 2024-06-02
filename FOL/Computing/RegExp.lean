@@ -431,7 +431,16 @@ def RegExp.toEpsilonNFA
       accepting_state_list := R'.accepting_state_list ++ S'.accepting_state_list
     }
 
-  | concat R S => sorry
+  | concat R S =>
+    let R' := R.toEpsilonNFA.wrapLeft S.State
+    let S' := S.toEpsilonNFA.wrapRight R.State
+    {
+      symbol_arrow_list := R'.symbol_arrow_list ++ S'.symbol_arrow_list
+      epsilon_arrow_list := R'.accepting_state_list.map (fun (state) => ⟨ state, S'.starting_state_list ⟩)
+      starting_state_list := R'.starting_state_list
+      accepting_state_list := S'.accepting_state_list
+    }
+
   | closure R => sorry
 
 
@@ -604,30 +613,7 @@ example
       sorry
 
 
-def match_concat_EpsilonNFA
-  (α : Type)
-  [DecidableEq α]
-  (σ_0 σ_1 : Type)
-  [DecidableEq σ_0]
-  [DecidableEq σ_1]
-  (e1 : EpsilonNFA α σ_0)
-  (e2 : EpsilonNFA α σ_1) :
-  EpsilonNFA α (σ_0 ⊕ σ_1) :=
-  let e1' : EpsilonNFA α (σ_0 ⊕ σ_1) := e1.wrapLeft σ_1
-  let e2' : EpsilonNFA α (σ_0 ⊕ σ_1) := e2.wrapRight σ_0
-  {
 /-
-    stateSet := e1'.stateSet ∪ e2'.stateSet
-    symbolSet := e1'.symbolSet ∪ e2'.symbolSet
--/
-    -- Steps on epsilon from each of the accepting states of e1' to the starting state of e2'.
-    stepList := e1'.acceptingStateList.map (fun (state : σ_0 ⊕ σ_1) => ((state, Option.none), e2'.startingStateList))
-
-    startingStateList := e1'.startingStateList
-    acceptingStateList := e2'.acceptingStateList
-  }
-
-
 def match_closure_EpsilonNFA
   (α : Type)
   [DecidableEq α]
