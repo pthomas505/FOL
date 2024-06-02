@@ -1,5 +1,4 @@
 import FOL.Computing.EpsilonNFA
-import FOL.FunctionUpdateITE
 
 import Mathlib.Data.Set.Basic
 
@@ -343,6 +342,7 @@ example
     simp only [EpsilonNFA.accepts]
     simp only [EpsilonNFA.eval]
     simp only [EpsilonNFA.eval_from]
+    sorry
   simp
   constructor
   · intro a1
@@ -354,12 +354,7 @@ example
     case _ a2_left a2_right =>
       apply Exists.intro s
       constructor
-      · simp only [e_left]
-        cases xs
-        case _ =>
-          simp at a2_left
-          simp
-
+      · sorry
       · simp only [e_left]
         simp only [EpsilonNFA.wrapLeft]
         simp
@@ -384,10 +379,10 @@ example
       simp only [EpsilonNFA.wrapLeft] at a2
       simp at a2
 
+
 @[reducible]
 def RegExp.State
-  (α : Type)
-  [DecidableEq α] :
+  (α : Type) :
   RegExp α → Type
 | char _ => ℕ
 | epsilon => ℕ
@@ -399,10 +394,9 @@ def RegExp.State
 
 def RegExp.toEpsilonNFA
   {α : Type}
-  [DecidableEq α]
-  (T : RegExp α) :
-  EpsilonNFA α T.State :=
-  match T with
+  (e : RegExp α) :
+  EpsilonNFA α e.State :=
+  match e with
   | char c =>
     {
       symbol_arrow_list := [⟨0, c, [1]⟩]
@@ -607,16 +601,7 @@ example
     apply Exists.intro s
     cases a1
     case _ left right =>
-      constructor
-      · cases xs
-        case nil =>
-          simp at left
-          simp
-          sorry
-        case cons hd tl =>
-          simp
-
-
+      sorry
 
 
 def match_concat_EpsilonNFA
