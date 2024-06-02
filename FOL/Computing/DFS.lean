@@ -10,7 +10,8 @@ import Mathlib.Data.Finset.Basic
   The representation of a directed graph as a list of directed edges.
   `(x, y)` is in the list if and only if there is a directed edge from `x` to `y`.
 -/
-abbrev Graph
+@[reducible]
+def Graph
   (Node : Type) :
   Type :=
   List (Node × Node)
