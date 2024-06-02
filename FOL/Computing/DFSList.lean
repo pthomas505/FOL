@@ -264,7 +264,7 @@ def dft_aux
 
         exact Prod.Lex.left ((direct_succ_list g x).length + xs.length) (xs.length + 1) s1
       case neg =>
-        have s1 : (g.nodes_of.erase x) = g.nodes_of := List.erase_of_not_mem c2
+        have s1 : g.nodes_of.erase x = g.nodes_of := List.erase_of_not_mem c2
         simp only [s1]
 
         simp only [not_mem_imp_no_direct_succ g x c2]
@@ -430,7 +430,19 @@ lemma list_direct_succ_set_closed_dft_aux
       · intro a a1
         simp at a1
         simp
-        aesop
+        cases a1
+        case _ c2 =>
+          cases c2
+          case _ c3 =>
+            subst c3
+            right
+            exact c1
+          case _ c3 =>
+            left
+            exact c3
+        case _ c2 =>
+          right
+          exact c2
     case _ visited x stack c1 ih =>
       simp only [dft_aux]
       simp only [if_neg c1]
@@ -444,7 +456,7 @@ lemma list_direct_succ_set_closed_dft_aux
         tauto
       · intro a a1
 
-        have s1 : a ∈ (x :: stack).toFinset.toSet ∪ visited.toFinset.toSet := by exact h1 a1
+        have s1 : a ∈ (x :: stack).toFinset.toSet ∪ visited.toFinset.toSet := h1 a1
 
         simp at s1
         simp
