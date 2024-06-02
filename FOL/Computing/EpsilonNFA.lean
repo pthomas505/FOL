@@ -1,4 +1,4 @@
-import FOL.Computing.DFS
+import FOL.Computing.DFSList
 
 
 set_option autoImplicit false
@@ -10,6 +10,14 @@ structure SymbolArrow
   Type :=
   (start_state : σ)
   (symbol : α)
+  (stop_state : σ)
+  deriving Repr
+
+
+structure EpsilonArrow
+  (σ : Type) :
+  Type :=
+  (start_state : σ)
   (stop_state : σ)
   deriving Repr
 
@@ -54,12 +62,34 @@ example : symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'a', 1⟩] 0 'a' = [1
 example : symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'a', 1⟩, ⟨0, 'a', 2⟩] 0 'a' = [1, 2] := by rfl
 
 
+@[simp]
+def epsilon_arrow_list_to_fun
+  {σ : Type}
+  [DecidableEq σ]
+  (epsilon_arrow_list : List (EpsilonArrow σ))
+  (start_state : σ) :
+  List σ :=
+  (epsilon_arrow_list.filterMap (fun (arrow : EpsilonArrow σ) =>
+    if arrow.start_state = start_state
+    then Option.some arrow.stop_state
+    else Option.none)).dedup
+
+
+def epsilon_arrow_fun_to_list
+  {σ : Type}
+  (epsilon_arrow_fun : σ → List σ)
+  (state_list : List σ) :
+  List (σ × List σ) :=
+  state_list.map (fun (state : σ) => (state, epsilon_arrow_fun state))
+
+
 structure EpsilonNFA
   (α : Type)
   (σ : Type) :
   Type :=
+  (state_list : List σ)
   (symbol_arrow_fun : σ → α → List σ)
-  (epsilon_arrow_list : List (σ × σ))
+  (epsilon_arrow_fun : σ → List σ)
   (starting_state_list : List σ)
   (accepting_state_list : List σ)
 
@@ -72,7 +102,7 @@ def EpsilonNFA.epsilon_closure
   (e : EpsilonNFA α σ)
   (state_list : List σ) :
   List σ :=
-  dfs e.epsilon_arrow_list state_list
+  dfs (epsilon_arrow_fun_to_list e.epsilon_arrow_fun e.state_list) state_list
 
 
 /--
@@ -138,26 +168,34 @@ instance
     infer_instance
 
 
-example : EpsilonNFA.eval_from ⟨ symbol_arrow_list_to_fun [⟨0, 'a', 1⟩], [⟨ 0, 1 ⟩], [0], [1] ⟩ [] ([] : List Char) = [] := by rfl
+example : EpsilonNFA.eval_from
+  {
+    state_list := ([0, 1] : List ℕ),
+    symbol_arrow_fun := symbol_arrow_list_to_fun [⟨0, 'a', 1⟩],
+    epsilon_arrow_fun := epsilon_arrow_list_to_fun [⟨0, 1⟩],starting_state_list := [0],
+    accepting_state_list := [1]
+  }
+  []
+  ([] : List Char) = [] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [], [], [0], [1] ⟩ ([] : List Char) = [0] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1], symbol_arrow_list_to_fun [], epsilon_arrow_list_to_fun [], [0], [1] ⟩ ([] : List Char) = [0] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [], [], [0], [1] ⟩ ['a'] = [] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1], symbol_arrow_list_to_fun [], epsilon_arrow_list_to_fun [], [0], [1] ⟩ ['a'] = [] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [⟨0, 'a', 1⟩], [], [0], [1] ⟩ ['a'] = [1] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1], symbol_arrow_list_to_fun [⟨0, 'a', 1⟩], epsilon_arrow_list_to_fun [], [0], [1] ⟩ ['a'] = [1] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [⟨0, 'a', 1⟩], [], [0], [1] ⟩ ['b'] = [] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1], symbol_arrow_list_to_fun [⟨0, 'a', 1⟩], epsilon_arrow_list_to_fun [], [0], [1] ⟩ ['b'] = [] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'b', 1⟩], [], [0], [1] ⟩ ['a'] = [1] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1], symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'b', 1⟩], epsilon_arrow_list_to_fun [], [0], [1] ⟩ ['a'] = [1] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'b', 1⟩], [], [0], [1] ⟩ ['b'] = [1] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1], symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'b', 1⟩], epsilon_arrow_list_to_fun [], [0], [1] ⟩ ['b'] = [1] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'b', 2⟩], [], [0], [1] ⟩ ['a'] = [1] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1, 2], symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'b', 2⟩], epsilon_arrow_list_to_fun [], [0], [1] ⟩ ['a'] = [1] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'b', 2⟩], [], [0], [1] ⟩ ['b'] = [2] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1, 2], symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'b', 2⟩], epsilon_arrow_list_to_fun [], [0], [1] ⟩ ['b'] = [2] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'a', 2⟩], [], [0], [1] ⟩ ['a'] = [2, 1] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1, 2], symbol_arrow_list_to_fun [⟨0, 'a', 1⟩, ⟨0, 'a', 2⟩], epsilon_arrow_list_to_fun [], [0], [1] ⟩ ['a'] = [2, 1] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [], [⟨ 0, 1 ⟩], [0], [1] ⟩ ([] : List Char) = [1, 0] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1], symbol_arrow_list_to_fun [], epsilon_arrow_list_to_fun [⟨ 0, 1 ⟩], [0], [1] ⟩ ([] : List Char) = [1, 0] := by rfl
 
-example : EpsilonNFA.eval ⟨ symbol_arrow_list_to_fun [], [⟨ 0, 1 ⟩], [0], [1] ⟩ ['a'] = [] := by rfl
+example : EpsilonNFA.eval ⟨ [0, 1], symbol_arrow_list_to_fun [], epsilon_arrow_list_to_fun [⟨ 0, 1 ⟩], [0], [1] ⟩ ['a'] = [] := by rfl
