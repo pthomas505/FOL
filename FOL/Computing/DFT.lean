@@ -557,9 +557,31 @@ lemma subset_of_reachable_is_reachable
   (xs : List Node) :
   xs.toFinset.toSet ⊆ reachable g xs :=
   by
+    simp only [Set.subset_def]
     intro x a1
     simp at a1
     exact reachable.base x a1
+
+
+theorem extracted_5
+  {α : Type}
+  [inst : DecidableEq α]
+  (g : Graph α)
+  (xs : List α)
+  (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
+  reachable g xs ⊆ ↑xs.toFinset :=
+  by
+    simp only [list_direct_succ_set] at h1
+    simp at h1
+
+    simp only [Set.subset_def]
+    simp
+    intro a a1
+    induction a1
+    case _ _ ih =>
+      exact ih
+    case _ x e ih_1 ih_2 _ ih_4 =>
+      exact h1 x e.1 ih_4 e.2 ih_2 ih_1
 
 
 lemma list_direct_succ_set_closed_reachable
@@ -570,21 +592,9 @@ lemma list_direct_succ_set_closed_reachable
   (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
   xs.toFinset.toSet = reachable g xs :=
   by
-    simp only [list_direct_succ_set] at h1
-    simp at h1
-
-    ext a
-    constructor
-    · intro a1
-      simp at a1
-      exact reachable.base a a1
-    · intro a1
-      simp
-      induction a1
-      case _ x _ ih =>
-        exact ih
-      case _ x e ih_1 ih_2 _ ih_4 =>
-        exact h1 x e.1 ih_4 e.2 ih_2 ih_1
+    apply Set.eq_of_subset_of_subset
+    · apply subset_of_reachable_is_reachable
+    · exact extracted_5 g xs h1
 
 
 lemma reachable_mono
