@@ -550,7 +550,7 @@ inductive reachable
     reachable g xs x
 
 
-lemma subset_of_reachable_is_reachable
+lemma base_of_reachable_is_subset_of_reachable
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -593,7 +593,7 @@ lemma list_direct_succ_set_closed_reachable
   xs.toFinset.toSet = reachable g xs :=
   by
     apply Set.eq_of_subset_of_subset
-    · apply subset_of_reachable_is_reachable
+    · apply base_of_reachable_is_subset_of_reachable
     · exact extracted_5 g xs h1
 
 
@@ -728,7 +728,7 @@ lemma dft_aux_is_subset_of_reachable_and_visited
 
       have s1 : x ∈ reachable g (x :: stack) :=
       by
-        have s1_1 : (x :: stack).toFinset.toSet ⊆ reachable g (x :: stack) := subset_of_reachable_is_reachable g (x :: stack)
+        have s1_1 : (x :: stack).toFinset.toSet ⊆ reachable g (x :: stack) := base_of_reachable_is_subset_of_reachable g (x :: stack)
 
         apply Set.mem_of_subset_of_mem s1_1
         simp
