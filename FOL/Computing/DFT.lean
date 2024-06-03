@@ -371,6 +371,35 @@ lemma visited_subset_dft_aux
       · exact ih
 
 
+theorem extracted_1
+  {α : Type}
+  (xs  : List α)
+  (ys : List α)
+  (zs : List α)
+  (x : α)
+  (h1 : zs ⊆ xs)
+  (h2 : x ∈ ys)
+  (h3 : ys ⊆ xs) :
+  x :: zs ⊆ xs :=
+  by
+    simp
+    constructor
+    · apply Set.mem_of_subset_of_mem h3 h2
+    · exact h1
+
+
+theorem extracted_2
+  {α : Type}
+  (ws xs ys zs : List α)
+  (x : α)
+  (h1 : ws ++ ys ⊆ zs)
+  (h2 : x :: xs ⊆ zs) :
+  x :: ys ⊆ zs :=
+  by
+    simp at *
+    tauto
+
+
 lemma stack_subset_dft_aux
   {Node : Type}
   [DecidableEq Node]
@@ -386,22 +415,13 @@ lemma stack_subset_dft_aux
     case _ visited x stack c1 ih =>
       simp only [dft_aux]
       simp only [if_pos c1]
-      simp
-      constructor
-      · have s1 : visited ⊆ dft_aux g stack visited := visited_subset_dft_aux g stack visited
-        apply Set.mem_of_subset_of_mem s1 c1
-      · exact ih
+      apply extracted_1 (dft_aux g stack visited) visited stack x ih c1
+      exact visited_subset_dft_aux g stack visited
     case _ visited x stack c1 ih =>
       simp only [dft_aux]
       simp only [if_neg c1]
-      simp
-      constructor
-      · have s1 : x :: visited ⊆ dft_aux g (direct_succ_list g x ++ stack) (x :: visited) := visited_subset_dft_aux g (direct_succ_list g x ++ stack) (x :: visited)
-        have s2 : x ∈ x :: visited := by { simp }
-        apply Set.mem_of_subset_of_mem s1 s2
-      · trans (direct_succ_list g x) ++ stack
-        · simp
-        · exact ih
+      apply extracted_2 (direct_succ_list g x) visited stack (dft_aux g (direct_succ_list g x ++ stack) (x :: visited)) x ih
+      apply visited_subset_dft_aux g (direct_succ_list g x ++ stack) (x :: visited)
 
 
 lemma list_direct_succ_set_closed_dft_aux
