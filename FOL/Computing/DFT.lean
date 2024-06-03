@@ -424,6 +424,35 @@ lemma stack_subset_dft_aux
       apply visited_subset_dft_aux g (direct_succ_list g x ++ stack) (x :: visited)
 
 
+lemma list_cons_to_set_union
+  {α : Type}
+  [inst : DecidableEq α]
+  (ys : List α)
+  (x : α) :
+  (x :: ys).toFinset.toSet = {x} ∪ ys.toFinset.toSet :=
+  by
+    ext a
+    simp
+
+
+theorem extracted_3
+  {α : Type}
+  [inst : DecidableEq α]
+  (xs ys : List α)
+  (x : α)
+  (h1 : x ∈ xs) :
+  (x :: ys).toFinset.toSet ∪ xs.toFinset.toSet ⊆ ys.toFinset.toSet ∪ xs.toFinset.toSet :=
+  by
+    simp only [list_cons_to_set_union]
+    apply Set.union_subset
+    · apply Set.union_subset
+      · simp
+        right
+        exact h1
+      · exact Set.subset_union_left ys.toFinset.toSet xs.toFinset.toSet
+    · exact Set.subset_union_right ys.toFinset.toSet xs.toFinset.toSet
+
+
 lemma list_direct_succ_set_closed_dft_aux
   {Node : Type}
   [DecidableEq Node]
@@ -444,25 +473,9 @@ lemma list_direct_succ_set_closed_dft_aux
       simp only [dft_aux]
       simp only [if_pos c1]
       apply ih
-
       trans (x :: stack).toFinset.toSet ∪ visited.toFinset.toSet
       · exact h1
-      · intro a a1
-        simp at a1
-        simp
-        cases a1
-        case _ c2 =>
-          cases c2
-          case _ c3 =>
-            subst c3
-            right
-            exact c1
-          case _ c3 =>
-            left
-            exact c3
-        case _ c2 =>
-          right
-          exact c2
+      · exact extracted_3 visited stack x c1
     case _ visited x stack c1 ih =>
       simp only [dft_aux]
       simp only [if_neg c1]
