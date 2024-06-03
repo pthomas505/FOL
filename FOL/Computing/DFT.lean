@@ -569,7 +569,7 @@ theorem extracted_5
   (g : Graph α)
   (xs : List α)
   (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
-  reachable g xs ⊆ ↑xs.toFinset :=
+  reachable g xs ⊆ xs.toFinset.toSet :=
   by
     simp only [list_direct_succ_set] at h1
     simp at h1
