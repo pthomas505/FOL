@@ -6,6 +6,26 @@ import Mathlib.Data.Finset.Basic
 -- Adapted from https://www.isa-afp.org/entries/Depth-First-Search.html.
 
 
+lemma list_cons_to_set_union
+  {α : Type}
+  [inst : DecidableEq α]
+  (ys : List α)
+  (x : α) :
+  (x :: ys).toFinset.toSet = {x} ∪ ys.toFinset.toSet :=
+  by
+    ext a
+    simp
+
+lemma list_append_to_set_union
+  {α : Type}
+  [inst : DecidableEq α]
+  (xs ys : List α) :
+  (xs ++ ys).toFinset.toSet = xs.toFinset.toSet ∪ ys.toFinset.toSet :=
+  by
+    ext a
+    simp
+
+
 /--
   The representation of a directed graph as a list of directed edges.
   `(x, ys)` is in the list if and only if there is a directed edge from `x` to each of the nodes in `ys`.
@@ -424,17 +444,6 @@ lemma stack_subset_dft_aux
       apply visited_subset_dft_aux g (direct_succ_list g x ++ stack) (x :: visited)
 
 
-lemma list_cons_to_set_union
-  {α : Type}
-  [inst : DecidableEq α]
-  (ys : List α)
-  (x : α) :
-  (x :: ys).toFinset.toSet = {x} ∪ ys.toFinset.toSet :=
-  by
-    ext a
-    simp
-
-
 theorem extracted_3
   {α : Type}
   [inst : DecidableEq α]
@@ -451,6 +460,28 @@ theorem extracted_3
         exact h1
       · exact Set.subset_union_left ys.toFinset.toSet xs.toFinset.toSet
     · exact Set.subset_union_right ys.toFinset.toSet xs.toFinset.toSet
+
+
+theorem extracted_4
+  {Node : Type}
+  [inst : DecidableEq Node]
+  (xs ys zs : List Node)
+  (S : Set Node)
+  (x : Node)
+  (h1 : S ⊆ (x :: zs).toFinset.toSet ∪ ys.toFinset.toSet) :
+  xs.toFinset.toSet ∪ S ⊆ (xs ++ zs).toFinset.toSet ∪ (x :: ys).toFinset.toSet :=
+  by
+    simp only [list_cons_to_set_union] at h1
+    simp only [Set.subset_def] at h1
+    simp at h1
+
+    simp only [list_cons_to_set_union]
+    simp only [list_append_to_set_union]
+    simp only [Set.subset_def]
+    simp
+    intro a a1
+    specialize h1 a
+    tauto
 
 
 lemma list_direct_succ_set_closed_dft_aux
@@ -481,19 +512,7 @@ lemma list_direct_succ_set_closed_dft_aux
       simp only [if_neg c1]
       apply ih
       simp only [list_direct_succ_set_cons]
-      simp only [List.toFinset_append]
-      apply Set.union_subset
-      · intro a a1
-        simp at a1
-        simp
-        tauto
-      · intro a a1
-
-        have s1 : a ∈ (x :: stack).toFinset.toSet ∪ visited.toFinset.toSet := h1 a1
-
-        simp at s1
-        simp
-        tauto
+      exact extracted_4 (direct_succ_list g x) visited stack (list_direct_succ_set g visited) x h1
 
 
 lemma list_direct_succ_set_closed_dft
