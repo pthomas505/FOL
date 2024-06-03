@@ -581,7 +581,7 @@ theorem extracted_5
     case _ _ ih =>
       exact ih
     case _ x e ih_1 ih_2 _ ih_4 =>
-      exact h1 x e.1 ih_4 e.2 ih_2 ih_1
+      exact h1 x e.fst ih_4 e.snd ih_2 ih_1
 
 
 lemma list_direct_succ_set_closed_reachable
@@ -621,6 +621,7 @@ lemma reachable_direct_succ_list_is_subset_of_reachable
   (x : Node) :
   reachable g (direct_succ_list g x) ⊆ reachable g [x] :=
   by
+    simp only [Set.subset_def]
     intro a a1
     induction a1
     case _ x y ih =>
@@ -630,12 +631,11 @@ lemma reachable_direct_succ_list_is_subset_of_reachable
       intro ys a2
       cases a2
       case _ a2_left a2_right =>
-      apply reachable.step _ (x, ys) a2_right
-      · exact a2_left
-      · apply reachable.base x
+        apply reachable.step y (x, ys) a2_right a2_left
+        apply reachable.base x
         simp
     case _ x e ih_1 ih_2 _ ih_4 =>
-      apply reachable.step x e ih_1 ih_2 ih_4
+      exact reachable.step x e ih_1 ih_2 ih_4
 
 
 lemma reachable_of_append
@@ -674,20 +674,20 @@ lemma reachable_of_append
           cases ih_4
           case _ left =>
             left
-            apply reachable.step x e ih_1 ih_2 left
+            exact reachable.step x e ih_1 ih_2 left
           case _ right =>
             right
-            apply reachable.step x e ih_1 ih_2 right
+            exact reachable.step x e ih_1 ih_2 right
     · intro a1
       cases a1
       case _ c1 =>
         apply reachable_mono g xs (xs ++ ys)
-        simp
-        exact c1
+        · simp
+        · exact c1
       case _ c1 =>
         apply reachable_mono g ys (xs ++ ys)
-        simp
-        exact c1
+        · simp
+        · exact c1
 
 
 lemma dft_aux_is_subset_of_reachable_and_visited
