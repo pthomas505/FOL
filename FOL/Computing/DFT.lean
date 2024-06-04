@@ -393,9 +393,7 @@ lemma visited_subset_dft_aux
 
 theorem extracted_1
   {α : Type}
-  (xs  : List α)
-  (ys : List α)
-  (zs : List α)
+  (xs ys zs : List α)
   (x : α)
   (h1 : zs ⊆ xs)
   (h2 : x ∈ ys)
