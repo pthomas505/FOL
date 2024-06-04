@@ -824,8 +824,6 @@ lemma dft_aux_is_subset_of_reachable_from_list_and_visited
       simp only [dft_aux]
       simp only [if_neg c1]
 
-      simp only [dft_aux_append g (direct_succ_list g x) stack (x :: visited)] at *
-
       simp only [reachable_from_list_of_append g (direct_succ_list g x) stack] at ih
 
       simp only [reachable_from_list_of_cons g x stack]
