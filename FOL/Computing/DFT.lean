@@ -605,6 +605,7 @@ lemma reachable_mono
   (h1 : xs ⊆ ys) :
   reachable g xs ⊆ reachable g ys :=
   by
+    simp only [Set.subset_def]
     intro x a1
     induction a1
     case base a ih =>
