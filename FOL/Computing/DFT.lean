@@ -309,7 +309,7 @@ def dft_aux
 
 
 /--
-  `dft g start` := The depth first traversal of `g` from `start`. The nodes of `g` that are reachable from `start`.
+  `dft g start` := The depth first traversal of `g` from `start`. The nodes of `g` that are reachable_from_list from `start`.
 -/
 def dft
   {Node : Type}
@@ -541,9 +541,9 @@ lemma list_direct_succ_set_closed_dft
 
 
 /--
-  `reachable g xs` := The reflexive transitive closure of `xs` under `g`. The union of the nodes that are reachable from each node in `xs` through a sequence of zero or more directed edges in `g`.
+  `reachable_from_list g xs` := The reflexive transitive closure of `xs` under `g`. The union of the nodes that are reachable_from_list from each node in `xs` through a sequence of zero or more directed edges in `g`.
 -/
-inductive reachable
+inductive reachable_from_list
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -552,46 +552,46 @@ inductive reachable
   | base
     (x : Node) :
     x ∈ xs →
-    reachable g xs x
+    reachable_from_list g xs x
 
   | step
     (x : Node)
     (e : (Node × List Node)) :
     e ∈ g →
     x ∈ e.snd →
-    reachable g xs e.fst →
-    reachable g xs x
+    reachable_from_list g xs e.fst →
+    reachable_from_list g xs x
 
 
-lemma base_of_reachable_is_subset_of_reachable
+lemma base_of_reachable_from_list_is_subset_of_reachable_from_list
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (xs : List Node) :
-  xs.toFinset.toSet ⊆ reachable g xs :=
+  xs.toFinset.toSet ⊆ reachable_from_list g xs :=
   by
     simp only [Set.subset_def]
     intro x a1
     simp at a1
-    exact reachable.base x a1
+    exact reachable_from_list.base x a1
 
 
-lemma reachable_mono
+lemma reachable_from_list_mono
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (xs ys : List Node)
   (h1 : xs ⊆ ys) :
-  reachable g xs ⊆ reachable g ys :=
+  reachable_from_list g xs ⊆ reachable_from_list g ys :=
   by
     simp only [Set.subset_def]
     intro x a1
     induction a1
     case base a ih =>
-      apply reachable.base
+      apply reachable_from_list.base
       apply Set.mem_of_subset_of_mem h1 ih
     case step x e ih_1 ih_2 _ ih_4 =>
-      exact reachable.step x e ih_1 ih_2 ih_4
+      exact reachable_from_list.step x e ih_1 ih_2 ih_4
 
 
 theorem extracted_6
@@ -599,7 +599,7 @@ theorem extracted_6
   [inst : DecidableEq Node]
   (g : Graph Node)
   (xs ys : List Node) :
-  reachable g (xs ++ ys) ⊆ reachable g xs ∪ reachable g ys :=
+  reachable_from_list g (xs ++ ys) ⊆ reachable_from_list g xs ∪ reachable_from_list g ys :=
   by
     simp only [Set.subset_def]
     intro x a1
@@ -610,18 +610,18 @@ theorem extracted_6
       cases ih
       case inl c1 =>
         left
-        exact reachable.base x c1
+        exact reachable_from_list.base x c1
       case inr c1 =>
         right
-        exact reachable.base x c1
+        exact reachable_from_list.base x c1
     case _ x e ih_1 ih_2 ih_3 ih_4 =>
       cases ih_4
       case _ left =>
         left
-        exact reachable.step x e ih_1 ih_2 left
+        exact reachable_from_list.step x e ih_1 ih_2 left
       case _ right =>
         right
-        exact reachable.step x e ih_1 ih_2 right
+        exact reachable_from_list.step x e ih_1 ih_2 right
 
 
 theorem extracted_7
@@ -629,52 +629,52 @@ theorem extracted_7
   [inst : DecidableEq Node]
   (g : Graph Node)
   (xs ys : List Node) :
-  reachable g xs ∪ reachable g ys ⊆ reachable g (xs ++ ys) :=
+  reachable_from_list g xs ∪ reachable_from_list g ys ⊆ reachable_from_list g (xs ++ ys) :=
   by
     simp only [Set.subset_def]
     intro x a1
     simp at a1
     cases a1
     case _ left =>
-      apply reachable_mono g xs (xs ++ ys)
+      apply reachable_from_list_mono g xs (xs ++ ys)
       · simp
       · exact left
     case _ right =>
-      apply reachable_mono g ys (xs ++ ys)
+      apply reachable_from_list_mono g ys (xs ++ ys)
       · simp
       · exact right
 
 
-lemma reachable_of_append
+lemma reachable_from_list_of_append
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (xs ys : List Node) :
-  reachable g (xs ++ ys) = reachable g xs ∪ reachable g ys :=
+  reachable_from_list g (xs ++ ys) = reachable_from_list g xs ∪ reachable_from_list g ys :=
   by
     apply Set.eq_of_subset_of_subset
     · apply extracted_6
     · apply extracted_7
 
 
-lemma reachable_of_cons
+lemma reachable_from_list_of_cons
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (x : Node)
   (ys : List Node) :
-  reachable g (x :: ys) = reachable g [x] ∪ reachable g ys :=
+  reachable_from_list g (x :: ys) = reachable_from_list g [x] ∪ reachable_from_list g ys :=
   by
-    simp only [← reachable_of_append]
+    simp only [← reachable_from_list_of_append]
     simp
 
 
-lemma reachable_direct_succ_list_is_subset_of_reachable
+lemma reachable_from_list_direct_succ_list_is_subset_of_reachable_from_list
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (x : Node) :
-  reachable g (direct_succ_list g x) ⊆ reachable g [x] :=
+  reachable_from_list g (direct_succ_list g x) ⊆ reachable_from_list g [x] :=
   by
     simp only [Set.subset_def]
     intro a a1
@@ -686,19 +686,19 @@ lemma reachable_direct_succ_list_is_subset_of_reachable
       intro ys a2
       cases a2
       case _ a2_left a2_right =>
-        apply reachable.step y (x, ys) a2_right a2_left
-        apply reachable.base x
+        apply reachable_from_list.step y (x, ys) a2_right a2_left
+        apply reachable_from_list.base x
         simp
     case _ x e ih_1 ih_2 _ ih_4 =>
-      exact reachable.step x e ih_1 ih_2 ih_4
+      exact reachable_from_list.step x e ih_1 ih_2 ih_4
 
 
-lemma reachable_list_direct_succ_list_is_subset_of_reachable
+lemma reachable_from_list_list_direct_succ_list_is_subset_of_reachable_from_list
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (xs : List Node) :
-  reachable g (list_direct_succ_list g xs) ⊆ reachable g xs :=
+  reachable_from_list g (list_direct_succ_list g xs) ⊆ reachable_from_list g xs :=
   by
     simp only [Set.subset_def]
     intro x a1
@@ -710,14 +710,14 @@ lemma reachable_list_direct_succ_list_is_subset_of_reachable
     case cons hd tl ih =>
       simp only [list_direct_succ_list_cons] at a1
 
-      simp only [reachable_of_cons g hd tl]
+      simp only [reachable_from_list_of_cons g hd tl]
       simp
-      simp only [reachable_of_append] at a1
+      simp only [reachable_from_list_of_append] at a1
       simp at a1
       cases a1
       case _ left =>
         left
-        obtain s1 := reachable_direct_succ_list_is_subset_of_reachable g hd
+        obtain s1 := reachable_from_list_direct_succ_list_is_subset_of_reachable_from_list g hd
         exact Set.mem_of_subset_of_mem s1 left
       case _ right =>
         right
@@ -730,7 +730,7 @@ theorem extracted_5
   (g : Graph α)
   (xs : List α)
   (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
-  reachable g xs ⊆ xs.toFinset.toSet :=
+  reachable_from_list g xs ⊆ xs.toFinset.toSet :=
   by
     simp only [list_direct_succ_set] at h1
     simp at h1
@@ -745,27 +745,27 @@ theorem extracted_5
       exact h1 x e.fst ih_4 e.snd ih_2 ih_1
 
 
-lemma list_direct_succ_set_closed_reachable
+lemma list_direct_succ_set_closed_reachable_from_list
   {α : Type}
   [DecidableEq α]
   (g : Graph α)
   (xs : List α)
   (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
-  xs.toFinset.toSet = reachable g xs :=
+  xs.toFinset.toSet = reachable_from_list g xs :=
   by
     apply Set.eq_of_subset_of_subset
-    · apply base_of_reachable_is_subset_of_reachable
+    · apply base_of_reachable_from_list_is_subset_of_reachable_from_list
     · exact extracted_5 g xs h1
 
 
-lemma dft_aux_is_subset_of_reachable_and_visited
+lemma dft_aux_is_subset_of_reachable_from_list_and_visited
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (stack : List Node)
   (visited : List Node) :
   (dft_aux g stack visited).toFinset.toSet ⊆
-    reachable g stack ∪ visited.toFinset.toSet :=
+    reachable_from_list g stack ∪ visited.toFinset.toSet :=
   by
     induction stack, visited using dft_aux.induct g
     case _ visited =>
@@ -778,15 +778,15 @@ lemma dft_aux_is_subset_of_reachable_and_visited
       intro a a1
       simp at a1
 
-      have s1 : a ∈ reachable g stack ∪ visited.toFinset.toSet :=
+      have s1 : a ∈ reachable_from_list g stack ∪ visited.toFinset.toSet :=
       by
         apply Set.mem_of_subset_of_mem ih
         simp
         exact a1
 
-      have s2 : reachable g stack ⊆ reachable g (x :: stack) :=
+      have s2 : reachable_from_list g stack ⊆ reachable_from_list g (x :: stack) :=
       by
-        apply reachable_mono
+        apply reachable_from_list_mono
         simp
 
       aesop
@@ -794,31 +794,31 @@ lemma dft_aux_is_subset_of_reachable_and_visited
       simp only [dft_aux]
       simp only [if_neg c1]
 
-      have s1 : x ∈ reachable g (x :: stack) :=
+      have s1 : x ∈ reachable_from_list g (x :: stack) :=
       by
-        have s1_1 : (x :: stack).toFinset.toSet ⊆ reachable g (x :: stack) := base_of_reachable_is_subset_of_reachable g (x :: stack)
+        have s1_1 : (x :: stack).toFinset.toSet ⊆ reachable_from_list g (x :: stack) := base_of_reachable_from_list_is_subset_of_reachable_from_list g (x :: stack)
 
         apply Set.mem_of_subset_of_mem s1_1
         simp
 
-      have s2 : reachable g (direct_succ_list g x ++ stack) ⊆ reachable g (x :: stack) :=
+      have s2 : reachable_from_list g (direct_succ_list g x ++ stack) ⊆ reachable_from_list g (x :: stack) :=
       by
-        have s2_1 : reachable g (direct_succ_list g x ++ stack) = reachable g (direct_succ_list g x) ∪ reachable g stack := reachable_of_append g (direct_succ_list g x) stack
+        have s2_1 : reachable_from_list g (direct_succ_list g x ++ stack) = reachable_from_list g (direct_succ_list g x) ∪ reachable_from_list g stack := reachable_from_list_of_append g (direct_succ_list g x) stack
 
-        have s2_2 : reachable g (x :: stack) = reachable g [x] ∪ reachable g stack := reachable_of_append g [x] stack
+        have s2_2 : reachable_from_list g (x :: stack) = reachable_from_list g [x] ∪ reachable_from_list g stack := reachable_from_list_of_append g [x] stack
 
-        have s2_3 : reachable g (direct_succ_list g x) ⊆ reachable g [x] := reachable_direct_succ_list_is_subset_of_reachable g x
+        have s2_3 : reachable_from_list g (direct_succ_list g x) ⊆ reachable_from_list g [x] := reachable_from_list_direct_succ_list_is_subset_of_reachable_from_list g x
 
         simp only [s2_1, s2_2]
-        exact Set.union_subset_union_left (reachable g stack) s2_3
+        exact Set.union_subset_union_left (reachable_from_list g stack) s2_3
 
-      have s3 : (dft_aux g (direct_succ_list g x ++ stack) (x :: visited)).toFinset.toSet ⊆ reachable g (x :: stack) ∪ (x :: visited).toFinset.toSet :=
+      have s3 : (dft_aux g (direct_succ_list g x ++ stack) (x :: visited)).toFinset.toSet ⊆ reachable_from_list g (x :: stack) ∪ (x :: visited).toFinset.toSet :=
       by
-        trans (reachable g (direct_succ_list g x ++ stack) ∪ (x :: visited).toFinset.toSet)
+        trans (reachable_from_list g (direct_succ_list g x ++ stack) ∪ (x :: visited).toFinset.toSet)
         · exact ih
         · exact Set.union_subset_union_left (x :: visited).toFinset.toSet s2
 
-      trans (reachable g (x :: stack) ∪ ↑(x :: visited).toFinset)
+      trans (reachable_from_list g (x :: stack) ∪ ↑(x :: visited).toFinset)
       · exact s3
       · intro a a1
         simp at a1
@@ -826,53 +826,53 @@ lemma dft_aux_is_subset_of_reachable_and_visited
         aesop
 
 
-lemma reachable_closed_dft
+lemma reachable_from_list_closed_dft
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (stack : List Node) :
-  reachable g stack ⊆ (dft_aux g stack []).toFinset.toSet :=
+  reachable_from_list g stack ⊆ (dft_aux g stack []).toFinset.toSet :=
   by
-    have s1 : (dft_aux g stack []).toFinset.toSet = reachable g (dft_aux g stack []) :=
+    have s1 : (dft_aux g stack []).toFinset.toSet = reachable_from_list g (dft_aux g stack []) :=
     by
-      apply list_direct_succ_set_closed_reachable g (dft_aux g stack [])
+      apply list_direct_succ_set_closed_reachable_from_list g (dft_aux g stack [])
       exact list_direct_succ_set_closed_dft g stack
 
     simp only [s1]
-    apply reachable_mono g stack (dft_aux g stack [])
+    apply reachable_from_list_mono g stack (dft_aux g stack [])
     exact stack_subset_dft_aux g stack []
 
 
-theorem dft_eq_reachable
+theorem dft_eq_reachable_from_list
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (stack : List Node) :
-  (dft_aux g stack []).toFinset.toSet = reachable g stack :=
+  (dft_aux g stack []).toFinset.toSet = reachable_from_list g stack :=
   by
-    have s1 : (dft_aux g stack []).toFinset.toSet ⊆ reachable g stack ∪ [].toFinset.toSet := dft_aux_is_subset_of_reachable_and_visited g stack []
+    have s1 : (dft_aux g stack []).toFinset.toSet ⊆ reachable_from_list g stack ∪ [].toFinset.toSet := dft_aux_is_subset_of_reachable_from_list_and_visited g stack []
 
-    have s2 : reachable g stack ⊆ (dft_aux g stack []).toFinset.toSet := reachable_closed_dft g stack
+    have s2 : reachable_from_list g stack ⊆ (dft_aux g stack []).toFinset.toSet := reachable_from_list_closed_dft g stack
 
     aesop
 
 
-theorem dft_eq_reachable_singleton
+theorem dft_eq_reachable_from_list_singleton
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (start : List Node) :
-  (dft g start).toFinset.toSet = reachable g start :=
+  (dft g start).toFinset.toSet = reachable_from_list g start :=
   by
     simp only [dft]
-    exact dft_eq_reachable g start
+    exact dft_eq_reachable_from_list g start
 
 
-lemma reachable_nil_graph
+lemma reachable_from_list_nil_graph
   {Node : Type}
   [DecidableEq Node]
   (xs : List Node) :
-  reachable [] xs = xs.toFinset.toSet :=
+  reachable_from_list [] xs = xs.toFinset.toSet :=
   by
     ext x
     simp
@@ -884,7 +884,7 @@ lemma reachable_nil_graph
       case _ x e ih_1 ih_2 ih_3 _ =>
         simp at ih_1
     · intro a1
-      exact reachable.base x a1
+      exact reachable_from_list.base x a1
 
 
 #lint
