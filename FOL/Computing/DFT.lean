@@ -604,7 +604,6 @@ example
         exact ih_4
 
 
-
 lemma base_of_reachable_from_list_is_subset_of_reachable_from_list
   {Node : Type}
   [DecidableEq Node]
