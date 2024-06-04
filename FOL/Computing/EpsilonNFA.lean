@@ -49,7 +49,7 @@ def EpsilonNFA.epsilon_closure
   (e : EpsilonNFA α σ)
   (state_list : List σ) :
   List σ :=
-  dfs (epsilon_arrow_list_to_graph e.epsilon_arrow_list) state_list
+  dft (epsilon_arrow_list_to_graph e.epsilon_arrow_list) state_list
 
 
 /--
