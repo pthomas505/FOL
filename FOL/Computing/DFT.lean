@@ -348,13 +348,13 @@ example
   (visited : List Node)
   (x : Node)
   (h1 : x ∈ visited) :
-  dft_aux g stack visited = dft_aux g (x :: stack) visited :=
+  dft_aux g (x :: stack) visited = dft_aux g stack visited :=
   by
     simp only [dft_aux]
     simp only [if_pos h1]
 
 
-example
+lemma dft_aux_append
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -815,22 +815,12 @@ lemma dft_aux_is_subset_of_reachable_from_list_and_visited
     case _ visited x stack c1 ih =>
       simp only [dft_aux]
       simp only [if_pos c1]
-
-      intro a a1
-      simp at a1
-
-      have s1 : a ∈ reachable_from_list g stack ∪ visited.toFinset.toSet :=
-      by
-        apply Set.mem_of_subset_of_mem ih
-        simp
-        exact a1
-
-      have s2 : reachable_from_list g stack ⊆ reachable_from_list g (x :: stack) :=
-      by
-        apply reachable_from_list_mono
-        simp
-
-      aesop
+      simp only [reachable_from_list_of_cons g x stack]
+      simp only [Set.subset_def] at *
+      simp at *
+      intro y a1
+      specialize ih y a1
+      tauto
     case _ visited x stack c1 ih =>
       simp only [dft_aux]
       simp only [if_neg c1]
