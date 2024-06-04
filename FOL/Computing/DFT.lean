@@ -693,7 +693,7 @@ lemma reachable_direct_succ_list_is_subset_of_reachable
       exact reachable.step x e ih_1 ih_2 ih_4
 
 
-example
+lemma reachable_list_direct_succ_list_is_subset_of_reachable
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
