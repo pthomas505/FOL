@@ -500,7 +500,7 @@ theorem extracted_4
     tauto
 
 
-lemma list_direct_succ_set_closed_dft_aux
+lemma list_direct_succ_set_closed_dft_aux_aux
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -531,14 +531,14 @@ lemma list_direct_succ_set_closed_dft_aux
       exact extracted_4 (direct_succ_list g x) visited stack (list_direct_succ_set g visited) x h1
 
 
-lemma list_direct_succ_set_closed_dft
+lemma list_direct_succ_set_closed_dft_aux
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
   (stack : List Node) :
   list_direct_succ_set g (dft_aux g stack []) ⊆ (dft_aux g stack []).toFinset.toSet :=
   by
-    apply list_direct_succ_set_closed_dft_aux
+    apply list_direct_succ_set_closed_dft_aux_aux
     simp only [list_direct_succ_set]
     simp
 
@@ -843,7 +843,7 @@ lemma dft_aux_is_subset_of_reachable_from_list_and_visited
         tauto
 
 
-lemma reachable_from_list_closed_dft
+lemma reachable_from_list_closed_dft_aux
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -853,14 +853,14 @@ lemma reachable_from_list_closed_dft
     have s1 : (dft_aux g stack []).toFinset.toSet = reachable_from_list g (dft_aux g stack []) :=
     by
       apply list_direct_succ_set_closed_reachable_from_list g (dft_aux g stack [])
-      exact list_direct_succ_set_closed_dft g stack
+      exact list_direct_succ_set_closed_dft_aux g stack
 
     simp only [s1]
     apply reachable_from_list_mono g stack (dft_aux g stack [])
     exact stack_subset_dft_aux g stack []
 
 
-theorem dft_eq_reachable_from_list
+theorem dft_aux_eq_reachable_from_list
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -868,40 +868,11 @@ theorem dft_eq_reachable_from_list
   (dft_aux g stack []).toFinset.toSet = reachable_from_list g stack :=
   by
     have s1 : (dft_aux g stack []).toFinset.toSet ⊆ reachable_from_list g stack ∪ [].toFinset.toSet := dft_aux_is_subset_of_reachable_from_list_and_visited g stack []
+    simp only [List.toFinset_nil, Finset.coe_empty, Set.union_empty] at s1
 
-    have s2 : reachable_from_list g stack ⊆ (dft_aux g stack []).toFinset.toSet := reachable_from_list_closed_dft g stack
+    have s2 : reachable_from_list g stack ⊆ (dft_aux g stack []).toFinset.toSet := reachable_from_list_closed_dft_aux g stack
 
-    aesop
-
-
-theorem dft_eq_reachable_from_list_singleton
-  {Node : Type}
-  [DecidableEq Node]
-  (g : Graph Node)
-  (start : List Node) :
-  (dft g start).toFinset.toSet = reachable_from_list g start :=
-  by
-    simp only [dft]
-    exact dft_eq_reachable_from_list g start
-
-
-lemma reachable_from_list_nil_graph
-  {Node : Type}
-  [DecidableEq Node]
-  (xs : List Node) :
-  reachable_from_list [] xs = xs.toFinset.toSet :=
-  by
-    ext x
-    simp
-    constructor
-    · intro a1
-      induction a1
-      case _ _ a2 =>
-        exact a2
-      case _ x e ih_1 ih_2 ih_3 _ =>
-        simp at ih_1
-    · intro a1
-      exact reachable_from_list.base x a1
+    exact Set.eq_of_subset_of_subset s1 s2
 
 
 #lint
