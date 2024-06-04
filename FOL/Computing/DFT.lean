@@ -135,6 +135,9 @@ lemma direct_succ_list_set_equiv
     simp only [mem_direct_succ_list_iff]
 
 
+-------------------------------------------------------------------------------
+
+
 /--
   `list_direct_succ_list g xs` := The image of `xs` under `g`. The direct successors of `xs` as a list.
 -/
@@ -178,6 +181,18 @@ lemma list_direct_succ_list_set_equiv
   by
     simp only [list_direct_succ_set]
     simp only [← mem_list_direct_succ_list_iff]
+    simp
+
+
+lemma list_direct_succ_list_cons
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (x : Node)
+  (xs : List Node) :
+  list_direct_succ_list g (x :: xs) = (direct_succ_list g x) ++ (list_direct_succ_list g xs) :=
+  by
+    simp only [list_direct_succ_list]
     simp
 
 
@@ -642,6 +657,18 @@ lemma reachable_of_append
     · apply extracted_7
 
 
+lemma reachable_of_cons
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (x : Node)
+  (ys : List Node) :
+  reachable g (x :: ys) = reachable g [x] ∪ reachable g ys :=
+  by
+    simp only [← reachable_of_append]
+    simp
+
+
 lemma reachable_direct_succ_list_is_subset_of_reachable
   {Node : Type}
   [DecidableEq Node]
@@ -664,6 +691,37 @@ lemma reachable_direct_succ_list_is_subset_of_reachable
         simp
     case _ x e ih_1 ih_2 _ ih_4 =>
       exact reachable.step x e ih_1 ih_2 ih_4
+
+
+example
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs : List Node) :
+  reachable g (list_direct_succ_list g xs) ⊆ reachable g xs :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    induction xs
+    case nil =>
+      simp only [list_direct_succ_list] at a1
+      simp at a1
+      exact a1
+    case cons hd tl ih =>
+      simp only [list_direct_succ_list_cons] at a1
+
+      simp only [reachable_of_cons g hd tl]
+      simp
+      simp only [reachable_of_append] at a1
+      simp at a1
+      cases a1
+      case _ left =>
+        left
+        obtain s1 := reachable_direct_succ_list_is_subset_of_reachable g hd
+        exact Set.mem_of_subset_of_mem s1 left
+      case _ right =>
+        right
+        exact ih right
 
 
 theorem extracted_5
@@ -698,10 +756,6 @@ lemma list_direct_succ_set_closed_reachable
     apply Set.eq_of_subset_of_subset
     · apply base_of_reachable_is_subset_of_reachable
     · exact extracted_5 g xs h1
-
-
-
-
 
 
 lemma dft_aux_is_subset_of_reachable_and_visited
