@@ -543,6 +543,9 @@ lemma list_direct_succ_set_closed_dft
     simp
 
 
+-------------------------------------------------------------------------------
+
+
 /--
   `reachable g x` := The reflexive transitive closure of `x` under `g`. The union of the nodes that are reachable from `x` through a sequence of zero or more directed edges in `g`.
 -/
