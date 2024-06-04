@@ -541,7 +541,26 @@ lemma list_direct_succ_set_closed_dft
 
 
 /--
-  `reachable_from_list g xs` := The reflexive transitive closure of `xs` under `g`. The union of the nodes that are reachable_from_list from each node in `xs` through a sequence of zero or more directed edges in `g`.
+  `reachable g x` := The reflexive transitive closure of `x` under `g`. The union of the nodes that are reachable from `x` through a sequence of zero or more directed edges in `g`.
+-/
+inductive reachable
+  {Node : Type}
+  [DecidableEq Node]
+  (g : List (Node × Node))
+  (x : Node) :
+  Set Node
+  | base :
+    reachable g x x
+
+  | step
+    (e : (Node × Node)) :
+    e ∈ g →
+    reachable g x e.fst →
+    reachable g x e.snd
+
+
+/--
+  `reachable_from_list g xs` := The reflexive transitive closure of `xs` under `g`. The union of the nodes that are reachable from each node in `xs` through a sequence of zero or more directed edges in `g`.
 -/
 inductive reachable_from_list
   {Node : Type}
@@ -561,6 +580,29 @@ inductive reachable_from_list
     x ∈ e.snd →
     reachable_from_list g xs e.fst →
     reachable_from_list g xs x
+
+
+example
+  {Node : Type}
+  [DecidableEq Node]
+  (g : List (Node × Node))
+  (x : Node) :
+  reachable g x ⊆ reachable_from_list (g.map (fun (e : Node × Node) => (e.fst, [e.snd]))) [x] :=
+  by
+    simp only [Set.subset_def]
+    intro y a1
+    induction a1
+    case base =>
+      apply reachable_from_list.base
+      simp
+    case step g e ih_2 _ ih_4 =>
+      apply reachable_from_list.step _ (e.fst, [e.snd])
+      · simp
+        exact ih_2
+      · simp
+      · simp
+        exact ih_4
+
 
 
 lemma base_of_reachable_from_list_is_subset_of_reachable_from_list
