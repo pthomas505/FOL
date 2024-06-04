@@ -824,36 +824,24 @@ lemma dft_aux_is_subset_of_reachable_from_list_and_visited
       simp only [dft_aux]
       simp only [if_neg c1]
 
-      have s1 : x ∈ reachable_from_list g (x :: stack) :=
-      by
-        have s1_1 : (x :: stack).toFinset.toSet ⊆ reachable_from_list g (x :: stack) := base_of_reachable_from_list_is_subset_of_reachable_from_list g (x :: stack)
+      simp only [dft_aux_append g (direct_succ_list g x) stack (x :: visited)] at *
 
-        apply Set.mem_of_subset_of_mem s1_1
-        simp
+      simp only [reachable_from_list_of_append g (direct_succ_list g x) stack] at ih
 
-      have s2 : reachable_from_list g (direct_succ_list g x ++ stack) ⊆ reachable_from_list g (x :: stack) :=
-      by
-        have s2_1 : reachable_from_list g (direct_succ_list g x ++ stack) = reachable_from_list g (direct_succ_list g x) ∪ reachable_from_list g stack := reachable_from_list_of_append g (direct_succ_list g x) stack
+      simp only [reachable_from_list_of_cons g x stack]
 
-        have s2_2 : reachable_from_list g (x :: stack) = reachable_from_list g [x] ∪ reachable_from_list g stack := reachable_from_list_of_append g [x] stack
+      trans (reachable_from_list g (direct_succ_list g x) ∪ reachable_from_list g stack ∪ (x :: visited).toFinset.toSet)
+      · exact ih
+      · have s1 : reachable_from_list g (direct_succ_list g x) ⊆ reachable_from_list g [x] := reachable_from_list_direct_succ_list_is_subset_of_reachable_from_list g x
 
-        have s2_3 : reachable_from_list g (direct_succ_list g x) ⊆ reachable_from_list g [x] := reachable_from_list_direct_succ_list_is_subset_of_reachable_from_list g x
+        have s2 : x ∈ reachable_from_list g [x] :=
+          by
+            apply reachable_from_list.base
+            simp
 
-        simp only [s2_1, s2_2]
-        exact Set.union_subset_union_left (reachable_from_list g stack) s2_3
-
-      have s3 : (dft_aux g (direct_succ_list g x ++ stack) (x :: visited)).toFinset.toSet ⊆ reachable_from_list g (x :: stack) ∪ (x :: visited).toFinset.toSet :=
-      by
-        trans (reachable_from_list g (direct_succ_list g x ++ stack) ∪ (x :: visited).toFinset.toSet)
-        · exact ih
-        · exact Set.union_subset_union_left (x :: visited).toFinset.toSet s2
-
-      trans (reachable_from_list g (x :: stack) ∪ ↑(x :: visited).toFinset)
-      · exact s3
-      · intro a a1
-        simp at a1
-        simp
-        aesop
+        simp only [Set.subset_def] at *
+        simp at *
+        tauto
 
 
 lemma reachable_from_list_closed_dft
