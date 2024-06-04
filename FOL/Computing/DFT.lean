@@ -642,6 +642,30 @@ lemma reachable_of_append
     · apply extracted_7
 
 
+lemma reachable_direct_succ_list_is_subset_of_reachable
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (x : Node) :
+  reachable g (direct_succ_list g x) ⊆ reachable g [x] :=
+  by
+    simp only [Set.subset_def]
+    intro a a1
+    induction a1
+    case _ x y ih =>
+      obtain s1 := mem_direct_succ_list_iff g x y
+      simp only [s1] at ih
+      apply Exists.elim ih
+      intro ys a2
+      cases a2
+      case _ a2_left a2_right =>
+        apply reachable.step y (x, ys) a2_right a2_left
+        apply reachable.base x
+        simp
+    case _ x e ih_1 ih_2 _ ih_4 =>
+      exact reachable.step x e ih_1 ih_2 ih_4
+
+
 theorem extracted_5
   {α : Type}
   [inst : DecidableEq α]
@@ -678,28 +702,6 @@ lemma list_direct_succ_set_closed_reachable
 
 
 
-lemma reachable_direct_succ_list_is_subset_of_reachable
-  {Node : Type}
-  [DecidableEq Node]
-  (g : Graph Node)
-  (x : Node) :
-  reachable g (direct_succ_list g x) ⊆ reachable g [x] :=
-  by
-    simp only [Set.subset_def]
-    intro a a1
-    induction a1
-    case _ x y ih =>
-      obtain s1 := mem_direct_succ_list_iff g x y
-      simp only [s1] at ih
-      apply Exists.elim ih
-      intro ys a2
-      cases a2
-      case _ a2_left a2_right =>
-        apply reachable.step y (x, ys) a2_right a2_left
-        apply reachable.base x
-        simp
-    case _ x e ih_1 ih_2 _ ih_4 =>
-      exact reachable.step x e ih_1 ih_2 ih_4
 
 
 lemma dft_aux_is_subset_of_reachable_and_visited
