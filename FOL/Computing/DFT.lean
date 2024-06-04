@@ -340,7 +340,7 @@ example
     simp only [dft_aux]
 
 
-example
+lemma dft_aux_cons
   {Node : Type}
   [DecidableEq Node]
   (g : Graph Node)
@@ -813,14 +813,13 @@ lemma dft_aux_is_subset_of_reachable_from_list_and_visited
       simp only [dft_aux]
       simp
     case _ visited x stack c1 ih =>
+      simp only [reachable_from_list_of_cons g x stack]
+
       simp only [dft_aux]
       simp only [if_pos c1]
-      simp only [reachable_from_list_of_cons g x stack]
-      simp only [Set.subset_def] at *
-      simp at *
-      intro y a1
-      specialize ih y a1
-      tauto
+
+      simp only [Set.union_assoc ]
+      exact Set.subset_union_of_subset_right ih (reachable_from_list g [x])
     case _ visited x stack c1 ih =>
       simp only [dft_aux]
       simp only [if_neg c1]
