@@ -659,24 +659,13 @@ lemma reachable_of_append
           right
           exact reachable.base x c1
       case _ x e ih_1 ih_2 ih_3 ih_4 =>
-        simp at ih_3
-        cases ih_3
-        case base c1 =>
-          cases ih_4
-          case _ left =>
-            left
-            exact reachable.step x e ih_1 ih_2 left
-          case _ right =>
-            right
-            exact reachable.step x e ih_1 ih_2 right
-        case step x' e' ih_1' ih_2' ih_3' =>
-          cases ih_4
-          case _ left =>
-            left
-            exact reachable.step x e ih_1 ih_2 left
-          case _ right =>
-            right
-            exact reachable.step x e ih_1 ih_2 right
+        cases ih_4
+        case _ left =>
+          left
+          exact reachable.step x e ih_1 ih_2 left
+        case _ right =>
+          right
+          exact reachable.step x e ih_1 ih_2 right
     · intro a1
       cases a1
       case _ c1 =>
