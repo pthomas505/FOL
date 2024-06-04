@@ -561,6 +561,87 @@ lemma base_of_reachable_is_subset_of_reachable
     exact reachable.base x a1
 
 
+lemma reachable_mono
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs ys : List Node)
+  (h1 : xs ⊆ ys) :
+  reachable g xs ⊆ reachable g ys :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    induction a1
+    case base a ih =>
+      apply reachable.base
+      apply Set.mem_of_subset_of_mem h1 ih
+    case step x e ih_1 ih_2 _ ih_4 =>
+      exact reachable.step x e ih_1 ih_2 ih_4
+
+
+theorem extracted_6
+  {Node : Type}
+  [inst : DecidableEq Node]
+  (g : Graph Node)
+  (xs ys : List Node) :
+  reachable g (xs ++ ys) ⊆ reachable g xs ∪ reachable g ys :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp
+    induction a1
+    case _ x ih =>
+      simp at ih
+      cases ih
+      case inl c1 =>
+        left
+        exact reachable.base x c1
+      case inr c1 =>
+        right
+        exact reachable.base x c1
+    case _ x e ih_1 ih_2 ih_3 ih_4 =>
+      cases ih_4
+      case _ left =>
+        left
+        exact reachable.step x e ih_1 ih_2 left
+      case _ right =>
+        right
+        exact reachable.step x e ih_1 ih_2 right
+
+
+theorem extracted_7
+  {Node : Type}
+  [inst : DecidableEq Node]
+  (g : Graph Node)
+  (xs ys : List Node) :
+  reachable g xs ∪ reachable g ys ⊆ reachable g (xs ++ ys) :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp at a1
+    cases a1
+    case _ left =>
+      apply reachable_mono g xs (xs ++ ys)
+      · simp
+      · exact left
+    case _ right =>
+      apply reachable_mono g ys (xs ++ ys)
+      · simp
+      · exact right
+
+
+lemma reachable_of_append
+  {Node : Type}
+  [DecidableEq Node]
+  (g : Graph Node)
+  (xs ys : List Node) :
+  reachable g (xs ++ ys) = reachable g xs ∪ reachable g ys :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · apply extracted_6
+    · apply extracted_7
+
+
 theorem extracted_5
   {α : Type}
   [inst : DecidableEq α]
@@ -595,22 +676,6 @@ lemma list_direct_succ_set_closed_reachable
     · exact extracted_5 g xs h1
 
 
-lemma reachable_mono
-  {Node : Type}
-  [DecidableEq Node]
-  (g : Graph Node)
-  (xs ys : List Node)
-  (h1 : xs ⊆ ys) :
-  reachable g xs ⊆ reachable g ys :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
-    induction a1
-    case base a ih =>
-      apply reachable.base
-      apply Set.mem_of_subset_of_mem h1 ih
-    case step x e ih_1 ih_2 _ ih_4 =>
-      exact reachable.step x e ih_1 ih_2 ih_4
 
 
 lemma reachable_direct_succ_list_is_subset_of_reachable
@@ -635,47 +700,6 @@ lemma reachable_direct_succ_list_is_subset_of_reachable
         simp
     case _ x e ih_1 ih_2 _ ih_4 =>
       exact reachable.step x e ih_1 ih_2 ih_4
-
-
-lemma reachable_of_append
-  {Node : Type}
-  [DecidableEq Node]
-  (g : Graph Node)
-  (xs ys : List Node) :
-  reachable g (xs ++ ys) = reachable g xs ∪ reachable g ys :=
-  by
-    ext a
-    simp
-    constructor
-    · intro a1
-      induction a1
-      case _ x ih =>
-        simp at ih
-        cases ih
-        case inl c1 =>
-          left
-          exact reachable.base x c1
-        case inr c1 =>
-          right
-          exact reachable.base x c1
-      case _ x e ih_1 ih_2 ih_3 ih_4 =>
-        cases ih_4
-        case _ left =>
-          left
-          exact reachable.step x e ih_1 ih_2 left
-        case _ right =>
-          right
-          exact reachable.step x e ih_1 ih_2 right
-    · intro a1
-      cases a1
-      case _ c1 =>
-        apply reachable_mono g xs (xs ++ ys)
-        · simp
-        · exact c1
-      case _ c1 =>
-        apply reachable_mono g ys (xs ++ ys)
-        · simp
-        · exact c1
 
 
 lemma dft_aux_is_subset_of_reachable_and_visited
