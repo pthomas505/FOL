@@ -834,11 +834,6 @@ lemma dft_aux_is_subset_of_reachable_from_list_and_visited
       · exact ih
       · have s1 : reachable_from_list g (direct_succ_list g x) ⊆ reachable_from_list g [x] := reachable_from_list_direct_succ_list_is_subset_of_reachable_from_list g x
 
-        have s2 : x ∈ reachable_from_list g [x] :=
-          by
-            apply reachable_from_list.base
-            simp
-
         simp only [Set.subset_def] at *
         simp at *
         tauto
