@@ -210,6 +210,9 @@ lemma list_direct_succ_set_cons
     rfl
 
 
+-------------------------------------------------------------------------------
+
+
 /--
   `Graph.nodes_of g` := The nodes of `g`.
 -/
