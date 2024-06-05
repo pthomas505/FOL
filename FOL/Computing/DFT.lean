@@ -641,7 +641,7 @@ lemma reachable_from_list_mono
       exact reachable_from_list.step x e ih_1 ih_2 ih_4
 
 
-theorem extracted_6
+theorem reachable_from_list_of_append_left
   {Node : Type}
   [inst : DecidableEq Node]
   (g : Graph Node)
@@ -671,7 +671,7 @@ theorem extracted_6
         exact reachable_from_list.step x e ih_1 ih_2 right
 
 
-theorem extracted_7
+theorem reachable_from_list_of_append_right
   {Node : Type}
   [inst : DecidableEq Node]
   (g : Graph Node)
@@ -700,8 +700,8 @@ lemma reachable_from_list_of_append
   reachable_from_list g (xs ++ ys) = reachable_from_list g xs ∪ reachable_from_list g ys :=
   by
     apply Set.eq_of_subset_of_subset
-    · apply extracted_6
-    · apply extracted_7
+    · apply reachable_from_list_of_append_left
+    · apply reachable_from_list_of_append_right
 
 
 lemma reachable_from_list_of_cons
