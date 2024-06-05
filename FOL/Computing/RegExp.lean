@@ -1,6 +1,4 @@
-import FOL.Computing.EpsilonNFA
-
-import Mathlib.Data.Set.Basic
+import Mathlib.Data.Finset.Basic
 
 
 set_option autoImplicit false
