@@ -312,7 +312,7 @@ def dft_aux
 
 
 /--
-  `dft g start` := The depth first traversal of `g` from `start`. The nodes of `g` that are reachable_from_list from `start`.
+  `dft g start` := The depth first traversal of `g` from `start`. The nodes of `g` that are reachable from `start`.
 -/
 def dft
   {Node : Type}
@@ -547,7 +547,7 @@ lemma list_direct_succ_set_closed_dft_aux
 
 
 /--
-  `reachable g x` := The reflexive transitive closure of `x` under `g`. The union of the nodes that are reachable from `x` through a sequence of zero or more directed edges in `g`.
+  `reachable g x` := The reflexive transitive closure of `x` under `g`. The nodes that are reachable from `x` through a sequence of zero or more directed edges in `g`.
 -/
 inductive reachable
   {Node : Type}
