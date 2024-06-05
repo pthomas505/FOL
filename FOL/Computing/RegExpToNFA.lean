@@ -1,4 +1,5 @@
 import FOL.Computing.RegExp
+import FOL.Computing.EpsilonNFA
 
 
 set_option autoImplicit false
