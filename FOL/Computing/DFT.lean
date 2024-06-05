@@ -409,7 +409,7 @@ lemma visited_subset_dft_aux
       · exact ih
 
 
-theorem extracted_1
+lemma extracted_1
   {α : Type}
   (xs ys zs : List α)
   (x : α)
@@ -424,7 +424,7 @@ theorem extracted_1
     · exact h1
 
 
-theorem extracted_2
+lemma extracted_2
   {α : Type}
   (ws xs ys zs : List α)
   (x : α)
@@ -460,7 +460,7 @@ lemma stack_subset_dft_aux
       apply visited_subset_dft_aux g (direct_succ_list g x ++ stack) (x :: visited)
 
 
-theorem extracted_3
+lemma extracted_3
   {α : Type}
   [inst : DecidableEq α]
   (xs ys : List α)
@@ -478,7 +478,7 @@ theorem extracted_3
     · exact Set.subset_union_right ys.toFinset.toSet xs.toFinset.toSet
 
 
-theorem extracted_4
+lemma extracted_4
   {Node : Type}
   [inst : DecidableEq Node]
   (xs ys zs : List Node)
@@ -641,7 +641,7 @@ lemma reachable_from_list_mono
       exact reachable_from_list.step x e ih_1 ih_2 ih_4
 
 
-theorem reachable_from_list_of_append_left
+lemma reachable_from_list_of_append_left
   {Node : Type}
   [inst : DecidableEq Node]
   (g : Graph Node)
@@ -671,7 +671,7 @@ theorem reachable_from_list_of_append_left
         exact reachable_from_list.step x e ih_1 ih_2 right
 
 
-theorem reachable_from_list_of_append_right
+lemma reachable_from_list_of_append_right
   {Node : Type}
   [inst : DecidableEq Node]
   (g : Graph Node)
@@ -809,7 +809,7 @@ lemma dft_aux_is_subset_of_reachable_from_list_and_visited
         tauto
 
 
-theorem extracted_5
+lemma extracted_5
   {α : Type}
   [inst : DecidableEq α]
   (g : Graph α)
