@@ -771,40 +771,6 @@ lemma reachable_from_list_list_direct_succ_list_is_subset_of_reachable_from_list
         exact ih right
 
 
-theorem extracted_5
-  {α : Type}
-  [inst : DecidableEq α]
-  (g : Graph α)
-  (xs : List α)
-  (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
-  reachable_from_list g xs ⊆ xs.toFinset.toSet :=
-  by
-    simp only [list_direct_succ_set] at h1
-    simp at h1
-
-    simp only [Set.subset_def]
-    simp
-    intro a a1
-    induction a1
-    case _ _ ih =>
-      exact ih
-    case _ x e ih_1 ih_2 _ ih_4 =>
-      exact h1 x e.fst ih_4 e.snd ih_2 ih_1
-
-
-lemma list_direct_succ_set_closed_reachable_from_list
-  {α : Type}
-  [DecidableEq α]
-  (g : Graph α)
-  (xs : List α)
-  (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
-  xs.toFinset.toSet = reachable_from_list g xs :=
-  by
-    apply Set.eq_of_subset_of_subset
-    · apply base_of_reachable_from_list_is_subset_of_reachable_from_list
-    · exact extracted_5 g xs h1
-
-
 lemma dft_aux_is_subset_of_reachable_from_list_and_visited
   {Node : Type}
   [DecidableEq Node]
@@ -843,6 +809,40 @@ lemma dft_aux_is_subset_of_reachable_from_list_and_visited
         tauto
 
 
+theorem extracted_5
+  {α : Type}
+  [inst : DecidableEq α]
+  (g : Graph α)
+  (xs : List α)
+  (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
+  reachable_from_list g xs ⊆ xs.toFinset.toSet :=
+  by
+    simp only [list_direct_succ_set] at h1
+    simp at h1
+
+    simp only [Set.subset_def]
+    simp
+    intro a a1
+    induction a1
+    case _ _ ih =>
+      exact ih
+    case _ x e ih_1 ih_2 _ ih_4 =>
+      exact h1 x e.fst ih_4 e.snd ih_2 ih_1
+
+
+lemma list_direct_succ_set_closed_reachable_from_list
+  {α : Type}
+  [DecidableEq α]
+  (g : Graph α)
+  (xs : List α)
+  (h1 : list_direct_succ_set g xs ⊆ xs.toFinset.toSet) :
+  xs.toFinset.toSet = reachable_from_list g xs :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · apply base_of_reachable_from_list_is_subset_of_reachable_from_list
+    · exact extracted_5 g xs h1
+
+
 lemma reachable_from_list_closed_dft_aux
   {Node : Type}
   [DecidableEq Node]
@@ -858,6 +858,9 @@ lemma reachable_from_list_closed_dft_aux
     simp only [s1]
     apply reachable_from_list_mono g stack (dft_aux g stack [])
     exact stack_subset_dft_aux g stack []
+
+
+-------------------------------------------------------------------------------
 
 
 theorem dft_aux_eq_reachable_from_list
