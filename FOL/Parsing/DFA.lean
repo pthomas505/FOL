@@ -1,4 +1,4 @@
-import FOL.Computing.NFA
+import FOL.Parsing.NFA
 
 
 set_option autoImplicit false

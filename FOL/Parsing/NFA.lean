@@ -1,4 +1,4 @@
-import FOL.Computing.EpsilonNFA
+import FOL.Parsing.EpsilonNFA
 
 
 set_option autoImplicit false

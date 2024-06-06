@@ -1,5 +1,3 @@
-import Mathlib.Util.CompileInductive
-import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finset.Basic
 
 import FOL.FunctionUpdateITE

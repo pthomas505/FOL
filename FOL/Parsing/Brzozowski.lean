@@ -1,4 +1,4 @@
-import FOL.Computing.RegExp
+import FOL.Parsing.RegExp
 
 
 set_option autoImplicit false

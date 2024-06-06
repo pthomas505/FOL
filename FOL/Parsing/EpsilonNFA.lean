@@ -1,4 +1,4 @@
-import FOL.Computing.DFT
+import FOL.Parsing.DFT
 
 
 set_option autoImplicit false
