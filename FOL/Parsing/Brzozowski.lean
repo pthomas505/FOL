@@ -69,6 +69,149 @@ def RegExp.delta
   | closure _ => RegExp.epsilon
 
 
+lemma delta_subset
+  (α : Type)
+  (e : RegExp α) :
+  e.delta.languageOf ⊆ e.languageOf :=
+  by
+    induction e
+    case char a =>
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+      simp
+    case epsilon =>
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+      simp
+    case zero =>
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+      simp
+    case union r s r_ih s_ih =>
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+      simp
+      tauto
+    case concat r s r_ih s_ih =>
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+
+      simp
+      intro cs xs a1 ys a2 a3
+      apply Exists.intro xs
+      constructor
+      · tauto
+      · apply Exists.intro ys
+        tauto
+    case closure e _ =>
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+      simp
+      apply Exists.intro []
+      simp
+
+
+example
+  (α : Type)
+  (e : RegExp α)
+  (h1 : e.nullable) :
+  [] ∈ e.delta.languageOf :=
+  by
+    induction e
+    case char a =>
+      simp only [RegExp.nullable] at h1
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+    case epsilon =>
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+      simp
+    case zero =>
+      simp only [RegExp.nullable] at h1
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+    case union r s r_ih s_ih =>
+      simp only [RegExp.nullable] at r_ih
+      simp only [RegExp.nullable] at s_ih
+
+      simp only [RegExp.nullable] at h1
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+      simp
+      tauto
+    case concat r s r_ih s_ih =>
+      simp only [RegExp.nullable] at r_ih
+      simp only [RegExp.nullable] at s_ih
+
+      simp only [RegExp.nullable] at h1
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+      simp
+      tauto
+    case closure e _ =>
+      simp only [RegExp.delta]
+      simp only [RegExp.languageOf]
+      simp
+
+
+example
+  (α : Type)
+  (e : RegExp α)
+  (cs : List α)
+  (h1 : cs ∈ e.delta.languageOf) :
+  cs = [] :=
+  by
+    induction e generalizing cs
+    case char a =>
+      simp only [RegExp.delta] at h1
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+    case epsilon =>
+      simp only [RegExp.delta] at h1
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+      exact h1
+    case zero =>
+      simp only [RegExp.delta] at h1
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+    case union r s r_ih s_ih =>
+      simp only [RegExp.delta] at h1
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+      tauto
+    case concat r s r_ih s_ih =>
+      simp only [RegExp.delta] at h1
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+      apply Exists.elim h1
+      intro xs a1
+      clear h1
+      cases a1
+      case _ a1_left a1_right =>
+        apply Exists.elim a1_right
+        intro ys a2
+        clear a1_right
+        cases a2
+        case _ a2_left a2_right =>
+          specialize r_ih xs a1_left
+          specialize s_ih ys a2_left
+          subst r_ih
+          subst s_ih
+          simp at a2_right
+          simp only [a2_right]
+    case closure e _ =>
+      simp only [RegExp.languageOf] at h1
+      simp at h1
+      exact h1
+
+
 example
   (α : Type)
   (R : RegExp α)
@@ -157,6 +300,114 @@ def RegExp.derivative
       (RegExp.concat r.delta (s.derivative a))
 
   | closure r => RegExp.concat (r.derivative a) r.closure
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (a : α)
+  (e : RegExp α) :
+  RegExp.languageOf α (e.derivative a) = derivative (RegExp.languageOf α e) [a] :=
+  by
+    induction e
+    case char b =>
+      simp only [derivative]
+      simp only [RegExp.derivative]
+      simp
+      split_ifs
+      case pos c1 =>
+        simp only [c1]
+        simp only [RegExp.languageOf]
+        simp
+      case neg c1 =>
+        simp only [RegExp.languageOf]
+        simp
+        simp only [c1]
+        simp
+    case epsilon =>
+      simp only [derivative]
+      simp only [RegExp.derivative]
+      simp only [RegExp.languageOf]
+      simp
+    case zero =>
+      simp only [derivative]
+      simp only [RegExp.derivative]
+      simp only [RegExp.languageOf]
+      simp
+    case union r s r_ih s_ih =>
+      simp only [derivative]
+      simp only [RegExp.derivative]
+      simp only [RegExp.languageOf]
+      simp only [r_ih]
+      simp only [s_ih]
+      simp only [derivative]
+      ext cs
+      simp
+    case concat r s r_ih s_ih =>
+      simp only [derivative]
+      simp only [RegExp.derivative]
+      simp only [RegExp.languageOf]
+      simp only [r_ih]
+      clear r_ih
+      simp only [s_ih]
+      clear s_ih
+      simp only [derivative]
+      ext cs
+      simp
+      constructor
+      · intro a1
+        cases a1
+        case _ left =>
+          apply Exists.elim left
+          intro xs a2
+          clear left
+          cases a2
+          case _ a2_left a2_right =>
+            apply Exists.elim a2_right
+            intro ys a3
+            clear a2_right
+            cases a3
+            case _ a3_left a3_right =>
+              apply Exists.intro (a :: xs)
+              constructor
+              · exact a2_left
+              · apply Exists.intro ys
+                simp only [← a3_right]
+                simp
+                exact a3_left
+        case _ right =>
+          apply Exists.elim right
+          intro xs a2
+          clear right
+          cases a2
+          case _ a2_left a2_right =>
+            apply Exists.elim a2_right
+            intro ys a3
+            clear a2_right
+            cases a3
+            case _ a3_left a3_right =>
+              simp only [<- a3_right]
+              apply Exists.intro [a]
+              constructor
+              · apply Set.mem_of_subset_of_mem
+                apply delta_subset
+                sorry
+              · apply Exists.intro (a :: ys)
+                constructor
+                · exact a3_left
+                · simp
+                  sorry
+      · sorry
+    case closure e ih =>
+      simp only [derivative] at *
+      simp only [RegExp.derivative] at *
+      simp only [RegExp.languageOf] at *
+      simp at *
+      ext cs
+      simp
+      sorry
+
+
 
 
 lemma lem_3_1
