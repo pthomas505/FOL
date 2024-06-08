@@ -878,4 +878,26 @@ theorem dft_aux_eq_reachable_from_list
     exact Set.eq_of_subset_of_subset s1 s2
 
 
+-------------------------------------------------------------------------------
+
+
+theorem dft_iff {α : Type} [DecidableEq α] (g : Graph α) (S : List α) (s' : α) :
+  s' ∈ dft g S ↔ ∃ s ∈ S, Relation.ReflTransGen (fun a b => ∃ l, (a,l) ∈ g ∧ b ∈ l) s s' := by
+  have := congrArg (s' ∈ ·) (dft_aux_eq_reachable_from_list g S)
+  simp at this; simp [dft, this]; clear this
+  constructor
+  · intro h
+    induction h with
+    | base _ h => exact ⟨_, h, .refl⟩
+    | step _ _ h1 h2 _ ih =>
+      have ⟨_, h3, h4⟩ := ih
+      exact ⟨_, h3, .tail h4 ⟨_, h1, h2⟩⟩
+  · intro ⟨s, h1, h2⟩
+    induction h2 with
+    | refl => exact reachable_from_list.base _ h1
+    | tail _ h ih =>
+      have ⟨_, h3, h4⟩ := h
+      exact reachable_from_list.step _ _ h3 h4 ih
+
+
 #lint
