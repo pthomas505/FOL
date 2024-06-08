@@ -34,6 +34,56 @@ def RegExp.languageOf
 example
   {α : Type}
   (R : RegExp α) :
+  RegExp.languageOf α (RegExp.closure R) =
+    RegExp.languageOf α (RegExp.union RegExp.epsilon (RegExp.concat R (RegExp.closure R))) :=
+  by
+    ext cs
+    simp only [RegExp.languageOf]
+    simp
+    constructor
+    · intro a1
+      apply Exists.elim a1
+      intro xs a2
+      clear a1
+      cases a2
+      case _ a2_left a2_right =>
+        simp only [← a2_right]
+        cases xs
+        case nil =>
+          left
+          simp
+        case cons hd tl =>
+          right
+          simp at a2_left
+          cases a2_left
+          case _ a2_left_left a2_left_right =>
+            apply Exists.intro hd
+            tauto
+    · intro a1
+      cases a1
+      case _ left =>
+        apply Exists.intro []
+        simp
+        simp only [left]
+      case _ right =>
+        apply Exists.elim right
+        intro xs a2
+        clear right
+        cases a2
+        case _ a2_left a2_right =>
+          apply Exists.elim a2_right
+          intro ys a3
+          clear a2_right
+          cases a3
+          case _ a3_left a3_right =>
+            apply Exists.intro ([xs] ++ ys)
+            simp
+            tauto
+
+
+example
+  {α : Type}
+  (R : RegExp α) :
   (RegExp.union R RegExp.zero).languageOf = R.languageOf ∧
     (RegExp.union RegExp.zero R).languageOf = R.languageOf :=
   by
