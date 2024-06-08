@@ -379,7 +379,7 @@ def EpsilonNFA.map
   }
 
 
-def AbstractEpsilonNFA.map
+def AbstractEpsilonNFA.comap
   {α : Type}
   {σ₁ σ₂ : Type}
   (f_inv : σ₂ → σ₁)
@@ -395,4 +395,35 @@ def AbstractEpsilonNFA.map
     start := fun (state : σ₂) => e.start (f_inv state),
 
     accepting := fun (state : σ₂) => e.accepting (f_inv state)
+  }
+
+
+def AbstractEpsilonNFA.map
+  {α : Type}
+  {σ₁ σ₂ : Type}
+  (f : σ₁ → σ₂)
+  (e : AbstractEpsilonNFA α σ₁) :
+  AbstractEpsilonNFA α σ₂ :=
+  {
+    symbol :=
+      fun (start_state : σ₂) (symbol : α) (stop_state: σ₂) =>
+        ∃ (start_state' : σ₁) (stop_state': σ₁),
+          f start_state' = start_state ∧
+          f stop_state' = stop_state ∧
+          e.symbol start_state' symbol stop_state',
+
+    epsilon :=
+      fun (start_state : σ₂) (stop_state: σ₂) =>
+        ∃ (start_state' : σ₁) (stop_state': σ₁),
+          f start_state' = start_state ∧
+          f stop_state' = stop_state ∧
+          e.epsilon start_state' stop_state',
+
+    start :=
+      fun (state : σ₂) =>
+        ∃ (state' : σ₁), f state' = state ∧ e.start state',
+
+    accepting :=
+      fun (state : σ₂) =>
+        ∃ (state' : σ₁), f state' = state ∧ e.accepting state'
   }
