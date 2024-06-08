@@ -15,6 +15,8 @@ inductive RegExp
   | closure : RegExp α → RegExp α
   deriving Repr
 
+compile_inductive% RegExp
+
 
 def RegExp.languageOf
   (α : Type) :
@@ -31,7 +33,7 @@ def RegExp.languageOf
   | closure R => { l | ∃ rs : List (List α), (∀ (r : List α), r ∈ rs → r ∈ R.languageOf) ∧ rs.join = l }
 
 
-example
+lemma equiv_language_of_closure
   {α : Type}
   (R : RegExp α) :
   RegExp.languageOf α (RegExp.closure R) =
