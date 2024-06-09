@@ -355,9 +355,25 @@ lemma derivative_def
                 · exact a3_left
                 · simp only [← a3_right]
                   simp
-        · sorry
-      case neg c1 =>
-        sorry
+        · intro a1
+          apply Exists.elim a1
+          intro xs a2
+          clear a1
+          cases a2
+          case _ a2_left a2_right =>
+            apply Exists.elim a2_right
+            intro ys a3
+            clear a2_right
+            cases a3
+            case _ a3_left a3_right =>
+              simp only [is_nullable_def] at c1
+
+              apply Exists.intro (a :: w)
+              constructor
+              · simp only [← a3_right]
+                sorry
+              · apply Exists.intro []
+                sorry
     case closure e ih =>
       simp only [RegExp.derivative]
       simp only [RegExp.languageOf]
