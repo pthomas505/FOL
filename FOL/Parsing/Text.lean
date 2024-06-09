@@ -285,7 +285,7 @@ inductive lang_kleene_closure
     lang_kleene_closure α L (s ++ t)
 
 
-example
+theorem thm_4
   {α : Type}
   (L : Language α)
   (n : ℕ) :
