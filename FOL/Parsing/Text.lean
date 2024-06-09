@@ -192,8 +192,46 @@ example
 /-
 Definition 11 (Concatenation)
 -/
-def language_concat
+def lang_concat
   (α : Type)
   (L1 L2 : Language α) :
   Set (Str α) :=
   { r ++ s | (r ∈ L1) (s ∈ L2) }
+
+
+theorem thm_3_a
+  {α : Type}
+  (L : Language α) :
+  lang_concat α L ∅ = ∅ :=
+  by
+    simp only [lang_concat]
+    simp
+
+
+theorem thm_3_b
+  {α : Type}
+  (L : Language α) :
+  lang_concat α ∅ L = ∅ :=
+  by
+    simp only [lang_concat]
+    simp
+
+
+theorem thm_3_c
+  {α : Type}
+  (L1 L2 L3 : Language α) :
+  lang_concat α L1 (lang_concat α L2 L3) =
+    lang_concat α (lang_concat α L1 L2) L3 :=
+  by
+    simp only [lang_concat]
+    simp
+
+
+theorem thm_3_d
+  {α : Type}
+  (L1 L2 L3 : Language α) :
+  lang_concat α L1 (L2 ∪ L3) =
+    lang_concat α L1 L2 ∪ lang_concat α L1 L3 :=
+  by
+    simp only [lang_concat]
+    aesop
