@@ -75,16 +75,6 @@ lemma str_mem_exp
     exact s1
 
 
-/-
-Definition 5 (Kleene closure). Let Σ be an alphabet, then we denote the set of all finite strings over Σ by Σ∗.
--/
-
-def kleene_closure
-  (α : Type) :
-  Set (Str α) :=
-  ⋃ (n : ℕ), exp α n
-
-
 lemma rev_str_mem_exp_str_len
   {α : Type}
   (s : Str α) :
@@ -124,6 +114,26 @@ lemma mem_exp_imp_str_len_eq
       exact ih_2
 
 
+/-
+Definition 5 (Kleene closure). Let Σ be an alphabet, then we denote the set of all finite strings over Σ by Σ∗.
+-/
+
+def kleene_closure
+  (α : Type) :
+  Set (Str α) :=
+  ⋃ (n : ℕ), exp α n
+
+
+lemma all_str_mem_kleene_closure
+  {α : Type}
+  (s : Str α) :
+  s ∈ kleene_closure α :=
+  by
+    simp only [kleene_closure]
+    simp
+    exact str_mem_exp s
+
+
 example
   (α : Type)
   (s t : Str α)
@@ -160,3 +170,20 @@ theorem thm_2
   by
     symm
     exact (List.append_assoc s t u)
+
+
+/-
+Definition 10 (Language). A language L over some alphabet Σ is a subset of Σ∗, i.e. L ⊆ Σ∗.
+-/
+
+abbrev Language (α : Type) : Type := Set (Str α)
+
+
+example
+  (α : Type)
+  (L : Language α) :
+  L ⊆ kleene_closure α :=
+  by
+    simp only [Set.subset_def]
+    intro x _
+    exact all_str_mem_kleene_closure x
