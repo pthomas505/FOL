@@ -374,10 +374,36 @@ lemma derivative_def
                 sorry
               · apply Exists.intro []
                 sorry
+      case neg c1 =>
+        simp only [RegExp.languageOf]
+        simp
+        constructor
+        · intro a1
+          apply Exists.elim a1
+          intro xs a2
+          clear a1
+          sorry
+        · sorry
     case closure e ih =>
       simp only [RegExp.derivative]
       simp only [RegExp.languageOf]
       simp
+      constructor
+      · intro a1
+        apply Exists.elim a1
+        intro xs a2
+        clear a1
+        cases a2
+        case _ a2_left a2_right =>
+          apply Exists.elim a2_right
+          intro ys a3
+          clear a2_right
+          cases a3
+          case _ a3_left a3_right =>
+            apply Exists.intro [(a :: w)]
+            simp
+            simp only [← ih]
+            sorry
       sorry
 
 
@@ -405,222 +431,3 @@ example
       simp only [RegExp.is_match]
       simp only [ih]
       exact derivative_def hd tl e
-
-
-lemma lem_3_1
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α)
-  (a : α)
-  (h1 : Language.isRegular L) :
-  Language.isRegular (derivative L [a]) :=
-  by
-    simp only [Language.isRegular] at h1
-    apply Exists.elim h1
-    intro r a1
-    clear h1
-    subst a1
-    simp only [Language.isRegular]
-    simp only [derivative]
-    simp
-    apply Exists.intro (r.derivative a)
-    ext cs
-    simp
-
-    induction r
-    case h.char b =>
-      simp only [RegExp.derivative]
-      simp only [RegExp.languageOf]
-      simp
-      split_ifs
-      case pos c1 =>
-        tauto
-      case neg c1 =>
-        tauto
-    case h.epsilon =>
-      simp only [RegExp.derivative]
-      simp only [RegExp.languageOf]
-      simp
-    case h.zero =>
-      simp only [RegExp.derivative]
-      simp only [RegExp.languageOf]
-      simp
-    case h.union r s r_ih s_ih =>
-      simp only [RegExp.derivative]
-      simp only [RegExp.languageOf]
-      simp
-      tauto
-    case concat r s r_ih s_ih =>
-      simp only [RegExp.derivative]
-      simp only [RegExp.languageOf]
-      simp
-      constructor
-      · intro a1
-        apply Exists.elim a1
-        intro xs a2
-        clear a1
-        cases a2
-        case _ a2_left a2_right =>
-          apply Exists.elim a2_right
-          intro ys a3
-          clear a2_right
-          cases a3
-          case _ a3_left a3_right =>
-            simp only [← a3_right] at r_ih
-            simp only [← a3_right] at s_ih
-            by_cases c1 : (∃ r_1 ∈ RegExp.languageOf α (RegExp.derivative a r), ∃ s_1 ∈ RegExp.languageOf α s, r_1 ++ s_1 = cs)
-            case pos =>
-              left
-              exact c1
-            case neg =>
-              right
-              simp at c1
-              sorry
-      · sorry
-    case h.closure r ih =>
-      simp only [RegExp.derivative]
-      simp only [RegExp.languageOf]
-      simp
-      constructor
-      case _ =>
-        intro a1
-        apply Exists.elim a1
-        intro xs a2
-        clear a1
-        cases a2
-        case _ a2_left a2_right =>
-          sorry
-      sorry
-
-
-
-
-/-
-Theorem 3.1
-If L ⊆ Σ∗ is regular, then ∂u L is regular for all strings u ∈ Σ∗.
--/
-theorem thm_3_1
-  {α : Type}
-  (L : Language α)
-  (h1 : Language.isRegular L) :
-  ∀ (u : Str α), Language.isRegular (derivative L u) :=
-  by
-    sorry
-
-
-
-
-example
-  {α : Type}
-  [DecidableEq α]
-  (r : RegExp α)
-  (a : α) :
-  RegExp.derivative_set r a = (r.derivative a).languageOf :=
-  by
-  ext cs
-  induction r
-  case char a b =>
-    simp only [RegExp.derivative_set]
-    simp only [RegExp.derivative]
-    split_ifs
-    case pos c1 =>
-      simp only [RegExp.languageOf]
-      simp
-      intro _
-      exact c1
-    case neg c1 =>
-      simp only [RegExp.languageOf]
-      simp
-      intro contra
-      contradiction
-  case epsilon =>
-    simp only [RegExp.derivative_set]
-    simp only [RegExp.derivative]
-    simp only [RegExp.languageOf]
-    simp
-  case zero =>
-    simp only [RegExp.derivative_set]
-    simp only [RegExp.derivative]
-    simp only [RegExp.languageOf]
-    simp
-  case union r s r_ih s_ih =>
-    simp only [RegExp.languageOf]
-    simp
-    simp only [← r_ih]
-    simp only [← s_ih]
-    simp only [RegExp.derivative_set]
-    simp only [RegExp.languageOf]
-    simp
-  case concat r s r_ih s_ih =>
-    simp only [RegExp.derivative_set] at r_ih
-    simp at r_ih
-
-    simp only [RegExp.derivative_set] at s_ih
-    simp at s_ih
-
-    simp only [RegExp.derivative_set]
-    simp
-
-    simp only [RegExp.derivative]
-
-    simp only [RegExp.languageOf]
-    simp
-
-    constructor
-    · intro a1
-      apply Exists.elim a1
-      intro r' a2
-      clear a1
-      cases a2
-      case _ a2_left a2_right =>
-        apply Exists.elim a2_right
-        intro s' a3
-        clear a2_right
-        cases a3
-        case _ a3_left a3_right =>
-          sorry
-    · intro a1
-      cases a1
-      case _ a1_left =>
-        apply Exists.elim a1_left
-        intro r' a2
-        clear a1_left
-        cases a2
-        case _ a2_left a2_right =>
-          apply Exists.elim a2_right
-          intro s' a3
-          clear a2_right
-          cases a3
-          case _ a3_left a3_right =>
-            sorry
-      case _ a1_right =>
-        sorry
-  case closure r r_ih =>
-    simp only [RegExp.derivative_set] at r_ih
-    simp at r_ih
-
-    simp only [RegExp.derivative_set]
-    simp only [RegExp.derivative]
-    simp only [RegExp.languageOf]
-    simp
-    constructor
-    · intro a1
-      apply Exists.elim a1
-      intro rs a2
-      clear a1
-      cases a2
-      case _ a2_left a2_right =>
-        simp only [← a2_right] at r_ih
-        cases r_ih
-        case _ mp mpr =>
-          cases rs
-          case nil =>
-            simp at a2_right
-          case cons hd tl =>
-            simp at a2_left
-            cases a2_left
-            case _ a2_left_left a2_left_right =>
-              simp at a2_right
-              apply Exists.intro cs
-              sorry
-    · sorry
