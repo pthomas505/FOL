@@ -151,3 +151,12 @@ example
     simp at s3
     simp only [s1, s2] at s3
     exact s3
+
+
+theorem thm_2
+  (α : Type)
+  (s t u : Str α) :
+  s ++ (t ++ u) = (s ++ t) ++ u :=
+  by
+    symm
+    exact (List.append_assoc s t u)
