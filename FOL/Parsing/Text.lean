@@ -283,3 +283,42 @@ inductive lang_kleene_closure
     s ∈ lang_kleene_closure α L →
     t ∈ L →
     lang_kleene_closure α L (s ++ t)
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  lang_exp L n ⊆ lang_kleene_closure α L :=
+  by
+    simp only [Set.subset_def]
+    intro s a1
+
+    induction n generalizing s
+    case zero =>
+      simp only [lang_exp] at a1
+      simp at a1
+
+      simp only [a1]
+      exact lang_kleene_closure.eps L
+    case succ n ih =>
+      simp only [lang_exp] at a1
+      simp only [lang_concat] at a1
+      simp at a1
+
+      apply Exists.elim a1
+      intro xs a2
+      clear a1
+
+      cases a2
+      case _ a2_left a2_right =>
+        apply Exists.elim a2_right
+        intro ys a3
+        clear a2_right
+
+        cases a3
+        case _ a3_left a3_right =>
+          simp only [← a3_right]
+          apply lang_kleene_closure.succ L
+          apply ih xs a2_left
+          exact a3_left
