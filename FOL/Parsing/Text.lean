@@ -187,3 +187,13 @@ example
     simp only [Set.subset_def]
     intro x _
     exact all_str_mem_kleene_closure x
+
+
+/-
+Definition 11 (Concatenation)
+-/
+def language_concat
+  (α : Type)
+  (L1 L2 : Language α) :
+  Set (Str α) :=
+  { r ++ s | (r ∈ L1) (s ∈ L2) }
