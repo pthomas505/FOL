@@ -114,6 +114,30 @@ lemma mem_exp_imp_str_len_eq
       exact ih_2
 
 
+-- The set of all strings of length n.
+def exp_set
+  (α : Type)
+  (n : ℕ) :
+  Set (Str α) :=
+  {s : Str α | s.length = n}
+
+
+example
+  (α : Type)
+  (n : ℕ) :
+  exp α n = exp_set α n :=
+  by
+    simp only [exp_set]
+    ext s
+    simp
+    constructor
+    · intro a1
+      exact mem_exp_imp_str_len_eq s n a1
+    · intro a1
+      simp only [← a1]
+      exact str_mem_exp_str_len s
+
+
 /-
 Definition 5 (Kleene closure). Let Σ be an alphabet, then we denote the set of all finite strings over Σ by Σ∗.
 -/
@@ -196,7 +220,7 @@ def lang_concat
   {α : Type}
   (L1 L2 : Language α) :
   Language α :=
-  { r ++ s | (r ∈ L1) (s ∈ L2) }
+  { s ++ t | (s ∈ L1) (t ∈ L2) }
 
 
 theorem thm_3_a
