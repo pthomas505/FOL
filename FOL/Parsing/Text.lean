@@ -1,4 +1,5 @@
 import Mathlib.Data.Set.Lattice
+import Mathlib.Data.Finset.Basic
 
 
 set_option autoImplicit false
@@ -202,6 +203,12 @@ theorem thm_2
 end Strings
 
 
+-------------------------------------------------------------------------------
+
+
+namespace Languages
+
+
 /-
 Definition 10 (Language). A language L over some alphabet Σ is a subset of Σ∗, i.e. L ⊆ Σ∗.
 -/
@@ -217,12 +224,6 @@ example
     simp only [Set.subset_def]
     intro x _
     exact Strings.all_str_mem_kleene_closure x
-
-
--------------------------------------------------------------------------------
-
-
-namespace Languages
 
 
 /-
@@ -295,6 +296,13 @@ inductive kleene_closure
     s ∈ kleene_closure α L →
     t ∈ L →
     kleene_closure α L (s ++ t)
+
+
+-- Each l is the concatenation of a list of strings, each of which is in L.
+def kleene_closure_set
+  (α : Type)
+  (L : Language α) :=
+  { l | ∃ M : List (Str α), (∀ (r : Str α), r ∈ M → r ∈ L) ∧ M.join = l }
 
 
 theorem thm_4
@@ -379,3 +387,77 @@ theorem thm_5_right
       · apply Exists.intro ys
         simp
         exact ih_2
+
+
+theorem thm_5
+  {α : Type}
+  (L : Language α) :
+  kleene_closure α L = ⋃ (n : ℕ), exp L n :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · exact thm_5_right L
+    · exact thm_5_left L
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  concat (exp L n) L = exp L (n + 1) :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro s a1
+      simp only [concat] at a1
+      simp at a1
+
+      apply Exists.elim a1
+      intro xs a2
+      clear a1
+
+      cases a2
+      case _ a2_left a2_right =>
+        apply Exists.elim a2_right
+        intro ys a3
+        clear a2_right
+
+        cases a3
+        case _ a3_left a3_right =>
+          simp only [exp]
+          simp only [concat]
+          simp
+          apply Exists.intro xs
+          constructor
+          · exact a2_left
+          · apply Exists.intro ys
+            tauto
+    · simp only [Set.subset_def]
+      intro s a1
+      simp only [exp] at a1
+      exact a1
+
+
+theorem thm_6
+  {α : Type}
+  (L : Language α) :
+  (kleene_closure α L) = {[]} ∪ (concat L (kleene_closure α L)) :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro s a1
+      simp only [thm_5 L] at a1
+      simp at a1
+
+      apply Exists.elim a1
+      intro n a2
+      clear a1
+
+      cases n
+      case _ =>
+        simp only [exp] at a2
+        simp
+        tauto
+      case _ k =>
+        simp only [exp] at a2
+        sorry
+    · sorry
