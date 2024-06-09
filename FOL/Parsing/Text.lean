@@ -23,6 +23,9 @@ of a string with no symbols, called the empty string, and denote it by ε.
 abbrev Str (α : Type) : Type := List α
 
 
+namespace Strings
+
+
 /-
   Exponentiation
   exp α n is the set of all strings of length n.
@@ -196,6 +199,9 @@ theorem thm_2
     exact (List.append_assoc s t u)
 
 
+end Strings
+
+
 /-
 Definition 10 (Language). A language L over some alphabet Σ is a subset of Σ∗, i.e. L ⊆ Σ∗.
 -/
@@ -206,17 +212,20 @@ abbrev Language (α : Type) : Type := Set (Str α)
 example
   (α : Type)
   (L : Language α) :
-  L ⊆ kleene_closure α :=
+  L ⊆ Strings.kleene_closure α :=
   by
     simp only [Set.subset_def]
     intro x _
-    exact all_str_mem_kleene_closure x
+    exact Strings.all_str_mem_kleene_closure x
+
+
+namespace Languages
 
 
 /-
 Definition 11 (Concatenation)
 -/
-def lang_concat
+def concat
   {α : Type}
   (L1 L2 : Language α) :
   Language α :=
@@ -226,84 +235,84 @@ def lang_concat
 theorem thm_3_a
   {α : Type}
   (L : Language α) :
-  lang_concat L ∅ = ∅ :=
+  concat L ∅ = ∅ :=
   by
-    simp only [lang_concat]
+    simp only [concat]
     simp
 
 
 theorem thm_3_b
   {α : Type}
   (L : Language α) :
-  lang_concat ∅ L = ∅ :=
+  concat ∅ L = ∅ :=
   by
-    simp only [lang_concat]
+    simp only [concat]
     simp
 
 
 theorem thm_3_c
   {α : Type}
   (L1 L2 L3 : Language α) :
-  lang_concat L1 (lang_concat L2 L3) =
-    lang_concat (lang_concat L1 L2) L3 :=
+  concat L1 (concat L2 L3) =
+    concat (concat L1 L2) L3 :=
   by
-    simp only [lang_concat]
+    simp only [concat]
     simp
 
 
 theorem thm_3_d
   {α : Type}
   (L1 L2 L3 : Language α) :
-  lang_concat L1 (L2 ∪ L3) =
-    lang_concat L1 L2 ∪ lang_concat L1 L3 :=
+  concat L1 (L2 ∪ L3) =
+    concat L1 L2 ∪ concat L1 L3 :=
   by
-    simp only [lang_concat]
+    simp only [concat]
     aesop
 
 
-def lang_exp
+def exp
   {α : Type}
   (L : Language α)
   (n : ℕ) :
   Language α :=
   match n with
   | 0 => {[]}
-  | n + 1 => lang_concat (lang_exp L n) L
+  | n + 1 => concat (exp L n) L
 
 
-inductive lang_kleene_closure
+inductive kleene_closure
   (α : Type) :
   Language α → Language α
   | eps
     (L : Language α) :
-    lang_kleene_closure α L []
+    kleene_closure α L []
   | succ
     (L : Language α)
     (s t : Str α) :
-    s ∈ lang_kleene_closure α L →
+    s ∈ kleene_closure α L →
     t ∈ L →
-    lang_kleene_closure α L (s ++ t)
+    kleene_closure α L (s ++ t)
 
 
 theorem thm_4
   {α : Type}
   (L : Language α)
   (n : ℕ) :
-  lang_exp L n ⊆ lang_kleene_closure α L :=
+  exp L n ⊆ kleene_closure α L :=
   by
     simp only [Set.subset_def]
     intro s a1
 
     induction n generalizing s
     case zero =>
-      simp only [lang_exp] at a1
+      simp only [exp] at a1
       simp at a1
 
       simp only [a1]
-      exact lang_kleene_closure.eps L
+      exact kleene_closure.eps L
     case succ n ih =>
-      simp only [lang_exp] at a1
-      simp only [lang_concat] at a1
+      simp only [exp] at a1
+      simp only [concat] at a1
       simp at a1
 
       apply Exists.elim a1
@@ -319,6 +328,6 @@ theorem thm_4
         cases a3
         case _ a3_left a3_right =>
           simp only [← a3_right]
-          apply lang_kleene_closure.succ L
+          apply kleene_closure.succ L
           apply ih xs a2_left
           exact a3_left
