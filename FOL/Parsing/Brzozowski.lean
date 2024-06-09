@@ -285,11 +285,106 @@ def RegExp.derivative
   | union r s => RegExp.union (r.derivative a) (s.derivative a)
 
   | concat r s =>
-    RegExp.union
-      (RegExp.concat (r.derivative a) s)
-      (RegExp.concat r.delta (s.derivative a))
+      if r.is_nullable
+      then RegExp.concat (r.derivative a) s
+      else RegExp.concat r.delta (s.derivative a)
 
   | closure r => RegExp.concat (r.derivative a) r.closure
+
+
+lemma derivative_def
+  {α : Type}
+  [DecidableEq α]
+  (a : α)
+  (w : List α)
+  (e : RegExp α) :
+  w ∈ (e.derivative a).languageOf ↔ a :: w ∈ e.languageOf :=
+  by
+    induction e generalizing w
+    case char b =>
+      simp only [RegExp.derivative]
+      split_ifs
+      case pos c1 =>
+        simp only [c1]
+        simp only [RegExp.languageOf]
+        simp
+      case neg c1 =>
+        simp only [RegExp.languageOf]
+        simp
+        intro a1
+        contradiction
+    case epsilon =>
+      simp only [RegExp.derivative]
+      simp only [RegExp.languageOf]
+      simp
+    case zero =>
+      simp only [RegExp.derivative]
+      simp only [RegExp.languageOf]
+      simp
+    case union r s r_ih s_ih =>
+      simp only [RegExp.derivative]
+      simp only [RegExp.languageOf]
+      specialize r_ih w
+      specialize s_ih w
+      simp
+      tauto
+    case concat r s r_ih s_ih =>
+      simp only [RegExp.derivative]
+      split_ifs
+      case pos c1 =>
+        simp only [RegExp.languageOf]
+        simp
+        constructor
+        · intro a1
+          apply Exists.elim a1
+          intro xs a2
+          clear a1
+          cases a2
+          case _ a2_left a2_right =>
+            apply Exists.elim a2_right
+            intro ys a3
+            clear a2_right
+            cases a3
+            case _ a3_left a3_right =>
+              specialize r_ih w
+              specialize s_ih w
+              simp only [← a3_right] at r_ih
+              simp only [← a3_right] at s_ih
+              sorry
+        · sorry
+      case neg c1 =>
+        sorry
+    case closure e ih =>
+      simp only [RegExp.derivative]
+      simp only [RegExp.languageOf]
+      simp
+      sorry
+
+
+def RegExp.is_match
+  {α : Type}
+  [DecidableEq α]
+  (e : RegExp α) :
+  List α → Prop
+  | [] => e.is_nullable
+  | hd :: tl => (e.derivative hd).is_match tl
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (e : RegExp α)
+  (input : List α) :
+  e.is_match input ↔ input ∈ e.languageOf :=
+  by
+    induction input generalizing e
+    case nil =>
+      simp only [RegExp.is_match]
+      exact is_nullable_def e
+    case cons hd tl ih =>
+      simp only [RegExp.is_match]
+      simp only [ih]
+      exact derivative_def hd tl e
 
 
 lemma lem_3_1
