@@ -334,3 +334,48 @@ theorem thm_4
           apply kleene_closure.succ L
           apply ih xs a2_left
           exact a3_left
+
+
+theorem thm_5_left
+  {α : Type}
+  (L : Language α) :
+  ⋃ (n : ℕ), exp L n ⊆ kleene_closure α L :=
+  by
+    simp only [Set.subset_def]
+    intro s a1
+    simp at a1
+    apply Exists.elim a1
+    intro n a2
+    exact Set.mem_of_subset_of_mem (thm_4 L n) a2
+
+theorem thm_5_right
+  {α : Type}
+  (L : Language α) :
+  kleene_closure α L ⊆ ⋃ (n : ℕ), exp L n :=
+  by
+    simp only [Set.subset_def]
+    intro s a1
+    induction a1
+    case eps =>
+      simp
+      apply Exists.intro 0
+      simp only [exp]
+      simp
+    case succ xs ys _ ih_2 ih_3 =>
+      simp at ih_3
+
+      apply Exists.elim ih_3
+      intro n a2
+      clear ih_3
+
+      simp
+      apply Exists.intro (n + 1)
+      simp only [exp]
+      simp only [concat]
+      simp
+      apply Exists.intro xs
+      constructor
+      · exact a2
+      · apply Exists.intro ys
+        simp
+        exact ih_2
