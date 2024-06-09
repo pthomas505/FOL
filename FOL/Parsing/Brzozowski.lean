@@ -346,11 +346,15 @@ lemma derivative_def
             clear a2_right
             cases a3
             case _ a3_left a3_right =>
-              specialize r_ih w
-              specialize s_ih w
-              simp only [← a3_right] at r_ih
-              simp only [← a3_right] at s_ih
-              sorry
+              apply Exists.intro (a :: xs)
+              constructor
+              · simp only [← r_ih]
+                exact a2_left
+              · apply Exists.intro ys
+                constructor
+                · exact a3_left
+                · simp only [← a3_right]
+                  simp
         · sorry
       case neg c1 =>
         sorry
