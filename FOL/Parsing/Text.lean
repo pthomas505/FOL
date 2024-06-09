@@ -56,7 +56,7 @@ lemma rev_str_mem_exp
     induction s
     case nil =>
       apply Exists.intro 0
-      apply exp.zero
+      exact exp.zero
     case cons hd tl ih =>
       apply Exists.elim ih
       intro n a1
@@ -72,4 +72,38 @@ lemma str_mem_exp
   by
     obtain s1 := rev_str_mem_exp α s.reverse
     simp only [List.reverse_reverse] at s1
+    exact s1
+
+
+/-
+Definition 5 (Kleene closure). Let Σ be an alphabet, then we denote the set of all finite strings over Σ by Σ∗.
+-/
+
+def kleene_closure
+  (α : Type) :
+  Set (Str α) :=
+  ⋃ (n : ℕ), exp α n
+
+
+lemma rev_str_mem_exp_str_len
+  (α : Type)
+  (s : Str α) :
+  s.reverse ∈ exp α s.length :=
+  by
+    induction s
+    case nil =>
+      simp
+      exact exp.zero
+    case cons hd tl ih =>
+      simp
+      exact exp.succ tl.length hd tl.reverse ih
+
+
+lemma str_mem_exp_str_len
+  (α : Type)
+  (s : Str α) :
+  s ∈ exp α s.length :=
+  by
+    obtain s1 := rev_str_mem_exp_str_len α s.reverse
+    simp at s1
     exact s1
