@@ -193,16 +193,16 @@ example
 Definition 11 (Concatenation)
 -/
 def lang_concat
-  (α : Type)
+  {α : Type}
   (L1 L2 : Language α) :
-  Set (Str α) :=
+  Language α :=
   { r ++ s | (r ∈ L1) (s ∈ L2) }
 
 
 theorem thm_3_a
   {α : Type}
   (L : Language α) :
-  lang_concat α L ∅ = ∅ :=
+  lang_concat L ∅ = ∅ :=
   by
     simp only [lang_concat]
     simp
@@ -211,7 +211,7 @@ theorem thm_3_a
 theorem thm_3_b
   {α : Type}
   (L : Language α) :
-  lang_concat α ∅ L = ∅ :=
+  lang_concat ∅ L = ∅ :=
   by
     simp only [lang_concat]
     simp
@@ -220,8 +220,8 @@ theorem thm_3_b
 theorem thm_3_c
   {α : Type}
   (L1 L2 L3 : Language α) :
-  lang_concat α L1 (lang_concat α L2 L3) =
-    lang_concat α (lang_concat α L1 L2) L3 :=
+  lang_concat L1 (lang_concat L2 L3) =
+    lang_concat (lang_concat L1 L2) L3 :=
   by
     simp only [lang_concat]
     simp
@@ -230,8 +230,18 @@ theorem thm_3_c
 theorem thm_3_d
   {α : Type}
   (L1 L2 L3 : Language α) :
-  lang_concat α L1 (L2 ∪ L3) =
-    lang_concat α L1 L2 ∪ lang_concat α L1 L3 :=
+  lang_concat L1 (L2 ∪ L3) =
+    lang_concat L1 L2 ∪ lang_concat L1 L3 :=
   by
     simp only [lang_concat]
     aesop
+
+
+def lang_exp
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  Language α :=
+  match n with
+  | 0 => {[]}
+  | n + 1 => lang_concat (lang_exp L n) L
