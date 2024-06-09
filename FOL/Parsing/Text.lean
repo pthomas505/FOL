@@ -33,7 +33,7 @@ inductive exp (α : Type) : ℕ → Set (Str α)
     (n : ℕ)
     (a : α)
     (s : Str α) :
-    exp α n s →
+    s ∈ exp α n →
     exp α (n + 1) (s ++ [a])
 
 example : ['a'] ∈ exp Char 1 :=
@@ -245,3 +245,17 @@ def lang_exp
   match n with
   | 0 => {[]}
   | n + 1 => lang_concat (lang_exp L n) L
+
+
+inductive lang_kleene_closure
+  (α : Type) :
+  Language α → Language α
+  | eps
+    (L : Language α) :
+    lang_kleene_closure α L []
+  | succ
+    (L : Language α)
+    (s t : Str α) :
+    s ∈ lang_kleene_closure α L →
+    t ∈ L →
+    lang_kleene_closure α L (s ++ t)
