@@ -90,7 +90,7 @@ example : symbol_arrow_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'a', [1]⟩, ⟨0, 
 
 
 /--
-  `EpsilonNFA.eval_one e l c` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the list of states `l` and consumes the symbol `c`.
+  `EpsilonNFA.eval_one e xs c` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the state list `xs` and consumes the symbol `c`.
 -/
 def EpsilonNFA.eval_one
   {α : Type}
@@ -104,6 +104,9 @@ def EpsilonNFA.eval_one
   e.epsilon_closure (state_list.map (fun (state : σ) => (symbol_arrow_list_to_fun e.symbol_arrow_list) state symbol)).join.dedup
 
 
+/--
+  `EpsilonNFA.eval_from e xs cs` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the state list `xs` and consumes the list of symbols `cs`.
+-/
 def EpsilonNFA.eval_from
   {α : Type}
   [DecidableEq α]
@@ -116,6 +119,9 @@ def EpsilonNFA.eval_from
   List.foldl e.eval_one (e.epsilon_closure starting_state_list) input
 
 
+/--
+  `EpsilonNFA.eval e cs` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the state list `e.starting_state_list` and consumes the list of symbols `cs`.
+-/
 def EpsilonNFA.eval
   {α : Type}
   [DecidableEq α]
@@ -127,6 +133,9 @@ def EpsilonNFA.eval
   e.eval_from e.starting_state_list input
 
 
+/--
+  `EpsilonNFA.accepts e cs` := True if and only if one of the states that the nondeterministic automaton `e` transitions to if it starts at the state list `e.starting_state_list` and consumes the list of symbols `cs` is an accepting state.
+-/
 def EpsilonNFA.accepts
   {α : Type}
   [DecidableEq α]
@@ -279,20 +288,30 @@ theorem EpsilonNFA.eval_one'_def
   (e : EpsilonNFA α σ)
   (state_list : List σ)
   (symbol : α)
-  {s : σ} :
-  s ∈ e.eval_one' state_list symbol ↔
-  (∃ a ∈ state_list, s ∈ symbol_arrow_list_to_fun e.symbol_arrow_list a symbol) := by simp [eval_one']
+  {stop_state : σ} :
+  stop_state ∈ e.eval_one' state_list symbol ↔
+  (∃ start_state ∈ state_list, stop_state ∈ symbol_arrow_list_to_fun e.symbol_arrow_list start_state symbol) :=
+  by
+    simp [eval_one']
 
 
-theorem EpsilonNFA.eval_one'_iff {α σ} [DecidableEq α] [DecidableEq σ]
-    (M : EpsilonNFA α σ) {S s' a} :
-    s' ∈ M.eval_one' S a ↔ (∃ s ∈ S, M.toAbstract.symbol s a s') := by
-  simp [eval_one', toAbstract, symbol_arrow_list_to_fun]
-  constructor
-  · rintro ⟨_, h1, _, ⟨⟨⟩, h2, ⟨rfl, rfl⟩, rfl⟩, h3⟩
-    exact ⟨_, h1, _, h2, h3⟩
-  · rintro ⟨_, h1, _, h2, h3⟩
-    exact ⟨_, h1, _, ⟨_, h2, ⟨rfl, rfl⟩, rfl⟩, h3⟩
+theorem EpsilonNFA.eval_one'_iff
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : EpsilonNFA α σ)
+  {S : List σ}
+  {s' : σ}
+  {a : α} :
+  s' ∈ e.eval_one' S a ↔ (∃ s ∈ S, e.toAbstract.symbol s a s') :=
+  by
+    simp [eval_one', toAbstract, symbol_arrow_list_to_fun]
+    constructor
+    · rintro ⟨_, h1, _, ⟨⟨⟩, h2, ⟨rfl, rfl⟩, rfl⟩, h3⟩
+      exact ⟨_, h1, _, h2, h3⟩
+    · rintro ⟨_, h1, _, h2, h3⟩
+      exact ⟨_, h1, _, ⟨_, h2, ⟨rfl, rfl⟩, rfl⟩, h3⟩
 
 
 @[simp]
