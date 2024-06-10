@@ -238,24 +238,24 @@ def AbstractEpsilonNFA.Accepts
   {α : Type}
   {σ : Type}
   (M : AbstractEpsilonNFA α σ)
-  (as : List α) :
+  (cs : List α) :
   Prop :=
-  ∃ (s : σ), M.start s ∧ M.Eval s as
+  ∃ (s : σ), M.start s ∧ M.Eval s cs
 
 
 def EpsilonNFA.toAbstract
   {α : Type}
   {σ : Type}
-  (M : EpsilonNFA α σ) :
+  (e : EpsilonNFA α σ) :
   AbstractEpsilonNFA α σ :=
   {
-    symbol := fun (start_state : σ) (symbol : α) (stop_state : σ) => ∃ (stop_state_list : List σ), ⟨start_state, symbol, stop_state_list⟩ ∈ M.symbol_arrow_list ∧ stop_state ∈ stop_state_list,
+    symbol := fun (start_state : σ) (symbol : α) (stop_state : σ) => ∃ (stop_state_list : List σ), ⟨start_state, symbol, stop_state_list⟩ ∈ e.symbol_arrow_list ∧ stop_state ∈ stop_state_list,
 
-    epsilon := fun (start_state : σ) (stop_state : σ) => ∃ (stop_state_list : List σ), ⟨start_state, stop_state_list⟩ ∈ M.epsilon_arrow_list ∧ stop_state ∈ stop_state_list,
+    epsilon := fun (start_state : σ) (stop_state : σ) => ∃ (stop_state_list : List σ), ⟨start_state, stop_state_list⟩ ∈ e.epsilon_arrow_list ∧ stop_state ∈ stop_state_list,
 
-    start := fun (s : σ) => s ∈ M.starting_state_list,
+    start := fun (state : σ) => state ∈ e.starting_state_list,
 
-    accepting := fun (s : σ) => s ∈ M.accepting_state_list
+    accepting := fun (state : σ) => state ∈ e.accepting_state_list
   }
 
 
@@ -272,10 +272,14 @@ def EpsilonNFA.eval_one'
 
 
 theorem EpsilonNFA.eval_one'_def
-  {α : Type} [DecidableEq α] {σ : Type} [DecidableEq σ]
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
   (e : EpsilonNFA α σ)
   (state_list : List σ)
-  (symbol : α) {s} :
+  (symbol : α)
+  {s : σ} :
   s ∈ e.eval_one' state_list symbol ↔
   (∃ a ∈ state_list, s ∈ symbol_arrow_list_to_fun e.symbol_arrow_list a symbol) := by simp [eval_one']
 
