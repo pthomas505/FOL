@@ -10,5 +10,6 @@ require mathlib from git
 
 @[default_target]
 lean_lib «FOL» {
+  globs := #[.andSubmodules `FOL]
   -- add any library configuration options here
 }
