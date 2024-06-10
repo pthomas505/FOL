@@ -154,11 +154,34 @@ example
     case pos =>
       simp only [c1]
       simp
-      decide
+      simp only [EpsilonNFA.accepts]
+      apply Exists.intro 1
+      simp
+      simp only [EpsilonNFA.eval]
+      simp only [EpsilonNFA.eval_from]
+      simp only [EpsilonNFA.epsilon_closure]
+      simp only [epsilon_arrow_list_to_graph]
+      simp only [dft]
+      simp only [dft_aux]
+      simp
+      simp only [direct_succ_list]
+      simp only [dft_aux]
+      simp only [EpsilonNFA.eval_one]
+      simp
+      simp only [symbol_arrow_list_to_fun]
+      simp
+      simp only [EpsilonNFA.epsilon_closure]
+      simp only [epsilon_arrow_list_to_graph]
+      simp only [dft]
+      simp only [dft_aux]
+      simp
+      simp only [direct_succ_list]
+      simp only [dft_aux]
+      simp
     case neg =>
       simp
       simp only [c1]
-      decide
+      sorry
 
 
 example
