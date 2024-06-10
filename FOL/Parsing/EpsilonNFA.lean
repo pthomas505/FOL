@@ -192,29 +192,46 @@ structure AbstractEpsilonNFA
   (accepting : σ → Prop)
 
 
+/--
+  `AbstractEpsilonNFA.Eval M start_state input` : True if and only if beginning from `start_state` and evaluating `M` on `input` results in an accepted state.
+-/
 inductive AbstractEpsilonNFA.Eval
   {α σ : Type}
   (M : AbstractEpsilonNFA α σ) :
   σ → List α → Prop
+
   | eps
-    {s s' : σ}
-    {as : List α} :
-    M.epsilon s s' →
-    Eval M s' as →
-    Eval M s as
+    {start_state stop_state : σ}
+    {input : List α} :
+    -- There is an epsilon transition from `start_state` to `stop_state`.
+    M.epsilon start_state stop_state →
+
+    -- Beginning from `stop_state` and evaluating `M` on `input` results in an accepted state.
+    Eval M stop_state input →
+
+    -- Beginning from `start_state` and evaluating `M` on `input` results in an accepted state.
+    Eval M start_state input
 
   | sym
-    {s s' : σ}
-    {a : α}
-    {as : List α} :
-    M.symbol s a s' →
-    Eval M s' as →
-    Eval M s (a :: as)
+    {start_state stop_state : σ}
+    {c : α}
+    {cs : List α} :
+    -- There is a symbol transition from `start_state` to `stop_state` on `c`.
+    M.symbol start_state c stop_state →
+
+    -- Beginning from `stop_state` and evaluating `M` on `cs` results in an accepted state.
+    Eval M stop_state cs →
+
+    -- Beginning from `start_state` and evaluating `M` on `c :: cs` results in an accepted state.
+    Eval M start_state (c :: cs)
 
   | accept
-    {s : σ} :
-    M.accepting s →
-    Eval M s []
+    {start_state : σ} :
+    -- `start_state` is an accepted state.
+    M.accepting start_state →
+
+    -- Beginning from `start_state` and evaluating `M` on the empty string results in an accepted state.
+    Eval M start_state []
 
 
 def AbstractEpsilonNFA.Accepts
