@@ -151,6 +151,21 @@ example : ¬ (match_char_EpsilonNFA 'a').accepts ['b', 'a'] :=
   by decide
 
 
+theorem match_char_EpsilonNFA_toAbstract
+  {α : Type}
+  [DecidableEq α]
+  (c : α) :
+  (match_char_EpsilonNFA c).toAbstract =
+    {
+      symbol := fun s b s' => s = 0 ∧ b = c ∧ s' = 1
+      epsilon := fun _ _ => False
+      start := fun s => s = 0
+      accepting := fun s => s = 1
+    } := by
+  simp [EpsilonNFA.toAbstract]
+  simp_rw [← and_assoc, and_right_comm]; simp
+
+
 example
   (α : Type)
   [DecidableEq α]
@@ -158,38 +173,11 @@ example
   (x : α) :
   (match_char_EpsilonNFA c).accepts [x] ↔ c = x :=
   by
-    by_cases c1 : c = x
-    case pos =>
-      simp only [c1]
-      simp
-      simp only [EpsilonNFA.accepts]
-      apply Exists.intro 1
-      simp
-      simp only [EpsilonNFA.eval]
-      simp only [EpsilonNFA.eval_from]
-      simp only [EpsilonNFA.epsilon_closure]
-      simp only [epsilon_arrow_list_to_graph]
-      simp only [dft]
-      simp only [dft_aux]
-      simp
-      simp only [direct_succ_list]
-      simp only [dft_aux]
-      simp only [EpsilonNFA.eval_one]
-      simp
-      simp only [symbol_arrow_list_to_fun]
-      simp
-      simp only [EpsilonNFA.epsilon_closure]
-      simp only [epsilon_arrow_list_to_graph]
-      simp only [dft]
-      simp only [dft_aux]
-      simp
-      simp only [direct_succ_list]
-      simp only [dft_aux]
-      simp
-    case neg =>
-      simp
-      simp only [c1]
-      sorry
+    rw [EpsilonNFA.accepts_iff, match_char_EpsilonNFA_toAbstract]
+    simp [AbstractEpsilonNFA.accepts]
+    constructor
+    · intro | .sym ⟨rfl, e, rfl⟩ _ => exact e.symm
+    · exact fun h => .sym ⟨rfl, h.symm, rfl⟩ (.accept rfl)
 
 
 example
