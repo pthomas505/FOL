@@ -78,13 +78,18 @@ def RegExp.toEpsilonNFA
     }
 
   | union R S =>
-    let start := Sum.inl 0
+    let starting_state := Sum.inl 0
     let R' := (R.toEpsilonNFA.wrapLeft S.State).wrapRight ℕ
     let S' := (S.toEpsilonNFA.wrapRight R.State).wrapRight ℕ
     {
       symbol_arrow_list := R'.symbol_arrow_list ++ S'.symbol_arrow_list
-      epsilon_arrow_list := ⟨start, R'.starting_state_list⟩ :: R'.epsilon_arrow_list ++ ⟨start, R'.starting_state_list⟩ :: S'.epsilon_arrow_list
-      starting_state_list := R'.starting_state_list ++ S'.starting_state_list
+
+      epsilon_arrow_list :=
+        ⟨starting_state, R'.starting_state_list⟩ :: R'.epsilon_arrow_list ++
+        ⟨starting_state, S'.starting_state_list⟩ :: S'.epsilon_arrow_list
+
+      starting_state_list := [starting_state]
+
       accepting_state_list := R'.accepting_state_list ++ S'.accepting_state_list
     }
 
@@ -93,8 +98,11 @@ def RegExp.toEpsilonNFA
     let S' := S.toEpsilonNFA.wrapRight R.State
     {
       symbol_arrow_list := R'.symbol_arrow_list ++ S'.symbol_arrow_list
+
       epsilon_arrow_list := R'.accepting_state_list.map (fun (state) => ⟨ state, S'.starting_state_list ⟩)
+
       starting_state_list := R'.starting_state_list
+
       accepting_state_list := S'.accepting_state_list
     }
 
