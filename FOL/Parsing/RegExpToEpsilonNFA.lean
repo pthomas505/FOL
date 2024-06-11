@@ -187,14 +187,14 @@ example
   (x y : α) :
   ¬ (match_char_EpsilonNFA c).accepts [x, y] :=
   by
-  by_cases c1 : c = x
-  case pos =>
-    simp only [c1]
-    simp
-    sorry
-  case neg =>
-    simp
-    sorry
+    by_cases c1 : c = x
+    case pos =>
+      simp only [c1]
+      simp
+      sorry
+    case neg =>
+      simp
+      sorry
 
 
 def match_epsilon_EpsilonNFA
