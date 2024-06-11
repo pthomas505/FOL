@@ -388,59 +388,73 @@ theorem EpsilonNFA.epsilon_closure_iff
     constructor <;> [rintro ⟨rfl, rfl⟩; rintro rfl] <;> [rfl; constructor <;> rfl]
 
 
-theorem EpsilonNFA.eval_from_iff {α σ} [DecidableEq α] [DecidableEq σ]
-    (M : EpsilonNFA α σ) {S input} :
-    (∃ s ∈ M.eval_from S input, s ∈ M.accepting_state_list) ↔
-    (∃ s ∈ S, M.toAbstract.eval s input) := by
-  induction input generalizing S with simp
-  | nil =>
-    simp [epsilon_closure_iff]
-    constructor
-    · intro ⟨s, ⟨s', h1, h2⟩, h3⟩
-      refine ⟨_, h1, ?_⟩
-      clear h1
-      induction h2 using Relation.ReflTransGen.head_induction_on with
-      | refl => exact .accept h3
-      | head h _ ih => exact .eps h ih
-    · intro ⟨s, h1, h2⟩
-      obtain ⟨s', h3, h4⟩ : ∃ s', M.toAbstract.EpsilonClosure s s' ∧ s' ∈ M.accepting_state_list := by
-        clear h1; generalize e : [] = l at h2
-        induction h2 with cases e
-        | accept h' => exact ⟨_, .refl, h'⟩
-        | eps h1 _ ih =>
-          have ⟨s', h3, h4⟩ := ih rfl
-          exact ⟨_, .head h1 h3, h4⟩
-      exact ⟨_, ⟨_, h1, h3⟩, h4⟩
-  | cons a as IH =>
-    simp [IH, epsilon_closure_iff, eval_one_no_eps_iff]
-    constructor
-    · intro ⟨s₁, ⟨s₂, ⟨s₃, h1, h2⟩, h3⟩, h4⟩
-      refine ⟨_, h1, ?_⟩
-      clear h1
-      induction h2 using Relation.ReflTransGen.head_induction_on with
-      | refl => exact .sym h3 h4
-      | head h _ ih => exact .eps h ih
-    · intro ⟨s, h1, h2⟩
-      obtain ⟨s₁, s₂, h3, h4, h5⟩ :
-          ∃ s₁ s₂, M.toAbstract.EpsilonClosure s s₂ ∧
-            M.toAbstract.symbol s₂ a s₁ ∧ M.toAbstract.eval s₁ as := by
-        clear h1; generalize e : a::as = l at h2
-        induction h2 with cases e
-        | sym h1 h2 => exact ⟨_, _, .refl, h1, h2⟩
-        | eps h1 _ ih =>
-          have ⟨s₁, s₂, h3, h4, h5⟩ := ih rfl
-          exact ⟨_, _, .head h1 h3, h4, h5⟩
-      exact ⟨_, ⟨_, ⟨_, h1, h3⟩, h4⟩, h5⟩
+theorem EpsilonNFA.eval_from_iff
+  {α : Type}
+  {σ : Type}
+  [DecidableEq α]
+  [DecidableEq σ]
+  (M : EpsilonNFA α σ)
+  {S : List σ}
+  {input : List α} :
+  (∃ s ∈ M.eval_from S input, s ∈ M.accepting_state_list) ↔
+    (∃ s ∈ S, M.toAbstract.eval s input) :=
+  by
+    induction input generalizing S with simp
+    | nil =>
+      simp [epsilon_closure_iff]
+      constructor
+      · intro ⟨s, ⟨s', h1, h2⟩, h3⟩
+        refine ⟨_, h1, ?_⟩
+        clear h1
+        induction h2 using Relation.ReflTransGen.head_induction_on with
+        | refl => exact .accept h3
+        | head h _ ih => exact .eps h ih
+      · intro ⟨s, h1, h2⟩
+        obtain ⟨s', h3, h4⟩ : ∃ s', M.toAbstract.EpsilonClosure s s' ∧ s' ∈ M.accepting_state_list := by
+          clear h1; generalize e : [] = l at h2
+          induction h2 with cases e
+          | accept h' => exact ⟨_, .refl, h'⟩
+          | eps h1 _ ih =>
+            have ⟨s', h3, h4⟩ := ih rfl
+            exact ⟨_, .head h1 h3, h4⟩
+        exact ⟨_, ⟨_, h1, h3⟩, h4⟩
+    | cons a as IH =>
+      simp [IH, epsilon_closure_iff, eval_one_no_eps_iff]
+      constructor
+      · intro ⟨s₁, ⟨s₂, ⟨s₃, h1, h2⟩, h3⟩, h4⟩
+        refine ⟨_, h1, ?_⟩
+        clear h1
+        induction h2 using Relation.ReflTransGen.head_induction_on with
+        | refl => exact .sym h3 h4
+        | head h _ ih => exact .eps h ih
+      · intro ⟨s, h1, h2⟩
+        obtain ⟨s₁, s₂, h3, h4, h5⟩ :
+            ∃ s₁ s₂, M.toAbstract.EpsilonClosure s s₂ ∧
+              M.toAbstract.symbol s₂ a s₁ ∧ M.toAbstract.eval s₁ as := by
+          clear h1; generalize e : a::as = l at h2
+          induction h2 with cases e
+          | sym h1 h2 => exact ⟨_, _, .refl, h1, h2⟩
+          | eps h1 _ ih =>
+            have ⟨s₁, s₂, h3, h4, h5⟩ := ih rfl
+            exact ⟨_, _, .head h1 h3, h4, h5⟩
+        exact ⟨_, ⟨_, ⟨_, h1, h3⟩, h4⟩, h5⟩
 
 
-theorem EpsilonNFA.accepts_iff {α σ} [DecidableEq α] [DecidableEq σ]
-    (M : EpsilonNFA α σ) {input} : M.accepts input ↔ M.toAbstract.accepts input := by
-  simp [accepts, eval]; rw [EpsilonNFA.eval_from_iff]; rfl
+theorem EpsilonNFA.accepts_iff
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : EpsilonNFA α σ)
+  {input} :
+  e.accepts input ↔ e.toAbstract.accepts input :=
+  by
+    simp [accepts, eval]
+    rw [EpsilonNFA.eval_from_iff]
+    rfl
 
 
-
-
-
+-------------------------------------------------------------------------------
 
 
 def EpsilonNFA.map
