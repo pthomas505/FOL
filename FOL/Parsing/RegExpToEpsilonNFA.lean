@@ -177,8 +177,10 @@ example
   (x : α) :
   (match_char_EpsilonNFA c).accepts [x] ↔ c = x :=
   by
-    rw [EpsilonNFA.accepts_iff, match_char_EpsilonNFA_toAbstract]
-    simp [AbstractEpsilonNFA.accepts]
+    simp only [EpsilonNFA.accepts_iff]
+    simp only [match_char_EpsilonNFA_toAbstract]
+    simp only [AbstractEpsilonNFA.accepts]
+    simp
     constructor
     · intro | .sym ⟨rfl, e, rfl⟩ _ => exact e.symm
     · exact fun h => .sym ⟨rfl, h.symm, rfl⟩ (.accept rfl)
