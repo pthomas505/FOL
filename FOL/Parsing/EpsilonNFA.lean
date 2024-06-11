@@ -96,6 +96,34 @@ example : symbol_arrow_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'a', [1]⟩] 0 'a' 
 example : symbol_arrow_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩] 0 'a' = [1, 2] := by rfl
 
 
+def EpsilonNFA.eval_one_no_eps
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : EpsilonNFA α σ)
+  (starting_state_list : List σ)
+  (symbol : α) :
+  List σ :=
+  (starting_state_list.map (fun (state : σ) => (symbol_arrow_list_to_fun e.symbol_arrow_list) state symbol)).join.dedup
+
+
+theorem EpsilonNFA.eval_one_no_eps_def
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : EpsilonNFA α σ)
+  (starting_state_list : List σ)
+  (symbol : α)
+  {stop_state : σ} :
+  stop_state ∈ e.eval_one_no_eps starting_state_list symbol ↔
+    (∃ (state : σ), state ∈ starting_state_list ∧ stop_state ∈ symbol_arrow_list_to_fun e.symbol_arrow_list state symbol) :=
+  by
+    simp only [eval_one_no_eps]
+    simp
+
+
 /--
   `EpsilonNFA.eval_one e xs c` := The list of states that the nondeterministic automaton `e` transitions to if it starts at the list of states `xs` and reads the symbol `c`.
 -/
@@ -105,10 +133,10 @@ def EpsilonNFA.eval_one
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
-  (state_list : List σ)
+  (starting_state_list : List σ)
   (symbol : α) :
   List σ :=
-  e.epsilon_closure (state_list.map (fun (state : σ) => (symbol_arrow_list_to_fun e.symbol_arrow_list) state symbol)).join.dedup
+  e.epsilon_closure (starting_state_list.map (fun (state : σ) => (symbol_arrow_list_to_fun e.symbol_arrow_list) state symbol)).join.dedup
 
 
 /--
@@ -124,6 +152,32 @@ def EpsilonNFA.eval_from
   (input : List α) :
   List σ :=
   List.foldl e.eval_one (e.epsilon_closure starting_state_list) input
+
+
+@[simp]
+theorem EpsilonNFA.eval_from_on_nil
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : EpsilonNFA α σ)
+  (starting_state_list : List σ) :
+  e.eval_from starting_state_list [] =
+    e.epsilon_closure starting_state_list := rfl
+
+
+@[simp]
+theorem EpsilonNFA.eval_from_on_cons
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : EpsilonNFA α σ)
+  (starting_state_list : List σ)
+  (c : α)
+  (cs : List α) :
+    e.eval_from starting_state_list (c :: cs) =
+      e.eval_from (e.eval_one_no_eps (e.epsilon_closure starting_state_list) c) cs := rfl
 
 
 /--
@@ -275,34 +329,6 @@ def EpsilonNFA.toAbstract
   }
 
 
-def EpsilonNFA.eval_one_no_eps
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (e : EpsilonNFA α σ)
-  (state_list : List σ)
-  (symbol : α) :
-  List σ :=
-  (state_list.map (fun (state : σ) => (symbol_arrow_list_to_fun e.symbol_arrow_list) state symbol)).join.dedup
-
-
-theorem EpsilonNFA.eval_one_no_eps_def
-  {α : Type}
-  [DecidableEq α]
-  {σ : Type}
-  [DecidableEq σ]
-  (e : EpsilonNFA α σ)
-  (state_list : List σ)
-  (symbol : α)
-  {stop_state : σ} :
-  stop_state ∈ e.eval_one_no_eps state_list symbol ↔
-    (∃ (state : σ), state ∈ state_list ∧ stop_state ∈ symbol_arrow_list_to_fun e.symbol_arrow_list state symbol) :=
-  by
-    simp only [eval_one_no_eps]
-    simp
-
-
 theorem EpsilonNFA.eval_one_no_eps_iff
   {α : Type}
   [DecidableEq α]
@@ -320,19 +346,6 @@ theorem EpsilonNFA.eval_one_no_eps_iff
       exact ⟨_, h1, _, h2, h3⟩
     · rintro ⟨_, h1, _, h2, h3⟩
       exact ⟨_, h1, _, ⟨_, h2, ⟨rfl, rfl⟩, rfl⟩, h3⟩
-
-
-@[simp]
-theorem EpsilonNFA.eval_from_nil
-  {α : Type} [DecidableEq α] {σ : Type} [DecidableEq σ]
-  (e : EpsilonNFA α σ) (S : List σ) :
-  e.eval_from S [] = e.epsilon_closure S := rfl
-
-@[simp]
-theorem EpsilonNFA.eval_from_cons
-  {α : Type} [DecidableEq α] {σ : Type} [DecidableEq σ]
-  (e : EpsilonNFA α σ) (S : List σ) (a as) :
-  e.eval_from S (a :: as) = e.eval_from (e.eval_one_no_eps (e.epsilon_closure S) a) as := rfl
 
 
 abbrev AbstractEpsilonNFA.EpsilonClosure {α σ} (M : AbstractEpsilonNFA α σ) :=
