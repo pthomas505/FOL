@@ -161,9 +161,13 @@ theorem match_char_EpsilonNFA_toAbstract
       epsilon := fun _ _ => False
       start := fun s => s = 0
       accepting := fun s => s = 1
-    } := by
-  simp [EpsilonNFA.toAbstract]
-  simp_rw [← and_assoc, and_right_comm]; simp
+    } :=
+  by
+    simp only [EpsilonNFA.toAbstract]
+    simp
+    simp only [← and_assoc]
+    simp only [and_right_comm]
+    simp
 
 
 example
