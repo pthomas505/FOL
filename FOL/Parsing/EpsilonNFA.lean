@@ -290,13 +290,15 @@ def EpsilonNFA.toAbstract
   `AbstractEpsilonNFA.eval e x cs` : True if and only if the state that the nondeterministic automaton `e` transitions to if it starts at the state `x` and reads the list of symbols `cs` is an accepting state.
 -/
 inductive AbstractEpsilonNFA.eval
-  {α σ : Type}
+  {α : Type}
+  {σ : Type}
   (e : AbstractEpsilonNFA α σ) :
   σ → List α → Prop
 
   | eps
-    {start_state stop_state : σ}
-    {input : List α} :
+    (start_state : σ)
+    (stop_state : σ)
+    (input : List α) :
     -- There is an epsilon transition from `start_state` to `stop_state`.
     e.epsilon start_state stop_state →
 
@@ -307,9 +309,10 @@ inductive AbstractEpsilonNFA.eval
     eval e start_state input
 
   | sym
-    {start_state stop_state : σ}
-    {c : α}
-    {cs : List α} :
+    (start_state : σ)
+    (stop_state : σ)
+    (c : α)
+    (cs : List α) :
     -- There is a symbol transition from `start_state` to `stop_state` on `c`.
     e.symbol start_state c stop_state →
 
@@ -320,7 +323,7 @@ inductive AbstractEpsilonNFA.eval
     eval e start_state (c :: cs)
 
   | accept
-    {start_state : σ} :
+    (start_state : σ) :
     -- `start_state` is an accepting state.
     e.accepting start_state →
 
@@ -407,14 +410,14 @@ theorem EpsilonNFA.eval_from_iff
         refine ⟨_, h1, ?_⟩
         clear h1
         induction h2 using Relation.ReflTransGen.head_induction_on with
-        | refl => exact .accept h3
-        | head h _ ih => exact .eps h ih
+        | refl => exact .accept _ h3
+        | head h _ ih => exact .eps _ _ _ h ih
       · intro ⟨s, h1, h2⟩
         obtain ⟨s', h3, h4⟩ : ∃ s', M.toAbstract.EpsilonClosure s s' ∧ s' ∈ M.accepting_state_list := by
           clear h1; generalize e : [] = l at h2
           induction h2 with cases e
-          | accept h' => exact ⟨_, .refl, h'⟩
-          | eps h1 _ ih =>
+          | accept _ h' => exact ⟨_, .refl, h'⟩
+          | eps _ _ _ h1 _ ih =>
             have ⟨s', h3, h4⟩ := ih rfl
             exact ⟨_, .head h1 h3, h4⟩
         exact ⟨_, ⟨_, h1, h3⟩, h4⟩
@@ -425,16 +428,16 @@ theorem EpsilonNFA.eval_from_iff
         refine ⟨_, h1, ?_⟩
         clear h1
         induction h2 using Relation.ReflTransGen.head_induction_on with
-        | refl => exact .sym h3 h4
-        | head h _ ih => exact .eps h ih
+        | refl => {apply AbstractEpsilonNFA.eval.sym _ _ _ _ h3 h4;  }
+        | head h _ ih => exact .eps _ _ _ h ih
       · intro ⟨s, h1, h2⟩
         obtain ⟨s₁, s₂, h3, h4, h5⟩ :
             ∃ s₁ s₂, M.toAbstract.EpsilonClosure s s₂ ∧
               M.toAbstract.symbol s₂ a s₁ ∧ M.toAbstract.eval s₁ as := by
           clear h1; generalize e : a::as = l at h2
           induction h2 with cases e
-          | sym h1 h2 => exact ⟨_, _, .refl, h1, h2⟩
-          | eps h1 _ ih =>
+          | sym _ _ _ _ h1 h2 => exact ⟨_, _, .refl, h1, h2⟩
+          | eps _ _ _ h1 _ ih =>
             have ⟨s₁, s₂, h3, h4, h5⟩ := ih rfl
             exact ⟨_, _, .head h1 h3, h4, h5⟩
         exact ⟨_, ⟨_, ⟨_, h1, h3⟩, h4⟩, h5⟩
