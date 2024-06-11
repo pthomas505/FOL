@@ -262,6 +262,30 @@ structure AbstractEpsilonNFA
   (accepting : σ → Prop)
 
 
+def EpsilonNFA.toAbstract
+  {α : Type}
+  {σ : Type}
+  (e : EpsilonNFA α σ) :
+  AbstractEpsilonNFA α σ :=
+  {
+    symbol :=
+      fun (start_state : σ) (symbol : α) (stop_state : σ) =>
+        ∃ (stop_state_list : List σ),
+            ⟨start_state, symbol, stop_state_list⟩ ∈ e.symbol_arrow_list ∧
+            stop_state ∈ stop_state_list,
+
+    epsilon :=
+      fun (start_state : σ) (stop_state : σ) =>
+        ∃ (stop_state_list : List σ),
+          ⟨start_state, stop_state_list⟩ ∈ e.epsilon_arrow_list ∧
+          stop_state ∈ stop_state_list,
+
+    start := fun (state : σ) => state ∈ e.starting_state_list,
+
+    accepting := fun (state : σ) => state ∈ e.accepting_state_list
+  }
+
+
 /--
   `AbstractEpsilonNFA.eval e x cs` : True if and only if the state that the nondeterministic automaton `e` transitions to if it starts at the state `x` and reads the list of symbols `cs` is an accepting state.
 -/
@@ -308,25 +332,9 @@ def AbstractEpsilonNFA.accepts
   {α : Type}
   {σ : Type}
   (e : AbstractEpsilonNFA α σ)
-  (cs : List α) :
+  (input : List α) :
   Prop :=
-  ∃ (s : σ), e.start s ∧ e.eval s cs
-
-
-def EpsilonNFA.toAbstract
-  {α : Type}
-  {σ : Type}
-  (e : EpsilonNFA α σ) :
-  AbstractEpsilonNFA α σ :=
-  {
-    symbol := fun (start_state : σ) (symbol : α) (stop_state : σ) => ∃ (stop_state_list : List σ), ⟨start_state, symbol, stop_state_list⟩ ∈ e.symbol_arrow_list ∧ stop_state ∈ stop_state_list,
-
-    epsilon := fun (start_state : σ) (stop_state : σ) => ∃ (stop_state_list : List σ), ⟨start_state, stop_state_list⟩ ∈ e.epsilon_arrow_list ∧ stop_state ∈ stop_state_list,
-
-    start := fun (state : σ) => state ∈ e.starting_state_list,
-
-    accepting := fun (state : σ) => state ∈ e.accepting_state_list
-  }
+  ∃ (start_state : σ), e.start start_state ∧ e.eval start_state input
 
 
 theorem EpsilonNFA.eval_one_no_eps_iff
@@ -335,12 +343,16 @@ theorem EpsilonNFA.eval_one_no_eps_iff
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
-  {S : List σ}
-  {s' : σ}
-  {a : α} :
-  s' ∈ e.eval_one_no_eps S a ↔ (∃ s ∈ S, e.toAbstract.symbol s a s') :=
+  {starting_state_list : List σ}
+  {symbol : α}
+  {stop_state : σ} :
+  stop_state ∈ e.eval_one_no_eps starting_state_list symbol ↔
+    (∃ (state : σ), state ∈ starting_state_list ∧ e.toAbstract.symbol state symbol stop_state) :=
   by
-    simp [eval_one_no_eps, toAbstract, symbol_arrow_list_to_fun]
+    simp only [EpsilonNFA.eval_one_no_eps]
+    simp only [EpsilonNFA.toAbstract]
+    simp only [symbol_arrow_list_to_fun]
+    simp
     constructor
     · rintro ⟨_, h1, _, ⟨⟨⟩, h2, ⟨rfl, rfl⟩, rfl⟩, h3⟩
       exact ⟨_, h1, _, h2, h3⟩
@@ -348,20 +360,32 @@ theorem EpsilonNFA.eval_one_no_eps_iff
       exact ⟨_, h1, _, ⟨_, h2, ⟨rfl, rfl⟩, rfl⟩, h3⟩
 
 
-abbrev AbstractEpsilonNFA.EpsilonClosure {α σ} (M : AbstractEpsilonNFA α σ) :=
-  Relation.ReflTransGen M.epsilon
+abbrev AbstractEpsilonNFA.EpsilonClosure
+  {α : Type}
+  {σ : Type}
+  (e : AbstractEpsilonNFA α σ) :
+  σ → σ → Prop :=
+  Relation.ReflTransGen e.epsilon
 
 
 theorem EpsilonNFA.epsilon_closure_iff
-  {α : Type} [DecidableEq α] {σ : Type} [DecidableEq σ]
-  (e : EpsilonNFA α σ) {S s'} :
-  s' ∈ e.epsilon_closure S ↔ ∃ s ∈ S, e.toAbstract.EpsilonClosure s s' := by
-  simp [epsilon_closure, dft_iff]
-  congr! with a b c
-  simp [toAbstract]
-  induction e.epsilon_arrow_list <;> simp [*, epsilon_arrow_list_to_graph, or_and_right, exists_or]
-  apply or_congr_left <| exists_congr fun a => and_congr_left fun _ => ?_
-  constructor <;> [rintro ⟨rfl, rfl⟩; rintro rfl] <;> [rfl; constructor <;> rfl]
+  {α : Type}
+  [DecidableEq α]
+  {σ : Type}
+  [DecidableEq σ]
+  (e : EpsilonNFA α σ)
+  {starting_state_list : List σ}
+  {state : σ} :
+  state ∈ e.epsilon_closure starting_state_list ↔
+    ∃ (start_state : σ), start_state ∈ starting_state_list ∧ e.toAbstract.EpsilonClosure start_state state :=
+  by
+    simp only [epsilon_closure]
+    simp only [dft_iff]
+    congr! with a b c
+    simp [toAbstract]
+    induction e.epsilon_arrow_list <;> simp [*, epsilon_arrow_list_to_graph, or_and_right, exists_or]
+    apply or_congr_left <| exists_congr fun a => and_congr_left fun _ => ?_
+    constructor <;> [rintro ⟨rfl, rfl⟩; rintro rfl] <;> [rfl; constructor <;> rfl]
 
 
 theorem EpsilonNFA.eval_from_iff {α σ} [DecidableEq α] [DecidableEq σ]
