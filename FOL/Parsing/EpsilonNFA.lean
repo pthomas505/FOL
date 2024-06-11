@@ -346,9 +346,9 @@ theorem EpsilonNFA.eval_one_no_eps_iff
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
-  {starting_state_list : List σ}
-  {symbol : α}
-  {stop_state : σ} :
+  (starting_state_list : List σ)
+  (symbol : α)
+  (stop_state : σ) :
   stop_state ∈ e.eval_one_no_eps starting_state_list symbol ↔
     (∃ (state : σ), state ∈ starting_state_list ∧ e.toAbstract.symbol state symbol stop_state) :=
   by
@@ -377,8 +377,8 @@ theorem EpsilonNFA.epsilon_closure_iff
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
-  {starting_state_list : List σ}
-  {state : σ} :
+  (starting_state_list : List σ)
+  (state : σ) :
   state ∈ e.epsilon_closure starting_state_list ↔
     ∃ (start_state : σ), start_state ∈ starting_state_list ∧ e.toAbstract.EpsilonClosure start_state state :=
   by
@@ -397,8 +397,8 @@ theorem EpsilonNFA.eval_from_iff
   [DecidableEq α]
   [DecidableEq σ]
   (M : EpsilonNFA α σ)
-  {S : List σ}
-  {input : List α} :
+  (S : List σ)
+  (input : List α) :
   (∃ s ∈ M.eval_from S input, s ∈ M.accepting_state_list) ↔
     (∃ s ∈ S, M.toAbstract.eval s input) :=
   by
@@ -449,7 +449,7 @@ theorem EpsilonNFA.accepts_iff
   {σ : Type}
   [DecidableEq σ]
   (e : EpsilonNFA α σ)
-  {input} :
+  (input) :
   e.accepts input ↔ e.toAbstract.accepts input :=
   by
     simp [accepts, eval]

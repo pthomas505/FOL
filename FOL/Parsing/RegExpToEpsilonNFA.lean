@@ -169,8 +169,20 @@ example
     simp only [AbstractEpsilonNFA.accepts]
     simp
     constructor
-    · intro | .sym ⟨rfl, e, rfl⟩ _ => exact e.symm
-    · exact fun h => .sym ⟨rfl, h.symm, rfl⟩ (.accept rfl)
+    · intro a1
+      cases a1
+      case _ start_state ih_1 ih_2 =>
+        simp only at ih_1
+      case _ stop_state ih_1 ih_2 =>
+        simp only at ih_1
+        tauto
+    · intro a1
+      apply AbstractEpsilonNFA.eval.sym 0 1
+      · simp only
+        simp only [a1]
+        simp
+      · apply AbstractEpsilonNFA.eval.accept
+        simp only
 
 
 example
