@@ -39,6 +39,13 @@ def epsilon_arrow_list_to_graph
   | [] => []
   | (hd :: tl) => (hd.start_state, hd.stop_state_list) :: epsilon_arrow_list_to_graph tl
 
+/-
+def epsilon_arrow_list_to_graph
+  {σ : Type}
+  (xs : List (EpsilonArrow σ)) :
+  Graph σ :=
+  xs.map (fun (x : EpsilonArrow σ) => (x.start_state, x.stop_state_list))
+-/
 
 def EpsilonNFA.epsilon_closure
   {α : Type}
@@ -90,7 +97,7 @@ example : symbol_arrow_list_to_fun [⟨0, 'a', [1]⟩, ⟨0, 'a', [1]⟩, ⟨0, 
 
 
 /--
-  `EpsilonNFA.eval_one e xs c` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the state list `xs` and consumes the symbol `c`.
+  `EpsilonNFA.eval_one e xs c` := The list of states that the nondeterministic automaton `e` transitions to if it starts at the list of states `xs` and reads the symbol `c`.
 -/
 def EpsilonNFA.eval_one
   {α : Type}
@@ -105,7 +112,7 @@ def EpsilonNFA.eval_one
 
 
 /--
-  `EpsilonNFA.eval_from e xs cs` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the state list `xs` and consumes the list of symbols `cs`.
+  `EpsilonNFA.eval_from e xs cs` := The list of states that the nondeterministic automaton `e` transitions to if it starts at the list of states `xs` and reads the list of symbols `cs`.
 -/
 def EpsilonNFA.eval_from
   {α : Type}
@@ -120,7 +127,7 @@ def EpsilonNFA.eval_from
 
 
 /--
-  `EpsilonNFA.eval e cs` := Returns the list of states that the nondeterministic automaton `e` transitions to if it starts at the state list `e.starting_state_list` and consumes the list of symbols `cs`.
+  `EpsilonNFA.eval e cs` := The list of states that the nondeterministic automaton `e` transitions to if it starts at the list of states `e.starting_state_list` and reads the list of symbols `cs`.
 -/
 def EpsilonNFA.eval
   {α : Type}
@@ -134,7 +141,7 @@ def EpsilonNFA.eval
 
 
 /--
-  `EpsilonNFA.accepts e cs` := True if and only if one of the states that the nondeterministic automaton `e` transitions to if it starts at the state list `e.starting_state_list` and consumes the list of symbols `cs` is an accepting state.
+  `EpsilonNFA.accepts e cs` := True if and only if at least one of the states that the nondeterministic automaton `e` transitions to if it starts at the list of states `e.starting_state_list` and reads the list of symbols `cs` is an accepting state.
 -/
 def EpsilonNFA.accepts
   {α : Type}
