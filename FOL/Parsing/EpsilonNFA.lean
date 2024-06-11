@@ -297,9 +297,10 @@ theorem EpsilonNFA.eval_one_no_eps_def
   (symbol : α)
   {stop_state : σ} :
   stop_state ∈ e.eval_one_no_eps state_list symbol ↔
-  (∃ start_state ∈ state_list, stop_state ∈ symbol_arrow_list_to_fun e.symbol_arrow_list start_state symbol) :=
+    (∃ (state : σ), state ∈ state_list ∧ stop_state ∈ symbol_arrow_list_to_fun e.symbol_arrow_list state symbol) :=
   by
-    simp [eval_one_no_eps]
+    simp only [eval_one_no_eps]
+    simp
 
 
 theorem EpsilonNFA.eval_one_no_eps_iff
