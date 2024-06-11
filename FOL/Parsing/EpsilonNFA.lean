@@ -209,54 +209,54 @@ structure AbstractEpsilonNFA
 
 
 /--
-  `AbstractEpsilonNFA.Eval M start_state input` : True if and only if beginning from `start_state` and evaluating `M` on `input` results in an accepted state.
+  `AbstractEpsilonNFA.eval e x cs` : True if and only if the state that the nondeterministic automaton `e` transitions to if it starts at the state `x` and reads the list of symbols `cs` is an accepting state.
 -/
-inductive AbstractEpsilonNFA.Eval
+inductive AbstractEpsilonNFA.eval
   {α σ : Type}
-  (M : AbstractEpsilonNFA α σ) :
+  (e : AbstractEpsilonNFA α σ) :
   σ → List α → Prop
 
   | eps
     {start_state stop_state : σ}
     {input : List α} :
     -- There is an epsilon transition from `start_state` to `stop_state`.
-    M.epsilon start_state stop_state →
+    e.epsilon start_state stop_state →
 
-    -- Beginning from `stop_state` and evaluating `M` on `input` results in an accepted state.
-    Eval M stop_state input →
+    -- Beginning from `stop_state` and evaluating `e` on `input` results in an accepting state.
+    eval e stop_state input →
 
-    -- Beginning from `start_state` and evaluating `M` on `input` results in an accepted state.
-    Eval M start_state input
+    -- Beginning from `start_state` and evaluating `e` on `input` results in an accepting state.
+    eval e start_state input
 
   | sym
     {start_state stop_state : σ}
     {c : α}
     {cs : List α} :
     -- There is a symbol transition from `start_state` to `stop_state` on `c`.
-    M.symbol start_state c stop_state →
+    e.symbol start_state c stop_state →
 
-    -- Beginning from `stop_state` and evaluating `M` on `cs` results in an accepted state.
-    Eval M stop_state cs →
+    -- Beginning from `stop_state` and evaluating `e` on `cs` results in an accepting state.
+    eval e stop_state cs →
 
-    -- Beginning from `start_state` and evaluating `M` on `c :: cs` results in an accepted state.
-    Eval M start_state (c :: cs)
+    -- Beginning from `start_state` and evaluating `e` on `c :: cs` results in an accepting state.
+    eval e start_state (c :: cs)
 
   | accept
     {start_state : σ} :
-    -- `start_state` is an accepted state.
-    M.accepting start_state →
+    -- `start_state` is an accepting state.
+    e.accepting start_state →
 
-    -- Beginning from `start_state` and evaluating `M` on the empty string results in an accepted state.
-    Eval M start_state []
+    -- Beginning from `start_state` and evaluating `e` on an empty list of symbols results in an accepting state.
+    eval e start_state []
 
 
-def AbstractEpsilonNFA.Accepts
+def AbstractEpsilonNFA.accepts
   {α : Type}
   {σ : Type}
-  (M : AbstractEpsilonNFA α σ)
+  (e : AbstractEpsilonNFA α σ)
   (cs : List α) :
   Prop :=
-  ∃ (s : σ), M.start s ∧ M.Eval s cs
+  ∃ (s : σ), e.start s ∧ e.eval s cs
 
 
 def EpsilonNFA.toAbstract
@@ -353,7 +353,7 @@ theorem EpsilonNFA.epsilon_closure_iff
 theorem EpsilonNFA.eval_from_iff {α σ} [DecidableEq α] [DecidableEq σ]
     (M : EpsilonNFA α σ) {S input} :
     (∃ s ∈ M.eval_from S input, s ∈ M.accepting_state_list) ↔
-    (∃ s ∈ S, M.toAbstract.Eval s input) := by
+    (∃ s ∈ S, M.toAbstract.eval s input) := by
   induction input generalizing S with simp
   | nil =>
     simp [epsilon_closure_iff]
@@ -385,7 +385,7 @@ theorem EpsilonNFA.eval_from_iff {α σ} [DecidableEq α] [DecidableEq σ]
     · intro ⟨s, h1, h2⟩
       obtain ⟨s₁, s₂, h3, h4, h5⟩ :
           ∃ s₁ s₂, M.toAbstract.EpsilonClosure s s₂ ∧
-            M.toAbstract.symbol s₂ a s₁ ∧ M.toAbstract.Eval s₁ as := by
+            M.toAbstract.symbol s₂ a s₁ ∧ M.toAbstract.eval s₁ as := by
         clear h1; generalize e : a::as = l at h2
         induction h2 with cases e
         | sym h1 h2 => exact ⟨_, _, .refl, h1, h2⟩
@@ -396,7 +396,7 @@ theorem EpsilonNFA.eval_from_iff {α σ} [DecidableEq α] [DecidableEq σ]
 
 
 theorem EpsilonNFA.accepts_iff {α σ} [DecidableEq α] [DecidableEq σ]
-    (M : EpsilonNFA α σ) {input} : M.accepts input ↔ M.toAbstract.Accepts input := by
+    (M : EpsilonNFA α σ) {input} : M.accepts input ↔ M.toAbstract.accepts input := by
   simp [accepts, eval]; rw [EpsilonNFA.eval_from_iff]; rfl
 
 
