@@ -23,19 +23,6 @@ def EpsilonNFA.wrapRight
     e.map Sum.inr
 
 
-example
-  (α : Type)
-  [DecidableEq α]
-  (σ_l σ_r : Type)
-  [DecidableEq σ_l]
-  [DecidableEq σ_r]
-  (e : EpsilonNFA α σ_l)
-  (xs : List α) :
-  e.accepts xs ↔ (e.wrapLeft σ_r).accepts xs :=
-  by
-    sorry
-
-
 @[reducible]
 def RegExp.State
   (α : Type) :
