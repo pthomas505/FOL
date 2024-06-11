@@ -192,14 +192,27 @@ example
   (x y : α) :
   ¬ (match_char_EpsilonNFA c).accepts [x, y] :=
   by
-    by_cases c1 : c = x
-    case pos =>
-      simp only [c1]
-      simp
-      sorry
-    case neg =>
-      simp
-      sorry
+    simp only [EpsilonNFA.accepts_iff]
+    simp only [match_char_EpsilonNFA_toAbstract]
+    simp only [AbstractEpsilonNFA.accepts]
+    simp
+    intro contra
+    cases contra
+    case eps stop_state ih_1 ih_2 =>
+      simp only at ih_1
+    case sym start_state stop_state ih_1 ih_2 =>
+      simp only at ih_1
+      simp at ih_1
+      cases ih_1
+      case _ ih_1_left ih_1_right =>
+        subst ih_1_left
+        subst ih_1_right
+        cases ih_2
+        case eps stop_state ih_1 ih_2 =>
+          simp only at ih_1
+        case sym stop_state ih_1 ih_2 =>
+          simp only at ih_1
+          simp at ih_1
 
 
 def match_epsilon_EpsilonNFA
