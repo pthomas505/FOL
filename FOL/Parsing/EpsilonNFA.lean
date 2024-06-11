@@ -275,7 +275,7 @@ def EpsilonNFA.toAbstract
   }
 
 
-def EpsilonNFA.eval_one'
+def EpsilonNFA.eval_one_no_eps
   {α : Type}
   [DecidableEq α]
   {σ : Type}
@@ -287,7 +287,7 @@ def EpsilonNFA.eval_one'
   (state_list.map (fun (state : σ) => (symbol_arrow_list_to_fun e.symbol_arrow_list) state symbol)).join.dedup
 
 
-theorem EpsilonNFA.eval_one'_def
+theorem EpsilonNFA.eval_one_no_eps_def
   {α : Type}
   [DecidableEq α]
   {σ : Type}
@@ -296,13 +296,13 @@ theorem EpsilonNFA.eval_one'_def
   (state_list : List σ)
   (symbol : α)
   {stop_state : σ} :
-  stop_state ∈ e.eval_one' state_list symbol ↔
+  stop_state ∈ e.eval_one_no_eps state_list symbol ↔
   (∃ start_state ∈ state_list, stop_state ∈ symbol_arrow_list_to_fun e.symbol_arrow_list start_state symbol) :=
   by
-    simp [eval_one']
+    simp [eval_one_no_eps]
 
 
-theorem EpsilonNFA.eval_one'_iff
+theorem EpsilonNFA.eval_one_no_eps_iff
   {α : Type}
   [DecidableEq α]
   {σ : Type}
@@ -311,9 +311,9 @@ theorem EpsilonNFA.eval_one'_iff
   {S : List σ}
   {s' : σ}
   {a : α} :
-  s' ∈ e.eval_one' S a ↔ (∃ s ∈ S, e.toAbstract.symbol s a s') :=
+  s' ∈ e.eval_one_no_eps S a ↔ (∃ s ∈ S, e.toAbstract.symbol s a s') :=
   by
-    simp [eval_one', toAbstract, symbol_arrow_list_to_fun]
+    simp [eval_one_no_eps, toAbstract, symbol_arrow_list_to_fun]
     constructor
     · rintro ⟨_, h1, _, ⟨⟨⟩, h2, ⟨rfl, rfl⟩, rfl⟩, h3⟩
       exact ⟨_, h1, _, h2, h3⟩
@@ -331,7 +331,7 @@ theorem EpsilonNFA.eval_from_nil
 theorem EpsilonNFA.eval_from_cons
   {α : Type} [DecidableEq α] {σ : Type} [DecidableEq σ]
   (e : EpsilonNFA α σ) (S : List σ) (a as) :
-  e.eval_from S (a :: as) = e.eval_from (e.eval_one' (e.epsilon_closure S) a) as := rfl
+  e.eval_from S (a :: as) = e.eval_from (e.eval_one_no_eps (e.epsilon_closure S) a) as := rfl
 
 
 abbrev AbstractEpsilonNFA.EpsilonClosure {α σ} (M : AbstractEpsilonNFA α σ) :=
@@ -374,7 +374,7 @@ theorem EpsilonNFA.eval_from_iff {α σ} [DecidableEq α] [DecidableEq σ]
           exact ⟨_, .head h1 h3, h4⟩
       exact ⟨_, ⟨_, h1, h3⟩, h4⟩
   | cons a as IH =>
-    simp [IH, epsilon_closure_iff, eval_one'_iff]
+    simp [IH, epsilon_closure_iff, eval_one_no_eps_iff]
     constructor
     · intro ⟨s₁, ⟨s₂, ⟨s₃, h1, h2⟩, h3⟩, h4⟩
       refine ⟨_, h1, ?_⟩
