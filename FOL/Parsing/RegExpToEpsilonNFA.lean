@@ -47,7 +47,6 @@ def match_char_AbstractEpsilonNFA
       accepting := fun p => p = 1
     }
 
-
 theorem match_char_EpsilonNFA_toAbstract
   {α : Type}
   [DecidableEq α]
@@ -174,7 +173,6 @@ def match_epsilon_AbstractEpsilonNFA
     accepting := fun p => p = 1
   }
 
-
 theorem match_epsilon_EpsilonNFA_toAbstract
   {α : Type}
   [DecidableEq α] :
@@ -235,7 +233,6 @@ def match_zero_AbstractEpsilonNFA
     start := fun p => p = 0
     accepting := fun _ => False
   }
-
 
 theorem match_zero_EpsilonNFA_toAbstract
   {α : Type}
