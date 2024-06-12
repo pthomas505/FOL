@@ -97,7 +97,7 @@ example
   [DecidableEq α]
   (c : α)
   (x : α) :
-  (match_char_EpsilonNFA c).accepts [x] ↔ c = x :=
+  (match_char_EpsilonNFA c).accepts [x] ↔ x = c :=
   by
     simp only [EpsilonNFA.accepts_iff]
     simp only [match_char_EpsilonNFA_toAbstract]
@@ -107,7 +107,7 @@ example
     constructor
     · intro a1
       cases a1
-      case _ start_state ih_1 ih_2 =>
+      case _ stop_state ih_1 ih_2 =>
         simp only at ih_1
       case _ stop_state ih_1 ih_2 =>
         simp only at ih_1
@@ -137,7 +137,7 @@ example
     cases contra
     case eps stop_state ih_1 ih_2 =>
       simp only at ih_1
-    case sym start_state stop_state ih_1 ih_2 =>
+    case sym stop_state ih_1 ih_2 =>
       simp only at ih_1
       simp at ih_1
       cases ih_1
@@ -184,13 +184,15 @@ theorem match_epsilon_EpsilonNFA_toAbstract
     simp only [EpsilonNFA.toAbstract]
     simp only [match_epsilon_AbstractEpsilonNFA]
     simp
-    funext s s'
+    funext p q
     simp
     constructor
     · intro a1
+
       apply Exists.elim a1
-      intro xs a2
+      intro stop_state_list a2
       clear a1
+
       cases a2
       case _ a2_left a2_right =>
         cases a2_left
@@ -259,9 +261,9 @@ example
     simp
     intro contra
     cases contra
-    case eps s ih_1 ih_2 =>
+    case eps stop_state ih_1 ih_2 =>
       simp only at ih_1
-    case sym c m cs ih_1 ih_2 =>
+    case sym c stop_state cs ih_1 ih_2 =>
       simp only at ih_2
     case accept ih_1 =>
       simp only at ih_1
