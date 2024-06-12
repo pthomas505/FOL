@@ -80,10 +80,9 @@ def RegExp.toEpsilonNFA
     {
       symbol_arrow_list := R'.symbol_arrow_list ++ S'.symbol_arrow_list
 
-      epsilon_arrow_list := R'.accepting_state_list.map (fun (state) => ⟨ state, S'.starting_state_list ⟩)
+      epsilon_arrow_list := R'.epsilon_arrow_list ++ S'.epsilon_arrow_list ++ R'.accepting_state_list.map (fun (accepting_state) => ⟨ accepting_state, S'.starting_state_list ⟩)
 
       starting_state_list := R'.starting_state_list
-
       accepting_state_list := S'.accepting_state_list
     }
 
