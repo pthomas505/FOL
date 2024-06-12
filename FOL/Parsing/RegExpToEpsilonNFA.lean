@@ -309,6 +309,21 @@ def match_union_AbstractEpsilonNFA
         | Sum.inr p' => M_1.accepting p'
     }
 
+theorem match_union_EpsilonNFA_toAbstract
+  {α : Type}
+  [DecidableEq α]
+  (σ_0 σ_1 : Type)
+  (M_0 : EpsilonNFA α σ_0)
+  (M_1 : EpsilonNFA α σ_1) :
+  (match_union_EpsilonNFA α σ_0 σ_1 M_0 M_1).toAbstract =
+    match_union_AbstractEpsilonNFA α σ_0 σ_1 M_0.toAbstract M_1.toAbstract :=
+  by
+    simp only [match_union_EpsilonNFA]
+    simp only [EpsilonNFA.toAbstract]
+    simp only [match_union_AbstractEpsilonNFA]
+    simp
+    sorry
+
 -------------------------------------------------------------------------------
 
 def match_concat_EpsilonNFA
