@@ -227,6 +227,40 @@ def match_epsilon_EpsilonNFA
   }
 
 
+theorem match_epsilon_EpsilonNFA_toAbstract
+  {α : Type}
+  [DecidableEq α] :
+  (match_epsilon_EpsilonNFA α).toAbstract =
+    {
+      symbol := fun _ _ _ => False
+      epsilon := fun s s' => s = 0 ∧ s' = 1
+      start := fun s => s = 0
+      accepting := fun s => s = 1
+    } :=
+  by
+    simp only [EpsilonNFA.toAbstract]
+    simp only [match_epsilon_EpsilonNFA]
+    simp
+    funext s s'
+    simp
+    constructor
+    · intro a1
+      apply Exists.elim a1
+      intro xs a2
+      clear a1
+      cases a2
+      case _ a2_left a2_right =>
+        cases a2_left
+        case _ a2_left_left a2_left_right =>
+          simp only [a2_left_right] at a2_right
+          simp at a2_right
+          tauto
+    · intro a1
+      apply Exists.intro [1]
+      simp
+      exact a1
+
+
 example
   (α : Type)
   [DecidableEq α] :
