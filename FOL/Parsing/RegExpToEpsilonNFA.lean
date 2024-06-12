@@ -9,151 +9,23 @@ def EpsilonNFA.wrapLeft
   {α : Type}
   {σ_l : Type}
   (σ_r : Type)
-  (e : EpsilonNFA α σ_l) :
+  (M : EpsilonNFA α σ_l) :
   EpsilonNFA α (σ_l ⊕ σ_r) :=
-    e.map Sum.inl
+  M.map Sum.inl
 
 
 def EpsilonNFA.wrapRight
   {α : Type}
   (σ_l : Type)
   {σ_r : Type}
-  (e : EpsilonNFA α σ_r) :
+  (M : EpsilonNFA α σ_r) :
   EpsilonNFA α (σ_l ⊕ σ_r) :=
-    e.map Sum.inr
+  M.map Sum.inr
 
+-------------------------------------------------------------------------------
 
-@[reducible]
-def RegExp.State
-  (α : Type) :
-  RegExp α → Type
-| char _ => ℕ
-| epsilon => ℕ
-| zero => ℕ
-| union R S => ℕ ⊕ R.State ⊕ S.State
-| concat R S => R.State ⊕ S.State
-| closure R => Option R.State
-
-
-def RegExp.toEpsilonNFA
-  {α : Type}
-  (e : RegExp α) :
-  EpsilonNFA α e.State :=
-  match e with
-  | char c =>
-    {
-      symbol_arrow_list := [⟨0, c, [1]⟩]
-      epsilon_arrow_list := []
-      starting_state_list := [0]
-      accepting_state_list := [1]
-    }
-
-  | epsilon =>
-    {
-      symbol_arrow_list := []
-      epsilon_arrow_list := [⟨0, [1]⟩]
-      starting_state_list := [0]
-      accepting_state_list := [1]
-    }
-
-  | zero =>
-    {
-      symbol_arrow_list := []
-      epsilon_arrow_list := []
-      starting_state_list := [0]
-      accepting_state_list := []
-    }
-
-  | union R S =>
-    let R' := (R.toEpsilonNFA.wrapLeft S.State).wrapRight ℕ
-    let S' := (S.toEpsilonNFA.wrapRight R.State).wrapRight ℕ
-    {
-      symbol_arrow_list := R'.symbol_arrow_list ++ S'.symbol_arrow_list
-      epsilon_arrow_list := R'.epsilon_arrow_list ++ S'.epsilon_arrow_list
-      starting_state_list := R'.starting_state_list ++ S'.starting_state_list
-      accepting_state_list := R'.accepting_state_list ++ S'.accepting_state_list
-    }
-
-  | concat R S =>
-    let R' := R.toEpsilonNFA.wrapLeft S.State
-    let S' := S.toEpsilonNFA.wrapRight R.State
-    {
-      symbol_arrow_list := R'.symbol_arrow_list ++ S'.symbol_arrow_list
-
-      epsilon_arrow_list := R'.epsilon_arrow_list ++ S'.epsilon_arrow_list ++ R'.accepting_state_list.map (fun (accepting_state) => ⟨ accepting_state, S'.starting_state_list ⟩)
-
-      starting_state_list := R'.starting_state_list
-      accepting_state_list := S'.accepting_state_list
-    }
-
-  | closure R => sorry
-
-
-def RegExp.toAbstractEpsilonNFA
-  {α : Type}
-  (e : RegExp α) :
-  AbstractEpsilonNFA α e.State :=
-  match e with
-  | char c =>
-    {
-      symbol := fun s b s' => s = 0 ∧ b = c ∧ s' = 1
-      epsilon := fun _ _ => False
-      start := fun s => s = 0
-      accepting := fun s => s = 1
-    }
-
-  | epsilon =>
-    {
-      symbol := fun _ _ _ => False
-      epsilon := fun s s' => s = 0 ∧ s' = 1
-      start := fun s => s = 0
-      accepting := fun s => s = 1
-    }
-
-  | zero =>
-    {
-      symbol := fun _ _ _ => False
-      epsilon := fun _ _ => False
-      start := fun s => s = 0
-      accepting := fun _ => False
-    }
-
-  | union R S =>
-    let R' := R.toAbstractEpsilonNFA
-    let S' := S.toAbstractEpsilonNFA
-    {
-      symbol := fun p c q =>
-        match (p, q) with
-      | (Sum.inr (Sum.inl p), Sum.inr (Sum.inl q)) => R'.symbol p c q
-      | (Sum.inr (Sum.inr p), Sum.inr (Sum.inr q)) => S'.symbol p c q
-      | _ => False,
-      epsilon := fun p q =>
-        match (p, q) with
-      | (Sum.inr (Sum.inl p), Sum.inr (Sum.inl q)) => R'.epsilon p q
-      | (Sum.inr (Sum.inr p), Sum.inr (Sum.inr q)) => S'.epsilon p q
-      | _ => False,
-      start := fun (s : State α (R.union S)) =>
-        match s with
-        | Sum.inl 0 => True
-        | Sum.inr (Sum.inl q) => R'.start q
-        | Sum.inr (Sum.inr q) => S'.start q
-        | _ => False
-      accepting := fun s =>
-        match s with
-        | Sum.inr (Sum.inr q) => S'.accepting q
-        | _ => False
-    }
-
-  | concat R S => sorry
-
-  | closure R => sorry
-
-
-
-@[simp]
 def match_char_EpsilonNFA
   {α : Type}
-  [DecidableEq α]
   (c : α) :
   EpsilonNFA α ℕ :=
   {
@@ -162,6 +34,19 @@ def match_char_EpsilonNFA
     starting_state_list := [0]
     accepting_state_list := [1]
   }
+
+def match_char_AbstractEpsilonNFA
+  {α : Type}
+  [DecidableEq α]
+  (c : α) :
+  AbstractEpsilonNFA α ℕ :=
+    {
+      symbol := fun p a q => p = 0 ∧ a = c ∧ q = 1
+      epsilon := fun _ _ => False
+      start := fun p => p = 0
+      accepting := fun p => p = 1
+    }
+
 
 
 example : (match_char_EpsilonNFA 'a').eval [] = [0] := by rfl
@@ -177,7 +62,7 @@ example : ¬ (match_char_EpsilonNFA 'a').accepts [] :=
 
 example : (match_char_EpsilonNFA 'a').accepts ['a'] :=
   by
-    simp
+    simp only [match_char_EpsilonNFA]
     decide
 
 example : ¬ (match_char_EpsilonNFA 'a').accepts ['b'] :=
@@ -205,6 +90,7 @@ theorem match_char_EpsilonNFA_toAbstract
     } :=
   by
     simp only [EpsilonNFA.toAbstract]
+    simp only [match_char_EpsilonNFA]
     simp
     simp only [← and_assoc]
     simp only [and_right_comm]
@@ -268,16 +154,27 @@ example
           simp only at ih_1
           simp at ih_1
 
+-------------------------------------------------------------------------------
 
 def match_epsilon_EpsilonNFA
-  (α : Type)
-  [DecidableEq α] :
+  (α : Type) :
   EpsilonNFA α ℕ :=
   {
     symbol_arrow_list := []
     epsilon_arrow_list := [⟨0, [1]⟩]
     starting_state_list := [0]
     accepting_state_list := [1]
+  }
+
+def match_epsilon_AbstractEpsilonNFA
+  (α : Type)
+  [DecidableEq α] :
+  AbstractEpsilonNFA α ℕ :=
+  {
+    symbol := fun _ _ _ => False
+    epsilon := fun p q => p = 0 ∧ q = 1
+    start := fun p => p = 0
+    accepting := fun p => p = 1
   }
 
 
@@ -323,16 +220,26 @@ example
     apply Exists.intro 1
     tauto
 
+-------------------------------------------------------------------------------
 
 def match_zero_EpsilonNFA
-  (α : Type)
-  [DecidableEq α] :
+  (α : Type) :
   EpsilonNFA α ℕ :=
   {
     symbol_arrow_list := []
     epsilon_arrow_list := []
     starting_state_list := [0]
     accepting_state_list := []
+  }
+
+def match_zero_AbstractEpsilonNFA
+  (α : Type) :
+  AbstractEpsilonNFA α ℕ :=
+  {
+    symbol := fun _ _ _ => False
+    epsilon := fun _ _ => False
+    start := fun p => p = 0
+    accepting := fun _ => False
   }
 
 
@@ -371,44 +278,121 @@ example
     case accept ih_1 =>
       simp only at ih_1
 
+-------------------------------------------------------------------------------
 
 def match_union_EpsilonNFA
-  {α : Type}
-  [DecidableEq α]
-  {σ_0 σ_1 : Type}
-  [DecidableEq σ_0]
-  [DecidableEq σ_1]
-  (e1 : EpsilonNFA α σ_0)
-  (e2 : EpsilonNFA α σ_1) :
+  (α : Type)
+  (σ_0 σ_1 : Type)
+  (M_0 : EpsilonNFA α σ_0)
+  (M_1 : EpsilonNFA α σ_1) :
   EpsilonNFA α (σ_0 ⊕ σ_1) :=
-  -- The states of e1 need to be made disjoint from the states of e2. Therefore the states of e1 are made Sum.inl instances of (σ_0 ⊕ σ_1) and the states of e2 are made Sum.inr instances of (σ_0 ⊕ σ_1).
-  let e1' := e1.wrapLeft σ_1
-  let e2' := e2.wrapRight σ_0
+  let M_0' := M_0.wrapLeft σ_1
+  let M_1' := M_1.wrapRight σ_0
   {
-    symbol_arrow_list := e1'.symbol_arrow_list ++ e2'.symbol_arrow_list
-    epsilon_arrow_list := e1'.epsilon_arrow_list ++ e2'.epsilon_arrow_list
-    starting_state_list := e1'.starting_state_list ++ e2'.starting_state_list
-    accepting_state_list := e1'.accepting_state_list ++ e2'.accepting_state_list
+    symbol_arrow_list := M_0'.symbol_arrow_list ++ M_1'.symbol_arrow_list
+    epsilon_arrow_list := M_0'.epsilon_arrow_list ++ M_1'.epsilon_arrow_list
+    starting_state_list := M_0'.starting_state_list ++ M_1'.starting_state_list
+    accepting_state_list := M_0'.accepting_state_list ++ M_1'.accepting_state_list
   }
 
-
-example
+def match_union_AbstractEpsilonNFA
   (α : Type)
-  [DecidableEq α]
   (σ_0 σ_1 : Type)
-  [DecidableEq σ_0]
-  [DecidableEq σ_1]
-  (e1 : EpsilonNFA α σ_0)
-  (e2 : EpsilonNFA α σ_1)
-  (xs : List α)
-  (h1 : e1.accepts xs) :
-  (match_union_EpsilonNFA e1 e2).accepts xs :=
-  by
-    apply Exists.elim h1
-    intro s a1
-    clear h1
-    sorry
+  (M_0 : AbstractEpsilonNFA α σ_0)
+  (M_1 : AbstractEpsilonNFA α σ_1) :
+  AbstractEpsilonNFA α (σ_0 ⊕ σ_1) :=
+    {
+      symbol := fun p c q =>
+        match (p, q) with
+        | (Sum.inl p', Sum.inl q') => M_0.symbol p' c q'
+        | (Sum.inr p', Sum.inr q') => M_1.symbol p' c q'
+        | _ => False,
+      epsilon := fun p q =>
+        match (p, q) with
+        | (Sum.inl p', Sum.inl q') => M_0.epsilon p' q'
+        | (Sum.inr p', Sum.inr q') => M_1.epsilon p' q'
+        | _ => False,
+      start := fun p =>
+        match p with
+        | Sum.inl p' => M_0.start p'
+        | Sum.inr p' => M_1.start p'
+      accepting := fun p =>
+        match p with
+        | Sum.inl p' => M_0.accepting p'
+        | Sum.inr p' => M_1.accepting p'
+    }
 
+-------------------------------------------------------------------------------
+
+def match_concat_EpsilonNFA
+  (α : Type)
+  (σ_0 σ_1 : Type)
+  (M_0 : EpsilonNFA α σ_0)
+  (M_1 : EpsilonNFA α σ_1) :
+  EpsilonNFA α (ℕ ⊕ σ_0 ⊕ σ_1) :=
+  let M_0' := (M_0.wrapLeft σ_1).wrapRight ℕ
+  let M_1' := (M_1.wrapRight σ_0).wrapRight ℕ
+  {
+    symbol_arrow_list := M_0'.symbol_arrow_list ++ M_1'.symbol_arrow_list
+
+    epsilon_arrow_list := M_0'.epsilon_arrow_list ++ M_1'.epsilon_arrow_list ++ M_0'.accepting_state_list.map (fun (accepting_state) => ⟨ accepting_state, M_1'.starting_state_list ⟩)
+
+    starting_state_list := M_0'.starting_state_list
+    accepting_state_list := M_1'.accepting_state_list
+  }
+
+-------------------------------------------------------------------------------
+
+@[reducible]
+def RegExp.State
+  (α : Type) :
+  RegExp α → Type
+| char _ => ℕ
+| epsilon => ℕ
+| zero => ℕ
+| union R S => R.State ⊕ S.State
+| concat R S => (ℕ ⊕ R.State ⊕ S.State)
+| closure R => Option R.State
+
+
+def RegExp.toEpsilonNFA
+  {α : Type}
+  (E : RegExp α) :
+  EpsilonNFA α E.State :=
+  match E with
+  | char c => match_char_EpsilonNFA c
+
+  | epsilon => match_epsilon_EpsilonNFA α
+
+  | zero => match_zero_EpsilonNFA α
+
+  | union R S => match_union_EpsilonNFA α R.State S.State R.toEpsilonNFA S.toEpsilonNFA
+
+  | concat R S => match_concat_EpsilonNFA α R.State S.State R.toEpsilonNFA S.toEpsilonNFA
+
+  | closure R => sorry
+
+
+def RegExp.toAbstractEpsilonNFA
+  {α : Type}
+  [DecidableEq α]
+  (E : RegExp α) :
+  AbstractEpsilonNFA α E.State :=
+  match E with
+  | char c => match_char_AbstractEpsilonNFA c
+
+  | epsilon => match_epsilon_AbstractEpsilonNFA α
+
+  | zero => match_zero_AbstractEpsilonNFA α
+
+  | union R S => match_union_AbstractEpsilonNFA α R.State S.State R.toAbstractEpsilonNFA S.toAbstractEpsilonNFA
+
+  | concat R S => sorry
+
+  | closure R => sorry
+
+
+-------------------------------------------------------------------------------
 
 /-
 def match_closure_EpsilonNFA
