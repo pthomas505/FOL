@@ -52,10 +52,11 @@ theorem match_char_EpsilonNFA_toAbstract
   {α : Type}
   [DecidableEq α]
   (c : α) :
-  (match_char_EpsilonNFA c).toAbstract = match_char_AbstractEpsilonNFA c :=
+  (match_char_EpsilonNFA c).toAbstract =
+    match_char_AbstractEpsilonNFA c :=
   by
-    simp only [EpsilonNFA.toAbstract]
     simp only [match_char_EpsilonNFA]
+    simp only [EpsilonNFA.toAbstract]
     simp only [match_char_AbstractEpsilonNFA]
     simp
     simp only [← and_assoc]
@@ -179,8 +180,8 @@ theorem match_epsilon_EpsilonNFA_toAbstract
   [DecidableEq α] :
   (match_epsilon_EpsilonNFA α).toAbstract = match_epsilon_AbstractEpsilonNFA α :=
   by
-    simp only [EpsilonNFA.toAbstract]
     simp only [match_epsilon_EpsilonNFA]
+    simp only [EpsilonNFA.toAbstract]
     simp only [match_epsilon_AbstractEpsilonNFA]
     simp
     funext s s'
@@ -239,8 +240,8 @@ theorem match_zero_EpsilonNFA_toAbstract
   [DecidableEq α] :
   (match_zero_EpsilonNFA α).toAbstract = match_zero_AbstractEpsilonNFA α :=
   by
-    simp only [EpsilonNFA.toAbstract]
     simp only [match_zero_EpsilonNFA]
+    simp only [EpsilonNFA.toAbstract]
     simp only [match_zero_AbstractEpsilonNFA]
     simp
 
