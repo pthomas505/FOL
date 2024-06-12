@@ -65,18 +65,12 @@ def RegExp.toEpsilonNFA
     }
 
   | union R S =>
-    let starting_state := Sum.inl 0
     let R' := (R.toEpsilonNFA.wrapLeft S.State).wrapRight ℕ
     let S' := (S.toEpsilonNFA.wrapRight R.State).wrapRight ℕ
     {
       symbol_arrow_list := R'.symbol_arrow_list ++ S'.symbol_arrow_list
-
-      epsilon_arrow_list :=
-        ⟨starting_state, R'.starting_state_list⟩ :: R'.epsilon_arrow_list ++
-        ⟨starting_state, S'.starting_state_list⟩ :: S'.epsilon_arrow_list
-
-      starting_state_list := [starting_state]
-
+      epsilon_arrow_list := R'.epsilon_arrow_list ++ S'.epsilon_arrow_list
+      starting_state_list := R'.starting_state_list ++ S'.starting_state_list
       accepting_state_list := R'.accepting_state_list ++ S'.accepting_state_list
     }
 
@@ -94,6 +88,67 @@ def RegExp.toEpsilonNFA
     }
 
   | closure R => sorry
+
+
+def RegExp.toAbstractEpsilonNFA
+  {α : Type}
+  (e : RegExp α) :
+  AbstractEpsilonNFA α e.State :=
+  match e with
+  | char c =>
+    {
+      symbol := fun s b s' => s = 0 ∧ b = c ∧ s' = 1
+      epsilon := fun _ _ => False
+      start := fun s => s = 0
+      accepting := fun s => s = 1
+    }
+
+  | epsilon =>
+    {
+      symbol := fun _ _ _ => False
+      epsilon := fun s s' => s = 0 ∧ s' = 1
+      start := fun s => s = 0
+      accepting := fun s => s = 1
+    }
+
+  | zero =>
+    {
+      symbol := fun _ _ _ => False
+      epsilon := fun _ _ => False
+      start := fun s => s = 0
+      accepting := fun _ => False
+    }
+
+  | union R S =>
+    let R' := R.toAbstractEpsilonNFA
+    let S' := S.toAbstractEpsilonNFA
+    {
+      symbol := fun p c q =>
+        match (p, q) with
+      | (Sum.inr (Sum.inl p), Sum.inr (Sum.inl q)) => R'.symbol p c q
+      | (Sum.inr (Sum.inr p), Sum.inr (Sum.inr q)) => S'.symbol p c q
+      | _ => False,
+      epsilon := fun p q =>
+        match (p, q) with
+      | (Sum.inr (Sum.inl p), Sum.inr (Sum.inl q)) => R'.epsilon p q
+      | (Sum.inr (Sum.inr p), Sum.inr (Sum.inr q)) => S'.epsilon p q
+      | _ => False,
+      start := fun (s : State α (R.union S)) =>
+        match s with
+        | Sum.inl 0 => True
+        | Sum.inr (Sum.inl q) => R'.start q
+        | Sum.inr (Sum.inr q) => S'.start q
+        | _ => False
+      accepting := fun s =>
+        match s with
+        | Sum.inr (Sum.inr q) => S'.accepting q
+        | _ => False
+    }
+
+  | concat R S => sorry
+
+  | closure R => sorry
+
 
 
 @[simp]
