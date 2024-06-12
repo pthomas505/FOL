@@ -177,12 +177,12 @@ example
         simp only at ih_1
         tauto
     · intro a1
-      apply AbstractEpsilonNFA.eval.sym 0 1
+      apply AbstractEpsilonNFA.eval.sym 0 _ 1
+      · apply AbstractEpsilonNFA.eval.accept
+        simp only
       · simp only
         simp only [a1]
         simp
-      · apply AbstractEpsilonNFA.eval.accept
-        simp only
 
 
 example
@@ -282,13 +282,40 @@ def match_zero_EpsilonNFA
   }
 
 
+theorem match_zero_EpsilonNFA_toAbstract
+  {α : Type}
+  [DecidableEq α] :
+  (match_zero_EpsilonNFA α).toAbstract =
+    {
+      symbol := fun _ _ _ => False
+      epsilon := fun _ _ => False
+      start := fun s => s = 0
+      accepting := fun _ => False
+    } :=
+  by
+    simp only [EpsilonNFA.toAbstract]
+    simp only [match_zero_EpsilonNFA]
+    simp
+
+
 example
   (α : Type)
   [DecidableEq α]
   (xs : List α) :
   ¬ (match_zero_EpsilonNFA α).accepts xs :=
   by
-    sorry
+    simp only [EpsilonNFA.accepts_iff]
+    simp only [match_zero_EpsilonNFA_toAbstract]
+    simp only [AbstractEpsilonNFA.accepts]
+    simp
+    intro contra
+    cases contra
+    case eps s ih_1 ih_2 =>
+      simp only at ih_1
+    case sym c m cs ih_1 ih_2 =>
+      simp only at ih_2
+    case accept ih_1 =>
+      simp only at ih_1
 
 
 def match_union_EpsilonNFA
