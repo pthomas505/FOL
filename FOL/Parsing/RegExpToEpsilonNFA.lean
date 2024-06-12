@@ -48,6 +48,20 @@ def match_char_AbstractEpsilonNFA
     }
 
 
+theorem match_char_EpsilonNFA_toAbstract
+  {α : Type}
+  [DecidableEq α]
+  (c : α) :
+  (match_char_EpsilonNFA c).toAbstract = match_char_AbstractEpsilonNFA c :=
+  by
+    simp only [EpsilonNFA.toAbstract]
+    simp only [match_char_EpsilonNFA]
+    simp only [match_char_AbstractEpsilonNFA]
+    simp
+    simp only [← and_assoc]
+    simp only [and_right_comm]
+    simp
+
 
 example : (match_char_EpsilonNFA 'a').eval [] = [0] := by rfl
 example : (match_char_EpsilonNFA 'a').eval ['a'] = [1] := by rfl
@@ -77,26 +91,6 @@ example : ¬ (match_char_EpsilonNFA 'a').accepts ['b', 'a'] :=
   by decide
 
 
-theorem match_char_EpsilonNFA_toAbstract
-  {α : Type}
-  [DecidableEq α]
-  (c : α) :
-  (match_char_EpsilonNFA c).toAbstract =
-    {
-      symbol := fun s b s' => s = 0 ∧ b = c ∧ s' = 1
-      epsilon := fun _ _ => False
-      start := fun s => s = 0
-      accepting := fun s => s = 1
-    } :=
-  by
-    simp only [EpsilonNFA.toAbstract]
-    simp only [match_char_EpsilonNFA]
-    simp
-    simp only [← and_assoc]
-    simp only [and_right_comm]
-    simp
-
-
 example
   (α : Type)
   [DecidableEq α]
@@ -106,6 +100,7 @@ example
   by
     simp only [EpsilonNFA.accepts_iff]
     simp only [match_char_EpsilonNFA_toAbstract]
+    simp only [match_char_AbstractEpsilonNFA]
     simp only [AbstractEpsilonNFA.accepts]
     simp
     constructor
@@ -134,6 +129,7 @@ example
   by
     simp only [EpsilonNFA.accepts_iff]
     simp only [match_char_EpsilonNFA_toAbstract]
+    simp only [match_char_AbstractEpsilonNFA]
     simp only [AbstractEpsilonNFA.accepts]
     simp
     intro contra
@@ -181,16 +177,11 @@ def match_epsilon_AbstractEpsilonNFA
 theorem match_epsilon_EpsilonNFA_toAbstract
   {α : Type}
   [DecidableEq α] :
-  (match_epsilon_EpsilonNFA α).toAbstract =
-    {
-      symbol := fun _ _ _ => False
-      epsilon := fun s s' => s = 0 ∧ s' = 1
-      start := fun s => s = 0
-      accepting := fun s => s = 1
-    } :=
+  (match_epsilon_EpsilonNFA α).toAbstract = match_epsilon_AbstractEpsilonNFA α :=
   by
     simp only [EpsilonNFA.toAbstract]
     simp only [match_epsilon_EpsilonNFA]
+    simp only [match_epsilon_AbstractEpsilonNFA]
     simp
     funext s s'
     simp
@@ -246,16 +237,11 @@ def match_zero_AbstractEpsilonNFA
 theorem match_zero_EpsilonNFA_toAbstract
   {α : Type}
   [DecidableEq α] :
-  (match_zero_EpsilonNFA α).toAbstract =
-    {
-      symbol := fun _ _ _ => False
-      epsilon := fun _ _ => False
-      start := fun s => s = 0
-      accepting := fun _ => False
-    } :=
+  (match_zero_EpsilonNFA α).toAbstract = match_zero_AbstractEpsilonNFA α :=
   by
     simp only [EpsilonNFA.toAbstract]
     simp only [match_zero_EpsilonNFA]
+    simp only [match_zero_AbstractEpsilonNFA]
     simp
 
 
@@ -268,6 +254,7 @@ example
     simp only [EpsilonNFA.accepts_iff]
     simp only [match_zero_EpsilonNFA_toAbstract]
     simp only [AbstractEpsilonNFA.accepts]
+    simp only [match_zero_AbstractEpsilonNFA]
     simp
     intro contra
     cases contra
