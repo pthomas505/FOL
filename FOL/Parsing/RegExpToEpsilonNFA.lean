@@ -570,7 +570,33 @@ theorem match_concat_EpsilonNFA_toAbstract
     simp only [EpsilonNFA.wrapLeft]
     simp only [EpsilonNFA.wrapRight]
     simp only [EpsilonNFA.map]
-    sorry
+    constructor
+    · funext p c q
+      sorry
+    · constructor
+      · funext p q
+        sorry
+      · constructor
+        · funext p
+          cases p
+          case _ p_0 =>
+            simp
+          case _ p_0 =>
+            cases p_0
+            case _ p_0 =>
+              simp
+            case _ p_0 =>
+              simp
+        · funext p
+          cases p
+          case _ p_0 =>
+            simp
+          case _ p_0 =>
+            cases p_0
+            case _ p_0 =>
+              simp
+            case _ p_0 =>
+              simp
 
 
 -------------------------------------------------------------------------------
