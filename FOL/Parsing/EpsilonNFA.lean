@@ -262,6 +262,17 @@ structure AbstractEpsilonNFA
   (accepting : σ → Prop)
 
 
+def EpsilonNFA_symbol.toAbstract
+  {α : Type}
+  {σ : Type}
+  (symbol_arrow_list : List (SymbolArrow α σ))
+  :=
+      fun (start_state : σ) (symbol : α) (stop_state : σ) =>
+        ∃ (stop_state_list : List σ),
+            ⟨start_state, symbol, stop_state_list⟩ ∈ symbol_arrow_list ∧
+            stop_state ∈ stop_state_list
+
+
 def EpsilonNFA.toAbstract
   {α : Type}
   {σ : Type}

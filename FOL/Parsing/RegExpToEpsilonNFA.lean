@@ -322,7 +322,31 @@ theorem match_union_EpsilonNFA_toAbstract
     simp only [EpsilonNFA.toAbstract]
     simp only [match_union_AbstractEpsilonNFA]
     simp
-    sorry
+    constructor
+    · funext p c q
+      cases p
+      case _ p_0 =>
+        simp
+        constructor
+        · intro a1
+          apply Exists.elim a1
+          intro stop_state_list a2
+          clear a1
+          cases a2
+          case _ a2_left a2_right =>
+            cases q
+            case _ q0 =>
+              simp
+              cases a2_left
+              case _ inl =>
+                sorry
+              case _ inr =>
+                sorry
+            case _ q0 =>
+              sorry
+        · sorry
+      sorry
+    · sorry
 
 -------------------------------------------------------------------------------
 
