@@ -530,28 +530,48 @@ def match_concat_AbstractEpsilonNFA
   (σ_0 σ_1 : Type)
   (M_0 : AbstractEpsilonNFA α σ_0)
   (M_1 : AbstractEpsilonNFA α σ_1) :
-  AbstractEpsilonNFA α (σ_0 ⊕ σ_1) :=
+  AbstractEpsilonNFA α (ℕ ⊕ σ_0 ⊕ σ_1) :=
     {
       symbol := fun p c q =>
         match (p, q) with
-        | (Sum.inl p', Sum.inl q') => M_0.symbol p' c q'
-        | (Sum.inr p', Sum.inr q') => M_1.symbol p' c q'
+        | (Sum.inr (Sum.inl p'), Sum.inr (Sum.inl q')) => M_0.symbol p' c q'
+        | (Sum.inr (Sum.inr p'), Sum.inr (Sum.inr q')) => M_1.symbol p' c q'
         | _ => False,
       epsilon := fun p q =>
         match (p, q) with
-        | (Sum.inl p', Sum.inl q') => M_0.epsilon p' q'
-        | (Sum.inr p', Sum.inr q') => M_1.epsilon p' q'
-        | (Sum.inl p', Sum.inr q') => M_0.accepting p' ∧ M_1.start q'
+        | (Sum.inr (Sum.inl p'), Sum.inr (Sum.inl q')) => M_0.epsilon p' q'
+        | (Sum.inr (Sum.inr p'), Sum.inr (Sum.inr q')) => M_1.epsilon p' q'
+        | (Sum.inr (Sum.inl p'), Sum.inr (Sum.inr q')) => M_0.accepting p' ∧ M_1.start q'
         | _ => False
       start := fun p =>
         match p with
-        | Sum.inl p' => M_0.start p'
+        | Sum.inr (Sum.inl p') => M_0.start p'
         | _ => False
       accepting := fun p =>
         match p with
-        | Sum.inr p' => M_1.accepting p'
+        | Sum.inr (Sum.inr p') => M_1.accepting p'
         | _ => False
     }
+
+
+theorem match_concat_EpsilonNFA_toAbstract
+  {α : Type}
+  [DecidableEq α]
+  (σ_0 σ_1 : Type)
+  (M_0 : EpsilonNFA α σ_0)
+  (M_1 : EpsilonNFA α σ_1) :
+  (match_concat_EpsilonNFA α σ_0 σ_1 M_0 M_1).toAbstract =
+    match_concat_AbstractEpsilonNFA α σ_0 σ_1 M_0.toAbstract M_1.toAbstract :=
+  by
+    simp only [match_concat_EpsilonNFA]
+    simp only [EpsilonNFA.toAbstract]
+    simp only [match_concat_AbstractEpsilonNFA]
+    simp only [AbstractEpsilonNFA.mk.injEq]
+    simp only [EpsilonNFA.wrapLeft]
+    simp only [EpsilonNFA.wrapRight]
+    simp only [EpsilonNFA.map]
+    sorry
+
 
 -------------------------------------------------------------------------------
 
