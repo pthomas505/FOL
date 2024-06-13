@@ -581,7 +581,9 @@ theorem match_concat_EpsilonNFA_toAbstract
           cases q
           case _ q_0 =>
             simp
-            sorry
+            intro xs x a1 a2 a3 a4
+            simp only [← a4]
+            simp
           case _ q_0 =>
             cases q_0
             case _ q_0 =>
@@ -589,21 +591,26 @@ theorem match_concat_EpsilonNFA_toAbstract
               sorry
             case _ q_0 =>
               simp
-              sorry
+              intro xs x a1 a2 a3 a4
+              simp only [← a4]
+              simp
         case _ p_0 =>
           cases q
           case _ q_0 =>
             simp
-            sorry
+            intro xs x a1 a2 a3 a4
+            simp only [← a4]
+            simp
           case _ q_0 =>
             cases q_0
             case _ q_0 =>
               simp
-              sorry
+              intro xs x a1 a2 a3 a4
+              simp only [← a4]
+              simp
             case _ q_0 =>
               simp
               sorry
-
     · constructor
       · funext p q
         sorry
