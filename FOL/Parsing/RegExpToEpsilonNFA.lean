@@ -333,26 +333,52 @@ theorem match_union_EpsilonNFA_toAbstract
         case _ q_0 =>
           simp only [eq_iff_iff]
           constructor
-          · sorry
-          · sorry
+          · simp
+            intro xs x a1 a2 a3 a4 a5
+            sorry
+          · simp
+            intro xs x a1
+            sorry
         case _ q0 =>
-          sorry
+          simp
+          intro xs x a1 a2 a3 a4
+          simp only [← a4]
+          simp
       case _ p0 =>
-        sorry
+        cases q
+        case _ q_0 =>
+          simp only [eq_iff_iff]
+          constructor
+          · simp
+            intro xs x a1 a2 a3 a4
+            simp only [← a4]
+            simp
+          · simp
+        case _ q0 =>
+          simp
+          sorry
     · constructor
       · funext p q
         cases p
         case _ p_0 =>
           cases q
           case _ q_0 =>
+            simp
             sorry
           case _ q_0 =>
-            sorry
+            simp
+            intro xs x a1 a2 a3
+            simp only [← a3]
+            simp
         case _ p_0 =>
           cases q
           case _ q_0 =>
-            sorry
+            simp
+            intro xs x a1 a2 a3
+            simp only [← a3]
+            simp
           case _ q_0 =>
+            simp
             sorry
       · constructor
         · funext p
