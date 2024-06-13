@@ -338,7 +338,13 @@ theorem match_union_EpsilonNFA_toAbstract
             sorry
           · simp
             intro xs x a1
-            sorry
+            apply Exists.intro (xs.map Sum.inl)
+            constructor
+            · apply Exists.intro { start_state := p_0, symbol := c, stop_state_list := xs }
+              simp
+              exact x
+            · simp
+              exact a1
         case _ q0 =>
           simp
           intro xs x a1 a2 a3 a4
