@@ -346,7 +346,82 @@ theorem match_union_EpsilonNFA_toAbstract
               sorry
         · sorry
       sorry
-    · sorry
+    · constructor
+      · funext p q
+        simp
+        constructor
+        · intro a1
+          sorry
+        · intro a1
+          sorry
+      · constructor
+        · funext p
+          simp
+          constructor
+          · intro a1
+            cases a1
+            case _ left =>
+              cases p
+              case _ p0 =>
+                simp
+                simp only [EpsilonNFA.wrapLeft] at left
+                simp only [EpsilonNFA.map] at left
+                simp at left
+                exact left
+              case _ p0 =>
+                simp
+                simp only [EpsilonNFA.wrapLeft] at left
+                simp only [EpsilonNFA.map] at left
+                simp at left
+            case _ right =>
+              cases p
+              case _ p0 =>
+                simp
+                simp only [EpsilonNFA.wrapRight] at right
+                simp only [EpsilonNFA.map] at right
+                simp at right
+              case _ p0 =>
+                simp
+                simp only [EpsilonNFA.wrapRight] at right
+                simp only [EpsilonNFA.map] at right
+                simp at right
+                exact right
+          · intro a1
+            cases p
+            case _ p0 =>
+              simp at a1
+              simp only [EpsilonNFA.wrapLeft]
+              simp only [EpsilonNFA.map]
+              simp
+              left
+              exact a1
+            case _ p0 =>
+              simp at a1
+              simp only [EpsilonNFA.wrapRight]
+              simp only [EpsilonNFA.map]
+              simp
+              right
+              exact a1
+        · funext p
+          simp
+          cases p
+          case _ p0 =>
+            simp
+            simp only [EpsilonNFA.wrapLeft]
+            simp only [EpsilonNFA.map]
+            simp
+            simp only [EpsilonNFA.wrapRight]
+            simp only [EpsilonNFA.map]
+            simp
+          case _ p0 =>
+            simp
+            simp only [EpsilonNFA.wrapLeft]
+            simp only [EpsilonNFA.map]
+            simp
+            simp only [EpsilonNFA.wrapRight]
+            simp only [EpsilonNFA.map]
+            simp
+
 
 -------------------------------------------------------------------------------
 
