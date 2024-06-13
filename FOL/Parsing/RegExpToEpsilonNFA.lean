@@ -525,6 +525,34 @@ def match_concat_EpsilonNFA
     accepting_state_list := M_1'.accepting_state_list
   }
 
+def match_concat_AbstractEpsilonNFA
+  (α : Type)
+  (σ_0 σ_1 : Type)
+  (M_0 : AbstractEpsilonNFA α σ_0)
+  (M_1 : AbstractEpsilonNFA α σ_1) :
+  AbstractEpsilonNFA α (σ_0 ⊕ σ_1) :=
+    {
+      symbol := fun p c q =>
+        match (p, q) with
+        | (Sum.inl p', Sum.inl q') => M_0.symbol p' c q'
+        | (Sum.inr p', Sum.inr q') => M_1.symbol p' c q'
+        | _ => False,
+      epsilon := fun p q =>
+        match (p, q) with
+        | (Sum.inl p', Sum.inl q') => M_0.epsilon p' q'
+        | (Sum.inr p', Sum.inr q') => M_1.epsilon p' q'
+        | (Sum.inl p', Sum.inr q') => M_0.accepting p' ∧ M_1.start q'
+        | _ => False
+      start := fun p =>
+        match p with
+        | Sum.inl p' => M_0.start p'
+        | _ => False
+      accepting := fun p =>
+        match p with
+        | Sum.inr p' => M_1.accepting p'
+        | _ => False
+    }
+
 -------------------------------------------------------------------------------
 
 @[reducible]
