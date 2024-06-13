@@ -613,7 +613,37 @@ theorem match_concat_EpsilonNFA_toAbstract
               sorry
     · constructor
       · funext p q
-        sorry
+        cases p
+        case _ p_0 =>
+          simp
+        case _ p_0 =>
+          cases p_0
+          case _ p_0 =>
+            cases q
+            case _ q_0 =>
+              simp
+              sorry
+            case _ q_0 =>
+              cases q_0
+              case _ q_0 =>
+                simp
+                sorry
+              case _ q_0 =>
+                simp
+                sorry
+          case _ p_0 =>
+            cases q
+            case _ q_0 =>
+              simp
+              sorry
+            case _ q_0 =>
+              cases q_0
+              case _ q_0 =>
+                simp
+                sorry
+              case _ q_0 =>
+                simp
+                sorry
       · constructor
         · funext p
           cases p
