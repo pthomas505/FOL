@@ -335,7 +335,15 @@ theorem match_union_EpsilonNFA_toAbstract
           constructor
           · simp
             intro xs x a1 a2 a3 a4 a5
-            sorry
+            simp only [← a4] at a5
+            clear a4
+            simp only [← a2]
+            simp only [← a3]
+            apply Exists.intro x.stop_state_list
+            constructor
+            · exact a1
+            · simp at a5
+              exact a5
           · simp
             intro xs x a1
             apply Exists.intro (xs.map Sum.inl)
@@ -347,7 +355,7 @@ theorem match_union_EpsilonNFA_toAbstract
               exact a1
         case _ q0 =>
           simp
-          intro xs x a1 a2 a3 a4
+          intro xs x _ _ _ a4
           simp only [← a4]
           simp
       case _ p0 =>
@@ -356,7 +364,7 @@ theorem match_union_EpsilonNFA_toAbstract
           simp only [eq_iff_iff]
           constructor
           · simp
-            intro xs x a1 a2 a3 a4
+            intro xs x _ _ _ a4
             simp only [← a4]
             simp
           · simp
@@ -442,14 +450,14 @@ theorem match_union_EpsilonNFA_toAbstract
                     exact a2_right
           case _ q_0 =>
             simp
-            intro xs x a1 a2 a3
+            intro xs x _ _ a3
             simp only [← a3]
             simp
         case _ p_0 =>
           cases q
           case _ q_0 =>
             simp
-            intro xs x a1 a2 a3
+            intro xs x _ _ a3
             simp only [← a3]
             simp
           case _ q_0 =>
