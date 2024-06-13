@@ -623,7 +623,25 @@ theorem match_concat_EpsilonNFA_toAbstract
             case _ q_0 =>
               simp
               intro xs a1
-              sorry
+              cases a1
+              case _ left =>
+                cases left
+                case _ x a2 =>
+                  cases a2
+                  case _ a2_left a2_right =>
+                    cases a2_right
+                    case _ a2_right_left a2_right_right =>
+                      simp only [← a2_right_right]
+                      simp
+              case _ right =>
+                cases right
+                case _ x a2 =>
+                  cases a2
+                  case _ a2_left a2_right =>
+                    cases a2_right
+                    case _ a2_right_left a2_right_right =>
+                      simp only [← a2_right_right]
+                      simp
             case _ q_0 =>
               cases q_0
               case _ q_0 =>
