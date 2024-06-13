@@ -400,7 +400,18 @@ theorem match_union_EpsilonNFA_toAbstract
                         constructor
                         · exact a3_left
                         · exact a2_right
-            · sorry
+            · intro a1
+              cases a1
+              case _ xs a2 =>
+                cases a2
+                case _ a2_left a2_right =>
+                  apply Exists.intro (xs.map Sum.inr)
+                  constructor
+                  · apply Exists.intro { start_state := p_0, stop_state_list := xs }
+                    simp
+                    exact a2_left
+                  · simp
+                    exact a2_right
       · constructor
         · funext p
           cases p
