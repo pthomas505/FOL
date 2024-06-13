@@ -713,7 +713,7 @@ def RegExp.toAbstractEpsilonNFA
 
   | union R S => match_union_AbstractEpsilonNFA α R.State S.State R.toAbstractEpsilonNFA S.toAbstractEpsilonNFA
 
-  | concat R S => sorry
+  | concat R S => match_concat_AbstractEpsilonNFA α R.State S.State R.toAbstractEpsilonNFA S.toAbstractEpsilonNFA
 
   | closure R => sorry
 
