@@ -379,7 +379,28 @@ theorem match_union_EpsilonNFA_toAbstract
             simp
           case _ q_0 =>
             simp
-            sorry
+            constructor
+            · intro a1
+              cases a1
+              case _ xs a2 =>
+                cases a2
+                case _ a2_left a2_right =>
+                  cases a2_left
+                  case _ x a3 =>
+                    cases a3
+                    case _ a3_left a3_right =>
+                      cases a3_right
+                      case _ a3_right_left a3_right_right =>
+                        simp only [← a3_right_right] at a2_right
+                        clear a3_right_right
+                        simp at a2_right
+
+                        apply Exists.intro x.stop_state_list
+                        simp only [← a3_right_left]
+                        constructor
+                        · exact a3_left
+                        · exact a2_right
+            · sorry
       · constructor
         · funext p
           cases p
