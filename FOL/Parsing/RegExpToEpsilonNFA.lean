@@ -321,108 +321,48 @@ theorem match_union_EpsilonNFA_toAbstract
     simp only [match_union_EpsilonNFA]
     simp only [EpsilonNFA.toAbstract]
     simp only [match_union_AbstractEpsilonNFA]
-    simp
+    simp only [AbstractEpsilonNFA.mk.injEq]
+    simp only [EpsilonNFA.wrapLeft]
+    simp only [EpsilonNFA.wrapRight]
+    simp only [EpsilonNFA.map]
     constructor
     · funext p c q
       cases p
       case _ p_0 =>
-        simp
-        constructor
-        · intro a1
-          apply Exists.elim a1
-          intro stop_state_list a2
-          clear a1
-          cases a2
-          case _ a2_left a2_right =>
-            cases q
-            case _ q0 =>
-              simp
-              cases a2_left
-              case _ inl =>
-                sorry
-              case _ inr =>
-                sorry
-            case _ q0 =>
-              sorry
-        · sorry
-      case _ p_0 =>
         cases q
-        case _ q0 =>
-          simp
-          intro stop_state_list a1
-          cases a1
-          case _ left =>
-            simp only [EpsilonNFA.wrapLeft] at left
-            simp only [EpsilonNFA.map] at left
-            simp at left
-          case _ right =>
-            simp only [EpsilonNFA.wrapRight] at right
-            simp only [EpsilonNFA.map] at right
-            simp at right
-            apply Exists.elim right
-            intro x a2
-            clear right
-            cases a2
-            case _ a2_left a2_right =>
-              cases a2_right
-              case _ _ a2_right_right =>
-                cases a2_right_right
-                case _ _ a2_right_right_right =>
-                  simp only [<- a2_right_right_right]
-                  simp
+        case _ q_0 =>
+          simp only [eq_iff_iff]
+          constructor
+          · sorry
+          · sorry
         case _ q0 =>
           sorry
+      case _ p0 =>
+        sorry
     · constructor
       · funext p q
-        simp
-        constructor
-        · intro a1
-          sorry
-        · intro a1
-          cases p
-          case _ p0 =>
-            cases q
-            case _ q0 =>
-              simp at a1
-              apply Exists.elim a1
-              intro stop_state_list a2
-              clear a1
-              cases a2
-              case _ a2_left a2_right =>
-                sorry
-            case _ q0 =>
-              sorry
-          case _ p0 =>
-            cases q
-            case _ q0 =>
-              simp at a1
-            case _ q0 =>
-              simp at a1
-              sorry
+        cases p
+        case _ p_0 =>
+          cases q
+          case _ q_0 =>
+            sorry
+          case _ q_0 =>
+            sorry
+        case _ p_0 =>
+          cases q
+          case _ q_0 =>
+            sorry
+          case _ q_0 =>
+            sorry
       · constructor
         · funext p
           cases p
-          all_goals
-            simp only
-            simp only [EpsilonNFA.wrapLeft]
-            simp only [EpsilonNFA.wrapRight]
-            simp only [EpsilonNFA.map]
-          case _ p0 =>
-            simp
-          case _ p0 =>
-            simp
+          · simp
+          · simp
         · funext p
-          simp
           cases p
-          all_goals
-            simp only
-            simp only [EpsilonNFA.wrapLeft]
-            simp only [EpsilonNFA.wrapRight]
-            simp only [EpsilonNFA.map]
-          case _ p0 =>
-            simp
-          case _ p0 =>
-            simp
+          · simp
+          · simp
 
 
 -------------------------------------------------------------------------------
