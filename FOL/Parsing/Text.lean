@@ -282,6 +282,16 @@ def exp
   | n + 1 => concat (exp L n) L
 
 
+example
+  {α : Type}
+  (L : Language α) :
+  exp L 1 = L :=
+  by
+    simp only [exp]
+    simp only [concat]
+    simp
+
+
 inductive kleene_closure
   (α : Type) :
   Language α → Language α
@@ -457,5 +467,15 @@ theorem thm_6
         tauto
       case _ k =>
         simp only [exp] at a2
+        simp
         sorry
-    · sorry
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      cases a1
+      case _ a1_left =>
+        simp only [a1_left]
+        exact kleene_closure.eps L
+      case _ a1_right =>
+        simp only [thm_5 L] at a1_right
+        sorry
