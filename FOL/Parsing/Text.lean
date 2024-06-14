@@ -292,6 +292,15 @@ example
     simp
 
 
+example
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  exp L (n + 1) = concat (exp L n) L :=
+  by
+    rfl
+
+
 inductive kleene_closure
   (α : Type) :
   Language α → Language α
@@ -405,44 +414,6 @@ theorem thm_5
     apply Set.eq_of_subset_of_subset
     · exact thm_5_right L
     · exact thm_5_left L
-
-
-example
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  concat (exp L n) L = exp L (n + 1) :=
-  by
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro s a1
-      simp only [concat] at a1
-      simp at a1
-
-      apply Exists.elim a1
-      intro xs a2
-      clear a1
-
-      cases a2
-      case _ a2_left a2_right =>
-        apply Exists.elim a2_right
-        intro ys a3
-        clear a2_right
-
-        cases a3
-        case _ a3_left a3_right =>
-          simp only [exp]
-          simp only [concat]
-          simp
-          apply Exists.intro xs
-          constructor
-          · exact a2_left
-          · apply Exists.intro ys
-            tauto
-    · simp only [Set.subset_def]
-      intro s a1
-      simp only [exp] at a1
-      exact a1
 
 
 lemma concat_exp_comm
