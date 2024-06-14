@@ -320,7 +320,7 @@ example
     rfl
 
 
-example
+lemma concat_mem_exp
   {α : Type}
   (L : Language α)
   (s t : Str α)
@@ -331,6 +331,23 @@ example
   by
     simp only [exp]
     exact concat_mem_concat (exp L n) L s t h1 h2
+
+
+lemma concat_exp_comm
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  concat (exp L n) L = concat L (exp L n) :=
+  by
+    induction n
+    case zero =>
+      simp only [exp]
+      simp only [concat]
+      simp
+    case succ k ih =>
+      simp only [exp]
+      conv => left; simp only [ih]
+      simp only [thm_3_c]
 
 
 inductive kleene_closure
@@ -446,23 +463,6 @@ theorem thm_5
     apply Set.eq_of_subset_of_subset
     · exact thm_5_right L
     · exact thm_5_left L
-
-
-lemma concat_exp_comm
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  concat (exp L n) L = concat L (exp L n) :=
-  by
-    induction n
-    case zero =>
-      simp only [exp]
-      simp only [concat]
-      simp
-    case succ k ih =>
-      simp only [exp]
-      conv => left; simp only [ih]
-      simp only [thm_3_c]
 
 
 theorem thm_6
