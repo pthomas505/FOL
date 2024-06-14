@@ -16,9 +16,7 @@ Definition 1 (Alphabet). An alphabet is any, possibly infinite, set of symbols. 
 -/
 
 /-
-Definition 2 (String). A string s over some alphabet Σ is a, possibly infinite,
-sequence of symbols s = a₁a₂...aᵢ..., with aᵢ ∈ Σ. We note the special case
-of a string with no symbols, called the empty string, and denote it by ε.
+Definition 2 (String). A string s over some alphabet Σ is a, possibly infinite, sequence of symbols s = a₁a₂...aᵢ..., with aᵢ ∈ Σ. We note the special case of a string with no symbols, called the empty string, and denote it by ε.
 -/
 
 abbrev Str (α : Type) : Type := List α
