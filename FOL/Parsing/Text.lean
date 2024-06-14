@@ -455,18 +455,8 @@ theorem thm_6
       intro s a1
       simp only [thm_5 L] at a1
       simp at a1
-
-      apply Exists.elim a1
-      intro n a2
-      clear a1
-
-      cases n
-      case _ =>
-        simp only [exp] at a2
-        simp
-        tauto
-      case _ k =>
-        simp only [exp] at a2
+      cases a1
+      case _ i a2 =>
         simp
         sorry
     · simp only [Set.subset_def]
