@@ -234,6 +234,25 @@ def concat
   { s ++ t | (s ∈ L1) (t ∈ L2) }
 
 
+lemma concat_mem_concat
+  {α : Type}
+  (L M : Language α)
+  (s t : Str α)
+  (h1 : s ∈ L)
+  (h2 : t ∈ M) :
+  s ++ t ∈ concat L M :=
+  by
+    simp only [concat]
+    simp
+    apply Exists.intro s
+    constructor
+    · exact h1
+    · apply Exists.intro t
+      constructor
+      · exact h2
+      · rfl
+
+
 theorem thm_3_a
   {α : Type}
   (L : Language α) :
@@ -299,6 +318,19 @@ example
   exp L (n + 1) = concat (exp L n) L :=
   by
     rfl
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ exp L n)
+  (h2 : t ∈ L) :
+  s ++ t ∈ exp L (n + 1) :=
+  by
+    simp only [exp]
+    exact concat_mem_concat (exp L n) L s t h1 h2
 
 
 inductive kleene_closure
@@ -486,4 +518,14 @@ theorem thm_6
         exact kleene_closure.eps L
       case _ a1_right =>
         simp only [thm_5 L] at a1_right
-        sorry
+        simp only [concat] at a1_right
+        simp at a1_right
+        cases a1_right
+        case _ s a2 =>
+          cases a2
+          case _ a2_left a2_right =>
+            cases a2_right
+            case _ t a3 =>
+              cases a3
+              case _ a3_left a3_right =>
+                sorry
