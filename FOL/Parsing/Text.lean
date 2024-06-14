@@ -446,7 +446,37 @@ theorem thm_6
       cases a1
       case _ i a2 =>
         simp
-        sorry
+        induction i
+        case zero =>
+          simp only [exp] at a2
+          simp at a2
+          left
+          exact a2
+        case succ k ih =>
+          simp only [exp] at a2
+          simp only [concat_exp_comm] at a2
+          simp only [concat] at a2
+          simp at a2
+          cases a2
+          case _ s_1 a3 =>
+            cases a3
+            case _ a3_left a3_right =>
+              cases a3_right
+              case _ t a4 =>
+                cases a4
+                case _ a4_left a4_right =>
+                  right
+                  simp only [thm_5]
+                  simp only [concat]
+                  simp
+                  apply Exists.intro s_1
+                  constructor
+                  · exact a3_left
+                  · apply Exists.intro t
+                    constructor
+                    · apply Exists.intro k
+                      exact a4_left
+                    · exact a4_right
     · simp only [Set.subset_def]
       intro x a1
       simp at a1
