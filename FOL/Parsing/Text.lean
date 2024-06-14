@@ -445,6 +445,23 @@ example
       exact a1
 
 
+lemma concat_exp_comm
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  concat (exp L n) L = concat L (exp L n) :=
+  by
+    induction n
+    case zero =>
+      simp only [exp]
+      simp only [concat]
+      simp
+    case succ k ih =>
+      simp only [exp]
+      conv => left; simp only [ih]
+      simp only [thm_3_c]
+
+
 theorem thm_6
   {α : Type}
   (L : Language α) :
