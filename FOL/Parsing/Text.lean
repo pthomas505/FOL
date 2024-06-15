@@ -861,3 +861,12 @@ theorem thm_8
         apply kleene_closure.eps L
       case _ s t _ ih_2 ih_3 =>
         exact kleene_closure_closed_concat L s t ih_3 ih_2
+
+
+theorem corollary_2
+  {α : Type}
+  (L : Language α) :
+  kleene_closure α L =
+    concat (kleene_closure α L) (kleene_closure α L) :=
+  by
+    sorry
