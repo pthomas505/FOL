@@ -374,6 +374,49 @@ lemma concat_mem_exp_comm
     exact concat_mem_concat L (exp L n) s t h1 h2
 
 
+lemma exp_sum
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (m n : ℕ)
+  (h1 : s ∈ exp L m)
+  (h2 : t ∈ exp L n) :
+  s ++ t ∈ exp L (m + n) :=
+  by
+    induction n generalizing t
+    case zero =>
+      simp only [exp] at h2
+      simp at h2
+      simp only [h2]
+      simp
+      exact h1
+    case succ n ih =>
+      simp only [exp] at h2
+      simp only [concat] at h2
+      simp at h2
+      cases h2
+      case _ s' a1 =>
+        cases a1
+        case _ a1_left a1_right =>
+          cases a1_right
+          case _ t' a2 =>
+            cases a2
+            case _ a2_left a2_right =>
+              simp only [exp]
+              simp only [concat]
+              simp
+
+              specialize ih s' a1_left
+              apply Exists.intro (s ++ s')
+              constructor
+              · exact ih
+              · simp only [← a2_right]
+                apply Exists.intro t'
+                constructor
+                · exact a2_left
+                · simp
+
+
 inductive kleene_closure
   (α : Type) :
   Language α → Language α
@@ -549,3 +592,21 @@ theorem thm_6
                   simp only [← a3_right]
                   obtain s1 := concat_mem_exp_comm L s t i a2_left a4
                   exact thm_4 L (i + 1) s1
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (h1 : s ∈ kleene_closure α L)
+  (h2 : t ∈ kleene_closure α L) :
+  s ++ t ∈ kleene_closure α L :=
+  by
+    simp only [thm_5] at *
+    simp at *
+    cases h1
+    case _ m a1 =>
+      cases h2
+      case _ n a2 =>
+        apply Exists.intro (m + n)
+        apply exp_sum L s t m n a1 a2
