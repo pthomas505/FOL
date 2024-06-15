@@ -350,6 +350,16 @@ lemma concat_exp_comm
       simp only [thm_3_c]
 
 
+lemma exp_succ_concat_left
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  exp L (n + 1) = concat L (exp L n) :=
+  by
+    simp only [← concat_exp_comm]
+    rfl
+
+
 inductive kleene_closure
   (α : Type) :
   Language α → Language α
@@ -473,20 +483,19 @@ theorem thm_6
     apply Set.eq_of_subset_of_subset
     · simp only [Set.subset_def]
       intro s a1
-      simp only [thm_5 L] at a1
+      simp only [thm_5] at a1
       simp at a1
       cases a1
       case _ i a2 =>
         simp
-        induction i
+        cases i
         case zero =>
           simp only [exp] at a2
           simp at a2
           left
           exact a2
-        case succ k ih =>
-          simp only [exp] at a2
-          simp only [concat_exp_comm] at a2
+        case succ k =>
+          simp only [exp_succ_concat_left] at a2
           simp only [concat] at a2
           simp at a2
           cases a2
@@ -498,17 +507,10 @@ theorem thm_6
                 cases a4
                 case _ a4_left a4_right =>
                   right
-                  simp only [thm_5]
-                  simp only [concat]
-                  simp
-                  apply Exists.intro s_1
-                  constructor
+                  simp only [← a4_right]
+                  apply concat_mem_concat
                   · exact a3_left
-                  · apply Exists.intro t
-                    constructor
-                    · apply Exists.intro k
-                      exact a4_left
-                    · exact a4_right
+                  · exact Set.mem_of_mem_of_subset a4_left (thm_4 L k)
     · simp only [Set.subset_def]
       intro x a1
       simp at a1
