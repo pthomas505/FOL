@@ -594,7 +594,7 @@ theorem thm_6
                   exact thm_4 L (i + 1) s1
 
 
-example
+theorem kleene_closure_closed_concat
   {α : Type}
   (L : Language α)
   (s t : Str α)
