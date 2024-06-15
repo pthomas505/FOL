@@ -612,8 +612,8 @@ def kleene_closure_set
   { l | ∃ M : List (Str α), (∀ (r : Str α), r ∈ M → r ∈ L) ∧ M.join = l }
 
 
-example
-  (α : Type)
+lemma kleene_closure_set_eq_kleene_closure_left
+  {α : Type}
   (L : Language α) :
   kleene_closure_set α L ⊆ kleene_closure α L :=
   by
@@ -647,8 +647,8 @@ example
               exact concat_mem_exp_comm L hd tl.join i a2_left_left a3
 
 
-example
-  (α : Type)
+lemma kleene_closure_set_eq_kleene_closure_right
+  {α : Type}
   [DecidableEq α]
   (L : Language α) :
   kleene_closure α L ⊆ kleene_closure_set α L :=
@@ -684,3 +684,14 @@ example
                 exact ih_2
             · simp
               exact a3_right
+
+
+theorem kleene_closure_set_eq_kleene_closure
+  (α : Type)
+  [DecidableEq α]
+  (L : Language α) :
+  kleene_closure_set α L = kleene_closure α L :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · exact kleene_closure_set_eq_kleene_closure_left L
+    · exact kleene_closure_set_eq_kleene_closure_right L
