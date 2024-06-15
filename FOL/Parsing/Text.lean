@@ -525,68 +525,6 @@ theorem thm_5
     · exact thm_5_left L
 
 
-theorem thm_6
-  {α : Type}
-  (L : Language α) :
-  (kleene_closure α L) = {[]} ∪ (concat L (kleene_closure α L)) :=
-  by
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro s a1
-      simp only [thm_5] at a1
-      simp at a1
-      cases a1
-      case _ i a2 =>
-        simp
-        cases i
-        case zero =>
-          simp only [exp] at a2
-          simp at a2
-          left
-          exact a2
-        case succ k =>
-          simp only [exp_succ_concat_left] at a2
-          simp only [concat] at a2
-          simp at a2
-          cases a2
-          case _ s_1 a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              cases a3_right
-              case _ t a4 =>
-                cases a4
-                case _ a4_left a4_right =>
-                  right
-                  simp only [← a4_right]
-                  apply concat_mem_concat
-                  · exact a3_left
-                  · exact Set.mem_of_mem_of_subset a4_left (thm_4 L k)
-    · simp only [Set.subset_def]
-      intro x a1
-      simp at a1
-      cases a1
-      case _ a1_left =>
-        simp only [a1_left]
-        exact kleene_closure.eps L
-      case _ a1_right =>
-        simp only [thm_5 L] at a1_right
-        simp only [concat] at a1_right
-        simp at a1_right
-        cases a1_right
-        case _ s a2 =>
-          cases a2
-          case _ a2_left a2_right =>
-            cases a2_right
-            case _ t a3 =>
-              cases a3
-              case _ a3_left a3_right =>
-                cases a3_left
-                case _ i a4 =>
-                  simp only [← a3_right]
-                  obtain s1 := concat_mem_exp_comm L s t i a2_left a4
-                  exact thm_4 L (i + 1) s1
-
-
 theorem kleene_closure_closed_concat
   {α : Type}
   (L : Language α)
@@ -695,3 +633,65 @@ theorem kleene_closure_set_eq_kleene_closure
     apply Set.eq_of_subset_of_subset
     · exact kleene_closure_set_eq_kleene_closure_left L
     · exact kleene_closure_set_eq_kleene_closure_right L
+
+
+theorem thm_6
+  {α : Type}
+  (L : Language α) :
+  (kleene_closure α L) = {[]} ∪ (concat L (kleene_closure α L)) :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro s a1
+      simp only [thm_5] at a1
+      simp at a1
+      cases a1
+      case _ i a2 =>
+        simp
+        cases i
+        case zero =>
+          simp only [exp] at a2
+          simp at a2
+          left
+          exact a2
+        case succ k =>
+          simp only [exp_succ_concat_left] at a2
+          simp only [concat] at a2
+          simp at a2
+          cases a2
+          case _ s_1 a3 =>
+            cases a3
+            case _ a3_left a3_right =>
+              cases a3_right
+              case _ t a4 =>
+                cases a4
+                case _ a4_left a4_right =>
+                  right
+                  simp only [← a4_right]
+                  apply concat_mem_concat
+                  · exact a3_left
+                  · exact Set.mem_of_mem_of_subset a4_left (thm_4 L k)
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      cases a1
+      case _ a1_left =>
+        simp only [a1_left]
+        exact kleene_closure.eps L
+      case _ a1_right =>
+        simp only [thm_5 L] at a1_right
+        simp only [concat] at a1_right
+        simp at a1_right
+        cases a1_right
+        case _ s a2 =>
+          cases a2
+          case _ a2_left a2_right =>
+            cases a2_right
+            case _ t a3 =>
+              cases a3
+              case _ a3_left a3_right =>
+                cases a3_left
+                case _ i a4 =>
+                  simp only [← a3_right]
+                  obtain s1 := concat_mem_exp_comm L s t i a2_left a4
+                  exact thm_4 L (i + 1) s1
