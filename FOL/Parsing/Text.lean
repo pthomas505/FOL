@@ -645,3 +645,42 @@ example
             case _ i a3 =>
               apply Exists.intro (i + 1)
               exact concat_mem_exp_comm L hd tl.join i a2_left_left a3
+
+
+example
+  (α : Type)
+  [DecidableEq α]
+  (L : Language α) :
+  kleene_closure α L ⊆ kleene_closure_set α L :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp only [kleene_closure_set]
+    simp
+
+    induction a1
+    case eps =>
+      simp
+      apply Exists.intro []
+      simp
+    case succ s t ih_1 ih_2 ih_3 =>
+      simp only [thm_5] at ih_1
+      simp at ih_1
+      cases ih_1
+      case _ i a2 =>
+        cases ih_3
+        case _ M a3 =>
+          cases a3
+          case _ a3_left a3_right =>
+            apply Exists.intro (M ++ [t])
+            constructor
+            · intro r a4
+              simp at a4
+              cases a4
+              case _ a4_right =>
+                exact a3_left r a4_right
+              case _ a4_left =>
+                simp only [a4_left]
+                exact ih_2
+            · simp
+              exact a3_right
