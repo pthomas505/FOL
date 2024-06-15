@@ -431,13 +431,6 @@ inductive kleene_closure
     kleene_closure α L (s ++ t)
 
 
--- Each l is the concatenation of a list of strings, each of which is in L.
-def kleene_closure_set
-  (α : Type)
-  (L : Language α) :=
-  { l | ∃ M : List (Str α), (∀ (r : Str α), r ∈ M → r ∈ L) ∧ M.join = l }
-
-
 theorem thm_4
   {α : Type}
   (L : Language α)
@@ -610,3 +603,45 @@ theorem kleene_closure_closed_concat
       case _ n a2 =>
         apply Exists.intro (m + n)
         apply exp_sum L s t m n a1 a2
+
+
+-- Each l is the concatenation of a list of strings, each of which is in L.
+def kleene_closure_set
+  (α : Type)
+  (L : Language α) :=
+  { l | ∃ M : List (Str α), (∀ (r : Str α), r ∈ M → r ∈ L) ∧ M.join = l }
+
+
+example
+  (α : Type)
+  (L : Language α) :
+  kleene_closure_set α L ⊆ kleene_closure α L :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp only [kleene_closure_set] at a1
+    simp at a1
+    cases a1
+    case _ l a2 =>
+      cases a2
+      case _ a2_left a2_right =>
+        simp only [← a2_right]
+        clear a2_right
+
+        simp only [thm_5]
+        simp
+        induction l
+        case nil =>
+          apply Exists.intro 0
+          simp only [exp]
+          simp
+        case cons hd tl ih =>
+          simp at a2_left
+          cases a2_left
+          case _ a2_left_left a2_left_right =>
+            specialize ih a2_left_right
+            simp
+            cases ih
+            case _ i a3 =>
+              apply Exists.intro (i + 1)
+              exact concat_mem_exp_comm L hd tl.join i a2_left_left a3
