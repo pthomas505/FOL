@@ -470,6 +470,18 @@ theorem thm_4
           exact a3_left
 
 
+lemma lang_sub_kleene_closure
+  {α : Type}
+  (L : Language α) :
+  L ⊆ kleene_closure α L :=
+  by
+    obtain s2 := thm_4 L 1
+    simp only [exp] at s2
+    simp only [concat] at s2
+    simp at s2
+    exact s2
+
+
 theorem thm_5_left
   {α : Type}
   (L : Language α) :
@@ -833,3 +845,19 @@ theorem thm_7
     simp only [thm_5]
     simp only [concat_kleene_closure_succ_left]
     simp only [concat_kleene_closure_succ_right]
+
+
+theorem thm_8
+  {α : Type}
+  (L : Language α) :
+  kleene_closure α L = kleene_closure α (kleene_closure α L) :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · exact lang_sub_kleene_closure (kleene_closure α L)
+    · simp only [Set.subset_def]
+      intro x a1
+      induction a1
+      case _ =>
+        apply kleene_closure.eps L
+      case _ s t _ ih_2 ih_3 =>
+        exact kleene_closure_closed_concat L s t ih_3 ih_2
