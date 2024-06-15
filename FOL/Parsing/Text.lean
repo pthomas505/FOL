@@ -716,3 +716,120 @@ theorem corollary_1
     obtain s2 := thm_6 L
     simp only [s1] at s2
     exact s2
+
+
+lemma concat_kleene_closure_succ_left
+  {α : Type}
+  (L : Language α) :
+  concat L (⋃ (n : ℕ), exp L n) = ⋃ (n : ℕ), exp L (n + 1) :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x a1
+      simp only [concat] at a1
+      simp at a1
+      cases a1
+      case _ s a2 =>
+        cases a2
+        case _ a2_left a2_right =>
+          cases a2_right
+          case _ t a3 =>
+            cases a3
+            case _ a3_left a3_right =>
+              cases a3_left
+              case _ i a4 =>
+                simp
+                apply Exists.intro i
+                simp only [← a3_right]
+                simp only [exp]
+                exact concat_mem_exp_comm L s t i a2_left a4
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      cases a1
+      case _ i a2 =>
+        simp only [exp] at a2
+        simp only [concat_exp_comm] at a2
+        simp only [concat] at a2
+        simp at a2
+        cases a2
+        case _ s a3 =>
+          cases a3
+          case _ a3_left a3_right =>
+            cases a3_right
+            case _ t a4 =>
+              cases a4
+              case _ a4_left a4_right =>
+                simp only [concat]
+                simp
+                apply Exists.intro s
+                constructor
+                · exact a3_left
+                · apply Exists.intro t
+                  constructor
+                  · apply Exists.intro i
+                    exact a4_left
+                  · exact a4_right
+
+
+lemma concat_kleene_closure_succ_right
+  {α : Type}
+  (L : Language α) :
+  concat (⋃ (n : ℕ), exp L n) L = ⋃ (n : ℕ), exp L (n + 1) :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x a1
+      simp only [concat] at a1
+      simp at a1
+      cases a1
+      case _ s a2 =>
+        cases a2
+        case _ a2_left a2_right =>
+          cases a2_left
+          case _ i a3 =>
+            cases a2_right
+            case _ t a4 =>
+              cases a4
+              case _ a4_left a4_right =>
+                simp
+                apply Exists.intro i
+                simp only [← a4_right]
+                simp only [exp]
+                exact concat_mem_exp L s t i a3 a4_left
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      cases a1
+      case _ i a2 =>
+        simp only [exp] at a2
+        simp only [concat] at a2
+        simp at a2
+        cases a2
+        case _ s a3 =>
+          cases a3
+          case _ a3_left a3_right =>
+            cases a3_right
+            case _ t a4 =>
+              cases a4
+              case _ a4_left a4_right =>
+                simp only [concat]
+                simp
+                apply Exists.intro s
+                constructor
+                · apply Exists.intro i
+                  exact a3_left
+                · apply Exists.intro t
+                  constructor
+                  · exact a4_left
+                  · exact a4_right
+
+
+theorem thm_7
+  {α : Type}
+  (L : Language α) :
+  concat L (kleene_closure α L) = concat (kleene_closure α L) L :=
+  by
+    simp only [thm_5]
+    simp only [concat_kleene_closure_succ_left]
+    simp only [concat_kleene_closure_succ_right]
