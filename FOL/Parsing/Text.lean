@@ -695,3 +695,24 @@ theorem thm_6
                   simp only [← a3_right]
                   obtain s1 := concat_mem_exp_comm L s t i a2_left a4
                   exact thm_4 L (i + 1) s1
+
+
+theorem corollary_1
+  {α : Type}
+  (L : Language α)
+  (h1 : [] ∈ L) :
+  kleene_closure α L = concat L (kleene_closure α L) :=
+  by
+    have s1 : {[]} ∪ concat L (kleene_closure α L) = concat L (kleene_closure α L) :=
+    by
+      apply Set.union_eq_self_of_subset_left
+      simp
+      simp only [concat]
+      simp
+      constructor
+      · exact h1
+      · exact kleene_closure.eps L
+
+    obtain s2 := thm_6 L
+    simp only [s1] at s2
+    exact s2
