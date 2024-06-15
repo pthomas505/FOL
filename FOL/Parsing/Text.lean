@@ -869,4 +869,22 @@ theorem corollary_2
   kleene_closure α L =
     concat (kleene_closure α L) (kleene_closure α L) :=
   by
-    sorry
+    have s1 : {[]} ∪ concat (kleene_closure α L) (kleene_closure α (kleene_closure α L)) = concat (kleene_closure α L) (kleene_closure α (kleene_closure α L)) :=
+      by
+        apply Set.union_eq_self_of_subset_left
+        simp
+        simp only [concat]
+        simp
+        constructor
+        · exact kleene_closure.eps L
+        · exact kleene_closure.eps (kleene_closure α L)
+
+    calc
+      kleene_closure α L = kleene_closure α (kleene_closure α L) := thm_8 L
+
+      _ = {[]} ∪ (concat (kleene_closure α L) (kleene_closure α (kleene_closure α L))) := thm_6 (kleene_closure α L)
+
+      _ = concat (kleene_closure α L) (kleene_closure α (kleene_closure α L)) := s1
+
+      _ = concat (kleene_closure α L) (kleene_closure α L) :=
+        by simp only [← thm_8]
