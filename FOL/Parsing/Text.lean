@@ -360,6 +360,20 @@ lemma exp_succ_concat_left
     rfl
 
 
+lemma concat_mem_exp_comm
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ exp L n)
+  (h2 : t ∈ L) :
+  t ++ s ∈ exp L (n + 1) :=
+  by
+    simp only [exp]
+    simp only [concat_exp_comm]
+    exact concat_mem_concat L (exp L n) t s h2 h1
+
+
 inductive kleene_closure
   (α : Type) :
   Language α → Language α
@@ -530,4 +544,7 @@ theorem thm_6
             case _ t a3 =>
               cases a3
               case _ a3_left a3_right =>
-                sorry
+                cases a3_left
+                case _ i a4 =>
+                  simp only [← a3_right]
+                  sorry
