@@ -365,13 +365,13 @@ lemma concat_mem_exp_comm
   (L : Language α)
   (s t : Str α)
   (n : ℕ)
-  (h1 : s ∈ exp L n)
-  (h2 : t ∈ L) :
-  t ++ s ∈ exp L (n + 1) :=
+  (h1 : s ∈ L)
+  (h2 : t ∈ exp L n) :
+  s ++ t ∈ exp L (n + 1) :=
   by
     simp only [exp]
     simp only [concat_exp_comm]
-    exact concat_mem_concat L (exp L n) t s h2 h1
+    exact concat_mem_concat L (exp L n) s t h1 h2
 
 
 inductive kleene_closure
@@ -547,4 +547,5 @@ theorem thm_6
                 cases a3_left
                 case _ i a4 =>
                   simp only [← a3_right]
-                  sorry
+                  obtain s1 := concat_mem_exp_comm L s t i a2_left a4
+                  exact thm_4 L (i + 1) s1
