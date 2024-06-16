@@ -1061,3 +1061,15 @@ example
     apply Set.singleton_ne_empty []
     · symm
       exact h1
+
+
+/-
+Definition 15 (String derivative). The derivative of a language L ⊆ Σ∗ with respect to a string s ∈ Σ∗ is defined to be ∂sL = {t : s · t ∈ L}.
+-/
+
+def derivative
+  {α : Type}
+  (L : Language α)
+  (s : Str α) :
+  Set (Str α) :=
+  { t : Str α | s ++ t ∈ L }
