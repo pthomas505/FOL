@@ -1028,3 +1028,36 @@ example
                   simp only [concat]
                   simp
                   tauto
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (h1 : L.nullify = ∅) :
+  (Lᶜ).nullify = {[]} :=
+  by
+    simp only [Language.nullify] at h1
+    simp at h1
+    simp only [Language.nullify]
+    simp
+    intro a1
+    contradiction
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (h1 : L.nullify = {[]}) :
+  (Lᶜ).nullify = ∅ :=
+  by
+    simp only [Language.nullify] at h1
+    simp at h1
+    simp only [Language.nullify]
+    simp
+    by_contra contra
+    specialize h1 contra
+    apply Set.singleton_ne_empty []
+    · symm
+      exact h1
