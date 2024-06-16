@@ -291,6 +291,16 @@ theorem thm_3_d
     aesop
 
 
+theorem thm_3_d_comm
+  {α : Type}
+  (L1 L2 L3 : Language α) :
+  concat (L1 ∪ L2) L3 =
+    concat L1 L3 ∪ concat L2 L3 :=
+  by
+    simp only [concat]
+    aesop
+
+
 def exp
   {α : Type}
   (L : Language α)
@@ -1091,3 +1101,93 @@ theorem thm_11_b
   by
     simp only [derivative]
     simp
+
+
+-- [a] ∈ Σ^1
+
+theorem thm_12_1
+  {α : Type}
+  (a : α) :
+  derivative ∅ [a] = ∅ :=
+  by
+    simp only [derivative]
+    simp
+
+theorem thm_12_2
+  {α : Type}
+  (a : α) :
+  derivative {[]} [a] = ∅ :=
+  by
+    simp only [derivative]
+    simp
+
+theorem thm_12_3
+  {α : Type}
+  (a : α) :
+  derivative {[a]} [a] = {[]} :=
+  by
+    simp only [derivative]
+    simp
+
+theorem thm_12_4
+  {α : Type}
+  (a b : α)
+  (h1 : ¬ a = b) :
+  derivative {[b]} [a] = ∅ :=
+  by
+    simp only [derivative]
+    simp
+    simp only [h1]
+    simp
+
+theorem thm_12_5
+  {α : Type}
+  (L1 L2 : Language α)
+  (a : α) :
+  derivative (L1 ∪ L2) [a] =
+    (derivative L1 [a]) ∪ (derivative L2 [a]) :=
+  by
+    simp only [derivative]
+    rfl
+
+theorem thm_12_6
+  {α : Type}
+  (L1 L2 : Language α)
+  (a : α) :
+  derivative (L1 ∩ L2) [a] =
+    (derivative L1 [a]) ∩ (derivative L2 [a]) :=
+  by
+    simp only [derivative]
+    rfl
+
+theorem thm_12_7
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α)
+  (a : α) :
+  derivative (concat L1 L2) [a] =
+    (concat (derivative L1 [a]) L2) ∪ (concat L1.nullify ((derivative L2 [a]))) :=
+  by
+    have s1 : ∀ (L0 : Language α), L0.nullify = ∅ →
+      derivative (concat (L1.nullify ∪ L0) L2) [a] =
+        {s | a :: s ∈ concat (L1.nullify ∪ L0) L2} :=
+    by
+      intro L0 a1
+      simp only [derivative]
+      rfl
+
+    have s2 : ∀ (L0 : Language α), L0.nullify = ∅ →
+      {s | a :: s ∈ concat (L1.nullify ∪ L0) L2} =
+        {s | a :: s ∈ concat L1.nullify L2} ∪ {t | a :: t ∈ concat L0 L2} :=
+    by
+      intro L0 a1
+      obtain s3 := thm_3_d_comm L1.nullify L0 L2
+      simp only [s3]
+      rfl
+
+    have s5 : ∀ (L0 : Language α), L0.nullify = ∅ →
+      (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 = (concat L1.nullify (derivative L2 [a])) ∪ (concat (derivative L0 [a]) L2) :=
+    by
+      intro L0 a1
+      simp only [derivative]
+      rfl
