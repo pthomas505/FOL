@@ -431,6 +431,14 @@ inductive kleene_closure
     kleene_closure α L (s ++ t)
 
 
+lemma empty_mem_kleene_closure
+  {α : Type}
+  (L : Language α) :
+  [] ∈ kleene_closure α L :=
+  by
+    exact kleene_closure.eps L
+
+
 theorem thm_4
   {α : Type}
   (L : Language α)
@@ -888,3 +896,50 @@ theorem corollary_2
 
       _ = concat (kleene_closure α L) (kleene_closure α L) :=
         by simp only [← thm_8]
+
+
+def Language.is_nullable
+  {α : Type}
+  (L : Language α) :
+  Prop :=
+  [] ∈ L
+
+
+def Language.nullify
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α) :
+  Language α :=
+  open Classical in
+  if [] ∈ L
+  then {[]}
+  else ∅
+
+
+example
+  {α : Type}
+  [DecidableEq α] :
+  Language.nullify (∅ : Language α) = ∅ :=
+  by
+    simp only [Language.nullify]
+    simp
+
+
+example
+  {α : Type}
+  [DecidableEq α] :
+  Language.nullify ({[]} : Language α) = {[]} :=
+  by
+    simp only [Language.nullify]
+    simp
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α) :
+  Language.nullify (kleene_closure α L) = {[]} :=
+  by
+    simp only [Language.nullify]
+    simp only [empty_mem_kleene_closure]
+    simp
