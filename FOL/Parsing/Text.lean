@@ -1185,6 +1185,15 @@ theorem thm_12_7
       simp only [s3]
       rfl
 
+
+    have s4 : ∀ (L0 : Language α), L0.nullify = ∅ →
+      (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} = (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 :=
+    by
+      intro L0 a1
+      simp only [concat]
+      simp
+
+
     have s5 : ∀ (L0 : Language α), L0.nullify = ∅ →
       (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 = (concat L1.nullify (derivative L2 [a])) ∪ (concat (derivative L0 [a]) L2) :=
     by
