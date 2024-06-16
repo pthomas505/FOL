@@ -1317,4 +1317,11 @@ theorem thm_12_7
         simp only [derivative]
         rfl
 
+    have s2 : ∀ (L0 : Language α), derivative (L1.nullify ∪ L0) [a] = derivative L0 [a] :=
+    by
+      intro L0
+      simp only [derivative]
+      simp only [Language.nullify]
+      simp
+
     sorry
