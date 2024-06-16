@@ -1071,5 +1071,5 @@ def derivative
   {α : Type}
   (L : Language α)
   (s : Str α) :
-  Set (Str α) :=
+  Language α :=
   { t : Str α | s ++ t ∈ L }
