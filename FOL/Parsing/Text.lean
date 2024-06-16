@@ -943,3 +943,88 @@ example
     simp only [Language.nullify]
     simp only [empty_mem_kleene_closure]
     simp
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α) :
+  (L1 ∪ L2).nullify = L1.nullify ∪ L2.nullify :=
+  by
+    simp only [Language.nullify]
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      simp
+      tauto
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      simp
+      tauto
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α) :
+  (L1 ∩ L2).nullify = L1.nullify ∩ L2.nullify :=
+  by
+    simp only [Language.nullify]
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      simp
+      tauto
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      simp
+      tauto
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α) :
+  (concat L1 L2).nullify = concat L1.nullify L2.nullify :=
+  by
+    simp only [Language.nullify]
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      cases a1
+      case _ a1_left a2_right =>
+        simp only [concat] at a1_left
+        simp at a1_left
+
+        simp only [a2_right]
+        simp only [concat]
+        simp
+        exact a1_left
+    · simp only [Set.subset_def]
+      intro x a1
+      simp only [concat] at a1
+      simp at a1
+      cases a1
+      case _ s a2 =>
+        cases a2
+        case _ a2_left a2_right =>
+          cases a2_left
+          case _ a2_left_left a2_left_right =>
+            cases a2_right
+            case _ t a3 =>
+              cases a3
+              case _ a3_left a3_right =>
+                cases a3_left
+                case _ a3_left_left a3_left_right =>
+                  simp only [← a3_right]
+                  simp only [a2_left_right]
+                  simp only [a3_left_right]
+                  simp
+                  simp only [concat]
+                  simp
+                  tauto
