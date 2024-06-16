@@ -1161,7 +1161,7 @@ theorem thm_12_6
     rfl
 
 
-example
+lemma thm_12_7_1
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -1227,7 +1227,7 @@ example
                   simp at a2_left
 
 
-example
+lemma thm_12_7_2
   {α : Type}
   [DecidableEq α]
   (L0 L2 : Language α)
@@ -1303,8 +1303,10 @@ theorem thm_12_7
       {s | a :: s ∈ concat L1.nullify L2} ∪ {t | a :: t ∈ concat L0 L2} = (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
     by
       intro L0 a1
-
-      sorry
+      obtain s3_1 := thm_12_7_1 L1 L2 a
+      simp only [s3_1]
+      obtain s3_2 := thm_12_7_2 L0 L2 a a1
+      simp only [s3_2]
 
     have s4 : ∀ (L0 : Language α), L0.nullify = ∅ →
       (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} = (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 :=
