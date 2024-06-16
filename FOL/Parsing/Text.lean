@@ -1227,6 +1227,53 @@ example
                   simp at a2_left
 
 
+example
+  {α : Type}
+  [DecidableEq α]
+  (L0 L2 : Language α)
+  (a : α)
+  (h1 : L0.nullify = ∅) :
+  {t | a :: t ∈ concat L0 L2} = {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
+  by
+    have s1 : [] ∉ L0 :=
+    by
+      simp only [Language.nullify] at h1
+      simp at h1
+      exact h1
+
+    simp only [concat]
+    simp
+    ext xs
+    constructor
+    · simp
+      intro s a1 t a3 a4
+      cases s
+      case nil =>
+        contradiction
+      case cons s_hd s_tl =>
+        simp at a4
+        cases a4
+        case _ a4_left a4_right =>
+          simp only [a4_left] at a1
+          apply Exists.intro s_tl
+          constructor
+          · exact a1
+          · apply Exists.intro t
+            constructor
+            · exact a3
+            · exact a4_right
+    · simp
+      intro s a1 t a2 a3
+      apply Exists.intro (a :: s)
+      constructor
+      · exact a1
+      · apply Exists.intro t
+        constructor
+        · exact a2
+        · simp only [← a3]
+          simp
+
+
 theorem thm_12_7
   {α : Type}
   [DecidableEq α]
@@ -1255,6 +1302,8 @@ theorem thm_12_7
     have s3 : ∀ (L0 : Language α), L0.nullify = ∅ →
       {s | a :: s ∈ concat L1.nullify L2} ∪ {t | a :: t ∈ concat L0 L2} = (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
     by
+      intro L0 a1
+
       sorry
 
     have s4 : ∀ (L0 : Language α), L0.nullify = ∅ →
