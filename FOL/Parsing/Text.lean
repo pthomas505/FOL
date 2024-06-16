@@ -1073,3 +1073,21 @@ def derivative
   (s : Str α) :
   Language α :=
   { t : Str α | s ++ t ∈ L }
+
+
+theorem thm_11_a
+  {α : Type}
+  (L : Language α) :
+  derivative L [] = L :=
+  by
+    simp only [derivative]
+    simp
+
+theorem thm_11_b
+  {α : Type}
+  (L : Language α)
+  (s a : Str α) :
+  derivative L (s ++ a) = derivative (derivative L s) a :=
+  by
+    simp only [derivative]
+    simp
