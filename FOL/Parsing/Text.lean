@@ -1284,51 +1284,37 @@ theorem thm_12_7
   by
     have s1 : ∀ (L0 : Language α), L0.nullify = ∅ →
       derivative (concat (L1.nullify ∪ L0) L2) [a] =
-        {s | a :: s ∈ concat (L1.nullify ∪ L0) L2} :=
-    by
-      intro L0 a1
-      simp only [derivative]
-      rfl
-
-    have s2 : ∀ (L0 : Language α), L0.nullify = ∅ →
-      {s | a :: s ∈ concat (L1.nullify ∪ L0) L2} =
-        {s | a :: s ∈ concat L1.nullify L2} ∪ {t | a :: t ∈ concat L0 L2} :=
-    by
-      intro L0 a1
-      obtain s3 := thm_3_d_comm L1.nullify L0 L2
-      simp only [s3]
-      rfl
-
-    have s3 : ∀ (L0 : Language α), L0.nullify = ∅ →
-      {s | a :: s ∈ concat L1.nullify L2} ∪ {t | a :: t ∈ concat L0 L2} = (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
-    by
-      intro L0 a1
-      obtain s3_1 := thm_12_7_1 L1 L2 a
-      simp only [s3_1]
-      obtain s3_2 := thm_12_7_2 L0 L2 a a1
-      simp only [s3_2]
-
-    have s4 : ∀ (L0 : Language α), L0.nullify = ∅ →
-      (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} = (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 :=
-    by
-      intro L0 a1
-      simp only [concat]
-      simp
-
-    have s5 : ∀ (L0 : Language α), L0.nullify = ∅ →
-      (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 = (concat L1.nullify (derivative L2 [a])) ∪ (concat (derivative L0 [a]) L2) :=
-    by
-      intro L0 a1
-      simp only [derivative]
-      rfl
-
-    have s6 : ∀ (L0 : Language α), L0.nullify = ∅ →
-      derivative (concat (L1.nullify ∪ L0) L2) [a] =
         (concat L1.nullify (derivative L2 [a])) ∪ (concat (derivative L0 [a]) L2) :=
     by
       intro L0 a1
-      simp only [s1 L0 a1]
-      simp only [s2 L0 a1]
-      simp only [s3 L0 a1]
-      simp only [s4 L0 a1]
-      simp only [s5 L0 a1]
+      calc
+      derivative (concat (L1.nullify ∪ L0) L2) [a] =
+        {s | a :: s ∈ concat (L1.nullify ∪ L0) L2} :=
+      by
+        simp only [derivative]
+        rfl
+
+      _ = {s | a :: s ∈ concat L1.nullify L2} ∪ {t | a :: t ∈ concat L0 L2} :=
+      by
+        obtain s3 := thm_3_d_comm L1.nullify L0 L2
+        simp only [s3]
+        rfl
+
+      _ = (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
+      by
+        obtain s3_1 := thm_12_7_1 L1 L2 a
+        simp only [s3_1]
+        obtain s3_2 := thm_12_7_2 L0 L2 a a1
+        simp only [s3_2]
+
+      _ = (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 :=
+      by
+        simp only [concat]
+        simp
+
+      _ = (concat L1.nullify (derivative L2 [a])) ∪ (concat (derivative L0 [a]) L2) :=
+      by
+        simp only [derivative]
+        rfl
+
+    sorry
