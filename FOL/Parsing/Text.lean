@@ -1160,6 +1160,73 @@ theorem thm_12_6
     simp only [derivative]
     rfl
 
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α)
+  (a : α) :
+  {s | a :: s ∈ (concat L1.nullify L2)} = concat L1.nullify (derivative L2 [a]) :=
+  by
+    simp only [derivative]
+    simp only [concat]
+    simp
+    ext xs
+    simp
+    constructor
+    · intro a1
+      cases a1
+      case _ s a2 =>
+        cases a2
+        case _ a2_left a2_right =>
+          cases a2_right
+          case _ t a3 =>
+            cases a3
+            case _ a3_left a3_right =>
+              cases s
+              case nil =>
+                simp at a3_right
+                apply Exists.intro []
+                constructor
+                · exact a2_left
+                · apply Exists.intro xs
+                  simp
+                  simp only [← a3_right]
+                  exact a3_left
+              case cons s_hd s_tl =>
+                simp only [Language.nullify] at a2_left
+                split_ifs at a2_left
+                case pos c1 =>
+                  simp at a2_left
+                case neg c1 =>
+                  simp at a2_left
+    · intro a1
+      cases a1
+      case _ s a2 =>
+        cases a2
+        case _ a2_left a2_right =>
+          cases a2_right
+          case _ t a3 =>
+            cases a3
+            case _ a3_left a3_right =>
+              cases s
+              case nil =>
+                simp at a3_right
+                apply Exists.intro []
+                constructor
+                · exact a2_left
+                · simp only [← a3_right]
+                  simp
+                  exact a3_left
+              case cons s_hd s_tl s_ih =>
+                simp only [Language.nullify] at a2_left
+                split_ifs at a2_left
+                case pos c1 =>
+                  simp at a2_left
+                case neg c1 =>
+                  simp at a2_left
+
+
 theorem thm_12_7
   {α : Type}
   [DecidableEq α]
@@ -1185,6 +1252,10 @@ theorem thm_12_7
       simp only [s3]
       rfl
 
+    have s3 : ∀ (L0 : Language α), L0.nullify = ∅ →
+      {s | a :: s ∈ concat L1.nullify L2} ∪ {t | a :: t ∈ concat L0 L2} = (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
+    by
+      sorry
 
     have s4 : ∀ (L0 : Language α), L0.nullify = ∅ →
       (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} = (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 :=
@@ -1200,3 +1271,5 @@ theorem thm_12_7
       intro L0 a1
       simp only [derivative]
       rfl
+
+    sorry
