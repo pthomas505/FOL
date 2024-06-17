@@ -1164,6 +1164,24 @@ theorem thm_12_6
 lemma thm_12_7_1
   {α : Type}
   [DecidableEq α]
+  (L1 : Language α) :
+  ∃ (L0 : Language α), L0.nullify = ∅ ∧ L1 = L1.nullify ∪ L0 :=
+  by
+    simp only [Language.nullify]
+    split_ifs
+    case pos c1 =>
+      simp
+      apply Exists.intro (L1 \ {[]})
+      simp
+      exact (Set.insert_eq_of_mem c1).symm
+    case neg c1 =>
+      simp
+      exact c1
+
+
+lemma thm_12_7_2
+  {α : Type}
+  [DecidableEq α]
   (L1 L2 : Language α)
   (a : α) :
   {s | a :: s ∈ (concat L1.nullify L2)} = concat L1.nullify (derivative L2 [a]) :=
@@ -1227,7 +1245,7 @@ lemma thm_12_7_1
                   simp at a2_left
 
 
-lemma thm_12_7_2
+lemma thm_12_7_3
   {α : Type}
   [DecidableEq α]
   (L0 L2 : Language α)
@@ -1302,9 +1320,9 @@ theorem thm_12_7
 
       _ = (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
       by
-        obtain s3_1 := thm_12_7_1 L1 L2 a
+        obtain s3_1 := thm_12_7_2 L1 L2 a
         simp only [s3_1]
-        obtain s3_2 := thm_12_7_2 L0 L2 a a1
+        obtain s3_2 := thm_12_7_3 L0 L2 a a1
         simp only [s3_2]
 
       _ = (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 :=
