@@ -1447,8 +1447,12 @@ theorem thm_12_8
         simp only [Language.nullify]
         split_ifs
         case pos c1 =>
-          simp only [concat_eps_left]
           obtain s1 := eps_mem_imp_exp_subset_exp_succ L (m - 1) c1
+          simp only [Nat.sub_add_cancel n] at s1
+
+          simp only [concat_eps_left]
+          simp
+
           sorry
         case neg c1 =>
           simp only [concat]
