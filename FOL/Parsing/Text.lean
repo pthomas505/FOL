@@ -1342,4 +1342,15 @@ theorem thm_12_7
       simp only [Language.nullify]
       simp
 
-    sorry
+    obtain s3 := thm_12_7_1 L1
+    cases s3
+    case _ L0 a1 =>
+      cases a1
+      case _ a1_left a1_right =>
+        specialize s1 L0 a1_left
+        specialize s2 L0
+        simp only [← a1_right] at s1
+        simp only [← a1_right] at s2
+        simp only [s2]
+        simp only [s1]
+        exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
