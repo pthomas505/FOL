@@ -331,6 +331,34 @@ example
     exact Set.mem_of_subset_of_mem h2 a1
 
 
+lemma concat_subset_right
+  {α : Type}
+  (L1 L2 L3 : Language α)
+  (h1 : L2 ⊆ L3) :
+  concat L1 L2 ⊆ concat L1 L3 :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp only [concat] at a1
+    simp at a1
+    cases a1
+    case _ s a2 =>
+      cases a2
+      case _ a2_left a2_right =>
+        cases a2_right
+        case _ t a3 =>
+          cases a3
+          case _ a3_left a3_right =>
+            simp only [concat]
+            simp
+            apply Exists.intro s
+            constructor
+            · exact a2_left
+            · apply Exists.intro t
+              constructor
+              · exact Set.mem_of_subset_of_mem h1 a3_left
+              · exact a3_right
+
 def exp
   {α : Type}
   (L : Language α)
@@ -1443,17 +1471,17 @@ theorem thm_12_8
         simp only [exp]
         simp only [concat_exp_comm]
         simp only [thm_12_7]
-        simp only [ih]
         simp only [Language.nullify]
         split_ifs
         case pos c1 =>
+          simp only [concat_eps_left]
+          simp only [ih]
+          simp
+
           obtain s1 := eps_mem_imp_exp_subset_exp_succ L (m - 1) c1
           simp only [Nat.sub_add_cancel n] at s1
 
-          simp only [concat_eps_left]
-          simp
-
-          sorry
+          exact concat_subset_right (derivative L [a]) (exp L (m - 1)) (exp L m) s1
         case neg c1 =>
           simp only [concat]
           simp
