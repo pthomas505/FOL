@@ -301,6 +301,36 @@ theorem thm_3_d_comm
     aesop
 
 
+example
+  {α : Type}
+  (L : Language α) :
+  concat L {[]} = L :=
+  by
+    simp only [concat]
+    simp
+
+example
+  {α : Type}
+  (L : Language α) :
+  concat {[]} L = L :=
+  by
+    simp only [concat]
+    simp
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : [] ∈ L)
+  (h2 : L ⊆ M) :
+  L ⊆ concat L M :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    apply concat_mem_concat L M [] x h1
+    exact Set.mem_of_subset_of_mem h2 a1
+
+
 def exp
   {α : Type}
   (L : Language α)
@@ -382,6 +412,40 @@ lemma concat_mem_exp_comm
     simp only [exp]
     simp only [concat_exp_comm]
     exact concat_mem_concat L (exp L n) s t h1 h2
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (n : ℕ)
+  (h1 : [] ∈ L) :
+  [] ∈ exp L n :=
+  by
+    induction n
+    case zero =>
+      simp only [exp]
+      simp
+    case succ k ih =>
+      simp only [exp]
+      simp only [concat]
+      simp
+      constructor
+      · exact ih
+      · exact h1
+
+
+lemma eps_mem_imp_exp_subset_exp_succ
+  {α : Type}
+  (L : Language α)
+  (n : ℕ)
+  (h1 : [] ∈ L) :
+  exp L n ⊆ exp L (n + 1) :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    obtain s1 := concat_mem_exp_comm L [] x n h1 a1
+    simp at s1
+    exact s1
 
 
 lemma exp_sum
