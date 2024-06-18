@@ -1161,6 +1161,9 @@ theorem thm_12_6
     rfl
 
 
+/-
+  If [] ∈ L1 then let L0 be L1 \ {[]}. If [] ∉ L1 then let L0 be L1.
+-/
 lemma thm_12_7_1
   {α : Type}
   [DecidableEq α]
