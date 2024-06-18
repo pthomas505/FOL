@@ -1366,4 +1366,26 @@ theorem thm_12_8
   (a : α) :
   derivative (kleene_closure α L) [a] = concat (derivative L [a]) (kleene_closure α L) :=
   by
+    have s1 : ∀ (k : ℕ), k ≥ 1 → derivative (exp L k) [a] = concat (derivative L [a]) (exp L (k - 1)) :=
+    by
+      intro k a1
+      induction k, a1 using Nat.le_induction
+      case base =>
+        simp
+        simp only [exp]
+        simp only [concat]
+        simp
+      case succ m n ih =>
+        simp only [exp]
+        simp only [concat_exp_comm]
+        simp only [thm_12_7]
+        simp only [ih]
+        simp only [Language.nullify]
+        split_ifs
+        case pos c1 =>
+          sorry
+        case neg c1 =>
+          simp only [concat]
+          simp
+
     sorry
