@@ -301,18 +301,18 @@ theorem thm_3_d_comm
     aesop
 
 
-example
+lemma concat_eps_left
   {α : Type}
   (L : Language α) :
-  concat L {[]} = L :=
+  concat {[]} L = L :=
   by
     simp only [concat]
     simp
 
-example
+lemma concat_eps_right
   {α : Type}
   (L : Language α) :
-  concat {[]} L = L :=
+  concat L {[]} = L :=
   by
     simp only [concat]
     simp
@@ -1447,6 +1447,7 @@ theorem thm_12_8
         simp only [Language.nullify]
         split_ifs
         case pos c1 =>
+          simp only [concat_eps_left]
           obtain s1 := eps_mem_imp_exp_subset_exp_succ L (m - 1) c1
           sorry
         case neg c1 =>
