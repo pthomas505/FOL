@@ -1357,3 +1357,13 @@ theorem thm_12_7
         simp only [s2]
         simp only [s1]
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
+
+
+theorem thm_12_8
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a : α) :
+  derivative (kleene_closure α L) [a] = concat (derivative L [a]) (kleene_closure α L) :=
+  by
+    sorry
