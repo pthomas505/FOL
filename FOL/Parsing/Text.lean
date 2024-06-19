@@ -1458,6 +1458,7 @@ theorem thm_12_7
         simp only [s1]
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
 
+-------------------------------------------------------------------------------
 
 lemma derivative_iUnion
   {α : Type}
@@ -1513,6 +1514,59 @@ lemma derivative_exp_succ
         simp
 
 
+lemma aux_1
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a : α) :
+  ⋃ (k : ℕ), derivative (exp L (k + 1)) [a] =
+    ⋃ (k : ℕ), concat (derivative L [a]) (exp L k) :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      cases a1
+      case _ i a2 =>
+        simp
+        apply Exists.intro i
+        simp only [← derivative_exp_succ L a i]
+        exact a2
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      cases a1
+      case _ i a2 =>
+        simp
+        apply Exists.intro i
+        simp only [derivative_exp_succ L a i]
+        exact a2
+
+
+lemma aux_2
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α) :
+  ⋃ k, concat L1 (exp L2 k) = concat L1 (⋃ k, (exp L2 k)) :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      simp only [concat] at a1
+      simp at a1
+      simp only [concat]
+      simp
+      aesop
+    · simp only [Set.subset_def]
+      intro x a1
+      simp only [concat] at a1
+      simp at a1
+      simp only [concat]
+      simp
+      aesop
+
+
 theorem thm_12_8
   {α : Type}
   [DecidableEq α]
@@ -1520,38 +1574,15 @@ theorem thm_12_8
   (a : α) :
   derivative (kleene_closure α L) [a] = concat (derivative L [a]) (kleene_closure α L) :=
   by
-    have s1 : ∀ (k : ℕ), k ≥ 1 → derivative (exp L k) [a] = concat (derivative L [a]) (exp L (k - 1)) :=
-    by
-      intro k a1
-      induction k, a1 using Nat.le_induction
-      case base =>
-        simp
-        simp only [exp]
-        simp only [concat]
-        simp
-      case succ m n ih =>
-        simp only [exp]
-        simp only [concat_exp_comm]
-        simp only [thm_12_7]
-        simp only [Language.nullify]
-        split_ifs
-        case pos c1 =>
-          simp only [concat_eps_left]
-          simp only [ih]
-          simp
+    obtain s2 := derivative_iUnion L a
 
-          obtain s1 := eps_mem_imp_exp_subset_exp_succ L (m - 1) c1
-          simp only [Nat.sub_add_cancel n] at s1
-
-          exact concat_subset_right (derivative L [a]) (exp L (m - 1)) (exp L m) s1
-        case neg c1 =>
-          simp only [concat]
-          simp
-
-    conv => left; simp only [thm_5]; simp only [← Set.union_iUnion_nat_succ (exp L)]
+    conv => left; simp only [thm_5]
+    simp only [← Set.union_iUnion_nat_succ (exp L)]
     simp only [thm_12_5]
     simp only [exp_zero]
     simp only [thm_12_2]
     simp only [Set.empty_union]
-
-    sorry
+    simp only [s2]
+    simp only [aux_1]
+    simp only [aux_2]
+    simp only [thm_5]
