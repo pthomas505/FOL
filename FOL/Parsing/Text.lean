@@ -1502,16 +1502,8 @@ lemma aux_1
   (f : ℕ → Language α) :
   ⋃ n, derivative (f n) [a] = derivative (⋃ n, f n) [a] :=
   by
-    apply Set.eq_of_subset_of_subset
-    all_goals
-      simp only [Set.subset_def]
-      intro x a1
-      simp only [derivative] at a1
-      simp at a1
-
-      simp only [derivative]
-      simp
-      exact a1
+    simp only [derivative]
+    aesop
 
 
 lemma aux_2
@@ -1522,7 +1514,6 @@ lemma aux_2
   ⋃ n, concat L (f n) = concat L (⋃ n, (f n)) :=
   by
     simp only [concat]
-    simp
     aesop
 
 
