@@ -1564,7 +1564,9 @@ theorem thm_12_9
   (L : Language α)
   (a : α) :
   derivative Lᶜ [a] = (derivative L [a])ᶜ :=
-  by
+  by rfl
+
+/-
     have s1 : derivative L [a] ∪ derivative Lᶜ [a] = derivative (L ∪ Lᶜ) [a] :=
     by
       simp only [thm_12_5]
@@ -1621,4 +1623,5 @@ theorem thm_12_9
       simp
       simp only [thm_12_1]
 
-    sorry
+    exact rfl
+-/
