@@ -1498,10 +1498,9 @@ lemma derivative_exp_succ
 lemma aux_1
   {α : Type}
   [DecidableEq α]
-  (L : Language α)
-  (a : α) :
-  derivative (⋃ n, exp L (n + 1)) [a] =
-    ⋃ n, derivative (exp L (n + 1)) [a] :=
+  (a : α)
+  (f : ℕ → Language α) :
+  ⋃ n, derivative (f n) [a] = derivative (⋃ n, f n) [a] :=
   by
     apply Set.eq_of_subset_of_subset
     all_goals
@@ -1518,8 +1517,9 @@ lemma aux_1
 lemma aux_2
   {α : Type}
   [DecidableEq α]
-  (L1 L2 : Language α) :
-  ⋃ k, concat L1 (exp L2 k) = concat L1 (⋃ k, (exp L2 k)) :=
+  (L : Language α)
+  (f : ℕ → Language α) :
+  ⋃ n, concat L (f n) = concat L (⋃ n, (f n)) :=
   by
     simp only [concat]
     simp
@@ -1539,7 +1539,7 @@ theorem thm_12_8
     simp only [exp_zero]
     simp only [thm_12_2]
     simp only [Set.empty_union]
-    simp only [aux_1]
+    simp only [← aux_1]
     simp only [derivative_exp_succ]
     simp only [aux_2]
     simp only [thm_5]
