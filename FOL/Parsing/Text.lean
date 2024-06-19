@@ -1023,10 +1023,13 @@ theorem corollary_2
 
 theorem thm_9
   {α : Type}
-  (L1 L2 X : Language α) :
-  concat (kleene_closure α L1) L2 =
-    concat L1 (concat (kleene_closure α L1) L2) ∪ L2 :=
+  (L1 L2 X : Language α)
+  (h1 : X = concat (kleene_closure α L1) L2) :
+  X = concat L1 X ∪ L2 :=
   by
+    have s1 : concat (concat L1 (kleene_closure α L1)) L2 ∪ L2 =
+      concat ((concat L1 (kleene_closure α L1)) ∪ {[]}) L2 :=
+    by sorry
     sorry
 
 
