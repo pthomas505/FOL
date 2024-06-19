@@ -1624,3 +1624,14 @@ theorem thm_12_9
 
     exact rfl
 -/
+
+
+theorem thm_13
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (s : Str α) :
+  s ∈ L ↔ [] ∈ derivative L s :=
+  by
+    simp only [derivative]
+    simp
