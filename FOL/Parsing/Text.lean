@@ -1029,7 +1029,9 @@ theorem thm_9
   by
     have s1 : concat (concat L1 (kleene_closure α L1)) L2 ∪ L2 =
       concat ((concat L1 (kleene_closure α L1)) ∪ {[]}) L2 :=
-    by sorry
+    by
+      simp only [thm_3_d_comm]
+      simp only [concat_eps_left]
     sorry
 
 
