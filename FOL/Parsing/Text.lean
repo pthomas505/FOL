@@ -1656,3 +1656,10 @@ theorem corollary_3
       simp
       obtain s1 := Set.singleton_ne_empty []
       exact id (Ne.symm s1)
+
+
+theorem thm_14
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α) :
+  L = L.nullify ∪ ⋃ (a : α), concat {[a]} (derivative L [a]) := sorry
