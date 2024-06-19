@@ -1563,8 +1563,7 @@ theorem thm_12_9
   [DecidableEq α]
   (L : Language α)
   (a : α) :
-  derivative Lᶜ [a] = (derivative L [a])ᶜ :=
-  by rfl
+  derivative Lᶜ [a] = (derivative L [a])ᶜ := rfl
 
 /-
     have s1 : derivative L [a] ∪ derivative Lᶜ [a] = derivative (L ∪ Lᶜ) [a] :=
