@@ -1662,4 +1662,47 @@ theorem thm_14
   {α : Type}
   [DecidableEq α]
   (L : Language α) :
-  L = L.nullify ∪ ⋃ (a : α), concat {[a]} (derivative L [a]) := sorry
+  L = L.nullify ∪ ⋃ (a : α), concat {[a]} (derivative L [a]) :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x a1
+      cases x
+      case _ =>
+        simp
+        left
+        simp only [Language.nullify]
+        simp only [a1]
+        simp
+      case _ hd tl =>
+        simp
+        right
+        apply Exists.intro hd
+        simp only [concat]
+        simp
+        simp only [derivative]
+        simp
+        exact a1
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      cases a1
+      case _ a1_left =>
+        simp only [Language.nullify] at a1_left
+        simp at a1_left
+        cases a1_left
+        case _ a1_left_left a1_left_right =>
+          simp only [a1_left_right]
+          exact a1_left_left
+      case _ a1_right =>
+        cases a1_right
+        case _ i a2 =>
+          simp only [concat] at a2
+          simp only [derivative] at a2
+          simp at a2
+          cases a2
+          case _ t a3 =>
+            cases a3
+            case _ a3_left a3_right =>
+              simp only [← a3_right]
+              exact a3_left
