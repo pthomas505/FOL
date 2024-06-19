@@ -1521,22 +1521,9 @@ lemma aux_2
   (L1 L2 : Language α) :
   ⋃ k, concat L1 (exp L2 k) = concat L1 (⋃ k, (exp L2 k)) :=
   by
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro x a1
-      simp at a1
-      simp only [concat] at a1
-      simp at a1
-      simp only [concat]
-      simp
-      aesop
-    · simp only [Set.subset_def]
-      intro x a1
-      simp only [concat] at a1
-      simp at a1
-      simp only [concat]
-      simp
-      aesop
+    simp only [concat]
+    simp
+    aesop
 
 
 theorem thm_12_8
