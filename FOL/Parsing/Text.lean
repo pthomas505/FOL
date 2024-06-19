@@ -1025,14 +1025,22 @@ theorem thm_9
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = concat (kleene_closure α L1) L2) :
-  X = concat L1 X ∪ L2 :=
+  X = (concat L1 X) ∪ L2 :=
   by
-    have s1 : concat (concat L1 (kleene_closure α L1)) L2 ∪ L2 =
-      concat ((concat L1 (kleene_closure α L1)) ∪ {[]}) L2 :=
+    simp only [h1]
+    clear h1
+
+    have s1 : concat L1 (concat (kleene_closure α L1) L2) ∪ L2 = concat ((concat L1 (kleene_closure α L1)) ∪ {[]}) L2 :=
     by
       simp only [thm_3_d_comm]
       simp only [concat_eps_left]
-    sorry
+      simp only [thm_3_c]
+
+    simp only [s1]
+    clear s1
+
+    simp only [Set.union_comm (concat L1 (kleene_closure α L1))]
+    simp only [← thm_6]
 
 
 def Language.is_nullable
