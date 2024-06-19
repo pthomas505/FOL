@@ -1635,3 +1635,24 @@ theorem thm_13
   by
     simp only [derivative]
     simp
+
+
+theorem corollary_3
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (s : Str α) :
+  (derivative L s).nullify = {[]} ↔ s ∈ L :=
+  by
+    simp only [thm_13 L]
+    simp only [Language.nullify]
+
+    split_ifs
+    case pos c1 =>
+      simp
+      exact c1
+    case neg c1 =>
+      simp only [c1]
+      simp
+      obtain s1 := Set.singleton_ne_empty []
+      exact id (Ne.symm s1)
