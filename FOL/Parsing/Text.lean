@@ -1606,4 +1606,19 @@ theorem thm_12_9
           simp
         · apply Exists.intro x
           simp
+
+    have s5 : derivative L [a] ∪ derivative Lᶜ [a] = Set.univ :=
+      by
+        simp only [s1]
+        simp only [s2]
+        simp only [s3]
+        simp only [s4]
+        simp only [Strings.kleene_closure_eq_univ]
+
+    have s6 : derivative L [a] ∩ derivative Lᶜ [a] = ∅ :=
+    by
+      simp only [← thm_12_6 L Lᶜ a]
+      simp
+      simp only [thm_12_1]
+
     sorry
