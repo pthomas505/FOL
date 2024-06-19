@@ -124,7 +124,7 @@ def exp_set
   {s : Str α | s.length = n}
 
 
-example
+lemma exp_eq_exp_set
   (α : Type)
   (n : ℕ) :
   exp α n = exp_set α n :=
@@ -158,6 +158,19 @@ lemma all_str_mem_kleene_closure
     simp only [kleene_closure]
     simp
     exact str_mem_exp s
+
+
+lemma kleene_closure_eq_univ
+  (α : Type) :
+  kleene_closure α = Set.univ :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x _
+      exact trivial
+    · simp only [Set.subset_def]
+      intro x _
+      exact all_str_mem_kleene_closure x
 
 
 example
@@ -1205,6 +1218,7 @@ theorem thm_11_b
 
 -- [a] ∈ Σ^1
 
+-- 1.50
 theorem thm_12_1
   {α : Type}
   (a : α) :
@@ -1213,6 +1227,7 @@ theorem thm_12_1
     simp only [derivative]
     simp
 
+-- 1.51
 theorem thm_12_2
   {α : Type}
   (a : α) :
@@ -1221,6 +1236,7 @@ theorem thm_12_2
     simp only [derivative]
     simp
 
+-- 1.52
 theorem thm_12_3
   {α : Type}
   (a : α) :
@@ -1229,6 +1245,7 @@ theorem thm_12_3
     simp only [derivative]
     simp
 
+-- 1.53
 theorem thm_12_4
   {α : Type}
   (a b : α)
@@ -1240,6 +1257,7 @@ theorem thm_12_4
     simp only [h1]
     simp
 
+-- 1.54
 theorem thm_12_5
   {α : Type}
   (L1 L2 : Language α)
@@ -1250,6 +1268,7 @@ theorem thm_12_5
     simp only [derivative]
     rfl
 
+-- 1.55
 theorem thm_12_6
   {α : Type}
   (L1 L2 : Language α)
@@ -1395,6 +1414,7 @@ lemma thm_12_7_3
           simp
 
 
+-- 1.56
 theorem thm_12_7
   {α : Type}
   [DecidableEq α]
@@ -1517,6 +1537,7 @@ lemma aux_2
     aesop
 
 
+-- 1.57
 theorem thm_12_8
   {α : Type}
   [DecidableEq α]
@@ -1534,3 +1555,55 @@ theorem thm_12_8
     simp only [derivative_exp_succ]
     simp only [aux_2]
     simp only [thm_5]
+
+
+-- 1.58
+theorem thm_12_9
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a : α) :
+  derivative Lᶜ [a] = (derivative L [a])ᶜ :=
+  by
+    have s1 : derivative L [a] ∪ derivative Lᶜ [a] = derivative (L ∪ Lᶜ) [a] :=
+    by
+      simp only [thm_12_5]
+
+    have s2 : derivative (L ∪ Lᶜ) [a] = derivative Set.univ [a] :=
+      by
+        simp
+
+    have s3 : derivative Set.univ [a] = derivative (concat (Strings.exp α 1) Set.univ) [a] :=
+    by
+      simp only [thm_12_7]
+      simp only [Strings.exp_eq_exp_set]
+      simp only [Strings.exp_set]
+      simp only [Language.nullify]
+      simp
+      simp only [thm_3_b]
+      simp
+
+      simp only [derivative]
+      simp
+      simp only [concat]
+      simp
+
+    have s4 : derivative (concat (Strings.exp α 1) Set.univ) [a] = Strings.kleene_closure α :=
+    by
+      simp only [Strings.kleene_closure_eq_univ]
+      apply Set.eq_of_subset_of_subset
+      · simp only [Set.subset_univ]
+      · simp only [Set.subset_def]
+        intro x a1
+        simp only [concat]
+        simp
+        simp only [derivative]
+        simp
+        apply Exists.intro [a]
+        constructor
+        · simp only [Strings.exp_eq_exp_set]
+          simp only [Strings.exp_set]
+          simp
+        · apply Exists.intro x
+          simp
+    sorry
