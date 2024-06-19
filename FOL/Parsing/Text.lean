@@ -1459,38 +1459,27 @@ theorem thm_12_7
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
 
 
-example
+lemma derivative_iUnion
   {α : Type}
   [DecidableEq α]
   (L : Language α)
   (a : α) :
-  derivative (⋃ n, exp L (n + 1)) [a] = ⋃ n, derivative (exp L (n + 1)) [a] :=
+  derivative (⋃ n, exp L (n + 1)) [a] =
+    ⋃ n, derivative (exp L (n + 1)) [a] :=
   by
     apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
+    all_goals
+      simp only [Set.subset_def]
       intro x a1
-      simp only [exp]
-      simp
       simp only [derivative] at a1
       simp at a1
+
       simp only [derivative]
       simp
-      simp only [exp] at a1
       exact a1
-    · simp only [Set.subset_def]
-      intro x a1
-      simp at a1
-      cases a1
-      case _ i a2 =>
-        simp only [derivative]
-        simp
-        simp only [derivative] at a2
-        simp at a2
-        apply Exists.intro i
-        exact a2
 
 
-example
+lemma derivative_exp_succ
   {α : Type}
   [DecidableEq α]
   (L : Language α)
