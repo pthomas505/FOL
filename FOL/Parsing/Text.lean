@@ -1021,6 +1021,15 @@ theorem corollary_2
         by simp only [← thm_8]
 
 
+theorem thm_9
+  {α : Type}
+  (L1 L2 X : Language α) :
+  concat (kleene_closure α L1) L2 =
+    concat L1 (concat (kleene_closure α L1) L2) ∪ L2 :=
+  by
+    sorry
+
+
 def Language.is_nullable
   {α : Type}
   (L : Language α) :
