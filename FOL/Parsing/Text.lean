@@ -1460,26 +1460,7 @@ theorem thm_12_7
 
 -------------------------------------------------------------------------------
 
-lemma derivative_iUnion
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α)
-  (a : α) :
-  derivative (⋃ n, exp L (n + 1)) [a] =
-    ⋃ n, derivative (exp L (n + 1)) [a] :=
-  by
-    apply Set.eq_of_subset_of_subset
-    all_goals
-      simp only [Set.subset_def]
-      intro x a1
-      simp only [derivative] at a1
-      simp at a1
-
-      simp only [derivative]
-      simp
-      exact a1
-
-
+-- 1.59
 lemma derivative_exp_succ
   {α : Type}
   [DecidableEq α]
@@ -1519,28 +1500,19 @@ lemma aux_1
   [DecidableEq α]
   (L : Language α)
   (a : α) :
-  ⋃ (k : ℕ), derivative (exp L (k + 1)) [a] =
-    ⋃ (k : ℕ), concat (derivative L [a]) (exp L k) :=
+  derivative (⋃ n, exp L (n + 1)) [a] =
+    ⋃ n, derivative (exp L (n + 1)) [a] :=
   by
     apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
+    all_goals
+      simp only [Set.subset_def]
       intro x a1
+      simp only [derivative] at a1
       simp at a1
-      cases a1
-      case _ i a2 =>
-        simp
-        apply Exists.intro i
-        simp only [← derivative_exp_succ L a i]
-        exact a2
-    · simp only [Set.subset_def]
-      intro x a1
-      simp at a1
-      cases a1
-      case _ i a2 =>
-        simp
-        apply Exists.intro i
-        simp only [derivative_exp_succ L a i]
-        exact a2
+
+      simp only [derivative]
+      simp
+      exact a1
 
 
 lemma aux_2
@@ -1574,15 +1546,13 @@ theorem thm_12_8
   (a : α) :
   derivative (kleene_closure α L) [a] = concat (derivative L [a]) (kleene_closure α L) :=
   by
-    obtain s2 := derivative_iUnion L a
-
     conv => left; simp only [thm_5]
     simp only [← Set.union_iUnion_nat_succ (exp L)]
     simp only [thm_12_5]
     simp only [exp_zero]
     simp only [thm_12_2]
     simp only [Set.empty_union]
-    simp only [s2]
     simp only [aux_1]
+    simp only [derivative_exp_succ]
     simp only [aux_2]
     simp only [thm_5]
