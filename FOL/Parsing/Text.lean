@@ -369,6 +369,14 @@ def exp
   | n + 1 => concat (exp L n) L
 
 
+lemma exp_zero
+  {α : Type}
+  (L : Language α) :
+  exp L 0 = {[]} :=
+  by
+    rfl
+
+
 example
   {α : Type}
   (L : Language α) :
@@ -1451,6 +1459,71 @@ theorem thm_12_7
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
 
 
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a : α) :
+  derivative (⋃ n, exp L (n + 1)) [a] = ⋃ n, derivative (exp L (n + 1)) [a] :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · simp only [Set.subset_def]
+      intro x a1
+      simp only [exp]
+      simp
+      simp only [derivative] at a1
+      simp at a1
+      simp only [derivative]
+      simp
+      simp only [exp] at a1
+      exact a1
+    · simp only [Set.subset_def]
+      intro x a1
+      simp at a1
+      cases a1
+      case _ i a2 =>
+        simp only [derivative]
+        simp
+        simp only [derivative] at a2
+        simp at a2
+        apply Exists.intro i
+        exact a2
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a : α)
+  (k : ℕ) :
+  derivative (exp L (k + 1)) [a] =
+    concat (derivative L [a]) (exp L k) :=
+  by
+    induction k
+    case zero =>
+      simp
+      simp only [exp]
+      simp only [concat]
+      simp
+    case succ k ih =>
+      rw [exp]
+      simp only [concat_exp_comm]
+      simp only [thm_12_7]
+      simp only [Language.nullify]
+      split_ifs
+      case pos c1 =>
+        simp only [concat_eps_left]
+        simp only [ih]
+        simp
+
+        obtain s1 := eps_mem_imp_exp_subset_exp_succ L k c1
+
+        exact concat_subset_right (derivative L [a]) (exp L k) (exp L (k + 1)) s1
+      case neg c1 c2 =>
+        simp only [concat]
+        simp
+
+
 theorem thm_12_8
   {α : Type}
   [DecidableEq α]
@@ -1485,5 +1558,11 @@ theorem thm_12_8
         case neg c1 =>
           simp only [concat]
           simp
+
+    conv => left; simp only [thm_5]; simp only [← Set.union_iUnion_nat_succ (exp L)]
+    simp only [thm_12_5]
+    simp only [exp_zero]
+    simp only [thm_12_2]
+    simp only [Set.empty_union]
 
     sorry
