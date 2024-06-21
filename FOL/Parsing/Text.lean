@@ -1150,7 +1150,7 @@ example
   (L1 L2 X : Language α)
   (n : ℕ)
   (h1 : X = (concat L1 X) ∪ L2) :
-  concat (exp L1 (n + 1)) X = concat (⋃ (k ≤ n), exp L1 k) L2 :=
+  X = concat (exp L1 (n + 1)) X ∪ concat (⋃ (k ≤ n), exp L1 k) L2 :=
   by
     sorry
 
