@@ -1047,6 +1047,38 @@ theorem thm_9
         by simp only [h1]
 
 
+example
+  {α : Type}
+  (L1 L2 X : Language α)
+  (h1 : X = (concat L1 X) ∪ L2) :
+  ∀ (n : ℕ), concat (exp L1 n) L2 ⊆ X :=
+  by
+    intro n
+    induction n
+    case zero =>
+      simp only [exp]
+      simp only [concat_eps_left]
+      rw [h1]
+      exact Set.subset_union_right (concat L1 X) L2
+    case succ n ih =>
+      have s1 : concat L1 (concat (exp L1 n) L2) ⊆ concat L1 X :=
+      by
+        apply concat_subset_right
+        exact ih
+
+      simp only [thm_3_c] at s1
+      simp only [← exp_succ_concat_left] at s1
+
+      have s2 : concat L1 X ⊆ X :=
+      by
+        conv => right; rw [h1]
+        exact Set.subset_union_left (concat L1 X) L2
+
+      trans (concat L1 X)
+      · exact s1
+      · exact s2
+
+
 def Language.is_nullable
   {α : Type}
   (L : Language α) :
