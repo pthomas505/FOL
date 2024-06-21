@@ -1149,7 +1149,26 @@ example
   {α : Type}
   (L1 L2 X : Language α)
   (n : ℕ)
-  (h1 : X = (concat L1 X) ∪ L2) :
+  (h1 : X = (concat L1 X) ∪ L2)
+  (h2 : [] ∉ L1) :
+  X ⊆ concat (exp L1 (n + 1)) X ∪ concat (⋃ (k ≤ n), exp L1 k) L2 :=
+  by
+    induction n
+    case zero =>
+      simp
+      simp only [exp]
+      simp only [concat_eps_left]
+      conv => left; rw [h1]
+    case succ k ih =>
+      sorry
+
+
+example
+  {α : Type}
+  (L1 L2 X : Language α)
+  (n : ℕ)
+  (h1 : X = (concat L1 X) ∪ L2)
+  (h2 : [] ∉ L1) :
   X = concat (exp L1 (n + 1)) X ∪ concat (⋃ (k ≤ n), exp L1 k) L2 :=
   by
     induction n
@@ -1159,6 +1178,10 @@ example
       simp only [concat_eps_left]
       exact h1
     case succ k ih =>
+      have s1 : concat L1 X ⊆ X :=
+      by
+        conv => right; rw [h1]
+        exact Set.subset_union_left (concat L1 X) L2
       sorry
 
 
