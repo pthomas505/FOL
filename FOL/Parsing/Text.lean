@@ -247,6 +247,18 @@ def concat
   { s ++ t | (s ∈ L1) (t ∈ L2) }
 
 
+example
+  {α : Type}
+  (L M : Language α)
+  (w : Str α)
+  (h1 : w ∈ concat L M) :
+  ∃ (s : Str α), s ∈ L ∧ ∃ (t : Str α), t ∈ M ∧ s ++ t = w:=
+  by
+    simp only [concat] at h1
+    simp at h1
+    exact h1
+
+
 lemma concat_mem_concat
   {α : Type}
   (L M : Language α)
@@ -1047,7 +1059,7 @@ theorem thm_9
         by simp only [h1]
 
 
-example
+lemma thm_9_unique_right_aux_1
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = (concat L1 X) ∪ L2) :
