@@ -610,6 +610,24 @@ lemma empty_mem_kleene_closure
     exact kleene_closure.eps L
 
 
+example
+  {α : Type} :
+  kleene_closure α ∅ = {[]} :=
+  by
+  ext cs
+  simp
+  constructor
+  · intro a1
+    induction a1
+    case _ =>
+      rfl
+    case _ s t ih_1 ih_2 _ =>
+      simp at ih_2
+  · intro a1
+    simp only [a1]
+    exact kleene_closure.eps ∅
+
+
 theorem thm_4
   {α : Type}
   (L : Language α)
