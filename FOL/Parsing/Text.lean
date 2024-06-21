@@ -1152,7 +1152,14 @@ example
   (h1 : X = (concat L1 X) ∪ L2) :
   X = concat (exp L1 (n + 1)) X ∪ concat (⋃ (k ≤ n), exp L1 k) L2 :=
   by
-    sorry
+    induction n
+    case zero =>
+      simp
+      simp only [exp]
+      simp only [concat_eps_left]
+      exact h1
+    case succ k ih =>
+      sorry
 
 
 def Language.is_nullable
