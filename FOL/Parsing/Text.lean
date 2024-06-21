@@ -534,6 +534,27 @@ lemma concat_mem_exp
     exact concat_mem_concat (exp L n) L s t h1 h2
 
 
+example
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ ⋃ (k ≤ n), exp L k)
+  (h2 : t ∈ L) :
+  s ++ t ∈ ⋃ (k ≤ n), exp L (k + 1) :=
+  by
+    simp at h1
+    cases h1
+    case _ i a1 =>
+      cases a1
+      case _ a1_left a1_right =>
+        simp
+        apply Exists.intro i
+        constructor
+        · exact a1_left
+        · apply concat_mem_exp L s t i a1_right h2
+
+
 lemma concat_exp_comm
   {α : Type}
   (L : Language α)
