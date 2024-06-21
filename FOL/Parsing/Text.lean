@@ -1178,20 +1178,18 @@ example
       simp only [concat_eps_left]
       exact h1
     case succ k ih =>
-      have s1 : concat L1 (concat ((⋃ (i ≤ k), exp L1 i)) L2) ⊆ concat L1 X :=
+      have s1 : concat L1 (concat (⋃ i, ⋃ (_ : i ≤ k), exp L1 i) L2) ⊆ X :=
       by
-        apply concat_subset_right
-        simp only [Set.subset_def]
-        intro x a1
-        rw [ih]
-        simp
-        right
-        exact a1
-
-      have s2 : concat L1 X ⊆ X :=
-      by
-        conv => right; rw [h1]
-        exact Set.subset_union_left (concat L1 X) L2
+        trans (concat L1 X)
+        · apply concat_subset_right
+          simp only [Set.subset_def]
+          intro x a1
+          rw [ih]
+          simp
+          right
+          exact a1
+        · conv => right; rw [h1]
+          exact Set.subset_union_left (concat L1 X) L2
 
       sorry
 
