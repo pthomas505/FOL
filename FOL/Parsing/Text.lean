@@ -1145,6 +1145,16 @@ lemma thm_9_unique_right_aux_1
       · exact s2
 
 
+example
+  {α : Type}
+  (L1 L2 X : Language α)
+  (n : ℕ)
+  (h1 : X = (concat L1 X) ∪ L2) :
+  concat (exp L1 (n + 1)) X = concat (⋃ (k ≤ n), exp L1 k) L2 :=
+  by
+    sorry
+
+
 def Language.is_nullable
   {α : Type}
   (L : Language α) :
