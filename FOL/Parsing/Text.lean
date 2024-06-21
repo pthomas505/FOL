@@ -1182,6 +1182,16 @@ example
       by
         conv => right; rw [h1]
         exact Set.subset_union_left (concat L1 X) L2
+
+      have s2 : concat L1 (concat ((⋃ (i ≤ k), exp L1 i)) L2) ⊆ concat L1 X :=
+      by
+        apply concat_subset_right
+        simp only [Set.subset_def]
+        intro x a1
+        rw [ih]
+        simp
+        right
+        exact a1
       sorry
 
 
