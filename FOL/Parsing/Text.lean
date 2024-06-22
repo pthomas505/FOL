@@ -696,7 +696,7 @@ example
   {α : Type}
   (L : Language α)
   (n : ℕ) :
-  [] ∈ (⋃ k, ⋃ (_ : k ≤ n), exp L k) :=
+  [] ∈ ⋃ (k ≤ n), exp L k :=
   by
     induction n
     case zero =>
@@ -1368,7 +1368,7 @@ example
       simp only [concat_eps_left]
       exact h1
     case succ k ih =>
-      have s1 : concat L1 (concat (⋃ i, ⋃ (_ : i ≤ k), exp L1 i) L2) ⊆ X :=
+      have s1 : concat L1 (concat (⋃ (i ≤ k), exp L1 i) L2) ⊆ X :=
       by
         trans (concat L1 X)
         · apply concat_subset_right
