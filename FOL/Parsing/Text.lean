@@ -603,6 +603,16 @@ lemma exp_succ_concat_left
     rfl
 
 
+lemma exp_succ_concat_left_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  (⋃ (k ≤ n), exp L (k + 1)) = concat L (⋃ (k ≤ n), exp L k) :=
+  by
+    simp only [← concat_exp_comm_union]
+    exact union_exp_succ L n
+
+
 lemma concat_mem_exp_comm
   {α : Type}
   (L : Language α)
