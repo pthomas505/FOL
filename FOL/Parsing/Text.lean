@@ -279,6 +279,19 @@ lemma concat_mem_concat
       · rfl
 
 
+lemma eps_concat_mem_concat
+  {α : Type}
+  (L M : Language α)
+  (x : Str α)
+  (h1 : [] ∈ L)
+  (h2 : x ∈ M) :
+  x ∈ concat L M :=
+  by
+    obtain s1 := concat_mem_concat L M [] x h1 h2
+    simp at s1
+    exact s1
+
+
 theorem thm_3_a
   {α : Type}
   (L : Language α) :
@@ -787,7 +800,7 @@ inductive kleene_closure
     kleene_closure α L (s ++ t)
 
 
-lemma empty_mem_kleene_closure
+lemma eps_mem_kleene_closure
   {α : Type}
   (L : Language α) :
   [] ∈ kleene_closure α L :=
@@ -1502,7 +1515,7 @@ lemma eps_not_mem_imp_mem_concat_exp_ge_exp
             exact Nat.lt_add_right (List.length t) s1
 
 
-example
+lemma eps_not_mem_imp_not_mem_concat_exp
   {α : Type}
   (L M : Language α)
   (x : Str α)
@@ -1521,7 +1534,18 @@ theorem thm_9_unique_right
   (h2 : [] ∉ L1) :
   X ⊆ concat (kleene_closure α L1) L2 :=
   by
-    sorry
+    simp only [Set.subset_def]
+    intro x a1
+    rw [h1] at a1
+    simp only [concat] at a1
+    simp at a1
+    cases a1
+    case _ a1_left =>
+      sorry
+    case _ a1_right =>
+      apply eps_concat_mem_concat
+      · apply eps_mem_kleene_closure
+      · exact a1_right
 
 
 def Language.is_nullable
@@ -1567,7 +1591,7 @@ example
   Language.nullify (kleene_closure α L) = {[]} :=
   by
     simp only [Language.nullify]
-    simp only [empty_mem_kleene_closure]
+    simp only [eps_mem_kleene_closure]
     simp
 
 
