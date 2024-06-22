@@ -1565,7 +1565,7 @@ theorem thm_9_unique_right
       have ht' := ht
       rw [h1] at ht'
       simp at ht'
-      obtain ht1 | ht1 := ht'
+      obtain _ | ht1 := ht'
       · have : t.length < x.length :=
         by
           simp only [← eq]
