@@ -1477,7 +1477,7 @@ example
     simp at s1
 
 
-example
+lemma eps_not_mem_imp_mem_concat_exp_ge_exp
   {α : Type}
   (L M : Language α)
   (x : Str α)
@@ -1500,6 +1500,18 @@ example
             simp
             obtain s1 := eps_not_mem_imp_mem_len_ge_exp L s n h1 a1_left
             exact Nat.lt_add_right (List.length t) s1
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (x : Str α)
+  (h1 : [] ∉ L) :
+  x ∉ concat (exp L (x.length + 1)) M :=
+  by
+    intro contra
+    obtain s1 := eps_not_mem_imp_mem_concat_exp_ge_exp L M x x.length h1 contra
+    simp at s1
 
 
 theorem thm_9_unique_right
