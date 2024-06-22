@@ -393,6 +393,33 @@ example
     exact Set.mem_of_subset_of_mem h2 a1
 
 
+lemma concat_subset_left
+  {α : Type}
+  (L1 L2 L3 : Language α)
+  (h1 : L2 ⊆ L3) :
+  concat L2 L1 ⊆ concat L3 L1 :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp only [concat] at a1
+    simp at a1
+    cases a1
+    case _ s a2 =>
+      cases a2
+      case _ a2_left a2_right =>
+        cases a2_right
+        case _ t a3 =>
+          cases a3
+          case _ a3_left a3_right =>
+            simp only [concat]
+            simp
+            apply Exists.intro s
+            constructor
+            · exact Set.mem_of_subset_of_mem h1 a2_left
+            · apply Exists.intro t
+              tauto
+
+
 lemma concat_subset_right
   {α : Type}
   (L1 L2 L3 : Language α)
@@ -474,24 +501,11 @@ lemma exp_succ_union
         cases a2
         case _ a2_left a2_right =>
           simp only [exp] at a2_right
-          simp only [concat] at a2_right
-          simp at a2_right
-          cases a2_right
-          case _ s a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              cases a3_right
-              case _ t a4 =>
-              cases a4
-              case _ a4_left a4_right =>
-                simp only [concat]
-                simp
-                apply Exists.intro s
-                constructor
-                · apply Exists.intro i
-                  tauto
-                · apply Exists.intro t
-                  tauto
+          have s1 : concat (exp L i) L ⊆ concat (⋃ k, ⋃ (_ : k ≤ n), exp L k) L :=
+          by
+            apply concat_subset_left
+            exact Set.subset_biUnion_of_mem a2_left
+          apply Set.mem_of_subset_of_mem s1 a2_right
     · simp only [Set.subset_def]
       intro x a1
       simp only [concat] at a1
@@ -659,6 +673,30 @@ example
       constructor
       · exact ih
       · exact h1
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  [] ∈ (⋃ k, ⋃ (_ : k ≤ n), exp L k) :=
+  by
+    induction n
+    case zero =>
+      simp
+      simp only [exp]
+      simp
+    case succ k ih =>
+      simp at ih
+      cases ih
+      case _ i a1 =>
+        simp
+        cases a1
+        case _ a1_left a1_right =>
+          apply Exists.intro i
+          constructor
+          · exact Nat.le_succ_of_le a1_left
+          · exact a1_right
 
 
 lemma eps_mem_imp_exp_subset_exp_succ
