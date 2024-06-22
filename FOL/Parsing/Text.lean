@@ -1384,6 +1384,15 @@ example
       sorry
 
 
+theorem thm_9_unique
+  {α : Type}
+  (L1 L2 X : Language α)
+  (h1 : X = (concat L1 X) ∪ L2) :
+  X = concat (kleene_closure α L1) L2 :=
+  by
+    sorry
+
+
 def Language.is_nullable
   {α : Type}
   (L : Language α) :
