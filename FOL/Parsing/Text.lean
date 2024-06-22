@@ -1,3 +1,4 @@
+import Mathlib.Data.Nat.Lattice
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finset.Basic
 
@@ -457,7 +458,7 @@ example
     rfl
 
 
-example
+lemma union_exp_succ
   {α : Type}
   (L : Language α)
   (n : ℕ) :
@@ -570,6 +571,26 @@ lemma concat_exp_comm
       simp only [exp]
       conv => left; simp only [ih]
       simp only [thm_3_c]
+
+
+lemma concat_exp_comm_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  concat (⋃ (k ≤ n), exp L k) L = concat L (⋃ (k ≤ n), exp L k) :=
+  by
+    induction n
+    case zero =>
+      simp
+      simp only [exp]
+      simp only [concat]
+      simp
+    case succ i ih =>
+      simp only [Set.biUnion_le_succ (exp L)]
+      simp only [thm_3_d_comm]
+      simp only [thm_3_d]
+      simp only [ih]
+      simp only [concat_exp_comm]
 
 
 lemma exp_succ_concat_left
