@@ -476,6 +476,23 @@ example
     simp
 
 
+theorem exp_union_sub_exp_succ_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  ⋃ (k ≤ n), exp L k ⊆ ⋃ (k ≤ n + 1), exp L k :=
+  by
+    simp
+    intro k a1
+    simp only [Set.subset_def]
+    intro x a2
+    simp
+    apply Exists.intro k
+    constructor
+    · exact Nat.le_succ_of_le a1
+    · exact a2
+
+
 example
   {α : Type}
   (L : Language α)
@@ -1328,6 +1345,11 @@ example
       simp only [concat_eps_left]
       conv => left; rw [h1]
     case succ k ih =>
+      have s1 : concat (⋃ (i ≤ k), exp L1 i) L2 ⊆ concat (⋃ (i ≤ k + 1), exp L1 i) L2 :=
+      by
+        apply concat_subset_left
+        apply exp_union_sub_exp_succ_union
+
       sorry
 
 
