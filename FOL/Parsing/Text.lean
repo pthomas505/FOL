@@ -1298,38 +1298,6 @@ theorem thm_9
         by simp only [h1]
 
 
-lemma thm_9_unique_right_aux_1
-  {α : Type}
-  (L1 L2 X : Language α)
-  (h1 : X = (concat L1 X) ∪ L2) :
-  ∀ (n : ℕ), concat (exp L1 n) L2 ⊆ X :=
-  by
-    intro n
-    induction n
-    case zero =>
-      simp only [exp]
-      simp only [concat_eps_left]
-      rw [h1]
-      exact Set.subset_union_right (concat L1 X) L2
-    case succ n ih =>
-      have s1 : concat L1 (concat (exp L1 n) L2) ⊆ concat L1 X :=
-      by
-        apply concat_subset_right
-        exact ih
-
-      simp only [thm_3_c] at s1
-      simp only [← exp_succ_concat_left] at s1
-
-      have s2 : concat L1 X ⊆ X :=
-      by
-        conv => right; rw [h1]
-        exact Set.subset_union_left (concat L1 X) L2
-
-      trans (concat L1 X)
-      · exact s1
-      · exact s2
-
-
 example
   {α : Type}
   (L1 L2 X : Language α)
@@ -1384,6 +1352,38 @@ example
       sorry
 
 
+lemma thm_9_unique_left_aux_1
+  {α : Type}
+  (L1 L2 X : Language α)
+  (h1 : X = (concat L1 X) ∪ L2) :
+  ∀ (n : ℕ), concat (exp L1 n) L2 ⊆ X :=
+  by
+    intro n
+    induction n
+    case zero =>
+      simp only [exp]
+      simp only [concat_eps_left]
+      rw [h1]
+      exact Set.subset_union_right (concat L1 X) L2
+    case succ n ih =>
+      have s1 : concat L1 (concat (exp L1 n) L2) ⊆ concat L1 X :=
+      by
+        apply concat_subset_right
+        exact ih
+
+      simp only [thm_3_c] at s1
+      simp only [← exp_succ_concat_left] at s1
+
+      have s2 : concat L1 X ⊆ X :=
+      by
+        conv => right; rw [h1]
+        exact Set.subset_union_left (concat L1 X) L2
+
+      trans (concat L1 X)
+      · exact s1
+      · exact s2
+
+
 theorem thm_9_unique_left
   {α : Type}
   (L1 L2 X : Language α)
@@ -1421,7 +1421,7 @@ theorem thm_9_unique_left
 
     cases s1
     case _ n a2 =>
-      obtain s2 := thm_9_unique_right_aux_1 L1 L2 X h1 n
+      obtain s2 := thm_9_unique_left_aux_1 L1 L2 X h1 n
       apply Set.mem_of_subset_of_mem s2 a2
 
 
