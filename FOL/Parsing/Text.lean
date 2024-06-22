@@ -1426,6 +1426,16 @@ theorem thm_9_unique_left
       apply Set.mem_of_subset_of_mem s1 a2
 
 
+theorem thm_9_unique_right
+  {α : Type}
+  (L1 L2 X : Language α)
+  (h1 : X = (concat L1 X) ∪ L2)
+  (h2 : [] ∉ L1) :
+  X ⊆ concat (kleene_closure α L1) L2 :=
+  by
+    sorry
+
+
 def Language.is_nullable
   {α : Type}
   (L : Language α) :
