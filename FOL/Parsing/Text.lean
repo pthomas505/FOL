@@ -1384,14 +1384,46 @@ example
       sorry
 
 
-theorem thm_9_unique
+theorem thm_9_unique_left
   {α : Type}
   (L1 L2 X : Language α)
-  (h1 : X = (concat L1 X) ∪ L2)
-  (h2 : [] ∉ L1) :
-  X = concat (kleene_closure α L1) L2 :=
+  (h1 : X = (concat L1 X) ∪ L2) :
+  concat (kleene_closure α L1) L2 ⊆ X :=
   by
-    sorry
+    obtain s1 := thm_9_unique_right_aux_1 L1 L2 X h1
+    simp only [thm_5]
+    simp only [Set.subset_def]
+    intro x a1
+
+    have s2 : ∃ (n : ℕ), x ∈ concat (exp L1 n) L2 :=
+    by
+      simp only [concat] at a1
+      simp at a1
+      cases a1
+      case _ s a2 =>
+        cases a2
+        case _ a2_left a2_right =>
+          cases a2_left
+          case _ i a3 =>
+            cases a2_right
+            case _ t a4 =>
+              cases a4
+              case _ a4_left a4_right =>
+                simp only [concat]
+                simp
+                apply Exists.intro i
+                apply Exists.intro s
+                constructor
+                · exact a3
+                · apply Exists.intro t
+                  constructor
+                  · exact a4_left
+                  · exact a4_right
+
+    cases s2
+    case _ n a2 =>
+      specialize s1 n
+      apply Set.mem_of_subset_of_mem s1 a2
 
 
 def Language.is_nullable
