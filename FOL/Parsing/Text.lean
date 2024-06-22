@@ -458,7 +458,7 @@ example
     rfl
 
 
-lemma union_exp_succ
+lemma exp_succ_union
   {α : Type}
   (L : Language α)
   (n : ℕ) :
@@ -610,7 +610,7 @@ lemma exp_succ_concat_left_union
   (⋃ (k ≤ n), exp L (k + 1)) = concat L (⋃ (k ≤ n), exp L k) :=
   by
     simp only [← concat_exp_comm_union]
-    exact union_exp_succ L n
+    exact exp_succ_union L n
 
 
 lemma concat_mem_exp_comm
@@ -625,6 +625,20 @@ lemma concat_mem_exp_comm
     simp only [exp]
     simp only [concat_exp_comm]
     exact concat_mem_concat L (exp L n) s t h1 h2
+
+
+lemma concat_mem_exp_comm_union
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ L)
+  (h2 : t ∈ (⋃ (k ≤ n), exp L k)) :
+  s ++ t ∈ (⋃ (k ≤ n), exp L (k + 1)) :=
+  by
+    simp only [exp_succ_union]
+    simp only [concat_exp_comm_union]
+    exact concat_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
 
 
 example
