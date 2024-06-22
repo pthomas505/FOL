@@ -1538,51 +1538,53 @@ lemma eps_not_mem_imp_not_mem_concat_exp
     simp at s1
 
 
+theorem left_append_not_eps
+  {α : Type}
+  (s t : Str α)
+  (h1 : ¬ s = []) :
+  List.length t < List.length (s ++ t) :=
+  by
+    simp
+    exact h1
+
+
 theorem thm_9_unique_right
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = (concat L1 X) ∪ L2)
   (h2 : [] ∉ L1) :
-  X ⊆ concat (kleene_closure α L1) L2 :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
+  X ⊆ concat (kleene_closure α L1) L2
+| x, a1 => by
     rw [h1] at a1
     simp only [concat] at a1
     simp at a1
-    cases a1
-    case _ a1_left =>
-      cases a1_left
-      case _ s a2 =>
-        cases a2
-        case _ a2_left a2_right =>
-          cases a2_right
-          case _ t a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              simp only [← a3_right]
-              simp only [concat]
-              simp
-              by_cases c1 : t ∈ L2
-              · apply Exists.intro s
-                constructor
-                · apply mem_lang_imp_mem_kleene L1 s a2_left
-                · apply Exists.intro t
-                  tauto
-              · have s1 : t ∈ concat L1 X := by {
-                  rw [h1] at a3_left
-                  simp at a3_left
-                  cases a3_left
-                  case _ c2 =>
-                    exact c2
-                  case _ c2 =>
-                    contradiction
-                }
-                sorry
-    case _ a1_right =>
-      apply eps_concat_mem_concat
+    obtain ⟨s, hs, t, ht, eq⟩ | hx := a1
+    · simp only [← eq]
+      simp only [concat]
+      simp
+      have ht' := ht
+      rw [h1] at ht'
+      simp at ht'
+      obtain ht1 | ht1 := ht'
+      · have : t.length < x.length :=
+        by
+          simp only [← eq]
+          apply left_append_not_eps
+          intro contra
+          simp only [contra] at hs
+          contradiction
+        have IH := thm_9_unique_right L1 L2 X h1 h2 ht
+        sorry
+      · apply Exists.intro s
+        constructor
+        · apply mem_lang_imp_mem_kleene L1 s hs
+        · apply Exists.intro t
+          tauto
+
+    · apply eps_concat_mem_concat
       · apply eps_mem_kleene_closure
-      · exact a1_right
+      · exact hx
+termination_by x => x.length
 
 
 def Language.is_nullable
