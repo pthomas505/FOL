@@ -1390,12 +1390,11 @@ theorem thm_9_unique_left
   (h1 : X = (concat L1 X) ∪ L2) :
   concat (kleene_closure α L1) L2 ⊆ X :=
   by
-    obtain s1 := thm_9_unique_right_aux_1 L1 L2 X h1
     simp only [thm_5]
     simp only [Set.subset_def]
     intro x a1
 
-    have s2 : ∃ (n : ℕ), x ∈ concat (exp L1 n) L2 :=
+    have s1 : ∃ (n : ℕ), x ∈ concat (exp L1 n) L2 :=
     by
       simp only [concat] at a1
       simp at a1
@@ -1420,10 +1419,10 @@ theorem thm_9_unique_left
                   · exact a4_left
                   · exact a4_right
 
-    cases s2
+    cases s1
     case _ n a2 =>
-      specialize s1 n
-      apply Set.mem_of_subset_of_mem s1 a2
+      obtain s2 := thm_9_unique_right_aux_1 L1 L2 X h1 n
+      apply Set.mem_of_subset_of_mem s2 a2
 
 
 theorem thm_9_unique_right
