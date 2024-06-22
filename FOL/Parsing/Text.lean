@@ -877,7 +877,7 @@ lemma lang_sub_kleene_closure
     exact s2
 
 
-lemma mem_lang_imp_mem_kleene
+lemma mem_lang_imp_mem_kleene_closure
   {α : Type}
   (L : Language α)
   (x : Str α)
@@ -1574,10 +1574,23 @@ theorem thm_9_unique_right
           simp only [contra] at hs
           contradiction
         have IH := thm_9_unique_right L1 L2 X h1 h2 ht
-        sorry
+        simp only [concat] at IH
+        simp at IH
+        obtain ⟨s', hs', t', ht', eq'⟩ := IH
+        apply Exists.intro (s ++ s')
+        constructor
+        · apply kleene_closure_closed_concat
+          · apply mem_lang_imp_mem_kleene_closure
+            exact hs
+          · exact hs'
+        · apply Exists.intro t'
+          constructor
+          · exact ht'
+          · simp
+            exact eq'
       · apply Exists.intro s
         constructor
-        · apply mem_lang_imp_mem_kleene L1 s hs
+        · apply mem_lang_imp_mem_kleene_closure L1 s hs
         · apply Exists.intro t
           tauto
 
