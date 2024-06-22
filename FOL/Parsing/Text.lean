@@ -1387,7 +1387,8 @@ example
 theorem thm_9_unique
   {α : Type}
   (L1 L2 X : Language α)
-  (h1 : X = (concat L1 X) ∪ L2) :
+  (h1 : X = (concat L1 X) ∪ L2)
+  (h2 : [] ∉ L1) :
   X = concat (kleene_closure α L1) L2 :=
   by
     sorry
