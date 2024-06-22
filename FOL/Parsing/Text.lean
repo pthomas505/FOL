@@ -877,6 +877,17 @@ lemma lang_sub_kleene_closure
     exact s2
 
 
+lemma mem_lang_imp_mem_kleene
+  {α : Type}
+  (L : Language α)
+  (x : Str α)
+  (h1 : x ∈ L) :
+  x ∈ kleene_closure α L :=
+  by
+    obtain s1 := lang_sub_kleene_closure L
+    exact Set.mem_of_subset_of_mem s1 h1
+
+
 theorem thm_5_left
   {α : Type}
   (L : Language α) :
@@ -1541,7 +1552,33 @@ theorem thm_9_unique_right
     simp at a1
     cases a1
     case _ a1_left =>
-      sorry
+      cases a1_left
+      case _ s a2 =>
+        cases a2
+        case _ a2_left a2_right =>
+          cases a2_right
+          case _ t a3 =>
+            cases a3
+            case _ a3_left a3_right =>
+              simp only [← a3_right]
+              simp only [concat]
+              simp
+              by_cases c1 : t ∈ L2
+              · apply Exists.intro s
+                constructor
+                · apply mem_lang_imp_mem_kleene L1 s a2_left
+                · apply Exists.intro t
+                  tauto
+              · have s1 : t ∈ concat L1 X := by {
+                  rw [h1] at a3_left
+                  simp at a3_left
+                  cases a3_left
+                  case _ c2 =>
+                    exact c2
+                  case _ c2 =>
+                    contradiction
+                }
+                sorry
     case _ a1_right =>
       apply eps_concat_mem_concat
       · apply eps_mem_kleene_closure
