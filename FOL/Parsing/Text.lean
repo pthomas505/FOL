@@ -1298,60 +1298,6 @@ theorem thm_9
         by simp only [h1]
 
 
-example
-  {α : Type}
-  (L1 L2 X : Language α)
-  (n : ℕ)
-  (h1 : X = (concat L1 X) ∪ L2)
-  (h2 : [] ∉ L1) :
-  X ⊆ concat (exp L1 (n + 1)) X ∪ concat (⋃ (k ≤ n), exp L1 k) L2 :=
-  by
-    induction n
-    case zero =>
-      simp
-      simp only [exp]
-      simp only [concat_eps_left]
-      conv => left; rw [h1]
-    case succ k ih =>
-      have s1 : concat (⋃ (i ≤ k), exp L1 i) L2 ⊆ concat (⋃ (i ≤ k + 1), exp L1 i) L2 :=
-      by
-        apply concat_subset_left
-        apply exp_union_sub_exp_succ_union
-
-      sorry
-
-
-example
-  {α : Type}
-  (L1 L2 X : Language α)
-  (n : ℕ)
-  (h1 : X = (concat L1 X) ∪ L2)
-  (h2 : [] ∉ L1) :
-  X = concat (exp L1 (n + 1)) X ∪ concat (⋃ (k ≤ n), exp L1 k) L2 :=
-  by
-    induction n
-    case zero =>
-      simp
-      simp only [exp]
-      simp only [concat_eps_left]
-      exact h1
-    case succ k ih =>
-      have s1 : concat L1 (concat (⋃ (i ≤ k), exp L1 i) L2) ⊆ X :=
-      by
-        trans (concat L1 X)
-        · apply concat_subset_right
-          simp only [Set.subset_def]
-          intro x a1
-          rw [ih]
-          simp
-          right
-          exact a1
-        · conv => right; rw [h1]
-          exact Set.subset_union_left (concat L1 X) L2
-
-      sorry
-
-
 lemma thm_9_unique_left_aux_1
   {α : Type}
   (L1 L2 X : Language α)
