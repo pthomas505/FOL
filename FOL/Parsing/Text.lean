@@ -1371,18 +1371,6 @@ theorem thm_9_unique_left
       apply Set.mem_of_subset_of_mem s2 a2
 
 
-theorem thm_9_unique_right_aux
-  {α : Type}
-  (L1 L2 : Language α)
-  (t : Str α)
-  (h1 : [] ∉ L1)
-  (h2 : t ∈ L2)
-  (h3 : t ∈ concat L1 L2) :
-  False :=
-  by
-    sorry
-
-
 theorem thm_9_unique_right
   {α : Type}
   (L1 L2 X : Language α)
@@ -1426,8 +1414,7 @@ theorem thm_9_unique_right
                 simp at s1
                 cases s1
                 case _ c1 =>
-                  obtain s2 := thm_9_unique_right_aux L1 X t h2 a3_left c1
-                  contradiction
+                  sorry
                 case _ c1 =>
                   exact c1
               · exact a3_right
