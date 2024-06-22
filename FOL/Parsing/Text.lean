@@ -1371,6 +1371,18 @@ theorem thm_9_unique_left
       apply Set.mem_of_subset_of_mem s2 a2
 
 
+theorem thm_9_unique_right_aux
+  {α : Type}
+  (L1 L2 : Language α)
+  (t : Str α)
+  (h1 : [] ∉ L1)
+  (h2 : t ∈ L2)
+  (h3 : t ∈ concat L1 L2) :
+  False :=
+  by
+    sorry
+
+
 theorem thm_9_unique_right
   {α : Type}
   (L1 L2 X : Language α)
@@ -1378,7 +1390,54 @@ theorem thm_9_unique_right
   (h2 : [] ∉ L1) :
   X ⊆ concat (kleene_closure α L1) L2 :=
   by
-    sorry
+    simp only [thm_5]
+    simp only [Set.subset_def]
+    intro x a1
+
+    rw [h1] at a1
+    simp only [concat] at a1
+    simp at a1
+    cases a1
+    case _ a1_left =>
+      cases a1_left
+      case _ s a2 =>
+        cases a2
+        case _ a2_left a2_right =>
+          cases a2_right
+          case _ t a3 =>
+          cases a3
+          case _ a3_left a3_right =>
+            simp only [concat]
+            simp
+            apply Exists.intro s
+            constructor
+            · apply Exists.intro 1
+              simp only [exp]
+              simp only [concat]
+              simp
+              exact a2_left
+            · apply Exists.intro t
+              constructor
+              · have s1 : t ∈ concat L1 X ∪ L2 := by {
+                  simp only [← h1]
+                  exact a3_left
+                }
+
+                simp at s1
+                cases s1
+                case _ c1 =>
+                  obtain s2 := thm_9_unique_right_aux L1 X t h2 a3_left c1
+                  contradiction
+                case _ c1 =>
+                  exact c1
+              · exact a3_right
+    case _ a1_right =>
+      obtain s1 := (empty_mem_kleene_closure L1)
+      simp only [thm_5] at s1
+
+      obtain s2 := concat_mem_concat (⋃ n, exp L1 n) L2 [] x s1 a1_right
+      simp at s2
+      exact s2
 
 
 def Language.is_nullable
