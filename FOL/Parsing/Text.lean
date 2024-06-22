@@ -1431,7 +1431,7 @@ example
     exact h1
 
 
-example
+lemma eps_not_mem_imp_mem_len_ge_exp
   {α : Type}
   (L : Language α)
   (x : Str α)
@@ -1467,11 +1467,14 @@ example
 
 example
   {α : Type}
-  (L M : Language α)
+  (L : Language α)
   (x : Str α)
   (h1 : [] ∉ L) :
-  x ∉ concat (exp L (x.length + 1)) M :=
-    sorry
+  x ∉ exp L (x.length + 1) :=
+  by
+    intro contra
+    obtain s1 := eps_not_mem_imp_mem_len_ge_exp L x x.length h1 contra
+    simp at s1
 
 
 theorem thm_9_unique_right
