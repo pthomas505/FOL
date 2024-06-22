@@ -1477,6 +1477,31 @@ example
     simp at s1
 
 
+example
+  {α : Type}
+  (L M : Language α)
+  (x : Str α)
+  (n : ℕ)
+  (h1 : [] ∉ L)
+  (h2 : x ∈ concat (exp L (n + 1)) M) :
+  x.length > n :=
+  by
+    simp only [concat] at h2
+    simp at h2
+    cases h2
+    case _ s a1 =>
+      cases a1
+      case _ a1_left a1_right =>
+        cases a1_right
+        case _ t a2 =>
+          cases a2
+          case _ a2_left a2_right =>
+            simp only [← a2_right]
+            simp
+            obtain s1 := eps_not_mem_imp_mem_len_ge_exp L s n h1 a1_left
+            exact Nat.lt_add_right (List.length t) s1
+
+
 theorem thm_9_unique_right
   {α : Type}
   (L1 L2 X : Language α)
