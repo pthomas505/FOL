@@ -1651,6 +1651,18 @@ theorem thm_9_unique_right
 termination_by x => x.length
 
 
+theorem thm_9_unique
+  {α : Type}
+  (L1 L2 X : Language α)
+  (h1 : X = (concat L1 X) ∪ L2)
+  (h2 : [] ∉ L1) :
+  concat (kleene_closure α L1) L2 = X :=
+  by
+    apply Set.eq_of_subset_of_subset
+    · exact thm_9_unique_left L1 L2 X h1
+    · exact thm_9_unique_right L1 L2 X h1 h2
+
+
 def Language.is_nullable
   {α : Type}
   (L : Language α) :
