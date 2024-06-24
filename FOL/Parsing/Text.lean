@@ -2153,7 +2153,8 @@ lemma aux_1
   ⋃ n, derivative (f n) [a] = derivative (⋃ n, f n) [a] :=
   by
     simp only [derivative]
-    aesop
+    ext cs
+    simp
 
 
 lemma aux_2
@@ -2161,10 +2162,48 @@ lemma aux_2
   [DecidableEq α]
   (L : Language α)
   (f : ℕ → Language α) :
-  ⋃ n, concat L (f n) = concat L (⋃ n, (f n)) :=
+  ⋃ (n : ℕ), concat L (f n) = concat L (⋃ (n : ℕ), (f n)) :=
   by
     simp only [concat]
-    aesop
+    ext cs
+    simp
+    constructor
+    · intro a1
+      cases a1
+      case _ i a2 =>
+        cases a2
+        case _ s a3 =>
+          cases a3
+          case _ a3_left a3_right =>
+            cases a3_right
+            case _ t a4 =>
+              cases a4
+              case _ a4_left a4_right =>
+                apply Exists.intro s
+                constructor
+                · exact a3_left
+                · apply Exists.intro t
+                  constructor
+                  · apply Exists.intro i
+                    exact a4_left
+                  · exact a4_right
+    · intro a1
+      cases a1
+      case _ s a2 =>
+        cases a2
+        case _ a2_left a2_right =>
+          cases a2_right
+          case _ t a3 =>
+            cases a3
+            case _ a3_left a3_right =>
+              cases a3_left
+              case _ i a4 =>
+                apply Exists.intro i
+                apply Exists.intro s
+                constructor
+                · exact a2_left
+                · apply Exists.intro t
+                  tauto
 
 
 -- 1.57
