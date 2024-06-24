@@ -373,7 +373,58 @@ theorem thm_3_d_comm
     concat L1 L3 ∪ concat L2 L3 :=
   by
     simp only [concat]
-    aesop
+    ext cs
+    constructor
+    · simp
+      intro s a1 t a2 a3
+      cases a1
+      case _ a1_left =>
+        left
+        apply Exists.intro s
+        constructor
+        · exact a1_left
+        · apply Exists.intro t
+          tauto
+      case _ a1_right =>
+        right
+        apply Exists.intro s
+        constructor
+        · exact a1_right
+        · apply Exists.intro t
+          tauto
+    · simp
+      intro a1
+      cases a1
+      case _ a1_left =>
+        cases a1_left
+        case _ s a2 =>
+          cases a2
+          case _ a2_left a2_right =>
+            cases a2_right
+            case _ t a3 =>
+              cases a3
+              case _ a3_left a3_right =>
+                apply Exists.intro s
+                constructor
+                · left
+                  exact a2_left
+                · apply Exists.intro t
+                  tauto
+      case _ a1_right =>
+        cases a1_right
+        case _ s a2 =>
+          cases a2
+          case _ a2_left a2_right =>
+            cases a2_right
+            case _ t a3 =>
+            cases a3
+            case _ a3_left a3_right =>
+              apply Exists.intro s
+              constructor
+              · right
+                exact a2_left
+              · apply Exists.intro t
+                tauto
 
 
 lemma concat_eps_left
