@@ -2387,3 +2387,21 @@ theorem thm_14
             case _ a3_left a3_right =>
               simp only [← a3_right]
               exact a3_left
+
+
+theorem thm_14_disjoint
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a b : α)
+  (h1 : ¬ b = a) :
+  concat {[a]} L ∩ concat {[b]} L = ∅ :=
+  by
+    ext cs
+    simp only [concat]
+    simp
+    intro s _ a2 t _
+    simp only [← a2]
+    simp
+    intro a4
+    contradiction
