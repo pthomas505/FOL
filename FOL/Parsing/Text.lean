@@ -2458,10 +2458,10 @@ theorem thm_15_symm
   {α : Type}
   (L : Language α)
   (s t : Str α) :
-  L_equiv L s t ↔ L_equiv L t s :=
+  L_equiv L s t → L_equiv L t s :=
   by
     simp only [L_equiv]
-    exact eq_comm
+    exact fun a => id a.symm
 
 
 theorem thm_15_trans
@@ -2476,3 +2476,17 @@ theorem thm_15_trans
     trans {u | s ++ u ∈ L}
     · exact h1
     · exact h2
+
+
+instance (α : Type) (L : Language α) : IsEquiv (Str α) (L_equiv L) :=
+  {
+    symm := thm_15_symm L
+    refl := thm_15_refl L
+    trans := thm_15_trans L
+  }
+
+theorem L_equivalence
+  {α : Type}
+  (L : Language α) :
+  Equivalence (L_equiv L) :=
+  ⟨ thm_15_refl L, thm_15_symm L _ _, thm_15_trans L _ _ _ ⟩
