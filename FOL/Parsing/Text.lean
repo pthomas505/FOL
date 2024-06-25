@@ -2405,3 +2405,31 @@ theorem thm_14_disjoint
     simp
     intro a4
     contradiction
+
+
+/-
+Definition 16 (Distinguishing extension). Let L ⊆ Σ∗ be a language, and
+s, t ∈ Σ∗ strings. A distinguishing extension is a string u ∈ Σ∗ such that
+either su ∈ L or tu ∈ L, but not both.
+-/
+def is_dist_ext
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (u : Str α) :
+  Prop :=
+  (s ++ u ∈ L ∧ t ++ u ∉ L) ∨ (s ++ u ∉ L ∧ t ++ u ∈ L)
+
+
+/-
+Definition 17. Define the relation ≡L, “L-equivalent”, or “equivalent with
+respect to L”, on strings by the rule
+s ≡L t ⇔ {u : su ∈ L} = {u : tu ∈ L} , (1.66)
+i.e. s ≡L t if there is no distinguishing extension for s and t.
+-/
+def L_equiv
+  {α : Type}
+  (L : Language α)
+  (s t : Str α) :
+  Prop :=
+  {u | s ++ u ∈ L} = {u | t ++ u ∈ L}
