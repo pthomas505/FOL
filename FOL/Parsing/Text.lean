@@ -2433,3 +2433,46 @@ def L_equiv
   (s t : Str α) :
   Prop :=
   {u | s ++ u ∈ L} = {u | t ++ u ∈ L}
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (s t : Str α) :
+  L_equiv L s t ↔ derivative L s = derivative L t :=
+  by
+    simp only [L_equiv]
+    simp only [derivative]
+
+
+theorem thm_15_refl
+  {α : Type}
+  (L : Language α)
+  (s : Str α) :
+  L_equiv L s s :=
+  by
+    simp only [L_equiv]
+
+
+theorem thm_15_symm
+  {α : Type}
+  (L : Language α)
+  (s t : Str α) :
+  L_equiv L s t ↔ L_equiv L t s :=
+  by
+    simp only [L_equiv]
+    exact eq_comm
+
+
+theorem thm_15_trans
+  {α : Type}
+  (L : Language α)
+  (r s t : Str α)
+  (h1 : L_equiv L r s)
+  (h2 : L_equiv L s t) :
+  L_equiv L r t :=
+  by
+    simp only [L_equiv] at *
+    trans {u | s ++ u ∈ L}
+    · exact h1
+    · exact h2
