@@ -2441,8 +2441,7 @@ example
   (s t : Str α) :
   L_equiv L s t ↔ derivative L s = derivative L t :=
   by
-    simp only [L_equiv]
-    simp only [derivative]
+    rfl
 
 
 theorem thm_15_refl
@@ -2451,7 +2450,7 @@ theorem thm_15_refl
   (s : Str α) :
   L_equiv L s s :=
   by
-    simp only [L_equiv]
+    rfl
 
 
 theorem thm_15_symm
@@ -2506,9 +2505,7 @@ example
   (s : Str α) :
   Str.equiv_class L s = { t | derivative L s = derivative L t } :=
   by
-    simp only [Str.equiv_class]
-    simp only [L_equiv]
-    simp only [derivative]
+    rfl
 
 
 example
@@ -2518,9 +2515,7 @@ example
   Str.equiv_class L [a] =
     { b | derivative L [a] = derivative L b } :=
   by
-    simp only [Str.equiv_class]
-    simp only [L_equiv]
-    simp only [derivative]
+    rfl
 
 
 example
