@@ -1910,6 +1910,18 @@ theorem thm_12_5
     simp only [derivative]
     rfl
 
+
+theorem thm_12_5_str
+  {α : Type}
+  (L1 L2 : Language α)
+  (a : Str α) :
+  derivative (L1 ∪ L2) a =
+    (derivative L1 a) ∪ (derivative L2 a) :=
+  by
+    simp only [derivative]
+    rfl
+
+
 -- 1.55
 theorem thm_12_6
   {α : Type}
@@ -2435,7 +2447,7 @@ def L_equiv
   {u | s ++ u ∈ L} = {u | t ++ u ∈ L}
 
 
-example
+lemma L_equiv_iff_deriv_eq
   {α : Type}
   (L : Language α)
   (s t : Str α) :
@@ -2525,4 +2537,62 @@ example
   L.nullify ∪ ⋃ (a : α), concat {[a]} (derivative L [a]) =
     L.nullify ∪ ⋃ (a : α), concat (Str.equiv_class L [a]) (derivative L [a]) :=
   by
+    sorry
+
+
+theorem Languages.extracted_1
+  {α : Type}
+  [inst : DecidableEq α]
+  (L1 L2 : Language α)
+  (s : Str α) :
+  derivative (concat L1 L2) s = concat (derivative L1 s) L2 ∪ concat L1.nullify (derivative L2 s) :=
+  by
+    induction s generalizing L1 L2
+    case nil =>
+      simp only [derivative]
+      simp only [concat]
+      simp only [Language.nullify]
+      ext cs
+      simp
+      intro a1 s a2 a3
+      apply Exists.intro []
+      constructor
+      · exact a1
+      · apply Exists.intro s
+        constructor
+        · exact a2
+        · simp
+          exact a3
+    case cons hd tl ih =>
+      have s1 : hd :: tl = [hd] ++ tl := by simp
+      simp only [s1]
+      clear s1
+
+      simp only [thm_11_b]
+
+      rw [thm_12_7]
+      simp only [thm_12_5_str]
+
+      rw [ih]
+
+      simp only [Set.union_assoc]
+
+      rw [← thm_11_b]
+
+      sorry
+
+
+theorem thm_16_1
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α)
+  (s t : Str α)
+  (h1 : L_equiv L1 s t)
+  (h2 : L_equiv L2 s t) :
+  L_equiv (concat L1 L2) s t :=
+  by
+    have s1 : derivative (concat L1 L2) s =
+      concat (derivative L1 s) L2 ∪ concat L1.nullify (derivative L2 s) :=
+    by
+      sorry
     sorry
