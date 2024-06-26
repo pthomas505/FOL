@@ -2490,3 +2490,44 @@ theorem L_equivalence
   (L : Language α) :
   Equivalence (L_equiv L) :=
   ⟨ thm_15_refl L, thm_15_symm L _ _, thm_15_trans L _ _ _ ⟩
+
+
+def Str.equiv_class
+  {α : Type}
+  (L : Language α)
+  (s : Str α) :
+  Set (Str α) :=
+  {t | L_equiv L s t}
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (s : Str α) :
+  Str.equiv_class L s = { t | derivative L s = derivative L t } :=
+  by
+    simp only [Str.equiv_class]
+    simp only [L_equiv]
+    simp only [derivative]
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (a : α) :
+  Str.equiv_class L [a] =
+    { b | derivative L [a] = derivative L b } :=
+  by
+    simp only [Str.equiv_class]
+    simp only [L_equiv]
+    simp only [derivative]
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α) :
+  L.nullify ∪ ⋃ (a : α), concat {[a]} (derivative L [a]) =
+    L.nullify ∪ ⋃ (a : α), concat (Str.equiv_class L [a]) (derivative L [a]) :=
+  by
+    sorry
