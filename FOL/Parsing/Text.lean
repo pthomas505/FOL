@@ -38,6 +38,10 @@ inductive exp (α : Type) : ℕ → Set (Str α)
     s ∈ exp α n →
     exp α (n + 1) (s ++ [a])
 
+example : [] ∈ exp Char 0 :=
+  by
+    exact exp.zero
+
 example : ['a'] ∈ exp Char 1 :=
   by
     apply exp.succ 0 'a' []
