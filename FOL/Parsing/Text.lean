@@ -51,33 +51,6 @@ example : ['a', 'b'] ∈ exp Char 2 :=
     exact exp.zero
 
 
-lemma rev_str_mem_exp
-  {α : Type}
-  (s : Str α) :
-  ∃ (n : ℕ), s.reverse ∈ exp α n :=
-  by
-    induction s
-    case nil =>
-      apply Exists.intro 0
-      exact exp.zero
-    case cons hd tl ih =>
-      apply Exists.elim ih
-      intro n a1
-      apply Exists.intro (n + 1)
-      simp
-      exact exp.succ n hd tl.reverse a1
-
-
-lemma str_mem_exp
-  {α : Type}
-  (s : Str α) :
-  ∃ (n : ℕ), s ∈ exp α n :=
-  by
-    obtain s1 := rev_str_mem_exp s.reverse
-    simp only [List.reverse_reverse] at s1
-    exact s1
-
-
 lemma rev_str_mem_exp_str_len
   {α : Type}
   (s : Str α) :
@@ -158,7 +131,8 @@ lemma all_str_mem_kleene_closure
   by
     simp only [kleene_closure]
     simp
-    exact str_mem_exp s
+    apply Exists.intro s.length
+    exact str_mem_exp_str_len s
 
 
 lemma kleene_closure_eq_univ
@@ -2524,8 +2498,8 @@ example
   {α : Type}
   (L : Language α)
   (a : α) :
-  Str.equiv_class L [a] =
-    { b | derivative L [a] = derivative L b } :=
+  Str.equiv_class L [a] ∩ Strings.exp_set α 1 =
+    { b | derivative L [a] = derivative L b ∧ b.length = 1 } :=
   by
     rfl
 
@@ -2535,7 +2509,7 @@ example
   [DecidableEq α]
   (L : Language α) :
   L.nullify ∪ ⋃ (a : α), concat {[a]} (derivative L [a]) =
-    L.nullify ∪ ⋃ (a : α), concat (Str.equiv_class L [a]) (derivative L [a]) :=
+    L.nullify ∪ ⋃ (a : α), concat (Str.equiv_class L [a] ∩ Strings.exp_set α 1) (derivative L [a]) :=
   by
     sorry
 
