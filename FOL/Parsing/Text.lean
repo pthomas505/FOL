@@ -19,6 +19,7 @@ set_option autoImplicit false
 -/
 
 
+-- Finite strings.
 abbrev Str (α : Type) : Type := List α
 
 
