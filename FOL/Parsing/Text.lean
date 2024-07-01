@@ -154,30 +154,23 @@ lemma kleene_closure_eq_univ
 example
   (α : Type)
   (s t : Str α)
-  (h1 : s ∈ kleene_closure α)
-  (h2 : t ∈ kleene_closure α) :
+  (m n : ℕ)
+  (h1 : s.length = m)
+  (h2 : t.length = n) :
+  s ++ t ∈ exp α (m + n) :=
+  by
+    simp only [← h1]
+    simp only [← h2]
+    simp only [← List.length_append s t]
+    exact str_mem_exp_str_len (s ++ t)
+
+
+example
+  (α : Type)
+  (s t : Str α) :
   s ++ t ∈ kleene_closure α :=
   by
-    simp only [kleene_closure] at *
-    simp at *
-
-    apply Exists.elim h1
-    intro m a1
-    clear h1
-
-    apply Exists.elim h2
-    intro n a2
-    clear h2
-
-    apply Exists.intro (m + n)
-
-    obtain s1 := mem_exp_imp_str_len_eq s m a1
-    obtain s2 := mem_exp_imp_str_len_eq t n a2
-
-    obtain s3 := str_mem_exp_str_len (s ++ t)
-    simp at s3
-    simp only [s1, s2] at s3
-    exact s3
+    exact all_str_mem_kleene_closure (s ++ t)
 
 
 theorem thm_2
