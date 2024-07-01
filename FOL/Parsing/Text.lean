@@ -26,7 +26,13 @@ namespace Strings
 
 
 /-
-  Exponentiation
+Definition 3 (Exponentiation). For an alphabet Σ we define the exponenti-
+ation, or powers of Σ by
+1. Σ^{0} = {ε}
+2. Σ^{n+1} = Σ^{n}Σ = {sa : s ∈ Σ^{n}, a ∈ Σ} n ∈ N
+-/
+
+/-
   exp α n is the set of all strings of length n.
 -/
 inductive exp (α : Type) : ℕ → Set (Str α)
@@ -68,7 +74,7 @@ lemma rev_str_mem_exp_str_len
       exact exp.succ tl.length hd tl.reverse ih
 
 
-lemma str_mem_exp_str_len
+theorem str_mem_exp_str_len
   {α : Type}
   (s : Str α) :
   s ∈ exp α s.length :=
@@ -78,7 +84,7 @@ lemma str_mem_exp_str_len
     exact s1
 
 
-lemma mem_exp_imp_str_len_eq
+theorem mem_exp_imp_str_len_eq
   {α : Type}
   (s : Str α)
   (n : ℕ)
