@@ -107,7 +107,7 @@ def exp_set
   {s : Str α | s.length = n}
 
 
-lemma exp_eq_exp_set
+theorem exp_eq_exp_set
   (α : Type)
   (n : ℕ) :
   exp α n = exp_set α n :=
@@ -133,7 +133,7 @@ def kleene_closure
   ⋃ (n : ℕ), exp α n
 
 
-lemma all_str_mem_kleene_closure
+theorem all_str_mem_kleene_closure
   {α : Type}
   (s : Str α) :
   s ∈ kleene_closure α :=
@@ -144,7 +144,7 @@ lemma all_str_mem_kleene_closure
     exact str_mem_exp_str_len s
 
 
-lemma kleene_closure_eq_univ
+theorem kleene_closure_eq_univ
   (α : Type) :
   kleene_closure α = Set.univ :=
   by
