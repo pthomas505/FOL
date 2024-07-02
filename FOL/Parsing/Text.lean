@@ -189,6 +189,56 @@ theorem thm_2
     exact (List.append_assoc s t u)
 
 
+/-
+Definition 7. (Substring) Suppose that s, t, u, v are strings such that s =
+tuv, then u is called a substring of s. Further, if at least one of t and v is
+not ε then u is called a proper substring of s.
+-/
+def is_substring_of
+  (α : Type)
+  (s u : Str α) :
+  Prop :=
+  ∃ (t v : Str α), s = t ++ u ++ v
+
+def is_proper_substring_of
+  (α : Type)
+  (s u : Str α) :
+  Prop :=
+  ∃ (t v : Str α), s = t ++ u ++ v ∧ (¬ t.isEmpty ∨ ¬ v.isEmpty)
+
+/-
+Definition 8. (Prefix) Suppose that s, t, u are strings such that s = tu, then
+t is called a prefix of s. Further, t is called a proper prefix of s if u ≠ ε,
+-/
+def is_prefix_of
+  (α : Type)
+  (s t : Str α) :
+  Prop :=
+  ∃ (u : Str α), s = t ++ u
+
+def is_proper_prefix_of
+  (α : Type)
+  (s t : Str α) :
+  Prop :=
+  ∃ (u : Str α), s = t ++ u ∧ ¬ u.isEmpty
+
+/-
+Definition 9. (Suffix) Suppose that s, t, u are strings such that s = tu, then
+u is called a suffix of s. Further, u is called a proper suffix of s if t ≠ ε
+-/
+def is_suffix_of
+  (α : Type)
+  (s u : Str α) :
+  Prop :=
+  ∃ (t : Str α), s = t ++ u
+
+def is_proper_suffix_of
+  (α : Type)
+  (s u : Str α) :
+  Prop :=
+  ∃ (t : Str α), s = t ++ u ∧ ¬ t.isEmpty
+
+
 end Strings
 
 
