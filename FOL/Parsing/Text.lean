@@ -366,35 +366,21 @@ theorem thm_3_d_union
       cases a2
       case _ c1 =>
         left
-        apply Exists.intro xs
-        constructor
-        · exact a1
-        · apply Exists.intro ys
-          tauto
+        exact ⟨xs, a1, ys, c1, rfl⟩
       case _ c1 =>
         right
-        apply Exists.intro xs
-        constructor
-        · exact a1
-        · apply Exists.intro ys
-          tauto
+        exact ⟨xs, a1, ys, c1, rfl⟩
     · simp
       intro a1
       cases a1
       all_goals
         case _ c1 =>
-          apply Exists.elim c1
-          intro xs a2
-          clear c1
-          cases a2
-          case _ a2_left a2_right =>
-            apply Exists.elim a2_right
-            intro ys a3
-            apply Exists.intro xs
-            constructor
-            · exact a2_left
-            · apply Exists.intro ys
-              tauto
+          obtain ⟨s, hs, t, ht, eq⟩ := c1
+          apply Exists.intro s
+          constructor
+          · exact hs
+          · apply Exists.intro t
+            tauto
 
 
 theorem thm_3_d_union_comm
@@ -456,6 +442,28 @@ theorem thm_3_d_union_comm
                 exact a2_left
               · apply Exists.intro t
                 tauto
+
+
+theorem thm_3_d_intersection
+  {α : Type}
+  (L1 L2 L3 : Language α) :
+  concat L1 (L2 ∩ L3) =
+    concat L1 L2 ∩ concat L1 L3 :=
+  by
+    simp only [concat]
+    ext cs
+    constructor
+    · intro a1
+      simp at a1
+      obtain ⟨s, hs, t, ⟨ht_left, ht_right⟩, eq⟩ := a1
+      simp
+      constructor
+      · exact ⟨s, hs, t, ht_left, eq⟩
+      · exact ⟨s, hs, t, ht_right, eq⟩
+    · intro a1
+      simp at a1
+      obtain ⟨⟨s_left, hs_left, t_left, ht_left, eq_left⟩, ⟨s_right, hs_right, t_right, ht_right, eq_right⟩⟩ := a1
+      sorry
 
 
 lemma concat_eps_left
