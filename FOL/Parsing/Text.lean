@@ -277,19 +277,7 @@ def concat
   { s ++ t | (s ∈ L1) (t ∈ L2) }
 
 
-example
-  {α : Type}
-  (L M : Language α)
-  (w : Str α)
-  (h1 : w ∈ concat L M) :
-  ∃ (s : Str α), s ∈ L ∧ ∃ (t : Str α), t ∈ M ∧ s ++ t = w:=
-  by
-    simp only [concat] at h1
-    simp at h1
-    exact h1
-
-
-lemma concat_mem_concat
+lemma append_mem_concat
   {α : Type}
   (L M : Language α)
   (s t : Str α)
@@ -308,7 +296,7 @@ lemma concat_mem_concat
       · rfl
 
 
-lemma eps_concat_mem_concat
+lemma append_eps_mem_concat
   {α : Type}
   (L M : Language α)
   (x : Str α)
@@ -316,9 +304,9 @@ lemma eps_concat_mem_concat
   (h2 : x ∈ M) :
   x ∈ concat L M :=
   by
-    obtain s1 := concat_mem_concat L M [] x h1 h2
-    simp at s1
-    exact s1
+    have s1 : x = [] ++ x := by rfl
+    rw [s1]
+    exact append_mem_concat L M [] x h1 h2
 
 
 theorem thm_3_a
@@ -482,7 +470,7 @@ example
   by
     simp only [Set.subset_def]
     intro x a1
-    apply concat_mem_concat L M [] x h1
+    apply append_mem_concat L M [] x h1
     exact Set.mem_of_subset_of_mem h2 a1
 
 
@@ -656,7 +644,7 @@ lemma concat_mem_exp
   s ++ t ∈ exp L (n + 1) :=
   by
     simp only [exp]
-    exact concat_mem_concat (exp L n) L s t h1 h2
+    exact append_mem_concat (exp L n) L s t h1 h2
 
 
 example
@@ -748,7 +736,7 @@ lemma concat_mem_exp_comm
   by
     simp only [exp]
     simp only [concat_exp_comm]
-    exact concat_mem_concat L (exp L n) s t h1 h2
+    exact append_mem_concat L (exp L n) s t h1 h2
 
 
 lemma concat_mem_exp_comm_union
@@ -762,7 +750,7 @@ lemma concat_mem_exp_comm_union
   by
     simp only [exp_succ_union]
     simp only [concat_exp_comm_union]
-    exact concat_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
+    exact append_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
 
 
 example
@@ -1166,7 +1154,7 @@ theorem thm_6
                 case _ a4_left a4_right =>
                   right
                   simp only [← a4_right]
-                  apply concat_mem_concat
+                  apply append_mem_concat
                   · exact a3_left
                   · exact Set.mem_of_mem_of_subset a4_left (thm_4 L k)
     · simp only [Set.subset_def]
@@ -1674,7 +1662,7 @@ theorem thm_9_unique_right
         · apply Exists.intro t
           tauto
 
-    · apply eps_concat_mem_concat
+    · apply append_eps_mem_concat
       · apply eps_mem_kleene_closure
       · exact hx
 termination_by x => x.length
