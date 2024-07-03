@@ -266,7 +266,9 @@ example
 
 
 /-
-Definition 11 (Concatenation)
+Definition 11 (Concatenation). Let L1 and L2 be languages. The concate-
+nation of L1 and L2, written L1 · L2, or L1L2 is defined by
+L1L2 = {s · t = st : s ∈ L1, t ∈ L2} .
 -/
 def concat
   {α : Type}
