@@ -120,14 +120,14 @@ theorem exp_eq_exp_set
   exp α n = exp_set α n :=
   by
     simp only [exp_set]
-    ext s
+    ext cs
     simp
     constructor
     · intro a1
-      exact mem_exp_imp_str_len_eq s n a1
+      exact mem_exp_imp_str_len_eq cs n a1
     · intro a1
       simp only [← a1]
-      exact str_mem_exp_str_len s
+      exact str_mem_exp_str_len cs
 
 
 /-
@@ -155,13 +155,11 @@ theorem kleene_closure_eq_univ
   (α : Type) :
   kleene_closure α = Set.univ :=
   by
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro x _
-      exact trivial
-    · simp only [Set.subset_def]
-      intro x _
-      exact all_str_mem_kleene_closure x
+    ext cs
+    constructor
+    · simp
+    · simp
+      exact all_str_mem_kleene_closure cs
 
 
 /-
@@ -301,13 +299,7 @@ lemma append_mem_concat
   by
     simp only [concat]
     simp
-    apply Exists.intro s
-    constructor
-    · exact h1
-    · apply Exists.intro t
-      constructor
-      · exact h2
-      · rfl
+    exact ⟨s, h1, t, h2, rfl⟩
 
 
 lemma append_eps_mem_concat
@@ -373,14 +365,12 @@ theorem thm_3_d_union
     · simp
       intro a1
       cases a1
-      all_goals
-        case _ c1 =>
-          obtain ⟨s, hs, t, ht, eq⟩ := c1
-          apply Exists.intro s
-          constructor
-          · exact hs
-          · apply Exists.intro t
-            tauto
+      case _ c1 =>
+        obtain ⟨s, hs, t, ht, eq⟩ := c1
+        exact ⟨s, hs, t, ⟨ by left; exact ht, eq⟩⟩
+      case _ c1 =>
+        obtain ⟨s, hs, t, ht, eq⟩ := c1
+        exact ⟨s, hs, t, ⟨ by right; exact ht, eq⟩⟩
 
 
 theorem thm_3_d_union_comm
@@ -397,51 +387,19 @@ theorem thm_3_d_union_comm
       cases a1
       case _ a1_left =>
         left
-        apply Exists.intro s
-        constructor
-        · exact a1_left
-        · apply Exists.intro t
-          tauto
+        exact ⟨s, a1_left, t, a2, a3⟩
       case _ a1_right =>
         right
-        apply Exists.intro s
-        constructor
-        · exact a1_right
-        · apply Exists.intro t
-          tauto
+        exact ⟨s, a1_right, t, a2, a3⟩
     · simp
       intro a1
       cases a1
       case _ a1_left =>
-        cases a1_left
-        case _ s a2 =>
-          cases a2
-          case _ a2_left a2_right =>
-            cases a2_right
-            case _ t a3 =>
-              cases a3
-              case _ a3_left a3_right =>
-                apply Exists.intro s
-                constructor
-                · left
-                  exact a2_left
-                · apply Exists.intro t
-                  tauto
+        obtain ⟨s, hs, t, ht, eq⟩ := a1_left
+        exact ⟨s, by left; exact hs, t, ht, eq⟩
       case _ a1_right =>
-        cases a1_right
-        case _ s a2 =>
-          cases a2
-          case _ a2_left a2_right =>
-            cases a2_right
-            case _ t a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              apply Exists.intro s
-              constructor
-              · right
-                exact a2_left
-              · apply Exists.intro t
-                tauto
+        obtain ⟨s, hs, t, ht, eq⟩ := a1_right
+        exact ⟨s, by right; exact hs, t, ht, eq⟩
 
 
 theorem thm_3_d_intersection
