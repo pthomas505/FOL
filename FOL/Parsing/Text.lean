@@ -61,6 +61,12 @@ example : ['a', 'b'] ∈ exp Char 2 :=
     exact exp.zero
 
 
+/-
+Definition 4 (String length). Let s ∈ Σn be a string. We say that the length
+of s is n, written |s| = n, and hence the length is the number of consecutive
+symbols. As a special case we have |ε| = 0.
+-/
+
 lemma rev_str_mem_exp_str_len
   {α : Type}
   (s : Str α) :
