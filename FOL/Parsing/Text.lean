@@ -158,6 +158,14 @@ theorem kleene_closure_eq_univ
       exact all_str_mem_kleene_closure x
 
 
+/-
+Definition 6 (Concatenation). Suppose that s ∈ Σm and t ∈ Σn are strings
+over some alphabet. The concatenation of s and t written s · t or st, is the
+string formed by letting the sequence of symbols in s be followed by the
+sequence of symbols in t, i.e.
+s · t = a1a2...am · b1b2...bn = a1a2...amb1b2...bn = st ∈ Σm+n
+-/
+
 example
   (α : Type)
   (s t : Str α)
