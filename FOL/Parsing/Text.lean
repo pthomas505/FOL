@@ -367,10 +367,10 @@ theorem thm_3_d_union
       cases a1
       case _ c1 =>
         obtain ⟨s, hs, t, ht, eq⟩ := c1
-        exact ⟨s, hs, t, ⟨ by left; exact ht, eq⟩⟩
+        exact ⟨s, hs, t, ⟨by left; exact ht, eq⟩⟩
       case _ c1 =>
         obtain ⟨s, hs, t, ht, eq⟩ := c1
-        exact ⟨s, hs, t, ⟨ by right; exact ht, eq⟩⟩
+        exact ⟨s, hs, t, ⟨by right; exact ht, eq⟩⟩
 
 
 theorem thm_3_d_union_comm
@@ -383,14 +383,14 @@ theorem thm_3_d_union_comm
     ext cs
     constructor
     · simp
-      intro s a1 t a2 a3
-      cases a1
-      case _ a1_left =>
+      intro s hs t ht eq
+      cases hs
+      case _ hs_left =>
         left
-        exact ⟨s, a1_left, t, a2, a3⟩
-      case _ a1_right =>
+        exact ⟨s, hs_left, t, ht, eq⟩
+      case _ hs_right =>
         right
-        exact ⟨s, a1_right, t, a2, a3⟩
+        exact ⟨s, hs_right, t, ht, eq⟩
     · simp
       intro a1
       cases a1
