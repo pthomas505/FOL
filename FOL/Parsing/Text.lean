@@ -351,7 +351,7 @@ theorem thm_3_c
     simp
 
 
-theorem thm_3_d
+theorem thm_3_d_union
   {α : Type}
   (L1 L2 L3 : Language α) :
   concat L1 (L2 ∪ L3) =
@@ -397,7 +397,7 @@ theorem thm_3_d
               tauto
 
 
-theorem thm_3_d_comm
+theorem thm_3_d_union_comm
   {α : Type}
   (L1 L2 L3 : Language α) :
   concat (L1 ∪ L2) L3 =
@@ -713,8 +713,8 @@ lemma concat_exp_comm_union
       simp
     case succ i ih =>
       simp only [Set.biUnion_le_succ (exp L)]
-      simp only [thm_3_d_comm]
-      simp only [thm_3_d]
+      simp only [thm_3_d_union_comm]
+      simp only [thm_3_d_union]
       simp only [ih]
       simp only [concat_exp_comm]
 
@@ -1396,7 +1396,7 @@ theorem thm_9
 
       _ = concat L1 (concat (kleene_closure α L1) L2) ∪ L2 :=
         by
-          simp only [thm_3_d_comm]
+          simp only [thm_3_d_union_comm]
           simp only [concat_eps_left]
           simp only [thm_3_c]
 
@@ -2122,7 +2122,7 @@ theorem thm_12_7
 
       _ = {s | a :: s ∈ concat L1.nullify L2} ∪ {t | a :: t ∈ concat L0 L2} :=
       by
-        obtain s3 := thm_3_d_comm L1.nullify L0 L2
+        obtain s3 := thm_3_d_union_comm L1.nullify L0 L2
         simp only [s3]
         rfl
 
