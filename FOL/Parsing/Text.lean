@@ -467,6 +467,12 @@ lemma concat_subset_right
     exact ⟨s, s1, t, ht, eq⟩
 
 
+/-
+Definition 12 (Exponentiation). Let L be a language. The exponentiation
+or powers of L is defined by
+1. L^0 = {ε}
+2. L^(n+1) = L^(n)L n ∈ N
+-/
 def exp
   {α : Type}
   (L : Language α)
