@@ -302,6 +302,19 @@ lemma append_mem_concat
     exact ⟨s, h1, t, h2, rfl⟩
 
 
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : [] ∈ L)
+  (h2 : L ⊆ M) :
+  L ⊆ concat L M :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    apply append_mem_concat L M [] x h1
+    exact Set.mem_of_subset_of_mem h2 a1
+
+
 lemma append_eps_mem_concat
   {α : Type}
   (L M : Language α)
@@ -410,6 +423,7 @@ lemma concat_eps_left
     simp only [concat]
     simp
 
+
 lemma concat_eps_right
   {α : Type}
   (L : Language α) :
@@ -417,19 +431,6 @@ lemma concat_eps_right
   by
     simp only [concat]
     simp
-
-
-example
-  {α : Type}
-  (L M : Language α)
-  (h1 : [] ∈ L)
-  (h2 : L ⊆ M) :
-  L ⊆ concat L M :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
-    apply append_mem_concat L M [] x h1
-    exact Set.mem_of_subset_of_mem h2 a1
 
 
 lemma concat_subset_left
