@@ -588,7 +588,8 @@ lemma exp_succ_concat_left_union
   {α : Type}
   (L : Language α)
   (n : ℕ) :
-  (⋃ (k ≤ n), exp L (k + 1)) = concat L (⋃ (k ≤ n), exp L k) :=
+  (⋃ (k ≤ n), exp L (k + 1)) =
+    concat L (⋃ (k ≤ n), exp L k) :=
   by
     simp only [← concat_exp_comm_union]
     exact exp_succ_concat_right_union L n
