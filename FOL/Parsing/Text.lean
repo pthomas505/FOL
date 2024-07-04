@@ -315,7 +315,7 @@ lemma append_eps_mem_concat
     exact append_mem_concat L M [] x h1 h2
 
 
-theorem thm_3_a
+example
   {α : Type}
   (L : Language α) :
   concat L ∅ = ∅ :=
@@ -324,7 +324,7 @@ theorem thm_3_a
     simp
 
 
-theorem thm_3_b
+example
   {α : Type}
   (L : Language α) :
   concat ∅ L = ∅ :=
@@ -343,7 +343,7 @@ theorem concat_assoc
     simp
 
 
-theorem thm_3_d_union
+theorem concat_distrib_union_left
   {α : Type}
   (L1 L2 L3 : Language α) :
   concat L1 (L2 ∪ L3) =
@@ -373,7 +373,7 @@ theorem thm_3_d_union
         exact ⟨s, hs, t, ⟨by right; exact ht, eq⟩⟩
 
 
-theorem thm_3_d_union_comm
+theorem concat_distrib_union_right
   {α : Type}
   (L1 L2 L3 : Language α) :
   concat (L1 ∪ L2) L3 =
@@ -640,7 +640,7 @@ lemma concat_exp_comm
     case succ k ih =>
       simp only [exp]
       conv => left; simp only [ih]
-      simp only [thm_3_c]
+      simp only [concat_assoc]
 
 
 lemma concat_exp_comm_union
@@ -657,8 +657,8 @@ lemma concat_exp_comm_union
       simp
     case succ i ih =>
       simp only [Set.biUnion_le_succ (exp L)]
-      simp only [thm_3_d_union_comm]
-      simp only [thm_3_d_union]
+      simp only [concat_distrib_union_right]
+      simp only [concat_distrib_union_left]
       simp only [ih]
       simp only [concat_exp_comm]
 
@@ -1340,9 +1340,9 @@ theorem thm_9
 
       _ = concat L1 (concat (kleene_closure α L1) L2) ∪ L2 :=
         by
-          simp only [thm_3_d_union_comm]
+          simp only [concat_distrib_union_right]
           simp only [concat_eps_left]
-          simp only [thm_3_c]
+          simp only [concat_assoc]
 
       _ = (concat L1 X) ∪ L2 :=
         by simp only [h1]
@@ -1367,7 +1367,7 @@ lemma thm_9_unique_left_aux_1
         apply concat_subset_right
         exact ih
 
-      simp only [thm_3_c] at s1
+      simp only [concat_assoc] at s1
       simp only [← exp_succ_concat_left] at s1
 
       have s2 : concat L1 X ⊆ X :=
@@ -2066,7 +2066,7 @@ theorem thm_12_7
 
       _ = {s | a :: s ∈ concat L1.nullify L2} ∪ {t | a :: t ∈ concat L0 L2} :=
       by
-        obtain s3 := thm_3_d_union_comm L1.nullify L0 L2
+        obtain s3 := concat_distrib_union_right L1.nullify L0 L2
         simp only [s3]
         rfl
 
