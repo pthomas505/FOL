@@ -657,24 +657,7 @@ lemma eps_mem_imp_exp_subset_exp_succ
 
 -----
 
-theorem exp_union_sub_exp_succ_union
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  ⋃ (k ≤ n), exp L k ⊆ ⋃ (k ≤ n + 1), exp L k :=
-  by
-    simp
-    intro k a1
-    simp only [Set.subset_def]
-    intro x a2
-    simp
-    apply Exists.intro k
-    constructor
-    · exact Nat.le_succ_of_le a1
-    · exact a2
-
-
-lemma exp_succ_union
+lemma exp_succ_concat_right_union
   {α : Type}
   (L : Language α)
   (n : ℕ) :
@@ -708,7 +691,24 @@ lemma exp_succ_concat_left_union
   (⋃ (k ≤ n), exp L (k + 1)) = concat L (⋃ (k ≤ n), exp L k) :=
   by
     simp only [← concat_exp_comm_union]
-    exact exp_succ_union L n
+    exact exp_succ_concat_right_union L n
+
+
+theorem exp_union_sub_exp_succ_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  ⋃ (k ≤ n), exp L k ⊆ ⋃ (k ≤ n + 1), exp L k :=
+  by
+    simp
+    intro k a1
+    simp only [Set.subset_def]
+    intro x a2
+    simp
+    apply Exists.intro k
+    constructor
+    · exact Nat.le_succ_of_le a1
+    · exact a2
 
 
 example
@@ -736,7 +736,7 @@ lemma concat_mem_exp_comm_union
   (h2 : t ∈ (⋃ (k ≤ n), exp L k)) :
   s ++ t ∈ (⋃ (k ≤ n), exp L (k + 1)) :=
   by
-    simp only [exp_succ_union]
+    simp only [exp_succ_concat_right_union]
     simp only [concat_exp_comm_union]
     exact append_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
 
