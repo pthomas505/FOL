@@ -577,15 +577,10 @@ example
   s ++ t ∈ ⋃ (k ≤ n), exp L (k + 1) :=
   by
     simp at h1
-    cases h1
-    case _ i a1 =>
-      cases a1
-      case _ a1_left a1_right =>
-        simp
-        apply Exists.intro i
-        constructor
-        · exact a1_left
-        · apply concat_mem_exp L s t i a1_right h2
+    obtain ⟨i, hi, hs⟩ := h1
+    simp
+    obtain s1 := concat_mem_exp L s t i hs h2
+    exact ⟨i, hi, s1⟩
 
 
 lemma concat_exp_comm
