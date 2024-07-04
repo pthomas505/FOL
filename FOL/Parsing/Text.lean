@@ -651,9 +651,9 @@ lemma eps_mem_imp_exp_subset_exp_succ
   by
     simp only [Set.subset_def]
     intro x a1
-    obtain s1 := append_mem_exp_right L [] x n h1 a1
-    simp at s1
-    exact s1
+    have s1 : x = [] ++ x := by rfl
+    rw [s1]
+    exact append_mem_exp_right L [] x n h1 a1
 
 
 theorem exp_union_sub_exp_succ_union
