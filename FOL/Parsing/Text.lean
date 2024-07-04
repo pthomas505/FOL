@@ -534,48 +534,24 @@ lemma exp_succ_union
   ⋃ (k ≤ n), exp L (k + 1) =
     concat (⋃ (k ≤ n), exp L k) L :=
   by
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro x a1
-      simp at a1
-      cases a1
-      case _ i a2 =>
-        cases a2
-        case _ a2_left a2_right =>
-          simp only [exp] at a2_right
-          have s1 : concat (exp L i) L ⊆ concat (⋃ k, ⋃ (_ : k ≤ n), exp L k) L :=
-          by
-            apply concat_subset_right
-            exact Set.subset_biUnion_of_mem a2_left
-          apply Set.mem_of_subset_of_mem s1 a2_right
-    · simp only [Set.subset_def]
-      intro x a1
+    ext cs
+    constructor
+    · intro a1
+      simp only [exp] at a1
       simp only [concat] at a1
       simp at a1
-      cases a1
-      case _ s a2 =>
-        cases a2
-        case _ a2_left a2_right =>
-          cases a2_left
-          case _ i a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              cases a2_right
-              case _ t a4 =>
-                cases a4
-                case _ a4_left a4_right =>
-                  simp
-                  simp only [exp]
-                  apply Exists.intro i
-                  constructor
-                  · exact a3_left
-                  · simp only [concat]
-                    simp
-                    apply Exists.intro s
-                    constructor
-                    · exact a3_right
-                    · apply Exists.intro t
-                      tauto
+      obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a1
+      simp only [concat]
+      simp
+      exact ⟨s, ⟨i, ⟨hi, hs⟩ ⟩, ⟨t, ht, eq⟩⟩
+    · intro a1
+      simp only [concat] at a1
+      simp at a1
+      obtain ⟨s, ⟨i, hi, hs⟩, t, ht, eq⟩ := a1
+      simp only [exp]
+      simp only [concat]
+      simp
+      exact ⟨i, hi, s, hs, t, ht, eq⟩
 
 
 lemma concat_mem_exp
