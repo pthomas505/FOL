@@ -510,6 +510,23 @@ example
     simp
 
 
+lemma concat_exp_comm
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  concat (exp L n) L = concat L (exp L n) :=
+  by
+    induction n
+    case zero =>
+      simp only [exp]
+      simp only [concat]
+      simp
+    case succ k ih =>
+      simp only [exp]
+      conv => left; simp only [ih]
+      simp only [concat_assoc]
+
+
 theorem exp_union_sub_exp_succ_union
   {α : Type}
   (L : Language α)
@@ -581,23 +598,6 @@ example
     simp
     obtain s1 := concat_mem_exp L s t i hs h2
     exact ⟨i, hi, s1⟩
-
-
-lemma concat_exp_comm
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  concat (exp L n) L = concat L (exp L n) :=
-  by
-    induction n
-    case zero =>
-      simp only [exp]
-      simp only [concat]
-      simp
-    case succ k ih =>
-      simp only [exp]
-      conv => left; simp only [ih]
-      simp only [concat_assoc]
 
 
 lemma concat_exp_comm_union
