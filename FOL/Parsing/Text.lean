@@ -564,6 +564,26 @@ lemma append_mem_exp_right
     exact append_mem_concat L (exp L n) s t h1 h2
 
 
+example
+  {α : Type}
+  (L : Language α)
+  (n : ℕ)
+  (h1 : [] ∈ L) :
+  [] ∈ exp L n :=
+  by
+    induction n
+    case zero =>
+      simp only [exp]
+      simp
+    case succ k ih =>
+      simp only [exp]
+      simp only [concat]
+      simp
+      constructor
+      · exact ih
+      · exact h1
+
+
 theorem exp_union_sub_exp_succ_union
   {α : Type}
   (L : Language α)
@@ -606,8 +626,6 @@ lemma exp_succ_union
       simp only [concat]
       simp
       exact ⟨i, hi, s, hs, t, ht, eq⟩
-
-
 
 
 example
@@ -670,24 +688,6 @@ lemma concat_mem_exp_comm_union
     exact append_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
 
 
-example
-  {α : Type}
-  (L : Language α)
-  (n : ℕ)
-  (h1 : [] ∈ L) :
-  [] ∈ exp L n :=
-  by
-    induction n
-    case zero =>
-      simp only [exp]
-      simp
-    case succ k ih =>
-      simp only [exp]
-      simp only [concat]
-      simp
-      constructor
-      · exact ih
-      · exact h1
 
 
 example
