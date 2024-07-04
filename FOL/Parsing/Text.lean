@@ -655,6 +655,7 @@ lemma eps_mem_imp_exp_subset_exp_succ
     rw [s1]
     exact append_mem_exp_right L [] x n h1 a1
 
+-----
 
 theorem exp_union_sub_exp_succ_union
   {α : Type}
@@ -700,6 +701,16 @@ lemma exp_succ_union
       exact ⟨i, hi, s, hs, t, ht, eq⟩
 
 
+lemma exp_succ_concat_left_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  (⋃ (k ≤ n), exp L (k + 1)) = concat L (⋃ (k ≤ n), exp L k) :=
+  by
+    simp only [← concat_exp_comm_union]
+    exact exp_succ_union L n
+
+
 example
   {α : Type}
   (L : Language α)
@@ -714,18 +725,6 @@ example
     simp
     obtain s1 := append_mem_exp_left L s t i hs h2
     exact ⟨i, hi, s1⟩
-
-
-
-
-lemma exp_succ_concat_left_union
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  (⋃ (k ≤ n), exp L (k + 1)) = concat L (⋃ (k ≤ n), exp L k) :=
-  by
-    simp only [← concat_exp_comm_union]
-    exact exp_succ_union L n
 
 
 lemma concat_mem_exp_comm_union
