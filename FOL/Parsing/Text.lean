@@ -333,7 +333,7 @@ theorem thm_3_b
     simp
 
 
-theorem thm_3_c
+theorem concat_assoc
   {α : Type}
   (L1 L2 L3 : Language α) :
   concat L1 (concat L2 L3) =
