@@ -753,15 +753,10 @@ example
       simp
     case succ k ih =>
       simp at ih
-      cases ih
-      case _ i a1 =>
-        simp
-        cases a1
-        case _ a1_left a1_right =>
-          apply Exists.intro i
-          constructor
-          · exact Nat.le_succ_of_le a1_left
-          · exact a1_right
+      obtain ⟨i, hi, a1⟩ := ih
+      simp
+      have s1 : i ≤ k + 1 := Nat.le_succ_of_le hi
+      exact ⟨i, s1, a1⟩
 
 
 /-
