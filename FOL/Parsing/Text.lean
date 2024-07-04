@@ -701,8 +701,8 @@ lemma append_mem_exp_right_union
   (s t : Str α)
   (n : ℕ)
   (h1 : s ∈ L)
-  (h2 : t ∈ (⋃ (k ≤ n), exp L k)) :
-  s ++ t ∈ (⋃ (k ≤ n), exp L (k + 1)) :=
+  (h2 : t ∈ ⋃ (k ≤ n), exp L k) :
+  s ++ t ∈ ⋃ (k ≤ n), exp L (k + 1) :=
   by
     simp only [exp_succ_concat_right_union]
     simp only [concat_exp_comm_union]
