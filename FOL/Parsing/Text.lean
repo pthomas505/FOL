@@ -493,15 +493,6 @@ lemma exp_zero
 
 example
   {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  exp L (n + 1) = concat (exp L n) L :=
-  by
-    rfl
-
-
-example
-  {α : Type}
   (L : Language α) :
   exp L 1 = L :=
   by
@@ -535,6 +526,42 @@ lemma exp_succ_concat_left
   by
     simp only [← concat_exp_comm]
     rfl
+
+
+lemma exp_succ_concat_right
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  exp L (n + 1) = concat (exp L n) L :=
+  by
+    rfl
+
+
+lemma append_mem_exp_left
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ exp L n)
+  (h2 : t ∈ L) :
+  s ++ t ∈ exp L (n + 1) :=
+  by
+    simp only [exp]
+    exact append_mem_concat (exp L n) L s t h1 h2
+
+
+lemma append_mem_exp_right
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ L)
+  (h2 : t ∈ exp L n) :
+  s ++ t ∈ exp L (n + 1) :=
+  by
+    simp only [exp]
+    simp only [concat_exp_comm]
+    exact append_mem_concat L (exp L n) s t h1 h2
 
 
 theorem exp_union_sub_exp_succ_union
@@ -581,31 +608,6 @@ lemma exp_succ_union
       exact ⟨i, hi, s, hs, t, ht, eq⟩
 
 
-lemma append_mem_exp_left
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ exp L n)
-  (h2 : t ∈ L) :
-  s ++ t ∈ exp L (n + 1) :=
-  by
-    simp only [exp]
-    exact append_mem_concat (exp L n) L s t h1 h2
-
-
-lemma append_mem_exp_right
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ L)
-  (h2 : t ∈ exp L n) :
-  s ++ t ∈ exp L (n + 1) :=
-  by
-    simp only [exp]
-    simp only [concat_exp_comm]
-    exact append_mem_concat L (exp L n) s t h1 h2
 
 
 example
