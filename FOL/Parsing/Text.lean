@@ -518,6 +518,26 @@ lemma concat_exp_comm
       simp only [concat_assoc]
 
 
+lemma concat_exp_comm_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  concat (⋃ (k ≤ n), exp L k) L = concat L (⋃ (k ≤ n), exp L k) :=
+  by
+    induction n
+    case zero =>
+      simp
+      simp only [exp]
+      simp only [concat]
+      simp
+    case succ i ih =>
+      simp only [Set.biUnion_le_succ (exp L)]
+      simp only [concat_distrib_union_right]
+      simp only [concat_distrib_union_left]
+      simp only [ih]
+      simp only [concat_exp_comm]
+
+
 lemma exp_succ_concat_left
   {α : Type}
   (L : Language α)
@@ -622,6 +642,20 @@ lemma append_mem_exp_right
     exact exp_sum L s t 1 n h1 h2
 
 
+lemma eps_mem_imp_exp_subset_exp_succ
+  {α : Type}
+  (L : Language α)
+  (n : ℕ)
+  (h1 : [] ∈ L) :
+  exp L n ⊆ exp L (n + 1) :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    obtain s1 := append_mem_exp_right L [] x n h1 a1
+    simp at s1
+    exact s1
+
+
 theorem exp_union_sub_exp_succ_union
   {α : Type}
   (L : Language α)
@@ -682,24 +716,6 @@ example
     exact ⟨i, hi, s1⟩
 
 
-lemma concat_exp_comm_union
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  concat (⋃ (k ≤ n), exp L k) L = concat L (⋃ (k ≤ n), exp L k) :=
-  by
-    induction n
-    case zero =>
-      simp
-      simp only [exp]
-      simp only [concat]
-      simp
-    case succ i ih =>
-      simp only [Set.biUnion_le_succ (exp L)]
-      simp only [concat_distrib_union_right]
-      simp only [concat_distrib_union_left]
-      simp only [ih]
-      simp only [concat_exp_comm]
 
 
 lemma exp_succ_concat_left_union
@@ -748,20 +764,6 @@ example
           constructor
           · exact Nat.le_succ_of_le a1_left
           · exact a1_right
-
-
-lemma eps_mem_imp_exp_subset_exp_succ
-  {α : Type}
-  (L : Language α)
-  (n : ℕ)
-  (h1 : [] ∈ L) :
-  exp L n ⊆ exp L (n + 1) :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
-    obtain s1 := append_mem_exp_right L [] x n h1 a1
-    simp at s1
-    exact s1
 
 
 /-
