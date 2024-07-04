@@ -527,6 +527,16 @@ lemma concat_exp_comm
       simp only [concat_assoc]
 
 
+lemma exp_succ_concat_left
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  exp L (n + 1) = concat L (exp L n) :=
+  by
+    simp only [← concat_exp_comm]
+    rfl
+
+
 theorem exp_union_sub_exp_succ_union
   {α : Type}
   (L : Language α)
@@ -620,14 +630,6 @@ lemma concat_exp_comm_union
       simp only [concat_exp_comm]
 
 
-lemma exp_succ_concat_left
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  exp L (n + 1) = concat L (exp L n) :=
-  by
-    simp only [← concat_exp_comm]
-    rfl
 
 
 lemma exp_succ_concat_left_union
