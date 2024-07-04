@@ -524,8 +524,8 @@ lemma exp_succ_concat_left
   (n : ℕ) :
   exp L (n + 1) = concat L (exp L n) :=
   by
-    simp only [← concat_exp_comm]
-    rfl
+    simp only [exp]
+    exact concat_exp_comm L n
 
 
 lemma exp_succ_concat_right
