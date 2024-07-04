@@ -402,28 +402,6 @@ theorem thm_3_d_union_comm
         exact ⟨s, by right; exact hs, t, ht, eq⟩
 
 
-theorem thm_3_d_intersection
-  {α : Type}
-  (L1 L2 L3 : Language α) :
-  concat L1 (L2 ∩ L3) =
-    concat L1 L2 ∩ concat L1 L3 :=
-  by
-    simp only [concat]
-    ext cs
-    constructor
-    · intro a1
-      simp at a1
-      obtain ⟨s, hs, t, ⟨ht_left, ht_right⟩, eq⟩ := a1
-      simp
-      constructor
-      · exact ⟨s, hs, t, ht_left, eq⟩
-      · exact ⟨s, hs, t, ht_right, eq⟩
-    · intro a1
-      simp at a1
-      obtain ⟨⟨s_left, hs_left, t_left, ht_left, eq_left⟩, ⟨s_right, hs_right, t_right, ht_right, eq_right⟩⟩ := a1
-      sorry
-
-
 lemma concat_eps_left
   {α : Type}
   (L : Language α) :
