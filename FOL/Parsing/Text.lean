@@ -491,7 +491,7 @@ lemma exp_zero
     rfl
 
 
-example
+lemma exp_one
   {α : Type}
   (L : Language α) :
   exp L 1 = L :=
@@ -537,31 +537,24 @@ lemma exp_succ_concat_right
     rfl
 
 
-lemma append_mem_exp_left
+example
   {α : Type}
   (L : Language α)
-  (s t : Str α)
   (n : ℕ)
-  (h1 : s ∈ exp L n)
-  (h2 : t ∈ L) :
-  s ++ t ∈ exp L (n + 1) :=
+  (h1 : [] ∈ L) :
+  [] ∈ exp L n :=
   by
-    simp only [exp]
-    exact append_mem_concat (exp L n) L s t h1 h2
-
-
-lemma append_mem_exp_right
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ L)
-  (h2 : t ∈ exp L n) :
-  s ++ t ∈ exp L (n + 1) :=
-  by
-    simp only [exp]
-    simp only [concat_exp_comm]
-    exact append_mem_concat L (exp L n) s t h1 h2
+    induction n
+    case zero =>
+      simp only [exp]
+      simp
+    case succ k ih =>
+      simp only [exp]
+      simp only [concat]
+      simp
+      constructor
+      · exact ih
+      · exact h1
 
 
 lemma exp_sum
@@ -599,24 +592,34 @@ lemma exp_sum
       exact ⟨(s ++ u), ih, v, hv, s1⟩
 
 
-example
+lemma append_mem_exp_left
   {α : Type}
   (L : Language α)
+  (s t : Str α)
   (n : ℕ)
-  (h1 : [] ∈ L) :
-  [] ∈ exp L n :=
+  (h1 : s ∈ exp L n)
+  (h2 : t ∈ L) :
+  s ++ t ∈ exp L (n + 1) :=
   by
-    induction n
-    case zero =>
-      simp only [exp]
-      simp
-    case succ k ih =>
-      simp only [exp]
-      simp only [concat]
-      simp
-      constructor
-      · exact ih
-      · exact h1
+    rw [← exp_one L] at h2
+    exact exp_sum L s t n 1 h1 h2
+
+
+lemma append_mem_exp_right
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ L)
+  (h2 : t ∈ exp L n) :
+  s ++ t ∈ exp L (n + 1) :=
+  by
+    rw [← exp_one L] at h1
+
+    have s1 : n + 1 = 1 + n := Nat.add_comm n 1
+    simp only [s1]
+
+    exact exp_sum L s t 1 n h1 h2
 
 
 theorem exp_union_sub_exp_succ_union
