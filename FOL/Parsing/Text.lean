@@ -437,23 +437,6 @@ lemma concat_subset_left
   {α : Type}
   (L1 L2 L3 : Language α)
   (h1 : L2 ⊆ L3) :
-  concat L2 L1 ⊆ concat L3 L1 :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
-    simp only [concat] at a1
-    simp at a1
-    obtain ⟨s, hs, t, ht, eq⟩ := a1
-    simp only [concat]
-    simp
-    have s1 : s ∈ L3 := Set.mem_of_subset_of_mem h1 hs
-    exact ⟨s, s1, t, ht, eq⟩
-
-
-lemma concat_subset_right
-  {α : Type}
-  (L1 L2 L3 : Language α)
-  (h1 : L2 ⊆ L3) :
   concat L1 L2 ⊆ concat L1 L3 :=
   by
     simp only [Set.subset_def]
@@ -465,6 +448,23 @@ lemma concat_subset_right
     simp
     have s1 : t ∈ L3 := Set.mem_of_subset_of_mem h1 ht
     exact ⟨s, hs, t, s1, eq⟩
+
+
+lemma concat_subset_right
+  {α : Type}
+  (L1 L2 L3 : Language α)
+  (h1 : L2 ⊆ L3) :
+  concat L2 L1 ⊆ concat L3 L1 :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp only [concat] at a1
+    simp at a1
+    obtain ⟨s, hs, t, ht, eq⟩ := a1
+    simp only [concat]
+    simp
+    have s1 : s ∈ L3 := Set.mem_of_subset_of_mem h1 hs
+    exact ⟨s, s1, t, ht, eq⟩
 
 
 def exp
@@ -539,7 +539,7 @@ lemma exp_succ_union
           simp only [exp] at a2_right
           have s1 : concat (exp L i) L ⊆ concat (⋃ k, ⋃ (_ : k ≤ n), exp L k) L :=
           by
-            apply concat_subset_left
+            apply concat_subset_right
             exact Set.subset_biUnion_of_mem a2_left
           apply Set.mem_of_subset_of_mem s1 a2_right
     · simp only [Set.subset_def]
@@ -1344,7 +1344,7 @@ lemma thm_9_unique_left_aux_1
     case succ n ih =>
       have s1 : concat L1 (concat (exp L1 n) L2) ⊆ concat L1 X :=
       by
-        apply concat_subset_right
+        apply concat_subset_left
         exact ih
 
       simp only [concat_assoc] at s1
@@ -2118,7 +2118,7 @@ lemma derivative_exp_succ
 
         obtain s1 := eps_mem_imp_exp_subset_exp_succ L k c1
 
-        exact concat_subset_right (derivative L [a]) (exp L k) (exp L (k + 1)) s1
+        exact concat_subset_left (derivative L [a]) (exp L k) (exp L (k + 1)) s1
       case neg c1 c2 =>
         simp only [concat]
         simp
