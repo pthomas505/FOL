@@ -798,6 +798,12 @@ lemma exp_sum
                 · simp
 
 
+/-
+Definition 13 (Kleene closure). Let L be a language. L∗ is defined by
+1. ε ∈ L∗
+2. For any s ∈ L∗ and t ∈ L, st ∈ L∗
+3. Nothing else is in L∗
+-/
 inductive kleene_closure
   (α : Type) :
   Language α → Language α
