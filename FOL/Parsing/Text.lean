@@ -584,27 +584,21 @@ lemma exp_sum
       simp only [exp] at h2
       simp only [concat] at h2
       simp at h2
-      cases h2
-      case _ s' a1 =>
-        cases a1
-        case _ a1_left a1_right =>
-          cases a1_right
-          case _ t' a2 =>
-            cases a2
-            case _ a2_left a2_right =>
-              simp only [exp]
-              simp only [concat]
-              simp
+      obtain ⟨u, hu, v, hv, eq⟩ := h2
 
-              specialize ih s' a1_left
-              apply Exists.intro (s ++ s')
-              constructor
-              · exact ih
-              · simp only [← a2_right]
-                apply Exists.intro t'
-                constructor
-                · exact a2_left
-                · simp
+      simp only [exp]
+      simp only [concat]
+      simp
+
+      specialize ih u hu
+      apply Exists.intro (s ++ u)
+      constructor
+      · exact ih
+      · apply Exists.intro v
+        constructor
+        · exact hv
+        · simp
+          exact eq
 
 
 example
