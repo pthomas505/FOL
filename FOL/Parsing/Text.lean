@@ -493,6 +493,15 @@ lemma exp_zero
 
 example
   {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  exp L (n + 1) = concat (exp L n) L :=
+  by
+    rfl
+
+
+example
+  {α : Type}
   (L : Language α) :
   exp L 1 = L :=
   by
@@ -516,15 +525,6 @@ theorem exp_union_sub_exp_succ_union
     constructor
     · exact Nat.le_succ_of_le a1
     · exact a2
-
-
-example
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  exp L (n + 1) = concat (exp L n) L :=
-  by
-    rfl
 
 
 lemma exp_succ_union
