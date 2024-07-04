@@ -557,6 +557,43 @@ lemma exp_succ_concat_right
     rfl
 
 
+lemma exp_succ_concat_right_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  ⋃ (k ≤ n), exp L (k + 1) =
+    concat (⋃ (k ≤ n), exp L k) L :=
+  by
+    ext cs
+    constructor
+    · intro a1
+      simp only [exp] at a1
+      simp only [concat] at a1
+      simp at a1
+      obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a1
+      simp only [concat]
+      simp
+      exact ⟨s, ⟨i, ⟨hi, hs⟩ ⟩, ⟨t, ht, eq⟩⟩
+    · intro a1
+      simp only [concat] at a1
+      simp at a1
+      obtain ⟨s, ⟨i, hi, hs⟩, t, ht, eq⟩ := a1
+      simp only [exp]
+      simp only [concat]
+      simp
+      exact ⟨i, hi, s, hs, t, ht, eq⟩
+
+
+lemma exp_succ_concat_left_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  (⋃ (k ≤ n), exp L (k + 1)) = concat L (⋃ (k ≤ n), exp L k) :=
+  by
+    simp only [← concat_exp_comm_union]
+    exact exp_succ_concat_right_union L n
+
+
 example
   {α : Type}
   (L : Language α)
@@ -656,42 +693,6 @@ lemma eps_mem_imp_exp_subset_exp_succ
     exact append_mem_exp_right L [] x n h1 a1
 
 -----
-
-lemma exp_succ_concat_right_union
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  ⋃ (k ≤ n), exp L (k + 1) =
-    concat (⋃ (k ≤ n), exp L k) L :=
-  by
-    ext cs
-    constructor
-    · intro a1
-      simp only [exp] at a1
-      simp only [concat] at a1
-      simp at a1
-      obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a1
-      simp only [concat]
-      simp
-      exact ⟨s, ⟨i, ⟨hi, hs⟩ ⟩, ⟨t, ht, eq⟩⟩
-    · intro a1
-      simp only [concat] at a1
-      simp at a1
-      obtain ⟨s, ⟨i, hi, hs⟩, t, ht, eq⟩ := a1
-      simp only [exp]
-      simp only [concat]
-      simp
-      exact ⟨i, hi, s, hs, t, ht, eq⟩
-
-
-lemma exp_succ_concat_left_union
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  (⋃ (k ≤ n), exp L (k + 1)) = concat L (⋃ (k ≤ n), exp L k) :=
-  by
-    simp only [← concat_exp_comm_union]
-    exact exp_succ_concat_right_union L n
 
 
 theorem exp_union_sub_exp_succ_union
