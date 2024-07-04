@@ -591,14 +591,12 @@ lemma exp_sum
       simp
 
       specialize ih u hu
-      apply Exists.intro (s ++ u)
-      constructor
-      · exact ih
-      · apply Exists.intro v
-        constructor
-        · exact hv
-        · simp
-          exact eq
+      have s1 : s ++ u ++ v = s ++ t :=
+      by
+        simp
+        exact eq
+
+      exact ⟨(s ++ u), ih, v, hv, s1⟩
 
 
 example
