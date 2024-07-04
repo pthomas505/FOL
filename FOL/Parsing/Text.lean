@@ -722,8 +722,6 @@ lemma eps_mem_imp_exp_subset_exp_succ
     rw [s1]
     exact append_mem_exp_right L [] x n h1 a1
 
------
-
 
 theorem exp_union_sub_exp_succ_union
   {α : Type}
@@ -740,8 +738,6 @@ theorem exp_union_sub_exp_succ_union
     constructor
     · exact Nat.le_succ_of_le a1
     · exact a2
-
-
 
 
 example
