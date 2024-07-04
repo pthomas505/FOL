@@ -581,7 +581,7 @@ lemma exp_succ_union
       exact ⟨i, hi, s, hs, t, ht, eq⟩
 
 
-lemma concat_mem_exp
+lemma append_mem_exp_left
   {α : Type}
   (L : Language α)
   (s t : Str α)
@@ -592,6 +592,20 @@ lemma concat_mem_exp
   by
     simp only [exp]
     exact append_mem_concat (exp L n) L s t h1 h2
+
+
+lemma append_mem_exp_right
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ L)
+  (h2 : t ∈ exp L n) :
+  s ++ t ∈ exp L (n + 1) :=
+  by
+    simp only [exp]
+    simp only [concat_exp_comm]
+    exact append_mem_concat L (exp L n) s t h1 h2
 
 
 example
@@ -606,7 +620,7 @@ example
     simp at h1
     obtain ⟨i, hi, hs⟩ := h1
     simp
-    obtain s1 := concat_mem_exp L s t i hs h2
+    obtain s1 := append_mem_exp_left L s t i hs h2
     exact ⟨i, hi, s1⟩
 
 
@@ -630,8 +644,6 @@ lemma concat_exp_comm_union
       simp only [concat_exp_comm]
 
 
-
-
 lemma exp_succ_concat_left_union
   {α : Type}
   (L : Language α)
@@ -640,20 +652,6 @@ lemma exp_succ_concat_left_union
   by
     simp only [← concat_exp_comm_union]
     exact exp_succ_union L n
-
-
-lemma concat_mem_exp_comm
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ L)
-  (h2 : t ∈ exp L n) :
-  s ++ t ∈ exp L (n + 1) :=
-  by
-    simp only [exp]
-    simp only [concat_exp_comm]
-    exact append_mem_concat L (exp L n) s t h1 h2
 
 
 lemma concat_mem_exp_comm_union
@@ -723,7 +721,7 @@ lemma eps_mem_imp_exp_subset_exp_succ
   by
     simp only [Set.subset_def]
     intro x a1
-    obtain s1 := concat_mem_exp_comm L [] x n h1 a1
+    obtain s1 := append_mem_exp_right L [] x n h1 a1
     simp at s1
     exact s1
 
@@ -991,7 +989,7 @@ lemma kleene_closure_set_eq_kleene_closure_left
             cases ih
             case _ i a3 =>
               apply Exists.intro (i + 1)
-              exact concat_mem_exp_comm L hd tl.join i a2_left_left a3
+              exact append_mem_exp_right L hd tl.join i a2_left_left a3
 
 
 lemma kleene_closure_set_eq_kleene_closure_right
@@ -1102,7 +1100,7 @@ theorem thm_6
                 cases a3_left
                 case _ i a4 =>
                   simp only [← a3_right]
-                  obtain s1 := concat_mem_exp_comm L s t i a2_left a4
+                  obtain s1 := append_mem_exp_right L s t i a2_left a4
                   exact thm_4 L (i + 1) s1
 
 
@@ -1151,7 +1149,7 @@ lemma concat_kleene_closure_succ_left
                 apply Exists.intro i
                 simp only [← a3_right]
                 simp only [exp]
-                exact concat_mem_exp_comm L s t i a2_left a4
+                exact append_mem_exp_right L s t i a2_left a4
     · simp only [Set.subset_def]
       intro x a1
       simp at a1
@@ -1205,7 +1203,7 @@ lemma concat_kleene_closure_succ_right
                 apply Exists.intro i
                 simp only [← a4_right]
                 simp only [exp]
-                exact concat_mem_exp L s t i a3 a4_left
+                exact append_mem_exp_left L s t i a3 a4_left
     · simp only [Set.subset_def]
       intro x a1
       simp at a1
