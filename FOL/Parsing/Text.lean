@@ -679,6 +679,36 @@ lemma append_mem_exp_right
     exact exp_sum L s t 1 n h1 h2
 
 
+example
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ ⋃ (k ≤ n), exp L k)
+  (h2 : t ∈ L) :
+  s ++ t ∈ ⋃ (k ≤ n), exp L (k + 1) :=
+  by
+    simp at h1
+    obtain ⟨i, hi, hs⟩ := h1
+    simp
+    obtain s1 := append_mem_exp_left L s t i hs h2
+    exact ⟨i, hi, s1⟩
+
+
+lemma concat_mem_exp_comm_union
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ L)
+  (h2 : t ∈ (⋃ (k ≤ n), exp L k)) :
+  s ++ t ∈ (⋃ (k ≤ n), exp L (k + 1)) :=
+  by
+    simp only [exp_succ_concat_right_union]
+    simp only [concat_exp_comm_union]
+    exact append_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
+
+
 lemma eps_mem_imp_exp_subset_exp_succ
   {α : Type}
   (L : Language α)
@@ -712,34 +742,6 @@ theorem exp_union_sub_exp_succ_union
     · exact a2
 
 
-example
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ ⋃ (k ≤ n), exp L k)
-  (h2 : t ∈ L) :
-  s ++ t ∈ ⋃ (k ≤ n), exp L (k + 1) :=
-  by
-    simp at h1
-    obtain ⟨i, hi, hs⟩ := h1
-    simp
-    obtain s1 := append_mem_exp_left L s t i hs h2
-    exact ⟨i, hi, s1⟩
-
-
-lemma concat_mem_exp_comm_union
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ L)
-  (h2 : t ∈ (⋃ (k ≤ n), exp L k)) :
-  s ++ t ∈ (⋃ (k ≤ n), exp L (k + 1)) :=
-  by
-    simp only [exp_succ_concat_right_union]
-    simp only [concat_exp_comm_union]
-    exact append_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
 
 
 example
