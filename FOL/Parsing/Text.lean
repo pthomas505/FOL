@@ -538,6 +538,15 @@ lemma concat_exp_comm_union
       simp only [concat_exp_comm]
 
 
+lemma exp_succ_concat_right
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  exp L (n + 1) = concat (exp L n) L :=
+  by
+    rfl
+
+
 lemma exp_succ_concat_left
   {α : Type}
   (L : Language α)
@@ -546,15 +555,6 @@ lemma exp_succ_concat_left
   by
     simp only [exp]
     exact concat_exp_comm L n
-
-
-lemma exp_succ_concat_right
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  exp L (n + 1) = concat (exp L n) L :=
-  by
-    rfl
 
 
 lemma exp_succ_concat_right_union
