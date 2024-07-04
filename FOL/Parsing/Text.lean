@@ -564,6 +564,49 @@ lemma append_mem_exp_right
     exact append_mem_concat L (exp L n) s t h1 h2
 
 
+lemma exp_sum
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (m n : ℕ)
+  (h1 : s ∈ exp L m)
+  (h2 : t ∈ exp L n) :
+  s ++ t ∈ exp L (m + n) :=
+  by
+    induction n generalizing t
+    case zero =>
+      simp only [exp] at h2
+      simp at h2
+      simp only [h2]
+      simp
+      exact h1
+    case succ n ih =>
+      simp only [exp] at h2
+      simp only [concat] at h2
+      simp at h2
+      cases h2
+      case _ s' a1 =>
+        cases a1
+        case _ a1_left a1_right =>
+          cases a1_right
+          case _ t' a2 =>
+            cases a2
+            case _ a2_left a2_right =>
+              simp only [exp]
+              simp only [concat]
+              simp
+
+              specialize ih s' a1_left
+              apply Exists.intro (s ++ s')
+              constructor
+              · exact ih
+              · simp only [← a2_right]
+                apply Exists.intro t'
+                constructor
+                · exact a2_left
+                · simp
+
+
 example
   {α : Type}
   (L : Language α)
@@ -688,8 +731,6 @@ lemma concat_mem_exp_comm_union
     exact append_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
 
 
-
-
 example
   {α : Type}
   (L : Language α)
@@ -726,49 +767,6 @@ lemma eps_mem_imp_exp_subset_exp_succ
     obtain s1 := append_mem_exp_right L [] x n h1 a1
     simp at s1
     exact s1
-
-
-lemma exp_sum
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (m n : ℕ)
-  (h1 : s ∈ exp L m)
-  (h2 : t ∈ exp L n) :
-  s ++ t ∈ exp L (m + n) :=
-  by
-    induction n generalizing t
-    case zero =>
-      simp only [exp] at h2
-      simp at h2
-      simp only [h2]
-      simp
-      exact h1
-    case succ n ih =>
-      simp only [exp] at h2
-      simp only [concat] at h2
-      simp at h2
-      cases h2
-      case _ s' a1 =>
-        cases a1
-        case _ a1_left a1_right =>
-          cases a1_right
-          case _ t' a2 =>
-            cases a2
-            case _ a2_left a2_right =>
-              simp only [exp]
-              simp only [concat]
-              simp
-
-              specialize ih s' a1_left
-              apply Exists.intro (s ++ s')
-              constructor
-              · exact ih
-              · simp only [← a2_right]
-                apply Exists.intro t'
-                constructor
-                · exact a2_left
-                · simp
 
 
 /-
