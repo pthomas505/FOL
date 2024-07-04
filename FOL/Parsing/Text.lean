@@ -302,20 +302,7 @@ lemma append_mem_concat
     exact ⟨s, h1, t, h2, rfl⟩
 
 
-example
-  {α : Type}
-  (L M : Language α)
-  (h1 : [] ∈ L)
-  (h2 : L ⊆ M) :
-  L ⊆ concat L M :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
-    apply append_mem_concat L M [] x h1
-    exact Set.mem_of_subset_of_mem h2 a1
-
-
-lemma append_eps_mem_concat
+lemma append_mem_concat_eps_left
   {α : Type}
   (L M : Language α)
   (x : Str α)
@@ -326,6 +313,19 @@ lemma append_eps_mem_concat
     have s1 : x = [] ++ x := by rfl
     rw [s1]
     exact append_mem_concat L M [] x h1 h2
+
+
+lemma append_mem_concat_eps_right
+  {α : Type}
+  (L M : Language α)
+  (x : Str α)
+  (h1 : x ∈ L)
+  (h2 : [] ∈ M) :
+  x ∈ concat L M :=
+  by
+    have s1 : x = x ++ [] := by rw [List.append_nil];
+    rw [s1]
+    exact append_mem_concat L M x [] h1 h2
 
 
 example
@@ -1621,7 +1621,7 @@ theorem thm_9_unique_right
         · apply Exists.intro t
           tauto
 
-    · apply append_eps_mem_concat
+    · apply append_mem_concat_eps_left
       · apply eps_mem_kleene_closure
       · exact hx
 termination_by x => x.length
