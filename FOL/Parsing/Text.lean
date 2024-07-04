@@ -460,23 +460,12 @@ lemma concat_subset_right
     intro x a1
     simp only [concat] at a1
     simp at a1
-    cases a1
-    case _ s a2 =>
-      cases a2
-      case _ a2_left a2_right =>
-        cases a2_right
-        case _ t a3 =>
-          cases a3
-          case _ a3_left a3_right =>
-            simp only [concat]
-            simp
-            apply Exists.intro s
-            constructor
-            · exact a2_left
-            · apply Exists.intro t
-              constructor
-              · exact Set.mem_of_subset_of_mem h1 a3_left
-              · exact a3_right
+    obtain ⟨s, hs, t, ht, eq⟩ := a1
+    simp only [concat]
+    simp
+    have s1 : t ∈ L3 := Set.mem_of_subset_of_mem h1 ht
+    exact ⟨s, hs, t, s1, eq⟩
+
 
 def exp
   {α : Type}
