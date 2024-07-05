@@ -193,7 +193,7 @@ theorem thm_2
   s ++ (t ++ u) = (s ++ t) ++ u :=
   by
     symm
-    exact (List.append_assoc s t u)
+    exact List.append_assoc s t u
 
 
 /-
@@ -269,8 +269,7 @@ example
 
 
 /-
-Definition 11 (Concatenation). Let L1 and L2 be languages. The concate-
-nation of L1 and L2, written L1 · L2, or L1L2 is defined by
+Definition 11 (Concatenation). Let L1 and L2 be languages. The concatenation of L1 and L2, written L1 · L2, or L1L2 is defined by
 L1L2 = {s · t = st : s ∈ L1, t ∈ L2} .
 -/
 def concat
