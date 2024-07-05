@@ -1209,7 +1209,7 @@ theorem thm_9
         by simp only [h1]
 
 
-lemma thm_9_unique_left_aux_1
+lemma thm_9_unique_left_aux
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = (concat L1 X) ∪ L2) :
@@ -1254,7 +1254,7 @@ theorem thm_9_unique_left
     simp at a1
     obtain ⟨s, ⟨i, hs⟩, t, ht, eq⟩ := a1
     rw [← eq]
-    obtain s1 := thm_9_unique_left_aux_1 L1 L2 X h1 i
+    obtain s1 := thm_9_unique_left_aux L1 L2 X h1 i
     apply Set.mem_of_subset_of_mem s1
     simp only [concat]
     simp
@@ -1264,12 +1264,12 @@ theorem thm_9_unique_left
 lemma eps_not_mem_imp_mem_len_gt_zero
   {α : Type}
   (L : Language α)
-  (x : Str α)
+  (s : Str α)
   (h1 : [] ∉ L)
-  (h2 : x ∈ L) :
-  x.length > 0 :=
+  (h2 : s ∈ L) :
+  s.length > 0 :=
   by
-    cases x
+    cases s
     case nil =>
       contradiction
     case cons hd tl =>
@@ -1279,12 +1279,12 @@ lemma eps_not_mem_imp_mem_len_gt_zero
 example
   {α : Type}
   (L M : Language α)
-  (x : Str α)
+  (s : Str α)
   (h1 : [] ∉ L)
-  (h2 : x ∈ concat L M) :
-  x.length > 0 :=
+  (h2 : s ∈ concat L M) :
+  s.length > 0 :=
   by
-    cases x
+    cases s
     case nil =>
       simp only [concat] at h2
       simp at h2
@@ -1340,19 +1340,12 @@ lemma eps_not_mem_imp_mem_len_ge_exp
       rw [exp] at h2
       simp only [concat] at h2
       simp at h2
-      cases h2
-      case _ s a1 =>
-        cases a1
-        case _ a1_left a1_right =>
-          cases a1_right
-          case _ t a2 =>
-            cases a2
-            case _ a2_left a2_right =>
-              simp only [← a2_right]
-              simp
-              specialize ih s a1_left
-              have s1 : t.length > 0 := eps_not_mem_imp_mem_len_gt_zero L t h1 a2_left
-              exact Nat.add_lt_add_of_lt_of_le ih s1
+      obtain ⟨s, hs, t, ht, eq⟩ := h2
+      rw [← eq]
+      simp
+      specialize ih s hs
+      have s1 : t.length > 0 := eps_not_mem_imp_mem_len_gt_zero L t h1 ht
+      exact Nat.add_lt_add_of_lt_of_le ih s1
 
 
 example
