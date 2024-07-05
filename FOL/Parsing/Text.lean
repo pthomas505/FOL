@@ -979,7 +979,7 @@ lemma kleene_closure_set_eq_kleene_closure_right
   kleene_closure α L ⊆ kleene_closure_set α L :=
   by
     simp only [Set.subset_def]
-    intro x a1
+    intro cs a1
     simp only [kleene_closure_set]
     simp
 
@@ -987,27 +987,20 @@ lemma kleene_closure_set_eq_kleene_closure_right
     case eps =>
       apply Exists.intro []
       simp
-    case succ s t ih_1 ih_2 ih_3 =>
-      simp only [thm_5] at ih_1
-      simp at ih_1
-      cases ih_1
-      case _ i a2 =>
-        cases ih_3
-        case _ M a3 =>
-          cases a3
-          case _ a3_left a3_right =>
-            apply Exists.intro (M ++ [t])
-            constructor
-            · intro r a4
-              simp at a4
-              cases a4
-              case _ a4_right =>
-                exact a3_left r a4_right
-              case _ a4_left =>
-                simp only [a4_left]
-                exact ih_2
-            · simp
-              exact a3_right
+    case succ s t _ ih_2 ih_3 =>
+      obtain ⟨M, a2, a3⟩ := ih_3
+      rw [a3]
+      apply Exists.intro (M ++ [t])
+      constructor
+      · intro r a4
+        simp at a4
+        cases a4
+        case _ a4_left =>
+          exact a2 r a4_left
+        case _ a4_right =>
+          simp only [a4_right]
+          exact ih_2
+      · simp
 
 
 theorem kleene_closure_set_eq_kleene_closure
