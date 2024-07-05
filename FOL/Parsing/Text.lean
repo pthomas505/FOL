@@ -650,6 +650,34 @@ lemma exp_sum
       exact ⟨(s ++ u), ih, v, hv, s1⟩
 
 
+example
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (m n : ℕ)
+  (h1 : s ∈ ⋃ (k ≤ m), exp L k)
+  (h2 : t ∈ ⋃ (k ≤ n), exp L k) :
+  s ++ t ∈ ⋃ (k ≤ m + n), exp L k :=
+  by
+    cases m
+    case zero =>
+      simp at h1
+      simp only [exp] at h1
+      simp at h1
+      simp at h2
+      simp only [h1]
+      simp
+      exact h2
+    case succ k =>
+      simp at *
+      obtain ⟨i, hi, hs⟩ := h1
+      obtain ⟨j, hj, ht⟩ := h2
+      apply Exists.intro (i + j)
+      constructor
+      · exact Nat.add_le_add hi hj
+      · exact exp_sum L s t i j hs ht
+
+
 lemma append_mem_exp_left
   {α : Type}
   (L : Language α)
