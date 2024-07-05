@@ -1464,6 +1464,13 @@ theorem thm_9_unique
   Set.eq_of_subset_of_subset (thm_9_unique_left L1 L2 X h1) (thm_9_unique_right L1 L2 X h1 h2)
 
 
+/-
+Definition 14 (Nullable). A language L is said to be nullable if ε ∈ L, and we define the nullify function ν by ν(L) =
+{ε} if ε ∈ L
+∅ if ε ∉ L
+-/
+
+
 def Language.is_nullable
   {α : Type}
   (L : Language α) :
@@ -1518,14 +1525,13 @@ example
   (L1 ∪ L2).nullify = L1.nullify ∪ L2.nullify :=
   by
     simp only [Language.nullify]
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro x a1
+    ext cs
+    constructor
+    · intro a1
       simp at a1
       simp
       tauto
-    · simp only [Set.subset_def]
-      intro x a1
+    · intro a1
       simp at a1
       simp
       tauto
@@ -1538,14 +1544,13 @@ example
   (L1 ∩ L2).nullify = L1.nullify ∩ L2.nullify :=
   by
     simp only [Language.nullify]
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro x a1
+    ext cs
+    constructor
+    · intro a1
       simp at a1
       simp
       tauto
-    · simp only [Set.subset_def]
-      intro x a1
+    · intro a1
       simp at a1
       simp
       tauto
@@ -1558,9 +1563,9 @@ example
   (concat L1 L2).nullify = concat L1.nullify L2.nullify :=
   by
     simp only [Language.nullify]
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro x a1
+    ext cs
+    constructor
+    · intro a1
       simp at a1
       cases a1
       case _ a1_left a2_right =>
@@ -1571,29 +1576,19 @@ example
         simp only [concat]
         simp
         exact a1_left
-    · simp only [Set.subset_def]
-      intro x a1
+    · intro a1
       simp only [concat] at a1
       simp at a1
-      cases a1
-      case _ s a2 =>
-        cases a2
-        case _ a2_left a2_right =>
-          cases a2_left
-          case _ a2_left_left a2_left_right =>
-            cases a2_right
-            case _ t a3 =>
-              cases a3
-              case _ a3_left a3_right =>
-                cases a3_left
-                case _ a3_left_left a3_left_right =>
-                  simp only [← a3_right]
-                  simp only [a2_left_right]
-                  simp only [a3_left_right]
-                  simp
-                  simp only [concat]
-                  simp
-                  tauto
+      obtain ⟨s, ⟨hs_left, hs_right⟩, t, ⟨ht_left, ht_right⟩, eq⟩ := a1
+      rw [← eq]
+      simp only [hs_right]
+      simp only [ht_right]
+      simp
+      simp only [concat]
+      simp
+      constructor
+      · exact hs_left
+      · exact ht_left
 
 
 example
