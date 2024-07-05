@@ -369,20 +369,20 @@ theorem concat_distrib_union_left
       intro xs a1 ys a2 a3
       subst a3
       cases a2
-      case _ c1 =>
+      case _ a2_left =>
         left
-        exact ⟨xs, a1, ys, c1, rfl⟩
-      case _ c1 =>
+        exact ⟨xs, a1, ys, a2_left, rfl⟩
+      case _ a2_right =>
         right
-        exact ⟨xs, a1, ys, c1, rfl⟩
+        exact ⟨xs, a1, ys, a2_right, rfl⟩
     · simp
       intro a1
       cases a1
-      case _ c1 =>
-        obtain ⟨s, hs, t, ht, eq⟩ := c1
+      case _ a1_left =>
+        obtain ⟨s, hs, t, ht, eq⟩ := a1_left
         exact ⟨s, hs, t, ⟨by left; exact ht, eq⟩⟩
-      case _ c1 =>
-        obtain ⟨s, hs, t, ht, eq⟩ := c1
+      case _ a1_right =>
+        obtain ⟨s, hs, t, ht, eq⟩ := a1_right
         exact ⟨s, hs, t, ⟨by right; exact ht, eq⟩⟩
 
 
