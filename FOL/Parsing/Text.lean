@@ -830,9 +830,9 @@ theorem thm_4
   exp L n ⊆ kleene_closure α L :=
   by
     simp only [Set.subset_def]
-    intro s a1
+    intro cs a1
 
-    induction n generalizing s
+    induction n generalizing cs
     case zero =>
       simp only [exp] at a1
       simp at a1
@@ -844,22 +844,11 @@ theorem thm_4
       simp only [concat] at a1
       simp at a1
 
-      apply Exists.elim a1
-      intro xs a2
-      clear a1
-
-      cases a2
-      case _ a2_left a2_right =>
-        apply Exists.elim a2_right
-        intro ys a3
-        clear a2_right
-
-        cases a3
-        case _ a3_left a3_right =>
-          simp only [← a3_right]
-          apply kleene_closure.succ L
-          apply ih xs a2_left
-          exact a3_left
+      obtain ⟨s, hs, t, ht, eq⟩ := a1
+      simp only [← eq]
+      apply kleene_closure.succ L
+      apply ih s hs
+      exact ht
 
 
 lemma lang_sub_kleene_closure
