@@ -66,6 +66,27 @@ example : ['a', 'b'] ∈ exp Char 2 :=
 Definition 4 (String length). Let s ∈ Σ^n be a string. We say that the length of s is n, written |s| = n, and hence the length is the number of consecutive symbols. As a special case we have |ε| = 0.
 -/
 
+
+theorem append_not_eps_left
+  {α : Type}
+  (s t : Str α)
+  (h1 : ¬ s = []) :
+  t.length < (s ++ t).length :=
+  by
+    simp
+    exact h1
+
+
+theorem append_not_eps_right
+  {α : Type}
+  (s t : Str α)
+  (h1 : ¬ t = []) :
+  s.length < (s ++ t).length :=
+  by
+    simp
+    exact h1
+
+
 lemma rev_str_mem_exp_str_len
   {α : Type}
   (s : Str α) :
@@ -268,6 +289,21 @@ example
     exact Strings.all_str_mem_kleene_closure cs
 
 
+lemma eps_not_mem_imp_mem_len_gt_zero
+  {α : Type}
+  (L : Language α)
+  (s : Str α)
+  (h1 : [] ∉ L)
+  (h2 : s ∈ L) :
+  s.length > 0 :=
+  by
+    cases s
+    case nil =>
+      contradiction
+    case cons hd tl =>
+      simp
+
+
 /-
 Definition 11 (Concatenation). Let L1 and L2 be languages. The concatenation of L1 and L2, written L1 · L2, or L1L2 is defined by
 L1L2 = {s · t = st : s ∈ L1, t ∈ L2} .
@@ -334,6 +370,30 @@ example
   by
     simp only [concat]
     simp
+
+
+lemma eps_not_mem_imp_eps_not_mem_concat
+  {α : Type}
+  (L M : Language α)
+  (h1 : [] ∉ L) :
+  [] ∉ concat L M :=
+  by
+    simp only [concat]
+    simp
+    intro a1
+    contradiction
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (s : Str α)
+  (h1 : [] ∉ L)
+  (h2 : s ∈ concat L M) :
+  s.length > 0 :=
+  by
+    obtain s1 := eps_not_mem_imp_eps_not_mem_concat L M h1
+    apply eps_not_mem_imp_mem_len_gt_zero (concat L M) s s1 h2
 
 
 theorem concat_assoc
@@ -488,6 +548,89 @@ lemma exp_one
     simp only [exp]
     simp only [concat]
     simp
+
+
+lemma eps_not_mem_imp_eps_not_mem_exp_succ
+  {α : Type}
+  (L : Language α)
+  (n : ℕ)
+  (h1 : [] ∉ L) :
+  [] ∉ exp L (n + 1) :=
+  by
+    simp only [exp]
+    simp only [concat]
+    simp
+    intro _
+    exact h1
+
+
+lemma eps_not_mem_imp_mem_len_ge_exp
+  {α : Type}
+  (L : Language α)
+  (s : Str α)
+  (n : ℕ)
+  (h1 : [] ∉ L)
+  (h2 : s ∈ exp L (n + 1)) :
+  s.length > n :=
+  by
+    induction n generalizing s
+    case zero =>
+      simp only [exp] at h2
+      simp only [concat] at h2
+      simp at h2
+      exact eps_not_mem_imp_mem_len_gt_zero L s h1 h2
+    case succ k ih =>
+      rw [exp] at h2
+      simp only [concat] at h2
+      simp at h2
+      obtain ⟨s, hs, t, ht, eq⟩ := h2
+      rw [← eq]
+      simp
+      specialize ih s hs
+      have s1 : t.length > 0 := eps_not_mem_imp_mem_len_gt_zero L t h1 ht
+      exact Nat.add_lt_add_of_lt_of_le ih s1
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (x : Str α)
+  (h1 : [] ∉ L) :
+  x ∉ exp L (x.length + 1) :=
+  by
+    intro contra
+    obtain s1 := eps_not_mem_imp_mem_len_ge_exp L x x.length h1 contra
+    simp at s1
+
+
+lemma eps_not_mem_imp_mem_concat_exp_ge_exp
+  {α : Type}
+  (L M : Language α)
+  (x : Str α)
+  (n : ℕ)
+  (h1 : [] ∉ L)
+  (h2 : x ∈ concat (exp L (n + 1)) M) :
+  x.length > n :=
+  by
+    simp only [concat] at h2
+    simp at h2
+    obtain ⟨s, hs, t, _, eq⟩ := h2
+    rw [← eq]
+    simp
+    have s1 : s.length > n := eps_not_mem_imp_mem_len_ge_exp L s n h1 hs
+    exact Nat.lt_add_right (List.length t) s1
+
+
+lemma eps_not_mem_imp_not_mem_concat_exp
+  {α : Type}
+  (L M : Language α)
+  (x : Str α)
+  (h1 : [] ∉ L) :
+  x ∉ concat (exp L (x.length + 1)) M :=
+  by
+    intro contra
+    obtain s1 := eps_not_mem_imp_mem_concat_exp_ge_exp L M x x.length h1 contra
+    simp at s1
 
 
 lemma concat_exp_comm
@@ -1261,159 +1404,13 @@ theorem thm_9_unique_left
     exact ⟨s, hs, t, ht, rfl⟩
 
 
-lemma eps_not_mem_imp_mem_len_gt_zero
-  {α : Type}
-  (L : Language α)
-  (s : Str α)
-  (h1 : [] ∉ L)
-  (h2 : s ∈ L) :
-  s.length > 0 :=
-  by
-    cases s
-    case nil =>
-      contradiction
-    case cons hd tl =>
-      simp
-
-
-example
-  {α : Type}
-  (L M : Language α)
-  (s : Str α)
-  (h1 : [] ∉ L)
-  (h2 : s ∈ concat L M) :
-  s.length > 0 :=
-  by
-    cases s
-    case nil =>
-      simp only [concat] at h2
-      simp at h2
-      cases h2
-      case _ h2_left h2_right =>
-        contradiction
-    case cons hd tl =>
-      simp
-
-
-example
-  {α : Type}
-  (L M : Language α)
-  (h1 : [] ∉ L) :
-  [] ∉ concat L M :=
-  by
-    simp only [concat]
-    simp
-    intro a1
-    contradiction
-
-
-example
-  {α : Type}
-  (L : Language α)
-  (n : ℕ)
-  (h1 : [] ∉ L) :
-  [] ∉ exp L (n + 1) :=
-  by
-    simp only [exp]
-    simp only [concat]
-    simp
-    intro _
-    exact h1
-
-
-lemma eps_not_mem_imp_mem_len_ge_exp
-  {α : Type}
-  (L : Language α)
-  (x : Str α)
-  (n : ℕ)
-  (h1 : [] ∉ L)
-  (h2 : x ∈ exp L (n + 1)) :
-  x.length > n :=
-  by
-    induction n generalizing x
-    case zero =>
-      simp only [exp] at h2
-      simp only [concat] at h2
-      simp at h2
-      apply eps_not_mem_imp_mem_len_gt_zero L x h1 h2
-    case succ k ih =>
-      rw [exp] at h2
-      simp only [concat] at h2
-      simp at h2
-      obtain ⟨s, hs, t, ht, eq⟩ := h2
-      rw [← eq]
-      simp
-      specialize ih s hs
-      have s1 : t.length > 0 := eps_not_mem_imp_mem_len_gt_zero L t h1 ht
-      exact Nat.add_lt_add_of_lt_of_le ih s1
-
-
-example
-  {α : Type}
-  (L : Language α)
-  (x : Str α)
-  (h1 : [] ∉ L) :
-  x ∉ exp L (x.length + 1) :=
-  by
-    intro contra
-    obtain s1 := eps_not_mem_imp_mem_len_ge_exp L x x.length h1 contra
-    simp at s1
-
-
-lemma eps_not_mem_imp_mem_concat_exp_ge_exp
-  {α : Type}
-  (L M : Language α)
-  (x : Str α)
-  (n : ℕ)
-  (h1 : [] ∉ L)
-  (h2 : x ∈ concat (exp L (n + 1)) M) :
-  x.length > n :=
-  by
-    simp only [concat] at h2
-    simp at h2
-    cases h2
-    case _ s a1 =>
-      cases a1
-      case _ a1_left a1_right =>
-        cases a1_right
-        case _ t a2 =>
-          cases a2
-          case _ a2_left a2_right =>
-            simp only [← a2_right]
-            simp
-            obtain s1 := eps_not_mem_imp_mem_len_ge_exp L s n h1 a1_left
-            exact Nat.lt_add_right (List.length t) s1
-
-
-lemma eps_not_mem_imp_not_mem_concat_exp
-  {α : Type}
-  (L M : Language α)
-  (x : Str α)
-  (h1 : [] ∉ L) :
-  x ∉ concat (exp L (x.length + 1)) M :=
-  by
-    intro contra
-    obtain s1 := eps_not_mem_imp_mem_concat_exp_ge_exp L M x x.length h1 contra
-    simp at s1
-
-
-theorem left_append_not_eps
-  {α : Type}
-  (s t : Str α)
-  (h1 : ¬ s = []) :
-  List.length t < List.length (s ++ t) :=
-  by
-    simp
-    exact h1
-
-
 theorem thm_9_unique_right
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = (concat L1 X) ∪ L2)
   (h2 : [] ∉ L1) :
   X ⊆ concat (kleene_closure α L1) L2
-| x, a1 => by
+  | x, a1 => by
     rw [h1] at a1
     simp only [concat] at a1
     simp at a1
@@ -1428,7 +1425,7 @@ theorem thm_9_unique_right
       · have : t.length < x.length :=
         by
           simp only [← eq]
-          apply left_append_not_eps
+          apply Strings.append_not_eps_left
           intro contra
           simp only [contra] at hs
           contradiction
