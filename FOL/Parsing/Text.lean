@@ -939,7 +939,7 @@ theorem kleene_closure_closed_concat
 def kleene_closure_set
   (α : Type)
   (L : Language α) :=
-  { l | ∃ M : List (Str α), (∀ (r : Str α), r ∈ M → r ∈ L) ∧ M.join = l }
+  { l | ∃ M : List (Str α), (∀ (r : Str α), r ∈ M → r ∈ L) ∧ l = M.join }
 
 
 lemma kleene_closure_set_eq_kleene_closure_left
@@ -955,7 +955,7 @@ lemma kleene_closure_set_eq_kleene_closure_left
     case _ l a2 =>
       cases a2
       case _ a2_left a2_right =>
-        simp only [← a2_right]
+        simp only [a2_right]
         clear a2_right
 
         simp only [thm_5]
@@ -990,7 +990,6 @@ lemma kleene_closure_set_eq_kleene_closure_right
 
     induction a1
     case eps =>
-      simp
       apply Exists.intro []
       simp
     case succ s t ih_1 ih_2 ih_3 =>
