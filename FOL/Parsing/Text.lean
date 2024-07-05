@@ -856,11 +856,8 @@ lemma lang_sub_kleene_closure
   (L : Language α) :
   L ⊆ kleene_closure α L :=
   by
-    obtain s2 := thm_4 L 1
-    simp only [exp] at s2
-    simp only [concat] at s2
-    simp at s2
-    exact s2
+    conv => left; rw [← exp_one L]
+    exact thm_4 L 1
 
 
 lemma mem_lang_imp_mem_kleene_closure
