@@ -1449,7 +1449,6 @@ theorem thm_9_unique_right
         · apply mem_lang_imp_mem_kleene_closure L1 s hs
         · apply Exists.intro t
           tauto
-
     · apply append_mem_concat_eps_left
       · apply eps_mem_kleene_closure
       · exact hx
@@ -1462,10 +1461,7 @@ theorem thm_9_unique
   (h1 : X = (concat L1 X) ∪ L2)
   (h2 : [] ∉ L1) :
   concat (kleene_closure α L1) L2 = X :=
-  by
-    apply Set.eq_of_subset_of_subset
-    · exact thm_9_unique_left L1 L2 X h1
-    · exact thm_9_unique_right L1 L2 X h1 h2
+  Set.eq_of_subset_of_subset (thm_9_unique_left L1 L2 X h1) (thm_9_unique_right L1 L2 X h1 h2)
 
 
 def Language.is_nullable
