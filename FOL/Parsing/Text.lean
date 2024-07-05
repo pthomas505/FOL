@@ -967,10 +967,9 @@ lemma kleene_closure_set_eq_kleene_closure_left
       case _ a2_left_left a2_left_right =>
         specialize ih a2_left_right
         simp
-        cases ih
-        case _ i a3 =>
-          apply Exists.intro (i + 1)
-          exact append_mem_exp_right L hd tl.join i a2_left_left a3
+        obtain ⟨i, a3⟩ := ih
+        apply Exists.intro (i + 1)
+        exact append_mem_exp_right L hd tl.join i a2_left_left a3
 
 
 lemma kleene_closure_set_eq_kleene_closure_right
