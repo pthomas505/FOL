@@ -752,11 +752,11 @@ lemma eps_mem_imp_exp_subset_exp_succ
     exact append_mem_exp_right L [] x n h1 a1
 
 
-theorem exp_union_sub_exp_succ_union
+example
   {α : Type}
   (L : Language α)
-  (n : ℕ) :
-  ⋃ (k ≤ n), exp L k ⊆ ⋃ (k ≤ n + 1), exp L k :=
+  (m n : ℕ) :
+  ⋃ (k ≤ m), exp L k ⊆ ⋃ (k ≤ m + n), exp L k :=
   by
     simp
     intro k a1
@@ -765,7 +765,7 @@ theorem exp_union_sub_exp_succ_union
     simp
     apply Exists.intro k
     constructor
-    · exact Nat.le_succ_of_le a1
+    · exact le_add_right a1
     · exact a2
 
 
