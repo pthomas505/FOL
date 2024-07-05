@@ -913,10 +913,7 @@ theorem thm_5
   {α : Type}
   (L : Language α) :
   kleene_closure α L = ⋃ (n : ℕ), exp L n :=
-  by
-    apply Set.eq_of_subset_of_subset
-    · exact thm_5_right L
-    · exact thm_5_left L
+    Set.eq_of_subset_of_subset (thm_5_right L) (thm_5_left L)
 
 
 theorem kleene_closure_closed_concat
@@ -1008,10 +1005,7 @@ theorem kleene_closure_set_eq_kleene_closure
   [DecidableEq α]
   (L : Language α) :
   kleene_closure_set α L = kleene_closure α L :=
-  by
-    apply Set.eq_of_subset_of_subset
-    · exact kleene_closure_set_eq_kleene_closure_left L
-    · exact kleene_closure_set_eq_kleene_closure_right L
+    Set.eq_of_subset_of_subset (kleene_closure_set_eq_kleene_closure_left L) (kleene_closure_set_eq_kleene_closure_right L)
 
 
 theorem thm_6
