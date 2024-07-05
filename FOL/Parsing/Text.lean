@@ -1148,7 +1148,7 @@ theorem thm_8
     apply Set.eq_of_subset_of_subset
     · exact lang_sub_kleene_closure (kleene_closure α L)
     · simp only [Set.subset_def]
-      intro x a1
+      intro cs a1
       induction a1
       case _ =>
         apply kleene_closure.eps L
@@ -1249,37 +1249,16 @@ theorem thm_9_unique_left
   by
     simp only [thm_5]
     simp only [Set.subset_def]
-    intro x a1
-
-    have s1 : ∃ (n : ℕ), x ∈ concat (exp L1 n) L2 :=
-    by
-      simp only [concat] at a1
-      simp at a1
-      cases a1
-      case _ s a2 =>
-        cases a2
-        case _ a2_left a2_right =>
-          cases a2_left
-          case _ i a3 =>
-            cases a2_right
-            case _ t a4 =>
-              cases a4
-              case _ a4_left a4_right =>
-                simp only [concat]
-                simp
-                apply Exists.intro i
-                apply Exists.intro s
-                constructor
-                · exact a3
-                · apply Exists.intro t
-                  constructor
-                  · exact a4_left
-                  · exact a4_right
-
-    cases s1
-    case _ n a2 =>
-      obtain s2 := thm_9_unique_left_aux_1 L1 L2 X h1 n
-      apply Set.mem_of_subset_of_mem s2 a2
+    intro cs a1
+    simp only [concat] at a1
+    simp at a1
+    obtain ⟨s, ⟨i, hs⟩, t, ht, eq⟩ := a1
+    rw [← eq]
+    obtain s1 := thm_9_unique_left_aux_1 L1 L2 X h1 i
+    apply Set.mem_of_subset_of_mem s1
+    simp only [concat]
+    simp
+    exact ⟨s, hs, t, ht, rfl⟩
 
 
 lemma eps_not_mem_imp_mem_len_gt_zero
