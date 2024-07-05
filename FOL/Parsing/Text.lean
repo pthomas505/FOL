@@ -877,7 +877,7 @@ theorem thm_5_left
   ⋃ (n : ℕ), exp L n ⊆ kleene_closure α L :=
   by
     simp only [Set.subset_def]
-    intro s a1
+    intro cs a1
     simp at a1
     apply Exists.elim a1
     intro n a2
@@ -889,31 +889,23 @@ theorem thm_5_right
   kleene_closure α L ⊆ ⋃ (n : ℕ), exp L n :=
   by
     simp only [Set.subset_def]
-    intro s a1
+    intro cs a1
     induction a1
     case eps =>
       simp
       apply Exists.intro 0
       simp only [exp]
       simp
-    case succ xs ys _ ih_2 ih_3 =>
+    case succ s t _ ih_2 ih_3 =>
       simp at ih_3
-
-      apply Exists.elim ih_3
-      intro n a2
-      clear ih_3
+      obtain ⟨i, hs⟩ := ih_3
 
       simp
-      apply Exists.intro (n + 1)
+      apply Exists.intro (i + 1)
       simp only [exp]
       simp only [concat]
       simp
-      apply Exists.intro xs
-      constructor
-      · exact a2
-      · apply Exists.intro ys
-        simp
-        exact ih_2
+      exact ⟨s, hs, t, ih_2, rfl⟩
 
 
 theorem thm_5
