@@ -948,7 +948,7 @@ lemma kleene_closure_set_eq_kleene_closure_left
   kleene_closure_set α L ⊆ kleene_closure α L :=
   by
     simp only [Set.subset_def]
-    intro x a1
+    intro cs a1
     simp only [kleene_closure_set] at a1
     simp at a1
     obtain ⟨M, a2_left, a2_right⟩ := a1
@@ -1021,37 +1021,29 @@ theorem thm_6
   by
     apply Set.eq_of_subset_of_subset
     · simp only [Set.subset_def]
-      intro s a1
+      intro cs a1
       simp only [thm_5] at a1
       simp at a1
-      cases a1
-      case _ i a2 =>
-        simp
-        cases i
-        case zero =>
-          simp only [exp] at a2
-          simp at a2
-          left
-          exact a2
-        case succ k =>
-          simp only [exp_succ_concat_left] at a2
-          simp only [concat] at a2
-          simp at a2
-          cases a2
-          case _ s_1 a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              cases a3_right
-              case _ t a4 =>
-                cases a4
-                case _ a4_left a4_right =>
-                  right
-                  simp only [← a4_right]
-                  apply append_mem_concat
-                  · exact a3_left
-                  · exact Set.mem_of_mem_of_subset a4_left (thm_4 L k)
+      obtain ⟨i, a2⟩ := a1
+      simp
+      cases i
+      case _ =>
+        simp only [exp] at a2
+        simp at a2
+        left
+        exact a2
+      case _ k =>
+        simp only [exp_succ_concat_left] at a2
+        simp only [concat] at a2
+        simp at a2
+        obtain ⟨s, hs, t, ht, eq⟩ := a2
+        right
+        simp only [← eq]
+        apply append_mem_concat
+        · exact hs
+        · exact Set.mem_of_mem_of_subset ht (thm_4 L k)
     · simp only [Set.subset_def]
-      intro x a1
+      intro cs a1
       simp at a1
       cases a1
       case _ a1_left =>
@@ -1061,19 +1053,10 @@ theorem thm_6
         simp only [thm_5 L] at a1_right
         simp only [concat] at a1_right
         simp at a1_right
-        cases a1_right
-        case _ s a2 =>
-          cases a2
-          case _ a2_left a2_right =>
-            cases a2_right
-            case _ t a3 =>
-              cases a3
-              case _ a3_left a3_right =>
-                cases a3_left
-                case _ i a4 =>
-                  simp only [← a3_right]
-                  obtain s1 := append_mem_exp_right L s t i a2_left a4
-                  exact thm_4 L (i + 1) s1
+        obtain ⟨s, hs, t, ⟨i, ht⟩, eq⟩ := a1_right
+        simp only [← eq]
+        obtain s1 := append_mem_exp_right L s t i hs ht
+        exact thm_4 L (i + 1) s1
 
 
 theorem corollary_1
