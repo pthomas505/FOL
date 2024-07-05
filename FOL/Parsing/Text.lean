@@ -883,6 +883,7 @@ theorem thm_5_left
     intro n a2
     exact Set.mem_of_subset_of_mem (thm_4 L n) a2
 
+
 theorem thm_5_right
   {α : Type}
   (L : Language α) :
@@ -928,12 +929,10 @@ theorem kleene_closure_closed_concat
   by
     simp only [thm_5] at *
     simp at *
-    cases h1
-    case _ m a1 =>
-      cases h2
-      case _ n a2 =>
-        apply Exists.intro (m + n)
-        apply exp_sum L s t m n a1 a2
+    obtain ⟨m, hs⟩ := h1
+    obtain ⟨n, ht⟩ := h2
+    apply Exists.intro (m + n)
+    exact exp_sum L s t m n hs ht
 
 
 -- Each l is the concatenation of a list of strings, each of which is in L.
