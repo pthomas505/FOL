@@ -45,6 +45,7 @@ inductive exp (α : Type) : ℕ → Set (Str α)
     s ∈ exp α n →
     exp α (n + 1) (s ++ [a])
 
+
 example : [] ∈ exp Char 0 :=
   by
     exact exp.zero
@@ -62,9 +63,7 @@ example : ['a', 'b'] ∈ exp Char 2 :=
 
 
 /-
-Definition 4 (String length). Let s ∈ Σn be a string. We say that the length
-of s is n, written |s| = n, and hence the length is the number of consecutive
-symbols. As a special case we have |ε| = 0.
+Definition 4 (String length). Let s ∈ Σ^n be a string. We say that the length of s is n, written |s| = n, and hence the length is the number of consecutive symbols. As a special case we have |ε| = 0.
 -/
 
 lemma rev_str_mem_exp_str_len
@@ -101,7 +100,7 @@ theorem mem_exp_imp_str_len_eq
     induction h1
     case zero =>
       simp
-    case succ m a s ih_1 ih_2 =>
+    case succ k c t ih_1 ih_2 =>
       simp
       exact ih_2
 
@@ -163,11 +162,7 @@ theorem kleene_closure_eq_univ
 
 
 /-
-Definition 6 (Concatenation). Suppose that s ∈ Σm and t ∈ Σn are strings
-over some alphabet. The concatenation of s and t written s · t or st, is the
-string formed by letting the sequence of symbols in s be followed by the
-sequence of symbols in t, i.e.
-s · t = a1a2...am · b1b2...bn = a1a2...amb1b2...bn = st ∈ Σm+n
+Definition 6 (Concatenation). Suppose that s ∈ Σ^m and t ∈ Σ^n are strings over some alphabet. The concatenation of s and t written s · t or st, is the string formed by letting the sequence of symbols in s be followed by the sequence of symbols in t, i.e. s · t = a1a2...am · b1b2...bn = a1a2...amb1b2...bn = st ∈ Σ^(m+n)
 -/
 
 example
@@ -202,9 +197,7 @@ theorem thm_2
 
 
 /-
-Definition 7. (Substring) Suppose that s, t, u, v are strings such that s =
-tuv, then u is called a substring of s. Further, if at least one of t and v is
-not ε then u is called a proper substring of s.
+Definition 7. (Substring) Suppose that s, t, u, v are strings such that s = tuv, then u is called a substring of s. Further, if at least one of t and v is not ε then u is called a proper substring of s.
 -/
 def is_substring_of
   (α : Type)
@@ -219,8 +212,7 @@ def is_proper_substring_of
   ∃ (t v : Str α), s = t ++ u ++ v ∧ (¬ t.isEmpty ∨ ¬ v.isEmpty)
 
 /-
-Definition 8. (Prefix) Suppose that s, t, u are strings such that s = tu, then
-t is called a prefix of s. Further, t is called a proper prefix of s if u ≠ ε,
+Definition 8. (Prefix) Suppose that s, t, u are strings such that s = tu, then t is called a prefix of s. Further, t is called a proper prefix of s if u ≠ ε.
 -/
 def is_prefix_of
   (α : Type)
@@ -235,8 +227,7 @@ def is_proper_prefix_of
   ∃ (u : Str α), s = t ++ u ∧ ¬ u.isEmpty
 
 /-
-Definition 9. (Suffix) Suppose that s, t, u are strings such that s = tu, then
-u is called a suffix of s. Further, u is called a proper suffix of s if t ≠ ε
+Definition 9. (Suffix) Suppose that s, t, u are strings such that s = tu, then u is called a suffix of s. Further, u is called a proper suffix of s if t ≠ ε.
 -/
 def is_suffix_of
   (α : Type)
