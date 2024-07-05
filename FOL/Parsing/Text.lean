@@ -951,28 +951,26 @@ lemma kleene_closure_set_eq_kleene_closure_left
     intro x a1
     simp only [kleene_closure_set] at a1
     simp at a1
-    obtain ⟨M, a2⟩ := a1
-    cases a2
-    case _ a2_left a2_right =>
-      simp only [a2_right]
-      clear a2_right
-      simp only [thm_5]
+    obtain ⟨M, a2_left, a2_right⟩ := a1
+    simp only [a2_right]
+    clear a2_right
+    simp only [thm_5]
+    simp
+    induction M
+    case nil =>
+      apply Exists.intro 0
+      simp only [exp]
       simp
-      induction M
-      case nil =>
-        apply Exists.intro 0
-        simp only [exp]
+    case cons hd tl ih =>
+      simp at a2_left
+      cases a2_left
+      case _ a2_left_left a2_left_right =>
+        specialize ih a2_left_right
         simp
-      case cons hd tl ih =>
-        simp at a2_left
-        cases a2_left
-        case _ a2_left_left a2_left_right =>
-          specialize ih a2_left_right
-          simp
-          cases ih
-          case _ i a3 =>
-            apply Exists.intro (i + 1)
-            exact append_mem_exp_right L hd tl.join i a2_left_left a3
+        cases ih
+        case _ i a3 =>
+          apply Exists.intro (i + 1)
+          exact append_mem_exp_right L hd tl.join i a2_left_left a3
 
 
 lemma kleene_closure_set_eq_kleene_closure_right
