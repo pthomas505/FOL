@@ -264,8 +264,8 @@ example
   L ⊆ Strings.kleene_closure α :=
   by
     simp only [Set.subset_def]
-    intro x _
-    exact Strings.all_str_mem_kleene_closure x
+    intro cs _
+    exact Strings.all_str_mem_kleene_closure cs
 
 
 /-
@@ -430,7 +430,7 @@ lemma concat_subset_left
   concat L1 L2 ⊆ concat L1 L3 :=
   by
     simp only [Set.subset_def]
-    intro x a1
+    intro cs a1
     simp only [concat] at a1
     simp at a1
     obtain ⟨s, hs, t, ht, eq⟩ := a1
@@ -447,7 +447,7 @@ lemma concat_subset_right
   concat L2 L1 ⊆ concat L3 L1 :=
   by
     simp only [Set.subset_def]
-    intro x a1
+    intro cs a1
     simp only [concat] at a1
     simp at a1
     obtain ⟨s, hs, t, ht, eq⟩ := a1
@@ -735,10 +735,10 @@ lemma eps_mem_imp_exp_subset_exp_succ
   exp L n ⊆ exp L (n + 1) :=
   by
     simp only [Set.subset_def]
-    intro x a1
-    have s1 : x = [] ++ x := by rfl
+    intro cs a1
+    have s1 : cs = [] ++ cs := by rfl
     rw [s1]
-    exact append_mem_exp_right L [] x n h1 a1
+    exact append_mem_exp_right L [] cs n h1 a1
 
 
 example
@@ -750,7 +750,7 @@ example
     simp
     intro k a1
     simp only [Set.subset_def]
-    intro x a2
+    intro cs a2
     simp
     apply Exists.intro k
     constructor
