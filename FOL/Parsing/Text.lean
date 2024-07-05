@@ -1013,9 +1013,9 @@ theorem thm_6
   (L : Language α) :
   (kleene_closure α L) = {[]} ∪ (concat L (kleene_closure α L)) :=
   by
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro cs a1
+    ext cs
+    constructor
+    · intro a1
       simp only [thm_5] at a1
       simp at a1
       obtain ⟨i, a2⟩ := a1
@@ -1036,8 +1036,7 @@ theorem thm_6
         apply append_mem_concat
         · exact hs
         · exact Set.mem_of_mem_of_subset ht (thm_4 L k)
-    · simp only [Set.subset_def]
-      intro cs a1
+    · intro a1
       simp at a1
       cases a1
       case _ a1_left =>
@@ -1079,9 +1078,9 @@ lemma concat_kleene_closure_succ_left
   (L : Language α) :
   concat L (⋃ (n : ℕ), exp L n) = ⋃ (n : ℕ), exp L (n + 1) :=
   by
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro cs a1
+    ext cs
+    constructor
+    · intro a1
       simp only [concat] at a1
       simp at a1
       obtain ⟨s, hs, t, ⟨i, ht⟩, eq⟩ := a1
@@ -1090,8 +1089,7 @@ lemma concat_kleene_closure_succ_left
       simp
       apply Exists.intro i
       exact append_mem_exp_right L s t i hs ht
-    · simp only [Set.subset_def]
-      intro cs a1
+    · intro a1
       simp at a1
       obtain ⟨i, a2⟩ := a1
       simp only [exp] at a2
@@ -1109,52 +1107,27 @@ lemma concat_kleene_closure_succ_right
   (L : Language α) :
   concat (⋃ (n : ℕ), exp L n) L = ⋃ (n : ℕ), exp L (n + 1) :=
   by
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro x a1
+    ext cs
+    constructor
+    · intro a1
       simp only [concat] at a1
       simp at a1
-      cases a1
-      case _ s a2 =>
-        cases a2
-        case _ a2_left a2_right =>
-          cases a2_left
-          case _ i a3 =>
-            cases a2_right
-            case _ t a4 =>
-              cases a4
-              case _ a4_left a4_right =>
-                simp
-                apply Exists.intro i
-                simp only [← a4_right]
-                simp only [exp]
-                exact append_mem_exp_left L s t i a3 a4_left
-    · simp only [Set.subset_def]
-      intro x a1
+      obtain ⟨s, ⟨i, hs⟩,  t, ht, eq⟩ := a1
+      simp
+      rw [← eq]
+      simp only [exp]
+      apply Exists.intro i
+      exact append_mem_exp_left L s t i hs ht
+    · intro a1
       simp at a1
-      cases a1
-      case _ i a2 =>
-        simp only [exp] at a2
-        simp only [concat] at a2
-        simp at a2
-        cases a2
-        case _ s a3 =>
-          cases a3
-          case _ a3_left a3_right =>
-            cases a3_right
-            case _ t a4 =>
-              cases a4
-              case _ a4_left a4_right =>
-                simp only [concat]
-                simp
-                apply Exists.intro s
-                constructor
-                · apply Exists.intro i
-                  exact a3_left
-                · apply Exists.intro t
-                  constructor
-                  · exact a4_left
-                  · exact a4_right
+      obtain ⟨i, a2⟩ := a1
+      simp only [exp] at a2
+      simp only [concat] at a2
+      simp at a2
+      obtain ⟨s, hs, t, ht, eq⟩ := a2
+      simp only [concat]
+      simp
+      exact ⟨s, ⟨i, hs⟩, t, ht, eq⟩
 
 
 theorem thm_7
