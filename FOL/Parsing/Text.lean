@@ -680,7 +680,7 @@ lemma append_mem_exp_right
     exact exp_sum L s t 1 n h1 h2
 
 
-lemma append_mem_exp_left_union
+example
   {α : Type}
   (L : Language α)
   (s t : Str α)
@@ -696,7 +696,7 @@ lemma append_mem_exp_left_union
     exact ⟨i, hi, s1⟩
 
 
-lemma append_mem_exp_right_union
+example
   {α : Type}
   (L : Language α)
   (s t : Str α)
