@@ -2134,7 +2134,9 @@ theorem thm_15_symm
   L_equiv L s t → L_equiv L t s :=
   by
     simp only [L_equiv]
-    exact fun a => id a.symm
+    intro a1
+    symm
+    exact a1
 
 
 theorem thm_15_trans
