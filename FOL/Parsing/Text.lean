@@ -1803,7 +1803,7 @@ lemma thm_12_7_3
 
     simp only [concat]
     simp
-    ext xs
+    ext cs
     constructor
     · simp
       intro s a1 t a2 a3
