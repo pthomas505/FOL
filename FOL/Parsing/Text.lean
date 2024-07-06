@@ -2024,10 +2024,10 @@ theorem thm_14
   (L : Language α) :
   L = L.nullify ∪ ⋃ (a : α), concat {[a]} (derivative L [a]) :=
   by
-    apply Set.eq_of_subset_of_subset
-    · simp only [Set.subset_def]
-      intro x a1
-      cases x
+    ext cs
+    constructor
+    · intro a1
+      cases cs
       case _ =>
         simp
         left
@@ -2043,8 +2043,7 @@ theorem thm_14
         simp only [derivative]
         simp
         exact a1
-    · simp only [Set.subset_def]
-      intro x a1
+    · intro a1
       simp at a1
       cases a1
       case _ a1_left =>
@@ -2055,17 +2054,13 @@ theorem thm_14
           simp only [a1_left_right]
           exact a1_left_left
       case _ a1_right =>
-        cases a1_right
-        case _ i a2 =>
-          simp only [concat] at a2
-          simp only [derivative] at a2
-          simp at a2
-          cases a2
-          case _ t a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              simp only [← a3_right]
-              exact a3_left
+        obtain ⟨i, a2⟩ := a1_right
+        simp only [concat] at a2
+        simp only [derivative] at a2
+        simp at a2
+        obtain ⟨t, ⟨a3_left, a3_right⟩⟩ := a2
+        rw [← a3_right]
+        exact a3_left
 
 
 theorem thm_14_disjoint
