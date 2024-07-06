@@ -1947,41 +1947,13 @@ lemma aux_2
     simp
     constructor
     · intro a1
-      cases a1
-      case _ i a2 =>
-        cases a2
-        case _ s a3 =>
-          cases a3
-          case _ a3_left a3_right =>
-            cases a3_right
-            case _ t a4 =>
-              cases a4
-              case _ a4_left a4_right =>
-                apply Exists.intro s
-                constructor
-                · exact a3_left
-                · apply Exists.intro t
-                  constructor
-                  · apply Exists.intro i
-                    exact a4_left
-                  · exact a4_right
+      obtain ⟨i, s, hs, t, ⟨ht, eq⟩⟩ := a1
+      rw [← eq]
+      exact ⟨s, hs, t, ⟨i, ht⟩, rfl⟩
     · intro a1
-      cases a1
-      case _ s a2 =>
-        cases a2
-        case _ a2_left a2_right =>
-          cases a2_right
-          case _ t a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              cases a3_left
-              case _ i a4 =>
-                apply Exists.intro i
-                apply Exists.intro s
-                constructor
-                · exact a2_left
-                · apply Exists.intro t
-                  tauto
+      obtain ⟨s, hs, t, ⟨i, ht⟩, eq⟩ := a1
+      rw [← eq]
+      exact ⟨i, s, hs, t, ht, rfl⟩
 
 
 -- 1.57
