@@ -1745,7 +1745,8 @@ lemma thm_12_7_1
       simp
       apply Exists.intro (L1 \ {[]})
       simp
-      exact (Set.insert_eq_of_mem c1).symm
+      symm
+      exact Set.insert_eq_of_mem c1
     case neg c1 =>
       simp
       exact c1
@@ -1761,60 +1762,29 @@ lemma thm_12_7_2
     simp only [derivative]
     simp only [concat]
     simp
-    ext xs
+    ext cs
     simp
     constructor
     · intro a1
-      cases a1
-      case _ s a2 =>
-        cases a2
-        case _ a2_left a2_right =>
-          cases a2_right
-          case _ t a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              cases s
-              case nil =>
-                simp at a3_right
-                apply Exists.intro []
-                constructor
-                · exact a2_left
-                · apply Exists.intro xs
-                  simp
-                  simp only [← a3_right]
-                  exact a3_left
-              case cons s_hd s_tl =>
-                simp only [Language.nullify] at a2_left
-                split_ifs at a2_left
-                case pos c1 =>
-                  simp at a2_left
-                case neg c1 =>
-                  simp at a2_left
+      obtain ⟨s, hs, t, ht, eq⟩ := a1
+      cases s
+      case nil =>
+        simp at eq
+        rw [eq] at ht
+        exact ⟨[], hs, cs, ⟨ht, by simp⟩⟩
+      case cons s_hd s_tl =>
+        simp only [Language.nullify] at hs
+        simp at hs
     · intro a1
-      cases a1
-      case _ s a2 =>
-        cases a2
-        case _ a2_left a2_right =>
-          cases a2_right
-          case _ t a3 =>
-            cases a3
-            case _ a3_left a3_right =>
-              cases s
-              case nil =>
-                simp at a3_right
-                apply Exists.intro []
-                constructor
-                · exact a2_left
-                · simp only [← a3_right]
-                  simp
-                  exact a3_left
-              case cons s_hd s_tl s_ih =>
-                simp only [Language.nullify] at a2_left
-                split_ifs at a2_left
-                case pos c1 =>
-                  simp at a2_left
-                case neg c1 =>
-                  simp at a2_left
+      obtain ⟨s, hs, t, ht, eq⟩ := a1
+      cases s
+      case nil =>
+        simp at eq
+        rw [eq] at ht
+        exact ⟨[], hs, (a :: cs), ht, by simp⟩
+      case cons s_hd s_tl s_ih =>
+        simp only [Language.nullify] at hs
+        simp at hs
 
 
 lemma thm_12_7_3
