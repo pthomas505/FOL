@@ -990,8 +990,8 @@ theorem thm_4
       obtain ⟨s, hs, t, ht, eq⟩ := a1
       simp only [← eq]
       apply kleene_closure.succ L
-      apply ih s hs
-      exact ht
+      · exact ih s hs
+      · exact ht
 
 
 lemma lang_sub_kleene_closure
