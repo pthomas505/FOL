@@ -1983,66 +1983,7 @@ theorem thm_12_9
   (L : Language α)
   (a : α) :
   derivative Lᶜ [a] = (derivative L [a])ᶜ := rfl
-
-/-
-    have s1 : derivative L [a] ∪ derivative Lᶜ [a] = derivative (L ∪ Lᶜ) [a] :=
-    by
-      simp only [thm_12_5]
-
-    have s2 : derivative (L ∪ Lᶜ) [a] = derivative Set.univ [a] :=
-      by
-        simp
-
-    have s3 : derivative Set.univ [a] = derivative (concat (Strings.exp α 1) Set.univ) [a] :=
-    by
-      simp only [thm_12_7]
-      simp only [Strings.exp_eq_exp_set]
-      simp only [Strings.exp_set]
-      simp only [Language.nullify]
-      simp
-      simp only [thm_3_b]
-      simp
-
-      simp only [derivative]
-      simp
-      simp only [concat]
-      simp
-
-    have s4 : derivative (concat (Strings.exp α 1) Set.univ) [a] = Strings.kleene_closure α :=
-    by
-      simp only [Strings.kleene_closure_eq_univ]
-      apply Set.eq_of_subset_of_subset
-      · simp only [Set.subset_univ]
-      · simp only [Set.subset_def]
-        intro x a1
-        simp only [concat]
-        simp
-        simp only [derivative]
-        simp
-        apply Exists.intro [a]
-        constructor
-        · simp only [Strings.exp_eq_exp_set]
-          simp only [Strings.exp_set]
-          simp
-        · apply Exists.intro x
-          simp
-
-    have s5 : derivative L [a] ∪ derivative Lᶜ [a] = Set.univ :=
-      by
-        simp only [s1]
-        simp only [s2]
-        simp only [s3]
-        simp only [s4]
-        simp only [Strings.kleene_closure_eq_univ]
-
-    have s6 : derivative L [a] ∩ derivative Lᶜ [a] = ∅ :=
-    by
-      simp only [← thm_12_6 L Lᶜ a]
-      simp
-      simp only [thm_12_1]
-
-    exact rfl
--/
+  -- Why is this proof so short?
 
 
 theorem thm_13
