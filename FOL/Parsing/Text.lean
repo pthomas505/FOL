@@ -1806,32 +1806,20 @@ lemma thm_12_7_3
     ext xs
     constructor
     · simp
-      intro s a1 t a3 a4
+      intro s a1 t a2 a3
       cases s
       case nil =>
         contradiction
       case cons s_hd s_tl =>
-        simp at a4
-        cases a4
-        case _ a4_left a4_right =>
-          simp only [a4_left] at a1
-          apply Exists.intro s_tl
-          constructor
-          · exact a1
-          · apply Exists.intro t
-            constructor
-            · exact a3
-            · exact a4_right
+        simp at a3
+        cases a3
+        case _ a3_left a3_right =>
+          simp only [a3_left] at a1
+          exact ⟨s_tl, a1, t, ⟨a2, a3_right⟩⟩
     · simp
       intro s a1 t a2 a3
-      apply Exists.intro (a :: s)
-      constructor
-      · exact a1
-      · apply Exists.intro t
-        constructor
-        · exact a2
-        · simp only [← a3]
-          simp
+      rw [← a3]
+      exact ⟨a :: s, a1, t, a2, by simp⟩
 
 
 -- 1.56
