@@ -2188,7 +2188,7 @@ example
   {α : Type}
   (L : Language α)
   (a : α) :
-  Str.equiv_class L [a] ∩ Strings.exp_set α 1 =
+  Str.equiv_class L [a] ∩ {s : Str α | s.length = 1} =
     { b | derivative L [a] = derivative L b ∧ b.length = 1 } :=
   by
     rfl
