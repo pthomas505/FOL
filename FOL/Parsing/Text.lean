@@ -1828,11 +1828,8 @@ lemma thm_12_7_3
   (h1 : L0.nullify = ∅) :
   {t | a :: t ∈ concat L0 L2} = {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
   by
-    have s1 : [] ∉ L0 :=
-    by
-      simp only [Language.nullify] at h1
-      simp at h1
-      exact h1
+    simp only [Language.nullify] at h1
+    simp at h1
 
     simp only [concat]
     simp
