@@ -1976,6 +1976,19 @@ lemma thm_12_7_3_right_str
   (h1 : L0.nullify = ∅) :
   {t | s ++ t ∈ concat L0 L2} ⊆ {t | ∃ t0 t2, s ++ t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
   by
+    simp only [Language.nullify] at h1
+    simp at h1
+    sorry
+
+
+theorem thm_12_7_str
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α)
+  (s : Str α) :
+  derivative (concat L1 L2) s =
+    (concat (derivative L1 s) L2) ∪ (concat L1.nullify ((derivative L2 s))) :=
+  by
     sorry
 
 
