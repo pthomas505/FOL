@@ -1961,14 +1961,25 @@ lemma thm_12_7_3_left_str
   {α : Type}
   [DecidableEq α]
   (L0 L2 : Language α)
-  (cs : Str α) :
-  {t | ∃ t0 t2, cs ++ t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} ⊆ {t | cs ++ t ∈ concat L0 L2} :=
+  (s : Str α) :
+  {t | ∃ t0 t2, s ++ t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} ⊆ {t | s ++ t ∈ concat L0 L2} :=
   by
     simp
-    intro s t a1 u a2 a3
+    intro xs ys a1 zs a2 a3
     rw [← a3]
     rw [← List.append_assoc]
-    apply append_mem_concat L0 L2 (cs ++ t) u a1 a2
+    exact append_mem_concat L0 L2 (s ++ ys) zs a1 a2
+
+
+lemma thm_12_7_3_right_str
+  {α : Type}
+  [DecidableEq α]
+  (L0 L2 : Language α)
+  (s : Str α)
+  (h1 : L0.nullify = ∅) :
+  {t | s ++ t ∈ concat L0 L2} ⊆ {t | ∃ t0 t2, s ++ t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
+  by
+    sorry
 
 
 -------------------------------------------------------------------------------
