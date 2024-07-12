@@ -2402,3 +2402,13 @@ theorem thm_17
       apply ih
       apply thm_17_aux
       exact h1
+
+
+theorem thm_18
+  {α : Type}
+  [DecidableEq α]
+  (R : Language α)
+  (h1: IsRegLang α R) :
+  Finite {derivative R s | s : Str α } :=
+  by
+    sorry
