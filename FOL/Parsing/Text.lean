@@ -2352,8 +2352,46 @@ theorem thm_17
   {α : Type}
   [DecidableEq α]
   (R : Language α)
-  (s : Str α)
+  (a : α)
   (h1 : IsRegLang α R) :
-  IsRegLang α (derivative R s) :=
+  IsRegLang α (derivative R [a]) :=
   by
-    sorry
+    induction h1
+    case char b =>
+      by_cases c1 : a = b
+      case pos =>
+        rw [c1]
+        simp only [thm_12_3]
+        exact IsRegLang.epsilon
+      case neg =>
+        simp only [thm_12_4 a b c1]
+        exact IsRegLang.zero
+    case epsilon =>
+      simp only [thm_12_2]
+      exact IsRegLang.zero
+    case zero =>
+      simp only [thm_12_1]
+      exact IsRegLang.zero
+    case union R1 R2 ih_1 ih_2 ih_3 ih_4 =>
+      simp only [thm_12_5]
+      exact IsRegLang.union (derivative R1 [a]) (derivative R2 [a]) ih_3 ih_4
+    case concat R1 R2 ih_1 ih_2 ih_3 ih_4 =>
+      simp only [thm_12_7]
+      apply IsRegLang.union
+      · apply IsRegLang.concat
+        · exact ih_3
+        · exact ih_2
+      · apply IsRegLang.concat
+        · simp only [Language.nullify]
+          split_ifs
+          case pos c1 =>
+            exact IsRegLang.epsilon
+          case neg c1 =>
+            exact IsRegLang.zero
+        · exact ih_4
+    case closure R' ih_1 ih_2 =>
+      simp only [thm_12_8]
+      apply IsRegLang.concat
+      · exact ih_2
+      · apply IsRegLang.closure
+        exact ih_1
