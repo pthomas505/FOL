@@ -2394,7 +2394,7 @@ theorem thm_17_aux
       · exact IsRegLang.closure R' ih_1
 
 
-example
+theorem thm_17
   {α : Type}
   [DecidableEq α]
   (R : Language α)
