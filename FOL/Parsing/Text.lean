@@ -2021,14 +2021,6 @@ theorem thm_12_7_str
       simp only [Language.nullify]
       split_ifs
       case pos c1 =>
-        have s2 : L1.nullify = {[]} :=
-        by
-          simp only [Language.nullify]
-          simp
-          intro a1
-          contradiction
-
-        simp only [s2] at ih
         simp only [concat_eps_left]
         congr
         sorry
