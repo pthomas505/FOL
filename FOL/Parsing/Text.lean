@@ -354,7 +354,7 @@ lemma append_mem_concat_eps_right
     exact append_mem_concat L M x [] h1 h2
 
 
-example
+lemma concat_empty_right
   {α : Type}
   (L : Language α) :
   concat L ∅ = ∅ :=
@@ -363,7 +363,7 @@ example
     simp
 
 
-example
+lemma concat_empty_left
   {α : Type}
   (L : Language α) :
   concat ∅ L = ∅ :=
@@ -1859,7 +1859,7 @@ theorem thm_12_7
   (L1 L2 : Language α)
   (a : α) :
   derivative (concat L1 L2) [a] =
-    (concat (derivative L1 [a]) L2) ∪ (concat L1.nullify ((derivative L2 [a]))) :=
+    (concat (derivative L1 [a]) L2) ∪ (concat L1.nullify (derivative L2 [a])) :=
   by
     have s1 : ∀ (L0 : Language α), L0.nullify = ∅ →
       derivative (concat (L1.nullify ∪ L0) L2) [a] =
@@ -1987,9 +1987,57 @@ theorem thm_12_7_str
   (L1 L2 : Language α)
   (s : Str α) :
   derivative (concat L1 L2) s =
-    (concat (derivative L1 s) L2) ∪ (concat L1.nullify ((derivative L2 s))) :=
+    (concat (derivative L1 s) L2) ∪ (concat L1.nullify (derivative L2 s)) :=
   by
-    sorry
+    induction s generalizing L1 L2
+    case nil =>
+      simp only [derivative]
+      simp only [Language.nullify]
+      simp
+      split_ifs
+      case pos h1 =>
+        simp only [concat_eps_left]
+        have s1 : L2 ⊆ concat L1 L2 :=
+        by
+          simp only [Set.subset_def]
+          intro x
+          exact append_mem_concat_eps_left L1 L2 x h1
+
+        symm
+        exact Set.union_eq_self_of_subset_right s1
+
+      case neg h1 =>
+        simp only [concat]
+        simp
+    case cons hd tl ih =>
+      have s1 : hd :: tl = [hd] ++ tl := rfl
+      simp only [s1]
+      clear s1
+
+      simp only [thm_11_b]
+      simp only [thm_12_7]
+      simp only [thm_12_5_str]
+
+      simp only [Language.nullify]
+      split_ifs
+      case pos c1 =>
+        have s2 : L1.nullify = {[]} :=
+        by
+          simp only [Language.nullify]
+          simp
+          intro a1
+          contradiction
+
+        simp only [s2] at ih
+        simp only [concat_eps_left]
+        congr
+        sorry
+      case neg c1 =>
+        simp only [concat_empty_left]
+        simp
+        simp only [thm_12_1_str]
+        simp
+        sorry
 
 
 -------------------------------------------------------------------------------
