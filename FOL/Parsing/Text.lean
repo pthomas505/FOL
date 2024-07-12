@@ -2348,7 +2348,7 @@ inductive IsRegLang (α : Type) : Language α → Prop
   IsRegLang α (kleene_closure α R)
 
 
-theorem thm_17
+theorem thm_17_aux
   {α : Type}
   [DecidableEq α]
   (R : Language α)
@@ -2414,5 +2414,5 @@ example
 
       rw [thm_11_b]
       apply ih
-      apply thm_17
+      apply thm_17_aux
       exact h1
