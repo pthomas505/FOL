@@ -2300,15 +2300,3 @@ theorem thm_16_3
     rw [thm_12_6_str L1 L2 t]
     rw [h1]
     rw [h2]
-
-
-theorem thm_16_4
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α)
-  (s t : Str α)
-  (h1 : L_equiv L s t) :
-  L_equiv (kleene_closure α L) s t :=
-  by
-    simp only [L_equiv_iff_deriv_eq] at *
-    sorry
