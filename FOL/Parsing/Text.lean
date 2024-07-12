@@ -2317,3 +2317,43 @@ inductive RegLang
   deriving Repr
 
 compile_inductive% RegLang
+
+
+inductive IsRegLang (α : Type) : Language α → Prop
+| char
+  (a : α) :
+  IsRegLang α {[a]}
+
+| epsilon :
+  IsRegLang α {[]}
+
+| zero :
+  IsRegLang α ∅
+
+| union
+  (R1 R2 : Language α) :
+  IsRegLang α R1 →
+  IsRegLang α R2 →
+  IsRegLang α (R1 ∪ R2)
+
+| concat
+  (R1 R2 : Language α) :
+  IsRegLang α R1 →
+  IsRegLang α R2 →
+  IsRegLang α (concat R1 R2)
+
+| closure
+  (R : Language α) :
+  IsRegLang α R →
+  IsRegLang α (kleene_closure α R)
+
+
+theorem thm_17
+  {α : Type}
+  [DecidableEq α]
+  (R : Language α)
+  (s : Str α)
+  (h1 : IsRegLang α R) :
+  IsRegLang α (derivative R s) :=
+  by
+    sorry
