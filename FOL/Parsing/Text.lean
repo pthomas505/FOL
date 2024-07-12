@@ -2305,15 +2305,15 @@ theorem thm_16_3
 -------------------------------------------------------------------------------
 
 
-inductive RegExp
+inductive RegLang
   (α : Type) :
   Type
-  | char : α → RegExp α
-  | epsilon : RegExp α
-  | zero : RegExp α
-  | union : RegExp α → RegExp α → RegExp α
-  | concat : RegExp α → RegExp α → RegExp α
-  | closure : RegExp α → RegExp α
+  | char : α → RegLang α
+  | epsilon : RegLang α
+  | zero : RegLang α
+  | union : RegLang α → RegLang α → RegLang α
+  | concat : RegLang α → RegLang α → RegLang α
+  | closure : RegLang α → RegLang α
   deriving Repr
 
-compile_inductive% RegExp
+compile_inductive% RegLang
