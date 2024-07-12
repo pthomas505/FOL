@@ -1647,8 +1647,8 @@ theorem thm_11_a
 theorem thm_11_b
   {α : Type}
   (L : Language α)
-  (s a : Str α) :
-  derivative L (s ++ a) = derivative (derivative L s) a :=
+  (s t : Str α) :
+  derivative L (s ++ t) = derivative (derivative L s) t :=
   by
     simp only [derivative]
     simp
