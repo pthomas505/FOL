@@ -2378,9 +2378,7 @@ theorem thm_17
     case concat R1 R2 ih_1 ih_2 ih_3 ih_4 =>
       simp only [thm_12_7]
       apply IsRegLang.union
-      · apply IsRegLang.concat
-        · exact ih_3
-        · exact ih_2
+      · exact IsRegLang.concat (derivative R1 [a]) R2 ih_3 ih_2
       · apply IsRegLang.concat
         · simp only [Language.nullify]
           split_ifs
@@ -2393,5 +2391,4 @@ theorem thm_17
       simp only [thm_12_8]
       apply IsRegLang.concat
       · exact ih_2
-      · apply IsRegLang.closure
-        exact ih_1
+      · exact IsRegLang.closure R' ih_1
