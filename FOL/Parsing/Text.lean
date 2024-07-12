@@ -1954,84 +1954,6 @@ lemma thm_12_7_2_str
         simp at hs
 
 
-lemma thm_12_7_3_left_str
-  {α : Type}
-  [DecidableEq α]
-  (L0 L2 : Language α)
-  (s : Str α) :
-  {t | ∃ t0 t2, s ++ t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} ⊆ {t | s ++ t ∈ concat L0 L2} :=
-  by
-    simp
-    intro xs ys a1 zs a2 a3
-    rw [← a3]
-    rw [← List.append_assoc]
-    exact append_mem_concat L0 L2 (s ++ ys) zs a1 a2
-
-
-lemma thm_12_7_3_right_str
-  {α : Type}
-  [DecidableEq α]
-  (L0 L2 : Language α)
-  (s : Str α)
-  (h1 : L0.nullify = ∅) :
-  {t | s ++ t ∈ concat L0 L2} ⊆ {t | ∃ t0 t2, s ++ t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
-  by
-    simp only [Language.nullify] at h1
-    simp at h1
-    sorry
-
-
-theorem thm_12_7_str
-  {α : Type}
-  [DecidableEq α]
-  (L1 L2 : Language α)
-  (s : Str α) :
-  derivative (concat L1 L2) s =
-    (concat (derivative L1 s) L2) ∪ (concat L1.nullify (derivative L2 s)) :=
-  by
-    induction s generalizing L1 L2
-    case nil =>
-      simp only [derivative]
-      simp only [Language.nullify]
-      simp
-      split_ifs
-      case pos h1 =>
-        simp only [concat_eps_left]
-        have s1 : L2 ⊆ concat L1 L2 :=
-        by
-          simp only [Set.subset_def]
-          intro x
-          exact append_mem_concat_eps_left L1 L2 x h1
-
-        symm
-        exact Set.union_eq_self_of_subset_right s1
-
-      case neg h1 =>
-        simp only [concat]
-        simp
-    case cons hd tl ih =>
-      have s1 : hd :: tl = [hd] ++ tl := rfl
-      simp only [s1]
-      clear s1
-
-      simp only [thm_11_b]
-      simp only [thm_12_7]
-      simp only [thm_12_5_str]
-
-      simp only [Language.nullify]
-      split_ifs
-      case pos c1 =>
-        simp only [concat_eps_left]
-        congr
-        sorry
-      case neg c1 =>
-        simp only [concat_empty_left]
-        simp
-        simp only [thm_12_1_str]
-        simp
-        sorry
-
-
 -------------------------------------------------------------------------------
 
 -- 1.59
@@ -2338,18 +2260,6 @@ example
     { b | derivative L [a] = derivative L b ∧ b.length = 1 } :=
   by
     rfl
-
-
-theorem thm_16_1
-  {α : Type}
-  [DecidableEq α]
-  (L1 L2 : Language α)
-  (s t : Str α)
-  (h1 : L_equiv L1 s t)
-  (h2 : L_equiv L2 s t) :
-  L_equiv (concat L1 L2) s t :=
-  by
-    sorry
 
 
 theorem thm_16_2
