@@ -2300,3 +2300,20 @@ theorem thm_16_3
     rw [thm_12_6_str L1 L2 t]
     rw [h1]
     rw [h2]
+
+
+-------------------------------------------------------------------------------
+
+
+inductive RegExp
+  (α : Type) :
+  Type
+  | char : α → RegExp α
+  | epsilon : RegExp α
+  | zero : RegExp α
+  | union : RegExp α → RegExp α → RegExp α
+  | concat : RegExp α → RegExp α → RegExp α
+  | closure : RegExp α → RegExp α
+  deriving Repr
+
+compile_inductive% RegExp
