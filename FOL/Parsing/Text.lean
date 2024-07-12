@@ -1820,6 +1820,41 @@ lemma thm_12_7_2
         simp at hs
 
 
+lemma thm_12_7_2_str
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α)
+  (a : Str α) :
+  {s | a ++ s ∈ (concat L1.nullify L2)} = concat L1.nullify (derivative L2 a) :=
+  by
+    simp only [derivative]
+    simp only [concat]
+    simp
+    ext cs
+    simp
+    constructor
+    · intro a1
+      obtain ⟨s, hs, t, ht, eq⟩ := a1
+      cases s
+      case nil =>
+        simp at eq
+        rw [eq] at ht
+        exact ⟨[], hs, cs, ⟨ht, by simp⟩⟩
+      case cons s_hd s_tl =>
+        simp only [Language.nullify] at hs
+        simp at hs
+    · intro a1
+      obtain ⟨s, hs, t, ht, eq⟩ := a1
+      cases s
+      case nil =>
+        simp at eq
+        rw [eq] at ht
+        exact ⟨[], hs, (a ++ cs), ht, by simp⟩
+      case cons s_hd s_tl s_ih =>
+        simp only [Language.nullify] at hs
+        simp at hs
+
+
 lemma thm_12_7_3
   {α : Type}
   [DecidableEq α]
@@ -1916,45 +1951,6 @@ theorem thm_12_7
         simp only [s1]
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
 
-
--------------------------------------------------------------------------------
-
-lemma thm_12_7_2_str
-  {α : Type}
-  [DecidableEq α]
-  (L1 L2 : Language α)
-  (a : Str α) :
-  {s | a ++ s ∈ (concat L1.nullify L2)} = concat L1.nullify (derivative L2 a) :=
-  by
-    simp only [derivative]
-    simp only [concat]
-    simp
-    ext cs
-    simp
-    constructor
-    · intro a1
-      obtain ⟨s, hs, t, ht, eq⟩ := a1
-      cases s
-      case nil =>
-        simp at eq
-        rw [eq] at ht
-        exact ⟨[], hs, cs, ⟨ht, by simp⟩⟩
-      case cons s_hd s_tl =>
-        simp only [Language.nullify] at hs
-        simp at hs
-    · intro a1
-      obtain ⟨s, hs, t, ht, eq⟩ := a1
-      cases s
-      case nil =>
-        simp at eq
-        rw [eq] at ht
-        exact ⟨[], hs, (a ++ cs), ht, by simp⟩
-      case cons s_hd s_tl s_ih =>
-        simp only [Language.nullify] at hs
-        simp at hs
-
-
--------------------------------------------------------------------------------
 
 -- 1.59
 lemma derivative_exp_succ
