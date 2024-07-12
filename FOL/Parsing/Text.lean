@@ -2305,20 +2305,6 @@ theorem thm_16_3
 -------------------------------------------------------------------------------
 
 
-inductive RegLang
-  (α : Type) :
-  Type
-  | char : α → RegLang α
-  | epsilon : RegLang α
-  | zero : RegLang α
-  | union : RegLang α → RegLang α → RegLang α
-  | concat : RegLang α → RegLang α → RegLang α
-  | closure : RegLang α → RegLang α
-  deriving Repr
-
-compile_inductive% RegLang
-
-
 inductive IsRegLang (α : Type) : Language α → Prop
 | char
   (a : α) :
