@@ -2392,3 +2392,27 @@ theorem thm_17
       apply IsRegLang.concat
       · exact ih_2
       · exact IsRegLang.closure R' ih_1
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (R : Language α)
+  (s : Str α)
+  (h1: IsRegLang α R) :
+  IsRegLang α (derivative R s) :=
+  by
+    induction s generalizing R
+    case nil =>
+      simp only [derivative]
+      simp
+      exact h1
+    case cons hd tl ih =>
+      have s1 : hd :: tl = [hd] ++ tl := rfl
+      rw [s1]
+      clear s1
+
+      rw [thm_11_b]
+      apply ih
+      apply thm_17
+      exact h1
