@@ -1952,6 +1952,17 @@ theorem thm_12_7
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
 
 
+theorem thm_12_7_str
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α)
+  (s : Str α) :
+  let B := { M | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ v.length > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v) }
+  derivative (concat L1 L2) s = (concat (derivative L1 s) L2) ∪ ⋃₀ B :=
+  by
+    sorry
+
+
 -- 1.59
 lemma derivative_exp_succ
   {α : Type}
