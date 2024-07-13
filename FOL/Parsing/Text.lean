@@ -1952,6 +1952,83 @@ theorem thm_12_7
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
 
 
+example
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α)
+  (a b : α) :
+  derivative (concat L1 L2) [a, b] = concat (derivative L1 [a, b]) L2 ∪ concat (derivative L1 [a]).nullify (derivative L2 [b]) ∪ concat L1.nullify (derivative L2 [a, b]) :=
+  by
+    ext cs
+    constructor
+    · intro a1
+      simp only [derivative] at a1
+      simp at a1
+      simp only [concat] at a1
+      simp at a1
+      obtain ⟨s, hs, t, ht, eq⟩ := a1
+
+      simp
+      simp only [derivative]
+      simp
+      simp only [concat]
+      simp
+      simp only [Language.nullify]
+      simp
+      sorry
+    · intro a1
+      simp at a1
+      cases a1
+      case _ c1 =>
+        cases c1
+        case _ c2 =>
+          simp only [derivative] at c2
+          simp at c2
+          simp only [concat] at c2
+          simp at c2
+          obtain ⟨s, hs, t, ht, eq⟩ := c2
+          simp only [derivative]
+          simp
+          simp only [concat]
+          simp
+          rw [← eq]
+          exact ⟨(a :: b :: s), hs, t, ht, by rfl ⟩
+        case _ c2 =>
+          simp only [derivative] at c2
+          simp at c2
+          simp only [concat] at c2
+          simp at c2
+          obtain ⟨s, hs, t, ht, eq⟩ := c2
+          simp only [derivative]
+          simp
+          simp only [concat]
+          simp
+          simp only [Language.nullify] at hs
+          simp at hs
+          obtain ⟨hs_left, hs_right⟩ := hs
+          rw [hs_right] at eq
+          simp at eq
+          rw [← eq]
+          exact ⟨[a], hs_left, (b :: t), ht, rfl⟩
+      case _ c1 =>
+        simp only [derivative] at c1
+        simp at c1
+        simp only [concat] at c1
+        simp at c1
+        obtain ⟨s, hs, t, ht, eq⟩ := c1
+        simp only [derivative]
+        simp
+        simp only [concat]
+        simp
+        rw [← eq]
+        simp only [Language.nullify] at hs
+        simp at hs
+        obtain ⟨hs_left, hs_right⟩ := hs
+        rw [hs_right]
+        simp
+        exact ⟨[], hs_left, (a :: b :: t), ht, rfl⟩
+
+
 theorem thm_12_7_str
   {α : Type}
   [DecidableEq α]
@@ -1995,10 +2072,16 @@ theorem thm_12_7_str
       clear s1
 
       simp only [thm_11_b]
-      simp only [Language.nullify]
+
+      simp only [B] at *
+      clear B
+
+      simp only [Language.nullify] at *
+
       split_ifs
       case pos c1 =>
         simp only [concat_eps_left]
+        obtain s2 := @thm_12_7
         sorry
       case neg c1 =>
         simp only [concat_empty_left]
