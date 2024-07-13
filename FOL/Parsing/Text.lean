@@ -1957,24 +1957,36 @@ theorem thm_12_7_str
   [DecidableEq α]
   (L1 L2 : Language α)
   (s : Str α) :
-  let B := { M | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ v.length > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v) }
+  let B := { M | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ u.length > 0 ∧ v.length > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v) }
 
-  derivative (concat L1 L2) s = (concat (derivative L1 s) L2) ∪ ⋃₀ B :=
+  derivative (concat L1 L2) s = (concat (derivative L1 s) L2) ∪ (concat L1.nullify (derivative L2 s)) ∪ ⋃₀ B :=
   by
-    intro B
-    simp only [B]
-    clear B
-
     induction s generalizing L1 L2
     case nil =>
-      simp only [thm_11_a]
-
-      have s1 : {M | ∃ u v, u ++ v = [] ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion = ∅ :=
+      intro B
+      have s1 : B.sUnion = ∅ :=
       by
+        simp only [B]
         simp
-
       rw [s1]
+      clear s1
+
       simp
+      simp only [thm_11_a]
+      simp only [Language.nullify]
+      split_ifs
+      case pos c1 =>
+        simp only [concat_eps_left]
+        have s2 : L2 ⊆ concat L1 L2 :=
+        by
+          simp only [Set.subset_def]
+          intro x a1
+          exact append_mem_concat_eps_left L1 L2 x c1 a1
+        symm
+        exact Set.union_eq_self_of_subset_right s2
+      case neg c1 =>
+        simp only [concat_empty_left]
+        simp
     case cons hd tl ih =>
       have s1 : hd :: tl = [hd] ++ tl := rfl
       rw [s1]
