@@ -1988,13 +1988,22 @@ theorem thm_12_7_str
         simp only [concat_empty_left]
         simp
     case cons hd tl ih =>
+      intro B
+
       have s1 : hd :: tl = [hd] ++ tl := rfl
       rw [s1]
       clear s1
 
       simp only [thm_11_b]
-      rw [thm_12_7]
-      sorry
+      simp only [Language.nullify]
+      split_ifs
+      case pos c1 =>
+        simp only [concat_eps_left]
+        sorry
+      case neg c1 =>
+        simp only [concat_empty_left]
+        simp
+        sorry
 
 
 -- 1.59
