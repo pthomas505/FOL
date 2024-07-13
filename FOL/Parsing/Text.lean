@@ -1958,9 +1958,31 @@ theorem thm_12_7_str
   (L1 L2 : Language α)
   (s : Str α) :
   let B := { M | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ v.length > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v) }
+
   derivative (concat L1 L2) s = (concat (derivative L1 s) L2) ∪ ⋃₀ B :=
   by
-    sorry
+    intro B
+    simp only [B]
+    clear B
+
+    induction s generalizing L1 L2
+    case nil =>
+      simp only [thm_11_a]
+
+      have s1 : {M | ∃ u v, u ++ v = [] ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion = ∅ :=
+      by
+        simp
+
+      rw [s1]
+      simp
+    case cons hd tl ih =>
+      have s1 : hd :: tl = [hd] ++ tl := rfl
+      rw [s1]
+      clear s1
+
+      simp only [thm_11_b]
+      rw [thm_12_7]
+      sorry
 
 
 -- 1.59
