@@ -1952,161 +1952,26 @@ theorem thm_12_7
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
 
 
-example
-  {α : Type}
-  [DecidableEq α]
-  (L1 L2 : Language α)
-  (a b : α) :
-  derivative (concat L1 L2) [a, b] = concat (derivative L1 [a, b]) L2 ∪ concat (derivative L1 [a]).nullify (derivative L2 [b]) ∪ concat L1.nullify (derivative L2 [a, b]) :=
-  by
-    ext cs
-    constructor
-    · intro a1
-      simp only [derivative] at a1
-      simp at a1
-      simp only [concat] at a1
-      simp at a1
-      obtain ⟨s, hs, t, ht, eq⟩ := a1
-
-      simp
-      simp only [derivative]
-      simp
-      simp only [concat]
-      simp
-      simp only [Language.nullify]
-      simp
-      cases s
-      case _ =>
-        simp at eq
-        right
-        apply Exists.intro []
-        simp
-        rw [← eq]
-        exact ⟨hs, ht⟩
-      case _ s_hd s_tl =>
-        simp at eq
-        obtain ⟨eq_left, eq_right⟩ := eq
-        subst eq_left
-        cases t
-        case _ =>
-          simp at eq_right
-          subst eq_right
-          left
-          left
-          exact ⟨cs, hs, [], ht, by simp⟩
-        case _ t_hd t_tl =>
-          sorry
-    · intro a1
-      simp at a1
-      cases a1
-      case _ c1 =>
-        cases c1
-        case _ c2 =>
-          simp only [derivative] at c2
-          simp at c2
-          simp only [concat] at c2
-          simp at c2
-          obtain ⟨s, hs, t, ht, eq⟩ := c2
-          simp only [derivative]
-          simp
-          simp only [concat]
-          simp
-          rw [← eq]
-          exact ⟨(a :: b :: s), hs, t, ht, by rfl ⟩
-        case _ c2 =>
-          simp only [derivative] at c2
-          simp at c2
-          simp only [concat] at c2
-          simp at c2
-          obtain ⟨s, hs, t, ht, eq⟩ := c2
-          simp only [derivative]
-          simp
-          simp only [concat]
-          simp
-          simp only [Language.nullify] at hs
-          simp at hs
-          obtain ⟨hs_left, hs_right⟩ := hs
-          rw [hs_right] at eq
-          simp at eq
-          rw [← eq]
-          exact ⟨[a], hs_left, (b :: t), ht, rfl⟩
-      case _ c1 =>
-        simp only [derivative] at c1
-        simp at c1
-        simp only [concat] at c1
-        simp at c1
-        obtain ⟨s, hs, t, ht, eq⟩ := c1
-        simp only [derivative]
-        simp
-        simp only [concat]
-        simp
-        rw [← eq]
-        simp only [Language.nullify] at hs
-        simp at hs
-        obtain ⟨hs_left, hs_right⟩ := hs
-        rw [hs_right]
-        simp
-        exact ⟨[], hs_left, (a :: b :: t), ht, rfl⟩
-
-
 theorem thm_12_7_str
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
   (s : Str α) :
-  let B := { M | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ u.length > 0 ∧ v.length > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v) }
-
-  derivative (concat L1 L2) s = (concat (derivative L1 s) L2) ∪ (concat L1.nullify (derivative L2 s)) ∪ ⋃₀ B :=
+  let B := { M | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ v.length > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v) }
+  derivative (concat L1 L2) s = (concat (derivative L1 s) L2) ∪ ⋃₀ B :=
   by
-    induction s generalizing L1 L2
-    case nil =>
-      intro B
-      have s1 : B.sUnion = ∅ :=
-      by
-        simp only [B]
-        simp
-      rw [s1]
-      clear s1
-
-      simp
-      simp only [thm_11_a]
-      simp only [Language.nullify]
-      split_ifs
-      case pos c1 =>
-        simp only [concat_eps_left]
-        have s2 : L2 ⊆ concat L1 L2 :=
-        by
-          simp only [Set.subset_def]
-          intro x a1
-          exact append_mem_concat_eps_left L1 L2 x c1 a1
-        symm
-        exact Set.union_eq_self_of_subset_right s2
-      case neg c1 =>
-        simp only [concat_empty_left]
-        simp
-    case cons hd tl ih =>
-      intro B
-
-      have s1 : hd :: tl = [hd] ++ tl := rfl
-      rw [s1]
-      clear s1
-
-      simp only [thm_11_b]
-
-      simp only [B] at *
-      clear B
-
-      simp only [Language.nullify] at *
-
-      split_ifs
-      case pos c1 =>
-        simp only [concat_eps_left]
-        obtain s2 := @thm_12_7
-        sorry
-      case neg c1 =>
-        simp only [concat_empty_left]
-        simp
-        sorry
+    ext t
+    simp [derivative, concat, Language.nullify]
+    constructor
+    · rintro ⟨u, hu, v, hv, eq⟩
+      obtain ⟨w, rfl, rfl⟩ | ⟨w, rfl, rfl⟩ := List.append_eq_append_iff.1 eq
+      · by_cases hw : w = []
+        · subst w; simp at *
+          exact .inl ⟨[], by simpa, _, hv, rfl⟩
+        · exact .inr ⟨_, ⟨u, _, rfl, hw, rfl⟩, _, ⟨hu, rfl⟩, _, hv, rfl⟩
+      · exact .inl ⟨_, hu, _, hv, rfl⟩
+    · rintro (⟨u, hu, v, hv, rfl⟩ | ⟨_, ⟨u, v, rfl, _, rfl⟩, _, ⟨hu, rfl⟩, _, hv, rfl⟩) <;>
+        exact ⟨_, hu, _, hv, by simp⟩
 
 
 -- 1.59
