@@ -1975,7 +1975,27 @@ example
       simp
       simp only [Language.nullify]
       simp
-      sorry
+      cases s
+      case _ =>
+        simp at eq
+        right
+        apply Exists.intro []
+        simp
+        rw [← eq]
+        exact ⟨hs, ht⟩
+      case _ s_hd s_tl =>
+        simp at eq
+        obtain ⟨eq_left, eq_right⟩ := eq
+        subst eq_left
+        cases t
+        case _ =>
+          simp at eq_right
+          subst eq_right
+          left
+          left
+          exact ⟨cs, hs, [], ht, by simp⟩
+        case _ t_hd t_tl =>
+          sorry
     · intro a1
       simp at a1
       cases a1
