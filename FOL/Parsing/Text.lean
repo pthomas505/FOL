@@ -2483,12 +2483,28 @@ example
       simp
       tauto
 
+
 example
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
   (s : Str α) :
   derivative (L1 ∪ L2) s = derivative L1 s ∪ derivative L2 s := rfl
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (s : Str α) :
+  let B := {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L u).nullify (derivative (kleene_closure α L) v)}
+
+  derivative (kleene_closure α L) s = derivative {[]} s ∪ (concat (derivative L s) (kleene_closure α L) ∪ ⋃₀ B) :=
+  by
+    intro B
+    conv => left; rw [thm_6]
+    rw [thm_12_5_str]
+    rw [thm_12_7_str]
 
 
 theorem thm_18
