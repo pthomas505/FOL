@@ -2426,11 +2426,69 @@ theorem thm_17
       exact h1
 
 
+example
+  {α : Type}
+  [DecidableEq α]
+  (s : Str α) :
+  derivative ∅ s = ∅ := rfl
+
+example
+  {α : Type}
+  [DecidableEq α] :
+  derivative {([] : Str α)} [] = {[]} := rfl
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (s : Str α)
+  (h1 : ¬ s = []) :
+  derivative {([] : Str α)} s = ∅ :=
+  by
+    simp only [derivative]
+    simp
+    simp only [h1]
+    simp
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (a : α) :
+  derivative {[a]} [] = {[a]} := rfl
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (a : α) :
+  derivative {[a]} [a] = {[]} :=
+  by
+    exact thm_12_3 a
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (s : Str α)
+  (a : α)
+  (h1 : ¬ s = [])
+  (h2 : ¬ s = [a]) :
+  derivative {[a]} s = ∅ :=
+  by
+    cases s
+    case nil =>
+      simp at h1
+    case cons hd tl =>
+      simp at h2
+      simp only [derivative]
+      simp
+      ext cs
+      simp
+      tauto
+
+
 theorem thm_18
   {α : Type}
   [DecidableEq α]
   (R : Language α)
   (h1: IsRegLang α R) :
-  Finite {derivative R s | s : Str α } :=
+  Finite { derivative R s | s : Str α } :=
   by
     sorry
