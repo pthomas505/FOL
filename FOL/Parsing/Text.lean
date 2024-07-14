@@ -2589,13 +2589,19 @@ example
   (L : Language α)
   (a1 a2 a3 a4 : α) :
   derivative (kleene_closure α L) [a1, a2, a3, a4] = concat (derivative L [a1, a2, a3, a4]) (kleene_closure α L) ∪
-    concat (derivative L [a1, a2, a3]).nullify (concat (derivative L [a4]) (kleene_closure α L)) ∪
-      concat (derivative L [a1, a2]).nullify (concat (derivative L [a3, a4]) (kleene_closure α L) ∪
-          concat (derivative L [a3]).nullify (concat (derivative L [a4]) (kleene_closure α L))) ∪
-            concat (derivative L [a1]).nullify (concat (derivative L [a2, a3, a4]) (kleene_closure α L) ∪
-              concat (derivative L [a2, a3]).nullify (concat (derivative L [a4]) (kleene_closure α L)) ∪
-                concat (derivative L [a2]).nullify (concat (derivative L [a3, a4]) (kleene_closure α L) ∪
-                  concat (derivative L [a3]).nullify (concat (derivative L [a4]) (kleene_closure α L)))) :=
+        concat (concat (derivative L [a1, a2, a3]).nullify (derivative L [a4])) (kleene_closure α L) ∪
+      (concat (concat (derivative L [a1, a2]).nullify (derivative L [a3, a4])) (kleene_closure α L) ∪
+        concat (concat (concat (derivative L [a1, a2]).nullify (derivative L [a3]).nullify) (derivative L [a4]))
+          (kleene_closure α L)) ∪
+    (concat (concat (derivative L [a1]).nullify (derivative L [a2, a3, a4])) (kleene_closure α L) ∪
+        concat (concat (concat (derivative L [a1]).nullify (derivative L [a2, a3]).nullify) (derivative L [a4]))
+          (kleene_closure α L) ∪
+      (concat (concat (concat (derivative L [a1]).nullify (derivative L [a2]).nullify) (derivative L [a3, a4]))
+          (kleene_closure α L) ∪
+        concat
+          (concat (concat (concat (derivative L [a1]).nullify (derivative L [a2]).nullify) (derivative L [a3]).nullify)
+            (derivative L [a4]))
+          (kleene_closure α L))) :=
   by
     have s1 : [a1, a2, a3, a4] = [a1] ++ [a2] ++ [a3] ++ [a4]:= rfl
     rw [s1]
@@ -2629,6 +2635,8 @@ example
     simp
     simp only [← thm_11_b]
     simp
+    simp only [concat_distrib_union_left]
+    simp only [concat_assoc]
 
 
 theorem thm_18
