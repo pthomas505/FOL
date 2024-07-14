@@ -2483,6 +2483,13 @@ example
       simp
       tauto
 
+example
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α)
+  (s : Str α) :
+  derivative (L1 ∪ L2) s = derivative L1 s ∪ derivative L2 s := rfl
+
 
 theorem thm_18
   {α : Type}
