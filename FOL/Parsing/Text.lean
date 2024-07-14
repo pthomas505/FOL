@@ -2603,23 +2603,7 @@ example
     clear s1
 
     simp only [thm_11_b]
-
-    simp only [thm_12_8]
-    simp only [thm_12_7]
-    simp only [thm_12_8]
-
-    simp only [thm_12_5]
-    simp only [thm_12_7]
-    simp only [thm_12_8]
-
-    simp only [thm_12_5]
-    simp only [thm_12_7]
-    simp only [thm_12_8]
-
-    simp only [thm_12_5]
-    simp only [thm_12_7]
-    simp only [thm_12_8]
-
+    simp only [thm_12_8, thm_12_7, thm_12_5]
     simp only [nullify_idempotent]
     simp only [derivative_of_nullify]
     simp only [thm_12_1]
