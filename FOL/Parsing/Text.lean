@@ -1624,6 +1624,24 @@ example
       exact h1
 
 
+lemma nullify_idempotent
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α) :
+  L.nullify.nullify = L.nullify :=
+  by
+    simp only [Language.nullify]
+    split_ifs
+    case _ c1 c2 =>
+      rfl
+    case _ c1 c2 =>
+      simp at c2
+    case _ c1 c2 =>
+      simp at c2
+    case _ c1 c2 =>
+      rfl
+
+
 /-
 Definition 15 (String derivative). The derivative of a language L ⊆ Σ∗ with respect to a string s ∈ Σ∗ is defined to be ∂sL = {t : s · t ∈ L}.
 -/
@@ -2177,6 +2195,19 @@ theorem thm_14_disjoint
     simp
     intro a4
     contradiction
+
+
+lemma derivative_of_nullify
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a : α) :
+  derivative (L.nullify) [a] = ∅ :=
+  by
+    simp only [derivative]
+    simp
+    simp only [Language.nullify]
+    simp
 
 
 /-
