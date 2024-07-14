@@ -2513,7 +2513,7 @@ example
   (L : Language α)
   (a1 a2 : α) :
   derivative (kleene_closure α L) [a1, a2] =
-    (concat (derivative L [a1, a2]) (kleene_closure α L)) ∪
+    concat (derivative L [a1, a2]) (kleene_closure α L) ∪
       concat (derivative L [a1]).nullify (derivative (kleene_closure α L) [a2]) :=
   by
     have s1 : [a1, a2] = [a1] ++ [a2] := rfl
