@@ -2496,21 +2496,6 @@ example
   {α : Type}
   [DecidableEq α]
   (L : Language α)
-  (s : Str α) :
-  let B := {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L u).nullify (derivative (kleene_closure α L) v)}
-
-  derivative (kleene_closure α L) s = derivative {[]} s ∪ (concat (derivative L s) (kleene_closure α L) ∪ ⋃₀ B) :=
-  by
-    intro B
-    conv => left; rw [thm_6]
-    rw [thm_12_5_str]
-    rw [thm_12_7_str]
-
-
-example
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α)
   (a1 a2 : α) :
   derivative (kleene_closure α L) [a1, a2] =
     concat (derivative L [a1, a2]) (kleene_closure α L) ∪
