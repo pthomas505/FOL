@@ -1489,7 +1489,7 @@ def Language.nullify
   else ∅
 
 
-example
+lemma nullify_empty
   {α : Type}
   [DecidableEq α] :
   Language.nullify (∅ : Language α) = ∅ :=
@@ -2577,6 +2577,57 @@ example
 
     simp only [nullify_idempotent]
     simp only [derivative_of_nullify]
+    simp only [concat_empty_left]
+    simp
+    simp only [← thm_11_b]
+    simp
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a1 a2 a3 a4 : α) :
+  derivative (kleene_closure α L) [a1, a2, a3, a4] = concat (derivative L [a1, a2, a3, a4]) (kleene_closure α L) ∪
+        concat (derivative L [a1, a2, a3]).nullify (concat (derivative L [a4]) (kleene_closure α L)) ∪
+      concat (derivative L [a1, a2]).nullify
+        (concat (derivative L [a3, a4]) (kleene_closure α L) ∪
+          concat (derivative L [a3]).nullify (concat (derivative L [a4]) (kleene_closure α L))) ∪
+    concat (derivative L [a1]).nullify
+      (concat (derivative L [a2, a3, a4]) (kleene_closure α L) ∪
+          concat (derivative L [a2, a3]).nullify (concat (derivative L [a4]) (kleene_closure α L)) ∪
+        concat (derivative L [a2]).nullify
+          (concat (derivative L [a3, a4]) (kleene_closure α L) ∪
+            concat (derivative L [a3]).nullify (concat (derivative L [a4]) (kleene_closure α L)))) :=
+  by
+    have s1 : [a1, a2, a3, a4] = [a1] ++ [a2] ++ [a3] ++ [a4]:= rfl
+    rw [s1]
+    clear s1
+
+    simp only [thm_11_b]
+
+    simp only [thm_12_8]
+    simp only [thm_12_7]
+    simp only [thm_12_8]
+
+    simp only [thm_12_5]
+    simp only [thm_12_7]
+    simp only [thm_12_8]
+
+    simp only [thm_12_5]
+    simp only [thm_12_7]
+    simp only [thm_12_8]
+
+    simp only [thm_12_5]
+    simp only [thm_12_7]
+    simp only [thm_12_8]
+
+    simp only [nullify_idempotent]
+    simp only [derivative_of_nullify]
+    simp only [thm_12_1]
+    simp only [concat_empty_left]
+    simp
+    simp only [nullify_empty]
     simp only [concat_empty_left]
     simp
     simp only [← thm_11_b]
