@@ -2526,6 +2526,41 @@ example
     rw [thm_12_8]
 
 
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a1 a2 a3 : α) :
+  derivative (kleene_closure α L) [a1, a2, a3] =
+    concat (derivative (derivative L [a1, a2]) [a3]) (kleene_closure α L) ∪
+      concat (derivative L [a1, a2]).nullify (concat (derivative L [a3]) (kleene_closure α L)) ∪
+        (concat (derivative (derivative L [a1]).nullify [a3]) (concat (derivative L [a2]) (kleene_closure α L)) ∪
+          concat (derivative L [a1]).nullify.nullify (concat (derivative (derivative L [a2]) [a3]) (kleene_closure α L) ∪
+            concat (derivative L [a2]).nullify (concat (derivative L [a3]) (kleene_closure α L)))) :=
+  by
+    have s1 : [a1, a2, a3] = [a1] ++ [a2] ++ [a3] := rfl
+    rw [s1]
+    clear s1
+
+    rw [thm_11_b]
+    simp
+
+    -----
+    have s2 : [a1, a2] = [a1] ++ [a2] := rfl
+    rw [s2]
+    clear s2
+
+    simp only [thm_11_b]
+    rw [thm_12_8]
+    rw [thm_12_7]
+    rw [thm_12_8]
+    -----
+
+    rw [thm_12_5]
+    simp only [thm_12_7]
+    rw [thm_12_8]
+
+
 theorem thm_18
   {α : Type}
   [DecidableEq α]
