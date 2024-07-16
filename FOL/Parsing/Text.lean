@@ -46,6 +46,27 @@ inductive exp (α : Type) : ℕ → Set (Str α)
     exp α (n + 1) (s ++ [a])
 
 
+example
+  (α : Type)
+  (n : ℕ)
+  (a : α)
+  (s : Str α)
+  (h1 : s ∈ exp α n) :
+  a :: s ∈ exp α (n + 1) :=
+  by
+    induction h1
+    case zero =>
+      have s1 : [a] = [] ++ [a] := by rfl
+      rw [s1]
+      apply exp.succ
+      exact exp.zero
+    case succ n' a' s' _ ih_2 =>
+      have s1 : a :: (s' ++ [a']) = (a :: s') ++ [a'] := rfl
+      rw [s1]
+      apply exp.succ
+      exact ih_2
+
+
 example : [] ∈ exp Char 0 :=
   by
     exact exp.zero
@@ -67,7 +88,7 @@ Definition 4 (String length). Let s ∈ Σ^n be a string. We say that the length
 -/
 
 
-theorem append_not_eps_left
+theorem append_length_left
   {α : Type}
   (s t : Str α)
   (h1 : ¬ s = []) :
@@ -77,7 +98,7 @@ theorem append_not_eps_left
     exact h1
 
 
-theorem append_not_eps_right
+theorem append_length_right
   {α : Type}
   (s t : Str α)
   (h1 : ¬ t = []) :
@@ -87,7 +108,7 @@ theorem append_not_eps_right
     exact h1
 
 
-lemma rev_str_mem_exp_str_len
+lemma reverse_mem_exp_length
   {α : Type}
   (s : Str α) :
   s.reverse ∈ exp α s.length :=
@@ -101,17 +122,17 @@ lemma rev_str_mem_exp_str_len
       exact exp.succ tl.length hd tl.reverse ih
 
 
-theorem str_mem_exp_str_len
+theorem mem_exp_length
   {α : Type}
   (s : Str α) :
   s ∈ exp α s.length :=
   by
-    obtain s1 := rev_str_mem_exp_str_len s.reverse
+    obtain s1 := reverse_mem_exp_length s.reverse
     simp at s1
     exact s1
 
 
-theorem mem_exp_imp_str_len_eq
+theorem mem_exp_length_eq
   {α : Type}
   (s : Str α)
   (n : ℕ)
@@ -144,10 +165,10 @@ theorem exp_eq_exp_set
     simp
     constructor
     · intro a1
-      exact mem_exp_imp_str_len_eq cs n a1
+      exact mem_exp_length_eq cs n a1
     · intro a1
       simp only [← a1]
-      exact str_mem_exp_str_len cs
+      exact mem_exp_length cs
 
 
 /-
@@ -168,7 +189,7 @@ theorem all_str_mem_kleene_closure
     simp only [kleene_closure]
     simp
     apply Exists.intro s.length
-    exact str_mem_exp_str_len s
+    exact mem_exp_length s
 
 
 theorem kleene_closure_eq_univ
@@ -197,7 +218,7 @@ example
     simp only [← h1]
     simp only [← h2]
     simp only [← List.length_append s t]
-    exact str_mem_exp_str_len (s ++ t)
+    exact mem_exp_length (s ++ t)
 
 
 example
@@ -1425,7 +1446,7 @@ theorem thm_9_unique_right
       · have : t.length < x.length :=
         by
           simp only [← eq]
-          apply Strings.append_not_eps_left
+          apply Strings.append_length_left
           intro contra
           simp only [contra] at hs
           contradiction
