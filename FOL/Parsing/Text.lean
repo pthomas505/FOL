@@ -2624,7 +2624,7 @@ example
   (L : Language α)
   (s : Str α)
   (h1 : ¬ s = []) :
-  ∃ T ⊆ s.tails, [] ∉ T ∧
+  ∃ (T : List (List α)), T ⊆ s.tails ∧ [] ∉ T ∧
     derivative (kleene_closure α L) s =
     ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
   by
