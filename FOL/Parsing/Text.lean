@@ -393,22 +393,10 @@ lemma concat_empty_left
     simp
 
 
-lemma eps_not_mem_left_not_mem_concat
-  {α : Type}
-  (L M : Language α)
-  (h1 : [] ∉ L) :
-  [] ∉ concat L M :=
-  by
-    simp only [concat]
-    simp
-    intro a1
-    contradiction
-
-
-lemma eps_not_mem_concat
+lemma eps_not_mem_concat_iff
   {α : Type}
   (L M : Language α) :
-  [] ∉ concat L M ↔ ([] ∉ L ∨ [] ∉ M) :=
+  ([] ∉ L ∨ [] ∉ M) ↔ [] ∉ concat L M :=
   by
     simp only [concat]
     simp only [Set.mem_setOf_eq, List.append_eq_nil, exists_eq_right_right]
@@ -419,12 +407,12 @@ example
   {α : Type}
   (L M : Language α)
   (s : Str α)
-  (h1 : [] ∉ L)
+  (h1 : [] ∉ L ∨ [] ∉ M)
   (h2 : s ∈ concat L M) :
   s.length > 0 :=
   by
-    obtain s1 := eps_not_mem_left_not_mem_concat L M h1
-    apply eps_not_mem_str_length_gt_zero (concat L M) s s1 h2
+    rw [eps_not_mem_concat_iff] at h1
+    exact eps_not_mem_str_length_gt_zero (concat L M) s h1 h2
 
 
 theorem concat_assoc
