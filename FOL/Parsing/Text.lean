@@ -2647,7 +2647,7 @@ example
         simp
         rw [thm_11_a]
       case neg =>
-        specialize ih (concat {tl} L) c1
+        specialize ih L c1
         obtain ⟨T, ⟨a1, a2, a3⟩⟩ := ih
         sorry
 
