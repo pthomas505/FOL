@@ -375,6 +375,69 @@ lemma append_mem_concat_eps_right
     exact append_mem_concat L M x [] h1 h2
 
 
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : [] ∈ L) :
+  M ⊆ concat L M :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    have s1 : x = [] ++ x := by rfl
+    rw [s1]
+    exact append_mem_concat L M [] x h1 a1
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : [] ∈ M) :
+  L ⊆ concat L M :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    have s1 : x = x ++ [] := by rw [List.append_nil]
+    rw [s1]
+    exact append_mem_concat L M x [] a1 h1
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : [] ∈ concat L M) :
+  [] ∈ L ∧ [] ∈ M :=
+  by
+    simp only [concat] at h1
+    simp at h1
+    exact h1
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (s : Str α)
+  (h1 : s ∈ L)
+  (h2 : M.Nonempty)
+  (h3 : [] ∉ M) :
+  ∃ (t : Str α), t ∈ concat L M ∧ t.length > s.length :=
+  by
+    obtain ⟨t, a1⟩ := h2
+    apply Exists.intro (s ++ t)
+    constructor
+    · apply append_mem_concat L M s t h1 a1
+    · have s1 : ¬ t = [] := ne_of_mem_of_not_mem a1 h3
+      exact Strings.str_append_length_right s t s1
+
+
+/-
+Let s be the longest string in L.
+Let M not be empty.
+Let [] not be in M.
+Then there exists a string in concat L M that is longer than s.
+Hence there exists a string in concat L M that is not in L.
+-/
+
+
 lemma concat_empty_right
   {α : Type}
   (L : Language α) :
