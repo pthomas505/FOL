@@ -2618,6 +2618,40 @@ example
     simp only [concat_assoc]
 
 
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (s : Str α)
+  (h1 : ¬ s = []) :
+  ∃ T ⊆ s.tails, [] ∉ T ∧
+    derivative (kleene_closure α L) s =
+    ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
+  by
+    induction s generalizing L
+    case nil =>
+      simp at h1
+    case cons hd tl ih =>
+      have s1 : hd :: tl = [hd] ++ tl := rfl
+      rw [s1]
+      clear s1
+
+      simp only [thm_11_b]
+      simp
+      simp only [thm_12_8]
+      by_cases c1 : tl = []
+      case pos =>
+        subst c1
+        simp
+        apply Exists.intro [[hd]]
+        simp
+        rw [thm_11_a]
+      case neg =>
+        specialize ih (concat {tl} L) c1
+        obtain ⟨T, ⟨a1, a2, a3⟩⟩ := ih
+        sorry
+
+
 theorem thm_18
   {α : Type}
   [DecidableEq α]
