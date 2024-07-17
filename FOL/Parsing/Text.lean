@@ -425,15 +425,6 @@ lemma concat_empty_iff
     simp only [not_and_or]
 
 
-lemma eps_mem_concat_iff
-  {α : Type}
-  (L M : Language α) :
-  [] ∈ concat L M ↔ [] ∈ L ∧ [] ∈ M :=
-  by
-    simp only [concat]
-    simp
-
-
 example
   {α : Type}
   (L M : Language α)
@@ -473,6 +464,15 @@ lemma concat_empty_left
   {α : Type}
   (L : Language α) :
   concat ∅ L = ∅ :=
+  by
+    simp only [concat]
+    simp
+
+
+lemma eps_mem_concat_iff
+  {α : Type}
+  (L M : Language α) :
+  [] ∈ concat L M ↔ [] ∈ L ∧ [] ∈ M :=
   by
     simp only [concat]
     simp
