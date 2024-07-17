@@ -397,6 +397,34 @@ example
     exact append_mem_concat_eps_right L M x a1 h1
 
 
+lemma concat_nonempty_iff
+  {α : Type}
+  (L M : Language α) :
+  (concat L M).Nonempty ↔ L.Nonempty ∧ M.Nonempty :=
+  by
+    simp only [Set.Nonempty]
+    simp only [concat]
+    simp
+    constructor
+    · intro a1
+      obtain ⟨x, s, hs, t, ht, _⟩ := a1
+      exact ⟨⟨s, hs⟩, ⟨t, ht⟩⟩
+    · intro a1
+      obtain ⟨⟨s, hs⟩, ⟨t, ht⟩⟩ := a1
+      exact ⟨s ++ t, s, hs, t, ht, rfl⟩
+
+
+lemma concat_empty_iff
+  {α : Type}
+  (L M : Language α) :
+  (concat L M) = ∅ ↔ L = ∅ ∨ M = ∅ :=
+  by
+    rw [← Set.not_nonempty_iff_eq_empty]
+    rw [concat_nonempty_iff]
+    simp only [← Set.not_nonempty_iff_eq_empty]
+    simp only [not_and_or]
+
+
 lemma eps_mem_concat_iff
   {α : Type}
   (L M : Language α) :
