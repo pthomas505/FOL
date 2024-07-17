@@ -491,7 +491,7 @@ example
     exact eps_not_mem_str_length_gt_zero (concat L M) s h1 h2
 
 
-example
+lemma exists_str_length_lt_mem_concat
   {α : Type}
   (L M : Language α)
   (s : Str α)
@@ -508,6 +508,40 @@ example
     · exact hu
     · simp
       exact ne_of_mem_of_not_mem hv h2
+
+
+lemma min_list_length_exists
+  {α : Type}
+  (S : Set (List α))
+  (h1 : S.Nonempty) :
+  ∃ (xs : List α), xs ∈ S ∧ ∀ (ys : Str α), ys ∈ S → xs.length <= ys.length :=
+  by
+    sorry
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : L.Nonempty) :
+  L ⊆ concat L M ↔ [] ∈ M:=
+  by
+    constructor
+    · intro a1
+      by_contra contra
+      obtain s1 := min_list_length_exists L h1
+      obtain ⟨s, hs, min⟩ := s1
+      simp only [Set.subset_def] at a1
+      specialize a1 s hs
+      obtain s2 := exists_str_length_lt_mem_concat L M s
+      specialize s2 a1 contra
+      obtain ⟨t, ht, lt⟩ := s2
+      specialize min t ht
+      sorry
+    · intro a1
+      obtain ⟨s, hs⟩ := h1
+      simp only [Set.subset_def]
+      intro t ht
+      exact append_mem_concat_eps_right L M t ht a1
 
 
 theorem concat_assoc
