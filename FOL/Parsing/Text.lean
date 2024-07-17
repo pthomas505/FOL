@@ -349,6 +349,24 @@ lemma append_mem_concat
     exact ⟨s, h1, t, h2, rfl⟩
 
 
+lemma concat_empty_left
+  {α : Type}
+  (L : Language α) :
+  concat ∅ L = ∅ :=
+  by
+    simp only [concat]
+    simp
+
+
+lemma concat_empty_right
+  {α : Type}
+  (L : Language α) :
+  concat L ∅ = ∅ :=
+  by
+    simp only [concat]
+    simp
+
+
 lemma concat_nonempty_iff
   {α : Type}
   (L M : Language α) :
@@ -375,24 +393,6 @@ lemma concat_empty_iff
     rw [concat_nonempty_iff]
     simp only [← Set.not_nonempty_iff_eq_empty]
     simp only [not_and_or]
-
-
-lemma concat_empty_left
-  {α : Type}
-  (L : Language α) :
-  concat ∅ L = ∅ :=
-  by
-    simp only [concat]
-    simp
-
-
-lemma concat_empty_right
-  {α : Type}
-  (L : Language α) :
-  concat L ∅ = ∅ :=
-  by
-    simp only [concat]
-    simp
 
 
 lemma concat_eps_left
