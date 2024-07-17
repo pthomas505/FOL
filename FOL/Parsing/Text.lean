@@ -362,6 +362,17 @@ lemma append_mem_concat_eps_left
     exact append_mem_concat L M [] x h1 h2
 
 
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : [] ∈ L) :
+  M ⊆ concat L M :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    exact append_mem_concat_eps_left L M x h1 a1
+
+
 lemma append_mem_concat_eps_right
   {α : Type}
   (L M : Language α)
@@ -375,20 +386,7 @@ lemma append_mem_concat_eps_right
     exact append_mem_concat L M x [] h1 h2
 
 
-lemma eps_subset_left_concat
-  {α : Type}
-  (L M : Language α)
-  (h1 : [] ∈ L) :
-  M ⊆ concat L M :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
-    have s1 : x = [] ++ x := by rfl
-    rw [s1]
-    exact append_mem_concat L M [] x h1 a1
-
-
-lemma eps_subset_right_concat
+example
   {α : Type}
   (L M : Language α)
   (h1 : [] ∈ M) :
@@ -396,9 +394,7 @@ lemma eps_subset_right_concat
   by
     simp only [Set.subset_def]
     intro x a1
-    have s1 : x = x ++ [] := by rw [List.append_nil]
-    rw [s1]
-    exact append_mem_concat L M x [] a1 h1
+    exact append_mem_concat_eps_right L M x a1 h1
 
 
 example
