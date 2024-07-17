@@ -349,54 +349,6 @@ lemma append_mem_concat
     exact ⟨s, h1, t, h2, rfl⟩
 
 
-lemma append_mem_concat_eps_left
-  {α : Type}
-  (L M : Language α)
-  (x : Str α)
-  (h1 : [] ∈ L)
-  (h2 : x ∈ M) :
-  x ∈ concat L M :=
-  by
-    have s1 : x = [] ++ x := by rfl
-    rw [s1]
-    exact append_mem_concat L M [] x h1 h2
-
-
-example
-  {α : Type}
-  (L M : Language α)
-  (h1 : [] ∈ L) :
-  M ⊆ concat L M :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
-    exact append_mem_concat_eps_left L M x h1 a1
-
-
-lemma append_mem_concat_eps_right
-  {α : Type}
-  (L M : Language α)
-  (x : Str α)
-  (h1 : x ∈ L)
-  (h2 : [] ∈ M) :
-  x ∈ concat L M :=
-  by
-    have s1 : x = x ++ [] := by rw [List.append_nil];
-    rw [s1]
-    exact append_mem_concat L M x [] h1 h2
-
-
-example
-  {α : Type}
-  (L M : Language α)
-  (h1 : [] ∈ M) :
-  L ⊆ concat L M :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
-    exact append_mem_concat_eps_right L M x a1 h1
-
-
 lemma concat_nonempty_iff
   {α : Type}
   (L M : Language α) :
@@ -472,6 +424,54 @@ example
   by
     rw [eps_not_mem_concat_iff] at h1
     exact eps_not_mem_str_length_gt_zero (concat L M) s h1 h2
+
+
+lemma append_mem_concat_eps_left
+  {α : Type}
+  (L M : Language α)
+  (x : Str α)
+  (h1 : [] ∈ L)
+  (h2 : x ∈ M) :
+  x ∈ concat L M :=
+  by
+    have s1 : x = [] ++ x := by rfl
+    rw [s1]
+    exact append_mem_concat L M [] x h1 h2
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : [] ∈ L) :
+  M ⊆ concat L M :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    exact append_mem_concat_eps_left L M x h1 a1
+
+
+lemma append_mem_concat_eps_right
+  {α : Type}
+  (L M : Language α)
+  (x : Str α)
+  (h1 : x ∈ L)
+  (h2 : [] ∈ M) :
+  x ∈ concat L M :=
+  by
+    have s1 : x = x ++ [] := by rw [List.append_nil];
+    rw [s1]
+    exact append_mem_concat L M x [] h1 h2
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : [] ∈ M) :
+  L ⊆ concat L M :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    exact append_mem_concat_eps_right L M x a1 h1
 
 
 example
