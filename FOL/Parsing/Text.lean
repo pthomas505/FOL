@@ -481,7 +481,7 @@ example
   (h1 : s ∈ L)
   (h2 : M.Nonempty)
   (h3 : [] ∉ M) :
-  ∃ (t : Str α), t ∈ concat L M ∧ t.length > s.length :=
+  ∃ (t : Str α), t ∈ concat L M ∧ s.length < t.length :=
   by
     obtain ⟨t, a1⟩ := h2
     apply Exists.intro (s ++ t)
