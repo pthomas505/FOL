@@ -442,15 +442,6 @@ example
       exact Strings.str_append_length_right s t s1
 
 
-/-
-Let s be the longest string in L.
-Let M not be empty.
-Let [] not be in M.
-Then there exists a string in concat L M that is longer than s.
-Hence there exists a string in concat L M that is not in L.
--/
-
-
 lemma concat_empty_right
   {α : Type}
   (L : Language α) :
