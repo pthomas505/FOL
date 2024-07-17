@@ -492,7 +492,7 @@ example
     exact append_mem_concat_eps_right L M x a1 h1
 
 
-example
+lemma exists_mem_concat_str_length_gt
   {α : Type}
   (L M : Language α)
   (s : Str α)
@@ -509,7 +509,7 @@ example
       exact Strings.str_append_length_right s t s1
 
 
-lemma exists_str_length_lt_mem_concat
+lemma exists_mem_concat_left_str_length_lt
   {α : Type}
   (L M : Language α)
   (s : Str α)
@@ -550,7 +550,7 @@ example
       obtain ⟨s, hs, min⟩ := s1
       simp only [Set.subset_def] at a1
       specialize a1 s hs
-      obtain s2 := exists_str_length_lt_mem_concat L M s
+      obtain s2 := exists_mem_concat_left_str_length_lt L M s
       specialize s2 a1 contra
       obtain ⟨t, ht, lt⟩ := s2
       specialize min t ht
