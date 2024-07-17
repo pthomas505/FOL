@@ -425,23 +425,6 @@ lemma concat_empty_iff
     simp only [not_and_or]
 
 
-example
-  {α : Type}
-  (L M : Language α)
-  (s : Str α)
-  (h1 : s ∈ L)
-  (h2 : M.Nonempty)
-  (h3 : [] ∉ M) :
-  ∃ (t : Str α), t ∈ concat L M ∧ t.length > s.length :=
-  by
-    obtain ⟨t, a1⟩ := h2
-    apply Exists.intro (s ++ t)
-    constructor
-    · apply append_mem_concat L M s t h1 a1
-    · have s1 : ¬ t = [] := ne_of_mem_of_not_mem a1 h3
-      exact Strings.str_append_length_right s t s1
-
-
 lemma concat_empty_right
   {α : Type}
   (L : Language α) :
@@ -489,6 +472,23 @@ example
   by
     rw [eps_not_mem_concat_iff] at h1
     exact eps_not_mem_str_length_gt_zero (concat L M) s h1 h2
+
+
+example
+  {α : Type}
+  (L M : Language α)
+  (s : Str α)
+  (h1 : s ∈ L)
+  (h2 : M.Nonempty)
+  (h3 : [] ∉ M) :
+  ∃ (t : Str α), t ∈ concat L M ∧ t.length > s.length :=
+  by
+    obtain ⟨t, a1⟩ := h2
+    apply Exists.intro (s ++ t)
+    constructor
+    · apply append_mem_concat L M s t h1 a1
+    · have s1 : ¬ t = [] := ne_of_mem_of_not_mem a1 h3
+      exact Strings.str_append_length_right s t s1
 
 
 lemma exists_str_length_lt_mem_concat
