@@ -554,9 +554,9 @@ example
       specialize s2 a1 contra
       obtain ⟨t, ht, lt⟩ := s2
       specialize min t ht
-      sorry
+      have s3 : ¬ s.length ≤ t.length := Nat.not_le_of_lt lt
+      contradiction
     · intro a1
-      obtain ⟨s, hs⟩ := h1
       simp only [Set.subset_def]
       intro t ht
       exact append_mem_concat_eps_right L M t ht a1
