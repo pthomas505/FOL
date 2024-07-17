@@ -491,6 +491,25 @@ example
     exact eps_not_mem_str_length_gt_zero (concat L M) s h1 h2
 
 
+example
+  {α : Type}
+  (L M : Language α)
+  (s : Str α)
+  (h1 : s ∈ concat L M)
+  (h2 : [] ∉ M) :
+  ∃ (t : Str α), t ∈ L ∧ t.length < s.length :=
+  by
+    simp only [concat] at h1
+    simp at h1
+    obtain ⟨u, hu, v, hv, eq⟩ := h1
+    rw [← eq]
+    apply Exists.intro u
+    constructor
+    · exact hu
+    · simp
+      exact ne_of_mem_of_not_mem hv h2
+
+
 theorem concat_assoc
   {α : Type}
   (L1 L2 L3 : Language α) :
