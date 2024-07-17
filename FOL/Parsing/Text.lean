@@ -397,15 +397,13 @@ example
     exact append_mem_concat_eps_right L M x a1 h1
 
 
-example
+lemma eps_mem_concat_iff
   {α : Type}
-  (L M : Language α)
-  (h1 : [] ∈ concat L M) :
-  [] ∈ L ∧ [] ∈ M :=
+  (L M : Language α) :
+  [] ∈ concat L M ↔ [] ∈ L ∧ [] ∈ M :=
   by
-    simp only [concat] at h1
-    simp at h1
-    exact h1
+    simp only [concat]
+    simp
 
 
 example
