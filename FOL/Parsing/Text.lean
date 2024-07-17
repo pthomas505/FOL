@@ -425,19 +425,19 @@ lemma concat_empty_iff
     simp only [not_and_or]
 
 
-lemma concat_empty_right
+lemma concat_empty_left
   {α : Type}
   (L : Language α) :
-  concat L ∅ = ∅ :=
+  concat ∅ L = ∅ :=
   by
     simp only [concat]
     simp
 
 
-lemma concat_empty_left
+lemma concat_empty_right
   {α : Type}
   (L : Language α) :
-  concat ∅ L = ∅ :=
+  concat L ∅ = ∅ :=
   by
     simp only [concat]
     simp
