@@ -395,6 +395,24 @@ lemma concat_empty_right
     simp
 
 
+lemma concat_eps_left
+  {α : Type}
+  (L : Language α) :
+  concat {[]} L = L :=
+  by
+    simp only [concat]
+    simp
+
+
+lemma concat_eps_right
+  {α : Type}
+  (L : Language α) :
+  concat L {[]} = L :=
+  by
+    simp only [concat]
+    simp
+
+
 lemma eps_mem_concat_iff
   {α : Type}
   (L M : Language α) :
@@ -611,24 +629,6 @@ theorem concat_distrib_union_right
       case _ a1_right =>
         obtain ⟨s, hs, t, ht, eq⟩ := a1_right
         exact ⟨s, by right; exact hs, t, ht, eq⟩
-
-
-lemma concat_eps_left
-  {α : Type}
-  (L : Language α) :
-  concat {[]} L = L :=
-  by
-    simp only [concat]
-    simp
-
-
-lemma concat_eps_right
-  {α : Type}
-  (L : Language α) :
-  concat L {[]} = L :=
-  by
-    simp only [concat]
-    simp
 
 
 lemma concat_subset_left
