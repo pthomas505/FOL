@@ -318,11 +318,8 @@ lemma eps_not_mem_str_length_gt_zero
   (h2 : s ∈ L) :
   s.length > 0 :=
   by
-    cases s
-    case nil =>
-      contradiction
-    case cons hd tl =>
-      simp
+    simp
+    exact ne_of_mem_of_not_mem h2 h1
 
 
 /-
@@ -857,6 +854,7 @@ lemma eps_mem_exp_succ_iff
       · exact a1
 
 
+/-
 lemma eps_not_mem_imp_eps_not_mem_exp_succ
   {α : Type}
   (L : Language α)
@@ -869,6 +867,7 @@ lemma eps_not_mem_imp_eps_not_mem_exp_succ
     simp
     intro _
     exact h1
+-/
 
 
 lemma eps_not_mem_imp_mem_len_ge_exp
