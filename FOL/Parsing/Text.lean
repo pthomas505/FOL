@@ -532,9 +532,19 @@ lemma min_list_length_exists
   {α : Type}
   (S : Set (List α))
   (h1 : S.Nonempty) :
-  ∃ (xs : List α), xs ∈ S ∧ ∀ (ys : Str α), ys ∈ S → xs.length <= ys.length :=
+  ∃ (xs : List α), xs ∈ S ∧
+    ∀ (ys : List α), ys ∈ S → xs.length <= ys.length :=
   by
-    sorry
+    obtain s1 := Set.Nonempty.image List.length h1
+    obtain s2 := Nat.sInf_mem s1
+    have ⟨xs, hx, hv⟩ := s2
+    apply Exists.intro xs
+    constructor
+    · exact hx
+    · intro ys hy
+      rw [hv]
+      obtain s3 := Set.mem_image_of_mem List.length hy
+      exact Nat.sInf_le s3
 
 
 example
