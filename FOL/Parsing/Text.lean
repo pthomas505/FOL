@@ -553,11 +553,25 @@ lemma set_list_inf_length_exists
       exact Nat.sInf_le s4
 
 
+/-
+  Theorem: If L is not empty and [] ∉ M then ¬ L ⊆ concat L M
+  Proof:
+  Suppose L is not empty and [] ∉ M.
+  Let min be the shortest string in L. This exists by set_list_inf_length_exists.
+  Suppose for contradiction that min is in concat L M.
+  Then there exists a string in L that is shorter than min by exists_mem_left_str_length_lt_concat.
+  This contradicts the assumption that min is the shortest string in L.
+  Hence min is not in concat L M.
+  Then min is an element of L that is not in concat L M.
+  Hence L is not a subset of concat L M.
+-/
+
+
 example
   {α : Type}
   (L M : Language α)
   (h1 : L.Nonempty) :
-  L ⊆ concat L M ↔ [] ∈ M:=
+  L ⊆ concat L M ↔ [] ∈ M :=
   by
     constructor
     · intro a1
