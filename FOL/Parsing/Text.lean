@@ -528,7 +528,7 @@ lemma exists_mem_concat_left_str_length_lt
       exact ne_of_mem_of_not_mem hv h2
 
 
-lemma min_list_length_exists
+lemma set_list_inf_length_exists
   {α : Type}
   (S : Set (List α))
   (h1 : S.Nonempty) :
@@ -562,7 +562,7 @@ example
     constructor
     · intro a1
       by_contra contra
-      obtain s1 := min_list_length_exists L h1
+      obtain s1 := set_list_inf_length_exists L h1
       obtain ⟨s, hs, min⟩ := s1
       simp only [Set.subset_def] at a1
       specialize a1 s hs
