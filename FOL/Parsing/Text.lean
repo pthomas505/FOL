@@ -535,16 +535,22 @@ lemma min_list_length_exists
   ∃ (xs : List α), xs ∈ S ∧
     ∀ (ys : List α), ys ∈ S → xs.length <= ys.length :=
   by
-    obtain s1 := Set.Nonempty.image List.length h1
-    obtain s2 := Nat.sInf_mem s1
-    have ⟨xs, hx, hv⟩ := s2
-    apply Exists.intro xs
+    let length_set : Set ℕ := Set.image List.length S
+    let length_set_inf := sInf length_set
+    have s1 : length_set.Nonempty := Set.Nonempty.image List.length h1
+    have s2 : length_set_inf ∈ length_set := Nat.sInf_mem s1
+    have s3 : ∃ (list_set_inf : List α), list_set_inf ∈ S ∧ list_set_inf.length = length_set_inf :=
+    by
+      rw [← Set.mem_image List.length S length_set_inf]
+      exact s2
+    obtain ⟨list_set_inf, list_set_inf_mem, list_set_inf_length⟩ := s3
+    apply Exists.intro list_set_inf
     constructor
-    · exact hx
+    · exact list_set_inf_mem
     · intro ys hy
-      rw [hv]
-      obtain s3 := Set.mem_image_of_mem List.length hy
-      exact Nat.sInf_le s3
+      rw [list_set_inf_length]
+      have s4 : ys.length ∈ length_set := Set.mem_image_of_mem List.length hy
+      exact Nat.sInf_le s4
 
 
 example
