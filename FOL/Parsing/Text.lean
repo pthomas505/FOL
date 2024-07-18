@@ -545,6 +545,25 @@ lemma exists_mem_left_str_length_lt_concat
       exact ne_of_mem_of_not_mem hv h2
 
 
+lemma exists_mem_right_str_length_lt_concat
+  {α : Type}
+  (L M : Language α)
+  (s : Str α)
+  (h1 : s ∈ concat L M)
+  (h2 : [] ∉ L) :
+  ∃ (t : Str α), t ∈ M ∧ t.length < s.length :=
+  by
+    simp only [concat] at h1
+    simp at h1
+    obtain ⟨u, hu, v, hv, eq⟩ := h1
+    rw [← eq]
+    apply Exists.intro v
+    constructor
+    · exact hv
+    · simp
+      exact ne_of_mem_of_not_mem hu h2
+
+
 lemma set_list_inf_length_exists
   {α : Type}
   (S : Set (List α))
