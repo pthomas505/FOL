@@ -628,6 +628,31 @@ example
       exact append_mem_concat_eps_right L M t ht a1
 
 
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : M.Nonempty) :
+  M ⊆ concat L M ↔ [] ∈ L :=
+  by
+    constructor
+    · intro a1
+      by_contra contra
+      obtain s1 := set_list_inf_length_exists M h1
+      obtain ⟨s, hs, min⟩ := s1
+      simp only [Set.subset_def] at a1
+      specialize a1 s hs
+      obtain s2 := exists_mem_right_str_length_lt_concat L M s
+      specialize s2 a1 contra
+      obtain ⟨t, ht, lt⟩ := s2
+      specialize min t ht
+      have s3 : ¬ s.length ≤ t.length := Nat.not_le_of_lt lt
+      contradiction
+    · intro a1
+      simp only [Set.subset_def]
+      intro t ht
+      apply append_mem_concat_eps_left L M t a1 ht
+
+
 theorem concat_assoc
   {α : Type}
   (L1 L2 L3 : Language α) :
