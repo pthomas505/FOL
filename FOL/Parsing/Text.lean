@@ -624,8 +624,8 @@ example
       contradiction
     · intro a1
       simp only [Set.subset_def]
-      intro t ht
-      exact append_mem_concat_eps_right L M t ht a1
+      intro s hs
+      exact append_mem_concat_eps_right L M s hs a1
 
 
 example
@@ -638,19 +638,19 @@ example
     · intro a1
       by_contra contra
       obtain s1 := set_list_inf_length_exists M h1
-      obtain ⟨s, hs, min⟩ := s1
+      obtain ⟨t, ht, min⟩ := s1
       simp only [Set.subset_def] at a1
-      specialize a1 s hs
-      obtain s2 := exists_mem_right_str_length_lt_concat L M s
+      specialize a1 t ht
+      obtain s2 := exists_mem_right_str_length_lt_concat L M t
       specialize s2 a1 contra
-      obtain ⟨t, ht, lt⟩ := s2
-      specialize min t ht
-      have s3 : ¬ s.length ≤ t.length := Nat.not_le_of_lt lt
+      obtain ⟨s, hs, lt⟩ := s2
+      specialize min s hs
+      have s3 : ¬ t.length ≤ s.length := Nat.not_le_of_lt lt
       contradiction
     · intro a1
       simp only [Set.subset_def]
       intro t ht
-      apply append_mem_concat_eps_left L M t a1 ht
+      exact append_mem_concat_eps_left L M t a1 ht
 
 
 theorem concat_assoc
