@@ -789,6 +789,74 @@ lemma exp_one
     simp
 
 
+lemma nonempty_imp_exp_nonempty
+  {α : Type}
+  (L : Language α)
+  (n : ℕ)
+  (h1 : L.Nonempty) :
+  (exp L n).Nonempty :=
+  by
+    induction n
+    case zero =>
+      simp only [Set.nonempty_def]
+      simp only [exp]
+      apply Exists.intro []
+      simp
+    case succ k ih =>
+      simp only [exp]
+      simp only [concat_nonempty_iff]
+      exact ⟨ih, h1⟩
+
+
+lemma exp_succ_nonempty_iff
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  (exp L (n + 1)).Nonempty ↔ L.Nonempty :=
+  by
+    simp only [exp]
+    simp only [concat_nonempty_iff]
+    constructor
+    · tauto
+    · intro a1
+      constructor
+      · exact nonempty_imp_exp_nonempty L n a1
+      · exact a1
+
+
+lemma eps_mem_imp_eps_mem_exp
+  {α : Type}
+  (L : Language α)
+  (n : ℕ)
+  (h1 : [] ∈ L) :
+  [] ∈ exp L n :=
+  by
+    induction n
+    case zero =>
+      simp only [exp]
+      simp
+    case succ k ih =>
+      simp only [exp]
+      simp only [eps_mem_concat_iff]
+      exact ⟨ih, h1⟩
+
+
+lemma eps_mem_exp_succ_iff
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  [] ∈ exp L (n + 1) ↔ [] ∈ L :=
+  by
+    simp only [exp]
+    simp only [eps_mem_concat_iff]
+    constructor
+    · tauto
+    · intro a1
+      constructor
+      · exact eps_mem_imp_eps_mem_exp L n a1
+      · exact a1
+
+
 lemma eps_not_mem_imp_eps_not_mem_exp_succ
   {α : Type}
   (L : Language α)
@@ -966,24 +1034,6 @@ lemma exp_succ_concat_left_union
     exact exp_succ_concat_right_union L n
 
 
-example
-  {α : Type}
-  (L : Language α)
-  (n : ℕ)
-  (h1 : [] ∈ L) :
-  [] ∈ exp L n :=
-  by
-    induction n
-    case zero =>
-      simp only [exp]
-      simp
-    case succ k ih =>
-      simp only [exp]
-      simp only [concat]
-      simp
-      constructor
-      · exact ih
-      · exact h1
 
 
 lemma exp_sum
