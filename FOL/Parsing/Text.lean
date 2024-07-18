@@ -603,7 +603,7 @@ lemma set_list_inf_length_exists
 -/
 
 
-example
+lemma left_subset_concat_eps_iff
   {α : Type}
   (L M : Language α)
   (h1 : L.Nonempty) :
@@ -628,7 +628,7 @@ example
       exact append_mem_concat_eps_right L M s hs a1
 
 
-example
+lemma right_subset_concat_eps_iff
   {α : Type}
   (L M : Language α)
   (h1 : M.Nonempty) :
