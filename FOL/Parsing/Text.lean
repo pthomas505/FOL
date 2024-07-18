@@ -509,6 +509,23 @@ lemma exists_mem_concat_str_length_gt_mem_left
       exact Strings.str_append_length_right s t s1
 
 
+lemma exists_mem_concat_str_length_gt_mem_right
+  {α : Type}
+  (L M : Language α)
+  (t : Str α)
+  (h1 : t ∈ M)
+  (h2 : L.Nonempty)
+  (h3 : [] ∉ L) :
+  ∃ (s : Str α), s ∈ concat L M ∧ t.length < s.length :=
+  by
+    obtain ⟨s, a1⟩ := h2
+    apply Exists.intro (s ++ t)
+    constructor
+    · apply append_mem_concat L M s t a1 h1
+    · have s1 : ¬ s = [] := ne_of_mem_of_not_mem a1 h3
+      exact Strings.str_append_length_left s t s1
+
+
 lemma exists_mem_left_str_length_lt_concat
   {α : Type}
   (L M : Language α)
