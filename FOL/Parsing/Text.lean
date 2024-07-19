@@ -386,10 +386,10 @@ lemma concat_empty_iff
   (L M : Language α) :
   (concat L M) = ∅ ↔ L = ∅ ∨ M = ∅ :=
   by
-    rw [or_iff_not_and_not]
-    rw [iff_not_comm]
-    simp only [← Set.nonempty_iff_ne_empty]
-    rw [concat_nonempty_iff]
+    simp only [← Set.not_nonempty_iff_eq_empty]
+    rw [← not_and_or]
+    apply not_congr
+    exact concat_nonempty_iff L M
 
 
 lemma concat_eps_left
