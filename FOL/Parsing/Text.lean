@@ -386,10 +386,10 @@ lemma concat_empty_iff
   (L M : Language α) :
   (concat L M) = ∅ ↔ L = ∅ ∨ M = ∅ :=
   by
-    rw [← Set.not_nonempty_iff_eq_empty]
+    rw [or_iff_not_and_not]
+    rw [iff_not_comm]
+    simp only [← Set.nonempty_iff_ne_empty]
     rw [concat_nonempty_iff]
-    simp only [← Set.not_nonempty_iff_eq_empty]
-    simp only [not_and_or]
 
 
 lemma concat_eps_left
@@ -422,11 +422,11 @@ lemma eps_mem_concat_iff
 lemma eps_not_mem_concat_iff
   {α : Type}
   (L M : Language α) :
-  ([] ∉ L ∨ [] ∉ M) ↔ [] ∉ concat L M :=
+  [] ∉ concat L M ↔ ([] ∉ L ∨ [] ∉ M) :=
   by
-    simp only [concat]
-    simp only [Set.mem_setOf_eq, List.append_eq_nil, exists_eq_right_right]
-    simp only [not_and_or]
+    rw [← not_and_or]
+    apply not_congr
+    exact eps_mem_concat_iff L M
 
 
 example
@@ -437,7 +437,7 @@ example
   (h2 : s ∈ concat L M) :
   s.length > 0 :=
   by
-    rw [eps_not_mem_concat_iff] at h1
+    rw [← eps_not_mem_concat_iff] at h1
     exact eps_not_mem_str_length_gt_zero (concat L M) s h1 h2
 
 
