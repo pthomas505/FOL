@@ -605,6 +605,25 @@ example
     contradiction
 
 
+example
+  {α : Type}
+  (L M : Language α)
+  (h1 : M.Nonempty)
+  (h2 : M ⊆ concat L M) :
+  [] ∈ L :=
+  by
+    obtain s1 := set_list_inf_length_exists M h1
+    obtain ⟨min, mem, le⟩ := s1
+    simp only [Set.subset_def] at h2
+    specialize h2 min mem
+    by_contra contra
+    obtain s2 := exists_mem_right_str_length_lt_concat L M min h2 contra
+    obtain ⟨t, ht, lt⟩ := s2
+    specialize le t ht
+    have s3 : ¬ min.length ≤ t.length := Nat.not_le_of_lt lt
+    contradiction
+
+
 theorem concat_assoc
   {α : Type}
   (L1 L2 L3 : Language α) :
