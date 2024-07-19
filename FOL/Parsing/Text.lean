@@ -586,68 +586,23 @@ lemma set_list_inf_length_exists
       exact Nat.sInf_le s4
 
 
-/-
-  Theorem: If L is not empty and [] ∉ M then ¬ L ⊆ concat L M
-  Proof:
-  Suppose L is not empty and [] ∉ M.
-  Let min be the shortest string in L. This exists by set_list_inf_length_exists.
-  Suppose for contradiction that min is in concat L M.
-  Then there exists a string in L that is shorter than min by exists_mem_left_str_length_lt_concat.
-  This contradicts the assumption that min is the shortest string in L.
-  Hence min is not in concat L M.
-  Then min is an element of L that is not in concat L M.
-  Hence L is not a subset of concat L M.
--/
-
-
-lemma left_subset_concat_eps_iff
+example
   {α : Type}
   (L M : Language α)
-  (h1 : L.Nonempty) :
-  L ⊆ concat L M ↔ [] ∈ M :=
+  (h1 : L.Nonempty)
+  (h2 : L ⊆ concat L M) :
+  [] ∈ M :=
   by
-    constructor
-    · intro a1
-      by_contra contra
-      obtain s1 := set_list_inf_length_exists L h1
-      obtain ⟨s, hs, min⟩ := s1
-      simp only [Set.subset_def] at a1
-      specialize a1 s hs
-      obtain s2 := exists_mem_left_str_length_lt_concat L M s
-      specialize s2 a1 contra
-      obtain ⟨t, ht, lt⟩ := s2
-      specialize min t ht
-      have s3 : ¬ s.length ≤ t.length := Nat.not_le_of_lt lt
-      contradiction
-    · intro a1
-      simp only [Set.subset_def]
-      intro s hs
-      exact append_mem_concat_eps_right L M s hs a1
-
-
-lemma right_subset_concat_eps_iff
-  {α : Type}
-  (L M : Language α)
-  (h1 : M.Nonempty) :
-  M ⊆ concat L M ↔ [] ∈ L :=
-  by
-    constructor
-    · intro a1
-      by_contra contra
-      obtain s1 := set_list_inf_length_exists M h1
-      obtain ⟨t, ht, min⟩ := s1
-      simp only [Set.subset_def] at a1
-      specialize a1 t ht
-      obtain s2 := exists_mem_right_str_length_lt_concat L M t
-      specialize s2 a1 contra
-      obtain ⟨s, hs, lt⟩ := s2
-      specialize min s hs
-      have s3 : ¬ t.length ≤ s.length := Nat.not_le_of_lt lt
-      contradiction
-    · intro a1
-      simp only [Set.subset_def]
-      intro t ht
-      exact append_mem_concat_eps_left L M t a1 ht
+    obtain s1 := set_list_inf_length_exists L h1
+    obtain ⟨min, mem, le⟩ := s1
+    simp only [Set.subset_def] at h2
+    specialize h2 min mem
+    by_contra contra
+    obtain s2 := exists_mem_left_str_length_lt_concat L M min h2 contra
+    obtain ⟨t, ht, lt⟩ := s2
+    specialize le t ht
+    have s3 : ¬ min.length ≤ t.length := Nat.not_le_of_lt lt
+    contradiction
 
 
 theorem concat_assoc
