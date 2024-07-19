@@ -991,8 +991,6 @@ lemma exp_succ_concat_left_union
     exact exp_succ_concat_right_union L n
 
 
-
-
 lemma exp_sum
   {α : Type}
   (L : Language α)
