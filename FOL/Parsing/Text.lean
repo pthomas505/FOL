@@ -828,22 +828,6 @@ lemma eps_mem_exp_succ_iff
       · exact a1
 
 
-/-
-lemma eps_not_mem_imp_eps_not_mem_exp_succ
-  {α : Type}
-  (L : Language α)
-  (n : ℕ)
-  (h1 : [] ∉ L) :
-  [] ∉ exp L (n + 1) :=
-  by
-    simp only [exp]
-    simp only [concat]
-    simp
-    intro _
-    exact h1
--/
-
-
 lemma eps_not_mem_imp_mem_len_ge_exp
   {α : Type}
   (L : Language α)
