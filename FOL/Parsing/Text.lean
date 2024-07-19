@@ -489,6 +489,116 @@ example
     exact append_mem_concat_eps_right L M x a1 h1
 
 
+theorem concat_assoc
+  {α : Type}
+  (L1 L2 L3 : Language α) :
+  concat L1 (concat L2 L3) =
+    concat (concat L1 L2) L3 :=
+  by
+    simp only [concat]
+    simp
+
+
+theorem concat_distrib_union_left
+  {α : Type}
+  (L1 L2 L3 : Language α) :
+  concat L1 (L2 ∪ L3) =
+    concat L1 L2 ∪ concat L1 L3 :=
+  by
+    simp only [concat]
+    ext cs
+    constructor
+    · simp
+      intro xs a1 ys a2 a3
+      subst a3
+      cases a2
+      case _ a2_left =>
+        left
+        exact ⟨xs, a1, ys, a2_left, rfl⟩
+      case _ a2_right =>
+        right
+        exact ⟨xs, a1, ys, a2_right, rfl⟩
+    · simp
+      intro a1
+      cases a1
+      case _ a1_left =>
+        obtain ⟨s, hs, t, ht, eq⟩ := a1_left
+        exact ⟨s, hs, t, ⟨by left; exact ht, eq⟩⟩
+      case _ a1_right =>
+        obtain ⟨s, hs, t, ht, eq⟩ := a1_right
+        exact ⟨s, hs, t, ⟨by right; exact ht, eq⟩⟩
+
+
+theorem concat_distrib_union_right
+  {α : Type}
+  (L1 L2 L3 : Language α) :
+  concat (L1 ∪ L2) L3 =
+    concat L1 L3 ∪ concat L2 L3 :=
+  by
+    simp only [concat]
+    ext cs
+    constructor
+    · simp
+      intro s hs t ht eq
+      cases hs
+      case _ hs_left =>
+        left
+        exact ⟨s, hs_left, t, ht, eq⟩
+      case _ hs_right =>
+        right
+        exact ⟨s, hs_right, t, ht, eq⟩
+    · simp
+      intro a1
+      cases a1
+      case _ a1_left =>
+        obtain ⟨s, hs, t, ht, eq⟩ := a1_left
+        exact ⟨s, by left; exact hs, t, ht, eq⟩
+      case _ a1_right =>
+        obtain ⟨s, hs, t, ht, eq⟩ := a1_right
+        exact ⟨s, by right; exact hs, t, ht, eq⟩
+
+
+lemma concat_subset
+  {α : Type}
+  (L1 L2 M1 M2 : Language α)
+  (h1 : L1 ⊆ M1)
+  (h2 : L2 ⊆ M2) :
+  concat L1 L2 ⊆ concat M1 M2 :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp only [concat] at a1
+    simp at a1
+    obtain ⟨s, hs, t, ht, eq⟩ := a1
+    simp only [concat]
+    simp
+    have s1 : s ∈ M1 := h1 hs
+    have s2 : t ∈ M2 := h2 ht
+    exact ⟨s, s1, t, s2, eq⟩
+
+
+lemma concat_subset_left
+  {α : Type}
+  (L1 L2 L3 : Language α)
+  (h1 : L2 ⊆ L3) :
+  concat L1 L2 ⊆ concat L1 L3 :=
+  by
+    apply concat_subset
+    · rfl
+    · exact h1
+
+
+lemma concat_subset_right
+  {α : Type}
+  (L1 L2 L3 : Language α)
+  (h1 : L2 ⊆ L3) :
+  concat L2 L1 ⊆ concat L3 L1 :=
+  by
+    apply concat_subset
+    · exact h1
+    · rfl
+
+
 lemma exists_mem_concat_str_length_gt_mem_left
   {α : Type}
   (L M : Language α)
@@ -622,116 +732,6 @@ example
     specialize le t ht
     have s3 : ¬ min.length ≤ t.length := Nat.not_le_of_lt lt
     contradiction
-
-
-theorem concat_assoc
-  {α : Type}
-  (L1 L2 L3 : Language α) :
-  concat L1 (concat L2 L3) =
-    concat (concat L1 L2) L3 :=
-  by
-    simp only [concat]
-    simp
-
-
-theorem concat_distrib_union_left
-  {α : Type}
-  (L1 L2 L3 : Language α) :
-  concat L1 (L2 ∪ L3) =
-    concat L1 L2 ∪ concat L1 L3 :=
-  by
-    simp only [concat]
-    ext cs
-    constructor
-    · simp
-      intro xs a1 ys a2 a3
-      subst a3
-      cases a2
-      case _ a2_left =>
-        left
-        exact ⟨xs, a1, ys, a2_left, rfl⟩
-      case _ a2_right =>
-        right
-        exact ⟨xs, a1, ys, a2_right, rfl⟩
-    · simp
-      intro a1
-      cases a1
-      case _ a1_left =>
-        obtain ⟨s, hs, t, ht, eq⟩ := a1_left
-        exact ⟨s, hs, t, ⟨by left; exact ht, eq⟩⟩
-      case _ a1_right =>
-        obtain ⟨s, hs, t, ht, eq⟩ := a1_right
-        exact ⟨s, hs, t, ⟨by right; exact ht, eq⟩⟩
-
-
-theorem concat_distrib_union_right
-  {α : Type}
-  (L1 L2 L3 : Language α) :
-  concat (L1 ∪ L2) L3 =
-    concat L1 L3 ∪ concat L2 L3 :=
-  by
-    simp only [concat]
-    ext cs
-    constructor
-    · simp
-      intro s hs t ht eq
-      cases hs
-      case _ hs_left =>
-        left
-        exact ⟨s, hs_left, t, ht, eq⟩
-      case _ hs_right =>
-        right
-        exact ⟨s, hs_right, t, ht, eq⟩
-    · simp
-      intro a1
-      cases a1
-      case _ a1_left =>
-        obtain ⟨s, hs, t, ht, eq⟩ := a1_left
-        exact ⟨s, by left; exact hs, t, ht, eq⟩
-      case _ a1_right =>
-        obtain ⟨s, hs, t, ht, eq⟩ := a1_right
-        exact ⟨s, by right; exact hs, t, ht, eq⟩
-
-
-lemma concat_subset
-  {α : Type}
-  (L1 L2 M1 M2 : Language α)
-  (h1 : L1 ⊆ M1)
-  (h2 : L2 ⊆ M2) :
-  concat L1 L2 ⊆ concat M1 M2 :=
-  by
-    simp only [Set.subset_def]
-    intro x a1
-    simp only [concat] at a1
-    simp at a1
-    obtain ⟨s, hs, t, ht, eq⟩ := a1
-    simp only [concat]
-    simp
-    have s1 : s ∈ M1 := h1 hs
-    have s2 : t ∈ M2 := h2 ht
-    exact ⟨s, s1, t, s2, eq⟩
-
-
-lemma concat_subset_left
-  {α : Type}
-  (L1 L2 L3 : Language α)
-  (h1 : L2 ⊆ L3) :
-  concat L1 L2 ⊆ concat L1 L3 :=
-  by
-    apply concat_subset
-    · rfl
-    · exact h1
-
-
-lemma concat_subset_right
-  {α : Type}
-  (L1 L2 L3 : Language α)
-  (h1 : L2 ⊆ L3) :
-  concat L2 L1 ⊆ concat L3 L1 :=
-  by
-    apply concat_subset
-    · exact h1
-    · rfl
 
 
 /-
