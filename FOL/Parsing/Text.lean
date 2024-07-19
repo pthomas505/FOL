@@ -1049,10 +1049,7 @@ lemma append_mem_exp_right
   s ++ t ∈ exp L (n + 1) :=
   by
     rw [← exp_one L] at h1
-
-    have s1 : n + 1 = 1 + n := Nat.add_comm n 1
-    simp only [s1]
-
+    rw [Nat.add_comm]
     exact exp_sum L s t 1 n h1 h2
 
 
