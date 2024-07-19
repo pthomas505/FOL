@@ -734,6 +734,16 @@ example
     contradiction
 
 
+example
+  {ι : Sort}
+  (α : Type)
+  (l : ι → Language α)
+  (L : Language α) :
+  concat (⨆ i, l i) L = ⨆ i, concat (l i) L :=
+  by
+    sorry
+
+
 /-
 Definition 12 (Exponentiation). Let L be a language. The exponentiation or powers of L is defined by
 1. L^0 = {ε}
@@ -776,7 +786,7 @@ lemma nonempty_imp_exp_nonempty
   by
     induction n
     case zero =>
-      simp only [Set.nonempty_def]
+      simp only [Set.Nonempty]
       simp only [exp]
       apply Exists.intro []
       simp
@@ -801,6 +811,7 @@ lemma exp_succ_nonempty_iff
       · exact nonempty_imp_exp_nonempty L n a1
       · exact a1
 
+-------------------------------------------------------------------------------
 
 lemma eps_mem_imp_eps_mem_exp
   {α : Type}
@@ -834,6 +845,7 @@ lemma eps_mem_exp_succ_iff
       · exact eps_mem_imp_eps_mem_exp L n a1
       · exact a1
 
+-------------------------------------------------------------------------------
 
 lemma eps_not_mem_imp_mem_len_ge_exp
   {α : Type}
