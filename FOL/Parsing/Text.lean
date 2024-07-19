@@ -847,6 +847,44 @@ lemma eps_mem_exp_succ_iff
 
 -------------------------------------------------------------------------------
 
+lemma concat_exp_comm
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  concat (exp L n) L = concat L (exp L n) :=
+  by
+    induction n
+    case zero =>
+      simp only [exp]
+      simp only [concat]
+      simp
+    case succ k ih =>
+      simp only [exp]
+      conv => left; simp only [ih]
+      simp only [concat_assoc]
+
+
+lemma concat_exp_comm_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  concat (⋃ (k ≤ n), exp L k) L = concat L (⋃ (k ≤ n), exp L k) :=
+  by
+    induction n
+    case zero =>
+      simp
+      simp only [exp]
+      simp only [concat]
+      simp
+    case succ i ih =>
+      simp only [Set.biUnion_le_succ (exp L)]
+      simp only [concat_distrib_union_right]
+      simp only [concat_distrib_union_left]
+      simp only [ih]
+      simp only [concat_exp_comm]
+
+-------------------------------------------------------------------------------
+
 lemma eps_not_mem_imp_mem_len_ge_exp
   {α : Type}
   (L : Language α)
@@ -914,43 +952,6 @@ lemma eps_not_mem_imp_not_mem_concat_exp
     intro contra
     obtain s1 := eps_not_mem_imp_mem_concat_exp_ge_exp L M x x.length h1 contra
     simp at s1
-
-
-lemma concat_exp_comm
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  concat (exp L n) L = concat L (exp L n) :=
-  by
-    induction n
-    case zero =>
-      simp only [exp]
-      simp only [concat]
-      simp
-    case succ k ih =>
-      simp only [exp]
-      conv => left; simp only [ih]
-      simp only [concat_assoc]
-
-
-lemma concat_exp_comm_union
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  concat (⋃ (k ≤ n), exp L k) L = concat L (⋃ (k ≤ n), exp L k) :=
-  by
-    induction n
-    case zero =>
-      simp
-      simp only [exp]
-      simp only [concat]
-      simp
-    case succ i ih =>
-      simp only [Set.biUnion_le_succ (exp L)]
-      simp only [concat_distrib_union_right]
-      simp only [concat_distrib_union_left]
-      simp only [ih]
-      simp only [concat_exp_comm]
 
 
 lemma exp_succ_concat_right
