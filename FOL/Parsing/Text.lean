@@ -693,21 +693,34 @@ theorem concat_distrib_union_right
         exact ⟨s, by right; exact hs, t, ht, eq⟩
 
 
+lemma concat_subset
+  {α : Type}
+  (L1 L2 M1 M2 : Language α)
+  (h1 : L1 ⊆ M1)
+  (h2 : L2 ⊆ M2) :
+  concat L1 L2 ⊆ concat M1 M2 :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp only [concat] at a1
+    simp at a1
+    obtain ⟨s, hs, t, ht, eq⟩ := a1
+    simp only [concat]
+    simp
+    have s1 : s ∈ M1 := h1 hs
+    have s2 : t ∈ M2 := h2 ht
+    exact ⟨s, s1, t, s2, eq⟩
+
+
 lemma concat_subset_left
   {α : Type}
   (L1 L2 L3 : Language α)
   (h1 : L2 ⊆ L3) :
   concat L1 L2 ⊆ concat L1 L3 :=
   by
-    simp only [Set.subset_def]
-    intro cs a1
-    simp only [concat] at a1
-    simp at a1
-    obtain ⟨s, hs, t, ht, eq⟩ := a1
-    simp only [concat]
-    simp
-    have s1 : t ∈ L3 := Set.mem_of_subset_of_mem h1 ht
-    exact ⟨s, hs, t, s1, eq⟩
+    apply concat_subset
+    · rfl
+    · exact h1
 
 
 lemma concat_subset_right
@@ -716,15 +729,9 @@ lemma concat_subset_right
   (h1 : L2 ⊆ L3) :
   concat L2 L1 ⊆ concat L3 L1 :=
   by
-    simp only [Set.subset_def]
-    intro cs a1
-    simp only [concat] at a1
-    simp at a1
-    obtain ⟨s, hs, t, ht, eq⟩ := a1
-    simp only [concat]
-    simp
-    have s1 : s ∈ L3 := Set.mem_of_subset_of_mem h1 hs
-    exact ⟨s, s1, t, ht, eq⟩
+    apply concat_subset
+    · exact h1
+    · rfl
 
 
 /-
