@@ -499,6 +499,27 @@ theorem concat_assoc
     simp
 
 
+theorem concat_distrib_s_union_left
+  {α : Type}
+  (L : Language α)
+  (S : Set (Language α)) :
+  concat L (⋃₀ S) = ⋃ (s ∈ S), (concat L s) :=
+  by
+    simp only [concat]
+    ext cs
+    constructor
+    · intro a1
+      simp at a1
+      obtain ⟨s, hs, t, ⟨ M, hM, ht⟩,  eq⟩ := a1
+      simp
+      exact ⟨M, hM, s, hs, t, ht, eq⟩
+    · intro a1
+      simp at a1
+      obtain ⟨M, hM, s, hs, t, ht, eq⟩ := a1
+      simp
+      exact ⟨s, hs, t, ⟨ M, hM, ht⟩,  eq⟩
+
+
 theorem concat_distrib_isup_left
   {ι : Sort*}
   {α : Type}
@@ -519,6 +540,27 @@ theorem concat_distrib_isup_left
       obtain ⟨i, s, hs, t, ht, eq⟩ := a1
       simp
       exact ⟨s, hs, t, ⟨i, ht⟩, eq⟩
+
+
+theorem concat_distrib_s_union_right
+  {α : Type}
+  (S : Set (Language α))
+  (L : Language α) :
+  concat (⋃₀ S) L = ⋃ (s ∈ S), (concat s L) :=
+  by
+    simp only [concat]
+    ext cs
+    constructor
+    · intro a1
+      simp at a1
+      obtain ⟨s, ⟨M, hM, hs⟩, t, ht, eq⟩ := a1
+      simp
+      exact ⟨M, hM, s, hs, t, ht, eq⟩
+    · intro a1
+      simp at a1
+      obtain ⟨M, hM, s, hs, t, ht, eq⟩ := a1
+      simp
+      exact ⟨s, ⟨M, hM, hs⟩, t, ht, eq⟩
 
 
 theorem concat_distrib_isup_right
@@ -549,13 +591,9 @@ theorem concat_distrib_union_left
   concat L1 (L2 ∪ L3) =
     concat L1 L2 ∪ concat L1 L3 :=
   by
-    obtain s1 := @concat_distrib_isup_left Bool α (fun (b : Bool) => cond b L2 L3) L1
-    rw [← sup_eq_iSup] at s1
+    obtain s1 := concat_distrib_s_union_left L1 {L2, L3}
     simp at s1
-    simp only [s1]
-    ext cs
-    simp
-    tauto
+    exact s1
 
 
 theorem concat_distrib_union_right
@@ -564,13 +602,9 @@ theorem concat_distrib_union_right
   concat (L1 ∪ L2) L3 =
     concat L1 L3 ∪ concat L2 L3 :=
   by
-    obtain s1 := @concat_distrib_isup_right Bool α (fun (b : Bool) => cond b L1 L2) L3
-    rw [← sup_eq_iSup] at s1
+    obtain s1 := concat_distrib_s_union_right {L1, L2} L3
     simp at s1
-    simp only [s1]
-    ext cs
-    simp
-    tauto
+    exact s1
 
 
 lemma concat_subset
