@@ -454,7 +454,7 @@ lemma append_mem_concat_eps_left
     exact append_mem_concat L M [] x h1 h2
 
 
-example
+lemma eps_mem_left_right_subset_concat
   {α : Type}
   (L M : Language α)
   (h1 : [] ∈ L) :
@@ -478,7 +478,7 @@ lemma append_mem_concat_eps_right
     exact append_mem_concat L M x [] h1 h2
 
 
-example
+lemma eps_mem_right_left_subset_concat
   {α : Type}
   (L M : Language α)
   (h1 : [] ∈ M) :
