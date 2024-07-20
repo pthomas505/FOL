@@ -959,7 +959,7 @@ lemma append_mem_exp_right
     exact exp_sum L s t 1 n h1 h2
 
 
-lemma eps_mem_imp_exp_subset_exp_succ
+lemma eps_mem_exp_subset_exp_succ
   {α : Type}
   (L : Language α)
   (n : ℕ)
@@ -2297,7 +2297,7 @@ lemma derivative_exp_succ
         simp only [ih]
         simp
 
-        obtain s1 := eps_mem_imp_exp_subset_exp_succ L k c1
+        obtain s1 := eps_mem_exp_subset_exp_succ L k c1
 
         exact concat_subset_left (derivative L [a]) (exp L k) (exp L (k + 1)) s1
       case neg c1 c2 =>
