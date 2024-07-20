@@ -772,13 +772,13 @@ lemma exp_one
     simp
 
 
-lemma exp_succ
+lemma exp_succ_concat_right
   {α : Type}
   (L : Language α)
   (n : ℕ) :
   exp L (n + 1) = concat (exp L n) L :=
   by
-    simp only [exp]
+    rfl
 
 -------------------------------------------------------------------------------
 
@@ -869,6 +869,16 @@ lemma concat_exp_comm
       simp only [concat_assoc]
 
 
+lemma exp_succ_concat_left
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  exp L (n + 1) = concat L (exp L n) :=
+  by
+    simp only [exp]
+    exact concat_exp_comm L n
+
+
 lemma concat_exp_succ_exp
   {α : Type}
   (L : Language α)
@@ -908,6 +918,62 @@ lemma concat_exp_exp_comm
 
 -------------------------------------------------------------------------------
 
+lemma exp_sum
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (m n : ℕ)
+  (h1 : s ∈ exp L m)
+  (h2 : t ∈ exp L n) :
+  s ++ t ∈ exp L (m + n) :=
+  by
+    obtain s1 := concat_exp_sum L m n
+    rw [← s1]
+    exact append_mem_concat (exp L m) (exp L n) s t h1 h2
+
+
+lemma append_mem_exp_left
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ exp L n)
+  (h2 : t ∈ L) :
+  s ++ t ∈ exp L (n + 1) :=
+  by
+    rw [← exp_one L] at h2
+    exact exp_sum L s t n 1 h1 h2
+
+
+lemma append_mem_exp_right
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ L)
+  (h2 : t ∈ exp L n) :
+  s ++ t ∈ exp L (n + 1) :=
+  by
+    rw [← exp_one L] at h1
+    rw [Nat.add_comm]
+    exact exp_sum L s t 1 n h1 h2
+
+
+lemma eps_mem_imp_exp_subset_exp_succ
+  {α : Type}
+  (L : Language α)
+  (n : ℕ)
+  (h1 : [] ∈ L) :
+  exp L n ⊆ exp L (n + 1) :=
+  by
+    simp only [Set.subset_def]
+    intro cs a1
+    have s1 : cs = [] ++ cs := by rfl
+    rw [s1]
+    exact append_mem_exp_right L [] cs n h1 a1
+
+-------------------------------------------------------------------------------
+
 lemma concat_exp_comm_union
   {α : Type}
   (L : Language α)
@@ -926,6 +992,139 @@ lemma concat_exp_comm_union
       simp only [concat_distrib_union_left]
       simp only [ih]
       simp only [concat_exp_comm]
+
+
+lemma exp_succ_concat_right_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  ⋃ (k ≤ n), exp L (k + 1) =
+    concat (⋃ (k ≤ n), exp L k) L :=
+  by
+    ext cs
+    constructor
+    · intro a1
+      simp only [exp] at a1
+      simp only [concat] at a1
+      simp at a1
+      obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a1
+      simp only [concat]
+      simp
+      exact ⟨s, ⟨i, ⟨hi, hs⟩ ⟩, ⟨t, ht, eq⟩⟩
+    · intro a1
+      simp only [concat] at a1
+      simp at a1
+      obtain ⟨s, ⟨i, hi, hs⟩, t, ht, eq⟩ := a1
+      simp only [exp]
+      simp only [concat]
+      simp
+      exact ⟨i, hi, s, hs, t, ht, eq⟩
+
+
+lemma exp_succ_concat_left_union
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  (⋃ (k ≤ n), exp L (k + 1)) =
+    concat L (⋃ (k ≤ n), exp L k) :=
+  by
+    simp only [← concat_exp_comm_union]
+    exact exp_succ_concat_right_union L n
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ ⋃ (k ≤ n), exp L k)
+  (h2 : t ∈ L) :
+  s ++ t ∈ ⋃ (k ≤ n), exp L (k + 1) :=
+  by
+    simp at h1
+    obtain ⟨i, hi, hs⟩ := h1
+    simp
+    obtain s1 := append_mem_exp_left L s t i hs h2
+    exact ⟨i, hi, s1⟩
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (n : ℕ)
+  (h1 : s ∈ L)
+  (h2 : t ∈ ⋃ (k ≤ n), exp L k) :
+  s ++ t ∈ ⋃ (k ≤ n), exp L (k + 1) :=
+  by
+    simp only [exp_succ_concat_right_union]
+    simp only [concat_exp_comm_union]
+    exact append_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (s t : Str α)
+  (m n : ℕ)
+  (h1 : s ∈ ⋃ (k ≤ m), exp L k)
+  (h2 : t ∈ ⋃ (k ≤ n), exp L k) :
+  s ++ t ∈ ⋃ (k ≤ m + n), exp L k :=
+  by
+    cases m
+    case zero =>
+      simp at h1
+      simp only [exp] at h1
+      simp at h1
+      simp at h2
+      simp only [h1]
+      simp
+      exact h2
+    case succ k =>
+      simp at *
+      obtain ⟨i, hi, hs⟩ := h1
+      obtain ⟨j, hj, ht⟩ := h2
+      apply Exists.intro (i + j)
+      constructor
+      · exact Nat.add_le_add hi hj
+      · exact exp_sum L s t i j hs ht
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (m n : ℕ) :
+  ⋃ (k ≤ m), exp L k ⊆ ⋃ (k ≤ m + n), exp L k :=
+  by
+    simp
+    intro k a1
+    simp only [Set.subset_def]
+    intro cs a2
+    simp
+    apply Exists.intro k
+    constructor
+    · exact le_add_right a1
+    · exact a2
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  [] ∈ ⋃ (k ≤ n), exp L k :=
+  by
+    induction n
+    case zero =>
+      simp
+      simp only [exp]
+      simp
+    case succ k ih =>
+      simp at ih
+      obtain ⟨i, hi, a1⟩ := ih
+      simp
+      have s1 : i ≤ k + 1 := Nat.le_succ_of_le hi
+      exact ⟨i, s1, a1⟩
+
 
 -------------------------------------------------------------------------------
 
@@ -997,233 +1196,7 @@ lemma eps_not_mem_imp_not_mem_concat_exp
     obtain s1 := eps_not_mem_imp_mem_concat_exp_ge_exp L M x x.length h1 contra
     simp at s1
 
-
-lemma exp_succ_concat_right
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  exp L (n + 1) = concat (exp L n) L :=
-  by
-    rfl
-
-
-lemma exp_succ_concat_left
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  exp L (n + 1) = concat L (exp L n) :=
-  by
-    simp only [exp]
-    exact concat_exp_comm L n
-
-
-lemma exp_succ_concat_right_union
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  ⋃ (k ≤ n), exp L (k + 1) =
-    concat (⋃ (k ≤ n), exp L k) L :=
-  by
-    ext cs
-    constructor
-    · intro a1
-      simp only [exp] at a1
-      simp only [concat] at a1
-      simp at a1
-      obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a1
-      simp only [concat]
-      simp
-      exact ⟨s, ⟨i, ⟨hi, hs⟩ ⟩, ⟨t, ht, eq⟩⟩
-    · intro a1
-      simp only [concat] at a1
-      simp at a1
-      obtain ⟨s, ⟨i, hi, hs⟩, t, ht, eq⟩ := a1
-      simp only [exp]
-      simp only [concat]
-      simp
-      exact ⟨i, hi, s, hs, t, ht, eq⟩
-
-
-lemma exp_succ_concat_left_union
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  (⋃ (k ≤ n), exp L (k + 1)) =
-    concat L (⋃ (k ≤ n), exp L k) :=
-  by
-    simp only [← concat_exp_comm_union]
-    exact exp_succ_concat_right_union L n
-
-
-lemma exp_sum
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (m n : ℕ)
-  (h1 : s ∈ exp L m)
-  (h2 : t ∈ exp L n) :
-  s ++ t ∈ exp L (m + n) :=
-  by
-    induction n generalizing t
-    case zero =>
-      simp only [exp] at h2
-      simp at h2
-      simp only [h2]
-      simp
-      exact h1
-    case succ n ih =>
-      simp only [exp] at h2
-      simp only [concat] at h2
-      simp at h2
-      obtain ⟨u, hu, v, hv, eq⟩ := h2
-
-      simp only [exp]
-      simp only [concat]
-      simp
-
-      specialize ih u hu
-      have s1 : s ++ u ++ v = s ++ t :=
-      by
-        simp
-        exact eq
-
-      exact ⟨(s ++ u), ih, v, hv, s1⟩
-
-
-lemma append_mem_exp_left
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ exp L n)
-  (h2 : t ∈ L) :
-  s ++ t ∈ exp L (n + 1) :=
-  by
-    rw [← exp_one L] at h2
-    exact exp_sum L s t n 1 h1 h2
-
-
-lemma append_mem_exp_right
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ L)
-  (h2 : t ∈ exp L n) :
-  s ++ t ∈ exp L (n + 1) :=
-  by
-    rw [← exp_one L] at h1
-    rw [Nat.add_comm]
-    exact exp_sum L s t 1 n h1 h2
-
-
-example
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ ⋃ (k ≤ n), exp L k)
-  (h2 : t ∈ L) :
-  s ++ t ∈ ⋃ (k ≤ n), exp L (k + 1) :=
-  by
-    simp at h1
-    obtain ⟨i, hi, hs⟩ := h1
-    simp
-    obtain s1 := append_mem_exp_left L s t i hs h2
-    exact ⟨i, hi, s1⟩
-
-
-example
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (n : ℕ)
-  (h1 : s ∈ L)
-  (h2 : t ∈ ⋃ (k ≤ n), exp L k) :
-  s ++ t ∈ ⋃ (k ≤ n), exp L (k + 1) :=
-  by
-    simp only [exp_succ_concat_right_union]
-    simp only [concat_exp_comm_union]
-    exact append_mem_concat L (⋃ k, ⋃ (_ : k ≤ n), exp L k) s t h1 h2
-
-
-example
-  {α : Type}
-  (L : Language α)
-  (s t : Str α)
-  (m n : ℕ)
-  (h1 : s ∈ ⋃ (k ≤ m), exp L k)
-  (h2 : t ∈ ⋃ (k ≤ n), exp L k) :
-  s ++ t ∈ ⋃ (k ≤ m + n), exp L k :=
-  by
-    cases m
-    case zero =>
-      simp at h1
-      simp only [exp] at h1
-      simp at h1
-      simp at h2
-      simp only [h1]
-      simp
-      exact h2
-    case succ k =>
-      simp at *
-      obtain ⟨i, hi, hs⟩ := h1
-      obtain ⟨j, hj, ht⟩ := h2
-      apply Exists.intro (i + j)
-      constructor
-      · exact Nat.add_le_add hi hj
-      · exact exp_sum L s t i j hs ht
-
-
-lemma eps_mem_imp_exp_subset_exp_succ
-  {α : Type}
-  (L : Language α)
-  (n : ℕ)
-  (h1 : [] ∈ L) :
-  exp L n ⊆ exp L (n + 1) :=
-  by
-    simp only [Set.subset_def]
-    intro cs a1
-    have s1 : cs = [] ++ cs := by rfl
-    rw [s1]
-    exact append_mem_exp_right L [] cs n h1 a1
-
-
-example
-  {α : Type}
-  (L : Language α)
-  (m n : ℕ) :
-  ⋃ (k ≤ m), exp L k ⊆ ⋃ (k ≤ m + n), exp L k :=
-  by
-    simp
-    intro k a1
-    simp only [Set.subset_def]
-    intro cs a2
-    simp
-    apply Exists.intro k
-    constructor
-    · exact le_add_right a1
-    · exact a2
-
-
-example
-  {α : Type}
-  (L : Language α)
-  (n : ℕ) :
-  [] ∈ ⋃ (k ≤ n), exp L k :=
-  by
-    induction n
-    case zero =>
-      simp
-      simp only [exp]
-      simp
-    case succ k ih =>
-      simp at ih
-      obtain ⟨i, hi, a1⟩ := ih
-      simp
-      have s1 : i ≤ k + 1 := Nat.le_succ_of_le hi
-      exact ⟨i, s1, a1⟩
-
+-------------------------------------------------------------------------------
 
 /-
 Definition 13 (Kleene closure). Let L be a language. L∗ is defined by
