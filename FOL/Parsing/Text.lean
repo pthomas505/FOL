@@ -501,7 +501,7 @@ theorem concat_assoc
 
 theorem concat_distrib_isup_left
   {ι : Sort*}
-  (α : Type)
+  {α : Type}
   (l : ι → Language α)
   (L : Language α) :
   concat L (⨆ i, l i) = ⨆ i, concat L (l i) :=
@@ -523,7 +523,7 @@ theorem concat_distrib_isup_left
 
 theorem concat_distrib_isup_right
   {ι : Sort*}
-  (α : Type)
+  {α : Type}
   (l : ι → Language α)
   (L : Language α) :
   concat (⨆ i, l i) L = ⨆ i, concat (l i) L :=
