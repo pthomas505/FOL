@@ -869,15 +869,14 @@ lemma concat_exp_comm
       simp only [concat_assoc]
 
 
-lemma concat_exp_succ_comm
+lemma concat_exp_succ_exp
   {α : Type}
   (L : Language α)
   (m n : ℕ) :
   concat (exp L (m + 1)) (exp L n) = concat (exp L m) (exp L (n + 1)) :=
   by
     simp only [exp]
-    simp only [concat_exp_comm]
-    simp only [concat_assoc]
+    rw [← concat_assoc]
     simp only [concat_exp_comm]
 
 
@@ -893,13 +892,12 @@ lemma concat_exp_sum
       simp
       exact concat_eps_left (exp L n)
     case succ k ih =>
-      simp only [concat_exp_succ_comm]
-      have s1 : (k + 1) + n = k + (n + 1) := Nat.succ_add_eq_add_succ k n
-      rw [s1]
+      simp only [concat_exp_succ_exp]
+      rw [Nat.succ_add_eq_add_succ]
       exact ih (n + 1)
 
 
-example
+lemma concat_exp_exp_comm
   {α : Type}
   (L : Language α)
   (m n : ℕ) :
