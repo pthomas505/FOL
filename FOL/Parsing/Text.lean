@@ -772,6 +772,16 @@ lemma exp_one
     simp
 
 
+lemma exp_succ
+  {α : Type}
+  (L : Language α)
+  (n : ℕ) :
+  exp L (n + 1) = concat (exp L n) L :=
+  by
+    simp only [exp]
+
+-------------------------------------------------------------------------------
+
 lemma nonempty_imp_exp_nonempty
   {α : Type}
   (L : Language α)
@@ -858,6 +868,47 @@ lemma concat_exp_comm
       conv => left; simp only [ih]
       simp only [concat_assoc]
 
+
+lemma concat_exp_succ_comm
+  {α : Type}
+  (L : Language α)
+  (m n : ℕ) :
+  concat (exp L (m + 1)) (exp L n) = concat (exp L m) (exp L (n + 1)) :=
+  by
+    simp only [exp]
+    simp only [concat_exp_comm]
+    simp only [concat_assoc]
+    simp only [concat_exp_comm]
+
+
+lemma concat_exp_sum
+  {α : Type}
+  (L : Language α)
+  (m n : ℕ) :
+  concat (exp L m) (exp L n) = exp L (m + n) :=
+  by
+    induction m generalizing n
+    case zero =>
+      simp only [exp]
+      simp
+      exact concat_eps_left (exp L n)
+    case succ k ih =>
+      simp only [concat_exp_succ_comm]
+      have s1 : (k + 1) + n = k + (n + 1) := Nat.succ_add_eq_add_succ k n
+      rw [s1]
+      exact ih (n + 1)
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (m n : ℕ) :
+  concat (exp L m) (exp L n) = concat (exp L n) (exp L m) :=
+  by
+    simp only [concat_exp_sum]
+    rw [Nat.add_comm m n]
+
+-------------------------------------------------------------------------------
 
 lemma concat_exp_comm_union
   {α : Type}
