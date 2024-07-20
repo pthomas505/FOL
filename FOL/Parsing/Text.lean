@@ -877,7 +877,7 @@ lemma concat_exp_succ_exp
   by
     simp only [exp]
     rw [← concat_assoc]
-    simp only [concat_exp_comm]
+    rw [concat_exp_comm]
 
 
 lemma concat_exp_sum
