@@ -510,36 +510,14 @@ theorem concat_distrib_s_union_left
     constructor
     · intro a1
       simp at a1
-      obtain ⟨s, hs, t, ⟨ M, hM, ht⟩,  eq⟩ := a1
+      obtain ⟨s, hs, t, ⟨M, hM, ht⟩, eq⟩ := a1
       simp
       exact ⟨M, hM, s, hs, t, ht, eq⟩
     · intro a1
       simp at a1
       obtain ⟨M, hM, s, hs, t, ht, eq⟩ := a1
       simp
-      exact ⟨s, hs, t, ⟨ M, hM, ht⟩,  eq⟩
-
-
-theorem concat_distrib_isup_left
-  {ι : Sort*}
-  {α : Type}
-  (l : ι → Language α)
-  (L : Language α) :
-  concat L (⨆ i, l i) = ⨆ i, concat L (l i) :=
-  by
-    simp only [concat]
-    ext cs
-    constructor
-    · intro a1
-      simp at a1
-      obtain ⟨s, hs, t, ⟨i, ht⟩, eq⟩ := a1
-      simp
-      exact ⟨i, s, hs, t, ht, eq⟩
-    · intro a1
-      simp at a1
-      obtain ⟨i, s, hs, t, ht, eq⟩ := a1
-      simp
-      exact ⟨s, hs, t, ⟨i, ht⟩, eq⟩
+      exact ⟨s, hs, t, ⟨M, hM, ht⟩, eq⟩
 
 
 theorem concat_distrib_s_union_right
@@ -561,28 +539,6 @@ theorem concat_distrib_s_union_right
       obtain ⟨M, hM, s, hs, t, ht, eq⟩ := a1
       simp
       exact ⟨s, ⟨M, hM, hs⟩, t, ht, eq⟩
-
-
-theorem concat_distrib_isup_right
-  {ι : Sort*}
-  {α : Type}
-  (l : ι → Language α)
-  (L : Language α) :
-  concat (⨆ i, l i) L = ⨆ i, concat (l i) L :=
-  by
-    simp only [concat]
-    ext cs
-    constructor
-    · intro a1
-      simp at a1
-      obtain ⟨s, ⟨i, hs⟩ , t, ht, eq⟩ := a1
-      simp
-      exact ⟨i, s, hs, t, ht, eq⟩
-    · intro a1
-      simp at a1
-      obtain ⟨i, s, hs, t, ht, eq⟩ := a1
-      simp
-      exact ⟨s, ⟨i, hs⟩, t, ht, eq⟩
 
 
 theorem concat_distrib_union_left
