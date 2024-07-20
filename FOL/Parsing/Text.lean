@@ -782,7 +782,7 @@ lemma exp_succ
 
 -------------------------------------------------------------------------------
 
-lemma nonempty_imp_exp_nonempty
+lemma nonempty_exp_nonempty
   {α : Type}
   (L : Language α)
   (n : ℕ)
@@ -813,12 +813,12 @@ lemma exp_succ_nonempty_iff
     · tauto
     · intro a1
       constructor
-      · exact nonempty_imp_exp_nonempty L n a1
+      · exact nonempty_exp_nonempty L n a1
       · exact a1
 
 -------------------------------------------------------------------------------
 
-lemma eps_mem_imp_eps_mem_exp
+lemma eps_mem_eps_mem_exp
   {α : Type}
   (L : Language α)
   (n : ℕ)
@@ -847,7 +847,7 @@ lemma eps_mem_exp_succ_iff
     · tauto
     · intro a1
       constructor
-      · exact eps_mem_imp_eps_mem_exp L n a1
+      · exact eps_mem_eps_mem_exp L n a1
       · exact a1
 
 -------------------------------------------------------------------------------
