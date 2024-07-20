@@ -801,20 +801,16 @@ lemma nonempty_exp_nonempty
       exact ⟨ih, h1⟩
 
 
-lemma exp_succ_nonempty_iff
+lemma exp_succ_nonempty_nonempty
   {α : Type}
   (L : Language α)
-  (n : ℕ) :
-  (exp L (n + 1)).Nonempty ↔ L.Nonempty :=
+  (n : ℕ)
+  (h1 : (exp L (n + 1)).Nonempty) :
+  Set.Nonempty (exp L n) ∧ Set.Nonempty L :=
   by
-    simp only [exp]
-    simp only [concat_nonempty_iff]
-    constructor
-    · tauto
-    · intro a1
-      constructor
-      · exact nonempty_exp_nonempty L n a1
-      · exact a1
+    simp only [exp] at h1
+    simp only [concat_nonempty_iff] at h1
+    exact h1
 
 -------------------------------------------------------------------------------
 
