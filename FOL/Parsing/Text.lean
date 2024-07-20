@@ -879,7 +879,7 @@ lemma exp_succ_concat_left
     exact concat_exp_comm L n
 
 
-lemma concat_exp_succ_exp
+lemma concat_exp_assoc
   {α : Type}
   (L : Language α)
   (m n : ℕ) :
@@ -902,7 +902,7 @@ lemma concat_exp_sum
       simp
       exact concat_eps_left (exp L n)
     case succ k ih =>
-      simp only [concat_exp_succ_exp]
+      simp only [concat_exp_assoc]
       rw [Nat.succ_add_eq_add_succ]
       exact ih (n + 1)
 
