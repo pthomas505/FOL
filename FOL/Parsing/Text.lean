@@ -549,28 +549,13 @@ theorem concat_distrib_union_left
   concat L1 (L2 ∪ L3) =
     concat L1 L2 ∪ concat L1 L3 :=
   by
-    simp only [concat]
+    obtain s1 := @concat_distrib_isup_left Bool α (fun (b : Bool) => cond b L2 L3) L1
+    rw [← sup_eq_iSup] at s1
+    simp at s1
+    simp only [s1]
     ext cs
-    constructor
-    · simp
-      intro xs a1 ys a2 a3
-      subst a3
-      cases a2
-      case _ a2_left =>
-        left
-        exact ⟨xs, a1, ys, a2_left, rfl⟩
-      case _ a2_right =>
-        right
-        exact ⟨xs, a1, ys, a2_right, rfl⟩
-    · simp
-      intro a1
-      cases a1
-      case _ a1_left =>
-        obtain ⟨s, hs, t, ht, eq⟩ := a1_left
-        exact ⟨s, hs, t, ⟨by left; exact ht, eq⟩⟩
-      case _ a1_right =>
-        obtain ⟨s, hs, t, ht, eq⟩ := a1_right
-        exact ⟨s, hs, t, ⟨by right; exact ht, eq⟩⟩
+    simp
+    tauto
 
 
 theorem concat_distrib_union_right
@@ -579,27 +564,13 @@ theorem concat_distrib_union_right
   concat (L1 ∪ L2) L3 =
     concat L1 L3 ∪ concat L2 L3 :=
   by
-    simp only [concat]
+    obtain s1 := @concat_distrib_isup_right Bool α (fun (b : Bool) => cond b L1 L2) L3
+    rw [← sup_eq_iSup] at s1
+    simp at s1
+    simp only [s1]
     ext cs
-    constructor
-    · simp
-      intro s hs t ht eq
-      cases hs
-      case _ hs_left =>
-        left
-        exact ⟨s, hs_left, t, ht, eq⟩
-      case _ hs_right =>
-        right
-        exact ⟨s, hs_right, t, ht, eq⟩
-    · simp
-      intro a1
-      cases a1
-      case _ a1_left =>
-        obtain ⟨s, hs, t, ht, eq⟩ := a1_left
-        exact ⟨s, by left; exact hs, t, ht, eq⟩
-      case _ a1_right =>
-        obtain ⟨s, hs, t, ht, eq⟩ := a1_right
-        exact ⟨s, by right; exact hs, t, ht, eq⟩
+    simp
+    tauto
 
 
 lemma concat_subset
