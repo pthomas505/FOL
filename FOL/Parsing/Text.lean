@@ -499,6 +499,50 @@ theorem concat_assoc
     simp
 
 
+theorem concat_distrib_isup_left
+  {ι : Sort*}
+  (α : Type)
+  (l : ι → Language α)
+  (L : Language α) :
+  concat L (⨆ i, l i) = ⨆ i, concat L (l i) :=
+  by
+    simp only [concat]
+    ext cs
+    constructor
+    · intro a1
+      simp at a1
+      obtain ⟨s, hs, t, ⟨i, ht⟩, eq⟩ := a1
+      simp
+      exact ⟨i, s, hs, t, ht, eq⟩
+    · intro a1
+      simp at a1
+      obtain ⟨i, s, hs, t, ht, eq⟩ := a1
+      simp
+      exact ⟨s, hs, t, ⟨i, ht⟩, eq⟩
+
+
+theorem concat_distrib_isup_right
+  {ι : Sort*}
+  (α : Type)
+  (l : ι → Language α)
+  (L : Language α) :
+  concat (⨆ i, l i) L = ⨆ i, concat (l i) L :=
+  by
+    simp only [concat]
+    ext cs
+    constructor
+    · intro a1
+      simp at a1
+      obtain ⟨s, ⟨i, hs⟩ , t, ht, eq⟩ := a1
+      simp
+      exact ⟨i, s, hs, t, ht, eq⟩
+    · intro a1
+      simp at a1
+      obtain ⟨i, s, hs, t, ht, eq⟩ := a1
+      simp
+      exact ⟨s, ⟨i, hs⟩, t, ht, eq⟩
+
+
 theorem concat_distrib_union_left
   {α : Type}
   (L1 L2 L3 : Language α) :
@@ -732,16 +776,6 @@ example
     specialize le t ht
     have s3 : ¬ min.length ≤ t.length := Nat.not_le_of_lt lt
     contradiction
-
-
-example
-  {ι : Sort}
-  (α : Type)
-  (l : ι → Language α)
-  (L : Language α) :
-  concat (⨆ i, l i) L = ⨆ i, concat (l i) L :=
-  by
-    sorry
 
 
 /-
