@@ -831,20 +831,16 @@ lemma eps_mem_eps_mem_exp
       exact ⟨ih, h1⟩
 
 
-lemma eps_mem_exp_succ_iff
+lemma eps_mem_exp_succ_eps_mem
   {α : Type}
   (L : Language α)
-  (n : ℕ) :
-  [] ∈ exp L (n + 1) ↔ [] ∈ L :=
+  (n : ℕ)
+  (h1 : [] ∈ exp L (n + 1)) :
+  [] ∈ exp L n ∧ [] ∈ L :=
   by
-    simp only [exp]
-    simp only [eps_mem_concat_iff]
-    constructor
-    · tauto
-    · intro a1
-      constructor
-      · exact eps_mem_eps_mem_exp L n a1
-      · exact a1
+    simp only [exp] at h1
+    simp only [eps_mem_concat_iff] at h1
+    exact h1
 
 -------------------------------------------------------------------------------
 
