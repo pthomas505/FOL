@@ -951,18 +951,17 @@ lemma append_mem_exp_right
     exact exp_sum L s t 1 n h1 h2
 
 
-lemma eps_mem_exp_subset_exp_succ
+lemma eps_mem_exp_subset_exp_add_nat
   {α : Type}
   (L : Language α)
-  (n : ℕ)
+  (m n : ℕ)
   (h1 : [] ∈ L) :
-  exp L n ⊆ exp L (n + 1) :=
+  exp L m ⊆ exp L (m + n) :=
   by
-    simp only [Set.subset_def]
-    intro cs a1
-    have s1 : cs = [] ++ cs := by rfl
-    rw [s1]
-    exact append_mem_exp_right L [] cs n h1 a1
+    obtain s1 := concat_exp_sum L m n
+    rw [← s1]
+    have s2 : [] ∈ exp L n := eps_mem_eps_mem_exp L n h1
+    exact eps_mem_right_left_subset_concat (exp L m) (exp L n) s2
 
 -------------------------------------------------------------------------------
 
@@ -2289,7 +2288,7 @@ lemma derivative_exp_succ
         simp only [ih]
         simp
 
-        obtain s1 := eps_mem_exp_subset_exp_succ L k c1
+        obtain s1 := eps_mem_exp_subset_exp_add_nat L k 1 c1
 
         exact concat_subset_left (derivative L [a]) (exp L k) (exp L (k + 1)) s1
       case neg c1 c2 =>
