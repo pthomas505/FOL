@@ -76,6 +76,15 @@ lemma eps_mem_kleene_closure
   by
     exact kleene_closure.eps L
 
+lemma kleene_closure_nonempty
+  {α : Type}
+  (L : Language α) :
+  (kleene_closure α L).Nonempty :=
+  by
+    simp only [Set.Nonempty]
+    apply Exists.intro []
+    exact eps_mem_kleene_closure L
+
 -------------------------------------------------------------------------------
 
 -- Theorem 4
