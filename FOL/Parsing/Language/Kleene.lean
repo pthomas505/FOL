@@ -30,14 +30,6 @@ inductive kleene_closure
     kleene_closure α L (s ++ t)
 
 
-lemma eps_mem_kleene_closure
-  {α : Type}
-  (L : Language α) :
-  [] ∈ kleene_closure α L :=
-  by
-    exact kleene_closure.eps L
-
-
 lemma kleene_closure_empty
   {α : Type} :
   kleene_closure α ∅ = {[]} :=
@@ -75,6 +67,16 @@ lemma kleene_closure_eps
       rw [a1]
       exact kleene_closure.eps {[]}
 
+-------------------------------------------------------------------------------
+
+lemma eps_mem_kleene_closure
+  {α : Type}
+  (L : Language α) :
+  [] ∈ kleene_closure α L :=
+  by
+    exact kleene_closure.eps L
+
+-------------------------------------------------------------------------------
 
 -- Theorem 4
 theorem exp_subset_kleene_closure
