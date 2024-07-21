@@ -181,7 +181,7 @@ lemma concat_exp_exp_comm
 
 -------------------------------------------------------------------------------
 
-lemma exp_sum
+lemma append_exp_sum
   {α : Type}
   (L : Language α)
   (s t : Str α)
@@ -205,7 +205,7 @@ lemma append_mem_exp_left
   s ++ t ∈ exp L (n + 1) :=
   by
     rw [← exp_one L] at h2
-    exact exp_sum L s t n 1 h1 h2
+    exact append_exp_sum L s t n 1 h1 h2
 
 
 lemma append_mem_exp_right
@@ -219,7 +219,7 @@ lemma append_mem_exp_right
   by
     rw [← exp_one L] at h1
     rw [Nat.add_comm]
-    exact exp_sum L s t 1 n h1 h2
+    exact append_exp_sum L s t 1 n h1 h2
 
 
 lemma eps_mem_exp_subset_exp_add_nat
@@ -349,7 +349,7 @@ example
       apply Exists.intro (i + j)
       constructor
       · exact Nat.add_le_add hi hj
-      · exact exp_sum L s t i j hs ht
+      · exact append_exp_sum L s t i j hs ht
 
 
 example

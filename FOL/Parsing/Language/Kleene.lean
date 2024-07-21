@@ -187,7 +187,7 @@ theorem kleene_closure_closed_concat
     simp
     apply Exists.intro (i + j)
     rw [← eq]
-    exact exp_sum L s t i j hs ht
+    exact append_exp_sum L s t i j hs ht
 
 
 theorem kleene_closure_closed_append
@@ -203,7 +203,7 @@ theorem kleene_closure_closed_append
     obtain ⟨m, hs⟩ := h1
     obtain ⟨n, ht⟩ := h2
     apply Exists.intro (m + n)
-    exact exp_sum L s t m n hs ht
+    exact append_exp_sum L s t m n hs ht
 
 
 -- Each l is the concatenation of a list of strings, each of which is in L.
