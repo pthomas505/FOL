@@ -420,7 +420,7 @@ lemma set_list_inf_length_exists
       exact Nat.sInf_le s4
 
 
-example
+lemma left_nonempty_subset_concat_eps_mem_right
   {α : Type}
   (L M : Language α)
   (h1 : L.Nonempty)
@@ -439,7 +439,7 @@ example
     contradiction
 
 
-example
+lemma right_nonempty_subset_concat_eps_mem_left
   {α : Type}
   (L M : Language α)
   (h1 : M.Nonempty)
