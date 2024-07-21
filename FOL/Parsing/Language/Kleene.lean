@@ -42,21 +42,22 @@ example
   {α : Type} :
   kleene_closure α ∅ = {[]} :=
   by
-  ext cs
-  simp
-  constructor
-  · intro a1
-    induction a1
-    case _ =>
-      rfl
-    case _ s t ih_1 ih_2 _ =>
-      simp at ih_2
-  · intro a1
-    simp only [a1]
-    exact kleene_closure.eps ∅
+    ext cs
+    simp
+    constructor
+    · intro a1
+      induction a1
+      case _ =>
+        rfl
+      case _ s t ih_1 ih_2 _ =>
+        simp at ih_2
+    · intro a1
+      simp only [a1]
+      exact kleene_closure.eps ∅
 
 
-theorem thm_4
+-- Theorem 4
+theorem exp_subset_kleene_closure
   {α : Type}
   (L : Language α)
   (n : ℕ) :
@@ -84,27 +85,27 @@ theorem thm_4
       · exact ht
 
 
-lemma lang_sub_kleene_closure
+lemma language_subset_kleene_closure
   {α : Type}
   (L : Language α) :
   L ⊆ kleene_closure α L :=
   by
     conv => left; rw [← exp_one L]
-    exact thm_4 L 1
+    exact exp_subset_kleene_closure L 1
 
 
-lemma mem_lang_imp_mem_kleene_closure
+lemma mem_language_mem_kleene_closure
   {α : Type}
   (L : Language α)
   (x : Str α)
   (h1 : x ∈ L) :
   x ∈ kleene_closure α L :=
   by
-    obtain s1 := lang_sub_kleene_closure L
+    obtain s1 := language_subset_kleene_closure L
     exact Set.mem_of_subset_of_mem s1 h1
 
 
-theorem thm_5_left
+theorem union_exp_subset_kleene_closure
   {α : Type}
   (L : Language α) :
   ⋃ (n : ℕ), exp L n ⊆ kleene_closure α L :=
@@ -112,12 +113,11 @@ theorem thm_5_left
     simp only [Set.subset_def]
     intro cs a1
     simp at a1
-    apply Exists.elim a1
-    intro n a2
-    exact Set.mem_of_subset_of_mem (thm_4 L n) a2
+    obtain ⟨n, a2⟩ := a1
+    exact Set.mem_of_subset_of_mem (exp_subset_kleene_closure L n) a2
 
 
-theorem thm_5_right
+theorem kleene_closure_subset_union_exp
   {α : Type}
   (L : Language α) :
   kleene_closure α L ⊆ ⋃ (n : ℕ), exp L n :=
@@ -142,11 +142,12 @@ theorem thm_5_right
       exact ⟨s, hs, t, ih_2, rfl⟩
 
 
-theorem thm_5
+-- Theorem 5
+theorem kleene_closure_eq_union_exp
   {α : Type}
   (L : Language α) :
   kleene_closure α L = ⋃ (n : ℕ), exp L n :=
-    Set.eq_of_subset_of_subset (thm_5_right L) (thm_5_left L)
+    Set.eq_of_subset_of_subset (kleene_closure_subset_union_exp L) (union_exp_subset_kleene_closure L)
 
 
 theorem kleene_closure_closed_concat
@@ -157,7 +158,7 @@ theorem kleene_closure_closed_concat
   (h2 : t ∈ kleene_closure α L) :
   s ++ t ∈ kleene_closure α L :=
   by
-    simp only [thm_5] at *
+    simp only [kleene_closure_eq_union_exp] at *
     simp at *
     obtain ⟨m, hs⟩ := h1
     obtain ⟨n, ht⟩ := h2
@@ -184,7 +185,7 @@ lemma kleene_closure_set_eq_kleene_closure_left
     obtain ⟨M, a2_left, a2_right⟩ := a1
     simp only [a2_right]
     clear a2_right
-    simp only [thm_5]
+    simp only [kleene_closure_eq_union_exp]
     simp
     induction M
     case nil =>
@@ -249,7 +250,7 @@ theorem thm_6
     ext cs
     constructor
     · intro a1
-      simp only [thm_5] at a1
+      simp only [kleene_closure_eq_union_exp] at a1
       simp at a1
       obtain ⟨i, a2⟩ := a1
       simp
@@ -268,7 +269,7 @@ theorem thm_6
         simp only [← eq]
         apply append_mem_concat
         · exact hs
-        · exact Set.mem_of_mem_of_subset ht (thm_4 L k)
+        · exact Set.mem_of_mem_of_subset ht (exp_subset_kleene_closure L k)
     · intro a1
       simp at a1
       cases a1
@@ -276,13 +277,13 @@ theorem thm_6
         simp only [a1_left]
         exact kleene_closure.eps L
       case _ a1_right =>
-        simp only [thm_5 L] at a1_right
+        simp only [kleene_closure_eq_union_exp L] at a1_right
         simp only [concat] at a1_right
         simp at a1_right
         obtain ⟨s, hs, t, ⟨i, ht⟩, eq⟩ := a1_right
         simp only [← eq]
         obtain s1 := append_mem_exp_right L s t i hs ht
-        exact thm_4 L (i + 1) s1
+        exact exp_subset_kleene_closure L (i + 1) s1
 
 
 theorem corollary_1
@@ -368,7 +369,7 @@ theorem thm_7
   (L : Language α) :
   concat L (kleene_closure α L) = concat (kleene_closure α L) L :=
   by
-    simp only [thm_5]
+    simp only [kleene_closure_eq_union_exp]
     simp only [concat_kleene_closure_succ_left]
     simp only [concat_kleene_closure_succ_right]
 
@@ -379,7 +380,7 @@ theorem thm_8
   kleene_closure α L = kleene_closure α (kleene_closure α L) :=
   by
     apply Set.eq_of_subset_of_subset
-    · exact lang_sub_kleene_closure (kleene_closure α L)
+    · exact language_subset_kleene_closure (kleene_closure α L)
     · simp only [Set.subset_def]
       intro cs a1
       induction a1
@@ -480,7 +481,7 @@ theorem thm_9_unique_left
   (h1 : X = (concat L1 X) ∪ L2) :
   concat (kleene_closure α L1) L2 ⊆ X :=
   by
-    simp only [thm_5]
+    simp only [kleene_closure_eq_union_exp]
     simp only [Set.subset_def]
     intro cs a1
     simp only [concat] at a1
@@ -526,7 +527,7 @@ theorem thm_9_unique_right
         apply Exists.intro (s ++ s')
         constructor
         · apply kleene_closure_closed_concat
-          · apply mem_lang_imp_mem_kleene_closure
+          · apply mem_language_mem_kleene_closure
             exact hs
           · exact hs'
         · apply Exists.intro t'
@@ -536,7 +537,7 @@ theorem thm_9_unique_right
             exact eq'
       · apply Exists.intro s
         constructor
-        · apply mem_lang_imp_mem_kleene_closure L1 s hs
+        · apply mem_language_mem_kleene_closure L1 s hs
         · apply Exists.intro t
           tauto
     · apply append_mem_concat_eps_left

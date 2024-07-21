@@ -448,7 +448,7 @@ theorem thm_12_8
   (a : α) :
   derivative (kleene_closure α L) [a] = concat (derivative L [a]) (kleene_closure α L) :=
   by
-    conv => left; simp only [thm_5]
+    conv => left; simp only [kleene_closure_eq_union_exp]
     simp only [← Set.union_iUnion_nat_succ (exp L)]
     simp only [thm_12_5]
     simp only [exp_zero]
@@ -457,7 +457,7 @@ theorem thm_12_8
     simp only [← aux_1]
     simp only [derivative_exp_succ]
     simp only [aux_2]
-    simp only [thm_5]
+    simp only [kleene_closure_eq_union_exp]
 
 
 -- 1.58
