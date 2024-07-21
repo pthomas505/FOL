@@ -173,7 +173,7 @@ theorem kleene_closure_eq_union_exp
 
 -------------------------------------------------------------------------------
 
-theorem kleene_closure_closed_concat
+theorem concat_kleene_closure_closed
   {α : Type}
   (L : Language α) :
   concat (kleene_closure α L) (kleene_closure α L) ⊆ kleene_closure α L :=
@@ -190,7 +190,7 @@ theorem kleene_closure_closed_concat
     exact append_exp_sum L s t i j hs ht
 
 
-theorem kleene_closure_closed_append
+theorem append_kleene_closure_closed
   {α : Type}
   (L : Language α)
   (s t : Str α)
@@ -427,7 +427,7 @@ theorem thm_8
       case _ =>
         apply kleene_closure.eps L
       case _ s t _ ih_2 ih_3 =>
-        exact kleene_closure_closed_append L s t ih_3 ih_2
+        exact append_kleene_closure_closed L s t ih_3 ih_2
 
 
 theorem corollary_2
@@ -566,7 +566,7 @@ theorem thm_9_unique_right
         obtain ⟨s', hs', t', ht', eq'⟩ := IH
         apply Exists.intro (s ++ s')
         constructor
-        · apply kleene_closure_closed_append
+        · apply append_kleene_closure_closed
           · apply mem_language_mem_kleene_closure
             exact hs
           · exact hs'
