@@ -38,7 +38,7 @@ lemma eps_mem_kleene_closure
     exact kleene_closure.eps L
 
 
-example
+lemma kleene_closure_empty
   {α : Type} :
   kleene_closure α ∅ = {[]} :=
   by
@@ -52,8 +52,28 @@ example
       case _ s t ih_1 ih_2 _ =>
         simp at ih_2
     · intro a1
-      simp only [a1]
+      rw [a1]
       exact kleene_closure.eps ∅
+
+
+lemma kleene_closure_eps
+  {α : Type} :
+  kleene_closure α {[]} = {[]} :=
+  by
+    ext cs
+    simp
+    constructor
+    · intro a1
+      induction a1
+      case _ =>
+        rfl
+      case _ s t ih_1 ih_2 ih_3 =>
+        simp at ih_2
+        rw [ih_3, ih_2]
+        simp
+    · intro a1
+      rw [a1]
+      exact kleene_closure.eps {[]}
 
 
 -- Theorem 4
@@ -84,6 +104,7 @@ theorem exp_subset_kleene_closure
       · exact ih s hs
       · exact ht
 
+-------------------------------------------------------------------------------
 
 lemma language_subset_kleene_closure
   {α : Type}
@@ -104,6 +125,7 @@ lemma mem_language_mem_kleene_closure
     obtain s1 := language_subset_kleene_closure L
     exact Set.mem_of_subset_of_mem s1 h1
 
+-------------------------------------------------------------------------------
 
 lemma union_exp_subset_kleene_closure
   {α : Type}
@@ -149,8 +171,26 @@ theorem kleene_closure_eq_union_exp
   kleene_closure α L = ⋃ (n : ℕ), exp L n :=
     Set.eq_of_subset_of_subset (kleene_closure_subset_union_exp L) (union_exp_subset_kleene_closure L)
 
+-------------------------------------------------------------------------------
 
 theorem kleene_closure_closed_concat
+  {α : Type}
+  (L : Language α) :
+  concat (kleene_closure α L) (kleene_closure α L) ⊆ kleene_closure α L :=
+  by
+    simp only [kleene_closure_eq_union_exp]
+    simp only [Set.subset_def]
+    intro cs a1
+    simp only [concat] at a1
+    simp at a1
+    obtain ⟨s, ⟨i, hs⟩, t, ⟨j, ht⟩, eq⟩ := a1
+    simp
+    apply Exists.intro (i + j)
+    rw [← eq]
+    exact exp_sum L s t i j hs ht
+
+
+theorem kleene_closure_closed_append
   {α : Type}
   (L : Language α)
   (s t : Str α)
@@ -387,7 +427,7 @@ theorem thm_8
       case _ =>
         apply kleene_closure.eps L
       case _ s t _ ih_2 ih_3 =>
-        exact kleene_closure_closed_concat L s t ih_3 ih_2
+        exact kleene_closure_closed_append L s t ih_3 ih_2
 
 
 theorem corollary_2
@@ -526,7 +566,7 @@ theorem thm_9_unique_right
         obtain ⟨s', hs', t', ht', eq'⟩ := IH
         apply Exists.intro (s ++ s')
         constructor
-        · apply kleene_closure_closed_concat
+        · apply kleene_closure_closed_append
           · apply mem_language_mem_kleene_closure
             exact hs
           · exact hs'
