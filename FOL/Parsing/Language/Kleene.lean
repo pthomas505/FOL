@@ -105,7 +105,7 @@ lemma mem_language_mem_kleene_closure
     exact Set.mem_of_subset_of_mem s1 h1
 
 
-theorem union_exp_subset_kleene_closure
+lemma union_exp_subset_kleene_closure
   {α : Type}
   (L : Language α) :
   ⋃ (n : ℕ), exp L n ⊆ kleene_closure α L :=
@@ -117,7 +117,7 @@ theorem union_exp_subset_kleene_closure
     exact Set.mem_of_subset_of_mem (exp_subset_kleene_closure L n) a2
 
 
-theorem kleene_closure_subset_union_exp
+lemma kleene_closure_subset_union_exp
   {α : Type}
   (L : Language α) :
   kleene_closure α L ⊆ ⋃ (n : ℕ), exp L n :=
