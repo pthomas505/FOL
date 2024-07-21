@@ -205,6 +205,7 @@ theorem append_kleene_closure_closed
     apply Exists.intro (m + n)
     exact append_exp_sum L s t m n hs ht
 
+-------------------------------------------------------------------------------
 
 -- Each l is the concatenation of a list of strings, each of which is in L.
 def kleene_closure_set
@@ -281,6 +282,7 @@ theorem kleene_closure_set_eq_kleene_closure
   kleene_closure_set α L = kleene_closure α L :=
     Set.eq_of_subset_of_subset (kleene_closure_set_eq_kleene_closure_left L) (kleene_closure_set_eq_kleene_closure_right L)
 
+-------------------------------------------------------------------------------
 
 theorem thm_6
   {α : Type}
