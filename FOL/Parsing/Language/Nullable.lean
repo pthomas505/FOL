@@ -38,7 +38,7 @@ def Language.nullify
 lemma nullify_empty
   {α : Type}
   [DecidableEq α] :
-  Language.nullify (∅ : Language α) = ∅ :=
+  (∅ : Language α).nullify = ∅ :=
   by
     simp only [Language.nullify]
     simp
@@ -47,7 +47,7 @@ lemma nullify_empty
 lemma nullify_eps
   {α : Type}
   [DecidableEq α] :
-  Language.nullify ({[]} : Language α) = {[]} :=
+  ({[]} : Language α).nullify = {[]} :=
   by
     simp only [Language.nullify]
     simp
@@ -130,7 +130,7 @@ lemma nullify_kleene_closure
   {α : Type}
   [DecidableEq α]
   (L : Language α) :
-  Language.nullify (kleene_closure α L) = {[]} :=
+  (kleene_closure α L).nullify = {[]} :=
   by
     simp only [Language.nullify]
     simp only [eps_mem_kleene_closure]
