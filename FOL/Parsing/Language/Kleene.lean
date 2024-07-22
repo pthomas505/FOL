@@ -225,7 +225,7 @@ def kleene_closure_set
   { s : Str α | ∃ M : List (Str α), (∀ (r : Str α), r ∈ M → r ∈ L) ∧ s = M.join }
 
 
-lemma kleene_closure_set_eq_kleene_closure_left
+lemma kleene_closure_set_subset_kleene_closure
   {α : Type}
   (L : Language α) :
   kleene_closure_set α L ⊆ kleene_closure α L :=
@@ -255,7 +255,7 @@ lemma kleene_closure_set_eq_kleene_closure_left
         exact append_mem_exp_right L hd tl.join i a2_left_left a3
 
 
-lemma kleene_closure_set_eq_kleene_closure_right
+lemma kleene_closure_subset_kleene_closure_set
   {α : Type}
   [DecidableEq α]
   (L : Language α) :
@@ -291,7 +291,7 @@ theorem kleene_closure_set_eq_kleene_closure
   [DecidableEq α]
   (L : Language α) :
   kleene_closure_set α L = kleene_closure α L :=
-    Set.eq_of_subset_of_subset (kleene_closure_set_eq_kleene_closure_left L) (kleene_closure_set_eq_kleene_closure_right L)
+    Set.eq_of_subset_of_subset (kleene_closure_set_subset_kleene_closure L) (kleene_closure_subset_kleene_closure_set L)
 
 -------------------------------------------------------------------------------
 
