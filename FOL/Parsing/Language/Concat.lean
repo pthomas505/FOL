@@ -64,6 +64,7 @@ lemma append_mem_concat
     simp
     exact ⟨s, h1, t, h2, rfl⟩
 
+-------------------------------------------------------------------------------
 
 lemma concat_empty_left
   {α : Type}
@@ -82,6 +83,7 @@ lemma concat_empty_right
     simp only [concat]
     simp
 
+-------------------------------------------------------------------------------
 
 lemma concat_nonempty_iff
   {α : Type}
@@ -110,6 +112,7 @@ lemma concat_empty_iff
     apply not_congr
     exact concat_nonempty_iff L M
 
+-------------------------------------------------------------------------------
 
 lemma concat_eps_left
   {α : Type}
@@ -128,6 +131,7 @@ lemma concat_eps_right
     simp only [concat]
     simp
 
+-------------------------------------------------------------------------------
 
 lemma eps_mem_concat_iff
   {α : Type}
@@ -159,6 +163,7 @@ example
     rw [← eps_not_mem_concat_iff] at h1
     exact eps_not_mem_str_length_gt_zero (concat L M) s h1 h2
 
+-------------------------------------------------------------------------------
 
 lemma append_mem_concat_eps_left
   {α : Type}
@@ -207,6 +212,7 @@ lemma eps_mem_right_left_subset_concat
     intro x a1
     exact append_mem_concat_eps_right L M x a1 h1
 
+-------------------------------------------------------------------------------
 
 theorem concat_assoc
   {α : Type}
@@ -217,6 +223,7 @@ theorem concat_assoc
     simp only [concat]
     simp
 
+-------------------------------------------------------------------------------
 
 theorem concat_distrib_s_union_left
   {α : Type}
@@ -281,6 +288,7 @@ theorem concat_distrib_union_right
     simp at s1
     exact s1
 
+-------------------------------------------------------------------------------
 
 lemma concat_subset
   {α : Type}
