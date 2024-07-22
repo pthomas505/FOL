@@ -296,7 +296,7 @@ theorem kleene_closure_set_eq_kleene_closure
 -------------------------------------------------------------------------------
 
 -- Theorem 6
-theorem kleene_closure_eq_eps_union_concat_kleene_closure
+theorem kleene_closure_eq_eps_union_concat_language_kleene_closure
   {α : Type}
   (L : Language α) :
   (kleene_closure α L) = {[]} ∪ (concat L (kleene_closure α L)) :=
@@ -340,7 +340,8 @@ theorem kleene_closure_eq_eps_union_concat_kleene_closure
         exact exp_subset_kleene_closure L (i + 1) s1
 
 
-theorem corollary_1
+-- Corollary 1
+theorem eps_mem_imp_kleene_closure_eq_concat_kleene_closure_left
   {α : Type}
   (L : Language α)
   (h1 : [] ∈ L) :
@@ -356,7 +357,7 @@ theorem corollary_1
       · exact h1
       · exact kleene_closure.eps L
 
-    obtain s2 := kleene_closure_eq_eps_union_concat_kleene_closure L
+    obtain s2 := kleene_closure_eq_eps_union_concat_language_kleene_closure L
     simp only [s1] at s2
     exact s2
 
@@ -419,7 +420,8 @@ lemma concat_kleene_closure_succ_right
       exact ⟨s, ⟨i, hs⟩, t, ht, eq⟩
 
 
-theorem thm_7
+-- Theorem 7
+theorem concat_kleene_closure_comm
   {α : Type}
   (L : Language α) :
   concat L (kleene_closure α L) = concat (kleene_closure α L) L :=
@@ -464,7 +466,7 @@ theorem corollary_2
     calc
       kleene_closure α L = kleene_closure α (kleene_closure α L) := thm_8 L
 
-      _ = {[]} ∪ (concat (kleene_closure α L) (kleene_closure α (kleene_closure α L))) := kleene_closure_eq_eps_union_concat_kleene_closure (kleene_closure α L)
+      _ = {[]} ∪ (concat (kleene_closure α L) (kleene_closure α (kleene_closure α L))) := kleene_closure_eq_eps_union_concat_language_kleene_closure (kleene_closure α L)
 
       _ = concat (kleene_closure α L) (kleene_closure α (kleene_closure α L)) := s1
 
@@ -482,7 +484,7 @@ theorem thm_9
       X = concat (kleene_closure α L1) L2 := h1
 
       _ = concat ({[]} ∪ concat L1 (kleene_closure α L1)) L2 :=
-        by simp only [← kleene_closure_eq_eps_union_concat_kleene_closure]
+        by simp only [← kleene_closure_eq_eps_union_concat_language_kleene_closure]
 
       _ = concat ((concat L1 (kleene_closure α L1)) ∪ {[]}) L2 :=
         by
