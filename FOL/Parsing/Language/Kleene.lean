@@ -430,8 +430,10 @@ theorem concat_kleene_closure_comm
     simp only [concat_kleene_closure_succ_left]
     simp only [concat_kleene_closure_succ_right]
 
+-------------------------------------------------------------------------------
 
-theorem thm_8
+-- Theorem 8
+theorem kleene_closure_idempotent
   {α : Type}
   (L : Language α) :
   kleene_closure α L = kleene_closure α (kleene_closure α L) :=
@@ -447,7 +449,8 @@ theorem thm_8
         exact append_kleene_closure_closed L s t ih_3 ih_2
 
 
-theorem corollary_2
+-- Corollary 2
+theorem kleene_closure_eq_concat_kleene_closure_kleene_closure
   {α : Type}
   (L : Language α) :
   kleene_closure α L =
@@ -464,17 +467,19 @@ theorem corollary_2
         · exact kleene_closure.eps (kleene_closure α L)
 
     calc
-      kleene_closure α L = kleene_closure α (kleene_closure α L) := thm_8 L
+      kleene_closure α L = kleene_closure α (kleene_closure α L) := kleene_closure_idempotent L
 
       _ = {[]} ∪ (concat (kleene_closure α L) (kleene_closure α (kleene_closure α L))) := kleene_closure_eq_eps_union_concat_language_kleene_closure (kleene_closure α L)
 
       _ = concat (kleene_closure α L) (kleene_closure α (kleene_closure α L)) := s1
 
       _ = concat (kleene_closure α L) (kleene_closure α L) :=
-        by simp only [← thm_8]
+        by simp only [← kleene_closure_idempotent]
 
+-------------------------------------------------------------------------------
 
-theorem thm_9
+-- Theorem 9
+theorem Ardens_rule
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = concat (kleene_closure α L1) L2) :
@@ -500,7 +505,7 @@ theorem thm_9
         by simp only [h1]
 
 
-lemma thm_9_unique_left_aux
+lemma Ardens_rule_unique_left_aux
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = (concat L1 X) ∪ L2) :
@@ -532,7 +537,7 @@ lemma thm_9_unique_left_aux
       · exact s2
 
 
-theorem thm_9_unique_left
+theorem Ardens_rule_unique_left
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = (concat L1 X) ∪ L2) :
@@ -545,14 +550,14 @@ theorem thm_9_unique_left
     simp at a1
     obtain ⟨s, ⟨i, hs⟩, t, ht, eq⟩ := a1
     rw [← eq]
-    obtain s1 := thm_9_unique_left_aux L1 L2 X h1 i
+    obtain s1 := Ardens_rule_unique_left_aux L1 L2 X h1 i
     apply Set.mem_of_subset_of_mem s1
     simp only [concat]
     simp
     exact ⟨s, hs, t, ht, rfl⟩
 
 
-theorem thm_9_unique_right
+theorem Ardens_rule_unique_right
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = (concat L1 X) ∪ L2)
@@ -577,7 +582,7 @@ theorem thm_9_unique_right
           intro contra
           simp only [contra] at hs
           contradiction
-        have IH := thm_9_unique_right L1 L2 X h1 h2 ht
+        have IH := Ardens_rule_unique_right L1 L2 X h1 h2 ht
         simp only [concat] at IH
         simp at IH
         obtain ⟨s', hs', t', ht', eq'⟩ := IH
@@ -603,10 +608,10 @@ theorem thm_9_unique_right
 termination_by x => x.length
 
 
-theorem thm_9_unique
+theorem Ardens_rule_unique
   {α : Type}
   (L1 L2 X : Language α)
   (h1 : X = (concat L1 X) ∪ L2)
   (h2 : [] ∉ L1) :
   concat (kleene_closure α L1) L2 = X :=
-  Set.eq_of_subset_of_subset (thm_9_unique_left L1 L2 X h1) (thm_9_unique_right L1 L2 X h1 h2)
+  Set.eq_of_subset_of_subset (Ardens_rule_unique_left L1 L2 X h1) (Ardens_rule_unique_right L1 L2 X h1 h2)
