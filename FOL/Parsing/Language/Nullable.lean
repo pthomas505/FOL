@@ -35,6 +35,28 @@ def Language.nullify
   else ∅
 
 
+lemma is_nullable_iff_nullify_eq_eps_singleton
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α) :
+  L.is_nullable ↔ L.nullify = {[]} :=
+  by
+    simp only [Language.is_nullable]
+    simp only [Language.nullify]
+    constructor
+    · intro a1
+      simp only [a1]
+      simp
+    · intro a1
+      split_ifs at a1
+      case pos c1 =>
+        exact c1
+      case neg c1 =>
+        have s1 : ¬ ({[]} : Language α) = ∅ := Set.singleton_ne_empty []
+        rw [a1] at s1
+        contradiction
+
+
 lemma nullify_empty
   {α : Type}
   [DecidableEq α] :
