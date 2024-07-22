@@ -295,7 +295,8 @@ theorem kleene_closure_set_eq_kleene_closure
 
 -------------------------------------------------------------------------------
 
-theorem thm_6
+-- Theorem 6
+theorem kleene_closure_eq_eps_union_concat_kleene_closure
   {α : Type}
   (L : Language α) :
   (kleene_closure α L) = {[]} ∪ (concat L (kleene_closure α L)) :=
@@ -355,10 +356,11 @@ theorem corollary_1
       · exact h1
       · exact kleene_closure.eps L
 
-    obtain s2 := thm_6 L
+    obtain s2 := kleene_closure_eq_eps_union_concat_kleene_closure L
     simp only [s1] at s2
     exact s2
 
+-------------------------------------------------------------------------------
 
 lemma concat_kleene_closure_succ_left
   {α : Type}
@@ -462,7 +464,7 @@ theorem corollary_2
     calc
       kleene_closure α L = kleene_closure α (kleene_closure α L) := thm_8 L
 
-      _ = {[]} ∪ (concat (kleene_closure α L) (kleene_closure α (kleene_closure α L))) := thm_6 (kleene_closure α L)
+      _ = {[]} ∪ (concat (kleene_closure α L) (kleene_closure α (kleene_closure α L))) := kleene_closure_eq_eps_union_concat_kleene_closure (kleene_closure α L)
 
       _ = concat (kleene_closure α L) (kleene_closure α (kleene_closure α L)) := s1
 
@@ -480,7 +482,7 @@ theorem thm_9
       X = concat (kleene_closure α L1) L2 := h1
 
       _ = concat ({[]} ∪ concat L1 (kleene_closure α L1)) L2 :=
-        by simp only [← thm_6]
+        by simp only [← kleene_closure_eq_eps_union_concat_kleene_closure]
 
       _ = concat ((concat L1 (kleene_closure α L1)) ∪ {[]}) L2 :=
         by
