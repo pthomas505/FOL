@@ -330,6 +330,7 @@ lemma concat_subset_right
     · exact h1
     · rfl
 
+-------------------------------------------------------------------------------
 
 lemma exists_mem_concat_str_length_gt_mem_left
   {α : Type}
