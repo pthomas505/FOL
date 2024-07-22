@@ -129,9 +129,9 @@ lemma language_subset_kleene_closure
 lemma mem_language_mem_kleene_closure
   {α : Type}
   (L : Language α)
-  (x : Str α)
-  (h1 : x ∈ L) :
-  x ∈ kleene_closure α L :=
+  (s : Str α)
+  (h1 : s ∈ L) :
+  s ∈ kleene_closure α L :=
   by
     obtain s1 := language_subset_kleene_closure L
     exact Set.mem_of_subset_of_mem s1 h1
@@ -218,11 +218,11 @@ theorem append_kleene_closure_closed
 
 -------------------------------------------------------------------------------
 
--- Each l is the concatenation of a list of strings, each of which is in L.
+-- Each s is the concatenation of a list of strings, each of which is in L.
 def kleene_closure_set
   (α : Type)
   (L : Language α) :=
-  { l | ∃ M : List (Str α), (∀ (r : Str α), r ∈ M → r ∈ L) ∧ l = M.join }
+  { s : Str α | ∃ M : List (Str α), (∀ (r : Str α), r ∈ M → r ∈ L) ∧ s = M.join }
 
 
 lemma kleene_closure_set_eq_kleene_closure_left
