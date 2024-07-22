@@ -44,7 +44,7 @@ lemma nullify_empty
     simp
 
 
-example
+lemma nullify_eps
   {α : Type}
   [DecidableEq α] :
   Language.nullify ({[]} : Language α) = {[]} :=
@@ -53,18 +53,7 @@ example
     simp
 
 
-example
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α) :
-  Language.nullify (kleene_closure α L) = {[]} :=
-  by
-    simp only [Language.nullify]
-    simp only [eps_mem_kleene_closure]
-    simp
-
-
-example
+lemma nullify_union
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α) :
@@ -83,7 +72,7 @@ example
       tauto
 
 
-example
+lemma nullify_intersection
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α) :
@@ -102,7 +91,7 @@ example
       tauto
 
 
-example
+lemma nullify_concat
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α) :
@@ -137,7 +126,18 @@ example
       · exact ht_left
 
 
-example
+lemma nullify_kleene_closure
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α) :
+  Language.nullify (kleene_closure α L) = {[]} :=
+  by
+    simp only [Language.nullify]
+    simp only [eps_mem_kleene_closure]
+    simp
+
+
+lemma nullify_complement_empty
   {α : Type}
   [DecidableEq α]
   (L : Language α)
@@ -152,7 +152,7 @@ example
     contradiction
 
 
-example
+lemma nullify_complement_eps
   {α : Type}
   [DecidableEq α]
   (L : Language α)
