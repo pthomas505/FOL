@@ -39,7 +39,7 @@ inductive IsRegLang (α : Type) : Language α → Prop
   IsRegLang α (kleene_closure α R)
 
 
-theorem thm_17_aux
+theorem derivative_of_reg_lang_wrt_char_is_reg_lang
   {α : Type}
   [DecidableEq α]
   (R : Language α)
@@ -85,7 +85,7 @@ theorem thm_17_aux
       · exact IsRegLang.closure R' ih_1
 
 
-theorem thm_17
+theorem derivative_of_reg_lang_wrt_str_is_reg_lang
   {α : Type}
   [DecidableEq α]
   (R : Language α)
@@ -105,7 +105,7 @@ theorem thm_17
 
       rw [derivative_wrt_append]
       apply ih
-      apply thm_17_aux
+      apply derivative_of_reg_lang_wrt_char_is_reg_lang
       exact h1
 
 
