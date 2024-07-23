@@ -79,7 +79,7 @@ theorem thm_17_aux
             exact IsRegLang.zero
         · exact ih_4
     case closure R' ih_1 ih_2 =>
-      simp only [thm_12_8]
+      simp only [derivative_kleene_closure_char]
       apply IsRegLang.concat
       · exact ih_2
       · exact IsRegLang.closure R' ih_1
@@ -189,9 +189,9 @@ example
     clear s1
 
     simp only [derivative_append]
-    rw [thm_12_8]
+    rw [derivative_kleene_closure_char]
     rw [derivative_concat_char]
-    rw [thm_12_8]
+    rw [derivative_kleene_closure_char]
 
 
 example
@@ -218,17 +218,17 @@ example
     clear s2
 
     simp only [derivative_append]
-    rw [thm_12_8]
+    rw [derivative_kleene_closure_char]
     rw [derivative_concat_char]
-    rw [thm_12_8]
+    rw [derivative_kleene_closure_char]
     -----
 
     rw [derivative_union_char]
     simp only [derivative_concat_char]
-    rw [thm_12_8]
+    rw [derivative_kleene_closure_char]
 
     simp only [nullify_idempotent]
-    simp only [derivative_of_nullify]
+    simp only [derivative_nullify_char]
     simp only [concat_empty_left]
     simp
     simp only [← derivative_append]
@@ -255,9 +255,9 @@ example
     clear s1
 
     simp only [derivative_append]
-    simp only [thm_12_8, derivative_concat_char, derivative_union_char]
+    simp only [derivative_kleene_closure_char, derivative_concat_char, derivative_union_char]
     simp only [nullify_idempotent]
-    simp only [derivative_of_nullify]
+    simp only [derivative_nullify_char]
     simp only [derivative_empty_char]
     simp only [concat_empty_left]
     simp
@@ -290,7 +290,7 @@ example
 
       simp only [derivative_append]
       simp
-      simp only [thm_12_8]
+      simp only [derivative_kleene_closure_char]
       by_cases c1 : tl = []
       case pos =>
         subst c1

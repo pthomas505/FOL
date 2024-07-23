@@ -441,7 +441,7 @@ lemma aux_2
 
 
 -- 1.57
-theorem thm_12_8
+theorem derivative_kleene_closure_char
   {α : Type}
   [DecidableEq α]
   (L : Language α)
@@ -461,7 +461,7 @@ theorem thm_12_8
 
 
 -- 1.58
-theorem thm_12_9
+theorem derivative_complement_char
   {α : Type}
   [DecidableEq α]
   (L : Language α)
@@ -470,7 +470,7 @@ theorem thm_12_9
   -- Why is this proof so short?
 
 
-theorem thm_13
+theorem str_mem_lang_iff_eps_mem_derivative
   {α : Type}
   [DecidableEq α]
   (L : Language α)
@@ -481,14 +481,14 @@ theorem thm_13
     simp
 
 
-theorem corollary_3
+theorem str_mem_lang_iff_nullify_derivative_eq_eps
   {α : Type}
   [DecidableEq α]
   (L : Language α)
   (s : Str α) :
-  (derivative L s).nullify = {[]} ↔ s ∈ L :=
+  s ∈ L ↔ (derivative L s).nullify = {[]} :=
   by
-    simp only [thm_13 L]
+    simp only [str_mem_lang_iff_eps_mem_derivative L]
     simp only [Language.nullify]
 
     split_ifs
@@ -565,7 +565,7 @@ theorem thm_14_disjoint
     contradiction
 
 
-lemma derivative_of_nullify
+lemma derivative_nullify_char
   {α : Type}
   [DecidableEq α]
   (L : Language α)
