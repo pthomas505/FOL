@@ -267,7 +267,7 @@ theorem concat_distrib_s_union_right
       exact ⟨s, ⟨M, hM, hs⟩, t, ht, eq⟩
 
 
-lemma aux_2
+lemma concat_distrib_countable_union_left
   {α : Type}
   [DecidableEq α]
   (L : Language α)
@@ -286,6 +286,7 @@ lemma aux_2
       obtain ⟨s, hs, t, ⟨i, ht⟩, eq⟩ := a1
       rw [← eq]
       exact ⟨i, s, hs, t, ht, rfl⟩
+
 
 theorem concat_distrib_union_left
   {α : Type}

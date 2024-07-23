@@ -436,7 +436,7 @@ theorem derivative_of_kleene_closure_wrt_char
     simp only [Set.empty_union]
     simp only [← derivative_distrib_union_of_countable_wrt_char]
     simp only [derivative_of_exp_succ_wrt_char]
-    simp only [aux_2]
+    simp only [concat_distrib_countable_union_left]
     simp only [kleene_closure_eq_union_exp]
 
 
