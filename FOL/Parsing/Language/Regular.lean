@@ -52,22 +52,22 @@ theorem thm_17_aux
       by_cases c1 : a = b
       case pos =>
         rw [c1]
-        simp only [derivative_char_wrt_eq_char]
+        simp only [derivative_of_char_wrt_eq_char]
         exact IsRegLang.epsilon
       case neg =>
-        simp only [derivative_char_wrt_ne_char a b c1]
+        simp only [derivative_of_char_wrt_ne_char a b c1]
         exact IsRegLang.zero
     case epsilon =>
-      simp only [derivative_eps_wrt_char]
+      simp only [derivative_of_eps_wrt_char]
       exact IsRegLang.zero
     case zero =>
-      simp only [derivative_empty_wrt_char]
+      simp only [derivative_of_empty_wrt_char]
       exact IsRegLang.zero
     case union R1 R2 ih_1 ih_2 ih_3 ih_4 =>
-      simp only [derivative_union_char]
+      simp only [derivative_of_union_wrt_char]
       exact IsRegLang.union (derivative R1 [a]) (derivative R2 [a]) ih_3 ih_4
     case concat R1 R2 ih_1 ih_2 ih_3 ih_4 =>
-      simp only [derivative_concat_char]
+      simp only [derivative_of_concat_wrt_char]
       apply IsRegLang.union
       · exact IsRegLang.concat (derivative R1 [a]) R2 ih_3 ih_2
       · apply IsRegLang.concat
@@ -79,7 +79,7 @@ theorem thm_17_aux
             exact IsRegLang.zero
         · exact ih_4
     case closure R' ih_1 ih_2 =>
-      simp only [derivative_kleene_closure_char]
+      simp only [derivative_of_kleene_closure_wrt_char]
       apply IsRegLang.concat
       · exact ih_2
       · exact IsRegLang.closure R' ih_1
@@ -144,7 +144,7 @@ example
   (a : α) :
   derivative {[a]} [a] = {[]} :=
   by
-    exact derivative_char_wrt_eq_char a
+    exact derivative_of_char_wrt_eq_char a
 
 example
   {α : Type}
@@ -189,9 +189,9 @@ example
     clear s1
 
     simp only [derivative_wrt_append]
-    rw [derivative_kleene_closure_char]
-    rw [derivative_concat_char]
-    rw [derivative_kleene_closure_char]
+    rw [derivative_of_kleene_closure_wrt_char]
+    rw [derivative_of_concat_wrt_char]
+    rw [derivative_of_kleene_closure_wrt_char]
 
 
 example
@@ -218,14 +218,14 @@ example
     clear s2
 
     simp only [derivative_wrt_append]
-    rw [derivative_kleene_closure_char]
-    rw [derivative_concat_char]
-    rw [derivative_kleene_closure_char]
+    rw [derivative_of_kleene_closure_wrt_char]
+    rw [derivative_of_concat_wrt_char]
+    rw [derivative_of_kleene_closure_wrt_char]
     -----
 
-    rw [derivative_union_char]
-    simp only [derivative_concat_char]
-    rw [derivative_kleene_closure_char]
+    rw [derivative_of_union_wrt_char]
+    simp only [derivative_of_concat_wrt_char]
+    rw [derivative_of_kleene_closure_wrt_char]
 
     simp only [nullify_idempotent]
     simp only [derivative_nullify_char]
@@ -255,10 +255,10 @@ example
     clear s1
 
     simp only [derivative_wrt_append]
-    simp only [derivative_kleene_closure_char, derivative_concat_char, derivative_union_char]
+    simp only [derivative_of_kleene_closure_wrt_char, derivative_of_concat_wrt_char, derivative_of_union_wrt_char]
     simp only [nullify_idempotent]
     simp only [derivative_nullify_char]
-    simp only [derivative_empty_wrt_char]
+    simp only [derivative_of_empty_wrt_char]
     simp only [concat_empty_left]
     simp
     simp only [nullify_empty]
@@ -290,7 +290,7 @@ example
 
       simp only [derivative_wrt_append]
       simp
-      simp only [derivative_kleene_closure_char]
+      simp only [derivative_of_kleene_closure_wrt_char]
       by_cases c1 : tl = []
       case pos =>
         subst c1

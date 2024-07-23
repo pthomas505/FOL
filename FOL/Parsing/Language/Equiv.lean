@@ -133,8 +133,8 @@ theorem thm_16_2
   L_equiv (L1 ∪ L2) s t :=
   by
     simp only [L_equiv_iff_deriv_eq] at *
-    rw [derivative_union_str L1 L2 s]
-    rw [derivative_union_str L1 L2 t]
+    rw [derivative_of_union_wrt_str L1 L2 s]
+    rw [derivative_of_union_wrt_str L1 L2 t]
     rw [h1]
     rw [h2]
 
@@ -149,7 +149,7 @@ theorem thm_16_3
   L_equiv (L1 ∩ L2) s t :=
   by
     simp only [L_equiv_iff_deriv_eq] at *
-    rw [derivative_intersection_str L1 L2 s]
-    rw [derivative_intersection_str L1 L2 t]
+    rw [derivative_of_intersection_wrt_str L1 L2 s]
+    rw [derivative_of_intersection_wrt_str L1 L2 t]
     rw [h1]
     rw [h2]

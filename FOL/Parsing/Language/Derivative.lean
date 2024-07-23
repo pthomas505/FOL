@@ -44,7 +44,7 @@ theorem derivative_wrt_append
 -- [a] ∈ Σ^1
 
 -- 1.50
-theorem derivative_empty_wrt_char
+theorem derivative_of_empty_wrt_char
   {α : Type}
   (a : α) :
   derivative ∅ [a] = ∅ :=
@@ -53,7 +53,7 @@ theorem derivative_empty_wrt_char
     simp
 
 
-theorem derivative_empty_wrt_str
+theorem derivative_of_empty_wrt_str
   {α : Type}
   (s : Str α) :
   derivative ∅ s = ∅ :=
@@ -63,7 +63,7 @@ theorem derivative_empty_wrt_str
 
 
 -- 1.51
-theorem derivative_eps_wrt_char
+theorem derivative_of_eps_wrt_char
   {α : Type}
   (a : α) :
   derivative {[]} [a] = ∅ :=
@@ -73,7 +73,7 @@ theorem derivative_eps_wrt_char
 
 
 -- 1.52
-theorem derivative_char_wrt_eq_char
+theorem derivative_of_char_wrt_eq_char
   {α : Type}
   (a : α) :
   derivative {[a]} [a] = {[]} :=
@@ -82,7 +82,7 @@ theorem derivative_char_wrt_eq_char
     simp
 
 
-theorem derivative_str_wrt_eq_str
+theorem derivative_of_str_wrt_eq_str
   {α : Type}
   (s : Str α) :
   derivative {s} s = {[]} :=
@@ -92,7 +92,7 @@ theorem derivative_str_wrt_eq_str
 
 
 -- 1.53
-theorem derivative_char_wrt_ne_char
+theorem derivative_of_char_wrt_ne_char
   {α : Type}
   (a b : α)
   (h1 : ¬ a = b) :
@@ -105,7 +105,7 @@ theorem derivative_char_wrt_ne_char
 
 
 -- 1.54
-theorem derivative_union_char
+theorem derivative_of_union_wrt_char
   {α : Type}
   (L1 L2 : Language α)
   (a : α) :
@@ -116,7 +116,7 @@ theorem derivative_union_char
     rfl
 
 
-theorem derivative_union_str
+theorem derivative_of_union_wrt_str
   {α : Type}
   (L1 L2 : Language α)
   (s : Str α) :
@@ -128,7 +128,7 @@ theorem derivative_union_str
 
 
 -- 1.55
-theorem derivative_intersection_char
+theorem derivative_of_intersection_wrt_char
   {α : Type}
   (L1 L2 : Language α)
   (a : α) :
@@ -139,7 +139,7 @@ theorem derivative_intersection_char
     rfl
 
 
-theorem derivative_intersection_str
+theorem derivative_of_intersection_wrt_str
   {α : Type}
   (L1 L2 : Language α)
   (s : Str α) :
@@ -153,7 +153,7 @@ theorem derivative_intersection_str
 /-
   If [] ∈ L1 then let L0 be L1 \ {[]}. If [] ∉ L1 then let L0 be L1.
 -/
-lemma lang_as_union_nullify_and_not_nullable
+lemma lang_as_union_of_nullify_and_not_nullable
   {α : Type}
   [DecidableEq α]
   (L1 : Language α) :
@@ -172,7 +172,7 @@ lemma lang_as_union_nullify_and_not_nullable
       exact c1
 
 
-lemma concat_nullify_derivative_char
+lemma concat_nullify_derivative_wrt_char
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -207,7 +207,7 @@ lemma concat_nullify_derivative_char
         simp at hs
 
 
-lemma concat_nullify_derivative_str
+lemma concat_nullify_derivative_wrt_str
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -275,7 +275,7 @@ lemma thm_12_7_3
 
 
 -- 1.56
-theorem derivative_concat_char
+theorem derivative_of_concat_wrt_char
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -303,7 +303,7 @@ theorem derivative_concat_char
 
       _ = (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
       by
-        obtain s3_1 := concat_nullify_derivative_char L1 L2 a
+        obtain s3_1 := concat_nullify_derivative_wrt_char L1 L2 a
         simp only [s3_1]
         obtain s3_2 := thm_12_7_3 L0 L2 a a1
         simp only [s3_2]
@@ -325,7 +325,7 @@ theorem derivative_concat_char
       simp only [Language.nullify]
       simp
 
-    obtain s3 := lang_as_union_nullify_and_not_nullable L1
+    obtain s3 := lang_as_union_of_nullify_and_not_nullable L1
     cases s3
     case _ L0 a1 =>
       cases a1
@@ -339,7 +339,7 @@ theorem derivative_concat_char
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
 
 
-theorem derivative_concat_str
+theorem derivative_of_concat_wrt_str
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -362,7 +362,7 @@ theorem derivative_concat_str
 
 
 -- 1.59
-lemma derivative_exp_succ
+lemma derivative_of_exp_succ_wrt_char
   {α : Type}
   [DecidableEq α]
   (L : Language α)
@@ -380,7 +380,7 @@ lemma derivative_exp_succ
     case succ k ih =>
       rw [exp]
       simp only [concat_exp_comm]
-      simp only [derivative_concat_char]
+      simp only [derivative_of_concat_wrt_char]
       simp only [Language.nullify]
       split_ifs
       case pos c1 =>
@@ -442,7 +442,7 @@ lemma aux_2
 
 
 -- 1.57
-theorem derivative_kleene_closure_char
+theorem derivative_of_kleene_closure_wrt_char
   {α : Type}
   [DecidableEq α]
   (L : Language α)
@@ -451,18 +451,18 @@ theorem derivative_kleene_closure_char
   by
     conv => left; simp only [kleene_closure_eq_union_exp]
     simp only [← Set.union_iUnion_nat_succ (exp L)]
-    simp only [derivative_union_char]
+    simp only [derivative_of_union_wrt_char]
     simp only [exp_zero]
-    simp only [derivative_eps_wrt_char]
+    simp only [derivative_of_eps_wrt_char]
     simp only [Set.empty_union]
     simp only [← aux_1]
-    simp only [derivative_exp_succ]
+    simp only [derivative_of_exp_succ_wrt_char]
     simp only [aux_2]
     simp only [kleene_closure_eq_union_exp]
 
 
 -- 1.58
-theorem derivative_complement_char
+theorem derivative_of_complement_wrt_char
   {α : Type}
   [DecidableEq α]
   (L : Language α)
