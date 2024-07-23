@@ -52,10 +52,10 @@ theorem thm_17_aux
       by_cases c1 : a = b
       case pos =>
         rw [c1]
-        simp only [derivative_of_char_wrt_eq_char]
+        simp only [derivative_of_char_wrt_same_char]
         exact IsRegLang.epsilon
       case neg =>
-        simp only [derivative_of_char_wrt_ne_char a b c1]
+        simp only [derivative_of_char_wrt_diff_char a b c1]
         exact IsRegLang.zero
     case epsilon =>
       simp only [derivative_of_eps_wrt_char]
@@ -144,7 +144,7 @@ example
   (a : α) :
   derivative {[a]} [a] = {[]} :=
   by
-    exact derivative_of_char_wrt_eq_char a
+    exact derivative_of_char_wrt_same_char a
 
 example
   {α : Type}

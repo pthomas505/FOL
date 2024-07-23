@@ -73,7 +73,7 @@ theorem derivative_of_eps_wrt_char
 
 
 -- 1.52
-theorem derivative_of_char_wrt_eq_char
+theorem derivative_of_char_wrt_same_char
   {α : Type}
   (a : α) :
   derivative {[a]} [a] = {[]} :=
@@ -82,7 +82,7 @@ theorem derivative_of_char_wrt_eq_char
     simp
 
 
-theorem derivative_of_str_wrt_eq_str
+theorem derivative_of_str_wrt_same_str
   {α : Type}
   (s : Str α) :
   derivative {s} s = {[]} :=
@@ -92,7 +92,7 @@ theorem derivative_of_str_wrt_eq_str
 
 
 -- 1.53
-theorem derivative_of_char_wrt_ne_char
+theorem derivative_of_char_wrt_diff_char
   {α : Type}
   (a b : α)
   (h1 : ¬ a = b) :
