@@ -274,7 +274,7 @@ lemma thm_12_7_3
 
 
 -- 1.56
-theorem thm_12_7
+theorem derivative_concat_char
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -379,7 +379,7 @@ lemma derivative_exp_succ
     case succ k ih =>
       rw [exp]
       simp only [concat_exp_comm]
-      simp only [thm_12_7]
+      simp only [derivative_concat_char]
       simp only [Language.nullify]
       split_ifs
       case pos c1 =>

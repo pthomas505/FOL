@@ -67,7 +67,7 @@ theorem thm_17_aux
       simp only [derivative_union_char]
       exact IsRegLang.union (derivative R1 [a]) (derivative R2 [a]) ih_3 ih_4
     case concat R1 R2 ih_1 ih_2 ih_3 ih_4 =>
-      simp only [thm_12_7]
+      simp only [derivative_concat_char]
       apply IsRegLang.union
       · exact IsRegLang.concat (derivative R1 [a]) R2 ih_3 ih_2
       · apply IsRegLang.concat
@@ -190,7 +190,7 @@ example
 
     simp only [derivative_append]
     rw [thm_12_8]
-    rw [thm_12_7]
+    rw [derivative_concat_char]
     rw [thm_12_8]
 
 
@@ -219,12 +219,12 @@ example
 
     simp only [derivative_append]
     rw [thm_12_8]
-    rw [thm_12_7]
+    rw [derivative_concat_char]
     rw [thm_12_8]
     -----
 
     rw [derivative_union_char]
-    simp only [thm_12_7]
+    simp only [derivative_concat_char]
     rw [thm_12_8]
 
     simp only [nullify_idempotent]
@@ -255,7 +255,7 @@ example
     clear s1
 
     simp only [derivative_append]
-    simp only [thm_12_8, thm_12_7, derivative_union_char]
+    simp only [thm_12_8, derivative_concat_char, derivative_union_char]
     simp only [nullify_idempotent]
     simp only [derivative_of_nullify]
     simp only [derivative_empty_char]
