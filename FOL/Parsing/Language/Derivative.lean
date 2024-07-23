@@ -150,28 +150,6 @@ theorem derivative_of_intersection_wrt_str
     rfl
 
 
-/-
-  If [] ∈ L1 then let L0 be L1 \ {[]}. If [] ∉ L1 then let L0 be L1.
--/
-lemma lang_as_union_of_nullify_and_not_nullable
-  {α : Type}
-  [DecidableEq α]
-  (L1 : Language α) :
-  ∃ (L0 : Language α), L0.nullify = ∅ ∧ L1 = L1.nullify ∪ L0 :=
-  by
-    simp only [Language.nullify]
-    split_ifs
-    case pos c1 =>
-      simp
-      apply Exists.intro (L1 \ {[]})
-      simp
-      symm
-      exact Set.insert_eq_of_mem c1
-    case neg c1 =>
-      simp
-      exact c1
-
-
 lemma concat_nullify_and_derivative_wrt_char
   {α : Type}
   [DecidableEq α]
