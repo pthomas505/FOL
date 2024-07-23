@@ -24,7 +24,7 @@ set_option autoImplicit false
 abbrev Str (α : Type) : Type := List α
 
 
-namespace Strings
+namespace String
 
 
 /-
@@ -283,6 +283,3 @@ def is_proper_suffix_of
   (s u : Str α) :
   Prop :=
   ∃ (t : Str α), s = t ++ u ∧ ¬ t.isEmpty
-
-
-end Strings

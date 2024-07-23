@@ -7,7 +7,7 @@ set_option autoImplicit false
 -- https://arxiv.org/pdf/1907.13577
 
 
-namespace Languages
+namespace Language
 
 
 /-

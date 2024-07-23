@@ -9,7 +9,7 @@ set_option autoImplicit false
 -- https://arxiv.org/pdf/1907.13577
 
 
-namespace Languages
+namespace Language
 
 
 /-
@@ -22,11 +22,11 @@ abbrev Language (α : Type) : Type := Set (Str α)
 example
   (α : Type)
   (L : Language α) :
-  L ⊆ Strings.kleene_closure α :=
+  L ⊆ String.kleene_closure α :=
   by
     simp only [Set.subset_def]
     intro cs _
-    exact Strings.str_mem_kleene_closure cs
+    exact String.str_mem_kleene_closure cs
 
 
 lemma eps_not_mem_str_length_gt_zero
@@ -346,7 +346,7 @@ lemma exists_mem_concat_str_length_gt_mem_left
     constructor
     · apply append_mem_concat L M s t h1 a1
     · have s1 : ¬ t = [] := ne_of_mem_of_not_mem a1 h3
-      exact Strings.str_append_length_right s t s1
+      exact String.str_append_length_right s t s1
 
 
 lemma exists_mem_concat_str_length_gt_mem_right
@@ -363,7 +363,7 @@ lemma exists_mem_concat_str_length_gt_mem_right
     constructor
     · apply append_mem_concat L M s t a1 h1
     · have s1 : ¬ s = [] := ne_of_mem_of_not_mem a1 h3
-      exact Strings.str_append_length_left s t s1
+      exact String.str_append_length_left s t s1
 
 
 lemma exists_mem_left_str_length_lt_concat
