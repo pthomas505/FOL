@@ -299,8 +299,17 @@ example
         simp
         rw [derivative_wrt_eps]
       case neg =>
-        specialize ih L c1
-        obtain ⟨T, ⟨a1, a2, a3⟩⟩ := ih
+        have s1 :
+          ∀ (L : Language α),
+            ∃ T ⊆ tl.tails,
+              [] ∉ T ∧
+                derivative (kleene_closure α L) tl =
+                  ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
+        by
+          intro L'
+          apply ih L' c1
+        clear ih
+        obtain ⟨T, hT, a1, a2⟩ := s1 L
         sorry
 
 
