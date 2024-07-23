@@ -338,7 +338,7 @@ theorem derivative_concat_char
         exact Set.union_comm (concat L1.nullify (derivative L2 [a])) (concat (derivative L0 [a]) L2)
 
 
-theorem thm_12_7_str
+theorem derivative_concat_str
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
