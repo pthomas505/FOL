@@ -228,7 +228,7 @@ example
     rw [derivative_of_kleene_closure_wrt_char]
 
     simp only [nullify_idempotent]
-    simp only [derivative_nullify_char]
+    simp only [derivative_of_nullify_wrt_char]
     simp only [concat_empty_left]
     simp
     simp only [← derivative_wrt_append]
@@ -257,7 +257,7 @@ example
     simp only [derivative_wrt_append]
     simp only [derivative_of_kleene_closure_wrt_char, derivative_of_concat_wrt_char, derivative_of_union_wrt_char]
     simp only [nullify_idempotent]
-    simp only [derivative_nullify_char]
+    simp only [derivative_of_nullify_wrt_char]
     simp only [derivative_of_empty_wrt_char]
     simp only [concat_empty_left]
     simp

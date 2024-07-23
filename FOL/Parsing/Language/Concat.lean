@@ -374,6 +374,25 @@ lemma concat_subset_right
 
 -------------------------------------------------------------------------------
 
+theorem intersection_concat_char_and_concat_diff_char_eq_empty
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a b : α)
+  (h1 : ¬ b = a) :
+  concat {[a]} L ∩ concat {[b]} L = ∅ :=
+  by
+    ext cs
+    simp only [concat]
+    simp
+    intro s _ a2 t _
+    simp only [← a2]
+    simp
+    intro a4
+    contradiction
+
+-------------------------------------------------------------------------------
+
 lemma exists_mem_concat_str_length_gt_mem_left
   {α : Type}
   (L M : Language α)

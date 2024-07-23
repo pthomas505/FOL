@@ -482,7 +482,7 @@ theorem str_mem_lang_iff_nullify_derivative_eq_eps
       exact id (Ne.symm s1)
 
 
-theorem thm_14
+theorem lang_eq_union_nullify_union_concat_char_derivative_wrt_char
   {α : Type}
   [DecidableEq α]
   (L : Language α) :
@@ -527,25 +527,7 @@ theorem thm_14
         exact a3_left
 
 
-theorem thm_14_disjoint
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α)
-  (a b : α)
-  (h1 : ¬ b = a) :
-  concat {[a]} L ∩ concat {[b]} L = ∅ :=
-  by
-    ext cs
-    simp only [concat]
-    simp
-    intro s _ a2 t _
-    simp only [← a2]
-    simp
-    intro a4
-    contradiction
-
-
-lemma derivative_nullify_char
+lemma derivative_of_nullify_wrt_char
   {α : Type}
   [DecidableEq α]
   (L : Language α)
