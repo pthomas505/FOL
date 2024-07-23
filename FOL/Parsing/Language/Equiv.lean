@@ -47,7 +47,7 @@ lemma L_equiv_iff_deriv_eq
     rfl
 
 
-theorem thm_15_refl
+theorem L_equiv_refl
   {α : Type}
   (L : Language α)
   (s : Str α) :
@@ -56,7 +56,7 @@ theorem thm_15_refl
     rfl
 
 
-theorem thm_15_symm
+theorem L_equiv_symm
   {α : Type}
   (L : Language α)
   (s t : Str α) :
@@ -68,7 +68,7 @@ theorem thm_15_symm
     exact a1
 
 
-theorem thm_15_trans
+theorem L_equiv_trans
   {α : Type}
   (L : Language α)
   (r s t : Str α)
@@ -84,16 +84,16 @@ theorem thm_15_trans
 
 instance (α : Type) (L : Language α) : IsEquiv (Str α) (L_equiv L) :=
   {
-    symm := thm_15_symm L
-    refl := thm_15_refl L
-    trans := thm_15_trans L
+    symm := L_equiv_symm L
+    refl := L_equiv_refl L
+    trans := L_equiv_trans L
   }
 
 theorem L_equivalence
   {α : Type}
   (L : Language α) :
   Equivalence (L_equiv L) :=
-  ⟨ thm_15_refl L, thm_15_symm L _ _, thm_15_trans L _ _ _ ⟩
+  ⟨ L_equiv_refl L, L_equiv_symm L _ _, L_equiv_trans L _ _ _ ⟩
 
 
 def Str.equiv_class
