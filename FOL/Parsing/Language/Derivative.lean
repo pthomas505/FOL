@@ -172,7 +172,7 @@ lemma lang_as_union_of_nullify_and_not_nullable
       exact c1
 
 
-lemma concat_nullify_derivative_wrt_char
+lemma concat_nullify_and_derivative_wrt_char
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -207,7 +207,7 @@ lemma concat_nullify_derivative_wrt_char
         simp at hs
 
 
-lemma concat_nullify_derivative_wrt_str
+lemma concat_nullify_and_derivative_wrt_str
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -242,7 +242,7 @@ lemma concat_nullify_derivative_wrt_str
         simp at hs
 
 
-lemma thm_12_7_3
+lemma derivative_of_concat_wrt_char_aux
   {α : Type}
   [DecidableEq α]
   (L0 L2 : Language α)
@@ -303,9 +303,9 @@ theorem derivative_of_concat_wrt_char
 
       _ = (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
       by
-        obtain s3_1 := concat_nullify_derivative_wrt_char L1 L2 a
+        obtain s3_1 := concat_nullify_and_derivative_wrt_char L1 L2 a
         simp only [s3_1]
-        obtain s3_2 := thm_12_7_3 L0 L2 a a1
+        obtain s3_2 := derivative_of_concat_wrt_char_aux L0 L2 a a1
         simp only [s3_2]
 
       _ = (concat L1.nullify (derivative L2 [a])) ∪ concat {t0 | a :: t0 ∈ L0} L2 :=
@@ -396,7 +396,7 @@ lemma derivative_of_exp_succ_wrt_char
         simp
 
 
-lemma aux_1
+lemma derivative_distrib_union_of_countable_wrt_char
   {α : Type}
   [DecidableEq α]
   (a : α)
@@ -408,7 +408,7 @@ lemma aux_1
     simp
 
 
-lemma aux_1_str
+lemma derivative_distrib_union_of_countable_wrt_str
   {α : Type}
   [DecidableEq α]
   (s : Str α)
@@ -418,27 +418,6 @@ lemma aux_1_str
     simp only [derivative]
     ext cs
     simp
-
-
-lemma aux_2
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α)
-  (f : ℕ → Language α) :
-  ⋃ (n : ℕ), concat L (f n) = concat L (⋃ (n : ℕ), (f n)) :=
-  by
-    simp only [concat]
-    ext cs
-    simp
-    constructor
-    · intro a1
-      obtain ⟨i, s, hs, t, ⟨ht, eq⟩⟩ := a1
-      rw [← eq]
-      exact ⟨s, hs, t, ⟨i, ht⟩, rfl⟩
-    · intro a1
-      obtain ⟨s, hs, t, ⟨i, ht⟩, eq⟩ := a1
-      rw [← eq]
-      exact ⟨i, s, hs, t, ht, rfl⟩
 
 
 -- 1.57
@@ -455,7 +434,7 @@ theorem derivative_of_kleene_closure_wrt_char
     simp only [exp_zero]
     simp only [derivative_of_eps_wrt_char]
     simp only [Set.empty_union]
-    simp only [← aux_1]
+    simp only [← derivative_distrib_union_of_countable_wrt_char]
     simp only [derivative_of_exp_succ_wrt_char]
     simp only [aux_2]
     simp only [kleene_closure_eq_union_exp]

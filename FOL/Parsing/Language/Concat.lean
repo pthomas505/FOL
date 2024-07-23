@@ -267,6 +267,26 @@ theorem concat_distrib_s_union_right
       exact ⟨s, ⟨M, hM, hs⟩, t, ht, eq⟩
 
 
+lemma aux_2
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (f : ℕ → Language α) :
+  ⋃ (n : ℕ), concat L (f n) = concat L (⋃ (n : ℕ), (f n)) :=
+  by
+    simp only [concat]
+    ext cs
+    simp
+    constructor
+    · intro a1
+      obtain ⟨i, s, hs, t, ⟨ht, eq⟩⟩ := a1
+      rw [← eq]
+      exact ⟨s, hs, t, ⟨i, ht⟩, rfl⟩
+    · intro a1
+      obtain ⟨s, hs, t, ⟨i, ht⟩, eq⟩ := a1
+      rw [← eq]
+      exact ⟨i, s, hs, t, ht, rfl⟩
+
 theorem concat_distrib_union_left
   {α : Type}
   (L1 L2 L3 : Language α) :
