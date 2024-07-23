@@ -89,6 +89,7 @@ instance (α : Type) (L : Language α) : IsEquiv (Str α) (L_equiv L) :=
     trans := L_equiv_trans L
   }
 
+
 theorem L_equivalence
   {α : Type}
   (L : Language α) :
@@ -123,7 +124,7 @@ example
     rfl
 
 
-theorem thm_16_2
+theorem L_equiv_union
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -139,7 +140,7 @@ theorem thm_16_2
     rw [h2]
 
 
-theorem thm_16_3
+theorem L_equiv_intersection
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
