@@ -22,7 +22,7 @@ def derivative
   { t : Str α | s ++ t ∈ L }
 
 
-theorem derivative_eps
+theorem derivative_wrt_eps
   {α : Type}
   (L : Language α) :
   derivative L [] = L :=
@@ -30,7 +30,8 @@ theorem derivative_eps
     simp only [derivative]
     simp
 
-theorem derivative_append
+
+theorem derivative_wrt_append
   {α : Type}
   (L : Language α)
   (s t : Str α) :
@@ -43,7 +44,7 @@ theorem derivative_append
 -- [a] ∈ Σ^1
 
 -- 1.50
-theorem derivative_empty_char
+theorem derivative_empty_wrt_char
   {α : Type}
   (a : α) :
   derivative ∅ [a] = ∅ :=
@@ -52,7 +53,7 @@ theorem derivative_empty_char
     simp
 
 
-theorem derivative_empty_str
+theorem derivative_empty_wrt_str
   {α : Type}
   (s : Str α) :
   derivative ∅ s = ∅ :=
@@ -62,7 +63,7 @@ theorem derivative_empty_str
 
 
 -- 1.51
-theorem derivative_eps_char
+theorem derivative_eps_wrt_char
   {α : Type}
   (a : α) :
   derivative {[]} [a] = ∅ :=
@@ -72,7 +73,7 @@ theorem derivative_eps_char
 
 
 -- 1.52
-theorem derivative_char_eq_char
+theorem derivative_char_wrt_eq_char
   {α : Type}
   (a : α) :
   derivative {[a]} [a] = {[]} :=
@@ -81,7 +82,7 @@ theorem derivative_char_eq_char
     simp
 
 
-theorem derivative_str_eq_str
+theorem derivative_str_wrt_eq_str
   {α : Type}
   (s : Str α) :
   derivative {s} s = {[]} :=
@@ -91,7 +92,7 @@ theorem derivative_str_eq_str
 
 
 -- 1.53
-theorem derivative_char_ne_char
+theorem derivative_char_wrt_ne_char
   {α : Type}
   (a b : α)
   (h1 : ¬ a = b) :
@@ -152,7 +153,7 @@ theorem derivative_intersection_str
 /-
   If [] ∈ L1 then let L0 be L1 \ {[]}. If [] ∉ L1 then let L0 be L1.
 -/
-lemma thm_12_7_1
+lemma lang_as_union_nullify_and_not_nullable
   {α : Type}
   [DecidableEq α]
   (L1 : Language α) :
@@ -171,7 +172,7 @@ lemma thm_12_7_1
       exact c1
 
 
-lemma thm_12_7_2
+lemma concat_nullify_derivative_char
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -206,7 +207,7 @@ lemma thm_12_7_2
         simp at hs
 
 
-lemma thm_12_7_2_str
+lemma concat_nullify_derivative_str
   {α : Type}
   [DecidableEq α]
   (L1 L2 : Language α)
@@ -302,7 +303,7 @@ theorem derivative_concat_char
 
       _ = (concat L1.nullify (derivative L2 [a])) ∪ {t | ∃ t0 t2, a :: t0 ∈ L0 ∧ t2 ∈ L2 ∧ t0 ++ t2 = t} :=
       by
-        obtain s3_1 := thm_12_7_2 L1 L2 a
+        obtain s3_1 := concat_nullify_derivative_char L1 L2 a
         simp only [s3_1]
         obtain s3_2 := thm_12_7_3 L0 L2 a a1
         simp only [s3_2]
@@ -324,7 +325,7 @@ theorem derivative_concat_char
       simp only [Language.nullify]
       simp
 
-    obtain s3 := thm_12_7_1 L1
+    obtain s3 := lang_as_union_nullify_and_not_nullable L1
     cases s3
     case _ L0 a1 =>
       cases a1
@@ -452,7 +453,7 @@ theorem derivative_kleene_closure_char
     simp only [← Set.union_iUnion_nat_succ (exp L)]
     simp only [derivative_union_char]
     simp only [exp_zero]
-    simp only [derivative_eps_char]
+    simp only [derivative_eps_wrt_char]
     simp only [Set.empty_union]
     simp only [← aux_1]
     simp only [derivative_exp_succ]
