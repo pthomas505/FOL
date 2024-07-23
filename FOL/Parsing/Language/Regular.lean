@@ -52,19 +52,19 @@ theorem thm_17_aux
       by_cases c1 : a = b
       case pos =>
         rw [c1]
-        simp only [thm_12_3]
+        simp only [derivative_char_eq_char]
         exact IsRegLang.epsilon
       case neg =>
-        simp only [thm_12_4 a b c1]
+        simp only [derivative_char_ne_char a b c1]
         exact IsRegLang.zero
     case epsilon =>
-      simp only [thm_12_2]
+      simp only [derivative_eps_char]
       exact IsRegLang.zero
     case zero =>
-      simp only [thm_12_1]
+      simp only [derivative_empty_char]
       exact IsRegLang.zero
     case union R1 R2 ih_1 ih_2 ih_3 ih_4 =>
-      simp only [thm_12_5]
+      simp only [derivative_union_char]
       exact IsRegLang.union (derivative R1 [a]) (derivative R2 [a]) ih_3 ih_4
     case concat R1 R2 ih_1 ih_2 ih_3 ih_4 =>
       simp only [thm_12_7]
@@ -103,7 +103,7 @@ theorem thm_17
       rw [s1]
       clear s1
 
-      rw [thm_11_b]
+      rw [derivative_append]
       apply ih
       apply thm_17_aux
       exact h1
@@ -144,7 +144,7 @@ example
   (a : α) :
   derivative {[a]} [a] = {[]} :=
   by
-    exact thm_12_3 a
+    exact derivative_char_eq_char a
 
 example
   {α : Type}
@@ -188,7 +188,7 @@ example
     rw [s1]
     clear s1
 
-    simp only [thm_11_b]
+    simp only [derivative_append]
     rw [thm_12_8]
     rw [thm_12_7]
     rw [thm_12_8]
@@ -209,7 +209,7 @@ example
     rw [s1]
     clear s1
 
-    rw [thm_11_b]
+    rw [derivative_append]
     simp
 
     -----
@@ -217,13 +217,13 @@ example
     rw [s2]
     clear s2
 
-    simp only [thm_11_b]
+    simp only [derivative_append]
     rw [thm_12_8]
     rw [thm_12_7]
     rw [thm_12_8]
     -----
 
-    rw [thm_12_5]
+    rw [derivative_union_char]
     simp only [thm_12_7]
     rw [thm_12_8]
 
@@ -231,7 +231,7 @@ example
     simp only [derivative_of_nullify]
     simp only [concat_empty_left]
     simp
-    simp only [← thm_11_b]
+    simp only [← derivative_append]
     simp
 
 
@@ -254,17 +254,17 @@ example
     rw [s1]
     clear s1
 
-    simp only [thm_11_b]
-    simp only [thm_12_8, thm_12_7, thm_12_5]
+    simp only [derivative_append]
+    simp only [thm_12_8, thm_12_7, derivative_union_char]
     simp only [nullify_idempotent]
     simp only [derivative_of_nullify]
-    simp only [thm_12_1]
+    simp only [derivative_empty_char]
     simp only [concat_empty_left]
     simp
     simp only [nullify_empty]
     simp only [concat_empty_left]
     simp
-    simp only [← thm_11_b]
+    simp only [← derivative_append]
     simp
     simp only [concat_distrib_union_left]
     simp only [concat_assoc]
@@ -288,7 +288,7 @@ example
       rw [s1]
       clear s1
 
-      simp only [thm_11_b]
+      simp only [derivative_append]
       simp
       simp only [thm_12_8]
       by_cases c1 : tl = []
@@ -297,7 +297,7 @@ example
         simp
         apply Exists.intro [[hd]]
         simp
-        rw [thm_11_a]
+        rw [derivative_eps]
       case neg =>
         specialize ih L c1
         obtain ⟨T, ⟨a1, a2, a3⟩⟩ := ih

@@ -22,7 +22,7 @@ def derivative
   { t : Str α | s ++ t ∈ L }
 
 
-theorem thm_11_a
+theorem derivative_eps
   {α : Type}
   (L : Language α) :
   derivative L [] = L :=
@@ -30,7 +30,7 @@ theorem thm_11_a
     simp only [derivative]
     simp
 
-theorem thm_11_b
+theorem derivative_append
   {α : Type}
   (L : Language α)
   (s t : Str α) :
@@ -43,7 +43,7 @@ theorem thm_11_b
 -- [a] ∈ Σ^1
 
 -- 1.50
-theorem thm_12_1
+theorem derivative_empty_char
   {α : Type}
   (a : α) :
   derivative ∅ [a] = ∅ :=
@@ -52,7 +52,7 @@ theorem thm_12_1
     simp
 
 
-theorem thm_12_1_str
+theorem derivative_empty_str
   {α : Type}
   (s : Str α) :
   derivative ∅ s = ∅ :=
@@ -62,7 +62,7 @@ theorem thm_12_1_str
 
 
 -- 1.51
-theorem thm_12_2
+theorem derivative_eps_char
   {α : Type}
   (a : α) :
   derivative {[]} [a] = ∅ :=
@@ -72,7 +72,7 @@ theorem thm_12_2
 
 
 -- 1.52
-theorem thm_12_3
+theorem derivative_char_eq_char
   {α : Type}
   (a : α) :
   derivative {[a]} [a] = {[]} :=
@@ -81,7 +81,7 @@ theorem thm_12_3
     simp
 
 
-theorem thm_12_3_str
+theorem derivative_str_eq_str
   {α : Type}
   (s : Str α) :
   derivative {s} s = {[]} :=
@@ -91,7 +91,7 @@ theorem thm_12_3_str
 
 
 -- 1.53
-theorem thm_12_4
+theorem derivative_char_ne_char
   {α : Type}
   (a b : α)
   (h1 : ¬ a = b) :
@@ -104,7 +104,7 @@ theorem thm_12_4
 
 
 -- 1.54
-theorem thm_12_5
+theorem derivative_union_char
   {α : Type}
   (L1 L2 : Language α)
   (a : α) :
@@ -115,7 +115,7 @@ theorem thm_12_5
     rfl
 
 
-theorem thm_12_5_str
+theorem derivative_union_str
   {α : Type}
   (L1 L2 : Language α)
   (s : Str α) :
@@ -127,7 +127,7 @@ theorem thm_12_5_str
 
 
 -- 1.55
-theorem thm_12_6
+theorem derivative_intersection_char
   {α : Type}
   (L1 L2 : Language α)
   (a : α) :
@@ -138,7 +138,7 @@ theorem thm_12_6
     rfl
 
 
-theorem thm_12_6_str
+theorem derivative_intersection_str
   {α : Type}
   (L1 L2 : Language α)
   (s : Str α) :
@@ -450,9 +450,9 @@ theorem thm_12_8
   by
     conv => left; simp only [kleene_closure_eq_union_exp]
     simp only [← Set.union_iUnion_nat_succ (exp L)]
-    simp only [thm_12_5]
+    simp only [derivative_union_char]
     simp only [exp_zero]
-    simp only [thm_12_2]
+    simp only [derivative_eps_char]
     simp only [Set.empty_union]
     simp only [← aux_1]
     simp only [derivative_exp_succ]
