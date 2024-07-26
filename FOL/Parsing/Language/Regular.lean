@@ -309,7 +309,9 @@ example
           simp
           congr
           ext cs
-          sorry
+          constructor
+          · sorry
+          · sorry
 
 
 theorem thm_18
