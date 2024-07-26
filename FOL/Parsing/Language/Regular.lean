@@ -310,7 +310,19 @@ example
               obtain ⟨s3_left, s3_right⟩ := s3
               specialize s3_left a5
               tauto
-        · sorry
+        · simp only [concat]
+          simp
+          rw [a4] at a5
+          simp only [concat] at a5
+          simp at a5
+          obtain ⟨s1, hs1, t1, ht1, eq⟩ := a5
+          specialize @H2 (derivative L (a :: u)) (derivative (kleene_closure α L) v) (s1 ++ t1)
+          have s3 : s1 ++ t1 ∈ concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) v)  := append_mem_concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) v) s1 t1 hs1 ht1
+          obtain ⟨H2_left, H2_right⟩ := H2
+          specialize H2_left s3
+          obtain ⟨H2_left_left, H2_left_right⟩ := H2_left
+          clear H2_right
+          sorry
       · intro a1
         obtain ⟨i, ⟨⟨u, hu⟩, a6, a7 ⟩, z, a4, ⟨v, ⟨ a8, a9⟩ ⟩⟩ := a1
         apply Exists.intro (concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) i))
@@ -323,13 +335,25 @@ example
             · exact a6
             · rfl
         · rw [← a9]
+          clear a9
           obtain s5 := @H2 (derivative L (a :: u)) (derivative (kleene_closure α L) i) (z ++ v)
           rw [s5]
+          clear s5
+          clear H2
           constructor
           · specialize @H1 u i hu
             rw [H1] at a7
             exact a7
-          · sorry
+          · specialize @H1 u i hu
+            simp only [H1] at a7
+            simp only [derivative]
+            simp
+            simp only [derivative] at a4
+            simp at a4
+            rw [String.str_append_assoc]
+            apply append_kleene_closure_closed
+            · exact mem_language_mem_kleene_closure L (i ++ z) a4
+            · exact a8
 
 
 theorem thm_18
