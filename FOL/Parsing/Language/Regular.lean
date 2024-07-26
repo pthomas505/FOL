@@ -288,12 +288,48 @@ example
       [] ∈ derivative L (a :: s.take (s.length - v.length)), ?_, ?_, ?_⟩
     · simp [List.subset_def, List.mem_filter]; aesop
     · simp [List.mem_filter]
-    · simp; congr 1; ext; simp [List.mem_filter, List.IsSuffix]
+    · simp; congr 1; ext x; simp [List.mem_filter, List.IsSuffix]
       have H1 {u v} (H : u ++ v = s) : List.take (s.length - v.length) s = u := H ▸ by simp
       have H2 {X Y : Language α} {s : Str α} : s ∈ concat X.nullify Y ↔ [] ∈ X ∧ s ∈ Y := by
         simp [concat, Language.nullify]
         aesop
-      sorry
+      constructor
+      · intro a1
+        obtain ⟨M, ⟨u, v, a2, a3, a4⟩, a5⟩ := a1
+        apply Exists.intro v
+        constructor
+        · constructor
+          · apply Exists.intro u
+            exact a2
+          · constructor
+            · exact a3
+            · obtain H3 := H1 a2
+              rw [H3]
+              obtain s3 := @H2 (derivative L (a :: u)) (derivative (kleene_closure α L) v) x
+              rw [← a4] at s3
+              obtain ⟨s3_left, s3_right⟩ := s3
+              specialize s3_left a5
+              tauto
+        · sorry
+      · intro a1
+        obtain ⟨i, ⟨⟨u, hu⟩, a6, a7 ⟩, z, a4, ⟨v, ⟨ a8, a9⟩ ⟩⟩ := a1
+        apply Exists.intro (concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) i))
+        constructor
+        · apply Exists.intro u
+          apply Exists.intro i
+          constructor
+          · exact hu
+          · constructor
+            · exact a6
+            · rfl
+        · rw [← a9]
+          obtain s5 := @H2 (derivative L (a :: u)) (derivative (kleene_closure α L) i) (z ++ v)
+          rw [s5]
+          constructor
+          · specialize @H1 u i hu
+            rw [H1] at a7
+            exact a7
+          · sorry
 
 
 theorem thm_18
