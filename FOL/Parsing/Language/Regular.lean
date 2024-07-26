@@ -280,37 +280,20 @@ example
     derivative (kleene_closure α L) s =
     ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
   by
-    induction s generalizing L
-    case nil =>
-      simp at h1
-    case cons hd tl ih =>
-      have s1 : hd :: tl = [hd] ++ tl := rfl
-      rw [s1]
-      clear s1
-
-      simp only [derivative_wrt_append]
-      simp
-      simp only [derivative_of_kleene_closure_wrt_char]
-      by_cases c1 : tl = []
-      case pos =>
-        subst c1
-        simp
-        apply Exists.intro [[hd]]
-        simp
-        rw [derivative_wrt_eps]
-      case neg =>
-        have s1 :
-          ∀ (L : Language α),
-            ∃ T ⊆ tl.tails,
-              [] ∉ T ∧
-                derivative (kleene_closure α L) tl =
-                  ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
-        by
-          intro L'
-          apply ih L' c1
-        clear ih
-        obtain ⟨T, hT, a1, a2⟩ := s1 L
-        sorry
+    let a :: s := s
+    rw [← List.singleton_append, derivative_wrt_append, derivative_of_kleene_closure_wrt_char, derivative_of_concat_wrt_str]
+    simp only [← derivative_wrt_append, List.singleton_append]
+    open Classical in
+    refine ⟨(a :: s) :: s.tails.filter fun v => v ≠ [] ∧
+      [] ∈ derivative L (a :: s.take (s.length - v.length)), ?_, ?_, ?_⟩
+    · simp [List.subset_def, List.mem_filter]; aesop
+    · simp [List.mem_filter]
+    · simp; congr 1; ext; simp [List.mem_filter, List.IsSuffix]
+      have H1 {u v} (H : u ++ v = s) : List.take (s.length - v.length) s = u := H ▸ by simp
+      have H2 {X Y : Language α} {s : Str α} : s ∈ concat X.nullify Y ↔ [] ∈ X ∧ s ∈ Y := by
+        simp [concat, Language.nullify]
+        aesop
+      sorry
 
 
 theorem thm_18
