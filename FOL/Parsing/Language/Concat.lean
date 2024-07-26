@@ -41,6 +41,16 @@ lemma eps_not_mem_str_length_gt_zero
     exact ne_of_mem_of_not_mem h2 h1
 
 
+lemma take_append_len_left
+  {α : Type}
+  (cs s t : Str α)
+  (h1 : s ++ t = cs) :
+  List.take (cs.length - t.length) cs = s :=
+  by
+    rw [← h1]
+    simp
+
+
 /-
 Definition 11 (Concatenation). Let L1 and L2 be languages. The concatenation of L1 and L2, written L1 · L2, or L1L2 is defined by
 L1L2 = {s · t = st : s ∈ L1, t ∈ L2} .
