@@ -283,96 +283,97 @@ example
     let a :: s := s
     rw [← List.singleton_append, derivative_wrt_append, derivative_of_kleene_closure_wrt_char, derivative_of_concat_wrt_str]
     simp only [← derivative_wrt_append, List.singleton_append]
-    open Classical in
-    refine ⟨(a :: s) :: s.tails.filter fun v => v ≠ [] ∧
-      [] ∈ derivative L (a :: s.take (s.length - v.length)), ?_, ?_, ?_⟩
+
+    apply Exists.intro ((a :: s) :: s.tails.filter (open Classical in fun v => v ≠ [] ∧ [] ∈ derivative L (a :: s.take (s.length - v.length))))
+    constructor
     · simp [List.subset_def, List.mem_filter]; aesop
-    · simp [List.mem_filter]
-    · simp; congr 1; ext x; simp [List.mem_filter, List.IsSuffix]
-      have s1 {u v} (H : u ++ v = s) : List.take (s.length - v.length) s = u := H ▸ by simp
-      obtain s10 := take_append_len_left s
-      have s2 : ∀ (X Y : Language α) (s : Str α), s ∈ concat X.nullify Y ↔ [] ∈ X ∧ s ∈ Y := by
-        simp [concat, Language.nullify]
-        aesop
-      constructor
-      · intro a1
-        obtain ⟨M, ⟨u, v, a2, a3, a4⟩, a5⟩ := a1
-        apply Exists.intro v
+    · constructor
+      · simp [List.mem_filter]
+      · simp; congr 1; ext x; simp [List.mem_filter, List.IsSuffix]
+        have s1 {u v} (H : u ++ v = s) : List.take (s.length - v.length) s = u := H ▸ by simp
+        obtain s10 := take_append_len_left s
+        have s2 : ∀ (X Y : Language α) (s : Str α), s ∈ concat X.nullify Y ↔ [] ∈ X ∧ s ∈ Y := by
+          simp [concat, Language.nullify]
+          aesop
         constructor
-        · constructor
-          · apply Exists.intro u
-            exact a2
-          · constructor
-            · exact a3
-            · obtain H3 := s1 a2
-              rw [H3]
-              obtain s3 := s2 (derivative L (a :: u)) (derivative (kleene_closure α L) v) x
-              rw [← a4] at s3
-              obtain ⟨s3_left, s3_right⟩ := s3
-              specialize s3_left a5
-              tauto
-        · simp only [concat]
-          simp
-          rw [a4] at a5
-          clear a4
-          simp only [concat] at a5
-          simp at a5
-          obtain ⟨s1, hs1, t1, ht1, eq⟩ := a5
-          specialize s2 (derivative L (a :: u)) (derivative (kleene_closure α L) v) (s1 ++ t1)
-          have s3 : s1 ++ t1 ∈ concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) v)  := append_mem_concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) v) s1 t1 hs1 ht1
-          obtain ⟨H2_left, H2_right⟩ := s2
-          specialize H2_left s3
-          clear s3
-          obtain ⟨H2_left_left, H2_left_right⟩ := H2_left
-          clear H2_right
-          simp only [Language.nullify] at hs1
-          simp at hs1
-          simp only [derivative] at hs1
-          simp at hs1
-          simp only [derivative] at ht1
-          simp at ht1
-          simp only [derivative] at H2_left_left
-          simp at H2_left_left
-          obtain ⟨hs1_left, hs1_right⟩ := hs1
-          subst hs1_right
-          simp at *
-          rw [← eq]
-          simp only [derivative]
-          simp
-          simp only [derivative] at H2_left_right
-          simp at H2_left_right
-          sorry
-      · intro a1
-        obtain ⟨i, ⟨⟨u, hu⟩, a6, a7 ⟩, z, a4, ⟨v, ⟨ a8, a9⟩ ⟩⟩ := a1
-        apply Exists.intro (concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) i))
-        constructor
-        · apply Exists.intro u
-          apply Exists.intro i
+        · intro a1
+          obtain ⟨M, ⟨u, v, a2, a3, a4⟩, a5⟩ := a1
+          apply Exists.intro v
           constructor
-          · exact hu
           · constructor
-            · exact a6
-            · rfl
-        · rw [← a9]
-          clear a9
-          obtain s5 := s2 (derivative L (a :: u)) (derivative (kleene_closure α L) i) (z ++ v)
-          rw [s5]
-          clear s5
-          clear s2
-          constructor
-          · specialize @s1 u i hu
-            rw [s1] at a7
-            exact a7
-          · specialize @s1 u i hu
-            simp only [s1] at a7
+            · apply Exists.intro u
+              exact a2
+            · constructor
+              · exact a3
+              · obtain H3 := s1 a2
+                rw [H3]
+                obtain s3 := s2 (derivative L (a :: u)) (derivative (kleene_closure α L) v) x
+                rw [← a4] at s3
+                obtain ⟨s3_left, s3_right⟩ := s3
+                specialize s3_left a5
+                tauto
+          · simp only [concat]
+            simp
+            rw [a4] at a5
+            clear a4
+            simp only [concat] at a5
+            simp at a5
+            obtain ⟨s1, hs1, t1, ht1, eq⟩ := a5
+            specialize s2 (derivative L (a :: u)) (derivative (kleene_closure α L) v) (s1 ++ t1)
+            have s3 : s1 ++ t1 ∈ concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) v)  := append_mem_concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) v) s1 t1 hs1 ht1
+            obtain ⟨H2_left, H2_right⟩ := s2
+            specialize H2_left s3
+            clear s3
+            obtain ⟨H2_left_left, H2_left_right⟩ := H2_left
+            clear H2_right
+            simp only [Language.nullify] at hs1
+            simp at hs1
+            simp only [derivative] at hs1
+            simp at hs1
+            simp only [derivative] at ht1
+            simp at ht1
+            simp only [derivative] at H2_left_left
+            simp at H2_left_left
+            obtain ⟨hs1_left, hs1_right⟩ := hs1
+            subst hs1_right
+            simp at *
+            rw [← eq]
             simp only [derivative]
             simp
-            simp only [derivative] at a4
-            simp at a4
-            rw [String.str_append_assoc]
-            apply append_kleene_closure_closed
-            · exact mem_language_mem_kleene_closure L (i ++ z) a4
-            · exact a8
+            simp only [derivative] at H2_left_right
+            simp at H2_left_right
+            sorry
+        · intro a1
+          obtain ⟨i, ⟨⟨u, hu⟩, a6, a7 ⟩, z, a4, ⟨v, ⟨ a8, a9⟩ ⟩⟩ := a1
+          apply Exists.intro (concat (derivative L (a :: u)).nullify (derivative (kleene_closure α L) i))
+          constructor
+          · apply Exists.intro u
+            apply Exists.intro i
+            constructor
+            · exact hu
+            · constructor
+              · exact a6
+              · rfl
+          · rw [← a9]
+            clear a9
+            obtain s5 := s2 (derivative L (a :: u)) (derivative (kleene_closure α L) i) (z ++ v)
+            rw [s5]
+            clear s5
+            clear s2
+            constructor
+            · specialize @s1 u i hu
+              rw [s1] at a7
+              exact a7
+            · specialize @s1 u i hu
+              simp only [s1] at a7
+              simp only [derivative]
+              simp
+              simp only [derivative] at a4
+              simp at a4
+              rw [String.str_append_assoc]
+              apply append_kleene_closure_closed
+              · exact mem_language_mem_kleene_closure L (i ++ z) a4
+              · exact a8
 
 
 theorem thm_18
