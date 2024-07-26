@@ -230,3 +230,29 @@ lemma lang_as_union_of_nullify_and_not_nullable
     case neg c1 =>
       simp
       exact c1
+
+
+lemma mem_concat_nullify_left_iff
+  {α : Type}
+  [DecidableEq α]
+  (L M : Language α)
+  (cs : Str α) :
+  cs ∈ concat L.nullify M ↔ [] ∈ L ∧ cs ∈ M :=
+  by
+    constructor
+    intro a1
+    · simp only [concat] at a1
+      simp only [Language.nullify] at a1
+      simp at a1
+      obtain ⟨s, ⟨hs_left, hs_right⟩, t, ht, eq⟩ := a1
+      rw [← eq]
+      simp only [hs_right]
+      simp
+      exact ⟨hs_left, ht⟩
+    · intro a1
+      simp only [concat]
+      simp only [Language.nullify]
+      simp
+      apply Exists.intro []
+      simp
+      exact a1
