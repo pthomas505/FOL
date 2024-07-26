@@ -304,14 +304,17 @@ example
         · simp
           simp only [List.mem_filter]
           simp
-        · obtain s1 := @take_append_len_left α
-          obtain s2 := @mem_concat_nullify_left_iff α
-          simp
+        · simp
           congr
           ext cs
           constructor
           · simp
             intro M s t eq ht a1 a2
+            obtain s1 := mem_concat_nullify_left_iff (derivative L (hd :: s)) (derivative (kleene_closure α L) t) cs
+            rw [← a1] at s1
+            simp only [a2] at s1
+            simp at s1
+            obtain ⟨s1_left, s1_right⟩ := s1
             sorry
           · simp
             intro s a1 a2
