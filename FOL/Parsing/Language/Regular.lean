@@ -304,7 +304,12 @@ example
         · simp
           simp only [List.mem_filter]
           simp
-        · sorry
+        · obtain s1 := @take_append_len_left α
+          obtain s2 := @mem_concat_nullify_left_iff α
+          simp
+          congr
+          ext cs
+          sorry
 
 
 theorem thm_18
