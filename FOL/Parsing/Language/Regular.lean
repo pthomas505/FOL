@@ -315,6 +315,11 @@ example
             simp only [a2] at s1
             simp at s1
             obtain ⟨s1_left, s1_right⟩ := s1
+            simp only [derivative] at s1_left
+            simp at s1_left
+            simp only [derivative] at s1_right
+            simp at s1_right
+            obtain s2 := take_append_len_left tl
             sorry
           · simp
             intro s a1 a2
