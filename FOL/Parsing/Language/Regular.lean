@@ -310,8 +310,12 @@ example
           congr
           ext cs
           constructor
-          · sorry
-          · sorry
+          · simp
+            intro M s t eq ht a1 a2
+            sorry
+          · simp
+            intro s a1 a2
+            sorry
 
 
 theorem thm_18
