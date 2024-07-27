@@ -291,41 +291,8 @@ example
       simp only [← derivative_wrt_append]
       simp only [List.singleton_append]
       simp
-      by_cases c1 : tl = []
-      case pos =>
-        subst c1
-        simp
-        apply Exists.intro [[hd]]
-        simp
-      case neg =>
-        apply Exists.intro ((hd :: tl) :: tl.tails.filter (open Classical in fun s => ¬ s = [] ∧ [] ∈ derivative L (hd :: tl.take (tl.length - s.length))))
-        constructor
-        · simp [List.subset_def, List.mem_filter]; aesop
-        · constructor
-          · simp [List.mem_filter]
-          · simp
-            congr 1
-            ext cs
-            simp [List.mem_filter]
-            constructor
-            · intro a1
-              obtain ⟨M, ⟨s, t, a1, a2, a3⟩, a4⟩ := a1
-              simp only [List.IsSuffix]
-              rw [a3] at a4
-              obtain s2 := mem_concat_nullify_left_iff (derivative L (hd :: s)) (derivative (kleene_closure α L) t) cs
-              simp only [a4] at s2
-              simp at s2
-              obtain ⟨s2_left, s2_right⟩ := s2
-              obtain s1 := take_append_len_left tl s t a1
-              apply Exists.intro t
-              constructor
-              · rw [s1]
-                constructor
-                · apply Exists.intro s
-                  exact a1
-                · exact ⟨a2, s2_left⟩
-              · sorry
-            · sorry
+      apply Exists.intro ((hd :: tl) :: tl.tails.filter (open Classical in fun s => ¬ s = [] ∧ [] ∈ derivative L (hd :: tl.take (tl.length - s.length))))
+      sorry
 
 
 theorem thm_18

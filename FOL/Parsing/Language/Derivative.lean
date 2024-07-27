@@ -518,7 +518,7 @@ lemma derivative_of_nullify_wrt_char
     simp
 
 
-example
+lemma concat_derivative_kleene_closure_subset
   {α : Type}
   [DecidableEq α]
   (L : Language α)
