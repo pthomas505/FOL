@@ -516,3 +516,33 @@ lemma derivative_of_nullify_wrt_char
     simp
     simp only [Language.nullify]
     simp
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a b : Str α)
+  (h1 : b ∈ L) :
+  concat (derivative L a) (kleene_closure α L) ⊆
+    concat (derivative L b).nullify (derivative (kleene_closure α L) a) :=
+  by
+    simp only [Set.subset_def]
+    intro x a1
+    simp only [concat] at a1
+    simp at a1
+    obtain ⟨s, hs, t, ht, eq⟩ := a1
+    rw [← eq]
+    simp only [concat]
+    simp
+    apply Exists.intro []
+    simp
+    simp only [derivative]
+    simp only [Language.nullify]
+    simp
+    constructor
+    · exact h1
+    · simp only [String.str_append_assoc]
+      apply append_kleene_closure_closed
+      · exact mem_language_mem_kleene_closure L (a ++ s) hs
+      · exact ht
