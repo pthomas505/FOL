@@ -296,7 +296,12 @@ example
       · simp [List.subset_def, List.mem_filter]; aesop
       · constructor
         · simp [List.mem_filter]
-        · simp; congr 1; ext cs; simp [List.mem_filter, List.IsSuffix]
+        · simp
+          congr 1
+          ext cs
+          simp only [List.mem_filter]
+          simp
+          simp only [List.IsSuffix]
           sorry
 
 
