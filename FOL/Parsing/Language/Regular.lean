@@ -292,7 +292,12 @@ example
       simp only [List.singleton_append]
       simp
       apply Exists.intro ((hd :: tl) :: tl.tails.filter (open Classical in fun s => ¬ s = [] ∧ [] ∈ derivative L (hd :: tl.take (tl.length - s.length))))
-      sorry
+      constructor
+      · simp [List.subset_def, List.mem_filter]; aesop
+      · constructor
+        · simp [List.mem_filter]
+        · simp; congr 1; ext cs; simp [List.mem_filter, List.IsSuffix]
+          sorry
 
 
 theorem thm_18
