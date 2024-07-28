@@ -329,8 +329,38 @@ example
                   simp
                   exact a6
             · simp
+              simp only [derivative]
+              simp only [concat]
+              simp
               sorry
-          · sorry
+          · intro a1
+            obtain ⟨i, ⟨⟨u, a2⟩, a3, a4⟩, a5⟩ := a1
+            rw [← a2] at a4
+            simp at a4
+            simp only [derivative] at a4
+            simp at a4
+
+            simp only [derivative] at a5
+            simp only [concat] at a5
+            simp at a5
+            obtain ⟨s, a6, t, a7, a8⟩ := a5
+            rw [← a8]
+
+            apply Exists.intro (derivative (kleene_closure α L) i)
+            constructor
+            · apply Exists.intro u
+              obtain s1 := str_mem_lang_iff_nullify_derivative_eq_eps L (hd :: u)
+              simp only [a4] at s1
+              simp at s1
+              rw [s1]
+              simp only [concat_eps_left]
+              apply Exists.intro i
+              constructor
+              · exact a2
+              · constructor
+                · exact a3
+                · rfl
+            · sorry
 
 
 theorem thm_18
