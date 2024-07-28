@@ -368,6 +368,70 @@ example
               · exact a7
 
 
+noncomputable def foo
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (s : Str α)
+  (h1 : ¬ s = []) :
+  { T : List (List α) // T ⊆ s.tails ∧ [] ∉ T ∧
+    derivative (kleene_closure α L) s =
+    ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) } :=
+  by
+    let hd :: tl := s
+    rw [← List.singleton_append]
+    simp only [derivative_wrt_append]
+    simp only [derivative_of_kleene_closure_wrt_char]
+    simp only [derivative_of_concat_wrt_str]
+    simp only [← derivative_wrt_append]
+    simp only [List.singleton_append]
+    simp only [List.tails, gt_iff_lt, List.length_pos, ne_eq]
+    open Classical in
+      let l1 :=
+        tl.tails.filter fun s => ¬ s = [] ∧ [] ∈ derivative L (hd :: tl.take (tl.length - s.length))
+    have IH (v) (h : List.IsSuffix v tl) :=
+      have := h.length_le
+      foo L v
+    let l2 := l1.attach.bind fun ⟨v, h⟩ => by
+      simp [l1, List.mem_filter] at h
+      exact (IH v h.1 h.2.1).1
+    refine ⟨(hd :: tl) :: l2, ?_, ?_, ?_⟩
+    · simp [l2, l1, List.subset_def, List.mem_filter]
+      intro _ _ ⟨a1, _⟩ a2
+      have := (IH _ _ _).2.1 a2
+      simp at this
+      exact .inr (this.trans a1)
+    · simp [List.mem_filter, l2, l1]
+      intro _ _ a2
+      exact (IH _ _ _).2.2.1 a2
+    · simp
+      congr 1
+      ext cs
+      simp only [Set.mem_sUnion, Set.mem_setOf_eq, List.mem_bind, List.mem_attach, true_and,
+        Subtype.exists, List.mem_filter, List.mem_tails, List.IsSuffix, decide_eq_true_eq,
+        Set.iUnion_exists, eq_mp_eq_cast, Set.biUnion_and', Set.biUnion_and, Set.mem_iUnion,
+        exists_prop, exists_and_right, l2, l1]
+      have H1 {u v} (H : u ++ v = tl) : List.take (tl.length - v.length) tl = u := H ▸ by simp
+      have H2 {X Y : Language α} {s : Str α} : s ∈ concat X.nullify Y ↔ [] ∈ X ∧ s ∈ Y := by
+        simp [concat, Language.nullify]
+        aesop
+      constructor
+      · rintro ⟨M, ⟨u, v, rfl, a1, rfl⟩, a5⟩
+        have ⟨a6, a7⟩ := H2.1 a5
+        simp [(IH _ ⟨_, rfl⟩ a1).2.2.2] at a7
+        obtain ⟨w, c1, c2⟩ := a7
+        refine ⟨_, _, ⟨a1, _, rfl, ?_, c1⟩, c2⟩
+        simp [a6]
+      · rintro ⟨v, w, ⟨a1, a2, rfl, a3, a4⟩, a5⟩
+        simp at a3
+        refine ⟨_, ⟨_, _, rfl, a1, rfl⟩, ?_⟩
+        rw [H2]
+        refine ⟨a3, ?_⟩
+        simp [(IH _ ⟨_, rfl⟩ a1).2.2.2]
+        refine ⟨_, a4, a5⟩
+termination_by s.length
+
+
 theorem thm_18
   {α : Type}
   [DecidableEq α]
