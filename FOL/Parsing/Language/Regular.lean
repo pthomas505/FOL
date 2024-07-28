@@ -360,7 +360,12 @@ example
               · constructor
                 · exact a3
                 · rfl
-            · sorry
+            · simp only [derivative]
+              simp
+              rw [String.str_append_assoc]
+              apply append_kleene_closure_closed
+              · exact mem_language_mem_kleene_closure L (i ++ s) a6
+              · exact a7
 
 
 theorem thm_18
