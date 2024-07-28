@@ -302,7 +302,35 @@ example
           simp only [List.mem_filter]
           simp
           simp only [List.IsSuffix]
-          sorry
+          constructor
+          · intro a1
+            obtain ⟨M, ⟨u, v, a2, a3, a4⟩ , a5⟩ := a1
+            rw [← a2]
+            rw [a4] at a5
+            simp only [derivative] at a5
+            simp at a5
+            simp only [Language.nullify] at a5
+            simp at a5
+            simp only [concat] at a5
+            simp at a5
+            obtain ⟨s, ⟨a6, a7⟩, t, a8, a9⟩ := a5
+            rw [← a9]
+            simp only [a7]
+
+            apply Exists.intro v
+            constructor
+            · constructor
+              · apply Exists.intro u
+                rfl
+              · constructor
+                · exact a3
+                · simp
+                  simp only [derivative]
+                  simp
+                  exact a6
+            · simp
+              sorry
+          · sorry
 
 
 theorem thm_18
