@@ -22,6 +22,44 @@ def derivative
   { t : Str α | s ++ t ∈ L }
 
 
+def derivative_list
+  {α : Type}
+  [DecidableEq α]
+  (L : List (List α))
+  (s : List α) :
+  List (List α) :=
+  (L.filter (fun (cs : List α) => List.IsPrefix s cs)).map
+    (fun (cs : List α) => cs.drop s.length)
+
+
+lemma derivative_eq_derivative_list
+  {α : Type}
+  [DecidableEq α]
+  (L : List (List α))
+  (s : List α) :
+  derivative L.toFinset.toSet s = (derivative_list L s).toFinset.toSet :=
+  by
+    ext t
+    simp only [derivative]
+    simp only [derivative_list]
+    simp
+    simp only [List.mem_filter]
+    simp only [List.IsPrefix]
+    simp
+    constructor
+    · intro a1
+      apply Exists.intro (s ++ t)
+      simp
+      exact a1
+    · intro a1
+      obtain ⟨xs, ⟨a2, cs, a3⟩, a4⟩ := a1
+      rw [← a3] at a4
+      simp at a4
+      rw [← a4]
+      rw [a3]
+      exact a2
+
+
 theorem derivative_wrt_eps
   {α : Type}
   (L : Language α) :
