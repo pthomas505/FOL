@@ -25,6 +25,35 @@ def exp
   | n + 1 => concat (exp L n) L
 
 
+def exp_list
+  {α : Type}
+  (L : List (List α))
+  (n : ℕ) :
+  List (List α) :=
+  match n with
+  | 0 => [[]]
+  | n + 1 => concat_list (exp_list L n) L
+
+
+lemma exp_eq_exp_list
+  {α : Type}
+  [DecidableEq α]
+  (L : List (List α))
+  (n : ℕ) :
+  exp L.toFinset.toSet n = (exp_list L n).toFinset.toSet :=
+  by
+    induction n
+    case zero =>
+      simp only [exp]
+      simp only [exp_list]
+      simp
+    case succ k ih =>
+      simp only [exp]
+      simp only [exp_list]
+      rw [ih]
+      exact concat_eq_concat_list (exp_list L k) L
+
+
 lemma exp_zero
   {α : Type}
   (L : Language α) :

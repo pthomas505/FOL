@@ -69,7 +69,7 @@ def concat_list
   (List.product L1 L2).map (fun (s, t) => s ++ t)
 
 
-example
+lemma concat_eq_concat_list
   {α : Type}
   [DecidableEq α]
   (L1 L2 : List (List α)) :
