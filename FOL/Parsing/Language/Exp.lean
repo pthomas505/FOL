@@ -54,6 +54,41 @@ lemma exp_eq_exp_list
       exact concat_eq_concat_list (exp_list L k) L
 
 
+def exp_list_finite_union
+  {α : Type}
+  (L : List (List α))
+  (n : ℕ) :
+  List (List α) :=
+  match n with
+  | 0 => exp_list L 0
+  | (k + 1) => exp_list_finite_union L k ++ exp_list L (k + 1)
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : List (List α))
+  (n : ℕ) :
+  ⋃ (k ≤ n), exp L.toFinset.toSet k = (exp_list_finite_union L n).toFinset.toSet :=
+  by
+    induction n
+    case zero =>
+      simp
+      simp only [exp]
+      simp only [exp_list_finite_union]
+      simp only [exp_list]
+      simp
+    case succ k ih =>
+      simp at ih
+      simp only [exp_list_finite_union]
+      simp
+      obtain s1 := exp_eq_exp_list L (k + 1)
+      simp at s1
+      rw [← s1]
+      rw [← ih]
+      exact Set.biUnion_le_succ (fun k => exp {a | a ∈ L} k) k
+
+
 lemma exp_zero
   {α : Type}
   (L : Language α) :
