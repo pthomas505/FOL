@@ -62,6 +62,34 @@ def concat
   { s ++ t | (s ∈ L1) (t ∈ L2) }
 
 
+def concat_list
+  {α : Type}
+  (L1 L2 : List (List α)) :
+  List (List α) :=
+  (List.product L1 L2).map (fun (s, t) => s ++ t)
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : List (List α)) :
+  concat L1.toFinset.toSet L2.toFinset.toSet = (concat_list L1 L2).toFinset.toSet :=
+  by
+    ext cs
+    simp only [concat]
+    simp only [concat_list]
+    simp
+    constructor
+    · intro a1
+      obtain ⟨s, hs, t, ht, eq⟩ := a1
+      rw [← eq]
+      exact ⟨s, t, ⟨hs, ht⟩, rfl⟩
+    · intro a1
+      obtain ⟨s, t, ⟨hs, ht⟩, eq⟩ := a1
+      rw [← eq]
+      exact ⟨s, hs, t, ht, rfl⟩
+
+
 lemma append_mem_concat
   {α : Type}
   (L M : Language α)
