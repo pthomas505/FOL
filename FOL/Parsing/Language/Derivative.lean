@@ -84,7 +84,7 @@ def derivative_wrt_str
   (L : Language α)
   (s : Str α) :
   Language α :=
-  List.foldl (fun (a : Language α) (b : α) => derivative a [b]) L s
+  List.foldl (fun (M : Language α) (c : α) => derivative M [c]) L s
 
 
 example
