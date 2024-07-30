@@ -79,6 +79,17 @@ theorem derivative_wrt_append
     simp
 
 
+theorem derivative_wrt_cons
+  {α : Type}
+  (L : Language α)
+  (hd : α)
+  (tl : Str α) :
+  derivative L (hd :: tl) = derivative (derivative L [hd]) tl :=
+  by
+    simp only [derivative]
+    simp
+
+
 def derivative_wrt_str
   {α : Type}
   (L : Language α)
