@@ -79,6 +79,33 @@ theorem derivative_wrt_append
     simp
 
 
+def derivative_wrt_str
+  {α : Type}
+  (L : Language α)
+  (s : Str α) :
+  Language α :=
+  List.foldl (fun (a : Language α) (b : α) => derivative a [b]) L s
+
+
+example
+  {α : Type}
+  (L : Language α)
+  (s : Str α) :
+  derivative L s = derivative_wrt_str L s :=
+  by
+    simp only [derivative_wrt_str]
+    induction s generalizing L
+    case nil =>
+      simp only [derivative]
+      simp
+    case cons hd tl ih =>
+      have s1 : hd :: tl = [hd] ++ tl := rfl
+      rw [s1]
+      simp only [derivative_wrt_append]
+      simp
+      exact ih (derivative L [hd])
+
+
 -- [a] ∈ Σ^1
 
 -- 1.50
