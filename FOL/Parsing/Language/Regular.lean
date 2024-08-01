@@ -274,6 +274,27 @@ example
   {α : Type}
   [DecidableEq α]
   (L : Language α)
+  (a b c d e f g : α) :
+  derivative (kleene_closure α L) [a, b, c, d, e, f, g] = sorry :=
+  by
+    rw [derivative_wrt_cons]
+    rw [derivative_wrt_cons]
+    rw [derivative_wrt_cons]
+    rw [derivative_wrt_cons]
+    rw [derivative_wrt_cons]
+    rw [derivative_wrt_cons]
+
+    simp only [derivative_of_kleene_closure_wrt_char, derivative_of_concat_wrt_char, derivative_of_union_wrt_char, concat_distrib_union_left, concat_distrib_union_right, nullify_idempotent, derivative_of_nullify_wrt_char, nullify_empty, concat_empty_left, concat_empty_right, ← nullify_concat, nullify_concat_nullify_left, concat_assoc, nullify_concat_nullify_right, derivative_of_empty_wrt_char, Set.empty_union, Set.union_assoc]
+
+    simp only [← concat_assoc, ← derivative_wrt_cons]
+
+    sorry
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
   (s : Str α)
   (h1 : ¬ s = []) :
   ∃ (T : List (List α)), T ⊆ s.tails ∧ [] ∉ T ∧

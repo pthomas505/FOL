@@ -296,6 +296,68 @@ lemma concat_nullify_and_derivative_wrt_str
         simp at hs
 
 
+lemma concat_derivative_and_nullify_wrt_str
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α)
+  (a : Str α) :
+  {s | a ++ s ∈ (concat L1 L2.nullify)} = concat (derivative L1 a) L2.nullify :=
+  by
+    simp only [derivative]
+    simp only [concat]
+    simp only [Language.nullify]
+    simp
+    ext cs
+    simp
+    constructor
+    · intro a1
+      obtain ⟨s, a2, t, ⟨a3, a4⟩, eq⟩ := a1
+      cases s
+      case nil =>
+        simp at eq
+        rw [eq] at a4
+        simp at a4
+        obtain ⟨a4_left, a4_right⟩ := a4
+        rw [a4_left]
+        rw [a4_right]
+        simp
+        exact ⟨a2, a3⟩
+      case cons s_hd s_tl =>
+        rw [a4] at eq
+        simp at eq
+        apply Exists.intro cs
+        rw [← eq]
+        constructor
+        · exact a2
+        · apply Exists.intro []
+          simp
+          exact a3
+    · intro a1
+      obtain ⟨s, a2, t, ⟨a3, a4⟩, eq⟩ := a1
+      cases s
+      case nil =>
+        simp at eq
+        simp at a2
+        apply Exists.intro a
+        constructor
+        · exact a2
+        · apply Exists.intro []
+          rw [← eq]
+          rw [a4]
+          simp
+          exact a3
+      case cons s_hd s_tl s_ih =>
+        rw [a4] at eq
+        simp at eq
+        rw [← eq]
+        apply Exists.intro (a ++ s_tl :: s_ih)
+        constructor
+        · exact a2
+        · apply Exists.intro []
+          simp
+          exact a3
+
+
 lemma derivative_of_concat_wrt_char_aux
   {α : Type}
   [DecidableEq α]
