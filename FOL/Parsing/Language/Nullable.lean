@@ -210,6 +210,26 @@ lemma nullify_idempotent
       rfl
 
 
+lemma nullify_concat_nullify_left
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α) :
+  (concat L1.nullify L2).nullify = (concat L1 L2).nullify :=
+  by
+    simp only [nullify_concat]
+    simp only [nullify_idempotent]
+
+
+lemma nullify_concat_nullify_right
+  {α : Type}
+  [DecidableEq α]
+  (L1 L2 : Language α) :
+  (concat L1 L2.nullify).nullify = (concat L1 L2).nullify :=
+  by
+    simp only [nullify_concat]
+    simp only [nullify_idempotent]
+
+
 /-
   If [] ∈ L1 then let L0 be L1 \ {[]}. If [] ∉ L1 then let L0 be L1.
 -/
