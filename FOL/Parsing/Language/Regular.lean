@@ -270,6 +270,24 @@ example
     simp only [concat_assoc]
 
 
+-- https://stackoverflow.com/a/13444990
+def List.partitions
+  {α : Type} :
+  List α → List (List (List α))
+  | [] => [[]]
+  | (x :: xs) =>
+    let partitions := List.partitions xs
+    let left := partitions.filterMap (fun (part : List (List α)) =>
+      match part with
+      | [] => Option.none
+      | (ys :: yss) => Option.some ((x :: ys) :: yss)
+    )
+    let right := partitions.map (fun (part : List (List α)) => [x] :: part)
+    left ++ right
+
+#eval List.partitions ['a', 'b', 'c', 'd', 'e']
+
+
 example
   {α : Type}
   [DecidableEq α]
@@ -286,7 +304,7 @@ example
 
     simp only [derivative_of_kleene_closure_wrt_char, derivative_of_concat_wrt_char, derivative_of_union_wrt_char, concat_distrib_union_left, concat_distrib_union_right, nullify_idempotent, derivative_of_nullify_wrt_char, nullify_empty, concat_empty_left, concat_empty_right, ← nullify_concat, nullify_concat_nullify_left, concat_assoc, nullify_concat_nullify_right, derivative_of_empty_wrt_char, Set.empty_union, Set.union_assoc]
 
-    simp only [← concat_assoc, ← derivative_wrt_cons]
+    simp only [← concat_assoc, ← derivative_wrt_append, List.nil_append, List.cons_append]
 
     sorry
 
