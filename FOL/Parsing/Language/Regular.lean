@@ -275,15 +275,14 @@ def List.partitions
   {α : Type} :
   List α → List (List (List α))
   | [] => [[]]
+  | [x] => [[[x]]]
   | (x :: xs) =>
     let partitions := List.partitions xs
-    let left := partitions.filterMap (fun (part : List (List α)) =>
-      match part with
-      | [] => Option.none
-      | (ys :: yss) => Option.some ((x :: ys) :: yss)
-    )
-    let right := partitions.map (fun (part : List (List α)) => [x] :: part)
-    left ++ right
+    let l := partitions.map
+      (fun (part : List (List α)) => ((x :: part.headI) :: part.tail))
+    let r := partitions.map
+      (fun (part : List (List α)) => [x] :: part)
+    l ++ r
 
 #eval List.partitions ['a', 'b', 'c', 'd', 'e']
 
