@@ -35,6 +35,20 @@ def Language.nullify
   else ∅
 
 
+def Language.nullify_list
+  {α : Type}
+  [DecidableEq α]
+  (L : List (Str α)) :
+  List (Str α) :=
+  open Classical in
+  if [] ∈ L
+  then [[]]
+  else []
+
+#eval Language.nullify_list [[0], []]
+#eval Language.nullify_list [[0]]
+
+
 lemma is_nullable_iff_nullify_eq_eps_singleton
   {α : Type}
   [DecidableEq α]
