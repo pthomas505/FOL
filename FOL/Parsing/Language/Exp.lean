@@ -117,6 +117,21 @@ lemma exp_succ_concat_right
 
 -------------------------------------------------------------------------------
 
+example
+  {α : Type}
+  (n : ℕ)
+  (h1 : ¬ n = 0) :
+  exp (∅ : Language α) n = ∅ :=
+  by
+    cases n
+    case zero =>
+      contradiction
+    case succ k =>
+      simp only [exp]
+      simp only [concat_empty_right]
+
+-------------------------------------------------------------------------------
+
 lemma nonempty_exp_nonempty
   {α : Type}
   (L : Language α)
