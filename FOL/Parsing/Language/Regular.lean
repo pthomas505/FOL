@@ -270,44 +270,6 @@ example
     simp only [concat_assoc]
 
 
--- https://stackoverflow.com/a/13444990
-def List.partitions
-  {α : Type} :
-  List α → List (List (List α))
-  | [] => [[]]
-  | [x] => [[[x]]]
-  | (x :: xs) =>
-    let partitions := List.partitions xs
-    let l := partitions.map
-      (fun (part : List (List α)) => ((x :: part.headI) :: part.tail))
-    let r := partitions.map
-      (fun (part : List (List α)) => [x] :: part)
-    l ++ r
-
-#eval List.partitions ['a', 'b', 'c', 'd', 'e']
-
-
-example
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α)
-  (a b c d e f g : α) :
-  derivative (kleene_closure α L) [a, b, c, d, e, f, g] = sorry :=
-  by
-    rw [derivative_wrt_cons]
-    rw [derivative_wrt_cons]
-    rw [derivative_wrt_cons]
-    rw [derivative_wrt_cons]
-    rw [derivative_wrt_cons]
-    rw [derivative_wrt_cons]
-
-    simp only [derivative_of_kleene_closure_wrt_char, derivative_of_concat_wrt_char, derivative_of_union_wrt_char, concat_distrib_union_left, concat_distrib_union_right, nullify_idempotent, derivative_of_nullify_wrt_char, nullify_empty, concat_empty_left, concat_empty_right, ← nullify_concat, nullify_concat_nullify_left, concat_assoc, nullify_concat_nullify_right, derivative_of_empty_wrt_char, Set.empty_union, Set.union_assoc]
-
-    simp only [← concat_assoc, ← derivative_wrt_append, List.nil_append, List.cons_append]
-
-    sorry
-
-
 example
   {α : Type}
   [DecidableEq α]
@@ -344,7 +306,9 @@ example
           · intro a1
             obtain ⟨M, ⟨u, v, a2, a3, a4⟩ , a5⟩ := a1
             rw [← a2]
+            clear a2
             rw [a4] at a5
+            clear a4
             simp only [derivative] at a5
             simp at a5
             simp only [Language.nullify] at a5
@@ -353,24 +317,43 @@ example
             simp at a5
             obtain ⟨s, ⟨a6, a7⟩, t, a8, a9⟩ := a5
             rw [← a9]
+            clear a9
             simp only [a7]
+            clear a7
+            simp
 
-            apply Exists.intro v
-            constructor
-            · constructor
-              · apply Exists.intro u
-                rfl
-              · constructor
-                · exact a3
-                · simp
-                  simp only [derivative]
-                  simp
-                  exact a6
-            · simp
-              simp only [derivative]
-              simp only [concat]
-              simp
-              sorry
+            simp only [derivative]
+            simp
+            simp only [concat]
+            simp
+            rw [kleene_closure_eq_eps_union_concat_language_kleene_closure] at a8
+            simp at a8
+            cases a8
+            case _ c1 =>
+              tauto
+            case _ c1 =>
+              simp only [concat] at c1
+              simp at c1
+              obtain ⟨a, a9, c, a10, a11⟩ := c1
+              simp only [List.append_eq_append_iff] at a11
+              cases a11
+              case _ c2 =>
+                obtain ⟨a', a12, a13⟩ := c2
+                rw [a12]
+                simp
+                sorry
+              case _ c2 =>
+                obtain ⟨c', a14, a15⟩ := c2
+                apply Exists.intro v
+                simp
+                constructor
+                · tauto
+                · apply Exists.intro c'
+                  rw [← a14]
+                  constructor
+                  · exact a9
+                  · apply Exists.intro c
+                    tauto
           · intro a1
             obtain ⟨i, ⟨⟨u, a2⟩, a3, a4⟩, a5⟩ := a1
             rw [← a2] at a4
