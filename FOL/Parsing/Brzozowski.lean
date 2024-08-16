@@ -1,8 +1,86 @@
 import FOL.Parsing.DFA
-import FOL.Parsing.RegExp
 
 
 set_option autoImplicit false
+
+
+inductive RegExp
+  (α : Type) :
+  Type
+  | char : α → RegExp α
+  | epsilon : RegExp α
+  | zero : RegExp α
+  | union : RegExp α → RegExp α → RegExp α
+  | concat : RegExp α → RegExp α → RegExp α
+  | closure : RegExp α → RegExp α
+  deriving Repr
+
+compile_inductive% RegExp
+
+
+def RegExp.languageOf
+  (α : Type) :
+  RegExp α → Set (List α)
+  | char x => { [x] }
+  | epsilon => { [] }
+  | zero => ∅
+  | union R S => R.languageOf ∪ S.languageOf
+
+  -- For each string r in L(R) and each string s in L(S), the string rs, the concatenation of strings r and s, is in L(RS).
+  | concat R S => { r ++ s | (r ∈ R.languageOf) (s ∈ S.languageOf) }
+
+  -- l is the concatenation of a list of strings, each of which is in L(R).
+  | closure R => { l | ∃ rs : List (List α), (∀ (r : List α), r ∈ rs → r ∈ R.languageOf) ∧ rs.join = l }
+
+
+lemma equiv_language_of_closure
+  {α : Type}
+  (R : RegExp α) :
+  RegExp.languageOf α (RegExp.closure R) =
+    RegExp.languageOf α (RegExp.union RegExp.epsilon (RegExp.concat R (RegExp.closure R))) :=
+  by
+    ext cs
+    simp only [RegExp.languageOf]
+    simp
+    constructor
+    · intro a1
+      apply Exists.elim a1
+      intro xs a2
+      clear a1
+      cases a2
+      case _ a2_left a2_right =>
+        simp only [← a2_right]
+        cases xs
+        case nil =>
+          left
+          simp
+        case cons hd tl =>
+          right
+          simp at a2_left
+          cases a2_left
+          case _ a2_left_left a2_left_right =>
+            apply Exists.intro hd
+            tauto
+    · intro a1
+      cases a1
+      case _ left =>
+        apply Exists.intro []
+        simp
+        simp only [left]
+      case _ right =>
+        apply Exists.elim right
+        intro xs a2
+        clear right
+        cases a2
+        case _ a2_left a2_right =>
+          apply Exists.elim a2_right
+          intro ys a3
+          clear a2_right
+          cases a3
+          case _ a3_left a3_right =>
+            apply Exists.intro ([xs] ++ ys)
+            simp
+            tauto
 
 
 /-

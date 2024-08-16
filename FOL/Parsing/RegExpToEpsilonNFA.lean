@@ -1,4 +1,3 @@
-import FOL.Parsing.RegExp
 import FOL.Parsing.EpsilonNFA
 
 
@@ -691,6 +690,21 @@ theorem match_concat_EpsilonNFA_toAbstract
 
 
 -------------------------------------------------------------------------------
+
+
+inductive RegExp
+  (α : Type) :
+  Type
+  | char : α → RegExp α
+  | epsilon : RegExp α
+  | zero : RegExp α
+  | union : RegExp α → RegExp α → RegExp α
+  | concat : RegExp α → RegExp α → RegExp α
+  | closure : RegExp α → RegExp α
+  deriving Repr
+
+compile_inductive% RegExp
+
 
 @[reducible]
 def RegExp.State
