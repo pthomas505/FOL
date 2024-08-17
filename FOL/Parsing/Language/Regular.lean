@@ -246,6 +246,18 @@ noncomputable def foo'
 termination_by s.length
 
 
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (s : Str α) :
+  let T : List (List α) := foo' L s
+  derivative (kleene_closure α L) s =
+    ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
+  by
+    sorry
+
+
 noncomputable def foo
   {α : Type}
   [DecidableEq α]
