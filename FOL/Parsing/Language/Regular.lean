@@ -187,8 +187,8 @@ noncomputable def foo'
     open Classical in
     let l1 :=
       tl.tails.filter fun s => ¬ s = [] ∧ [] ∈ derivative L (hd :: tl.take (tl.length - s.length))
-    have IH (v) (h : List.IsSuffix v tl) :=
-      have := h.length_le
+    have IH (v : List α) (h : v.IsSuffix tl) :=
+      have : v.length ≤ tl.length := h.length_le
       foo' L v
     let l2 := l1.attach.bind fun ⟨v, h⟩ => by
       simp [l1, List.mem_filter] at h
