@@ -175,62 +175,26 @@ example
   derivative (L1 ∪ L2) s = derivative L1 s ∪ derivative L2 s := rfl
 
 
-example
-  {α : Type}
-  [DecidableEq α]
-  (L1 L2 : Language α)
-  (s : Str α) :
-  derivative (concat L1 L2) s ⊆
-    (concat (derivative L1 s) L2) ∪ ⋃ v ∈ s.tails, derivative L2 v :=
-  by
-    induction s generalizing L1
-    case nil =>
-      simp only [derivative]
-      simp
-    case cons hd tl ih =>
-      rw [derivative_wrt_cons]
-      rw [derivative_of_concat_wrt_char]
-      conv => right; rw [derivative_wrt_cons]
-      simp only [derivative_of_union_wrt_str]
-      simp at *
-      constructor
-      · specialize ih (derivative L1 [hd])
-        trans (concat (derivative (derivative L1 [hd]) tl) L2 ∪ ⋃ v, ⋃ (_ : v.IsSuffix tl), derivative L2 v)
-        · exact ih
-        · refine Set.union_subset_union_right (concat (derivative (derivative L1 [hd]) tl) L2) ?h
-          exact
-            Set.subset_union_right (derivative L2 (hd :: tl))
-              (⋃ v, ⋃ (_ : v <:+ tl), derivative L2 v)
-      · simp only [Language.nullify]
-        split_ifs
-        case pos c1 =>
-          simp only [concat_eps_left]
-          conv => right; right; rw [derivative_wrt_cons]
-          have s1 : derivative (derivative L2 [hd]) tl ⊆ (derivative (derivative L2 [hd]) tl ∪ ⋃ x, ⋃ (_ : x.IsSuffix tl), derivative L2 x) :=
-          by
-            exact
-              Set.subset_union_left (derivative (derivative L2 [hd]) tl)
-                (⋃ x, ⋃ (_ : x <:+ tl), derivative L2 x)
-          trans (derivative (derivative L2 [hd]) tl ∪ ⋃ x, ⋃ (_ : x <:+ tl), derivative L2 x)
-          · exact s1
-          · exact
-            Set.subset_union_right (concat (derivative (derivative L1 [hd]) tl) L2)
-              (derivative (derivative L2 [hd]) tl ∪ ⋃ x, ⋃ (_ : x.IsSuffix tl), derivative L2 x)
-        case neg c1 =>
-          simp only [concat_empty_left]
-          simp only [derivative]
-          simp
-
-
-example
+noncomputable def foo'
   {α : Type}
   [DecidableEq α]
   (L : Language α)
   (s : Str α) :
-  derivative (kleene_closure α L) s ⊆
-    ⋃ v ∈ s.tails, concat (derivative L v) (kleene_closure α L) :=
-  by
-    sorry
+  List (List α) :=
+  match s with
+  | [] => []
+  | hd :: tl =>
+    open Classical in
+    let l1 :=
+      tl.tails.filter fun s => ¬ s = [] ∧ [] ∈ derivative L (hd :: tl.take (tl.length - s.length))
+    have IH (v) (h : List.IsSuffix v tl) :=
+      have := h.length_le
+      foo' L v
+    let l2 := l1.attach.bind fun ⟨v, h⟩ => by
+      simp [l1, List.mem_filter] at h
+      exact IH v h.1
+    (hd :: tl) :: l2
+termination_by s.length
 
 
 example
