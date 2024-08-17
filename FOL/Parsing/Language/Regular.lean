@@ -175,6 +175,55 @@ example
   derivative (L1 ∪ L2) s = derivative L1 s ∪ derivative L2 s := rfl
 
 
+example
+  {α : Type}
+  [inst : DecidableEq α]
+  (L : Language α)
+  (hd : α)
+  (tl : List α)
+  (cs : Str α) :
+  (∃ i,
+      ((∃ t, t ++ i = tl) ∧ ¬i = [] ∧ [] ∈ derivative L (hd :: List.take (tl.length - i.length) tl)) ∧
+        cs ∈ concat (derivative L i) (kleene_closure α L)) →
+    ∃ t,
+      (∃ u v, u ++ v = tl ∧ ¬v = [] ∧ t = concat (derivative L (hd :: u)).nullify (derivative (kleene_closure α L) v)) ∧
+        cs ∈ t :=
+  by
+    intro a1
+    obtain ⟨i, ⟨⟨u, a2⟩, a3, a4⟩, a5⟩ := a1
+    rw [← a2] at a4
+    simp at a4
+    simp only [derivative] at a4
+    simp at a4
+
+    simp only [derivative] at a5
+    simp only [concat] at a5
+    simp at a5
+    obtain ⟨s, a6, t, a7, a8⟩ := a5
+    rw [← a8]
+
+    apply Exists.intro (derivative (kleene_closure α L) i)
+    constructor
+    · apply Exists.intro u
+      obtain s1 := str_mem_lang_iff_nullify_derivative_eq_eps L (hd :: u)
+      simp only [a4] at s1
+      simp at s1
+      rw [s1]
+      simp only [concat_eps_left]
+      apply Exists.intro i
+      constructor
+      · exact a2
+      · constructor
+        · exact a3
+        · rfl
+    · simp only [derivative]
+      simp
+      rw [String.str_append_assoc]
+      apply append_kleene_closure_closed
+      · exact mem_language_mem_kleene_closure L (i ++ s) a6
+      · exact a7
+
+
 noncomputable def foo'
   {α : Type}
   [DecidableEq α]
