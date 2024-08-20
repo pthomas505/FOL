@@ -256,6 +256,7 @@ example
   derivative (kleene_closure α L) s =
     ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
   by
+    simp only
     induction s generalizing L
     case nil =>
       contradiction
@@ -290,7 +291,6 @@ example
             tauto
 
           specialize ih L s1
-          simp at ih
 
           rw [← a3] at ih
 
@@ -307,8 +307,6 @@ example
             simp at c2
 
             rw [← a3]
-
-            simp only [derivative_wrt_append] at ih
 
             sorry
           case neg c2 =>
@@ -341,7 +339,6 @@ example
             contradiction
           case neg =>
             specialize ih L c2
-            simp at ih
 
             simp only [derivative] at a3
             simp only [concat] at a3
