@@ -250,12 +250,108 @@ example
   {α : Type}
   [DecidableEq α]
   (L : Language α)
-  (s : Str α) :
+  (s : Str α)
+  (h1 : ¬ s = []) :
   let T : List (List α) := foo' L s
   derivative (kleene_closure α L) s =
     ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
   by
-    sorry
+    induction s generalizing L
+    case nil =>
+      contradiction
+    case cons hd tl ih =>
+      rw [derivative_wrt_cons]
+      simp only [derivative_of_kleene_closure_wrt_char]
+      simp only [derivative_of_concat_wrt_str]
+      simp only [← derivative_wrt_append]
+      simp only [List.singleton_append]
+      simp
+
+      ext cs
+      simp
+      constructor
+      · intro a1
+        cases a1
+        case _ c1 =>
+          apply Exists.intro (hd :: tl)
+          constructor
+          · simp only [foo']
+            apply List.mem_cons_self
+          · exact c1
+        case _ c1 =>
+          obtain ⟨M, ⟨u, v, a3, a4, a5⟩, a6⟩ := c1
+          rw [a5] at a6
+          clear a5
+
+          have s1 : ¬ tl = [] :=
+          by
+            rw [← a3]
+            simp
+            tauto
+
+          specialize ih L s1
+          simp at ih
+
+          rw [← a3] at ih
+
+          simp only [concat] at a6
+          simp at a6
+
+          simp only [Language.nullify] at a6
+          split_ifs at a6
+
+          case pos c2 =>
+            simp at a6
+
+            simp only [derivative] at c2
+            simp at c2
+
+            rw [← a3]
+
+            simp only [derivative_wrt_append] at ih
+
+            sorry
+          case neg c2 =>
+            simp at a6
+
+      · intro a1
+        obtain ⟨i, a2, a3⟩ := a1
+        simp only [foo'] at a2
+        simp at a2
+        cases a2
+        case _ c1 =>
+          rw [← c1]
+          left
+          exact a3
+        case _ c1 =>
+          obtain ⟨s, a4, a5⟩ := c1
+
+          simp only [List.mem_filter] at a4
+          simp at a4
+          obtain ⟨a6, a7, a8⟩ := a4
+
+          simp only [derivative] at a8
+          simp at a8
+
+          by_cases c2 : tl = []
+          case pos =>
+            simp only [List.IsSuffix] at a6
+            rw [c2] at a6
+            simp at a6
+            contradiction
+          case neg =>
+            specialize ih L c2
+            simp at ih
+
+            simp only [derivative] at a3
+            simp only [concat] at a3
+            simp at a3
+
+            obtain ⟨xs, a9, ys, a10, a11⟩ := a3
+            rw [← a11]
+
+            simp only [Language.nullify]
+            sorry
 
 
 noncomputable def foo
