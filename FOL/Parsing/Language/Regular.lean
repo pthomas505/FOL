@@ -246,7 +246,7 @@ noncomputable def foo'
 termination_by s.length
 
 
-example
+theorem foo_proof
   {α : Type}
   [DecidableEq α]
   (L : Language α)
@@ -257,10 +257,10 @@ example
     ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
   by
     simp only
-    induction s generalizing L
+    cases e : s
     case nil =>
       contradiction
-    case cons hd tl ih =>
+    case cons hd tl =>
       rw [derivative_wrt_cons]
       simp only [derivative_of_kleene_closure_wrt_char]
       simp only [derivative_of_concat_wrt_str]
@@ -268,150 +268,106 @@ example
       simp only [List.singleton_append]
       simp
 
-      ext cs
-      simp
+      have IH (v) (h : List.IsSuffix v tl) :=
+        have : v.length < s.length := by
+          simp [e]
+          have := h.length_le
+          omega
+        foo_proof L v
+
+      simp [Set.ext_iff, foo'] at IH ⊢
+      intro cs
+      apply or_congr_right
+
       constructor
       · intro a1
-        cases a1
-        case _ c1 =>
-          apply Exists.intro (hd :: tl)
-          constructor
-          · simp only [foo']
-            apply List.mem_cons_self
-          · exact c1
-        case _ c1 =>
-          obtain ⟨M, ⟨u, v, a3, a4, a5⟩, a6⟩ := c1
-          rw [a5] at a6
-          clear a5
+        obtain ⟨M, ⟨u, v, a2, a3, a4⟩, a5⟩ := a1
+        simp only [List.mem_filter]
+        simp
 
-          have s1 : ¬ tl = [] :=
-          by
-            rw [← a3]
-            simp
-            tauto
+        have s1 : v.IsSuffix tl :=
+        by
+          simp only [List.IsSuffix]
+          apply Exists.intro u
+          exact a2
 
-          specialize ih L s1
+        specialize IH v s1 a3
 
-          rw [← a3] at ih
-
-          simp only [concat] at a6
-          simp at a6
-
-          simp only [Language.nullify] at a6
-          split_ifs at a6
-
-          case pos c2 =>
-            simp at a6
-
-            simp only [derivative] at c2
-            simp at c2
-
-            rw [← a3]
-
-            sorry
-          case neg c2 =>
-            simp at a6
-
-      · intro a1
-        obtain ⟨i, a2, a3⟩ := a1
-        simp only [foo'] at a2
-        simp at a2
-        cases a2
-        case _ c1 =>
-          rw [← c1]
-          left
-          exact a3
-        case _ c1 =>
-          obtain ⟨s, a4, a5⟩ := c1
-
-          simp only [List.mem_filter] at a4
-          simp at a4
-          obtain ⟨a6, a7, a8⟩ := a4
-
-          simp only [derivative] at a8
-          simp at a8
-
-          by_cases c2 : tl = []
-          case pos =>
-            simp only [List.IsSuffix] at a6
-            rw [c2] at a6
-            simp at a6
+        apply Exists.intro v
+        constructor
+        · constructor
+          · exact s1
+          · constructor
+            · exact a3
+            · rw [← a2]
+              simp
+              obtain s2 := a4 cs
+              simp only [Language.nullify] at s2
+              simp only [derivative] at s2
+              simp at s2
+              split_ifs at s2
+              case pos c1 =>
+                simp at c1
+                simp only [derivative]
+                simp
+                exact c1
+              case neg c1 =>
+                simp only [concat_empty_left] at s2
+                simp at s2
+                contradiction
+        · rw [← IH]
+          specialize a4 cs
+          simp only [Language.nullify] at a4
+          split_ifs at a4
+          case pos c1 =>
+            simp only [concat_eps_left] at a4
+            rw [← a4]
+            exact a5
+          case neg c1 =>
+            simp only [concat_empty_left] at a4
+            simp at a4
             contradiction
-          case neg =>
-            specialize ih L c2
+      · intro a1
+        simp only [List.mem_filter] at a1
+        simp at a1
+        obtain ⟨i, ⟨a2, a3, a4⟩, j, a5, a6⟩ := a1
 
-            simp only [derivative] at a3
-            simp only [concat] at a3
-            simp at a3
+        simp only [derivative] at a4
+        simp at a4
 
-            obtain ⟨xs, a9, ys, a10, a11⟩ := a3
-            rw [← a11]
+        specialize IH i a2 a3 cs
+        have s1 : ∃ i_1 ∈ foo' L i, cs ∈ concat (derivative L i_1) (kleene_closure α L) :=
+        by
+          apply Exists.intro j
+          tauto
 
-            simp only [Language.nullify]
-            sorry
+        simp only [List.IsSuffix] at a2
+        obtain ⟨t, ht⟩ := a2
 
+        rw [← ht] at a4
+        simp at a4
 
-noncomputable def foo
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α)
-  (s : Str α)
-  (h1 : ¬ s = []) :
-  { T : List (List α) // T ⊆ s.tails ∧ [] ∉ T ∧
-    derivative (kleene_closure α L) s =
-    ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) } :=
-  by
-    let hd :: tl := s
-    rw [← List.singleton_append]
-    simp only [derivative_wrt_append]
-    simp only [derivative_of_kleene_closure_wrt_char]
-    simp only [derivative_of_concat_wrt_str]
-    simp only [← derivative_wrt_append]
-    simp only [List.singleton_append]
-    simp only [List.tails, gt_iff_lt, List.length_pos, ne_eq]
-    open Classical in
-      let l1 :=
-        tl.tails.filter fun s => ¬ s = [] ∧ [] ∈ derivative L (hd :: tl.take (tl.length - s.length))
-    have IH (v) (h : List.IsSuffix v tl) :=
-      have := h.length_le
-      foo L v
-    let l2 := l1.attach.bind fun ⟨v, h⟩ => by
-      simp [l1, List.mem_filter] at h
-      exact (IH v h.1 h.2.1).1
-    refine ⟨(hd :: tl) :: l2, ?_, ?_, ?_⟩
-    · simp [l2, l1, List.subset_def, List.mem_filter]
-      intro _ _ ⟨a1, _⟩ a2
-      have := (IH _ _ _).2.1 a2
-      simp at this
-      exact .inr (this.trans a1)
-    · simp [List.mem_filter, l2, l1]
-      intro _ _ a2
-      exact (IH _ _ _).2.2.1 a2
-    · simp
-      congr 1
-      ext cs
-      simp only [Set.mem_sUnion, Set.mem_setOf_eq, List.mem_bind, List.mem_attach, true_and,
-        Subtype.exists, List.mem_filter, List.mem_tails, List.IsSuffix, decide_eq_true_eq,
-        Set.iUnion_exists, eq_mp_eq_cast, Set.biUnion_and', Set.biUnion_and, Set.mem_iUnion,
-        exists_prop, exists_and_right, l2, l1]
-      have H1 {u v} (H : u ++ v = tl) : List.take (tl.length - v.length) tl = u := H ▸ by simp
-      have H2 {X Y : Language α} {s : Str α} : s ∈ concat X.nullify Y ↔ [] ∈ X ∧ s ∈ Y := by
-        simp [concat, Language.nullify]
-        aesop
-      constructor
-      · rintro ⟨M, ⟨u, v, rfl, a1, rfl⟩, a5⟩
-        have ⟨a6, a7⟩ := H2.1 a5
-        simp [(IH _ ⟨_, rfl⟩ a1).2.2.2] at a7
-        obtain ⟨w, c1, c2⟩ := a7
-        refine ⟨_, _, ⟨a1, _, rfl, ?_, c1⟩, c2⟩
-        simp [a6]
-      · rintro ⟨v, w, ⟨a1, a2, rfl, a3, a4⟩, a5⟩
-        simp at a3
-        refine ⟨_, ⟨_, _, rfl, a1, rfl⟩, ?_⟩
-        rw [H2]
-        refine ⟨a3, ?_⟩
-        simp [(IH _ ⟨_, rfl⟩ a1).2.2.2]
-        refine ⟨_, a4, a5⟩
+        simp only [s1] at IH
+        simp at IH
+        apply Exists.intro (derivative (kleene_closure α L) i)
+
+        constructor
+        · apply Exists.intro t
+          apply Exists.intro i
+          constructor
+          · exact ht
+          · constructor
+            · exact a3
+            · intro x
+              simp only [Language.nullify]
+              split_ifs
+              case pos c1 =>
+                simp only [concat_eps_left]
+              case neg c1 =>
+                simp only [derivative] at c1
+                simp at c1
+                contradiction
+        · exact IH
 termination_by s.length
 
 
