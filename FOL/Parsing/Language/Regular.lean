@@ -322,10 +322,6 @@ lemma foo_proof
         simp at a4
 
         specialize IH i a2 a3
-        have s1 : ∃ i_1 ∈ foo' L i, cs ∈ concat (derivative L i_1) (kleene_closure α L) :=
-        by
-          apply Exists.intro j
-          tauto
 
         simp only [List.IsSuffix] at a2
         obtain ⟨t, ht⟩ := a2
@@ -334,7 +330,6 @@ lemma foo_proof
         simp at a4
 
         apply Exists.intro (derivative (kleene_closure α L) i)
-
         constructor
         · apply Exists.intro t
           apply Exists.intro i
@@ -352,7 +347,8 @@ lemma foo_proof
                 contradiction
         · rw [IH]
           simp
-          exact s1
+          apply Exists.intro j
+          tauto
 termination_by s.length
 
 
