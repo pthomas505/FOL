@@ -8,6 +8,9 @@ set_option autoImplicit false
 -- https://www.cambridge.org/core/journals/journal-of-functional-programming/article/regularexpression-derivatives-reexamined/E5734B86DEB96C61C69E5CF3C4FB0AFA
 
 
+namespace RegExp
+
+
 inductive RegExp (α : Type) : Type
   | char : α → RegExp α
   | epsilon : RegExp α
@@ -55,3 +58,18 @@ example
     case kleene_closure E E_ih =>
       simp only [RegExp.LanguageOf]
       exact Language.IsRegLang.kleene_closure E.LanguageOf E_ih
+
+
+def derivative
+  (α : Type)
+  (E : RegExp α)
+  (s : Str α) :
+  Language.Language α :=
+  Language.derivative E.LanguageOf s
+
+
+def are_equivalent
+  (α : Type)
+  (E1 E2 : RegExp α) :
+  Prop :=
+  E1.LanguageOf = E2.LanguageOf
