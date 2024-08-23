@@ -246,44 +246,49 @@ noncomputable def foo'
 termination_by s.length
 
 
-theorem foo_proof
+example
   {α : Type}
   [DecidableEq α]
   (L : Language α)
   (s : Str α)
   (h1 : ¬ s = []) :
-  let T : List (List α) := foo' L s
   derivative (kleene_closure α L) s =
-    ⋃ t ∈ T, concat (derivative L t) (kleene_closure α L) :=
+    ⋃ t ∈ foo' L s, concat (derivative L t) (kleene_closure α L) :=
   by
-    simp only
     cases e : s
     case nil =>
       contradiction
     case cons hd tl =>
+      have IH : ∀ (v : List α), v.IsSuffix tl → ¬ v = [] → derivative (kleene_closure α L) v = ⋃ t ∈ foo' L v, concat (derivative L t) (kleene_closure α L) :=
+      by
+        intro v h
+        have : v.length < s.length :=
+        by
+          rw [e]
+          simp
+          apply Nat.lt_succ_of_le
+          exact List.IsSuffix.length_le h
+        exact foo_proof L v
+
       rw [derivative_wrt_cons]
       simp only [derivative_of_kleene_closure_wrt_char]
       simp only [derivative_of_concat_wrt_str]
       simp only [← derivative_wrt_append]
       simp only [List.singleton_append]
+
+      simp only [foo']
+
+      simp
+      congr! 1
+      ext cs
       simp
 
-      have IH (v) (h : List.IsSuffix v tl) :=
-        have : v.length < s.length := by
-          simp [e]
-          have := h.length_le
-          omega
-        foo_proof L v
-
-      simp [Set.ext_iff, foo'] at IH ⊢
-      intro cs
-      apply or_congr_right
+      simp only [List.mem_filter]
+      simp
 
       constructor
       · intro a1
         obtain ⟨M, ⟨u, v, a2, a3, a4⟩, a5⟩ := a1
-        simp only [List.mem_filter]
-        simp
 
         have s1 : v.IsSuffix tl :=
         by
@@ -293,6 +298,11 @@ theorem foo_proof
 
         specialize IH v s1 a3
 
+        rw [a4] at a5
+        clear a4
+        simp only [mem_concat_nullify_left_iff] at a5
+        obtain ⟨a6, a7⟩ := a5
+
         apply Exists.intro v
         constructor
         · constructor
@@ -301,41 +311,17 @@ theorem foo_proof
             · exact a3
             · rw [← a2]
               simp
-              obtain s2 := a4 cs
-              simp only [Language.nullify] at s2
-              simp only [derivative] at s2
-              simp at s2
-              split_ifs at s2
-              case pos c1 =>
-                simp at c1
-                simp only [derivative]
-                simp
-                exact c1
-              case neg c1 =>
-                simp only [concat_empty_left] at s2
-                simp at s2
-                contradiction
-        · rw [← IH]
-          specialize a4 cs
-          simp only [Language.nullify] at a4
-          split_ifs at a4
-          case pos c1 =>
-            simp only [concat_eps_left] at a4
-            rw [← a4]
-            exact a5
-          case neg c1 =>
-            simp only [concat_empty_left] at a4
-            simp at a4
-            contradiction
+              exact a6
+        · rw [IH] at a7
+          simp at a7
+          exact a7
       · intro a1
-        simp only [List.mem_filter] at a1
-        simp at a1
         obtain ⟨i, ⟨a2, a3, a4⟩, j, a5, a6⟩ := a1
 
         simp only [derivative] at a4
         simp at a4
 
-        specialize IH i a2 a3 cs
+        specialize IH i a2 a3
         have s1 : ∃ i_1 ∈ foo' L i, cs ∈ concat (derivative L i_1) (kleene_closure α L) :=
         by
           apply Exists.intro j
@@ -347,8 +333,6 @@ theorem foo_proof
         rw [← ht] at a4
         simp at a4
 
-        simp only [s1] at IH
-        simp at IH
         apply Exists.intro (derivative (kleene_closure α L) i)
 
         constructor
@@ -358,8 +342,7 @@ theorem foo_proof
           · exact ht
           · constructor
             · exact a3
-            · intro x
-              simp only [Language.nullify]
+            · simp only [Language.nullify]
               split_ifs
               case pos c1 =>
                 simp only [concat_eps_left]
@@ -367,7 +350,9 @@ theorem foo_proof
                 simp only [derivative] at c1
                 simp at c1
                 contradiction
-        · exact IH
+        · rw [IH]
+          simp
+          exact s1
 termination_by s.length
 
 
