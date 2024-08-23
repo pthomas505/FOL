@@ -99,11 +99,7 @@ theorem derivative_of_reg_lang_wrt_str_is_reg_lang
       simp
       exact h1
     case cons hd tl ih =>
-      have s1 : hd :: tl = [hd] ++ tl := rfl
-      rw [s1]
-      clear s1
-
-      rw [derivative_wrt_append]
+      rw [derivative_wrt_cons]
       apply ih
       apply derivative_of_reg_lang_wrt_char_is_reg_lang
       exact h1
