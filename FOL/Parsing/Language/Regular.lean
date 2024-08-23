@@ -197,7 +197,7 @@ noncomputable def foo'
 termination_by s.length
 
 
-lemma foo_proof
+lemma derivative_of_kleene_closure_wrt_str
   {α : Type}
   [DecidableEq α]
   (L : Language α)
@@ -219,7 +219,7 @@ lemma foo_proof
           simp
           apply Nat.lt_succ_of_le
           exact List.IsSuffix.length_le h
-        exact foo_proof L v
+        exact derivative_of_kleene_closure_wrt_str L v
 
       rw [derivative_wrt_cons]
       simp only [derivative_of_kleene_closure_wrt_char]
