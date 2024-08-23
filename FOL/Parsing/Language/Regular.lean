@@ -281,8 +281,8 @@ lemma foo_proof
       simp
       congr! 1
       ext cs
-      simp
 
+      simp
       simp only [List.mem_filter]
       simp
 
