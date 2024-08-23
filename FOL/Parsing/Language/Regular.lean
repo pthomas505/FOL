@@ -33,7 +33,7 @@ inductive IsRegLang (α : Type) : Language α → Prop
   IsRegLang α R2 →
   IsRegLang α (concat R1 R2)
 
-| closure
+| kleene_closure
   (R : Language α) :
   IsRegLang α R →
   IsRegLang α (kleene_closure α R)
@@ -78,11 +78,11 @@ theorem derivative_of_reg_lang_wrt_char_is_reg_lang
           case neg c1 =>
             exact IsRegLang.zero
         · exact ih_4
-    case closure R' ih_1 ih_2 =>
+    case kleene_closure R' ih_1 ih_2 =>
       simp only [derivative_of_kleene_closure_wrt_char]
       apply IsRegLang.concat
       · exact ih_2
-      · exact IsRegLang.closure R' ih_1
+      · exact IsRegLang.kleene_closure R' ih_1
 
 
 theorem derivative_of_reg_lang_wrt_str_is_reg_lang
