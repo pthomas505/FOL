@@ -246,7 +246,7 @@ noncomputable def foo'
 termination_by s.length
 
 
-example
+lemma foo_proof
   {α : Type}
   [DecidableEq α]
   (L : Language α)
