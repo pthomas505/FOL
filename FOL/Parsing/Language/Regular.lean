@@ -174,8 +174,40 @@ example
 theorem thm_18
   {α : Type}
   [DecidableEq α]
-  (R : Language α)
-  (h1: IsRegLang α R) :
-  Finite { derivative R s | s : Str α } :=
+  (L : Language α)
+  (h1: IsRegLang α L) :
+  Finite { derivative L s | s : Str α } :=
   by
-    sorry
+    induction h1
+    case char c =>
+      have s1 : {x | ∃ s, derivative {[c]} s = x} ⊆ {{}, {[]}, {[c]}} :=
+      by
+        simp only [Set.subset_def]
+        simp
+        intro s
+        cases s
+        case nil =>
+          right; right;
+          exact derivative_wrt_eps {[c]}
+        case cons hd tl =>
+          cases tl
+          case nil =>
+            by_cases c1 : hd = c
+            case pos =>
+              rw [c1]
+              right; left;
+              exact derivative_of_char_wrt_same_char c
+            case neg =>
+              left
+              exact derivative_of_char_wrt_diff_char hd c c1
+          case cons tl_hd tl_tl =>
+            simp only [derivative]
+            simp
+      apply Set.Finite.subset _ s1
+      exact Set.toFinite {∅, {[]}, {[c]}}
+    case epsilon =>
+      sorry
+    case zero =>
+      sorry
+    all_goals
+      sorry
