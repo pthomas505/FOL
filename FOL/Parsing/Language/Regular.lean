@@ -180,7 +180,7 @@ theorem thm_18
   by
     induction h1
     case char c =>
-      have s1 : {x | ∃ s, derivative {[c]} s = x} ⊆ {{}, {[]}, {[c]}} :=
+      have s1 : {x | ∃ (s : Str α), derivative {[c]} s = x} ⊆ {{}, {[]}, {[c]}} :=
       by
         simp only [Set.subset_def]
         simp
@@ -206,7 +206,22 @@ theorem thm_18
       apply Set.Finite.subset _ s1
       exact Set.toFinite {∅, {[]}, {[c]}}
     case epsilon =>
-      sorry
+      have s1 : {x | ∃ (s : Str α), derivative {[]} s = x} ⊆ {∅, {[]}} :=
+      by
+        simp only [Set.subset_def]
+        simp
+        intro s
+        cases s
+        case nil =>
+          right;
+          exact derivative_wrt_eps {[]}
+        case cons hd tl =>
+          left;
+          rw [derivative_wrt_cons]
+          simp only [derivative_of_eps_wrt_char]
+          exact derivative_of_empty_wrt_str tl
+      apply Set.Finite.subset _ s1
+      exact Set.toFinite {∅, {[]}}
     case zero =>
       sorry
     all_goals
