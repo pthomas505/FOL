@@ -30,17 +30,17 @@ def RegExp.LanguageOf
   | char c => {[c]}
   | epsilon => {[]}
   | zero => ∅
-  | union E1 E2 => E1.LanguageOf ∪ E2.LanguageOf
-  | concat E1 E2 => Language.concat E1.LanguageOf E2.LanguageOf
-  | kleene_closure E => Language.kleene_closure α E.LanguageOf
+  | union R S => R.LanguageOf ∪ S.LanguageOf
+  | concat R S => Language.concat R.LanguageOf S.LanguageOf
+  | kleene_closure R => Language.kleene_closure α R.LanguageOf
 
 
 example
   {α : Type}
-  (E : RegExp α) :
-  Language.IsRegLang α E.LanguageOf :=
+  (RE : RegExp α) :
+  Language.IsRegLang α RE.LanguageOf :=
   by
-    induction E
+    induction RE
     case char c =>
       simp only [RegExp.LanguageOf]
       exact Language.IsRegLang.char c
@@ -50,27 +50,36 @@ example
     case zero =>
       simp only [RegExp.LanguageOf]
       exact Language.IsRegLang.zero
-    case union E1 E2 E1_ih E2_ih =>
+    case union R S R_ih S_ih =>
       simp only [RegExp.LanguageOf]
-      exact Language.IsRegLang.union E1.LanguageOf E2.LanguageOf E1_ih E2_ih
-    case concat E1 E2 E1_ih E2_ih =>
+      exact Language.IsRegLang.union R.LanguageOf S.LanguageOf R_ih S_ih
+    case concat R S R_ih S_ih =>
       simp only [RegExp.LanguageOf]
-      exact Language.IsRegLang.concat E1.LanguageOf E2.LanguageOf E1_ih E2_ih
-    case kleene_closure E E_ih =>
+      exact Language.IsRegLang.concat R.LanguageOf S.LanguageOf R_ih S_ih
+    case kleene_closure R R_ih =>
       simp only [RegExp.LanguageOf]
-      exact Language.IsRegLang.kleene_closure E.LanguageOf E_ih
+      exact Language.IsRegLang.kleene_closure R.LanguageOf R_ih
 
 
 def derivative
-  (α : Type)
-  (E : RegExp α)
+  {α : Type}
+  (R : RegExp α)
   (s : Str α) :
   Language.Language α :=
-  Language.derivative E.LanguageOf s
+  Language.derivative R.LanguageOf s
 
 
-def are_equivalent
+def equivalent
   (α : Type)
-  (E1 E2 : RegExp α) :
+  (R S : RegExp α) :
   Prop :=
-  E1.LanguageOf = E2.LanguageOf
+  R.LanguageOf = S.LanguageOf
+
+
+def RegExp.matches
+  {α : Type}
+  [DecidableEq α]
+  (R : RegExp α)
+  (s : Str α) :
+  Prop :=
+  s ∈ R.LanguageOf
