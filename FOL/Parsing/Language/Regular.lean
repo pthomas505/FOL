@@ -223,6 +223,13 @@ theorem thm_18
       apply Set.Finite.subset _ s1
       exact Set.toFinite {∅, {[]}}
     case zero =>
-      sorry
+      have s1 : {x | ∃ (s : Str α), derivative ∅ s = x} ⊆ {∅} :=
+      by
+        simp only [Set.subset_def]
+        simp
+        intro s
+        exact derivative_of_empty_wrt_str s
+      apply Set.Finite.subset _ s1
+      exact Set.finite_singleton ∅
     all_goals
       sorry
