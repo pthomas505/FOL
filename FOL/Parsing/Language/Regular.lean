@@ -196,6 +196,24 @@ example
         constructor
         · apply a2
         . rfl
+    case concat L1 L2 L1_ih1 L2_ih1 L1_ih2 L2_ih2 =>
+      simp only [derivative_of_concat_wrt_str]
+
+      obtain ⟨T1, a1⟩ := L1_ih2
+      obtain ⟨T2, a2⟩ := L2_ih2
+
+      let A : Finset (Language α) := {L2}
+      have s1 : ∀ (s : Str α), concat (derivative L1 s) L2 ∈ T1.biUnion (fun a => A.biUnion (fun b => {concat a b})) :=
+      by
+        intro s
+        simp only [A]
+        simp
+        apply Exists.intro (derivative L1 s)
+        tauto
+
+      apply Exists.intro (T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b})))
+
+      sorry
     all_goals
       sorry
 
