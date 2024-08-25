@@ -211,8 +211,6 @@ example
         apply Exists.intro (derivative L1 s)
         tauto
 
-      apply Exists.intro (T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b})))
-
       sorry
     all_goals
       sorry
