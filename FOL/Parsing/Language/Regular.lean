@@ -1,5 +1,6 @@
 import FOL.Parsing.Language.Equiv
 
+import Mathlib.Data.Finset.NAry
 
 set_option autoImplicit false
 
@@ -171,6 +172,35 @@ example
   derivative (L1 ∪ L2) s = derivative L1 s ∪ derivative L2 s := rfl
 
 
+example
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (h1: IsRegLang α L) :
+  ∃ T : Finset (Language α), ∀ s, derivative L s ∈ T :=
+  by
+    open Classical in
+    induction h1
+    case union L1 L2 L1_ih1 L2_ih1 L1_ih2 L2_ih2 =>
+      obtain ⟨T1, a1⟩ := L1_ih2
+      obtain ⟨T2, a2⟩ := L2_ih2
+      simp only [derivative_of_union_wrt_str]
+      let T := T1.biUnion (fun a => T2.biUnion (fun b => {a ∪ b}))
+      apply Exists.intro T
+      simp only [T]
+      simp
+      intro s
+      apply Exists.intro (derivative L1 s)
+      constructor
+      · apply a1
+      · apply Exists.intro (derivative L2 s)
+        constructor
+        · apply a2
+        . rfl
+    all_goals
+      sorry
+
+
 theorem thm_18
   {α : Type}
   [DecidableEq α]
@@ -231,28 +261,6 @@ theorem thm_18
         exact derivative_of_empty_wrt_str s
       apply Set.Finite.subset _ s1
       exact Set.finite_singleton ∅
-    case union L1 L2 L1_ih1 L2_ih1 L1_ih2 L2_ih2 =>
-      simp only [derivative_of_union_wrt_str]
 
-      have s1 : {x | ∃ s, derivative L1 s = x} = ⋃ (s : Str α), {derivative L1 s} :=
-      by
-        ext cs
-        simp
-      rw [s1] at L1_ih2
-
-      have s2 : {x | ∃ s, derivative L2 s = x} = ⋃ (s : Str α), {derivative L2 s} :=
-      by
-        ext cs
-        simp
-      rw [s2] at L2_ih2
-
-      have s3 : {x | ∃ s, derivative L1 s ∪ derivative L2 s = x} = ⋃ (s : Str α), {derivative L1 s ∪ derivative L2 s} :=
-      by
-        ext cs
-        simp
-      rw [s3]
-
-      clear s1; clear s2; clear s3;
-      sorry
     all_goals
       sorry
