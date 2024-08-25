@@ -231,5 +231,28 @@ theorem thm_18
         exact derivative_of_empty_wrt_str s
       apply Set.Finite.subset _ s1
       exact Set.finite_singleton ∅
+    case union L1 L2 L1_ih1 L2_ih1 L1_ih2 L2_ih2 =>
+      simp only [derivative_of_union_wrt_str]
+
+      have s1 : {x | ∃ s, derivative L1 s = x} = ⋃ (s : Str α), {derivative L1 s} :=
+      by
+        ext cs
+        simp
+      rw [s1] at L1_ih2
+
+      have s2 : {x | ∃ s, derivative L2 s = x} = ⋃ (s : Str α), {derivative L2 s} :=
+      by
+        ext cs
+        simp
+      rw [s2] at L2_ih2
+
+      have s3 : {x | ∃ s, derivative L1 s ∪ derivative L2 s = x} = ⋃ (s : Str α), {derivative L1 s ∪ derivative L2 s} :=
+      by
+        ext cs
+        simp
+      rw [s3]
+
+      clear s1; clear s2; clear s3;
+      sorry
     all_goals
       sorry
