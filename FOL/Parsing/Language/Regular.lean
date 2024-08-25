@@ -211,6 +211,10 @@ example
         apply Exists.intro (derivative L1 s)
         tauto
 
+      have s2 : ∀ (s : Str α), {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion ∈ (sorry : Finset (Language α)) :=
+      by
+        sorry
+
       sorry
     all_goals
       sorry
