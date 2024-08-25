@@ -182,12 +182,11 @@ example
     open Classical in
     induction h1
     case union L1 L2 L1_ih1 L2_ih1 L1_ih2 L2_ih2 =>
+      simp only [derivative_of_union_wrt_str]
+
       obtain ⟨T1, a1⟩ := L1_ih2
       obtain ⟨T2, a2⟩ := L2_ih2
-      simp only [derivative_of_union_wrt_str]
-      let T := T1.biUnion (fun a => T2.biUnion (fun b => {a ∪ b}))
-      apply Exists.intro T
-      simp only [T]
+      apply Exists.intro (T1.biUnion (fun a => T2.biUnion (fun b => {a ∪ b})))
       simp
       intro s
       apply Exists.intro (derivative L1 s)
