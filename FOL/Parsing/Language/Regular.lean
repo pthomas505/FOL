@@ -227,6 +227,24 @@ example
             · apply a2
             · rfl
 
+
+      have s3 : ∀ s, {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ C :=
+      by
+        intro s
+        simp only [C]
+        simp only [Set.subset_def]
+        intro X a3
+        simp at a3
+        simp
+        obtain ⟨u, v, a4, a5, a6⟩ := a3
+        apply Exists.intro (derivative L1 u)
+        constructor
+        · apply a1
+        · apply Exists.intro (derivative L2 v)
+          constructor
+          · apply a2
+          · exact a6
+
 /-
       let D := {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion
 
