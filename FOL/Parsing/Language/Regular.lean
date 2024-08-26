@@ -203,19 +203,21 @@ example
       obtain ⟨T2, a2⟩ := L2_ih2
 
       let A : Finset (Language α) := {L2}
-      have s1 : ∀ (s : Str α), concat (derivative L1 s) L2 ∈ T1.biUnion (fun a => A.biUnion (fun b => {concat a b})) :=
+      let B : Finset (Language α) := T1.biUnion (fun a => A.biUnion (fun b => {concat a b}))
+      have s1 : ∀ (s : Str α), concat (derivative L1 s) L2 ∈ B :=
       by
         intro s
+        simp only [B]
         simp only [A]
         simp
         apply Exists.intro (derivative L1 s)
         tauto
 
-      let B : Finset (Language α) := (T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b} )) : Finset (Language α))
-      have s2 : ∀ (u v : Str α), concat (derivative L1 u).nullify (derivative L2 v) ∈ B :=
+      let C : Finset (Language α) := (T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b} )) : Finset (Language α))
+      have s2 : ∀ (u v : Str α), concat (derivative L1 u).nullify (derivative L2 v) ∈ C :=
       by
         intro u v
-        simp only [B]
+        simp only [C]
         simp
         apply Exists.intro (derivative L1 u)
         constructor
@@ -225,9 +227,20 @@ example
             · apply a2
             · rfl
 
-      have s3 : ∀ (s : Str α), {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion ∈ (sorry : Finset (Language α)) :=
-      by
-        sorry
+/-
+      let D := {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion
+
+      let E : Finset (Language α) := (B.biUnion (fun a => {a ∪ D} ))
+
+      apply Exists.intro E
+      simp only [E]
+      simp only [D]
+      simp only [B]
+      simp only [A]
+      intro s
+      simp
+      apply Exists.intro (concat (derivative L1 s) L2)
+-/
 
       sorry
     all_goals
