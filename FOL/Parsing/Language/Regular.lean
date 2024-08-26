@@ -227,7 +227,6 @@ example
             · apply a2
             · rfl
 
-
       have s3 : ∀ s, {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ C :=
       by
         intro s
@@ -245,20 +244,27 @@ example
           · apply a2
           · exact a6
 
-/-
-      let D := {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion
+      have s4 : ∀ s, Finite {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} :=
+      by
+        intro s
+        apply Set.Finite.subset
+        · exact Finite.of_fintype { x // x ∈ C }
+        · exact s3 s
 
-      let E : Finset (Language α) := (B.biUnion (fun a => {a ∪ D} ))
+      have s5 : ∀ s, {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.toFinite.toFinset ∈ C.powerset :=
+      by
+        intro s
+        apply Finset.mem_powerset.mpr
+        exact Set.Finite.toFinset_subset.mpr (s3 s)
 
-      apply Exists.intro E
-      simp only [E]
-      simp only [D]
-      simp only [B]
-      simp only [A]
-      intro s
-      simp
-      apply Exists.intro (concat (derivative L1 s) L2)
--/
+      have s6 : ∀ s, {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion ∈ C.powerset.image fun x => x.toSet.sUnion :=
+      by
+        intro s
+        apply Finset.mem_image.mpr
+        apply Exists.intro {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.toFinite.toFinset
+        simp
+        simp at s3
+        apply s3
 
       sorry
     all_goals
