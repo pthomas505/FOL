@@ -211,7 +211,22 @@ example
         apply Exists.intro (derivative L1 s)
         tauto
 
-      have s2 : ∀ (s : Str α), {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion ∈ (sorry : Finset (Language α)) :=
+      let B : Finset (Language α) := (T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b} )) : Finset (Language α))
+
+      have s2 : ∀ (u v : Str α), concat (derivative L1 u).nullify (derivative L2 v) ∈ B :=
+      by
+        intro u v
+        simp only [B]
+        simp
+        apply Exists.intro (derivative L1 u)
+        constructor
+        · apply a1
+        · apply Exists.intro (derivative L2 v)
+          · constructor
+            · apply a2
+            · rfl
+
+      have s3 : ∀ (s : Str α), {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion ∈ (sorry : Finset (Language α)) :=
       by
         sorry
 
