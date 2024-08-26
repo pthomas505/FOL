@@ -212,7 +212,6 @@ example
         tauto
 
       let B : Finset (Language α) := (T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b} )) : Finset (Language α))
-
       have s2 : ∀ (u v : Str α), concat (derivative L1 u).nullify (derivative L2 v) ∈ B :=
       by
         intro u v
