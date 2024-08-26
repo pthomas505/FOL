@@ -266,6 +266,12 @@ example
         simp at s3
         apply s3
 
+      let D := C.powerset.image fun x => x.toSet.sUnion
+
+      let T := (B.biUnion (fun a => D.biUnion (fun b => {a ∪ b})))
+
+      apply Exists.intro T
+
       sorry
     all_goals
       sorry
