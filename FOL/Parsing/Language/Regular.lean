@@ -271,8 +271,23 @@ example
       let T := (B.biUnion (fun a => D.biUnion (fun b => {a ∪ b})))
 
       apply Exists.intro T
+      intro s
+      simp only [T]
+      simp only [B]
+      simp only [D]
+      simp only [A]
+      simp
 
-      sorry
+      apply Exists.intro (concat (derivative L1 s) L2)
+      constructor
+      · apply Exists.intro (derivative L1 s)
+        constructor
+        · apply a1
+        · rfl
+      · apply Exists.intro ({M | ∃ u v, u ++ v = s ∧ v.length > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}).toFinite.toFinset
+        constructor
+        · exact Set.Finite.toFinset_subset.mpr (s3 s)
+        · simp
     all_goals
       sorry
 
