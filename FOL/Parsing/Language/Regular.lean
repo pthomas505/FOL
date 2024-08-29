@@ -314,16 +314,44 @@ example
     case kleene_closure L1 L1_ih1 L1_ih2 =>
       obtain ⟨T, a1⟩ := L1_ih2
 
-      have s1 : ∀ (s : Str α) (t), t ∈ foo' L1 s → derivative L1 t ∈ T :=
+      have s1 : ∀ (s : Str α), {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M} ⊆ T :=
       by
-        intro s t a2
+        intro s
+        apply Set.setOf_subset.mpr
+        simp
+        intro a a2
         apply a1
 
-      have s2 : ∃ (S : Finset (Language α)), ∀ (s : Str α), (⋃ s_1 ∈ foo' L1 s, derivative L1 s_1) ∈ S :=
+      have s2 : ∀ (s : Str α), Finite {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M} :=
       by
-        sorry
+        intro s
+        simp
+        apply Set.Finite.subset _ (s1 s)
+        simp
 
-      obtain ⟨S, a3⟩ := s2
+      have s3 : ∀ (s : Str α), {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M}.toFinite.toFinset ∈ T.powerset :=
+      by
+        intro s
+        simp
+        exact s1 s
+
+      have s4 : ∀ (s : Str α), (⋃ s_1 ∈ foo' L1 s, derivative L1 s_1) = ⋃₀ {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M} :=
+      by
+        intro s
+        ext cs
+        simp
+
+      have s5 : ∃ (S : Finset (Language α)), ∀ (s : Str α), (⋃ s_1 ∈ foo' L1 s, derivative L1 s_1) ∈ S :=
+      by
+        simp only [s4]
+        apply Exists.intro (T.powerset.image (fun x => x.toSet.sUnion))
+        intro s
+        simp
+        apply Exists.intro ({M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M}.toFinite.toFinset)
+        simp
+        apply s1
+
+      obtain ⟨S, a2⟩ := s5
 
       let A : Finset (Language α) := {kleene_closure α L1} ∪ S.biUnion (fun a => {concat a (kleene_closure α L1)})
 
