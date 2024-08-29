@@ -172,6 +172,29 @@ example
   derivative (L1 ∪ L2) s = derivative L1 s ∪ derivative L2 s := rfl
 
 
+lemma blah
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (M : List (Str α))
+  (f : Str α -> Language α):
+  ⋃ s ∈ M, concat (f s) L = concat (⋃ s ∈ M, (f s)) L :=
+  by
+    simp only [concat]
+    simp
+    ext cs
+    simp
+    constructor
+    · intro a1
+      obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a1
+      rw [← eq]
+      exact ⟨s, ⟨i, hi, hs⟩, t, ht, rfl⟩
+    · intro a1
+      obtain ⟨s, ⟨i, hi, hs⟩, t, ht, eq⟩ := a1
+      rw [← eq]
+      exact ⟨i, hi, s, hs, t, ht, rfl⟩
+
+
 example
   {α : Type}
   [DecidableEq α]
@@ -288,6 +311,41 @@ example
         constructor
         · exact Set.Finite.toFinset_subset.mpr (s3 s)
         · simp
+    case kleene_closure L1 L1_ih1 L1_ih2 =>
+      obtain ⟨T, a1⟩ := L1_ih2
+
+      have s1 : ∀ (s : Str α) (t), t ∈ foo' L1 s → derivative L1 t ∈ T :=
+      by
+        intro s t a2
+        apply a1
+
+      have s2 : ∃ (S : Finset (Language α)), ∀ (s : Str α), (⋃ s_1 ∈ foo' L1 s, derivative L1 s_1) ∈ S :=
+      by
+        sorry
+
+      obtain ⟨S, a3⟩ := s2
+
+      let A : Finset (Language α) := {kleene_closure α L1} ∪ S.biUnion (fun a => {concat a (kleene_closure α L1)})
+
+      apply Exists.intro A
+      intro s
+      by_cases c1 : s = []
+      case pos =>
+        simp only [A]
+        simp only [c1]
+        simp only [derivative_wrt_eps]
+        simp
+      case neg =>
+        obtain s1 := derivative_of_kleene_closure_wrt_str L1 s c1
+        rw [s1]
+        clear s1
+        rw [blah]
+        simp only [A]
+        simp
+        right
+        apply Exists.intro (⋃ s_1 ∈ foo' L1 s, derivative L1 s_1)
+        tauto
+
     all_goals
       sorry
 
