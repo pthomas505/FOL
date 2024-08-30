@@ -204,33 +204,35 @@ theorem thm_18
       let A := T1.biUnion (fun M1 => ({L2} : Finset (Language α)).biUnion (fun M2 => {concat M1 M2}))
 
       let B := T1.biUnion (fun M1 => T2.biUnion (fun M2 => {concat M1.nullify M2}))
-      let C := B.powerset.image (fun (S : Finset (Language α)) => S.toSet.sUnion)
 
-      let T := A.biUnion (fun M1 => C.biUnion (fun M2 => {M1 ∪ M2}))
-
-      have s3 : ∀ s, {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ B :=
+      have s1 : ∀ s, {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ B :=
       by
         intro s
         simp only [B]
         simp only [Set.subset_def]
-        intro X a3
+        intro M a3
         simp at a3
         simp
-        obtain ⟨u, v, a4, a5, a6⟩ := a3
+        obtain ⟨u, v, _, _, a4⟩ := a3
         apply Exists.intro (derivative L1 u)
         constructor
         · apply a1
         · apply Exists.intro (derivative L2 v)
           constructor
           · apply a2
-          · exact a6
+          · exact a4
 
-      have s4 : ∀ s, Finite {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} :=
+      have : ∀ s, Finite {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} :=
       by
         intro s
         apply Set.Finite.subset
         · exact Finite.of_fintype { x // x ∈ B }
-        · exact s3 s
+        · exact s1 s
+
+
+      let C := B.powerset.image (fun (S : Finset (Language α)) => S.toSet.sUnion)
+
+      let T := A.biUnion (fun M1 => C.biUnion (fun M2 => {M1 ∪ M2}))
 
       apply Exists.intro T
       intro s
@@ -247,7 +249,7 @@ theorem thm_18
         · rfl
       · apply Exists.intro ({M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}).toFinite.toFinset
         constructor
-        · exact Set.Finite.toFinset_subset.mpr (s3 s)
+        · exact Set.Finite.toFinset_subset.mpr (s1 s)
         · simp
     case kleene_closure L1 L1_ih1 L1_ih2 =>
       obtain ⟨T, a1⟩ := L1_ih2
