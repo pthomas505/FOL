@@ -201,15 +201,17 @@ theorem thm_18
       obtain ⟨T1, a1⟩ := L1_ih2
       obtain ⟨T2, a2⟩ := L2_ih2
 
-      let B : Finset (Language α) := T1.biUnion (fun a => ({L2} : Finset (Language α)).biUnion (fun b => {concat a b}))
-      let C : Finset (Language α) := T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b}))
-      let D := C.powerset.image fun x => x.toSet.sUnion
-      let T := B.biUnion (fun a => D.biUnion (fun b => {a ∪ b}))
+      let A := T1.biUnion (fun M1 => ({L2} : Finset (Language α)).biUnion (fun M2 => {concat M1 M2}))
 
-      have s3 : ∀ s, {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ C :=
+      let B := T1.biUnion (fun M1 => T2.biUnion (fun M2 => {concat M1.nullify M2}))
+      let C := B.powerset.image (fun (S : Finset (Language α)) => S.toSet.sUnion)
+
+      let T := A.biUnion (fun M1 => C.biUnion (fun M2 => {M1 ∪ M2}))
+
+      have s3 : ∀ s, {M | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ B :=
       by
         intro s
-        simp only [C]
+        simp only [B]
         simp only [Set.subset_def]
         intro X a3
         simp at a3
@@ -223,18 +225,18 @@ theorem thm_18
           · apply a2
           · exact a6
 
-      have s4 : ∀ s, Finite {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} :=
+      have s4 : ∀ s, Finite {M | ∃ u v, u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} :=
       by
         intro s
         apply Set.Finite.subset
-        · exact Finite.of_fintype { x // x ∈ C }
+        · exact Finite.of_fintype { x // x ∈ B }
         · exact s3 s
 
       apply Exists.intro T
       intro s
       simp only [T]
-      simp only [B]
-      simp only [D]
+      simp only [A]
+      simp only [C]
       simp
 
       apply Exists.intro (concat (derivative L1 s) L2)
@@ -243,7 +245,7 @@ theorem thm_18
         constructor
         · apply a1
         · rfl
-      · apply Exists.intro ({M | ∃ u v, u ++ v = s ∧ v.length > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}).toFinite.toFinset
+      · apply Exists.intro ({M | ∃ u v, u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}).toFinite.toFinset
         constructor
         · exact Set.Finite.toFinset_subset.mpr (s3 s)
         · simp
