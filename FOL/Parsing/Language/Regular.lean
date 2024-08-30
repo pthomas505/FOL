@@ -203,28 +203,7 @@ theorem thm_18
 
       let A : Finset (Language α) := {L2}
       let B : Finset (Language α) := T1.biUnion (fun a => A.biUnion (fun b => {concat a b}))
-      have s1 : ∀ (s : Str α), concat (derivative L1 s) L2 ∈ B :=
-      by
-        intro s
-        simp only [B]
-        simp only [A]
-        simp
-        apply Exists.intro (derivative L1 s)
-        tauto
-
       let C : Finset (Language α) := (T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b} )) : Finset (Language α))
-      have s2 : ∀ (u v : Str α), concat (derivative L1 u).nullify (derivative L2 v) ∈ C :=
-      by
-        intro u v
-        simp only [C]
-        simp
-        apply Exists.intro (derivative L1 u)
-        constructor
-        · apply a1
-        · apply Exists.intro (derivative L2 v)
-          · constructor
-            · apply a2
-            · rfl
 
       have s3 : ∀ s, {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ C :=
       by
@@ -249,21 +228,6 @@ theorem thm_18
         apply Set.Finite.subset
         · exact Finite.of_fintype { x // x ∈ C }
         · exact s3 s
-
-      have s5 : ∀ s, {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.toFinite.toFinset ∈ C.powerset :=
-      by
-        intro s
-        apply Finset.mem_powerset.mpr
-        exact Set.Finite.toFinset_subset.mpr (s3 s)
-
-      have s6 : ∀ s, {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.sUnion ∈ C.powerset.image fun x => x.toSet.sUnion :=
-      by
-        intro s
-        apply Finset.mem_image.mpr
-        apply Exists.intro {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}.toFinite.toFinset
-        simp
-        simp at s3
-        apply s3
 
       let D := C.powerset.image fun x => x.toSet.sUnion
 
@@ -304,12 +268,6 @@ theorem thm_18
         simp
         apply Set.Finite.subset _ (s1 s)
         simp
-
-      have s3 : ∀ (s : Str α), {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M}.toFinite.toFinset ∈ T.powerset :=
-      by
-        intro s
-        simp
-        exact s1 s
 
       have s4 : ∀ (s : Str α), (⋃ s_1 ∈ foo' L1 s, derivative L1 s_1) = ⋃₀ {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M} :=
       by
