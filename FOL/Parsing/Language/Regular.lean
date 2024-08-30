@@ -185,15 +185,16 @@ theorem thm_18
 
       obtain ⟨T1, a1⟩ := L1_ih2
       obtain ⟨T2, a2⟩ := L2_ih2
+
       apply Exists.intro (T1.biUnion (fun a => T2.biUnion (fun b => {a ∪ b})))
       simp
       intro s
       apply Exists.intro (derivative L1 s)
       constructor
-      · apply a1
+      · exact a1 s
       · apply Exists.intro (derivative L2 s)
         constructor
-        · apply a2
+        · exact a2 s
         . rfl
     case concat L1 L2 L1_ih1 L2_ih1 L1_ih2 L2_ih2 =>
       simp only [derivative_of_concat_wrt_str]
@@ -205,29 +206,25 @@ theorem thm_18
 
       let B := T1.biUnion (fun M1 => T2.biUnion (fun M2 => {concat M1.nullify M2}))
 
-      have s1 : ∀ s, {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ B :=
+      have s1 : ∀ (s : Str α), {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ B :=
       by
         intro s
         simp only [B]
         simp only [Set.subset_def]
-        intro M a3
-        simp at a3
         simp
-        obtain ⟨u, v, _, _, a4⟩ := a3
+        intro M u v _ _ a3
         apply Exists.intro (derivative L1 u)
         constructor
-        · apply a1
+        · exact a1 u
         · apply Exists.intro (derivative L2 v)
           constructor
-          · apply a2
-          · exact a4
+          · exact a2 v
+          · exact a3
 
-      have : ∀ s, Finite {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} :=
+      have : ∀ (s : Str α), Finite {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} :=
       by
         intro s
-        apply Set.Finite.subset
-        · exact Finite.of_fintype { x // x ∈ B }
-        · exact s1 s
+        exact Finite.Set.subset B (s1 s)
 
 
       let C := B.powerset.image (fun (S : Finset (Language α)) => S.toSet.sUnion)
@@ -245,13 +242,13 @@ theorem thm_18
       constructor
       · apply Exists.intro (derivative L1 s)
         constructor
-        · apply a1
+        · exact a1 s
         · rfl
       · apply Exists.intro ({M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}).toFinite.toFinset
         constructor
         · exact Set.Finite.toFinset_subset.mpr (s1 s)
         · simp
-    case kleene_closure L1 L1_ih1 L1_ih2 =>
+    case kleene_closure L1 _ L1_ih2 =>
       obtain ⟨T, a1⟩ := L1_ih2
 
       have s1 : ∀ (s : Str α), {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M} ⊆ T :=
