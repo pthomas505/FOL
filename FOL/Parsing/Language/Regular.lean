@@ -204,6 +204,48 @@ example
   by
     open Classical in
     induction h1
+    case char c =>
+      apply Exists.intro {{}, {[]}, {[c]}}
+      intro s
+      cases s
+      case nil =>
+        rw [derivative_wrt_eps]
+        apply Finset.mem_insert_of_mem
+        apply Finset.mem_insert_of_mem
+        simp only [Finset.mem_singleton]
+      case cons hd tl =>
+        cases tl
+        case nil =>
+          by_cases c1 : hd = c
+          case pos =>
+            rw [c1]
+            simp only [derivative_of_char_wrt_same_char c]
+            apply Finset.mem_insert_of_mem
+            exact Finset.mem_insert_self {[]} {{[c]}}
+          case neg =>
+            simp only [derivative_of_char_wrt_diff_char hd c c1]
+            exact Finset.mem_insert_self ∅ {{[]}, {[c]}}
+        case cons tl_hd tl_tl =>
+          simp only [derivative]
+          simp
+    case epsilon =>
+      apply Exists.intro {∅, {[]}}
+      intro s
+      cases s
+      case nil =>
+        simp only [derivative_wrt_eps]
+        apply Finset.mem_insert_of_mem
+        simp only [Finset.mem_singleton]
+      case cons hd tl =>
+        rw [derivative_wrt_cons]
+        simp only [derivative_of_eps_wrt_char]
+        simp only [derivative_of_empty_wrt_str]
+        exact Finset.mem_insert_self ∅ {{[]}}
+    case zero =>
+      apply Exists.intro {∅}
+      intro s
+      simp only [derivative_of_empty_wrt_str]
+      simp only [Finset.mem_singleton]
     case union L1 L2 L1_ih1 L2_ih1 L1_ih2 L2_ih2 =>
       simp only [derivative_of_union_wrt_str]
 
