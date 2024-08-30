@@ -208,7 +208,7 @@ theorem thm_18
 
       let T := A.biUnion (fun M1 => C.biUnion (fun M2 => {M1 ∪ M2}))
 
-      have s3 : ∀ s, {M | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ B :=
+      have s3 : ∀ s, {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ B :=
       by
         intro s
         simp only [B]
@@ -225,7 +225,7 @@ theorem thm_18
           · apply a2
           · exact a6
 
-      have s4 : ∀ s, Finite {M | ∃ u v, u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} :=
+      have s4 : ∀ s, Finite {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} :=
       by
         intro s
         apply Set.Finite.subset
@@ -245,7 +245,7 @@ theorem thm_18
         constructor
         · apply a1
         · rfl
-      · apply Exists.intro ({M | ∃ u v, u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}).toFinite.toFinset
+      · apply Exists.intro ({M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}).toFinite.toFinset
         constructor
         · exact Set.Finite.toFinset_subset.mpr (s3 s)
         · simp
