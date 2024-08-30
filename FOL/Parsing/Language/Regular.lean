@@ -202,9 +202,9 @@ theorem thm_18
       obtain ⟨T1, a1⟩ := L1_ih2
       obtain ⟨T2, a2⟩ := L2_ih2
 
-      let A := T1.biUnion (fun M1 => ({L2} : Finset (Language α)).biUnion (fun M2 => {concat M1 M2}))
+      let A := T1.biUnion (fun (M1 : Language α) => ({L2} : Finset (Language α)).biUnion (fun (M2 : Language α) => {concat M1 M2}))
 
-      let B := T1.biUnion (fun M1 => T2.biUnion (fun M2 => {concat M1.nullify M2}))
+      let B := T1.biUnion (fun (M1 : Language α) => T2.biUnion (fun (M2 : Language α) => {concat M1.nullify M2}))
 
       have s1 : ∀ (s : Str α), {M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ B :=
       by
@@ -229,7 +229,7 @@ theorem thm_18
 
       let C := B.powerset.image (fun (S : Finset (Language α)) => S.toSet.sUnion)
 
-      let T := A.biUnion (fun M1 => C.biUnion (fun M2 => {M1 ∪ M2}))
+      let T := A.biUnion (fun (M1 : Language α) => C.biUnion (fun (M2 : Language α) => {M1 ∪ M2}))
 
       apply Exists.intro T
       intro s
@@ -246,45 +246,46 @@ theorem thm_18
         · rfl
       · apply Exists.intro ({M : Language α | ∃ (u : Str α) (v : Str α), u ++ v = s ∧ ¬ v = [] ∧ M = concat (derivative L1 u).nullify (derivative L2 v)}).toFinite.toFinset
         constructor
-        · exact Set.Finite.toFinset_subset.mpr (s1 s)
+        · simp only [Set.Finite.toFinset_subset]
+          exact s1 s
         · simp
     case kleene_closure L1 _ L1_ih2 =>
       obtain ⟨T, a1⟩ := L1_ih2
 
-      have s1 : ∀ (s : Str α), {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M} ⊆ T :=
+      have s1 : ∀ (s : Str α), {M : Language α | ∃ (t : List α), t ∈ foo' L1 s ∧ derivative L1 t = M} ⊆ T.toSet :=
       by
         intro s
-        apply Set.setOf_subset.mpr
+        simp only [Set.subset_def]
         simp
-        intro a a2
-        apply a1
+        intro t _
+        exact a1 t
 
-      have s2 : ∀ (s : Str α), Finite {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M} :=
+      have s2 : ∀ (s : Str α), Finite {M : Language α | ∃ (t : List α), t ∈ foo' L1 s ∧ derivative L1 t = M} :=
       by
         intro s
         simp
         apply Set.Finite.subset _ (s1 s)
-        simp
+        exact Finset.finite_toSet T
 
-      have s4 : ∀ (s : Str α), (⋃ s_1 ∈ foo' L1 s, derivative L1 s_1) = ⋃₀ {M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M} :=
+      have s3 : ∀ (s : Str α), (⋃ t ∈ foo' L1 s, derivative L1 t) = ⋃₀ {M : Language α | ∃ (t : List α), t ∈ foo' L1 s ∧ derivative L1 t = M} :=
       by
         intro s
         ext cs
         simp
 
-      have s5 : ∃ (S : Finset (Language α)), ∀ (s : Str α), (⋃ s_1 ∈ foo' L1 s, derivative L1 s_1) ∈ S :=
+      have s4 : ∃ (S : Finset (Language α)), ∀ (s : Str α), (⋃ t ∈ foo' L1 s, derivative L1 t) ∈ S :=
       by
-        simp only [s4]
-        apply Exists.intro (T.powerset.image (fun x => x.toSet.sUnion))
+        simp only [s3]
+        apply Exists.intro (T.powerset.image (fun (S : Finset (Language α)) => S.toSet.sUnion))
         intro s
         simp
-        apply Exists.intro ({M | ∃ s_1 ∈ foo' L1 s, derivative L1 s_1 = M}.toFinite.toFinset)
+        apply Exists.intro {M : Language α | ∃ (t : List α), t ∈ foo' L1 s ∧ derivative L1 t = M}.toFinite.toFinset
         simp
         apply s1
 
-      obtain ⟨S, a2⟩ := s5
+      obtain ⟨S, a2⟩ := s4
 
-      let A : Finset (Language α) := {kleene_closure α L1} ∪ S.biUnion (fun a => {concat a (kleene_closure α L1)})
+      let A := {kleene_closure α L1} ∪ S.biUnion (fun (M : Language α) => {concat M (kleene_closure α L1)})
 
       apply Exists.intro A
       intro s
