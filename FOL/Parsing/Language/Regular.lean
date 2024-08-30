@@ -195,7 +195,7 @@ lemma blah
       exact ⟨i, hi, s, hs, t, ht, rfl⟩
 
 
-example
+theorem thm_18
   {α : Type}
   [DecidableEq α]
   (L : Language α)
