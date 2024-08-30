@@ -201,9 +201,10 @@ theorem thm_18
       obtain ⟨T1, a1⟩ := L1_ih2
       obtain ⟨T2, a2⟩ := L2_ih2
 
-      let A : Finset (Language α) := {L2}
-      let B : Finset (Language α) := T1.biUnion (fun a => A.biUnion (fun b => {concat a b}))
-      let C : Finset (Language α) := (T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b} )) : Finset (Language α))
+      let B : Finset (Language α) := T1.biUnion (fun a => ({L2} : Finset (Language α)).biUnion (fun b => {concat a b}))
+      let C : Finset (Language α) := T1.biUnion (fun a => T2.biUnion (fun b => {concat a.nullify b}))
+      let D := C.powerset.image fun x => x.toSet.sUnion
+      let T := B.biUnion (fun a => D.biUnion (fun b => {a ∪ b}))
 
       have s3 : ∀ s, {M | ∃ u v, u ++ v = s ∧ List.length v > 0 ∧ M = concat (derivative L1 u).nullify (derivative L2 v)} ⊆ C :=
       by
@@ -229,16 +230,11 @@ theorem thm_18
         · exact Finite.of_fintype { x // x ∈ C }
         · exact s3 s
 
-      let D := C.powerset.image fun x => x.toSet.sUnion
-
-      let T := (B.biUnion (fun a => D.biUnion (fun b => {a ∪ b})))
-
       apply Exists.intro T
       intro s
       simp only [T]
       simp only [B]
       simp only [D]
-      simp only [A]
       simp
 
       apply Exists.intro (concat (derivative L1 s) L2)
