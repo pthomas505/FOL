@@ -106,7 +106,7 @@ theorem derivative_of_reg_lang_wrt_str_is_reg_lang
       exact h1
 
 
-theorem thm_18
+theorem all_derivative_of_reg_lang_wrt_str_subset_finset
   {α : Type}
   [DecidableEq α]
   (L : Language α)
