@@ -213,4 +213,6 @@ example
     case cons hd tl ih =>
       simp only [RegExp.matches]
       rw [ih]
-      sorry
+      rw [regexp_lang_derivative_eq_regexp_derivative_lang]
+      simp only [Language.derivative]
+      simp
