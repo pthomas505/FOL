@@ -82,72 +82,33 @@ def RegExp.nullify
 lemma regexp_nullify_lang_eq_regexp_lang_nullify
   {α : Type}
   [DecidableEq α]
-  (R : RegExp α) :
-  R.nullify.LanguageOf = Language.Language.nullify R.LanguageOf :=
+  (RE : RegExp α) :
+  RE.nullify.LanguageOf = Language.Language.nullify RE.LanguageOf :=
   by
-    induction R
+    induction RE
     case char c =>
       simp only [RegExp.LanguageOf]
       simp only [Language.Language.nullify]
       simp
     case epsilon =>
       simp only [RegExp.LanguageOf]
-      simp only [Language.Language.nullify]
-      simp
+      simp only [Language.nullify_eps]
     case zero =>
       simp only [RegExp.LanguageOf]
-      simp only [Language.Language.nullify]
-      simp
+      simp only [Language.nullify_empty]
     case union R S R_ih S_ih =>
       simp only [RegExp.LanguageOf]
+      simp only [Language.nullify_union]
       rw [R_ih]
       rw [S_ih]
-      simp only [Language.Language.nullify]
-      ext cs
-      simp
-      tauto
     case concat R S R_ih S_ih =>
       simp only [RegExp.LanguageOf]
+      simp only [Language.nullify_concat]
       rw [R_ih]
       rw [S_ih]
-      simp only [Language.Language.nullify]
-      ext cs
-      simp
-      split_ifs
-      case pos c1 c2 =>
-        simp only [Language.concat]
-        simp
-        simp only [c1]
-        simp only [c2]
-        simp
-      case neg c1 c2 =>
-        simp only [Language.concat]
-        simp
-        simp only [c1]
-        simp only [c2]
-        simp
-      case pos c1 c2 =>
-        simp only [Language.concat]
-        simp
-        simp only [c1]
-        simp only [c2]
-        simp
-      case neg c1 c2 =>
-        simp only [Language.concat]
-        simp
-        simp only [c1]
-        simp only [c2]
-        simp
     case kleene_closure R _ =>
       simp only [RegExp.LanguageOf]
-      simp only [Language.Language.nullify]
-      split_ifs
-      case pos _ =>
-        rfl
-      case neg c1 =>
-        exfalso
-        apply c1
-        exact Language.eps_mem_kleene_closure (RegExp.LanguageOf α R)
+      simp only [Language.nullify_kleene_closure]
 
 
 example
@@ -190,39 +151,35 @@ example
     induction R
     case char c =>
       simp only [RegExp.derivative]
-      simp only [Language.derivative]
       split_ifs
       case pos c1 =>
         rw [c1]
         simp only [RegExp.LanguageOf]
-        simp
+        simp only [Language.derivative_of_char_wrt_same_char]
       case neg c1 =>
         simp only [RegExp.LanguageOf]
-        simp
-        simp only [c1]
-        simp
+        simp only [Language.derivative_of_char_wrt_diff_char a c c1]
     case epsilon =>
       simp only [RegExp.LanguageOf]
-      simp only [Language.derivative]
-      simp
+      simp only [Language.derivative_of_eps_wrt_char]
     case zero =>
       simp only [RegExp.LanguageOf]
-      simp only [Language.derivative]
-      simp
+      simp only [Language.derivative_of_empty_wrt_char]
     case union R S R_ih S_ih =>
       simp only [RegExp.LanguageOf]
       rw [R_ih]
       rw [S_ih]
-      simp only [Language.derivative]
-      ext cs
-      simp
+      simp only [Language.derivative_of_union_wrt_char]
     case concat R S R_ih S_ih =>
       simp only [RegExp.LanguageOf]
       rw [R_ih]
       rw [S_ih]
-      sorry
+      simp only [Language.derivative_of_concat_wrt_char]
+      simp only [regexp_nullify_lang_eq_regexp_lang_nullify]
     case kleene_closure R R_ih =>
-      sorry
+      simp only [RegExp.LanguageOf]
+      rw [R_ih]
+      simp only [Language.derivative_of_kleene_closure_wrt_char]
 
 
 def equal
