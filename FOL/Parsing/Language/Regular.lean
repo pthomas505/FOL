@@ -264,8 +264,7 @@ theorem thm_18
       by
         intro s
         simp
-        apply Set.Finite.subset _ (s1 s)
-        exact Finset.finite_toSet T
+        exact Set.Finite.subset (Finset.finite_toSet T) (s1 s)
 
       have s3 : ∀ (s : Str α), (⋃ t ∈ foo' L1 s, derivative L1 t) = ⋃₀ {M : Language α | ∃ (t : List α), t ∈ foo' L1 s ∧ derivative L1 t = M} :=
       by
@@ -281,7 +280,7 @@ theorem thm_18
         simp
         apply Exists.intro {M : Language α | ∃ (t : List α), t ∈ foo' L1 s ∧ derivative L1 t = M}.toFinite.toFinset
         simp
-        apply s1
+        exact s1 s
 
       obtain ⟨S, a2⟩ := s4
 
