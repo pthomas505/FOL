@@ -61,6 +61,13 @@ example
       exact Language.IsRegLang.kleene_closure R.LanguageOf R_ih
 
 
+def RegExp.is_nullable
+  {α : Type}
+  (RE : RegExp α) :
+  Prop :=
+  [] ∈ RE.LanguageOf
+
+
 def RegExp.nullify
   {α : Type} :
   RegExp α → RegExp α
@@ -72,34 +79,7 @@ def RegExp.nullify
   | kleene_closure _ => epsilon
 
 
-example
-  {α : Type}
-  (RE : RegExp α) :
-  open Classical in
-  if [] ∈ RE.LanguageOf
-  then RE.nullify = RegExp.epsilon
-  else RE.nullify = RegExp.zero :=
-  by
-    induction RE
-    case char c =>
-      simp only [RegExp.nullify]
-      simp only [RegExp.LanguageOf]
-      simp
-    case epsilon =>
-      simp only [RegExp.nullify]
-      simp only [RegExp.LanguageOf]
-      simp
-    case zero =>
-      simp only [RegExp.nullify]
-      simp only [RegExp.LanguageOf]
-      simp
-    case union R S R_ih S_ih =>
-      sorry
-    all_goals
-      sorry
-
-
-example
+lemma regexp_nullify_lang_eq_regexp_lang_nullify
   {α : Type}
   [DecidableEq α]
   (R : RegExp α) :
@@ -168,6 +148,23 @@ example
         exfalso
         apply c1
         exact Language.eps_mem_kleene_closure (RegExp.LanguageOf α R)
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α) :
+  open Classical in
+  if RE.is_nullable
+  then RE.nullify.LanguageOf = {[]}
+  else RE.nullify.LanguageOf = ∅ :=
+  by
+    rw [regexp_nullify_lang_eq_regexp_lang_nullify]
+    simp only [RegExp.is_nullable]
+    simp only [Language.Language.nullify]
+    split_ifs
+    · rfl
+    · rfl
 
 
 def RegExp.derivative
