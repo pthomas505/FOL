@@ -106,35 +106,12 @@ theorem derivative_of_reg_lang_wrt_str_is_reg_lang
       exact h1
 
 
-lemma blah
-  {α : Type}
-  [DecidableEq α]
-  (L : Language α)
-  (M : List (Str α))
-  (f : Str α -> Language α):
-  ⋃ s ∈ M, concat (f s) L = concat (⋃ s ∈ M, (f s)) L :=
-  by
-    simp only [concat]
-    simp
-    ext cs
-    simp
-    constructor
-    · intro a1
-      obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a1
-      rw [← eq]
-      exact ⟨s, ⟨i, hi, hs⟩, t, ht, rfl⟩
-    · intro a1
-      obtain ⟨s, ⟨i, hi, hs⟩, t, ht, eq⟩ := a1
-      rw [← eq]
-      exact ⟨i, hi, s, hs, t, ht, rfl⟩
-
-
 theorem thm_18
   {α : Type}
   [DecidableEq α]
   (L : Language α)
   (h1: IsRegLang α L) :
-  ∃ T : Finset (Language α), ∀ s, derivative L s ∈ T :=
+  ∃ (T : Finset (Language α)), ∀ (s : Str α), derivative L s ∈ T :=
   by
     open Classical in
     induction h1
@@ -298,9 +275,27 @@ theorem thm_18
         obtain s1 := derivative_of_kleene_closure_wrt_str L1 s c1
         rw [s1]
         clear s1
-        rw [blah]
+
+        have s2 : ⋃ t ∈ foo' L1 s, concat (derivative L1 t) (kleene_closure α L1) = concat (⋃ t ∈ foo' L1 s, derivative L1 t) (kleene_closure α L1) :=
+        by
+          simp only [concat]
+          simp
+          ext cs
+          simp
+          constructor
+          · intro a3
+            obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a3
+            rw [← eq]
+            exact ⟨s, ⟨i, hi, hs⟩, t, ht, rfl⟩
+          · intro a3
+            obtain ⟨s, ⟨i, hi, hs⟩, t, ht, eq⟩ := a3
+            rw [← eq]
+            exact ⟨i, hi, s, hs, t, ht, rfl⟩
+        rw [s2]
+        clear s2
+
         simp only [A]
         simp
         right
-        apply Exists.intro (⋃ s_1 ∈ foo' L1 s, derivative L1 s_1)
-        tauto
+        apply Exists.intro (⋃ t ∈ foo' L1 s, derivative L1 t)
+        exact ⟨a2 s, rfl⟩
