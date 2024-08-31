@@ -111,7 +111,7 @@ lemma regexp_nullify_lang_eq_regexp_lang_nullify
       simp only [Language.nullify_kleene_closure]
 
 
-example
+lemma regexp_is_nullable_ite
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α) :
@@ -141,7 +141,7 @@ def RegExp.derivative
   | kleene_closure R => concat (R.derivative a) (kleene_closure R)
 
 
-example
+lemma regexp_lang_derivative_eq_regexp_derivative_lang
   {α : Type}
   [DecidableEq α]
   (a : α)
@@ -192,7 +192,25 @@ def equal
 def RegExp.matches
   {α : Type}
   [DecidableEq α]
-  (R : RegExp α)
+  (RE : RegExp α) : Str α → Prop
+  | [] => RE.nullify.LanguageOf = {[]}
+  | hd :: tl => (RE.derivative hd).matches tl
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α)
   (s : Str α) :
-  Prop :=
-  s ∈ R.LanguageOf
+  RE.matches s ↔ s ∈ RE.LanguageOf :=
+  by
+    induction s generalizing RE
+    case nil =>
+      simp only [RegExp.matches]
+      simp only [regexp_nullify_lang_eq_regexp_lang_nullify]
+      simp only [← Language.is_nullable_iff_nullify_eq_eps_singleton]
+      simp only [Language.Language.is_nullable]
+    case cons hd tl ih =>
+      simp only [RegExp.matches]
+      rw [ih]
+      sorry

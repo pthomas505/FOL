@@ -71,10 +71,11 @@ lemma is_nullable_iff_nullify_eq_eps_singleton
         contradiction
 
 
-lemma nullify_empty
+lemma nullify_char
   {α : Type}
-  [DecidableEq α] :
-  (∅ : Language α).nullify = ∅ :=
+  [DecidableEq α]
+  (c : α) :
+  ({[c]} : Language α).nullify = ∅ :=
   by
     simp only [Language.nullify]
     simp
@@ -84,6 +85,15 @@ lemma nullify_eps
   {α : Type}
   [DecidableEq α] :
   ({[]} : Language α).nullify = {[]} :=
+  by
+    simp only [Language.nullify]
+    simp
+
+
+lemma nullify_empty
+  {α : Type}
+  [DecidableEq α] :
+  (∅ : Language α).nullify = ∅ :=
   by
     simp only [Language.nullify]
     simp
