@@ -79,6 +79,42 @@ def RegExp.nullify
   | kleene_closure _ => epsilon
 
 
+noncomputable
+instance
+  (α : Type)
+  [DecidableEq α]
+  (L : Language.Language α) :
+  Fintype L.nullify :=
+  by
+    simp only [Language.Language.nullify]
+    split_ifs
+    case pos c1 =>
+      exact Fintype.subtypeEq []
+    case neg c1 =>
+      exact Set.fintypeEmpty
+
+
+instance
+  (α : Type)
+  [DecidableEq α]
+  (RE : RegExp α) :
+  Fintype (RE.nullify.LanguageOf) :=
+  by
+    induction RE
+    case char _ =>
+      exact Set.fintypeEmpty
+    case epsilon =>
+      exact Fintype.subtypeEq []
+    case zero =>
+      exact Set.fintypeEmpty
+    case union R S R_ih S_ih =>
+      exact Set.fintypeUnion R.nullify.LanguageOf S.nullify.LanguageOf
+    case concat R S R_ih S_ih =>
+      exact Set.fintypeImage2 (fun a b => a ++ b) R.nullify.LanguageOf S.nullify.LanguageOf
+    case kleene_closure _ _ =>
+      exact Fintype.subtypeEq []
+
+
 lemma regexp_nullify_lang_eq_regexp_lang_nullify
   {α : Type}
   [DecidableEq α]
@@ -194,34 +230,8 @@ def RegExp.matches
   [DecidableEq α]
   (RE : RegExp α) :
   Str α → Prop
-  | [] => RE.nullify.LanguageOf = {[]}
+  | [] => RE.nullify.LanguageOf.toFinset = {[]}
   | hd :: tl => (RE.derivative hd).matches tl
-
-
-lemma regexp_nullify_lang_finite
-  {α : Type}
-  [DecidableEq α]
-  (RE : RegExp α) :
-  Finite RE.nullify.LanguageOf :=
-  by
-    induction RE
-    all_goals
-      simp only [RegExp.nullify]
-      simp only [RegExp.LanguageOf]
-
-    case char c =>
-      exact Set.finite_empty
-    case epsilon =>
-      exact Set.finite_singleton []
-    case zero =>
-      exact Set.finite_empty
-    case union R S R_ih S_ih =>
-      exact Set.Finite.union R_ih S_ih
-    case concat R S R_ih S_ih =>
-      simp only [Language.concat]
-      exact Finite.Set.finite_image2 (fun a b => a ++ b) R.nullify.LanguageOf S.nullify.LanguageOf
-    case kleene_closure R _ =>
-      exact Set.finite_singleton []
 
 
 instance
@@ -231,9 +241,16 @@ instance
   (s : Str α) :
   Decidable (RE.matches s) :=
   by
-    sorry
+    induction s generalizing RE
+    case nil =>
+      simp only [RegExp.matches]
+      exact decEq (Set.toFinset RE.nullify.LanguageOf) {[]}
+    case cons hd tl ih =>
+      simp only [RegExp.matches]
+      exact ih (RegExp.derivative hd RE)
 
--- #eval RegExp.matches (RegExp.char 'c') ['c']
+
+#eval RegExp.matches (RegExp.char 'c') ['c']
 
 
 example
@@ -246,9 +263,10 @@ example
     induction s generalizing RE
     case nil =>
       simp only [RegExp.matches]
-      simp only [regexp_nullify_lang_eq_regexp_lang_nullify]
-      simp only [← Language.is_nullable_iff_nullify_eq_eps_singleton]
-      simp only [Language.Language.is_nullable]
+      sorry
+      --simp only [regexp_nullify_lang_eq_regexp_lang_nullify]
+      --simp only [← Language.is_nullable_iff_nullify_eq_eps_singleton]
+      --simp only [Language.Language.is_nullable]
     case cons hd tl ih =>
       simp only [RegExp.matches]
       rw [ih]
