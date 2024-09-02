@@ -198,6 +198,32 @@ def RegExp.matches
   | hd :: tl => (RE.derivative hd).matches tl
 
 
+lemma regexp_nullify_lang_finite
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α) :
+  Finite RE.nullify.LanguageOf :=
+  by
+    induction RE
+    all_goals
+      simp only [RegExp.nullify]
+      simp only [RegExp.LanguageOf]
+
+    case char c =>
+      exact Set.finite_empty
+    case epsilon =>
+      exact Set.finite_singleton []
+    case zero =>
+      exact Set.finite_empty
+    case union R S R_ih S_ih =>
+      exact Set.Finite.union R_ih S_ih
+    case concat R S R_ih S_ih =>
+      simp only [Language.concat]
+      exact Finite.Set.finite_image2 (fun a b => a ++ b) R.nullify.LanguageOf S.nullify.LanguageOf
+    case kleene_closure R _ =>
+      exact Set.finite_singleton []
+
+
 instance
   (α : Type)
   [DecidableEq α]
@@ -206,7 +232,6 @@ instance
   Decidable (RE.matches s) :=
   by
     sorry
-
 
 -- #eval RegExp.matches (RegExp.char 'c') ['c']
 
