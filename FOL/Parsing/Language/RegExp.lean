@@ -286,3 +286,15 @@ def regexp_equiv
   (R S : RegExp α) :
   Prop :=
   R.LanguageOf = S.LanguageOf
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (R S : RegExp α)
+  (a : α)
+  (h1 : R.LanguageOf = S.LanguageOf) :
+  (R.derivative a).LanguageOf = (S.derivative a).LanguageOf :=
+  by
+    simp only [regexp_lang_derivative_eq_regexp_derivative_lang]
+    simp only [h1]
