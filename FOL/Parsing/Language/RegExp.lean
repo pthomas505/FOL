@@ -25,7 +25,7 @@ compile_inductive% RegExp
 
 
 def RegExp.LanguageOf
-  (α : Type) :
+  {α : Type} :
   RegExp α → Language.Language α
   | char c => {[c]}
   | epsilon => {[]}
@@ -38,7 +38,7 @@ def RegExp.LanguageOf
 example
   {α : Type}
   (RE : RegExp α) :
-  Language.IsRegLang α RE.LanguageOf :=
+  Language.IsRegLang RE.LanguageOf :=
   by
     induction RE
     case char c =>
@@ -83,7 +83,7 @@ lemma regexp_nullify_lang_eq_regexp_lang_nullify
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α) :
-  RE.nullify.LanguageOf = Language.Language.nullify RE.LanguageOf :=
+  RE.nullify.LanguageOf = (RE.LanguageOf).nullify :=
   by
     induction RE
     case char c =>
@@ -145,10 +145,10 @@ lemma regexp_lang_derivative_eq_regexp_derivative_lang
   {α : Type}
   [DecidableEq α]
   (a : α)
-  (R : RegExp α) :
-  (R.derivative a).LanguageOf = Language.derivative R.LanguageOf [a] :=
+  (RE : RegExp α) :
+  (RE.derivative a).LanguageOf = Language.derivative RE.LanguageOf [a] :=
   by
-    induction R
+    induction RE
     case char c =>
       simp only [RegExp.derivative]
       split_ifs
@@ -192,9 +192,23 @@ def equal
 def RegExp.matches
   {α : Type}
   [DecidableEq α]
-  (RE : RegExp α) : Str α → Prop
+  (RE : RegExp α) :
+  Str α → Prop
   | [] => RE.nullify.LanguageOf = {[]}
   | hd :: tl => (RE.derivative hd).matches tl
+
+
+instance
+  (α : Type)
+  [DecidableEq α]
+  (RE : RegExp α)
+  (s : Str α) :
+  Decidable (RE.matches s) :=
+  by
+    sorry
+
+
+-- #eval RegExp.matches (RegExp.char 'c') ['c']
 
 
 example

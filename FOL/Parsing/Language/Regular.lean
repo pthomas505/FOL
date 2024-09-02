@@ -11,33 +11,33 @@ set_option autoImplicit false
 namespace Language
 
 
-inductive IsRegLang (α : Type) : Language α → Prop
+inductive IsRegLang {α : Type} : Language α → Prop
 | char
   (a : α) :
-  IsRegLang α {[a]}
+  IsRegLang {[a]}
 
 | epsilon :
-  IsRegLang α {[]}
+  IsRegLang {[]}
 
 | zero :
-  IsRegLang α ∅
+  IsRegLang ∅
 
 | union
   (R1 R2 : Language α) :
-  IsRegLang α R1 →
-  IsRegLang α R2 →
-  IsRegLang α (R1 ∪ R2)
+  IsRegLang R1 →
+  IsRegLang R2 →
+  IsRegLang (R1 ∪ R2)
 
 | concat
   (R1 R2 : Language α) :
-  IsRegLang α R1 →
-  IsRegLang α R2 →
-  IsRegLang α (concat R1 R2)
+  IsRegLang R1 →
+  IsRegLang R2 →
+  IsRegLang (concat R1 R2)
 
 | kleene_closure
   (R : Language α) :
-  IsRegLang α R →
-  IsRegLang α (kleene_closure α R)
+  IsRegLang R →
+  IsRegLang (kleene_closure α R)
 
 
 theorem derivative_of_reg_lang_wrt_char_is_reg_lang
@@ -45,8 +45,8 @@ theorem derivative_of_reg_lang_wrt_char_is_reg_lang
   [DecidableEq α]
   (R : Language α)
   (a : α)
-  (h1 : IsRegLang α R) :
-  IsRegLang α (derivative R [a]) :=
+  (h1 : IsRegLang R) :
+  IsRegLang (derivative R [a]) :=
   by
     induction h1
     case char b =>
@@ -91,8 +91,8 @@ theorem derivative_of_reg_lang_wrt_str_is_reg_lang
   [DecidableEq α]
   (R : Language α)
   (s : Str α)
-  (h1: IsRegLang α R) :
-  IsRegLang α (derivative R s) :=
+  (h1: IsRegLang R) :
+  IsRegLang (derivative R s) :=
   by
     induction s generalizing R
     case nil =>
@@ -110,7 +110,7 @@ theorem all_derivative_of_reg_lang_wrt_str_mem_finset
   {α : Type}
   [DecidableEq α]
   (L : Language α)
-  (h1: IsRegLang α L) :
+  (h1: IsRegLang L) :
   ∃ (T : Finset (Language α)), ∀ (s : Str α), derivative L s ∈ T :=
   by
     open Classical in
