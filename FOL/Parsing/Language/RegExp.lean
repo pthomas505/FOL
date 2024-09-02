@@ -62,10 +62,55 @@ example
 
 
 def RegExp.is_nullable
+  {α : Type} :
+  RegExp α → Prop
+  | char _ => False
+  | epsilon => True
+  | zero => False
+  | union R S => R.is_nullable ∨ S.is_nullable
+  | concat R S => R.is_nullable ∧ S.is_nullable
+  | kleene_closure _ => True
+
+
+instance
+  (α : Type)
+  [DecidableEq α]
+  (RE : RegExp α) :
+  Decidable RE.is_nullable :=
+  by
+    induction RE
+    all_goals
+      simp only [RegExp.is_nullable]
+      infer_instance
+
+
+lemma regexp_is_nullable_iff_eps_mem_lang_of
   {α : Type}
   (RE : RegExp α) :
-  Prop :=
-  [] ∈ RE.LanguageOf
+  RE.is_nullable ↔ [] ∈ RE.LanguageOf :=
+  by
+    induction RE
+    all_goals
+      simp only [RegExp.is_nullable]
+      simp only [RegExp.LanguageOf]
+    case char c =>
+      simp
+    case epsilon =>
+      simp
+    case zero =>
+      simp
+    case union R S R_ih S_ih =>
+      rw [R_ih]
+      rw [S_ih]
+      simp
+    case concat R S R_ih S_ih =>
+      rw [R_ih]
+      rw [S_ih]
+      simp only [Language.concat]
+      simp
+    case kleene_closure R _ =>
+      simp
+      simp only [Language.eps_mem_kleene_closure]
 
 
 def RegExp.nullify
@@ -77,42 +122,6 @@ def RegExp.nullify
   | union R S => union R.nullify S.nullify
   | concat R S => concat R.nullify S.nullify
   | kleene_closure _ => epsilon
-
-
-noncomputable
-instance
-  (α : Type)
-  [DecidableEq α]
-  (L : Language.Language α) :
-  Fintype L.nullify :=
-  by
-    simp only [Language.Language.nullify]
-    split_ifs
-    case pos c1 =>
-      exact Fintype.subtypeEq []
-    case neg c1 =>
-      exact Set.fintypeEmpty
-
-
-instance
-  (α : Type)
-  [DecidableEq α]
-  (RE : RegExp α) :
-  Fintype (RE.nullify.LanguageOf) :=
-  by
-    induction RE
-    case char _ =>
-      exact Set.fintypeEmpty
-    case epsilon =>
-      exact Fintype.subtypeEq []
-    case zero =>
-      exact Set.fintypeEmpty
-    case union R S R_ih S_ih =>
-      exact Set.fintypeUnion R.nullify.LanguageOf S.nullify.LanguageOf
-    case concat R S R_ih S_ih =>
-      exact Set.fintypeImage2 (fun a b => a ++ b) R.nullify.LanguageOf S.nullify.LanguageOf
-    case kleene_closure _ _ =>
-      exact Fintype.subtypeEq []
 
 
 lemma regexp_nullify_lang_eq_regexp_lang_nullify
@@ -151,17 +160,22 @@ lemma regexp_is_nullable_ite
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α) :
-  open Classical in
   if RE.is_nullable
   then RE.nullify.LanguageOf = {[]}
   else RE.nullify.LanguageOf = ∅ :=
   by
     rw [regexp_nullify_lang_eq_regexp_lang_nullify]
-    simp only [RegExp.is_nullable]
-    simp only [Language.Language.nullify]
     split_ifs
-    · rfl
-    · rfl
+    case pos c1 =>
+      simp only [Language.Language.nullify]
+      rw [regexp_is_nullable_iff_eps_mem_lang_of] at c1
+      simp only [c1]
+      simp
+    case neg c1 =>
+      simp only [Language.Language.nullify]
+      rw [regexp_is_nullable_iff_eps_mem_lang_of] at c1
+      simp only [c1]
+      simp
 
 
 def RegExp.derivative
@@ -230,7 +244,7 @@ def RegExp.matches
   [DecidableEq α]
   (RE : RegExp α) :
   Str α → Prop
-  | [] => RE.nullify.LanguageOf.toFinset = {[]}
+  | [] => RE.is_nullable
   | hd :: tl => (RE.derivative hd).matches tl
 
 
@@ -244,13 +258,15 @@ instance
     induction s generalizing RE
     case nil =>
       simp only [RegExp.matches]
-      exact decEq (Set.toFinset RE.nullify.LanguageOf) {[]}
+      infer_instance
     case cons hd tl ih =>
       simp only [RegExp.matches]
-      exact ih (RegExp.derivative hd RE)
+      infer_instance
 
 
 #eval RegExp.matches (RegExp.char 'c') ['c']
+#eval RegExp.matches (RegExp.char 'c') ['d']
+#eval RegExp.matches (RegExp.kleene_closure (RegExp.char 'c')) ['c', 'c']
 
 
 example
@@ -263,10 +279,7 @@ example
     induction s generalizing RE
     case nil =>
       simp only [RegExp.matches]
-      sorry
-      --simp only [regexp_nullify_lang_eq_regexp_lang_nullify]
-      --simp only [← Language.is_nullable_iff_nullify_eq_eps_singleton]
-      --simp only [Language.Language.is_nullable]
+      exact regexp_is_nullable_iff_eps_mem_lang_of RE
     case cons hd tl ih =>
       simp only [RegExp.matches]
       rw [ih]
