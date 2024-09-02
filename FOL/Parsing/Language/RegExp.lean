@@ -232,13 +232,6 @@ lemma regexp_lang_derivative_eq_regexp_derivative_lang
       simp only [Language.derivative_of_kleene_closure_wrt_char]
 
 
-def equal
-  (α : Type)
-  (R S : RegExp α) :
-  Prop :=
-  R.LanguageOf = S.LanguageOf
-
-
 def RegExp.matches
   {α : Type}
   [DecidableEq α]
@@ -286,3 +279,10 @@ example
       rw [regexp_lang_derivative_eq_regexp_derivative_lang]
       simp only [Language.derivative]
       simp
+
+
+def regexp_equiv
+  {α : Type}
+  (R S : RegExp α) :
+  Prop :=
+  R.LanguageOf = S.LanguageOf
