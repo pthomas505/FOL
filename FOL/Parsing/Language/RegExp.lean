@@ -266,7 +266,7 @@ instance
 
 #eval RegExp.matches (RegExp.char 'c') ['c']
 #eval RegExp.matches (RegExp.char 'c') ['d']
-#eval RegExp.matches (RegExp.kleene_closure (RegExp.char 'c')) ['c', 'c']
+#eval RegExp.matches (RegExp.concat (RegExp.kleene_closure (RegExp.char 'c')) (RegExp.char 'd')) ['c', 'c', 'd']
 
 
 example
