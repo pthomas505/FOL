@@ -307,6 +307,10 @@ inductive Similar {α : Type} : RegExp α → RegExp α → Prop
   (R S T : RegExp α) :
   Similar (RegExp.union (RegExp.union R S) T) (RegExp.union R (RegExp.union S T))
 
+| union_4
+  (R : RegExp α) :
+  Similar (RegExp.union RegExp.zero R) R
+
 | concat_1
   (R S T : RegExp α) :
   Similar (RegExp.concat (RegExp.concat R S) T) (RegExp.concat R (RegExp.concat S T))
