@@ -288,6 +288,56 @@ def regexp_equiv
   R.LanguageOf = S.LanguageOf
 
 
+def RegExp.equiv_class
+  {α : Type}
+  (R : RegExp α) :=
+  {S : RegExp α | regexp_equiv R S}
+
+
+inductive Similar {α : Type} : RegExp α → RegExp α → Prop
+| union_1
+  (R : RegExp α) :
+  Similar (RegExp.union R R) R
+
+| union_2
+  (R S : RegExp α) :
+  Similar (RegExp.union R S) (RegExp.union S R)
+
+| union_3
+  (R S T : RegExp α) :
+  Similar (RegExp.union (RegExp.union R S) T) (RegExp.union R (RegExp.union S T))
+
+| concat_1
+  (R S T : RegExp α) :
+  Similar (RegExp.concat (RegExp.concat R S) T) (RegExp.concat R (RegExp.concat S T))
+
+| concat_2
+  (R : RegExp α) :
+  Similar (RegExp.concat RegExp.zero R) RegExp.zero
+
+| concat_3
+  (R : RegExp α) :
+  Similar (RegExp.concat R RegExp.zero) RegExp.zero
+
+| concat_4
+  (R : RegExp α) :
+  Similar (RegExp.concat RegExp.epsilon R) R
+
+| concat_5
+  (R : RegExp α) :
+  Similar (RegExp.concat R RegExp.epsilon) R
+
+| kleene_closure_1
+  (R : RegExp α) :
+  Similar (RegExp.kleene_closure (RegExp.kleene_closure R)) (RegExp.kleene_closure R)
+
+| kleene_closure_2 :
+  Similar (RegExp.kleene_closure RegExp.epsilon) RegExp.epsilon
+
+| kleene_closure_3 :
+  Similar (RegExp.kleene_closure RegExp.zero) RegExp.epsilon
+
+
 example
   {α : Type}
   [DecidableEq α]
