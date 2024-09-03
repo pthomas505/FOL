@@ -344,6 +344,53 @@ inductive Similar {α : Type} : RegExp α → RegExp α → Prop
 
 example
   {α : Type}
+  (RE_1 RE_2 : RegExp α)
+  (h1 : Similar RE_1 RE_2) :
+  RE_1.LanguageOf = RE_2.LanguageOf :=
+  by
+    induction h1
+    case union_1 R =>
+      simp only [RegExp.LanguageOf]
+      simp
+    case union_2 R S =>
+      simp only [RegExp.LanguageOf]
+      exact Set.union_comm R.LanguageOf S.LanguageOf
+    case union_3 R S T =>
+      simp only [RegExp.LanguageOf]
+      exact Set.union_assoc R.LanguageOf S.LanguageOf T.LanguageOf
+    case union_4 R =>
+      simp only [RegExp.LanguageOf]
+      exact Set.empty_union R.LanguageOf
+    case concat_1 R S T =>
+      simp only [RegExp.LanguageOf]
+      symm
+      exact Language.concat_assoc R.LanguageOf S.LanguageOf T.LanguageOf
+    case concat_2 R =>
+      simp only [RegExp.LanguageOf]
+      exact Language.concat_empty_left R.LanguageOf
+    case concat_3 R =>
+      simp only [RegExp.LanguageOf]
+      exact Language.concat_empty_right R.LanguageOf
+    case concat_4 R =>
+      simp only [RegExp.LanguageOf]
+      exact Language.concat_eps_left R.LanguageOf
+    case concat_5 R =>
+      simp only [RegExp.LanguageOf]
+      exact Language.concat_eps_right R.LanguageOf
+    case kleene_closure_1 R =>
+      simp only [RegExp.LanguageOf]
+      symm
+      exact Language.kleene_closure_idempotent R.LanguageOf
+    case kleene_closure_2 =>
+      simp only [RegExp.LanguageOf]
+      exact Language.kleene_closure_eps
+    case kleene_closure_3 =>
+      simp only [RegExp.LanguageOf]
+      exact Language.kleene_closure_empty
+
+
+example
+  {α : Type}
   [DecidableEq α]
   (R S : RegExp α)
   (a : α)
