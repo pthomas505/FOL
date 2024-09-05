@@ -399,3 +399,128 @@ example
   by
     simp only [regexp_lang_derivative_eq_regexp_derivative_lang]
     simp only [h1]
+
+
+def partial_derivative_concat
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α))
+  (β : RegExp α) :
+  Finset (RegExp α) :=
+  if ¬ β = RegExp.zero ∧ ¬ β = RegExp.epsilon
+  then Γ.image (fun α => RegExp.concat α β)
+  else
+    if β = RegExp.zero
+    then ∅
+    else Γ
+
+
+def RegExp.partial_derivative
+  {α : Type}
+  [DecidableEq α]
+  (a : α) :
+  RegExp α → Finset (RegExp α)
+  | char b => if a = b then {epsilon} else ∅
+  | epsilon => ∅
+  | zero => ∅
+  | union α β => (α.partial_derivative a) ∪ (β.partial_derivative a)
+  | concat α β =>
+  if α.is_nullable
+  then (partial_derivative_concat (α.partial_derivative a) β) ∪ (β.partial_derivative a)
+  else (partial_derivative_concat (α.partial_derivative a) β)
+  | kleene_closure α => partial_derivative_concat (α.partial_derivative a) (RegExp.kleene_closure α)
+
+
+def regexp_finset_language_of
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α)) :=
+  ⋃ (R ∈ Γ), R.LanguageOf
+
+lemma regexp_finset_language_of_union
+  {α : Type}
+  [DecidableEq α]
+  (S T : Finset (RegExp α)) :
+  regexp_finset_language_of (S ∪ T) = regexp_finset_language_of S ∪ regexp_finset_language_of T :=
+  by
+    simp only [regexp_finset_language_of]
+    ext re
+    simp
+    constructor
+    · intro a1
+      obtain ⟨i, a2, a3⟩ := a1
+      cases a2
+      case _ c1 =>
+        left
+        apply Exists.intro i
+        exact ⟨c1, a3⟩
+      case _ c1 =>
+        right
+        apply Exists.intro i
+        exact ⟨c1, a3⟩
+    · intro a1
+      cases a1
+      case _ c1 =>
+        obtain ⟨i, a2, a3⟩ := c1
+        apply Exists.intro i
+        constructor
+        · left
+          exact a2
+        · exact a3
+      case _ c1 =>
+        obtain ⟨i, a2, a3⟩ := c1
+        apply Exists.intro i
+        constructor
+        · right
+          exact a2
+        · exact a3
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (a : α)
+  (RE : RegExp α) :
+  regexp_finset_language_of (RE.partial_derivative a) = Language.derivative RE.LanguageOf [a] :=
+  by
+    induction RE
+    case char b =>
+      simp only [regexp_finset_language_of]
+      simp only [Language.derivative]
+      simp only [RegExp.LanguageOf]
+      ext re
+      simp
+      simp only [RegExp.partial_derivative]
+      split_ifs
+      case pos c1 =>
+        rw [c1]
+        simp
+        simp only [RegExp.LanguageOf]
+        simp
+      case neg c1 =>
+        simp
+        simp only [c1]
+        simp
+    case union R S R_ih S_ih =>
+      simp only [Language.derivative]
+      simp only [RegExp.LanguageOf]
+      ext re
+      simp only [RegExp.partial_derivative]
+      simp only [regexp_finset_language_of_union]
+      simp
+      congr! 1
+      · simp only [R_ih]
+        simp only [Language.derivative]
+        simp
+      · simp only [S_ih]
+        simp only [Language.derivative]
+        simp
+    case concat R S R_ih S_ih =>
+      ext re
+      constructor
+      · intro a1
+        sorry
+      · intro a1
+        sorry
+    all_goals
+      sorry
