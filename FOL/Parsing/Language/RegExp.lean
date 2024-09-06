@@ -106,11 +106,19 @@ lemma regexp_is_nullable_iff_eps_mem_lang_of
     case concat R S R_ih S_ih =>
       rw [R_ih]
       rw [S_ih]
-      simp only [Language.concat]
-      simp
+      simp only [Language.eps_mem_concat_iff]
     case kleene_closure R _ =>
       simp
       simp only [Language.eps_mem_kleene_closure]
+
+
+lemma regexp_is_nullable_iff_regexp_lang_of_is_nullable
+  {α : Type}
+  (RE : RegExp α) :
+  RE.is_nullable ↔ RE.LanguageOf.is_nullable :=
+  by
+    simp only [Language.Language.is_nullable]
+    exact regexp_is_nullable_iff_eps_mem_lang_of RE
 
 
 def RegExp.nullify
@@ -401,7 +409,7 @@ example
     simp only [h1]
 
 
-def partial_derivative_concat
+def concat_finset_regexp_regexp
   {α : Type}
   [DecidableEq α]
   (Γ : Finset (RegExp α))
@@ -415,6 +423,13 @@ def partial_derivative_concat
     else Γ
 
 
+def regexp_finset_language_of
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α)) :=
+  ⋃ (R ∈ Γ), R.LanguageOf
+
+
 def RegExp.partial_derivative
   {α : Type}
   [DecidableEq α]
@@ -426,16 +441,10 @@ def RegExp.partial_derivative
   | union α β => (α.partial_derivative a) ∪ (β.partial_derivative a)
   | concat α β =>
   if α.is_nullable
-  then (partial_derivative_concat (α.partial_derivative a) β) ∪ (β.partial_derivative a)
-  else (partial_derivative_concat (α.partial_derivative a) β)
-  | kleene_closure α => partial_derivative_concat (α.partial_derivative a) (RegExp.kleene_closure α)
+  then (concat_finset_regexp_regexp (α.partial_derivative a) β) ∪ (β.partial_derivative a)
+  else (concat_finset_regexp_regexp (α.partial_derivative a) β)
+  | kleene_closure α => concat_finset_regexp_regexp (α.partial_derivative a) (RegExp.kleene_closure α)
 
-
-def regexp_finset_language_of
-  {α : Type}
-  [DecidableEq α]
-  (Γ : Finset (RegExp α)) :=
-  ⋃ (R ∈ Γ), R.LanguageOf
 
 lemma regexp_finset_language_of_union
   {α : Type}
@@ -474,6 +483,39 @@ lemma regexp_finset_language_of_union
         · right
           exact a2
         · exact a3
+
+
+theorem RegExp.extracted_1
+  {α : Type}
+  [inst : DecidableEq α]
+  (S : RegExp α)
+  (Γ : Finset (RegExp α))
+  (re : Str α)
+  (h1 : re ∈ regexp_finset_language_of (concat_finset_regexp_regexp Γ S)) :
+  re ∈ Language.concat (regexp_finset_language_of Γ) S.LanguageOf :=
+  by
+    simp only [concat_finset_regexp_regexp] at h1
+    split_ifs at h1
+    case _ c2 =>
+      simp only [regexp_finset_language_of] at h1
+      simp at h1
+      simp only [RegExp.LanguageOf] at h1
+      simp only [Language.concat] at h1
+      simp at h1
+      simp only [regexp_finset_language_of]
+      simp only [Language.concat]
+      simp
+      aesop
+    case _ c2 c3 =>
+      simp only [regexp_finset_language_of] at h1
+      simp at h1
+    case _ c2 c3 =>
+      simp at c2
+      specialize c2 c3
+      rw [c2]
+      simp only [RegExp.LanguageOf]
+      simp only [Language.concat_eps_right]
+      exact h1
 
 
 example
@@ -516,11 +558,125 @@ example
         simp only [Language.derivative]
         simp
     case concat R S R_ih S_ih =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.derivative_of_concat_wrt_char]
+      rw [← R_ih]
+      rw [← S_ih]
       ext re
+      simp
       constructor
       · intro a1
-        sorry
+        simp only [RegExp.partial_derivative] at a1
+        split_ifs at a1
+        case pos c1 =>
+          simp only [regexp_is_nullable_iff_regexp_lang_of_is_nullable] at c1
+          simp only [Language.is_nullable_iff_nullify_eq_eps_singleton] at c1
+          simp only [c1]
+          simp only [Language.concat_eps_left]
+
+          simp only [regexp_finset_language_of_union] at a1
+          simp at a1
+          cases a1
+          case _ a1_left =>
+            left
+            apply RegExp.extracted_1
+            exact a1_left
+          case _ a1_right =>
+            right
+            exact a1_right
+        case neg c1 =>
+          simp only [regexp_is_nullable_iff_regexp_lang_of_is_nullable] at c1
+          simp only [Language.not_is_nullable_iff_nullify_eq_empty] at c1
+          simp only [c1]
+          simp only [Language.concat_empty_left]
+          simp
+          apply RegExp.extracted_1
+          exact a1
       · intro a1
-        sorry
+        cases a1
+        case _ a1_left =>
+          simp only [RegExp.partial_derivative]
+          split_ifs
+          case pos c1 =>
+            simp only [regexp_finset_language_of_union]
+            simp
+            simp only [regexp_finset_language_of] at a1_left
+            simp only [Language.concat] at a1_left
+            simp at a1_left
+            simp only [regexp_finset_language_of]
+            simp
+            simp only [concat_finset_regexp_regexp]
+            split_ifs
+            case pos c1 c2 =>
+              simp
+              simp only [RegExp.LanguageOf]
+              simp only [Language.concat]
+              simp
+              aesop
+            case neg c1 c2 c3 =>
+              simp at c2
+              specialize c2 c3
+              simp only [c2]
+              simp only [RegExp.partial_derivative]
+              simp
+              obtain ⟨s, ⟨i, a2, a3⟩, t, a4, a5 ⟩ := a1_left
+              simp only [c2] at a4
+              simp only [RegExp.LanguageOf] at a4
+              simp at a4
+              rw [a4] at a5
+              simp at a5
+              rw [a5] at a3
+              apply Exists.intro i
+              exact ⟨a2, a3⟩
+            case pos c1 c2 c3 =>
+              simp at c2
+              simp
+              obtain ⟨s, ⟨i, a2, a3⟩, t, a4, a5 ⟩ := a1_left
+              rw [c3] at a4
+              simp only [RegExp.LanguageOf] at a4
+              simp at a4
+          case neg c1 =>
+            simp only [RegExp.regexp_is_nullable_iff_regexp_lang_of_is_nullable] at c1
+            simp only [Language.not_is_nullable_iff_nullify_eq_empty] at c1
+            simp only [Language.concat] at a1_left
+            simp at a1_left
+            simp only [concat_finset_regexp_regexp]
+            split_ifs
+            case _ c2 =>
+              simp only [regexp_finset_language_of]
+              simp
+              simp only [RegExp.LanguageOf]
+              simp only [Language.concat]
+              simp
+              simp only [regexp_finset_language_of] at a1_left
+              simp at a1_left
+              aesop
+            case _ c2 c3 =>
+              simp at c2
+              simp only [regexp_finset_language_of] at a1_left
+              simp at a1_left
+              obtain ⟨s, ⟨i, a2, a3⟩, t, a4, a5 ⟩ := a1_left
+              rw [c3] at a4
+              simp only [RegExp.LanguageOf] at a4
+              simp at a4
+            case _ c2 c3 =>
+              simp at c2
+              specialize c2 c3
+              rw [c2] at a1_left
+              simp only [RegExp.LanguageOf] at a1_left
+              simp at a1_left
+              exact a1_left
+        case _ a1_right =>
+          simp only [RegExp.partial_derivative]
+          simp only [Language.mem_concat_nullify_left_iff] at a1_right
+          cases a1_right
+          case _ a1_right_left a1_right_right =>
+            simp only [← RegExp.regexp_is_nullable_iff_eps_mem_lang_of] at a1_right_left
+            simp only [a1_right_left]
+            simp
+            simp only [regexp_finset_language_of_union]
+            simp
+            right
+            exact a1_right_right
     all_goals
       sorry

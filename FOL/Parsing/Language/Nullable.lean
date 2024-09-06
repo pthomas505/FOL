@@ -71,6 +71,26 @@ lemma is_nullable_iff_nullify_eq_eps_singleton
         contradiction
 
 
+lemma not_is_nullable_iff_nullify_eq_empty
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α) :
+  ¬ L.is_nullable ↔ L.nullify = ∅ :=
+  by
+    simp only [Language.is_nullable]
+    simp only [Language.nullify]
+    constructor
+    · intro a1
+      simp only [a1]
+      simp
+    · intro a1
+      split_ifs at a1
+      case pos c1 =>
+        simp at a1
+      case neg c1 =>
+        exact c1
+
+
 lemma nullify_char
   {α : Type}
   [DecidableEq α]
@@ -284,19 +304,47 @@ lemma mem_concat_nullify_left_iff
   cs ∈ concat L.nullify M ↔ [] ∈ L ∧ cs ∈ M :=
   by
     constructor
-    intro a1
-    · simp only [concat] at a1
+    · intro a1
+      simp only [concat] at a1
       simp only [Language.nullify] at a1
       simp at a1
       obtain ⟨s, ⟨hs_left, hs_right⟩, t, ht, eq⟩ := a1
       rw [← eq]
+      simp only [hs_left]
       simp only [hs_right]
       simp
-      exact ⟨hs_left, ht⟩
+      exact ht
     · intro a1
       simp only [concat]
       simp only [Language.nullify]
       simp
       apply Exists.intro []
+      simp
+      exact a1
+
+
+lemma mem_concat_nullify_right_iff
+  {α : Type}
+  [DecidableEq α]
+  (L M : Language α)
+  (cs : Str α) :
+  cs ∈ concat L M.nullify ↔ cs ∈ L ∧ [] ∈ M :=
+  by
+    constructor
+    · intro a1
+      simp only [concat] at a1
+      simp only [Language.nullify] at a1
+      simp at a1
+      obtain ⟨s, hs, t, ⟨ht_left, ht_right⟩, eq⟩ := a1
+      rw [← eq]
+      simp only [ht_left]
+      simp only [ht_right]
+      simp
+      exact hs
+    · intro a1
+      simp only [concat]
+      simp only [Language.nullify]
+      simp
+      apply Exists.intro cs
       simp
       exact a1
