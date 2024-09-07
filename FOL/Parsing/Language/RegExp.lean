@@ -730,7 +730,7 @@ example
         simp
         simp only [RegExp.LanguageOf]
         simp
-        intro a1
+        intro _
         exact c1
       case neg c1 =>
         simp
@@ -800,5 +800,13 @@ example
           rw [← Language.concat_distrib_finset_i_union_right]
           simp
           simp only [RegExp.LanguageOf]
-    all_goals
-      sorry
+
+    case kleene_closure R R_ih =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.derivative_of_kleene_closure_wrt_char]
+      simp only [RegExp.partial_derivative_alt]
+      simp only [concat_finset_regexp_regexp_alt]
+      simp
+      simp only [RegExp.LanguageOf]
+      rw [Language.concat_distrib_finset_i_union_right]
+      rw [R_ih]
