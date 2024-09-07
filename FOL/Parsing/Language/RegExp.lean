@@ -755,5 +755,50 @@ example
       simp only [Finset.set_biUnion_union]
       rw [R_ih]
       rw [S_ih]
+    case concat R S R_ih S_ih =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.derivative_of_concat_wrt_char]
+      simp only [RegExp.partial_derivative_alt]
+
+      split_ifs
+      case pos c1 =>
+        simp only [regexp_is_nullable_iff_regexp_lang_of_is_nullable] at c1
+        simp only [Language.is_nullable_iff_nullify_eq_eps_singleton] at c1
+        rw [c1]
+        simp only [Language.concat_eps_left]
+
+        simp only [Finset.set_biUnion_union]
+        congr
+        · simp only [concat_finset_regexp_regexp_alt]
+          split_ifs
+          case pos c2 =>
+            rw [c2]
+            simp only [RegExp.LanguageOf]
+            simp only [Language.concat_empty_right]
+            simp
+          case neg c2 =>
+            rw [← R_ih]
+            rw [← Language.concat_distrib_finset_i_union_right]
+            simp
+            simp only [RegExp.LanguageOf]
+      case neg c1 =>
+        simp only [regexp_is_nullable_iff_regexp_lang_of_is_nullable] at c1
+        simp only [Language.not_is_nullable_iff_nullify_eq_empty] at c1
+        rw [c1]
+        simp only [Language.concat_empty_left]
+        simp
+
+        simp only [concat_finset_regexp_regexp_alt]
+        split_ifs
+        case pos c2 =>
+          rw [c2]
+          simp only [RegExp.LanguageOf]
+          simp only [Language.concat_empty_right]
+          simp
+        case neg c2 =>
+          rw [← R_ih]
+          rw [← Language.concat_distrib_finset_i_union_right]
+          simp
+          simp only [RegExp.LanguageOf]
     all_goals
       sorry

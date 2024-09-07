@@ -347,6 +347,52 @@ lemma concat_distrib_countable_union_right
       exact ⟨i, s, hs, t, ht, rfl⟩
 
 
+lemma concat_distrib_finset_i_union_left
+  {α : Type}
+  [DecidableEq α]
+  {β : Type}
+  (L : Language α)
+  (S : Finset β)
+  (f : β → Language α) :
+  ⋃ (x ∈ S), concat L (f x) = concat L (⋃ (x ∈ S), (f x)) :=
+  by
+    simp only [concat]
+    ext cs
+    simp
+    constructor
+    · intro a1
+      obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a1
+      rw [← eq]
+      exact ⟨s, hs, t, ⟨i, hi, ht⟩, rfl⟩
+    · intro a1
+      obtain ⟨s, hs, t, ⟨i, hi, ht⟩, eq⟩ := a1
+      rw [← eq]
+      exact ⟨i, hi, s, hs, t, ht, rfl⟩
+
+
+lemma concat_distrib_finset_i_union_right
+  {α : Type}
+  [DecidableEq α]
+  {β : Type}
+  (M : Language α)
+  (S : Finset β)
+  (f : β → Language α) :
+  ⋃ (x ∈ S), concat (f x) M = concat (⋃ (x ∈ S), (f x)) M :=
+  by
+    simp only [concat]
+    ext cs
+    simp
+    constructor
+    · intro a1
+      obtain ⟨i, hi, s, hs, t, ht, eq⟩ := a1
+      rw [← eq]
+      exact ⟨s, ⟨i, hi, hs⟩, t, ht, rfl⟩
+    · intro a1
+      obtain ⟨s, ⟨i, hi, hs⟩, t, ht, eq⟩ := a1
+      rw [← eq]
+      exact ⟨i, hi, s, hs, t, ht, rfl⟩
+
+
 theorem concat_distrib_union_left
   {α : Type}
   (L1 L2 L3 : Language α) :
