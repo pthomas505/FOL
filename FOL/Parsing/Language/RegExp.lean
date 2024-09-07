@@ -409,6 +409,13 @@ example
     simp only [h1]
 
 
+def finset_regexp_language_of
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α)) :=
+  ⋃ (R ∈ Γ), R.LanguageOf
+
+
 def concat_finset_regexp_regexp
   {α : Type}
   [DecidableEq α]
@@ -416,6 +423,7 @@ def concat_finset_regexp_regexp
   (β : RegExp α) :
   Finset (RegExp α) :=
   if ¬ β = RegExp.zero ∧ ¬ β = RegExp.epsilon
+  -- Finset { α β | α ∈ Γ }
   then Γ.image (fun α => RegExp.concat α β)
   else
     if β = RegExp.zero
@@ -423,11 +431,44 @@ def concat_finset_regexp_regexp
     else Γ
 
 
-def regexp_finset_language_of
+def concat_finset_regexp_regexp_alt
   {α : Type}
   [DecidableEq α]
-  (Γ : Finset (RegExp α)) :=
-  ⋃ (R ∈ Γ), R.LanguageOf
+  (Γ : Finset (RegExp α))
+  (β : RegExp α) :
+  Finset (RegExp α) :=
+  if ¬ β = RegExp.zero
+  -- Finset { α β | α ∈ Γ }
+  then Γ.image (fun α => RegExp.concat α β)
+  else ∅
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α))
+  (β : RegExp α) :
+  finset_regexp_language_of (concat_finset_regexp_regexp Γ β) = finset_regexp_language_of (concat_finset_regexp_regexp_alt Γ β) :=
+  by
+    simp only [concat_finset_regexp_regexp]
+    simp only [concat_finset_regexp_regexp_alt]
+    ext re
+    simp
+    split_ifs
+    case pos c1 c2 =>
+      tauto
+    case neg c1 c2 =>
+      rfl
+    case pos c1 c2 =>
+      rfl
+    case neg c1 c2 =>
+      simp at c1
+      specialize c1 c2
+      rw [c1]
+      simp only [finset_regexp_language_of]
+      simp
+      simp only [RegExp.LanguageOf]
+      simp only [Language.concat_eps_right]
 
 
 def RegExp.partial_derivative
@@ -440,19 +481,19 @@ def RegExp.partial_derivative
   | zero => ∅
   | union α β => (α.partial_derivative a) ∪ (β.partial_derivative a)
   | concat α β =>
-  if α.is_nullable
-  then (concat_finset_regexp_regexp (α.partial_derivative a) β) ∪ (β.partial_derivative a)
-  else (concat_finset_regexp_regexp (α.partial_derivative a) β)
+      if α.is_nullable
+      then (concat_finset_regexp_regexp (α.partial_derivative a) β) ∪ (β.partial_derivative a)
+      else (concat_finset_regexp_regexp (α.partial_derivative a) β)
   | kleene_closure α => concat_finset_regexp_regexp (α.partial_derivative a) (RegExp.kleene_closure α)
 
 
-lemma regexp_finset_language_of_union
+lemma finset_regexp_language_of_union
   {α : Type}
   [DecidableEq α]
   (S T : Finset (RegExp α)) :
-  regexp_finset_language_of (S ∪ T) = regexp_finset_language_of S ∪ regexp_finset_language_of T :=
+  finset_regexp_language_of (S ∪ T) = finset_regexp_language_of S ∪ finset_regexp_language_of T :=
   by
-    simp only [regexp_finset_language_of]
+    simp only [finset_regexp_language_of]
     ext re
     simp
     constructor
@@ -491,23 +532,23 @@ theorem RegExp.extracted_1
   (S : RegExp α)
   (Γ : Finset (RegExp α))
   (re : Str α)
-  (h1 : re ∈ regexp_finset_language_of (concat_finset_regexp_regexp Γ S)) :
-  re ∈ Language.concat (regexp_finset_language_of Γ) S.LanguageOf :=
+  (h1 : re ∈ finset_regexp_language_of (concat_finset_regexp_regexp Γ S)) :
+  re ∈ Language.concat (finset_regexp_language_of Γ) S.LanguageOf :=
   by
     simp only [concat_finset_regexp_regexp] at h1
     split_ifs at h1
     case _ c2 =>
-      simp only [regexp_finset_language_of] at h1
+      simp only [finset_regexp_language_of] at h1
       simp at h1
       simp only [RegExp.LanguageOf] at h1
       simp only [Language.concat] at h1
       simp at h1
-      simp only [regexp_finset_language_of]
+      simp only [finset_regexp_language_of]
       simp only [Language.concat]
       simp
       aesop
     case _ c2 c3 =>
-      simp only [regexp_finset_language_of] at h1
+      simp only [finset_regexp_language_of] at h1
       simp at h1
     case _ c2 c3 =>
       simp at c2
@@ -523,11 +564,11 @@ example
   [DecidableEq α]
   (a : α)
   (RE : RegExp α) :
-  regexp_finset_language_of (RE.partial_derivative a) = Language.derivative RE.LanguageOf [a] :=
+  finset_regexp_language_of (RE.partial_derivative a) = Language.derivative RE.LanguageOf [a] :=
   by
     induction RE
     case char b =>
-      simp only [regexp_finset_language_of]
+      simp only [finset_regexp_language_of]
       simp only [Language.derivative]
       simp only [RegExp.LanguageOf]
       ext re
@@ -548,7 +589,7 @@ example
       simp only [RegExp.LanguageOf]
       ext re
       simp only [RegExp.partial_derivative]
-      simp only [regexp_finset_language_of_union]
+      simp only [finset_regexp_language_of_union]
       simp
       congr! 1
       · simp only [R_ih]
@@ -574,7 +615,7 @@ example
           simp only [c1]
           simp only [Language.concat_eps_left]
 
-          simp only [regexp_finset_language_of_union] at a1
+          simp only [finset_regexp_language_of_union] at a1
           simp at a1
           cases a1
           case _ a1_left =>
@@ -598,12 +639,12 @@ example
           simp only [RegExp.partial_derivative]
           split_ifs
           case pos c1 =>
-            simp only [regexp_finset_language_of_union]
+            simp only [finset_regexp_language_of_union]
             simp
-            simp only [regexp_finset_language_of] at a1_left
+            simp only [finset_regexp_language_of] at a1_left
             simp only [Language.concat] at a1_left
             simp at a1_left
-            simp only [regexp_finset_language_of]
+            simp only [finset_regexp_language_of]
             simp
             simp only [concat_finset_regexp_regexp]
             split_ifs
@@ -643,17 +684,17 @@ example
             simp only [concat_finset_regexp_regexp]
             split_ifs
             case _ c2 =>
-              simp only [regexp_finset_language_of]
+              simp only [finset_regexp_language_of]
               simp
               simp only [RegExp.LanguageOf]
               simp only [Language.concat]
               simp
-              simp only [regexp_finset_language_of] at a1_left
+              simp only [finset_regexp_language_of] at a1_left
               simp at a1_left
               aesop
             case _ c2 c3 =>
               simp at c2
-              simp only [regexp_finset_language_of] at a1_left
+              simp only [finset_regexp_language_of] at a1_left
               simp at a1_left
               obtain ⟨s, ⟨i, a2, a3⟩, t, a4, a5 ⟩ := a1_left
               rw [c3] at a4
@@ -674,7 +715,7 @@ example
             simp only [← RegExp.regexp_is_nullable_iff_eps_mem_lang_of] at a1_right_left
             simp only [a1_right_left]
             simp
-            simp only [regexp_finset_language_of_union]
+            simp only [finset_regexp_language_of_union]
             simp
             right
             exact a1_right_right
