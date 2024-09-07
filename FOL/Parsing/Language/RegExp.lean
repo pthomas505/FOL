@@ -412,8 +412,19 @@ example
 def finset_regexp_language_of
   {α : Type}
   [DecidableEq α]
-  (Γ : Finset (RegExp α)) :=
+  (Γ : Finset (RegExp α)) :
+  Language.Language α :=
   ⋃ (R ∈ Γ), R.LanguageOf
+
+
+lemma finset_regexp_language_of_union
+  {α : Type}
+  [DecidableEq α]
+  (S T : Finset (RegExp α)) :
+  finset_regexp_language_of (S ∪ T) = finset_regexp_language_of S ∪ finset_regexp_language_of T :=
+  by
+    simp only [finset_regexp_language_of]
+    exact Finset.set_biUnion_union S T fun x => x.LanguageOf
 
 
 def concat_finset_regexp_regexp
@@ -487,43 +498,20 @@ def RegExp.partial_derivative
   | kleene_closure α => concat_finset_regexp_regexp (α.partial_derivative a) (RegExp.kleene_closure α)
 
 
-lemma finset_regexp_language_of_union
+def RegExp.partial_derivative_alt
   {α : Type}
   [DecidableEq α]
-  (S T : Finset (RegExp α)) :
-  finset_regexp_language_of (S ∪ T) = finset_regexp_language_of S ∪ finset_regexp_language_of T :=
-  by
-    simp only [finset_regexp_language_of]
-    ext re
-    simp
-    constructor
-    · intro a1
-      obtain ⟨i, a2, a3⟩ := a1
-      cases a2
-      case _ c1 =>
-        left
-        apply Exists.intro i
-        exact ⟨c1, a3⟩
-      case _ c1 =>
-        right
-        apply Exists.intro i
-        exact ⟨c1, a3⟩
-    · intro a1
-      cases a1
-      case _ c1 =>
-        obtain ⟨i, a2, a3⟩ := c1
-        apply Exists.intro i
-        constructor
-        · left
-          exact a2
-        · exact a3
-      case _ c1 =>
-        obtain ⟨i, a2, a3⟩ := c1
-        apply Exists.intro i
-        constructor
-        · right
-          exact a2
-        · exact a3
+  (a : α) :
+  RegExp α → Finset (RegExp α)
+  | char b => if a = b then {epsilon} else ∅
+  | epsilon => ∅
+  | zero => ∅
+  | union α β => (α.partial_derivative_alt a) ∪ (β.partial_derivative_alt a)
+  | concat α β =>
+      if α.is_nullable
+      then (concat_finset_regexp_regexp_alt (α.partial_derivative_alt a) β) ∪ (β.partial_derivative_alt a)
+      else (concat_finset_regexp_regexp_alt (α.partial_derivative_alt a) β)
+  | kleene_closure α => concat_finset_regexp_regexp_alt (α.partial_derivative_alt a) (RegExp.kleene_closure α)
 
 
 theorem RegExp.extracted_1
@@ -719,5 +707,53 @@ example
             simp
             right
             exact a1_right_right
+    all_goals
+      sorry
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (a : α)
+  (RE : RegExp α) :
+  finset_regexp_language_of (RE.partial_derivative_alt a) = Language.derivative RE.LanguageOf [a] :=
+  by
+    simp only [finset_regexp_language_of]
+    induction RE
+    case char b =>
+      simp only [Language.derivative]
+      ext cs
+      simp
+      simp only [RegExp.partial_derivative_alt]
+      split_ifs
+      case pos c1 =>
+        simp
+        simp only [RegExp.LanguageOf]
+        simp
+        intro a1
+        exact c1
+      case neg c1 =>
+        simp
+        simp only [RegExp.LanguageOf]
+        simp
+        intro a1
+        contradiction
+    case epsilon =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.derivative_of_eps_wrt_char]
+      simp only [RegExp.partial_derivative_alt]
+      simp
+    case zero =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.derivative_of_empty_wrt_char]
+      simp only [RegExp.partial_derivative_alt]
+      simp
+    case union R S R_ih S_ih =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.derivative_of_union_wrt_char]
+      simp only [RegExp.partial_derivative_alt]
+      simp only [Finset.set_biUnion_union]
+      rw [R_ih]
+      rw [S_ih]
     all_goals
       sorry
