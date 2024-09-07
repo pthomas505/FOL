@@ -164,7 +164,7 @@ lemma regexp_nullify_lang_eq_regexp_lang_nullify
       simp only [Language.nullify_kleene_closure]
 
 
-lemma regexp_is_nullable_ite
+example
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α) :
@@ -395,6 +395,46 @@ example
     case kleene_closure_3 =>
       simp only [RegExp.LanguageOf]
       exact Language.kleene_closure_empty
+
+
+def simp_concat
+  {α : Type}
+  (RE_1 RE_2 : RegExp α) :
+  RegExp α :=
+  match RE_1 with
+  | RegExp.epsilon => RE_2
+  | RegExp.zero => RegExp.zero
+  | R =>
+    match RE_2 with
+    | RegExp.epsilon => R
+    | RegExp.zero => RegExp.zero
+    | S => RegExp.concat R S
+
+example
+  {α : Type}
+  (RE_1 RE_2 : RegExp α) :
+  (simp_concat RE_1 RE_2).LanguageOf = (RegExp.concat RE_1 RE_2).LanguageOf
+  :=
+  by
+    simp only [simp_concat]
+
+    induction RE_1 generalizing RE_2
+    case epsilon =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.concat_eps_left]
+    case zero =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.concat_empty_left]
+    all_goals
+      cases RE_2
+      case epsilon =>
+        simp only [RegExp.LanguageOf]
+        simp only [Language.concat_eps_right]
+      case zero =>
+        simp only [RegExp.LanguageOf]
+        simp only [Language.concat_empty_right]
+      all_goals
+        rfl
 
 
 example
