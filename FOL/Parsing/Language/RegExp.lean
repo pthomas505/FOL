@@ -457,7 +457,7 @@ def finset_regexp_language_of
   ⋃ (R ∈ Γ), R.LanguageOf
 
 
-def concat_finset_regexp_regexp_alt
+def concat_finset_regexp_regexp
   {α : Type}
   [DecidableEq α]
   (Γ : Finset (RegExp α))
@@ -469,7 +469,7 @@ def concat_finset_regexp_regexp_alt
   else ∅
 
 
-def RegExp.partial_derivative_alt
+def RegExp.partial_derivative
   {α : Type}
   [DecidableEq α]
   (a : α) :
@@ -477,12 +477,12 @@ def RegExp.partial_derivative_alt
   | char b => if a = b then {epsilon} else ∅
   | epsilon => ∅
   | zero => ∅
-  | union α β => (α.partial_derivative_alt a) ∪ (β.partial_derivative_alt a)
+  | union α β => (α.partial_derivative a) ∪ (β.partial_derivative a)
   | concat α β =>
       if α.is_nullable
-      then (concat_finset_regexp_regexp_alt (α.partial_derivative_alt a) β) ∪ (β.partial_derivative_alt a)
-      else (concat_finset_regexp_regexp_alt (α.partial_derivative_alt a) β)
-  | kleene_closure α => concat_finset_regexp_regexp_alt (α.partial_derivative_alt a) (RegExp.kleene_closure α)
+      then (concat_finset_regexp_regexp (α.partial_derivative a) β) ∪ (β.partial_derivative a)
+      else (concat_finset_regexp_regexp (α.partial_derivative a) β)
+  | kleene_closure α => concat_finset_regexp_regexp (α.partial_derivative a) (RegExp.kleene_closure α)
 
 
 example
@@ -490,7 +490,7 @@ example
   [DecidableEq α]
   (a : α)
   (RE : RegExp α) :
-  finset_regexp_language_of (RE.partial_derivative_alt a) = Language.derivative RE.LanguageOf [a] :=
+  finset_regexp_language_of (RE.partial_derivative a) = Language.derivative RE.LanguageOf [a] :=
   by
     simp only [finset_regexp_language_of]
     induction RE
@@ -498,7 +498,7 @@ example
       simp only [Language.derivative]
       ext cs
       simp
-      simp only [RegExp.partial_derivative_alt]
+      simp only [RegExp.partial_derivative]
       split_ifs
       case pos c1 =>
         simp
@@ -515,24 +515,24 @@ example
     case epsilon =>
       simp only [RegExp.LanguageOf]
       simp only [Language.derivative_of_eps_wrt_char]
-      simp only [RegExp.partial_derivative_alt]
+      simp only [RegExp.partial_derivative]
       simp
     case zero =>
       simp only [RegExp.LanguageOf]
       simp only [Language.derivative_of_empty_wrt_char]
-      simp only [RegExp.partial_derivative_alt]
+      simp only [RegExp.partial_derivative]
       simp
     case union R S R_ih S_ih =>
       simp only [RegExp.LanguageOf]
       simp only [Language.derivative_of_union_wrt_char]
-      simp only [RegExp.partial_derivative_alt]
+      simp only [RegExp.partial_derivative]
       simp only [Finset.set_biUnion_union]
       rw [R_ih]
       rw [S_ih]
     case concat R S R_ih S_ih =>
       simp only [RegExp.LanguageOf]
       simp only [Language.derivative_of_concat_wrt_char]
-      simp only [RegExp.partial_derivative_alt]
+      simp only [RegExp.partial_derivative]
 
       split_ifs
       case pos c1 =>
@@ -543,7 +543,7 @@ example
 
         simp only [Finset.set_biUnion_union]
         congr
-        · simp only [concat_finset_regexp_regexp_alt]
+        · simp only [concat_finset_regexp_regexp]
           split_ifs
           case pos c2 =>
             rw [c2]
@@ -562,7 +562,7 @@ example
         simp only [Language.concat_empty_left]
         simp
 
-        simp only [concat_finset_regexp_regexp_alt]
+        simp only [concat_finset_regexp_regexp]
         split_ifs
         case pos c2 =>
           rw [c2]
@@ -578,8 +578,8 @@ example
     case kleene_closure R R_ih =>
       simp only [RegExp.LanguageOf]
       simp only [Language.derivative_of_kleene_closure_wrt_char]
-      simp only [RegExp.partial_derivative_alt]
-      simp only [concat_finset_regexp_regexp_alt]
+      simp only [RegExp.partial_derivative]
+      simp only [concat_finset_regexp_regexp]
       simp
       simp only [RegExp.LanguageOf]
       rw [Language.concat_distrib_finset_i_union_right]
