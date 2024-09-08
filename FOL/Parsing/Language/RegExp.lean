@@ -189,8 +189,10 @@ example
 def RegExp.derivative
   {α : Type}
   [DecidableEq α]
+  (RE : RegExp α)
   (a : α) :
-  RegExp α → RegExp α
+  RegExp α :=
+  match RE with
   | char b => if a = b then epsilon else zero
   | epsilon => zero
   | zero => zero
@@ -199,11 +201,20 @@ def RegExp.derivative
   | kleene_closure R => concat (R.derivative a) (kleene_closure R)
 
 
+def RegExp.derivative_wrt_str
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α) :
+  Str α → RegExp α
+  | [] => RE
+  | hd :: tl => RegExp.derivative_wrt_str (RegExp.derivative RE hd) tl
+
+
 lemma regexp_lang_derivative_eq_regexp_derivative_lang
   {α : Type}
   [DecidableEq α]
-  (a : α)
-  (RE : RegExp α) :
+  (RE : RegExp α)
+  (a : α) :
   (RE.derivative a).LanguageOf = Language.derivative RE.LanguageOf [a] :=
   by
     induction RE
@@ -238,6 +249,24 @@ lemma regexp_lang_derivative_eq_regexp_derivative_lang
       simp only [RegExp.LanguageOf]
       rw [R_ih]
       simp only [Language.derivative_of_kleene_closure_wrt_char]
+
+
+lemma regexp_lang_derivative_wrt_str_eq_regexp_derivative_lang
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α)
+  (s : Str α) :
+  (RE.derivative_wrt_str s).LanguageOf = Language.derivative RE.LanguageOf s :=
+  by
+    induction s generalizing RE
+    case nil =>
+      simp only [RegExp.derivative_wrt_str]
+      simp only [Language.derivative_wrt_eps]
+    case cons hd tl ih =>
+      simp only [RegExp.derivative_wrt_str]
+      rw [Language.derivative_wrt_cons]
+      simp only [← regexp_lang_derivative_eq_regexp_derivative_lang]
+      exact ih (RE.derivative hd)
 
 
 def RegExp.matches
@@ -506,8 +535,10 @@ lemma simp_kleene_closure_lang_eq_kleene_closure_lang
 def RegExp.simp_derivative
   {α : Type}
   [DecidableEq α]
+  (RE : RegExp α)
   (a : α) :
-  RegExp α → RegExp α
+  RegExp α :=
+  match RE with
   | char b => if a = b then epsilon else zero
   | epsilon => zero
   | zero => zero
@@ -521,7 +552,7 @@ lemma simp_derivative_lang_eq_derivative_lang
   [DecidableEq α]
   (RE : RegExp α)
   (a : α) :
-  (RegExp.simp_derivative a RE).LanguageOf = (RegExp.derivative a RE).LanguageOf :=
+  (RegExp.simp_derivative RE a).LanguageOf = (RegExp.derivative RE a).LanguageOf :=
   by
     induction RE
     case union R S R_ih S_ih =>
@@ -648,7 +679,7 @@ lemma partial_derivative_wrt_str_aux_last
       exact ih (RegExp.partial_derivative_of_finset Γ hd)
 
 
-example
+lemma partial_derivative_wrt_str_last
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α)
@@ -661,11 +692,11 @@ example
     exact partial_derivative_wrt_str_aux_last {RE} s a
 
 
-example
+theorem partial_derivative_lang_eq_derivative_lang
   {α : Type}
   [DecidableEq α]
-  (a : α)
-  (RE : RegExp α) :
+  (RE : RegExp α)
+  (a : α) :
   finset_regexp_language_of (RE.partial_derivative a) = Language.derivative RE.LanguageOf [a] :=
   by
     simp only [finset_regexp_language_of]
@@ -760,3 +791,17 @@ example
       simp only [RegExp.LanguageOf]
       rw [Language.concat_distrib_finset_i_union_right]
       rw [R_ih]
+
+
+theorem partial_derivative_wrt_str_lang_eq_derivative_lang_wrt_str
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α)
+  (s : Str α) :
+  finset_regexp_language_of (RE.partial_derivative_wrt_str s) = Language.derivative RE.LanguageOf s :=
+  by
+    induction s
+    case nil =>
+      sorry
+    case cons hd tl ih =>
+      sorry
