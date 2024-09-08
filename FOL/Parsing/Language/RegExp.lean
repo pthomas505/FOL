@@ -457,16 +457,6 @@ def finset_regexp_language_of
   ⋃ (R ∈ Γ), R.LanguageOf
 
 
-lemma finset_regexp_language_of_union
-  {α : Type}
-  [DecidableEq α]
-  (S T : Finset (RegExp α)) :
-  finset_regexp_language_of (S ∪ T) = finset_regexp_language_of S ∪ finset_regexp_language_of T :=
-  by
-    simp only [finset_regexp_language_of]
-    exact Finset.set_biUnion_union S T fun x => x.LanguageOf
-
-
 def concat_finset_regexp_regexp_alt
   {α : Type}
   [DecidableEq α]
