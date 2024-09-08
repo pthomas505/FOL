@@ -467,6 +467,17 @@ example
         rfl
 
 
+def simp_kleene_closure
+  {α : Type}
+  (RE : RegExp α) :
+  RegExp α :=
+  match RE with
+  | RegExp.zero => RegExp.epsilon
+  | RegExp.epsilon => RegExp.epsilon
+  | RegExp.kleene_closure R => simp_kleene_closure R
+  | R => RegExp.kleene_closure R
+
+
 example
   {α : Type}
   [DecidableEq α]
