@@ -410,7 +410,8 @@ def simp_concat
     | RegExp.zero => RegExp.zero
     | S => RegExp.concat R S
 
-example
+
+lemma simp_concat_lang_eq_concat_lang
   {α : Type}
   (RE_1 RE_2 : RegExp α) :
   (simp_concat RE_1 RE_2).LanguageOf = (RegExp.concat RE_1 RE_2).LanguageOf :=
@@ -447,7 +448,8 @@ def simp_union
     | RegExp.zero => R
     | S => RegExp.union R S
 
-example
+
+lemma simp_union_lang_eq_union_lang
   {α : Type}
   (RE_1 RE_2 : RegExp α) :
   (simp_union RE_1 RE_2).LanguageOf = (RegExp.union RE_1 RE_2).LanguageOf :=
@@ -477,7 +479,8 @@ def simp_kleene_closure
   | RegExp.kleene_closure R => simp_kleene_closure R
   | R => RegExp.kleene_closure R
 
-example
+
+lemma simp_kleene_closure_lang_eq_kleene_closure_lang
   {α : Type}
   (RE : RegExp α) :
   (simp_kleene_closure RE).LanguageOf = (RegExp.kleene_closure RE).LanguageOf :=
