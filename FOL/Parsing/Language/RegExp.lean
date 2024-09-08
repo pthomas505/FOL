@@ -467,21 +467,6 @@ lemma finset_regexp_language_of_union
     exact Finset.set_biUnion_union S T fun x => x.LanguageOf
 
 
-def concat_finset_regexp_regexp
-  {α : Type}
-  [DecidableEq α]
-  (Γ : Finset (RegExp α))
-  (β : RegExp α) :
-  Finset (RegExp α) :=
-  if ¬ β = RegExp.zero ∧ ¬ β = RegExp.epsilon
-  -- Finset { α β | α ∈ Γ }
-  then Γ.image (fun α => RegExp.concat α β)
-  else
-    if β = RegExp.zero
-    then ∅
-    else Γ
-
-
 def concat_finset_regexp_regexp_alt
   {α : Type}
   [DecidableEq α]
@@ -492,34 +477,6 @@ def concat_finset_regexp_regexp_alt
   -- Finset { α β | α ∈ Γ }
   then Γ.image (fun α => RegExp.concat α β)
   else ∅
-
-
-example
-  {α : Type}
-  [DecidableEq α]
-  (Γ : Finset (RegExp α))
-  (β : RegExp α) :
-  finset_regexp_language_of (concat_finset_regexp_regexp Γ β) = finset_regexp_language_of (concat_finset_regexp_regexp_alt Γ β) :=
-  by
-    simp only [concat_finset_regexp_regexp]
-    simp only [concat_finset_regexp_regexp_alt]
-    ext re
-    simp
-    split_ifs
-    case pos c1 c2 =>
-      tauto
-    case neg c1 c2 =>
-      rfl
-    case pos c1 c2 =>
-      rfl
-    case neg c1 c2 =>
-      simp at c1
-      specialize c1 c2
-      rw [c1]
-      simp only [finset_regexp_language_of]
-      simp
-      simp only [RegExp.LanguageOf]
-      simp only [Language.concat_eps_right]
 
 
 def RegExp.partial_derivative_alt
