@@ -587,8 +587,10 @@ def concat_finset_regexp_regexp
 def RegExp.partial_derivative
   {α : Type}
   [DecidableEq α]
+  (RE : RegExp α)
   (a : α) :
-  RegExp α → Finset (RegExp α)
+  Finset (RegExp α) :=
+  match RE with
   | char b => if a = b then {epsilon} else ∅
   | epsilon => ∅
   | zero => ∅
@@ -598,6 +600,65 @@ def RegExp.partial_derivative
       then (concat_finset_regexp_regexp (α.partial_derivative a) β) ∪ (β.partial_derivative a)
       else (concat_finset_regexp_regexp (α.partial_derivative a) β)
   | kleene_closure α => concat_finset_regexp_regexp (α.partial_derivative a) (RegExp.kleene_closure α)
+
+
+def RegExp.partial_derivative_of_finset
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α))
+  (a : α) :
+  Finset (RegExp α) :=
+  Finset.biUnion Γ (fun (R : RegExp α) => partial_derivative R a)
+
+
+def RegExp.partial_derivative_wrt_str_aux
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α)) :
+  Str α → Finset (RegExp α)
+  | [] => Γ
+  | hd :: tl => RegExp.partial_derivative_wrt_str_aux (RegExp.partial_derivative_of_finset Γ hd) tl
+
+
+def RegExp.partial_derivative_wrt_str
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α)
+  (s : Str α) :
+  Finset (RegExp α) :=
+  RegExp.partial_derivative_wrt_str_aux {RE} s
+
+
+lemma partial_derivative_wrt_str_aux_last
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α))
+  (s : Str α)
+  (a : α) :
+  RegExp.partial_derivative_wrt_str_aux Γ (s ++ [a]) =
+    RegExp.partial_derivative_of_finset (RegExp.partial_derivative_wrt_str_aux Γ s) a :=
+  by
+    induction s generalizing Γ
+    case nil =>
+      simp
+      simp only [RegExp.partial_derivative_wrt_str_aux]
+    case cons hd tl ih =>
+      simp
+      simp only [RegExp.partial_derivative_wrt_str_aux]
+      exact ih (RegExp.partial_derivative_of_finset Γ hd)
+
+
+example
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α)
+  (s : Str α)
+  (a : α) :
+  RegExp.partial_derivative_wrt_str RE (s ++ [a]) =
+    RegExp.partial_derivative_of_finset (RegExp.partial_derivative_wrt_str RE s) a :=
+  by
+    simp only [RegExp.partial_derivative_wrt_str]
+    exact partial_derivative_wrt_str_aux_last {RE} s a
 
 
 example

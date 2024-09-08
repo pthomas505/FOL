@@ -90,6 +90,17 @@ theorem derivative_wrt_cons
     simp
 
 
+example
+  {α : Type}
+  (L : Language α)
+  (s : Str α)
+  (a : α) :
+  derivative L (s ++ [a]) = derivative (derivative L s) [a] :=
+  by
+    simp only [derivative]
+    simp
+
+
 def derivative_wrt_str
   {α : Type}
   (L : Language α)
