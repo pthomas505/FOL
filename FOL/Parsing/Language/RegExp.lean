@@ -472,10 +472,32 @@ def simp_kleene_closure
   (RE : RegExp α) :
   RegExp α :=
   match RE with
-  | RegExp.zero => RegExp.epsilon
   | RegExp.epsilon => RegExp.epsilon
+  | RegExp.zero => RegExp.epsilon
   | RegExp.kleene_closure R => simp_kleene_closure R
   | R => RegExp.kleene_closure R
+
+example
+  {α : Type}
+  (RE : RegExp α) :
+  (simp_kleene_closure RE).LanguageOf = (RegExp.kleene_closure RE).LanguageOf :=
+  by
+    induction RE
+    case epsilon =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.kleene_closure_eps]
+    case zero =>
+      simp only [RegExp.LanguageOf]
+      simp only [Language.kleene_closure_empty]
+    case kleene_closure R R_ih =>
+      simp only [RegExp.LanguageOf] at R_ih
+
+      simp only [simp_kleene_closure]
+      simp only [RegExp.LanguageOf]
+      rw [← Language.kleene_closure_idempotent]
+      exact R_ih
+    all_goals
+      rfl
 
 
 example
