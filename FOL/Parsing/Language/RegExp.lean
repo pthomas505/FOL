@@ -500,6 +500,19 @@ example
       rfl
 
 
+def RegExp.simp_derivative
+  {α : Type}
+  [DecidableEq α]
+  (a : α) :
+  RegExp α → RegExp α
+  | char b => if a = b then epsilon else zero
+  | epsilon => zero
+  | zero => zero
+  | union R S => simp_union (R.simp_derivative a) (S.simp_derivative a)
+  | concat R S => simp_union (simp_concat (R.simp_derivative a) S) (simp_concat R.nullify (S.simp_derivative a))
+  | kleene_closure R => simp_concat (R.simp_derivative a) (simp_kleene_closure R)
+
+
 example
   {α : Type}
   [DecidableEq α]
