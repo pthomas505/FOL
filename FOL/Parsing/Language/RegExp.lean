@@ -516,6 +516,42 @@ def RegExp.simp_derivative
   | kleene_closure R => simp_concat (R.simp_derivative a) (simp_kleene_closure R)
 
 
+lemma simp_derivative_lang_eq_derivative_lang
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α)
+  (a : α) :
+  (RegExp.simp_derivative a RE).LanguageOf = (RegExp.derivative a RE).LanguageOf :=
+  by
+    induction RE
+    case union R S R_ih S_ih =>
+      simp only [RegExp.simp_derivative]
+      simp only [RegExp.derivative]
+      simp only [simp_union_lang_eq_union_lang]
+      simp only [RegExp.LanguageOf]
+      rw [R_ih]
+      rw [S_ih]
+    case concat R S R_ih S_ih =>
+      simp only [RegExp.simp_derivative]
+      simp only [RegExp.derivative]
+      simp only [simp_union_lang_eq_union_lang]
+      simp only [RegExp.LanguageOf]
+      simp only [simp_concat_lang_eq_concat_lang]
+      simp only [RegExp.LanguageOf]
+      rw [R_ih]
+      rw [S_ih]
+    case kleene_closure R R_ih =>
+      simp only [RegExp.simp_derivative]
+      simp only [RegExp.derivative]
+      simp only [simp_concat_lang_eq_concat_lang]
+      simp only [RegExp.LanguageOf]
+      simp only [simp_kleene_closure_lang_eq_kleene_closure_lang]
+      simp only [RegExp.LanguageOf]
+      rw [R_ih]
+    all_goals
+      rfl
+
+
 example
   {α : Type}
   [DecidableEq α]
