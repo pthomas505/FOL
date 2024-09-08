@@ -413,8 +413,7 @@ def simp_concat
 example
   {α : Type}
   (RE_1 RE_2 : RegExp α) :
-  (simp_concat RE_1 RE_2).LanguageOf = (RegExp.concat RE_1 RE_2).LanguageOf
-  :=
+  (simp_concat RE_1 RE_2).LanguageOf = (RegExp.concat RE_1 RE_2).LanguageOf :=
   by
     simp only [simp_concat]
 
@@ -448,12 +447,10 @@ def simp_union
     | RegExp.zero => R
     | S => RegExp.union R S
 
-
 example
   {α : Type}
   (RE_1 RE_2 : RegExp α) :
-  (simp_union RE_1 RE_2).LanguageOf = (RegExp.union RE_1 RE_2).LanguageOf
-  :=
+  (simp_union RE_1 RE_2).LanguageOf = (RegExp.union RE_1 RE_2).LanguageOf :=
   by
     simp only [simp_union]
 
