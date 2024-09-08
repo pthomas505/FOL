@@ -437,6 +437,39 @@ example
         rfl
 
 
+def simp_union
+  {α : Type}
+  (RE_1 RE_2 : RegExp α) :
+  RegExp α :=
+  match RE_1 with
+  | RegExp.zero => RE_2
+  | R =>
+    match RE_2 with
+    | RegExp.zero => R
+    | S => RegExp.union R S
+
+
+example
+  {α : Type}
+  (RE_1 RE_2 : RegExp α) :
+  (simp_union RE_1 RE_2).LanguageOf = (RegExp.union RE_1 RE_2).LanguageOf
+  :=
+  by
+    simp only [simp_union]
+
+    induction RE_1 generalizing RE_2
+    case zero =>
+      simp only [RegExp.LanguageOf]
+      simp
+    all_goals
+      cases RE_2
+      case zero =>
+        simp only [RegExp.LanguageOf]
+        simp
+      all_goals
+        rfl
+
+
 example
   {α : Type}
   [DecidableEq α]
