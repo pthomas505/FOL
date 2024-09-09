@@ -5,6 +5,9 @@ import Mathlib.Data.Finset.Basic
 set_option autoImplicit false
 
 
+-- https://arxiv.org/pdf/1509.02032.pdf
+
+
 /-
   The definition of a context free grammar.
 
@@ -67,3 +70,25 @@ inductive derives_in
   derives_in G alpha_0 alpha_1 →
   directly_derives G alpha_1 alpha_2 →
   derives_in G alpha_0 alpha_2
+
+
+example
+  {N : Type}
+  {T : Type}
+  (G : CFG N T) :
+  derives_in G = Relation.ReflTransGen (directly_derives G) :=
+  by
+    ext sf_1 sf_2
+    constructor
+    · intro a1
+      induction a1
+      case _ =>
+        exact Relation.ReflTransGen.refl
+      case _ alpha_0 alpha_1 _ ih_2 ih_3 =>
+        exact Relation.ReflTransGen.tail ih_3 ih_2
+    · intro a1
+      induction a1
+      case _ =>
+        exact derives_in.refl sf_1
+      case _ alpha_0 alpha_1 _ ih_2 ih_3 =>
+        exact derives_in.trans sf_1 alpha_0 alpha_1 ih_3 ih_2
