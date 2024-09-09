@@ -92,3 +92,11 @@ example
         exact derives_in.refl sf_1
       case _ alpha_0 alpha_1 _ ih_2 ih_3 =>
         exact derives_in.trans sf_1 alpha_0 alpha_1 ih_3 ih_2
+
+
+def CFG.LanguageOf
+  {N : Type}
+  {T : Type}
+  (G : CFG N T) :
+  Set (Sentence T) :=
+  { s : Sentence T | derives_in G [Sum.inl G.start_symbol] (s.map Sum.inr) }
