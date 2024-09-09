@@ -603,6 +603,52 @@ def finset_regexp_language_of
   ⋃ (R ∈ Γ), R.LanguageOf
 
 
+def RegExp.derivative_of_finset_wrt_char
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α))
+  (a : α) :
+  Finset (RegExp α) :=
+  Finset.biUnion Γ (fun (R : RegExp α) => {RegExp.derivative R a})
+
+
+lemma regexp_lang_derivative_of_finset_wrt_char_eq_regexp_derivative_of_finset_wrt_char_lang
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α))
+  (a : α) :
+  finset_regexp_language_of (RegExp.derivative_of_finset_wrt_char Γ a) = Language.derivative (finset_regexp_language_of Γ) [a] :=
+  by
+    simp only [RegExp.derivative_of_finset_wrt_char]
+    simp only [finset_regexp_language_of]
+    simp
+    simp only [regexp_lang_derivative_eq_regexp_derivative_lang]
+    rw [Language.derivative_distrib_union_of_finset_wrt_str]
+
+
+def RegExp.derivative_of_finset_wrt_str
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α))
+  (s : Str α) :
+  Finset (RegExp α) :=
+  Finset.biUnion Γ (fun (R : RegExp α) => {RegExp.derivative_wrt_str R s})
+
+
+lemma regexp_lang_derivative_of_finset_wrt_str_eq_regexp_derivative_of_finset_wrt_str_lang
+  {α : Type}
+  [DecidableEq α]
+  (Γ : Finset (RegExp α))
+  (s : Str α) :
+  finset_regexp_language_of (RegExp.derivative_of_finset_wrt_str Γ s) = Language.derivative (finset_regexp_language_of Γ) s :=
+  by
+    simp only [RegExp.derivative_of_finset_wrt_str]
+    simp only [finset_regexp_language_of]
+    simp
+    simp only [regexp_lang_derivative_wrt_str_eq_regexp_derivative_lang]
+    rw [Language.derivative_distrib_union_of_finset_wrt_str]
+
+
 def concat_finset_regexp_regexp
   {α : Type}
   [DecidableEq α]

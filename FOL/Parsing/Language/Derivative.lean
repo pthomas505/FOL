@@ -547,6 +547,34 @@ lemma derivative_distrib_union_of_countable_wrt_str
     simp
 
 
+lemma derivative_distrib_union_of_finset_wrt_char
+  {α : Type}
+  [DecidableEq α]
+  {β : Type}
+  (a : α)
+  (Γ : Finset β)
+  (f : β → Language α):
+  ⋃ (x ∈ Γ), derivative (f x) [a] = derivative (⋃ (x ∈ Γ), f x) [a] :=
+  by
+    simp only [derivative]
+    ext cs
+    simp
+
+
+lemma derivative_distrib_union_of_finset_wrt_str
+  {α : Type}
+  [DecidableEq α]
+  {β : Type}
+  (s : Str α)
+  (Γ : Finset β)
+  (f : β → Language α):
+  ⋃ (x ∈ Γ), derivative (f x) s = derivative (⋃ (x ∈ Γ), f x) s :=
+  by
+    simp only [derivative]
+    ext cs
+    simp
+
+
 -- 1.57
 theorem derivative_of_kleene_closure_wrt_char
   {α : Type}
