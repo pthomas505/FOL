@@ -1,11 +1,14 @@
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finset.Basic
 
+import FOL.Parsing.Language.Kleene
+
 
 set_option autoImplicit false
 
 
 -- https://arxiv.org/pdf/1509.02032.pdf
+-- https://core.ac.uk/download/pdf/156629067.pdf
 
 
 /-
@@ -21,13 +24,20 @@ set_option autoImplicit false
 -/
 
 
-abbrev SententialForm (N : Type) (T : Type) : Type := List (N ⊕ T)
+abbrev SententialForm (N : Type) (T : Type) : Type := Str (N ⊕ T)
 
-abbrev Sentence (T : Type) : Type := List T
+abbrev Sentence (T : Type) : Type := Str T
+
+def SententialForm.IsSentence
+  (N : Type)
+  (T : Type)
+  (sf : SententialForm N T) :
+  Prop :=
+  ∀ (symbol : (N ⊕ T)), symbol ∈ sf → symbol.isRight
 
 
 structure Production (N : Type) (T : Type) :=
-  (subject : N)
+  (lhs : N)
   (rhs : SententialForm N T)
 
 structure CFG (N : Type) (T : Type) :=
@@ -53,30 +63,86 @@ inductive directly_derives
     directly_derives G alpha_0 alpha_1
 
 
+inductive directly_derives_left
+  {N : Type}
+  {T : Type}
+  (G : CFG N T) :
+  SententialForm N T → SententialForm N T → Prop
+  | directly_derives_left
+    (alpha_0 alpha_1 : SententialForm N T)
+    (A : N)
+    (alpha beta gamma : SententialForm N T) :
+    alpha.IsSentence →
+    ⟨A, beta⟩ ∈ G.production_list →
+    alpha_0 = alpha ++ [Sum.inl A] ++ gamma →
+    alpha_1 = alpha ++ beta ++ gamma →
+    directly_derives_left G alpha_0 alpha_1
+
+
+inductive directly_derives_right
+  {N : Type}
+  {T : Type}
+  (G : CFG N T) :
+  SententialForm N T → SententialForm N T → Prop
+  | directly_derives_right
+    (alpha_0 alpha_1 : SententialForm N T)
+    (A : N)
+    (alpha beta gamma : SententialForm N T) :
+    gamma.IsSentence →
+    ⟨A, beta⟩ ∈ G.production_list →
+    alpha_0 = alpha ++ [Sum.inl A] ++ gamma →
+    alpha_1 = alpha ++ beta ++ gamma →
+    directly_derives_right G alpha_0 alpha_1
+
+
+def derives_in
+  {N : Type}
+  {T : Type}
+  (G : CFG N T) :
+  SententialForm N T → SententialForm N T → Prop :=
+  Relation.ReflTransGen (directly_derives G)
+
+
+def derives_in_left
+  {N : Type}
+  {T : Type}
+  (G : CFG N T) :
+  SententialForm N T → SententialForm N T → Prop :=
+  Relation.ReflTransGen (directly_derives_left G)
+
+
+def derives_in_right
+  {N : Type}
+  {T : Type}
+  (G : CFG N T) :
+  SententialForm N T → SententialForm N T → Prop :=
+  Relation.ReflTransGen (directly_derives_right G)
+
+
 /--
   derives_in G alpha_0 alpha_m := alpha_0 =>G* alpha_m
 -/
-inductive derives_in
+inductive derives_in_example
   {N : Type}
   {T : Type}
   (G : CFG N T) :
   SententialForm N T → SententialForm N T → Prop
 | refl
   (alpha : SententialForm N T) :
-  derives_in G alpha alpha
+  derives_in_example G alpha alpha
 
 | trans
   (alpha_0 alpha_1 alpha_2 : SententialForm N T) :
-  derives_in G alpha_0 alpha_1 →
+  derives_in_example G alpha_0 alpha_1 →
   directly_derives G alpha_1 alpha_2 →
-  derives_in G alpha_0 alpha_2
+  derives_in_example G alpha_0 alpha_2
 
 
 example
   {N : Type}
   {T : Type}
   (G : CFG N T) :
-  derives_in G = Relation.ReflTransGen (directly_derives G) :=
+  derives_in_example G = derives_in G :=
   by
     ext sf_1 sf_2
     constructor
@@ -89,9 +155,9 @@ example
     · intro a1
       induction a1
       case _ =>
-        exact derives_in.refl sf_1
+        exact derives_in_example.refl sf_1
       case _ alpha_0 alpha_1 _ ih_2 ih_3 =>
-        exact derives_in.trans sf_1 alpha_0 alpha_1 ih_3 ih_2
+        exact derives_in_example.trans sf_1 alpha_0 alpha_1 ih_3 ih_2
 
 
 def CFG.LanguageOf
@@ -105,7 +171,7 @@ def CFG.LanguageOf
 inductive LabeledTree (α : Type) : Type
   | mk
     (order : ℕ)
-    (label : α)
+    (label : Option α)
     (children : Fin order → LabeledTree α) :
     LabeledTree α
 
@@ -125,7 +191,7 @@ def LabeledTree.order
 def LabeledTree.label
   {α : Type}
   (T : LabeledTree α) :
-  α :=
+  Option α :=
   match T with
   | mk _ label _ => label
 
@@ -158,6 +224,6 @@ def LabeledTree.frontier
   {α : Type} :
   LabeledTree α → List α
   | mk order label children =>
-    if order = 0
-    then [label]
+    if h : order = 0 ∧ label.isSome
+    then [label.get h.right]
     else (List.ofFn (fun (i : Fin order) => (children i).frontier)).join
