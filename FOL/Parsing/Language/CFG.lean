@@ -145,22 +145,6 @@ def directly_derives_right
       sf_r = sf_1 ++ rhs ++ sf_2
 
 
-def derives_in_left
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  SententialForm NTS TS → SententialForm NTS TS → Prop :=
-  Relation.ReflTransGen (directly_derives_left G)
-
-
-def derives_in_right
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  SententialForm NTS TS → SententialForm NTS TS → Prop :=
-  Relation.ReflTransGen (directly_derives_right G)
-
-
 /--
   derives_in G alpha_0 alpha_m := alpha_0 =>G* alpha_m
 -/
@@ -178,6 +162,38 @@ inductive derives_in
   derives_in G sf_1 sf_2 →
   directly_derives G sf_2 sf_3 →
   derives_in G sf_1 sf_3
+
+
+inductive derives_in_left
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  SententialForm NTS TS → SententialForm NTS TS → Prop
+| refl
+  (sf : SententialForm NTS TS) :
+  derives_in_left G sf sf
+
+| trans
+  (sf_1 sf_2 sf_3 : SententialForm NTS TS) :
+  derives_in_left G sf_1 sf_2 →
+  directly_derives_left G sf_2 sf_3 →
+  derives_in_left G sf_1 sf_3
+
+
+inductive derives_in_right
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  SententialForm NTS TS → SententialForm NTS TS → Prop
+| refl
+  (sf : SententialForm NTS TS) :
+  derives_in_right G sf sf
+
+| trans
+  (sf_1 sf_2 sf_3 : SententialForm NTS TS) :
+  derives_in_right G sf_1 sf_2 →
+  directly_derives_right G sf_2 sf_3 →
+  derives_in_right G sf_1 sf_3
 
 
 example
