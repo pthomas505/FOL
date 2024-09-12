@@ -24,98 +24,148 @@ set_option autoImplicit false
 -/
 
 
-abbrev SententialForm (N : Type) (T : Type) : Type := Str (N ⊕ T)
+inductive Symbol (NTS : Type) (TS : Type)
+| nts : NTS → Symbol NTS TS
+| ts : TS → Symbol NTS TS
 
-abbrev Sentence (T : Type) : Type := Str T
 
-def SententialForm.IsSentence
-  (N : Type)
-  (T : Type)
-  (sf : SententialForm N T) :
+def Symbol.isNTS
+  {NTS : Type}
+  {TS : Type} :
+  Symbol NTS TS → Prop
+  | nts _ => True
+  | ts _ => False
+
+instance
+  (NTS : Type)
+  (TS : Type)
+  (c : Symbol NTS TS) :
+  Decidable c.isNTS :=
+  by
+    simp only [Symbol.isNTS]
+    cases c
+    all_goals
+      infer_instance
+
+
+def Symbol.isTS
+  {NTS : Type}
+  {TS : Type} :
+  Symbol NTS TS → Prop
+  | nts _ => False
+  | ts _ => True
+
+instance
+  (NTS : Type)
+  (TS : Type)
+  (c : Symbol NTS TS) :
+  Decidable c.isTS :=
+  by
+    simp only [Symbol.isTS]
+    cases c
+    all_goals
+      infer_instance
+
+
+abbrev SententialForm
+  (NTS : Type)
+  (TS : Type) :
+  Type :=
+  Str (Symbol NTS TS)
+
+
+abbrev Sentence (TS : Type) : Type := Str TS
+
+
+def SententialForm.isSentence
+  (NTS : Type)
+  (TS : Type)
+  (sf : SententialForm NTS TS) :
   Prop :=
-  ∀ (symbol : (N ⊕ T)), symbol ∈ sf → symbol.isRight
+  ∀ (c : Symbol NTS TS), c ∈ sf → c.isTS
 
 
-structure Production (N : Type) (T : Type) :=
-  (lhs : N)
-  (rhs : SententialForm N T)
+structure Rule (NTS : Type) (TS : Type) :=
+  (lhs : NTS)
+  (rhs : SententialForm NTS TS)
 
-structure CFG (N : Type) (T : Type) :=
-  (production_list : List (Production N T))
-  (start_symbol : N)
+
+structure CFG (NTS : Type) (TS : Type) :=
+  (rule_list : List (Rule NTS TS))
+  (start_symbol : NTS)
 
 
 /--
-  directly_derives G alpha_0 alpha_1 := alpha_0 =>G alpha_1
+  directly_derives G lsl rsl := lsl =>G rsl
 -/
-inductive directly_derives
-  {N : Type}
-  {T : Type}
-  (G : CFG N T) :
-  SententialForm N T → SententialForm N T → Prop
-  | directly_derives
-    (alpha_0 alpha_1 : SententialForm N T)
-    (A : N)
-    (alpha beta gamma : SententialForm N T) :
-    ⟨A, beta⟩ ∈ G.production_list →
-    alpha_0 = alpha ++ [Sum.inl A] ++ gamma →
-    alpha_1 = alpha ++ beta ++ gamma →
-    directly_derives G alpha_0 alpha_1
+def directly_derives
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (sf_l sf_r : SententialForm NTS TS) :
+  Prop :=
+    ∃
+      (lhs : NTS)
+      (rhs : SententialForm NTS TS)
+      (sf_1 sf_2 : SententialForm NTS TS),
+      ⟨lhs, rhs⟩ ∈ G.rule_list ∧
+      sf_l = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
+      sf_r = sf_1 ++ rhs ++ sf_2
 
 
-inductive directly_derives_left
-  {N : Type}
-  {T : Type}
-  (G : CFG N T) :
-  SententialForm N T → SententialForm N T → Prop
-  | directly_derives_left
-    (alpha_0 alpha_1 : SententialForm N T)
-    (A : N)
-    (alpha beta gamma : SententialForm N T) :
-    alpha.IsSentence →
-    ⟨A, beta⟩ ∈ G.production_list →
-    alpha_0 = alpha ++ [Sum.inl A] ++ gamma →
-    alpha_1 = alpha ++ beta ++ gamma →
-    directly_derives_left G alpha_0 alpha_1
+def directly_derives_left
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (sf_l sf_r : SententialForm NTS TS) :
+  Prop :=
+    ∃
+      (lhs : NTS)
+      (rhs : SententialForm NTS TS)
+      (sf_1 sf_2 : SententialForm NTS TS),
+      sf_1.isSentence ∧
+      ⟨lhs, rhs⟩ ∈ G.rule_list ∧
+      sf_l = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
+      sf_r = sf_1 ++ rhs ++ sf_2
 
 
-inductive directly_derives_right
-  {N : Type}
-  {T : Type}
-  (G : CFG N T) :
-  SententialForm N T → SententialForm N T → Prop
-  | directly_derives_right
-    (alpha_0 alpha_1 : SententialForm N T)
-    (A : N)
-    (alpha beta gamma : SententialForm N T) :
-    gamma.IsSentence →
-    ⟨A, beta⟩ ∈ G.production_list →
-    alpha_0 = alpha ++ [Sum.inl A] ++ gamma →
-    alpha_1 = alpha ++ beta ++ gamma →
-    directly_derives_right G alpha_0 alpha_1
+def directly_derives_right
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (sf_l sf_r : SententialForm NTS TS) :
+  Prop :=
+    ∃
+      (lhs : NTS)
+      (rhs : SententialForm NTS TS)
+      (sf_1 sf_2 : SententialForm NTS TS),
+      sf_2.isSentence ∧
+      ⟨lhs, rhs⟩ ∈ G.rule_list ∧
+      sf_l = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
+      sf_r = sf_1 ++ rhs ++ sf_2
 
 
 def derives_in
-  {N : Type}
-  {T : Type}
-  (G : CFG N T) :
-  SententialForm N T → SententialForm N T → Prop :=
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  SententialForm NTS TS → SententialForm NTS TS → Prop :=
   Relation.ReflTransGen (directly_derives G)
 
 
 def derives_in_left
-  {N : Type}
-  {T : Type}
-  (G : CFG N T) :
-  SententialForm N T → SententialForm N T → Prop :=
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  SententialForm NTS TS → SententialForm NTS TS → Prop :=
   Relation.ReflTransGen (directly_derives_left G)
 
 
 def derives_in_right
-  {N : Type}
-  {T : Type}
-  (G : CFG N T) :
-  SententialForm N T → SententialForm N T → Prop :=
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  SententialForm NTS TS → SententialForm NTS TS → Prop :=
   Relation.ReflTransGen (directly_derives_right G)
 
 
@@ -123,25 +173,25 @@ def derives_in_right
   derives_in G alpha_0 alpha_m := alpha_0 =>G* alpha_m
 -/
 inductive derives_in_example
-  {N : Type}
-  {T : Type}
-  (G : CFG N T) :
-  SententialForm N T → SententialForm N T → Prop
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  SententialForm NTS TS → SententialForm NTS TS → Prop
 | refl
-  (alpha : SententialForm N T) :
-  derives_in_example G alpha alpha
+  (sf : SententialForm NTS TS) :
+  derives_in_example G sf sf
 
 | trans
-  (alpha_0 alpha_1 alpha_2 : SententialForm N T) :
-  derives_in_example G alpha_0 alpha_1 →
-  directly_derives G alpha_1 alpha_2 →
-  derives_in_example G alpha_0 alpha_2
+  (sf_1 sf_2 sf_3 : SententialForm NTS TS) :
+  derives_in_example G sf_1 sf_2 →
+  directly_derives G sf_2 sf_3 →
+  derives_in_example G sf_1 sf_3
 
 
 example
-  {N : Type}
-  {T : Type}
-  (G : CFG N T) :
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
   derives_in_example G = derives_in G :=
   by
     ext sf_1 sf_2
@@ -161,11 +211,70 @@ example
 
 
 def CFG.LanguageOf
-  {N : Type}
-  {T : Type}
-  (G : CFG N T) :
-  Set (Sentence T) :=
-  { s : Sentence T | derives_in G [Sum.inl G.start_symbol] (s.map Sum.inr) }
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  Language.Language TS :=
+  { s : Sentence TS | derives_in G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+
+
+def CFG.LeftLanguageOf
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  Language.Language TS :=
+  { s : Sentence TS | derives_in_left G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+
+
+def CFG.RightLanguageOf
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  Language.Language TS :=
+  { s : Sentence TS | derives_in_right G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+
+
+lemma directly_derives_left_imp_directly_derives
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (sf_l sf_r : SententialForm NTS TS)
+  (h1 : directly_derives_left G sf_l sf_r) :
+  directly_derives G sf_l sf_r :=
+  by
+    simp only [directly_derives_left] at h1
+    obtain ⟨lhs, rhs, sf_1, sf_2, _, a2, a3⟩ := h1
+    exact ⟨lhs, rhs, sf_1, sf_2, a2, a3⟩
+
+example
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  G.LeftLanguageOf = G.LanguageOf :=
+  by
+    simp only [CFG.LeftLanguageOf]
+    simp only [derives_in_left]
+
+    simp only [CFG.LanguageOf]
+    simp only [derives_in]
+
+    ext s
+    simp
+    constructor
+    · intro a1
+      rw [Relation.ReflTransGen.cases_tail_iff] at a1
+      rw [Relation.ReflTransGen.cases_tail_iff]
+      cases a1
+      case _ a1_left =>
+        left
+        exact a1_left
+      case _ a1_right =>
+        obtain ⟨sf, a2, a3⟩ := a1_right
+        right
+        apply Exists.intro sf
+        constructor
+        ·
+
 
 
 inductive LabeledTree (α : Type) : Type
