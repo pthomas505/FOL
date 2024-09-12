@@ -102,22 +102,22 @@ def directly_derives
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (sf_l sf_r : SententialForm NTS TS) :
+  (sf_left sf_right : SententialForm NTS TS) :
   Prop :=
     ∃
       (lhs : NTS)
       (rhs : SententialForm NTS TS)
       (sf_1 sf_2 : SententialForm NTS TS),
       ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-      sf_l = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
-      sf_r = sf_1 ++ rhs ++ sf_2
+      sf_left = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
+      sf_right = sf_1 ++ rhs ++ sf_2
 
 
 def directly_derives_left
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (sf_l sf_r : SententialForm NTS TS) :
+  (sf_left sf_right : SententialForm NTS TS) :
   Prop :=
     ∃
       (lhs : NTS)
@@ -125,15 +125,15 @@ def directly_derives_left
       (sf_1 sf_2 : SententialForm NTS TS),
       sf_1.isSentence ∧
       ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-      sf_l = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
-      sf_r = sf_1 ++ rhs ++ sf_2
+      sf_left = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
+      sf_right = sf_1 ++ rhs ++ sf_2
 
 
 def directly_derives_right
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (sf_l sf_r : SententialForm NTS TS) :
+  (sf_left sf_right : SententialForm NTS TS) :
   Prop :=
     ∃
       (lhs : NTS)
@@ -141,8 +141,8 @@ def directly_derives_right
       (sf_1 sf_2 : SententialForm NTS TS),
       sf_2.isSentence ∧
       ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-      sf_l = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
-      sf_r = sf_1 ++ rhs ++ sf_2
+      sf_left = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
+      sf_right = sf_1 ++ rhs ++ sf_2
 
 
 /--
@@ -202,20 +202,20 @@ example
   (G : CFG NTS TS) :
   derives_in G = Relation.ReflTransGen (directly_derives G) :=
   by
-    ext sf_1 sf_2
+    ext sf_l sf_r
     constructor
     · intro a1
       induction a1
       case _ =>
         exact Relation.ReflTransGen.refl
-      case _ alpha_0 alpha_1 _ ih_2 ih_3 =>
+      case _ sf_1 sf_2 _ ih_2 ih_3 =>
         exact Relation.ReflTransGen.tail ih_3 ih_2
     · intro a1
       induction a1
       case _ =>
-        exact derives_in.refl sf_1
-      case _ alpha_0 alpha_1 _ ih_2 ih_3 =>
-        exact derives_in.trans sf_1 alpha_0 alpha_1 ih_3 ih_2
+        exact derives_in.refl sf_l
+      case _ sf_1 sf_2 _ ih_2 ih_3 =>
+        exact derives_in.trans sf_l sf_1 sf_2 ih_3 ih_2
 
 
 def CFG.LanguageOf
@@ -260,7 +260,27 @@ example
   (G : CFG NTS TS) :
   G.LeftLanguageOf = G.LanguageOf :=
   by
-    sorry
+    simp only [CFG.LeftLanguageOf]
+    simp only [CFG.LanguageOf]
+    ext s
+    simp
+    congr!
+    ext NTS' TS' G' sf_left sf_right
+    constructor
+    · intro a1
+      induction a1
+      case _ =>
+        apply derives_in.refl
+      case _ sf_1 sf_2 ih_1 ih_2 ih_3 =>
+        apply derives_in.trans sf_left sf_1 sf_2 ih_3
+        apply directly_derives_left_imp_directly_derives
+        exact ih_2
+    · intro a1
+      induction a1
+      case _ =>
+        apply derives_in_left.refl
+      case _ sf_1 sf_2 ih_1 ih_2 ih_3 =>
+        sorry
 
 
 inductive LabeledTree (α : Type) : Type
