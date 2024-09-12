@@ -145,14 +145,6 @@ def directly_derives_right
       sf_r = sf_1 ++ rhs ++ sf_2
 
 
-def derives_in
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  SententialForm NTS TS → SententialForm NTS TS → Prop :=
-  Relation.ReflTransGen (directly_derives G)
-
-
 def derives_in_left
   {NTS : Type}
   {TS : Type}
@@ -172,27 +164,27 @@ def derives_in_right
 /--
   derives_in G alpha_0 alpha_m := alpha_0 =>G* alpha_m
 -/
-inductive derives_in_example
+inductive derives_in
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
   SententialForm NTS TS → SententialForm NTS TS → Prop
 | refl
   (sf : SententialForm NTS TS) :
-  derives_in_example G sf sf
+  derives_in G sf sf
 
 | trans
   (sf_1 sf_2 sf_3 : SententialForm NTS TS) :
-  derives_in_example G sf_1 sf_2 →
+  derives_in G sf_1 sf_2 →
   directly_derives G sf_2 sf_3 →
-  derives_in_example G sf_1 sf_3
+  derives_in G sf_1 sf_3
 
 
 example
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
-  derives_in_example G = derives_in G :=
+  derives_in G = Relation.ReflTransGen (directly_derives G) :=
   by
     ext sf_1 sf_2
     constructor
@@ -205,9 +197,9 @@ example
     · intro a1
       induction a1
       case _ =>
-        exact derives_in_example.refl sf_1
+        exact derives_in.refl sf_1
       case _ alpha_0 alpha_1 _ ih_2 ih_3 =>
-        exact derives_in_example.trans sf_1 alpha_0 alpha_1 ih_3 ih_2
+        exact derives_in.trans sf_1 alpha_0 alpha_1 ih_3 ih_2
 
 
 def CFG.LanguageOf
@@ -252,29 +244,7 @@ example
   (G : CFG NTS TS) :
   G.LeftLanguageOf = G.LanguageOf :=
   by
-    simp only [CFG.LeftLanguageOf]
-    simp only [derives_in_left]
-
-    simp only [CFG.LanguageOf]
-    simp only [derives_in]
-
-    ext s
-    simp
-    constructor
-    · intro a1
-      rw [Relation.ReflTransGen.cases_tail_iff] at a1
-      rw [Relation.ReflTransGen.cases_tail_iff]
-      cases a1
-      case _ a1_left =>
-        left
-        exact a1_left
-      case _ a1_right =>
-        obtain ⟨sf, a2, a3⟩ := a1_right
-        right
-        apply Exists.intro sf
-        constructor
-        ·
-
+    sorry
 
 
 inductive LabeledTree (α : Type) : Type
