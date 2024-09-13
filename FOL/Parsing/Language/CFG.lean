@@ -67,6 +67,20 @@ instance
       infer_instance
 
 
+def Symbol.getNTS
+  (NTS : Type)
+  (TS : Type) :
+  (c : Symbol NTS TS) → (h1 : c.isNTS) → NTS
+  | nts a, _ => a
+
+
+def Symbol.getTS
+  (NTS : Type)
+  (TS : Type) :
+  (c : Symbol NTS TS) → (h1 : c.isTS) → TS
+  | ts a, _ => a
+
+
 abbrev SententialForm
   (NTS : Type)
   (TS : Type) :
@@ -286,7 +300,7 @@ example
 inductive LabeledTree (α : Type) : Type
   | mk
     (order : ℕ)
-    (label : Option α)
+    (label : α)
     (children : Fin order → LabeledTree α) :
     LabeledTree α
 
@@ -306,7 +320,7 @@ def LabeledTree.order
 def LabeledTree.label
   {α : Type}
   (T : LabeledTree α) :
-  Option α :=
+  α :=
   match T with
   | mk _ label _ => label
 
@@ -317,6 +331,13 @@ def LabeledTree.children
   Fin T.order → LabeledTree α :=
   match T with
   | mk _ _ children => children
+
+
+def LabeledTree.children_list
+  {α : Type}
+  (T : LabeledTree α) :
+  List (LabeledTree α) :=
+  List.ofFn (fun (i : Fin T.order) => (T.children i))
 
 
 def LabeledTree.isLeaf
@@ -339,6 +360,26 @@ def LabeledTree.frontier
   {α : Type} :
   LabeledTree α → List α
   | mk order label children =>
-    if h : order = 0 ∧ label.isSome
-    then [label.get h.right]
+    if order = 0
+    then [label]
     else (List.ofFn (fun (i : Fin order) => (children i).frontier)).join
+
+/-
+def is_partial_derivation_tree
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lhs : NTS)
+  (s : SententialForm NTS TS)
+  (T : LabeledTree (Symbol NTS TS)) :
+  Prop :=
+  T.label = Symbol.nts lhs ∧
+  T.frontier = s ∧
+  T.order > 0 →
+    let rhs := T.children_list.map (fun (child : LabeledTree (Symbol NTS TS)) => child.label)
+    ⟨lhs, rhs⟩ ∈ G.rule_list ∧
+    ∀ (child),
+      child ∈ T.children_list →
+      (h : child.label.isNTS) →
+      is_partial_derivation_tree G (child.label.getNTS h) child.frontier child
+-/
