@@ -167,62 +167,86 @@ def directly_derives_right
       sf_right = sf_1 ++ rhs ++ sf_2
 
 
+def derives_in
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  SententialForm NTS TS → SententialForm NTS TS → Prop :=
+  Relation.ReflTransGen (directly_derives G)
+
+
+def derives_in_left
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  SententialForm NTS TS → SententialForm NTS TS → Prop :=
+  Relation.ReflTransGen (directly_derives_left G)
+
+
+def derives_in_right
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  SententialForm NTS TS → SententialForm NTS TS → Prop :=
+  Relation.ReflTransGen (directly_derives_right G)
+
+
 /--
   derives_in G alpha_0 alpha_m := alpha_0 =>G* alpha_m
 -/
-inductive derives_in
+inductive derives_in_alt
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
   SententialForm NTS TS → SententialForm NTS TS → Prop
 | refl
   (sf : SententialForm NTS TS) :
-  derives_in G sf sf
+  derives_in_alt G sf sf
 
 | trans
   (sf_1 sf_2 sf_3 : SententialForm NTS TS) :
-  derives_in G sf_1 sf_2 →
+  derives_in_alt G sf_1 sf_2 →
   directly_derives G sf_2 sf_3 →
-  derives_in G sf_1 sf_3
+  derives_in_alt G sf_1 sf_3
 
 
-inductive derives_in_left
+inductive derives_in_left_alt
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
   SententialForm NTS TS → SententialForm NTS TS → Prop
 | refl
   (sf : SententialForm NTS TS) :
-  derives_in_left G sf sf
+  derives_in_left_alt G sf sf
 
 | trans
   (sf_1 sf_2 sf_3 : SententialForm NTS TS) :
-  derives_in_left G sf_1 sf_2 →
+  derives_in_left_alt G sf_1 sf_2 →
   directly_derives_left G sf_2 sf_3 →
-  derives_in_left G sf_1 sf_3
+  derives_in_left_alt G sf_1 sf_3
 
 
-inductive derives_in_right
+inductive derives_in_right_alt
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
   SententialForm NTS TS → SententialForm NTS TS → Prop
 | refl
   (sf : SententialForm NTS TS) :
-  derives_in_right G sf sf
+  derives_in_right_alt G sf sf
 
 | trans
   (sf_1 sf_2 sf_3 : SententialForm NTS TS) :
-  derives_in_right G sf_1 sf_2 →
+  derives_in_right_alt G sf_1 sf_2 →
   directly_derives_right G sf_2 sf_3 →
-  derives_in_right G sf_1 sf_3
+  derives_in_right_alt G sf_1 sf_3
 
 
 example
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
-  derives_in G = Relation.ReflTransGen (directly_derives G) :=
+  derives_in_alt G = derives_in G :=
   by
     ext sf_l sf_r
     constructor
@@ -235,9 +259,9 @@ example
     · intro a1
       induction a1
       case _ =>
-        exact derives_in.refl sf_l
+        exact derives_in_alt.refl sf_l
       case _ sf_1 sf_2 _ ih_2 ih_3 =>
-        exact derives_in.trans sf_l sf_1 sf_2 ih_3 ih_2
+        exact derives_in_alt.trans sf_l sf_1 sf_2 ih_3 ih_2
 
 
 def CFG.LanguageOf
@@ -276,6 +300,7 @@ lemma directly_derives_left_imp_directly_derives
     obtain ⟨lhs, rhs, sf_1, sf_2, _, a2, a3⟩ := h1
     exact ⟨lhs, rhs, sf_1, sf_2, a2, a3⟩
 
+
 example
   {NTS : Type}
   {TS : Type}
@@ -283,26 +308,19 @@ example
   G.LeftLanguageOf = G.LanguageOf :=
   by
     simp only [CFG.LeftLanguageOf]
+    simp only [derives_in_left]
+
     simp only [CFG.LanguageOf]
+    simp only [derives_in]
+
     ext s
     simp
-    congr!
-    ext NTS' TS' G' sf_left sf_right
+
     constructor
     · intro a1
-      induction a1
-      case _ =>
-        apply derives_in.refl
-      case _ sf_1 sf_2 ih_1 ih_2 ih_3 =>
-        apply derives_in.trans sf_left sf_1 sf_2 ih_3
-        apply directly_derives_left_imp_directly_derives
-        exact ih_2
+      sorry
     · intro a1
-      induction a1
-      case _ =>
-        apply derives_in_left.refl
-      case _ sf_1 sf_2 ih_1 ih_2 ih_3 =>
-        sorry
+      sorry
 
 
 inductive LabeledTree (α : Type) : Type
@@ -371,23 +389,3 @@ def LabeledTree.frontier
     if order = 0
     then [label]
     else (List.ofFn (fun (i : Fin order) => (children i).frontier)).join
-
-/-
-def is_partial_derivation_tree
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS)
-  (lhs : NTS)
-  (s : SententialForm NTS TS)
-  (T : LabeledTree (Symbol NTS TS)) :
-  Prop :=
-  T.label = Symbol.nts lhs ∧
-  T.frontier = s ∧
-  T.order > 0 →
-    let rhs := T.children_list.map (fun (child : LabeledTree (Symbol NTS TS)) => child.label)
-    ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-    ∀ (child),
-      child ∈ T.children_list →
-      (h : child.label.isNTS) →
-      is_partial_derivation_tree G (child.label.getNTS h) child.frontier child
--/
