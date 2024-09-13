@@ -104,6 +104,14 @@ structure Rule (NTS : Type) (TS : Type) :=
   (rhs : SententialForm NTS TS)
 
 
+def Rule.isEpsilonRule
+  {NTS : Type}
+  {TS : Type}
+  (P : Rule NTS TS) :
+  Prop :=
+  P.rhs = []
+
+
 structure CFG (NTS : Type) (TS : Type) :=
   (rule_list : List (Rule NTS TS))
   (start_symbol : NTS)
