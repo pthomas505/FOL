@@ -106,47 +106,47 @@ def directly_derives
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (sf_left sf_right : Str (Symbol NTS TS)) :
+  (lsl rsl : Str (Symbol NTS TS)) :
   Prop :=
     ∃
       (lhs : NTS)
       (rhs : Str (Symbol NTS TS))
-      (sf_1 sf_2 : Str (Symbol NTS TS)),
+      (sl_1 sl_2 : Str (Symbol NTS TS)),
       ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-      sf_left = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
-      sf_right = sf_1 ++ rhs ++ sf_2
+      lsl = sl_1 ++ [Symbol.nts lhs] ++ sl_2 ∧
+      rsl = sl_1 ++ rhs ++ sl_2
 
 
 def directly_derives_left
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (sf_left sf_right : Str (Symbol NTS TS)) :
+  (lsl rsl : Str (Symbol NTS TS)) :
   Prop :=
     ∃
       (lhs : NTS)
       (rhs : Str (Symbol NTS TS))
-      (sf_1 sf_2 : Str (Symbol NTS TS)),
-      (∀ (c : Symbol NTS TS), c ∈ sf_1 → c.isTS) ∧
+      (sl_1 sl_2 : Str (Symbol NTS TS)),
+      (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS) ∧
       ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-      sf_left = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
-      sf_right = sf_1 ++ rhs ++ sf_2
+      lsl = sl_1 ++ [Symbol.nts lhs] ++ sl_2 ∧
+      rsl = sl_1 ++ rhs ++ sl_2
 
 
 def directly_derives_right
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (sf_left sf_right : Str (Symbol NTS TS)) :
+  (lsl rsl : Str (Symbol NTS TS)) :
   Prop :=
     ∃
       (lhs : NTS)
       (rhs : Str (Symbol NTS TS))
-      (sf_1 sf_2 : Str (Symbol NTS TS)),
-      (∀ (c : Symbol NTS TS), c ∈ sf_2 → c.isTS) ∧
+      (sl_1 sl_2 : Str (Symbol NTS TS)),
+      (∀ (c : Symbol NTS TS), c ∈ sl_2 → c.isTS) ∧
       ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-      sf_left = sf_1 ++ [Symbol.nts lhs] ++ sf_2 ∧
-      sf_right = sf_1 ++ rhs ++ sf_2
+      lsl = sl_1 ++ [Symbol.nts lhs] ++ sl_2 ∧
+      rsl = sl_1 ++ rhs ++ sl_2
 
 
 def derives_in
@@ -182,46 +182,14 @@ inductive derives_in_alt
   (G : CFG NTS TS) :
   Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop
 | refl
-  (sf : Str (Symbol NTS TS)) :
-  derives_in_alt G sf sf
+  (sl : Str (Symbol NTS TS)) :
+  derives_in_alt G sl sl
 
 | trans
-  (sf_1 sf_2 sf_3 : Str (Symbol NTS TS)) :
-  derives_in_alt G sf_1 sf_2 →
-  directly_derives G sf_2 sf_3 →
-  derives_in_alt G sf_1 sf_3
-
-
-inductive derives_in_left_alt
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop
-| refl
-  (sf : Str (Symbol NTS TS)) :
-  derives_in_left_alt G sf sf
-
-| trans
-  (sf_1 sf_2 sf_3 : Str (Symbol NTS TS)) :
-  derives_in_left_alt G sf_1 sf_2 →
-  directly_derives_left G sf_2 sf_3 →
-  derives_in_left_alt G sf_1 sf_3
-
-
-inductive derives_in_right_alt
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop
-| refl
-  (sf : Str (Symbol NTS TS)) :
-  derives_in_right_alt G sf sf
-
-| trans
-  (sf_1 sf_2 sf_3 : Str (Symbol NTS TS)) :
-  derives_in_right_alt G sf_1 sf_2 →
-  directly_derives_right G sf_2 sf_3 →
-  derives_in_right_alt G sf_1 sf_3
+  (sl_1 sl_2 sl_3 : Str (Symbol NTS TS)) :
+  derives_in_alt G sl_1 sl_2 →
+  directly_derives G sl_2 sl_3 →
+  derives_in_alt G sl_1 sl_3
 
 
 example
@@ -230,20 +198,20 @@ example
   (G : CFG NTS TS) :
   derives_in_alt G = derives_in G :=
   by
-    ext sf_l sf_r
+    ext lsl rsl
     constructor
     · intro a1
       induction a1
       case _ =>
         exact Relation.ReflTransGen.refl
-      case _ sf_1 sf_2 _ ih_2 ih_3 =>
+      case _ sl_1 sl_2 _ ih_2 ih_3 =>
         exact Relation.ReflTransGen.tail ih_3 ih_2
     · intro a1
       induction a1
       case _ =>
-        exact derives_in_alt.refl sf_l
-      case _ sf_1 sf_2 _ ih_2 ih_3 =>
-        exact derives_in_alt.trans sf_l sf_1 sf_2 ih_3 ih_2
+        exact derives_in_alt.refl lsl
+      case _ sl_1 sl_2 _ ih_2 ih_3 =>
+        exact derives_in_alt.trans lsl sl_1 sl_2 ih_3 ih_2
 
 
 def CFG.LanguageOf
@@ -274,28 +242,28 @@ lemma directly_derives_left_imp_directly_derives
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (sf_l sf_r : Str (Symbol NTS TS))
-  (h1 : directly_derives_left G sf_l sf_r) :
-  directly_derives G sf_l sf_r :=
+  (lsl rsl : Str (Symbol NTS TS))
+  (h1 : directly_derives_left G lsl rsl) :
+  directly_derives G lsl rsl :=
   by
     simp only [directly_derives_left] at h1
-    obtain ⟨lhs, rhs, sf_1, sf_2, _, a2, a3⟩ := h1
-    exact ⟨lhs, rhs, sf_1, sf_2, a2, a3⟩
+    obtain ⟨lhs, rhs, sl_1, sl_2, _, a2, a3⟩ := h1
+    exact ⟨lhs, rhs, sl_1, sl_2, a2, a3⟩
 
 
-lemma directly_derives_sentence_imp_directly_derives_left
+lemma directly_derives_terminal_str_imp_directly_derives_left
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (sf_left sf_right : Str (Symbol NTS TS))
-  (h1 : directly_derives G sf_left sf_right)
-  (h2 : ∀ (c : Symbol NTS TS), c ∈ sf_right → c.isTS) :
-  directly_derives_left G sf_left sf_right :=
+  (lsl rsl : Str (Symbol NTS TS))
+  (h1 : directly_derives G lsl rsl)
+  (h2 : ∀ (c : Symbol NTS TS), c ∈ rsl → c.isTS) :
+  directly_derives_left G lsl rsl :=
   by
     simp only [directly_derives] at h1
-    obtain ⟨lhs, rhs, sf_1, sf_2, a1, a2, a3⟩ := h1
+    obtain ⟨lhs, rhs, sl_1, sl_2, a1, a2, a3⟩ := h1
     rw [a3] at h2
-    have s1 : ∀ (c : Symbol NTS TS), c ∈ sf_1 → c.isTS :=
+    have s1 : ∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS :=
     by
       intro c a4
       apply h2 c
@@ -303,22 +271,22 @@ lemma directly_derives_sentence_imp_directly_derives_left
       left
       exact a4
     simp only [directly_derives_left]
-    exact ⟨lhs, rhs, sf_1, sf_2, s1, a1, a2, a3⟩
+    exact ⟨lhs, rhs, sl_1, sl_2, s1, a1, a2, a3⟩
 
 
 example
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (sf_left sf_right : Str (Symbol NTS TS))
-  (h1 : Relation.TransGen (directly_derives G) sf_left sf_right)
-  (h2 : ∀ (c : Symbol NTS TS), c ∈ sf_right → c.isTS) :
-  Relation.TransGen (directly_derives_left G) sf_left sf_right :=
+  (lsl rsl : Str (Symbol NTS TS))
+  (h1 : Relation.TransGen (directly_derives G) lsl rsl)
+  (h2 : ∀ (c : Symbol NTS TS), c ∈ rsl → c.isTS) :
+  Relation.TransGen (directly_derives_left G) lsl rsl :=
   by
     induction h1
-    case single sf_1 ih_1 =>
+    case single sl_1 ih_1 =>
       apply Relation.TransGen.single
-      exact directly_derives_sentence_imp_directly_derives_left G sf_left sf_1 ih_1 h2
+      exact directly_derives_terminal_str_imp_directly_derives_left G lsl sl_1 ih_1 h2
     case tail sf_1 sf_2 ih_1 ih_2 ih_3 =>
       sorry
 
