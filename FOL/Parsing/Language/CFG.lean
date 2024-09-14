@@ -74,11 +74,75 @@ def Symbol.getNTS
   | nts a, _ => a
 
 
+lemma symbol_is_nts_imp_exists_nts
+  {NTS : Type}
+  {TS : Type}
+  (c : Symbol NTS TS)
+  (h1 : c.isNTS) :
+  ∃ (x : NTS), c = Symbol.nts x :=
+  by
+    cases c
+    case nts x =>
+      apply Exists.intro x
+      rfl
+    case ts x =>
+      simp only [Symbol.isNTS] at h1
+
+
 def Symbol.getTS
   (NTS : Type)
   (TS : Type) :
   (c : Symbol NTS TS) → (h1 : c.isTS) → TS
   | ts a, _ => a
+
+
+lemma symbol_is_ts_imp_exists_ts
+  {NTS : Type}
+  {TS : Type}
+  (c : Symbol NTS TS)
+  (h1 : c.isTS) :
+  ∃ (x : TS), c = Symbol.ts x :=
+  by
+    cases c
+    case nts x =>
+      simp only [Symbol.isTS] at h1
+    case ts x =>
+      apply Exists.intro x
+      rfl
+
+
+lemma symbol_not_nts_iff_is_ts
+  {NTS : Type}
+  {TS : Type}
+  (c : Symbol NTS TS) :
+  ¬ c.isNTS ↔ c.isTS :=
+  by
+    cases c
+    case _ x =>
+      simp only [Symbol.isNTS]
+      simp only [Symbol.isTS]
+      simp
+    case _ x =>
+      simp only [Symbol.isNTS]
+      simp only [Symbol.isTS]
+      simp
+
+
+lemma symbol_not_ts_iff_is_nts
+  {NTS : Type}
+  {TS : Type}
+  (c : Symbol NTS TS) :
+  ¬ c.isTS ↔ c.isNTS :=
+  by
+    cases c
+    case _ x =>
+      simp only [Symbol.isNTS]
+      simp only [Symbol.isTS]
+      simp
+    case _ x =>
+      simp only [Symbol.isNTS]
+      simp only [Symbol.isTS]
+      simp
 
 
 structure Rule (NTS : Type) (TS : Type) :=
@@ -163,6 +227,76 @@ example
       simp at ih_3
       contradiction
     · exact ⟨ih_1, ih_2, ih_3⟩
+
+
+example
+  {α : Type}
+  (l : List α)
+  (h1 : ¬ l = []) :
+  ∃ (xs zs : List α) (y : α), l = xs ++ [y] ++ zs :=
+  by
+    induction l
+    case nil =>
+      contradiction
+    case cons hd tl ih =>
+      by_cases c1 : tl = []
+      · rw [c1]
+        apply Exists.intro []
+        apply Exists.intro []
+        apply Exists.intro hd
+        simp
+      · specialize ih c1
+        obtain ⟨xs, zs, y, eq⟩ := ih
+        apply Exists.intro (hd :: xs)
+        apply Exists.intro zs
+        apply Exists.intro y
+        simp
+        simp at eq
+        exact eq
+
+
+example
+  {NTS : Type}
+  {TS : Type}
+  (sl : Str (Symbol NTS TS))
+  (h1 : ¬ (∀ (c : Symbol NTS TS), c ∈ sl → c.isTS)) :
+  ∃
+    (sl_1 : Str (Symbol NTS TS))
+    (A : NTS)
+    (sl_2 : Str (Symbol NTS TS)),
+    sl = sl_1 ++ [Symbol.nts A] ++ sl_2 :=
+  by
+    induction sl
+    case nil =>
+     simp at h1
+    case cons hd tl ih =>
+      simp at ih
+      simp at h1
+      by_cases c1 : tl = []
+      · rw [c1] at h1
+        simp at h1
+        rw [c1]
+        simp
+        apply Exists.intro []
+        simp
+        simp only [symbol_not_ts_iff_is_nts] at h1
+        exact symbol_is_nts_imp_exists_nts hd h1
+      · by_cases c2 : hd.isNTS
+        case pos =>
+          apply Exists.intro []
+          simp
+          apply symbol_is_nts_imp_exists_nts hd c2
+        case neg =>
+          simp only [symbol_not_nts_iff_is_ts] at c2
+          specialize h1 c2
+          obtain ⟨x, a1, a2⟩ := h1
+          specialize ih x a1 a2
+          obtain ⟨sl_1, A, sl_2, a3⟩ := ih
+          apply Exists.intro (hd :: (sl_1))
+          apply Exists.intro A
+          apply Exists.intro sl_2
+          rw [a3]
+          simp
 
 
 example
