@@ -282,7 +282,7 @@ example
     case single sl_1 ih_1 =>
       apply Relation.TransGen.single
       exact directly_derives_terminal_str_imp_directly_derives_left G lsl sl_1 ih_1 h2
-    case tail sf_1 sf_2 ih_1 ih_2 ih_3 =>
+    case tail sl_1 sl_2 ih_1 ih_2 ih_3 =>
       sorry
 
 
