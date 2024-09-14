@@ -326,6 +326,23 @@ lemma directly_derives_sentence_imp_directly_derives_left
     exact ⟨lhs, rhs, sf_1, sf_2, s1, a1, a2, a3⟩
 
 
+example
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (sf_left sf_right : SententialForm NTS TS)
+  (h1 : Relation.TransGen (directly_derives G) sf_left sf_right)
+  (h2 : sf_right.isSentence) :
+  Relation.TransGen (directly_derives_left G) sf_left sf_right :=
+  by
+    induction h1
+    case single sf_1 ih_1 =>
+      apply Relation.TransGen.single
+      exact directly_derives_sentence_imp_directly_derives_left G sf_left sf_1 ih_1 h2
+    case tail sf_1 sf_2 ih_1 ih_2 ih_3 =>
+      sorry
+
+
 inductive LabeledTree (α : Type) : Type
   | mk
     (order : ℕ)
