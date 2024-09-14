@@ -109,12 +109,11 @@ def directly_derives
   (lsl rsl : Str (Symbol NTS TS)) :
   Prop :=
     ∃
-      (lhs : NTS)
-      (rhs : Str (Symbol NTS TS))
+      (R : Rule NTS TS)
       (sl_1 sl_2 : Str (Symbol NTS TS)),
-      ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-      lsl = sl_1 ++ [Symbol.nts lhs] ++ sl_2 ∧
-      rsl = sl_1 ++ rhs ++ sl_2
+      R ∈ G.rule_list ∧
+      lsl = sl_1 ++ [Symbol.nts R.lhs] ++ sl_2 ∧
+      rsl = sl_1 ++ R.rhs ++ sl_2
 
 
 def directly_derives_left
@@ -124,13 +123,12 @@ def directly_derives_left
   (lsl rsl : Str (Symbol NTS TS)) :
   Prop :=
     ∃
-      (lhs : NTS)
-      (rhs : Str (Symbol NTS TS))
+      (R : Rule NTS TS)
       (sl_1 sl_2 : Str (Symbol NTS TS)),
       (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS) ∧
-      ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-      lsl = sl_1 ++ [Symbol.nts lhs] ++ sl_2 ∧
-      rsl = sl_1 ++ rhs ++ sl_2
+      R ∈ G.rule_list ∧
+      lsl = sl_1 ++ [Symbol.nts R.lhs] ++ sl_2 ∧
+      rsl = sl_1 ++ R.rhs ++ sl_2
 
 
 def directly_derives_right
@@ -140,13 +138,12 @@ def directly_derives_right
   (lsl rsl : Str (Symbol NTS TS)) :
   Prop :=
     ∃
-      (lhs : NTS)
-      (rhs : Str (Symbol NTS TS))
+      (R : Rule NTS TS)
       (sl_1 sl_2 : Str (Symbol NTS TS)),
       (∀ (c : Symbol NTS TS), c ∈ sl_2 → c.isTS) ∧
-      ⟨lhs, rhs⟩ ∈ G.rule_list ∧
-      lsl = sl_1 ++ [Symbol.nts lhs] ++ sl_2 ∧
-      rsl = sl_1 ++ rhs ++ sl_2
+      R ∈ G.rule_list ∧
+      lsl = sl_1 ++ [Symbol.nts R.lhs] ++ sl_2 ∧
+      rsl = sl_1 ++ R.rhs ++ sl_2
 
 
 def derives_in
@@ -173,9 +170,6 @@ def derives_in_right
   Relation.ReflTransGen (directly_derives_right G)
 
 
-/--
-  derives_in G alpha_0 alpha_m := alpha_0 =>G* alpha_m
--/
 inductive derives_in_alt
   {NTS : Type}
   {TS : Type}
@@ -247,21 +241,22 @@ lemma directly_derives_left_imp_directly_derives
   directly_derives G lsl rsl :=
   by
     simp only [directly_derives_left] at h1
-    obtain ⟨lhs, rhs, sl_1, sl_2, _, a2, a3⟩ := h1
-    exact ⟨lhs, rhs, sl_1, sl_2, a2, a3⟩
+    obtain ⟨R, sl_1, sl_2, _, a2, a3⟩ := h1
+    simp only [directly_derives]
+    exact ⟨R, sl_1, sl_2, a2, a3⟩
 
 
 lemma directly_derives_terminal_str_imp_directly_derives_left
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (lsl rsl : Str (Symbol NTS TS))
-  (h1 : directly_derives G lsl rsl)
-  (h2 : ∀ (c : Symbol NTS TS), c ∈ rsl → c.isTS) :
-  directly_derives_left G lsl rsl :=
+  (sl s : Str (Symbol NTS TS))
+  (h1 : directly_derives G sl s)
+  (h2 : ∀ (c : Symbol NTS TS), c ∈ s → c.isTS) :
+  directly_derives_left G sl s :=
   by
     simp only [directly_derives] at h1
-    obtain ⟨lhs, rhs, sl_1, sl_2, a1, a2, a3⟩ := h1
+    obtain ⟨R, sl_1, sl_2, a1, a2, a3⟩ := h1
     rw [a3] at h2
     have s1 : ∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS :=
     by
@@ -271,7 +266,7 @@ lemma directly_derives_terminal_str_imp_directly_derives_left
       left
       exact a4
     simp only [directly_derives_left]
-    exact ⟨lhs, rhs, sl_1, sl_2, s1, a1, a2, a3⟩
+    exact ⟨R, sl_1, sl_2, s1, a1, a2, a3⟩
 
 
 example
