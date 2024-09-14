@@ -301,26 +301,29 @@ lemma directly_derives_left_imp_directly_derives
     exact ⟨lhs, rhs, sf_1, sf_2, a2, a3⟩
 
 
-example
+lemma directly_derives_sentence_imp_directly_derives_left
   {NTS : Type}
   {TS : Type}
-  (G : CFG NTS TS) :
-  G.LeftLanguageOf = G.LanguageOf :=
+  (G : CFG NTS TS)
+  (sf_left sf_right : SententialForm NTS TS)
+  (h1 : sf_right.isSentence)
+  (h1 : directly_derives G sf_left sf_right) :
+  directly_derives_left G sf_left sf_right :=
   by
-    simp only [CFG.LeftLanguageOf]
-    simp only [derives_in_left]
-
-    simp only [CFG.LanguageOf]
-    simp only [derives_in]
-
-    ext s
-    simp
-
-    constructor
-    · intro a1
-      sorry
-    · intro a1
-      sorry
+    simp only [directly_derives] at h1
+    obtain ⟨lhs, rhs, sf_1, sf_2, a1, a2, a3⟩ := h1
+    rw [a3] at h1
+    simp only [SententialForm.isSentence] at h1
+    have s1 : sf_1.isSentence :=
+    by
+      simp only [SententialForm.isSentence]
+      intro c a4
+      apply h1 c
+      simp
+      left
+      exact a4
+    simp only [directly_derives_left]
+    exact ⟨lhs, rhs, sf_1, sf_2, s1, a1, a2, a3⟩
 
 
 inductive LabeledTree (α : Type) : Type
