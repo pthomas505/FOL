@@ -306,19 +306,19 @@ lemma directly_derives_sentence_imp_directly_derives_left
   {TS : Type}
   (G : CFG NTS TS)
   (sf_left sf_right : SententialForm NTS TS)
-  (h1 : sf_right.isSentence)
-  (h1 : directly_derives G sf_left sf_right) :
+  (h1 : directly_derives G sf_left sf_right)
+  (h2 : sf_right.isSentence) :
   directly_derives_left G sf_left sf_right :=
   by
     simp only [directly_derives] at h1
     obtain ⟨lhs, rhs, sf_1, sf_2, a1, a2, a3⟩ := h1
-    rw [a3] at h1
-    simp only [SententialForm.isSentence] at h1
+    rw [a3] at h2
+    simp only [SententialForm.isSentence] at h2
     have s1 : sf_1.isSentence :=
     by
       simp only [SententialForm.isSentence]
       intro c a4
-      apply h1 c
+      apply h2 c
       simp
       left
       exact a4
