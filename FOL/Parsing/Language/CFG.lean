@@ -131,6 +131,65 @@ def is_leftmost_derivation_step
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
+example
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lsl rsl : Str (Symbol NTS TS))
+  (h1 : is_derivation_step G lsl rsl)
+  (h2 : ¬ is_leftmost_derivation_step G lsl rsl) :
+    ∃
+      (R : Rule NTS TS)
+      (sl_1 sl_2 : Str (Symbol NTS TS)),
+      ¬ (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS) ∧
+      R ∈ G.rule_list ∧
+      lsl = sl_1 ++ [Symbol.nts R.lhs] ++ sl_2 ∧
+      rsl = sl_1 ++ R.rhs ++ sl_2 :=
+  by
+    simp only [is_derivation_step] at h1
+    obtain ⟨R, sl_1, sl_2, ih_1, ⟨ih_2, ih_3⟩⟩  := h1
+
+    simp only [is_leftmost_derivation_step] at h2
+    simp at h2
+    specialize h2 R sl_1
+
+    apply Exists.intro R
+    apply Exists.intro sl_1
+    apply Exists.intro sl_2
+    constructor
+    · intro contra
+      simp at ih_2
+      specialize h2 contra ih_1 sl_2 ih_2
+      simp at ih_3
+      contradiction
+    · exact ⟨ih_1, ih_2, ih_3⟩
+
+
+example
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lsl rsl : Str (Symbol NTS TS))
+  (h1 : is_derivation_step G lsl rsl)
+  (h2 : ¬ is_leftmost_derivation_step G lsl rsl) :
+  ∃
+    (sl_1 sl_2 sl_3 sl_4 : Str (Symbol NTS TS))
+    (A B : NTS),
+    (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS) ∧
+    ⟨B, sl_3⟩ ∈ G.rule_list ∧
+    lsl = sl_1 ++ [Symbol.nts A] ++ sl_2 ++ [Symbol.nts B] ++ sl_4 ∧
+    rsl = sl_1 ++ [Symbol.nts A] ++ sl_2 ++ sl_3 ++ sl_4 :=
+  by
+    simp only [is_derivation_step] at h1
+    obtain ⟨R, sl_1, sl_2, ih_1, ⟨ih_2, ih_3⟩⟩  := h1
+
+    simp only [is_leftmost_derivation_step] at h2
+    simp at h2
+
+    specialize h2 R sl_1
+    sorry
+
+
 def is_rightmost_derivation_step
   {NTS : Type}
   {TS : Type}
