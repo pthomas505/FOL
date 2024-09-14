@@ -100,9 +100,9 @@ structure CFG (NTS : Type) (TS : Type) :=
 
 
 /--
-  directly_derives G lsl rsl := lsl =>G rsl
+  is_derivation_step G lsl rsl := lsl =>G rsl
 -/
-def directly_derives
+def is_derivation_step
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
@@ -116,7 +116,7 @@ def directly_derives
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
-def directly_derives_left
+def is_leftmost_derivation_step
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
@@ -131,7 +131,7 @@ def directly_derives_left
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
-def directly_derives_right
+def is_rightmost_derivation_step
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
@@ -146,51 +146,51 @@ def directly_derives_right
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
-def derives_in
+def is_derivation
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
   Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop :=
-  Relation.ReflTransGen (directly_derives G)
+  Relation.ReflTransGen (is_derivation_step G)
 
 
-def derives_in_left
+def is_leftmost_derivation
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
   Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop :=
-  Relation.ReflTransGen (directly_derives_left G)
+  Relation.ReflTransGen (is_leftmost_derivation_step G)
 
 
-def derives_in_right
+def is_rightmost_derivation
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
   Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop :=
-  Relation.ReflTransGen (directly_derives_right G)
+  Relation.ReflTransGen (is_rightmost_derivation_step G)
 
 
-inductive derives_in_alt
+inductive is_derivation_alt
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
   Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop
 | refl
   (sl : Str (Symbol NTS TS)) :
-  derives_in_alt G sl sl
+  is_derivation_alt G sl sl
 
 | trans
   (sl_1 sl_2 sl_3 : Str (Symbol NTS TS)) :
-  derives_in_alt G sl_1 sl_2 →
-  directly_derives G sl_2 sl_3 →
-  derives_in_alt G sl_1 sl_3
+  is_derivation_alt G sl_1 sl_2 →
+  is_derivation_step G sl_2 sl_3 →
+  is_derivation_alt G sl_1 sl_3
 
 
 example
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
-  derives_in_alt G = derives_in G :=
+  is_derivation_alt G = is_derivation G :=
   by
     ext lsl rsl
     constructor
@@ -203,9 +203,9 @@ example
     · intro a1
       induction a1
       case _ =>
-        exact derives_in_alt.refl lsl
+        exact is_derivation_alt.refl lsl
       case _ sl_1 sl_2 _ ih_2 ih_3 =>
-        exact derives_in_alt.trans lsl sl_1 sl_2 ih_3 ih_2
+        exact is_derivation_alt.trans lsl sl_1 sl_2 ih_3 ih_2
 
 
 def CFG.LanguageOf
@@ -213,7 +213,7 @@ def CFG.LanguageOf
   {TS : Type}
   (G : CFG NTS TS) :
   Language.Language TS :=
-  { s : Str TS | derives_in G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+  { s : Str TS | is_derivation G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
 def CFG.LeftLanguageOf
@@ -221,7 +221,7 @@ def CFG.LeftLanguageOf
   {TS : Type}
   (G : CFG NTS TS) :
   Language.Language TS :=
-  { s : Str TS | derives_in_left G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+  { s : Str TS | is_leftmost_derivation G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
 def CFG.RightLanguageOf
@@ -229,33 +229,33 @@ def CFG.RightLanguageOf
   {TS : Type}
   (G : CFG NTS TS) :
   Language.Language TS :=
-  { s : Str TS | derives_in_right G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+  { s : Str TS | is_rightmost_derivation G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
-lemma directly_derives_left_imp_directly_derives
+lemma leftmost_derivation_step_is_derivation_step
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
   (lsl rsl : Str (Symbol NTS TS))
-  (h1 : directly_derives_left G lsl rsl) :
-  directly_derives G lsl rsl :=
+  (h1 : is_leftmost_derivation_step G lsl rsl) :
+  is_derivation_step G lsl rsl :=
   by
-    simp only [directly_derives_left] at h1
+    simp only [is_leftmost_derivation_step] at h1
     obtain ⟨R, sl_1, sl_2, _, a2, a3⟩ := h1
-    simp only [directly_derives]
+    simp only [is_derivation_step]
     exact ⟨R, sl_1, sl_2, a2, a3⟩
 
 
-lemma directly_derives_terminal_str_imp_directly_derives_left
+lemma derivation_step_to_terminal_string_is_leftmost_derivation_step
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
   (sl s : Str (Symbol NTS TS))
-  (h1 : directly_derives G sl s)
+  (h1 : is_derivation_step G sl s)
   (h2 : ∀ (c : Symbol NTS TS), c ∈ s → c.isTS) :
-  directly_derives_left G sl s :=
+  is_leftmost_derivation_step G sl s :=
   by
-    simp only [directly_derives] at h1
+    simp only [is_derivation_step] at h1
     obtain ⟨R, sl_1, sl_2, a1, a2, a3⟩ := h1
     rw [a3] at h2
     have s1 : ∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS :=
@@ -265,7 +265,7 @@ lemma directly_derives_terminal_str_imp_directly_derives_left
       simp
       left
       exact a4
-    simp only [directly_derives_left]
+    simp only [is_leftmost_derivation_step]
     exact ⟨R, sl_1, sl_2, s1, a1, a2, a3⟩
 
 
@@ -274,14 +274,14 @@ example
   {TS : Type}
   (G : CFG NTS TS)
   (lsl rsl : Str (Symbol NTS TS))
-  (h1 : Relation.TransGen (directly_derives G) lsl rsl)
+  (h1 : Relation.TransGen (is_derivation_step G) lsl rsl)
   (h2 : ∀ (c : Symbol NTS TS), c ∈ rsl → c.isTS) :
-  Relation.TransGen (directly_derives_left G) lsl rsl :=
+  Relation.TransGen (is_leftmost_derivation_step G) lsl rsl :=
   by
     induction h1
     case single sl_1 ih_1 =>
       apply Relation.TransGen.single
-      exact directly_derives_terminal_str_imp_directly_derives_left G lsl sl_1 ih_1 h2
+      exact derivation_step_to_terminal_string_is_leftmost_derivation_step G lsl sl_1 ih_1 h2
     case tail sl_1 sl_2 ih_1 ih_2 ih_3 =>
       sorry
 
