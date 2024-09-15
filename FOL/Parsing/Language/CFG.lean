@@ -322,42 +322,18 @@ lemma exists_nts_imp_exists_leftmost_nts
     (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS) ∧
     sl = sl_1 ++ [Symbol.nts A] ++ sl_2 :=
   by
-    induction sl
-    case nil =>
-     simp at h1
-    case cons hd tl ih =>
-      simp at ih
-      simp at h1
-      by_cases c1 : tl = []
-      · rw [c1] at h1
-        simp at h1
-        rw [c1]
-        simp
-        apply Exists.intro []
-        simp
-        exact symbol_is_nts_imp_exists_nts hd h1
-      · by_cases c2 : hd.isNTS
-        case pos =>
-          apply Exists.intro []
-          simp
-          apply symbol_is_nts_imp_exists_nts hd c2
-        case neg =>
-          cases h1
-          case _ h1_left =>
-            contradiction
-          case _ h1_right =>
-            obtain ⟨x, a1, a2⟩ := h1_right
-            specialize ih x a1 a2
-            obtain ⟨sl_1, a3, A, sl_2, a4⟩ := ih
-            apply Exists.intro (hd :: (sl_1))
-            apply Exists.intro A
-            apply Exists.intro sl_2
-            constructor
-            · simp
-              simp only [symbol_not_nts_iff_is_ts] at c2
-              exact ⟨c2, a3⟩
-            · rw [a4]
-              simp
+    obtain s1 := exists_imp_exists_leftmost sl (Symbol.isNTS) h1
+    obtain ⟨sl_1, A, sl_2, a1, a2, a3⟩ := s1
+    obtain s2 := symbol_is_nts_imp_exists_nts A a2
+    obtain ⟨x, a4⟩ := s2
+    apply Exists.intro sl_1
+    apply Exists.intro x
+    apply Exists.intro sl_2
+    constructor
+    · simp only [symbol_not_nts_iff_is_ts] at a3
+      exact a3
+    · rw [a4] at a1
+      exact a1
 
 
 example
