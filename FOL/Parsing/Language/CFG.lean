@@ -195,7 +195,7 @@ def is_leftmost_derivation_step
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
-example
+lemma is_derivation_step_and_is_not_leftmost_derivation_step
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
@@ -255,7 +255,7 @@ example
         exact eq
 
 
-example
+lemma exists_nts_in_symbol_string
   {NTS : Type}
   {TS : Type}
   (sl : Str (Symbol NTS TS))
@@ -264,6 +264,7 @@ example
     (sl_1 : Str (Symbol NTS TS))
     (A : NTS)
     (sl_2 : Str (Symbol NTS TS)),
+    (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS) ∧
     sl = sl_1 ++ [Symbol.nts A] ++ sl_2 :=
   by
     induction sl
@@ -291,12 +292,42 @@ example
           specialize h1 c2
           obtain ⟨x, a1, a2⟩ := h1
           specialize ih x a1 a2
-          obtain ⟨sl_1, A, sl_2, a3⟩ := ih
+          obtain ⟨sl_1, a3, A, sl_2, a4⟩ := ih
           apply Exists.intro (hd :: (sl_1))
           apply Exists.intro A
           apply Exists.intro sl_2
-          rw [a3]
-          simp
+          constructor
+          · simp
+            exact ⟨c2, a3⟩
+          · rw [a4]
+            simp
+
+
+example
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lsl rsl : Str (Symbol NTS TS))
+  (R : Rule NTS TS)
+  (sl_1 sl_2 : Str (Symbol NTS TS))
+  (h1 : ¬ (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS))
+  (h2 : R ∈ G.rule_list)
+  (h3 : lsl = sl_1 ++ [Symbol.nts R.lhs] ++ sl_2)
+  (h4 : rsl = sl_1 ++ R.rhs ++ sl_2) :
+  sorry :=
+  by
+    obtain s1 := exists_nts_in_symbol_string sl_1 h1
+    apply Exists.elim s1
+    intro sl_3 a1
+    clear s1
+    apply Exists.elim a1
+    intro A a2
+    clear a1
+    apply Exists.elim a2
+    intro sl_5 a3
+    clear a2
+
+    sorry
 
 
 example
@@ -314,13 +345,17 @@ example
     lsl = sl_1 ++ [Symbol.nts A] ++ sl_2 ++ [Symbol.nts B] ++ sl_4 ∧
     rsl = sl_1 ++ [Symbol.nts A] ++ sl_2 ++ sl_3 ++ sl_4 :=
   by
-    simp only [is_derivation_step] at h1
-    obtain ⟨R, sl_1, sl_2, ih_1, ⟨ih_2, ih_3⟩⟩  := h1
+    obtain s1 := is_derivation_step_and_is_not_leftmost_derivation_step G lsl rsl h1 h2
+    obtain ⟨R, sl_1, sl_2, a1, a2, a3, a4⟩ := s1
+    rw [a3]
+    rw [a4]
 
-    simp only [is_leftmost_derivation_step] at h2
-    simp at h2
+    obtain s2 := exists_nts_in_symbol_string sl_1 a1
 
-    specialize h2 R sl_1
+    simp at a1
+    obtain ⟨X, a5, a6⟩ := a1
+    obtain ⟨a, Y, b, a7⟩ := s2
+    simp only [symbol_not_ts_iff_is_nts] at a6
     sorry
 
 
