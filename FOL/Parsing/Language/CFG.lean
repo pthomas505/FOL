@@ -270,7 +270,7 @@ example
         exact eq
 
 
-lemma exists_nts_in_symbol_string
+lemma exists_nts_imp_exists_leftmost_nts
   {NTS : Type}
   {TS : Type}
   (sl : Str (Symbol NTS TS))
@@ -338,7 +338,7 @@ example
     rw [a3]
     rw [a4]
 
-    obtain s2 := exists_nts_in_symbol_string sl_1 a1
+    obtain s2 := exists_nts_imp_exists_leftmost_nts sl_1 a1
     obtain ⟨sl_3, A, sl_4, ⟨a5, a6⟩⟩ := s2
     rw [a6]
 
