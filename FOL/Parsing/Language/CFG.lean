@@ -274,7 +274,7 @@ lemma exists_nts_imp_exists_leftmost_nts
   {NTS : Type}
   {TS : Type}
   (sl : Str (Symbol NTS TS))
-  (h1 : ¬ (∀ (c : Symbol NTS TS), c ∈ sl → c.isTS)) :
+  (h1 : ∃ (c : Symbol NTS TS), c ∈ sl ∧ c.isNTS) :
   ∃
     (sl_1 : Str (Symbol NTS TS))
     (A : NTS)
@@ -295,7 +295,6 @@ lemma exists_nts_imp_exists_leftmost_nts
         simp
         apply Exists.intro []
         simp
-        simp only [symbol_not_ts_iff_is_nts] at h1
         exact symbol_is_nts_imp_exists_nts hd h1
       · by_cases c2 : hd.isNTS
         case pos =>
@@ -303,19 +302,22 @@ lemma exists_nts_imp_exists_leftmost_nts
           simp
           apply symbol_is_nts_imp_exists_nts hd c2
         case neg =>
-          simp only [symbol_not_nts_iff_is_ts] at c2
-          specialize h1 c2
-          obtain ⟨x, a1, a2⟩ := h1
-          specialize ih x a1 a2
-          obtain ⟨sl_1, a3, A, sl_2, a4⟩ := ih
-          apply Exists.intro (hd :: (sl_1))
-          apply Exists.intro A
-          apply Exists.intro sl_2
-          constructor
-          · simp
-            exact ⟨c2, a3⟩
-          · rw [a4]
-            simp
+          cases h1
+          case _ h1_left =>
+            contradiction
+          case _ h1_right =>
+            obtain ⟨x, a1, a2⟩ := h1_right
+            specialize ih x a1 a2
+            obtain ⟨sl_1, a3, A, sl_2, a4⟩ := ih
+            apply Exists.intro (hd :: (sl_1))
+            apply Exists.intro A
+            apply Exists.intro sl_2
+            constructor
+            · simp
+              simp only [symbol_not_nts_iff_is_ts] at c2
+              exact ⟨c2, a3⟩
+            · rw [a4]
+              simp
 
 
 example
@@ -338,6 +340,8 @@ example
     rw [a3]
     rw [a4]
 
+    simp at a1
+    simp only [symbol_not_ts_iff_is_nts] at a1
     obtain s2 := exists_nts_imp_exists_leftmost_nts sl_1 a1
     obtain ⟨sl_3, A, sl_4, ⟨a5, a6⟩⟩ := s2
     rw [a6]
