@@ -323,35 +323,6 @@ example
   {TS : Type}
   (G : CFG NTS TS)
   (lsl rsl : Str (Symbol NTS TS))
-  (R : Rule NTS TS)
-  (sl_1 sl_2 : Str (Symbol NTS TS))
-  (h1 : ¬ (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS))
-  (h2 : R ∈ G.rule_list)
-  (h3 : lsl = sl_1 ++ [Symbol.nts R.lhs] ++ sl_2)
-  (h4 : rsl = sl_1 ++ R.rhs ++ sl_2) :
-  sorry :=
-  by
-    obtain s1 := exists_nts_in_symbol_string sl_1 h1
-    apply Exists.elim s1
-    intro sl_3 a1
-    clear s1
-    apply Exists.elim a1
-    intro A a2
-    clear a1
-    apply Exists.elim a2
-    intro sl_5 a3
-    clear a2
-    obtain ⟨a3_left, a3_right⟩ := a3
-    rw [a3_right] at h3
-    rw [a3_right] at h4
-    sorry
-
-
-example
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS)
-  (lsl rsl : Str (Symbol NTS TS))
   (h1 : is_derivation_step G lsl rsl)
   (h2 : ¬ is_leftmost_derivation_step G lsl rsl) :
   ∃
