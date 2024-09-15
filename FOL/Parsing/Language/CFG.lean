@@ -368,12 +368,10 @@ example
     rw [a4]
 
     obtain s2 := exists_nts_in_symbol_string sl_1 a1
+    obtain ⟨sl_3, A, sl_4, ⟨a5, a6⟩⟩ := s2
+    rw [a6]
 
-    simp at a1
-    obtain ⟨X, a5, a6⟩ := a1
-    obtain ⟨a, Y, b, a7⟩ := s2
-    simp only [symbol_not_ts_iff_is_nts] at a6
-    sorry
+    exact ⟨sl_3, sl_4, R.rhs, sl_2, A, R.lhs, a5, a2, rfl, rfl⟩
 
 
 def is_derivation
