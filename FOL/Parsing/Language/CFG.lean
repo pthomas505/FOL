@@ -195,6 +195,21 @@ def is_leftmost_derivation_step
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
+def is_rightmost_derivation_step
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lsl rsl : Str (Symbol NTS TS)) :
+  Prop :=
+    ∃
+      (R : Rule NTS TS)
+      (sl_1 sl_2 : Str (Symbol NTS TS)),
+      (∀ (c : Symbol NTS TS), c ∈ sl_2 → c.isTS) ∧
+      R ∈ G.rule_list ∧
+      lsl = sl_1 ++ [Symbol.nts R.lhs] ++ sl_2 ∧
+      rsl = sl_1 ++ R.rhs ++ sl_2
+
+
 lemma is_derivation_step_and_is_not_leftmost_derivation_step
   {NTS : Type}
   {TS : Type}
@@ -357,21 +372,6 @@ example
     obtain ⟨a, Y, b, a7⟩ := s2
     simp only [symbol_not_ts_iff_is_nts] at a6
     sorry
-
-
-def is_rightmost_derivation_step
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS)
-  (lsl rsl : Str (Symbol NTS TS)) :
-  Prop :=
-    ∃
-      (R : Rule NTS TS)
-      (sl_1 sl_2 : Str (Symbol NTS TS)),
-      (∀ (c : Symbol NTS TS), c ∈ sl_2 → c.isTS) ∧
-      R ∈ G.rule_list ∧
-      lsl = sl_1 ++ [Symbol.nts R.lhs] ++ sl_2 ∧
-      rsl = sl_1 ++ R.rhs ++ sl_2
 
 
 def is_derivation
