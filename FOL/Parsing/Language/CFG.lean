@@ -341,7 +341,9 @@ example
     apply Exists.elim a2
     intro sl_5 a3
     clear a2
-
+    obtain ⟨a3_left, a3_right⟩ := a3
+    rw [a3_right] at h3
+    rw [a3_right] at h4
     sorry
 
 
