@@ -365,6 +365,18 @@ example
     exact ⟨sl_3, sl_4, R.rhs, sl_2, A, R.lhs, a5, a2, rfl, rfl⟩
 
 
+example
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lsl msl rsl : Str (Symbol NTS TS))
+  (h1 : is_derivation_step G lsl msl)
+  (h2 : is_leftmost_derivation_step G msl rsl) :
+  ∃ (msl' : Str (Symbol NTS TS)), is_leftmost_derivation_step G lsl msl' ∧ is_derivation_step G msl' rsl :=
+  by
+    sorry
+
+
 def is_derivation
   {NTS : Type}
   {TS : Type}
