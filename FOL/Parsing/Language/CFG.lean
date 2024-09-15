@@ -210,7 +210,7 @@ def is_rightmost_derivation_step
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
-lemma is_derivation_step_and_is_not_leftmost_derivation_step
+lemma is_derivation_step_and_is_not_leftmost_derivation_step_aux
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
@@ -336,7 +336,7 @@ lemma exists_nts_imp_exists_leftmost_nts
       exact a1
 
 
-example
+lemma is_derivation_step_and_is_not_leftmost_derivation_step
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
@@ -351,7 +351,7 @@ example
     lsl = sl_1 ++ [Symbol.nts A] ++ sl_2 ++ [Symbol.nts B] ++ sl_4 ∧
     rsl = sl_1 ++ [Symbol.nts A] ++ sl_2 ++ sl_3 ++ sl_4 :=
   by
-    obtain s1 := is_derivation_step_and_is_not_leftmost_derivation_step G lsl rsl h1 h2
+    obtain s1 := is_derivation_step_and_is_not_leftmost_derivation_step_aux G lsl rsl h1 h2
     obtain ⟨R, sl_1, sl_2, a1, a2, a3, a4⟩ := s1
     rw [a3]
     rw [a4]
@@ -363,18 +363,6 @@ example
     rw [a6]
 
     exact ⟨sl_3, sl_4, R.rhs, sl_2, A, R.lhs, a5, a2, rfl, rfl⟩
-
-
-example
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS)
-  (lsl msl rsl : Str (Symbol NTS TS))
-  (h1 : is_derivation_step G lsl msl)
-  (h2 : is_leftmost_derivation_step G msl rsl) :
-  ∃ (msl' : Str (Symbol NTS TS)), is_leftmost_derivation_step G lsl msl' ∧ is_derivation_step G msl' rsl :=
-  by
-    sorry
 
 
 def is_derivation
@@ -509,12 +497,20 @@ example
   (h2 : ∀ (c : Symbol NTS TS), c ∈ rsl → c.isTS) :
   Relation.TransGen (is_leftmost_derivation_step G) lsl rsl :=
   by
-    induction h1
-    case single sl_1 ih_1 =>
+    induction h1 using Relation.TransGen.head_induction_on
+    case base sl ih =>
       apply Relation.TransGen.single
-      exact derivation_step_to_terminal_string_is_leftmost_derivation_step G lsl sl_1 ih_1 h2
-    case tail sl_1 sl_2 ih_1 ih_2 ih_3 =>
-      sorry
+      exact derivation_step_to_terminal_string_is_leftmost_derivation_step G sl rsl ih h2
+    case ih sl_1 sl_2 ih_1 ih_2 ih_3 =>
+      by_cases c1 : is_leftmost_derivation_step G sl_1 sl_2
+      case pos =>
+        apply Relation.TransGen.trans
+        · exact Relation.TransGen.single c1
+        · exact ih_3
+      case neg =>
+        obtain s1 := is_derivation_step_and_is_not_leftmost_derivation_step G sl_1 sl_2 ih_1 c1
+        obtain ⟨sl_1_1, sl_2_1, sl_3_1, sl_4_1, A, B, a1, a2, a3, a4⟩ := s1
+        sorry
 
 
 inductive LabeledTree (α : Type) : Type
