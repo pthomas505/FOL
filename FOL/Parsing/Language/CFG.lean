@@ -210,6 +210,30 @@ def is_rightmost_derivation_step
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
+lemma is_derivation_step_same_append_left
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (u v : Str (Symbol NTS TS))
+  (x : Str (Symbol NTS TS))
+  (h1 : is_derivation_step G u v) :
+  is_derivation_step G (x ++ u) (x ++ v) :=
+  by
+    simp only [is_derivation_step] at h1
+    obtain ⟨R, sl_1, sl_2, a1, a2, a3⟩ := h1
+    rw [a2]
+    rw [a3]
+    simp only [is_derivation_step]
+    apply Exists.intro R
+    apply Exists.intro (x ++ sl_1)
+    apply Exists.intro sl_2
+    constructor
+    · exact a1
+    · constructor
+      · simp
+      · simp
+
+
 lemma is_derivation_step_and_is_not_leftmost_derivation_step_aux
   {NTS : Type}
   {TS : Type}
