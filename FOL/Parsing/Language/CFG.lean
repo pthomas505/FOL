@@ -488,28 +488,49 @@ lemma derivation_step_to_terminal_string_is_leftmost_derivation_step
     exact ⟨R, sl_1, sl_2, s1, a1, a2, a3⟩
 
 
+theorem extracted_1
+  {NTS TS : Type}
+  (G : CFG NTS TS)
+  (w : Str (Symbol NTS TS))
+  {alpha_1 : Str (Symbol NTS TS)}
+  (u mu delta rho : Str (Symbol NTS TS))
+  (A : NTS)
+  (h1 : Relation.TransGen (is_leftmost_derivation_step G) alpha_1 w)
+  (h2 : ∀ c ∈ u, c.isTS)
+  (h3 : alpha_1 = u ++ [Symbol.nts A] ++ mu ++ delta ++ rho) :
+  ∃ gamma,
+    { lhs := A, rhs := gamma } ∈ G.rule_list ∧
+     Relation.TransGen (is_leftmost_derivation_step G) (u ++ gamma ++ mu ++ delta ++ rho) w :=
+  by
+    sorry
+
+
 example
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
-  (lsl rsl : Str (Symbol NTS TS))
-  (h1 : Relation.TransGen (is_derivation_step G) lsl rsl)
-  (h2 : ∀ (c : Symbol NTS TS), c ∈ rsl → c.isTS) :
-  Relation.TransGen (is_leftmost_derivation_step G) lsl rsl :=
+  (lsl w : Str (Symbol NTS TS))
+  (h1 : Relation.TransGen (is_derivation_step G) lsl w)
+  (h2 : ∀ (c : Symbol NTS TS), c ∈ w → c.isTS) :
+  Relation.TransGen (is_leftmost_derivation_step G) lsl w :=
   by
     induction h1 using Relation.TransGen.head_induction_on
     case base sl ih =>
       apply Relation.TransGen.single
-      exact derivation_step_to_terminal_string_is_leftmost_derivation_step G sl rsl ih h2
-    case ih sl_1 sl_2 ih_1 ih_2 ih_3 =>
-      by_cases c1 : is_leftmost_derivation_step G sl_1 sl_2
+      exact derivation_step_to_terminal_string_is_leftmost_derivation_step G sl w ih h2
+    case ih alpha alpha_1 ih_1 ih_2 ih_3 =>
+      by_cases c1 : is_leftmost_derivation_step G alpha alpha_1
       case pos =>
         apply Relation.TransGen.trans
         · exact Relation.TransGen.single c1
         · exact ih_3
       case neg =>
-        obtain s1 := is_derivation_step_and_is_not_leftmost_derivation_step G sl_1 sl_2 ih_1 c1
-        obtain ⟨sl_1_1, sl_2_1, sl_3_1, sl_4_1, A, B, a1, a2, a3, a4⟩ := s1
+        obtain s1 := is_derivation_step_and_is_not_leftmost_derivation_step G alpha alpha_1 ih_1 c1
+        obtain ⟨u, mu, delta, rho, A, B, a1, a2, a3, a4⟩ := s1
+
+        have s2 : ∃ gamma : Str (Symbol NTS TS), ⟨A, gamma⟩ ∈ G.rule_list ∧ is_leftmost_derivation G (u ++ gamma ++ mu ++ delta ++ rho) w :=
+        sorry
+
         sorry
 
 
