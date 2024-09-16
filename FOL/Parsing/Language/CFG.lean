@@ -258,6 +258,24 @@ lemma is_derivation_step_same_append_right
       · simp
 
 
+lemma rtc_is_derivation_step_same_append_left
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (u v : Str (Symbol NTS TS))
+  (x : Str (Symbol NTS TS))
+  (h1 : Relation.ReflTransGen (is_derivation_step G) u v) :
+  Relation.ReflTransGen (is_derivation_step G) (x ++ u) (x ++ v) :=
+  by
+    induction h1 using Relation.ReflTransGen.head_induction_on
+    case refl =>
+      exact Relation.ReflTransGen.refl
+    case head a b ih_1 _ ih_3 =>
+      apply Relation.ReflTransGen.head
+      · exact is_derivation_step_same_append_left G a b x ih_1
+      · exact ih_3
+
+
 lemma is_derivation_step_and_is_not_leftmost_derivation_step_aux
   {NTS : Type}
   {TS : Type}
