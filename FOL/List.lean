@@ -333,4 +333,44 @@ lemma List.exists_mem_imp_exists_leftmost_mem
               exact ⟨c1, a5⟩
 
 
+lemma List.exists_mem_imp_exists_rightmost_mem
+  {α : Type}
+  (l : List α)
+  (f : α → Prop)
+  (h1 : ∃ (x : α), x ∈ l ∧ f x) :
+  ∃ (ll : List α) (y : α) (rl : List α), l = ll ++ [y] ++ rl ∧
+    f y ∧ ∀ (a : α), a ∈ rl → ¬ f a :=
+  by
+    induction l
+    case nil =>
+      simp at h1
+    case cons hd tl ih =>
+      simp at ih
+      simp at h1
+      simp
+      by_cases c1 : ∃ a ∈ tl, f a
+      case pos =>
+        obtain ⟨x, a1, a2⟩ := c1
+        specialize ih x a1 a2
+        obtain ⟨ll, y, rl, a3, a4, a5⟩ := ih
+        apply Exists.intro (hd :: ll)
+        apply Exists.intro y
+        apply Exists.intro rl
+        constructor
+        · rw [a3]
+          simp
+        · exact ⟨a4, a5⟩
+      case neg =>
+        cases h1
+        case inl h1_left =>
+          apply Exists.intro []
+          apply Exists.intro hd
+          apply Exists.intro tl
+          simp
+          simp at c1
+          exact ⟨h1_left, c1⟩
+        case inr h1_right =>
+          contradiction
+
+
 #lint
