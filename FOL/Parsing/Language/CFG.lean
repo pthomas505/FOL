@@ -421,30 +421,6 @@ lemma is_derivation_step_and_is_not_leftmost_derivation_step
     exact ⟨sl_3, sl_4, R.rhs, sl_2, A, R.lhs, a5, a2, rfl, rfl⟩
 
 
-def is_derivation
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop :=
-  Relation.ReflTransGen (is_derivation_step G)
-
-
-def is_leftmost_derivation
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop :=
-  Relation.ReflTransGen (is_leftmost_derivation_step G)
-
-
-def is_rightmost_derivation
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop :=
-  Relation.ReflTransGen (is_rightmost_derivation_step G)
-
-
 inductive is_derivation_alt
   {NTS : Type}
   {TS : Type}
@@ -465,7 +441,7 @@ example
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
-  is_derivation_alt G = is_derivation G :=
+  is_derivation_alt G = Relation.ReflTransGen (is_derivation_step G) :=
   by
     ext lsl rsl
     constructor
@@ -488,7 +464,7 @@ def CFG.LanguageOf
   {TS : Type}
   (G : CFG NTS TS) :
   Language.Language TS :=
-  { s : Str TS | is_derivation G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+  { s : Str TS | Relation.ReflTransGen (is_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
 def CFG.LeftLanguageOf
@@ -496,7 +472,7 @@ def CFG.LeftLanguageOf
   {TS : Type}
   (G : CFG NTS TS) :
   Language.Language TS :=
-  { s : Str TS | is_leftmost_derivation G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+  { s : Str TS | Relation.ReflTransGen (is_leftmost_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
 def CFG.RightLanguageOf
@@ -504,7 +480,7 @@ def CFG.RightLanguageOf
   {TS : Type}
   (G : CFG NTS TS) :
   Language.Language TS :=
-  { s : Str TS | is_rightmost_derivation G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+  { s : Str TS | Relation.ReflTransGen (is_rightmost_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
 theorem extracted_1
@@ -546,9 +522,6 @@ example
       case neg =>
         obtain s1 := is_derivation_step_and_is_not_leftmost_derivation_step G alpha alpha_1 ih_1 c1
         obtain ⟨u, mu, delta, rho, A, B, a1, a2, a3, a4⟩ := s1
-
-        have s2 : ∃ gamma : Str (Symbol NTS TS), ⟨A, gamma⟩ ∈ G.rule_list ∧ is_leftmost_derivation G (u ++ gamma ++ mu ++ delta ++ rho) w :=
-        sorry
 
         sorry
 
