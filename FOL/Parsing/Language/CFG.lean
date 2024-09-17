@@ -309,6 +309,20 @@ lemma leftmost_derivation_step_is_derivation_step
     exact ⟨R, sl_1, sl_2, a2, a3⟩
 
 
+lemma rightmost_derivation_step_is_derivation_step
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lsl rsl : Str (Symbol NTS TS))
+  (h1 : is_rightmost_derivation_step G lsl rsl) :
+  is_derivation_step G lsl rsl :=
+  by
+    simp only [is_rightmost_derivation_step] at h1
+    obtain ⟨R, sl_1, sl_2, _, a2, a3⟩ := h1
+    simp only [is_derivation_step]
+    exact ⟨R, sl_1, sl_2, a2, a3⟩
+
+
 lemma derivation_step_to_terminal_string_is_leftmost_derivation_step
   {NTS : Type}
   {TS : Type}
