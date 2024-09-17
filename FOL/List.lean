@@ -267,4 +267,70 @@ theorem nodup_eq_len_imp_eqv
   by sorry
 
 
+example
+  {α : Type}
+  (l : List α)
+  (h1 : ¬ l = []) :
+  ∃ (xs zs : List α) (y : α), l = xs ++ [y] ++ zs :=
+  by
+    induction l
+    case nil =>
+      contradiction
+    case cons hd tl ih =>
+      by_cases c1 : tl = []
+      · rw [c1]
+        apply Exists.intro []
+        apply Exists.intro []
+        apply Exists.intro hd
+        simp
+      · specialize ih c1
+        obtain ⟨xs, zs, y, eq⟩ := ih
+        apply Exists.intro (hd :: xs)
+        apply Exists.intro zs
+        apply Exists.intro y
+        simp
+        simp at eq
+        exact eq
+
+
+lemma List.exists_mem_imp_exists_leftmost_mem
+  {α : Type}
+  (l : List α)
+  (f : α → Prop)
+  (h1 : ∃ (x : α), x ∈ l ∧ f x) :
+  ∃ (ll : List α) (y : α) (rl : List α), l = ll ++ [y] ++ rl ∧
+    f y ∧ ∀ (a : α), a ∈ ll → ¬ f a :=
+  by
+    induction l
+    case nil =>
+      simp at h1
+    case cons hd tl ih =>
+      simp at ih
+      simp at h1
+      simp
+      by_cases c1 : f hd
+      case pos =>
+        apply Exists.intro []
+        simp
+        exact c1
+      case neg =>
+        cases h1
+        case inl h1_left =>
+          contradiction
+        case inr h1_right =>
+          obtain ⟨x, a1, a2⟩ := h1_right
+          specialize ih x a1 a2
+          obtain ⟨ll, y, ⟨rl, a3⟩, a4, a5⟩ := ih
+          apply Exists.intro (hd :: ll)
+          apply Exists.intro y
+          constructor
+          · apply Exists.intro rl
+            simp
+            exact a3
+          · constructor
+            · exact a4
+            · simp
+              exact ⟨c1, a5⟩
+
+
 #lint

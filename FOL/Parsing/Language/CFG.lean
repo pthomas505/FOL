@@ -1,6 +1,7 @@
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finset.Basic
 
+import FOL.List
 import FOL.Parsing.Language.Kleene
 
 
@@ -328,72 +329,6 @@ lemma is_derivation_step_and_is_not_leftmost_derivation_step_aux
     · exact ⟨ih_1, ih_2, ih_3⟩
 
 
-example
-  {α : Type}
-  (l : List α)
-  (h1 : ¬ l = []) :
-  ∃ (xs zs : List α) (y : α), l = xs ++ [y] ++ zs :=
-  by
-    induction l
-    case nil =>
-      contradiction
-    case cons hd tl ih =>
-      by_cases c1 : tl = []
-      · rw [c1]
-        apply Exists.intro []
-        apply Exists.intro []
-        apply Exists.intro hd
-        simp
-      · specialize ih c1
-        obtain ⟨xs, zs, y, eq⟩ := ih
-        apply Exists.intro (hd :: xs)
-        apply Exists.intro zs
-        apply Exists.intro y
-        simp
-        simp at eq
-        exact eq
-
-
-lemma exists_imp_exists_leftmost
-  {α : Type}
-  (l : List α)
-  (f : α → Prop)
-  (h1 : ∃ (x : α), x ∈ l ∧ f x) :
-  ∃ (ll : List α) (y : α) (rl : List α), l = ll ++ [y] ++ rl ∧
-    f y ∧ ∀ (a : α), a ∈ ll → ¬ f a :=
-  by
-    induction l
-    case nil =>
-      simp at h1
-    case cons hd tl ih =>
-      simp at ih
-      simp at h1
-      simp
-      by_cases c1 : f hd
-      case pos =>
-        apply Exists.intro []
-        simp
-        exact c1
-      case neg =>
-        cases h1
-        case inl h1_left =>
-          contradiction
-        case inr h1_right =>
-          obtain ⟨x, a1, a2⟩ := h1_right
-          specialize ih x a1 a2
-          obtain ⟨ll, y, ⟨rl, a3⟩, a4, a5⟩ := ih
-          apply Exists.intro (hd :: ll)
-          apply Exists.intro y
-          constructor
-          · apply Exists.intro rl
-            simp
-            exact a3
-          · constructor
-            · exact a4
-            · simp
-              exact ⟨c1, a5⟩
-
-
 lemma exists_nts_imp_exists_leftmost_nts
   {NTS : Type}
   {TS : Type}
@@ -406,7 +341,7 @@ lemma exists_nts_imp_exists_leftmost_nts
     (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS) ∧
     sl = sl_1 ++ [Symbol.nts A] ++ sl_2 :=
   by
-    obtain s1 := exists_imp_exists_leftmost sl (Symbol.isNTS) h1
+    obtain s1 := List.exists_mem_imp_exists_leftmost_mem sl (Symbol.isNTS) h1
     obtain ⟨sl_1, A, sl_2, a1, a2, a3⟩ := s1
     obtain s2 := symbol_is_nts_imp_exists_nts A a2
     obtain ⟨x, a4⟩ := s2
