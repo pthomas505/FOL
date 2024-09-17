@@ -396,6 +396,32 @@ lemma exists_nts_imp_exists_leftmost_nts
       exact a1
 
 
+lemma exists_nts_imp_exists_rightmost_nts
+  {NTS : Type}
+  {TS : Type}
+  (sl : Str (Symbol NTS TS))
+  (h1 : ∃ (c : Symbol NTS TS), c ∈ sl ∧ c.isNTS) :
+  ∃
+    (sl_1 : Str (Symbol NTS TS))
+    (A : NTS)
+    (sl_2 : Str (Symbol NTS TS)),
+    (∀ (c : Symbol NTS TS), c ∈ sl_2 → c.isTS) ∧
+    sl = sl_1 ++ [Symbol.nts A] ++ sl_2 :=
+  by
+    obtain s1 := List.exists_mem_imp_exists_rightmost_mem sl (Symbol.isNTS) h1
+    obtain ⟨sl_1, A, sl_2, a1, a2, a3⟩ := s1
+    obtain s2 := symbol_is_nts_imp_exists_nts A a2
+    obtain ⟨x, a4⟩ := s2
+    apply Exists.intro sl_1
+    apply Exists.intro x
+    apply Exists.intro sl_2
+    constructor
+    · simp only [symbol_not_nts_iff_is_ts] at a3
+      exact a3
+    · rw [a4] at a1
+      exact a1
+
+
 lemma is_derivation_step_and_is_not_leftmost_derivation_step_aux
   {NTS : Type}
   {TS : Type}
