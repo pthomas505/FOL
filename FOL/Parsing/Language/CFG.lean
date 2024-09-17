@@ -295,6 +295,69 @@ lemma rtc_is_derivation_step_same_append_right
       · exact ih_3
 
 
+lemma leftmost_derivation_step_is_derivation_step
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lsl rsl : Str (Symbol NTS TS))
+  (h1 : is_leftmost_derivation_step G lsl rsl) :
+  is_derivation_step G lsl rsl :=
+  by
+    simp only [is_leftmost_derivation_step] at h1
+    obtain ⟨R, sl_1, sl_2, _, a2, a3⟩ := h1
+    simp only [is_derivation_step]
+    exact ⟨R, sl_1, sl_2, a2, a3⟩
+
+
+lemma derivation_step_to_terminal_string_is_leftmost_derivation_step
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (sl s : Str (Symbol NTS TS))
+  (h1 : is_derivation_step G sl s)
+  (h2 : ∀ (c : Symbol NTS TS), c ∈ s → c.isTS) :
+  is_leftmost_derivation_step G sl s :=
+  by
+    simp only [is_derivation_step] at h1
+    obtain ⟨R, sl_1, sl_2, a1, a2, a3⟩ := h1
+    rw [a3] at h2
+    have s1 : ∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS :=
+    by
+      intro c a4
+      apply h2 c
+      simp
+      left
+      exact a4
+    simp only [is_leftmost_derivation_step]
+    exact ⟨R, sl_1, sl_2, s1, a1, a2, a3⟩
+
+
+lemma exists_nts_imp_exists_leftmost_nts
+  {NTS : Type}
+  {TS : Type}
+  (sl : Str (Symbol NTS TS))
+  (h1 : ∃ (c : Symbol NTS TS), c ∈ sl ∧ c.isNTS) :
+  ∃
+    (sl_1 : Str (Symbol NTS TS))
+    (A : NTS)
+    (sl_2 : Str (Symbol NTS TS)),
+    (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS) ∧
+    sl = sl_1 ++ [Symbol.nts A] ++ sl_2 :=
+  by
+    obtain s1 := List.exists_mem_imp_exists_leftmost_mem sl (Symbol.isNTS) h1
+    obtain ⟨sl_1, A, sl_2, a1, a2, a3⟩ := s1
+    obtain s2 := symbol_is_nts_imp_exists_nts A a2
+    obtain ⟨x, a4⟩ := s2
+    apply Exists.intro sl_1
+    apply Exists.intro x
+    apply Exists.intro sl_2
+    constructor
+    · simp only [symbol_not_nts_iff_is_ts] at a3
+      exact a3
+    · rw [a4] at a1
+      exact a1
+
+
 lemma is_derivation_step_and_is_not_leftmost_derivation_step_aux
   {NTS : Type}
   {TS : Type}
@@ -327,32 +390,6 @@ lemma is_derivation_step_and_is_not_leftmost_derivation_step_aux
       simp at ih_3
       contradiction
     · exact ⟨ih_1, ih_2, ih_3⟩
-
-
-lemma exists_nts_imp_exists_leftmost_nts
-  {NTS : Type}
-  {TS : Type}
-  (sl : Str (Symbol NTS TS))
-  (h1 : ∃ (c : Symbol NTS TS), c ∈ sl ∧ c.isNTS) :
-  ∃
-    (sl_1 : Str (Symbol NTS TS))
-    (A : NTS)
-    (sl_2 : Str (Symbol NTS TS)),
-    (∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS) ∧
-    sl = sl_1 ++ [Symbol.nts A] ++ sl_2 :=
-  by
-    obtain s1 := List.exists_mem_imp_exists_leftmost_mem sl (Symbol.isNTS) h1
-    obtain ⟨sl_1, A, sl_2, a1, a2, a3⟩ := s1
-    obtain s2 := symbol_is_nts_imp_exists_nts A a2
-    obtain ⟨x, a4⟩ := s2
-    apply Exists.intro sl_1
-    apply Exists.intro x
-    apply Exists.intro sl_2
-    constructor
-    · simp only [symbol_not_nts_iff_is_ts] at a3
-      exact a3
-    · rw [a4] at a1
-      exact a1
 
 
 lemma is_derivation_step_and_is_not_leftmost_derivation_step
@@ -468,43 +505,6 @@ def CFG.RightLanguageOf
   (G : CFG NTS TS) :
   Language.Language TS :=
   { s : Str TS | is_rightmost_derivation G [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
-
-
-lemma leftmost_derivation_step_is_derivation_step
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS)
-  (lsl rsl : Str (Symbol NTS TS))
-  (h1 : is_leftmost_derivation_step G lsl rsl) :
-  is_derivation_step G lsl rsl :=
-  by
-    simp only [is_leftmost_derivation_step] at h1
-    obtain ⟨R, sl_1, sl_2, _, a2, a3⟩ := h1
-    simp only [is_derivation_step]
-    exact ⟨R, sl_1, sl_2, a2, a3⟩
-
-
-lemma derivation_step_to_terminal_string_is_leftmost_derivation_step
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS)
-  (sl s : Str (Symbol NTS TS))
-  (h1 : is_derivation_step G sl s)
-  (h2 : ∀ (c : Symbol NTS TS), c ∈ s → c.isTS) :
-  is_leftmost_derivation_step G sl s :=
-  by
-    simp only [is_derivation_step] at h1
-    obtain ⟨R, sl_1, sl_2, a1, a2, a3⟩ := h1
-    rw [a3] at h2
-    have s1 : ∀ (c : Symbol NTS TS), c ∈ sl_1 → c.isTS :=
-    by
-      intro c a4
-      apply h2 c
-      simp
-      left
-      exact a4
-    simp only [is_leftmost_derivation_step]
-    exact ⟨R, sl_1, sl_2, s1, a1, a2, a3⟩
 
 
 theorem extracted_1
