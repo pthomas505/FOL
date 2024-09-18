@@ -775,6 +775,7 @@ lemma shift_openVar
     simp only [openVar]
     simp only [shift]
     simp
+    rfl
   case _ i =>
     cases i
     case zero =>
@@ -784,10 +785,16 @@ lemma shift_openVar
       simp only [openVar]
       simp only [shift]
       simp
-      split
+      split_ifs
       case _ c1 =>
+        rw [c1]
+        simp
+        simp only [openVar]
         simp
       case _ c1 =>
+        simp
+        simp only [openVar]
+        simp only [c1]
         simp
 
 
@@ -843,6 +850,7 @@ lemma shift_openVarList
     simp only [openVarList]
     simp only [shift]
     simp
+    rfl
   case _ n =>
     simp only [openVarList]
     simp only [shift]
@@ -852,29 +860,41 @@ lemma shift_openVarList
       simp
     case succ n =>
       simp
-      split
+      split_ifs
       case _ c1 =>
         have s1 : n + 1 < k + 1
         exact Nat.add_lt_add_right c1 1
         simp only [if_pos s1]
+        simp only [openVarList]
+        simp only [c1]
+        simp
 
-      case _ c1 =>
+      case _ c1 c2 =>
         have s1 : ¬ n + 1 < k + 1
         intro contra
         apply c1
         exact Nat.succ_lt_succ_iff.mp contra
 
-        split
-        case _ c2 =>
-          simp
-        case _ c2 =>
-          have s2 : zs.length ≤ n
-          simp at c2
-          trans (n - k)
-          · exact c2
-          · exact Nat.sub_le n k
+        simp
+        simp only [openVarList]
+        simp only [c1]
+        simp
+        simp only [c2]
+        simp
 
-          simp only [Nat.succ_sub s2]
+      case _ c1 c2 =>
+        have s2 : zs.length ≤ n
+        simp at c2
+        trans (n - k)
+        · exact c2
+        · exact Nat.sub_le n k
+
+        simp only [Nat.succ_sub s2]
+        simp only [openVarList]
+        simp only [c1]
+        simp
+        simp only [c2]
+        simp
 
 
 lemma Holds_openFormulaListAux
