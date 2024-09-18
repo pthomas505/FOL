@@ -933,6 +933,7 @@ theorem ShiftListVarOpenList
       simp only [← ih]
       simp only [Var.openList]
       simp
+      rfl
     case _ i =>
       cases i
       case zero =>
@@ -945,17 +946,6 @@ theorem ShiftListVarOpenList
         simp
         simp only [Var.openList]
         simp
-        split
-        case _ c1 =>
-          have s1 : i < tl.length
-          linarith
-          simp only [s1]
-          simp
-        case _ c1 =>
-          have s1 : ¬ i < tl.length
-          linarith
-          simp only [s1]
-          simp
 
 
 lemma lc_at_iff_lc
