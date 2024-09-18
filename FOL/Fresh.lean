@@ -6,16 +6,16 @@ set_option autoImplicit false
 
 
 /--
-  finset_string_max_len xs := The length of the longest variable name in the finite set of variable names xs or 0 if the set is empty.
+  finset_string_max_len xs := The length of the longest string in the finite set of strings xs or 0 if the set is empty.
 -/
 def finset_string_max_len :
-  Finset VarName → ℕ :=
-  Finset.fold (fun (m n : ℕ) => max m n) 0 (String.length ∘ VarName.toString)
+  Finset String → ℕ :=
+  Finset.fold (fun (m n : ℕ) => max m n) 0 String.length
 
 
 lemma finset_string_max_len_mem
-  (x : VarName)
-  (xs : Finset VarName)
+  (x : String)
+  (xs : Finset String)
   (h1 : x ∈ xs) :
   x.length <= finset_string_max_len xs :=
   by
@@ -43,30 +43,30 @@ lemma finset_string_max_len_mem
   fresh x c xs := If the variable name x is not a member of the finite set of variable names xs then x is returned. If x is a member of xs then the character c is repeatedly appended to x until the resulting variable name is not a member of xs. The resulting variable name is then returned.
 -/
 def fresh
-  (x : VarName)
+  (x : String)
   (c : Char)
-  (xs : Finset VarName) :
-  VarName :=
+  (xs : Finset String) :
+  String :=
   if h : x ∈ xs
   then
-    have : finset_string_max_len xs - String.length x.toString < finset_string_max_len xs + 1 - String.length x.toString :=
+    have : finset_string_max_len xs - String.length x < finset_string_max_len xs + 1 - String.length x :=
       by
       obtain s1 := finset_string_max_len_mem x xs h
       simp only [tsub_lt_tsub_iff_right s1]
       simp
-  fresh (VarName.mk (x.toString ++ c.toString)) c xs
+  fresh ((x ++ c.toString)) c xs
   else x
   termination_by finset_string_max_len xs + 1 - x.length
 
 
 lemma fresh_not_mem
-  (x : VarName)
+  (x : String)
   (c : Char)
-  (xs : Finset VarName) :
+  (xs : Finset String) :
   fresh x c xs ∉ xs :=
   if h : x ∈ xs
   then
-  have : finset_string_max_len xs - String.length x.toString < finset_string_max_len xs + 1 - String.length x.toString :=
+  have : finset_string_max_len xs - String.length x < finset_string_max_len xs + 1 - String.length x :=
     by
     obtain s1 := finset_string_max_len_mem x xs h
     simp only [tsub_lt_tsub_iff_right s1]
