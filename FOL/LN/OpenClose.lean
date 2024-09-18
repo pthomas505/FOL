@@ -780,7 +780,6 @@ lemma shift_openVar
     case zero =>
       simp only [openVar]
       simp only [shift]
-      rfl
     case succ i =>
       simp only [openVar]
       simp only [shift]
