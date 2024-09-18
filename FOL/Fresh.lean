@@ -54,7 +54,7 @@ def fresh
       obtain s1 := finset_string_max_len_mem x xs h
       simp only [tsub_lt_tsub_iff_right s1]
       simp
-  fresh ((x ++ c.toString)) c xs
+  fresh (x ++ c.toString) c xs
   else x
   termination_by finset_string_max_len xs + 1 - x.length
 
