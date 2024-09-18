@@ -1,15 +1,8 @@
-import FOL.NV.Formula
-
 import Mathlib.Tactic
 import Mathlib.Data.String.Lemmas
 
 
 set_option autoImplicit false
-
-
-namespace FOL.NV
-
-open Formula
 
 
 /--
