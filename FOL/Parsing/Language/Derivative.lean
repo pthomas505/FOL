@@ -22,6 +22,18 @@ def derivative
   { t : Str α | s ++ t ∈ L }
 
 
+lemma derivative_def
+  {α : Type}
+  [DecidableEq α]
+  (L : Language α)
+  (a : α)
+  (s : Str α) :
+  s ∈ (derivative L [a]) ↔ a :: s ∈ L :=
+  by
+    simp only [derivative]
+    simp
+
+
 def derivative_list
   {α : Type}
   [DecidableEq α]
