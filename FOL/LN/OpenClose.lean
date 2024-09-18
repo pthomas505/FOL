@@ -1718,18 +1718,6 @@ example
   (V : VarAssignment D)
   (x : String)
   (F : Formula)
-  (z : String) :
-  ∀ (d : D), (shift D V d)
-    ↔ ∀ (d : D), (Function.updateITE V (free_ z) d ∘ Var.instantiate 0 [free_ z]) F :=
-  sorry
-
-
-example
-  (D : Type)
-  (I : Interpretation D)
-  (V : VarAssignment D)
-  (x : String)
-  (F : Formula)
   (z : String)
   (h1 : (free_ z) ∉ F.freeVarSet) :
   Holds D I V (forall_ x F) ↔ ∀ (d : D), Holds D I (Function.updateITE V (free_ z) d) (instantiate 0 [free_ z] F) :=
