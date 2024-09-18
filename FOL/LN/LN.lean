@@ -3,11 +3,8 @@ import Batteries.Data.HashMap.WF
 import Mathlib.Data.Option.Basic
 import Mathlib.Util.CompileInductive
 
+
 set_option autoImplicit false
-
-
-
-notation "ℕ" => Nat
 
 
 namespace NV
@@ -73,7 +70,7 @@ instance : Repr Formula :=
 end LN
 
 
-def NVToLNAux (env : Std.HashMap String ℕ) : NV.Formula → LN.Formula
+def NVToLNAux (env : Batteries.HashMap String ℕ) : NV.Formula → LN.Formula
 | NV.Formula.Var x =>
     let opt := env.find? x
     if h : Option.isSome opt
@@ -84,10 +81,10 @@ def NVToLNAux (env : Std.HashMap String ℕ) : NV.Formula → LN.Formula
 | NV.Formula.App phi psi =>
     LN.Formula.App (NVToLNAux env phi) (NVToLNAux env psi)
 | NV.Formula.Abs x phi =>
-    let env' := (Std.HashMap.mapVal (fun _ val => val + 1) env).insert x 0
+    let env' := (Batteries.HashMap.mapVal (fun _ val => val + 1) env).insert x 0
     LN.Formula.Abs (NVToLNAux env' phi)
 
 def NVToLN (F : NV.Formula) : LN.Formula :=
-  NVToLNAux Std.HashMap.empty F
+  NVToLNAux Batteries.HashMap.empty F
 
 #eval NVToLN (NV.Formula.Abs "x" (NV.Formula.Abs "x" (NV.Formula.Var "x")))
