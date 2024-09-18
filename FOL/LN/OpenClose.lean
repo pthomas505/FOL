@@ -1339,6 +1339,7 @@ theorem shift_instantiate
     simp only [Var.instantiate]
     simp only [shift]
     simp
+    rfl
   case _ i =>
     cases i
     case zero =>
@@ -1349,20 +1350,30 @@ theorem shift_instantiate
         simp only [shift]
         simp only [Var.instantiate]
         simp
-        split
+        split_ifs
         case _ c1 =>
           have s1 : i + 1 < k + 1
           linarith
           simp only [if_pos s1]
-        case _ c1 =>
+          simp only [Var.instantiate]
+          simp only [c1]
+          simp
+        case _ c1 c2 =>
           have s1 : ¬ i + 1 < k + 1
           linarith
           simp only [if_neg s1]
-          split
-          case _ c2 =>
-            simp
-          case _ c2 =>
-            simp
+          simp only [Var.instantiate]
+          simp only [c1]
+          simp
+          simp only [c2]
+          simp
+        case _ c1 c2 =>
+          simp
+          simp only [Var.instantiate]
+          simp only [c1]
+          simp
+          simp only [c2]
+          simp
 
 
 lemma Holds_instantiate
@@ -1430,6 +1441,7 @@ theorem shift_list_instantiate
       simp only [← ih]
       simp only [Var.instantiate]
       simp
+      rfl
     case _ i =>
       cases i
       case zero =>
@@ -1442,17 +1454,6 @@ theorem shift_list_instantiate
         simp
         simp only [Var.instantiate]
         simp
-        split
-        case _ c1 =>
-          have s1 : i < tl.length
-          linarith
-          simp only [s1]
-          simp
-        case _ c1 =>
-          have s1 : ¬ i < tl.length
-          linarith
-          simp only [s1]
-          simp
 
 --------------------------------------------------
 
@@ -1477,7 +1478,6 @@ lemma shift_extract1
     split_ifs
     case _ c1 =>
       simp only [shift]
-      simp
     case _ c1 =>
       simp only [shift]
   case _ i =>
@@ -1718,8 +1718,10 @@ example
   (x : String)
   (F : Formula)
   (z : String) :
- ∀ (d : D), (shift D V d)
-↔ ∀ (d : D), (Function.updateITE V (free_ z) d ∘ Var.instantiate 0 [free_ z]) F :=
+  ∀ (d : D), (shift D V d)
+    ↔ ∀ (d : D), (Function.updateITE V (free_ z) d ∘ Var.instantiate 0 [free_ z]) F :=
+  sorry
+
 
 example
   (D : Type)
