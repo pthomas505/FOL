@@ -1711,6 +1711,7 @@ example
   all_goals
     sorry
 
+
 example
   (D : Type)
   (I : Interpretation D)
@@ -1745,8 +1746,6 @@ example
     simp only [Formula.instantiate]
     simp only [Holds]
     simp
-    apply forall_congr'
-    intro d
     congr! 1
     simp only [List.map_eq_map_iff]
     intro v a1
@@ -1764,6 +1763,7 @@ example
       split_ifs
       case _ c1 =>
         simp only [c1] at h1
+        simp at h1
       case _ c1 =>
         rfl
     case _ i =>
@@ -1785,13 +1785,13 @@ example
     simp only [Formula.instantiate]
     simp only [Holds]
     apply forall_congr'
-    intro d
+    intro d'
     simp only [Holds] at phi_ih
-    rw [phi_ih]
-    apply forall_congr'
-    intro a
-
-
+    specialize phi_ih V h1
+    simp
+    sorry
+  all_goals
+    sorry
 
 
 --#lint
