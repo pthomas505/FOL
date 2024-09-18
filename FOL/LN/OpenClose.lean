@@ -315,6 +315,7 @@ def Formula.predSub
   | forall_ x phi => forall_ x (phi.predSub τ)
 
 
+/-
 def Interpretation.usingPred
   (D : Type)
   (I : Interpretation D)
@@ -322,6 +323,7 @@ def Interpretation.usingPred
   Interpretation D := {
     nonempty_ := I.nonempty_
     pred_ := pred_ }
+-/
 
 --------------------------------------------------
 
@@ -341,6 +343,7 @@ lemma CloseVarOpenVarComp
     simp only [closeVar]
     simp
     simp only [h1]
+    simp
   case bound_ i =>
     simp
     simp only [openVar]
