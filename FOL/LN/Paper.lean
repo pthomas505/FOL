@@ -560,6 +560,7 @@ lemma VarSubstFreeVarSet'
     conv =>
       lhs
       simp only [Var.freeVarSet]
+    simp
 
 
 lemma FormulaSubstFreeVarSet'
@@ -624,6 +625,7 @@ lemma SubOpenVar
       simp only [Var.open]
       simp only [Var.substFun]
       simp only [str_fun_to_var_fun]
+    rfl
   case bound_ i =>
     conv =>
       lhs
@@ -828,6 +830,7 @@ theorem ShiftVarOpenList
     simp only [Var.openList]
     simp only [shift]
     simp
+    rfl
   case _ i =>
     cases i
     case zero =>
