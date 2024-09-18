@@ -1096,7 +1096,6 @@ theorem extracted_1
     split_ifs
     case _ c1 =>
       simp only [shift]
-      simp
     case _ c1 =>
       simp only [shift]
   case _ i =>
@@ -1360,6 +1359,8 @@ example
     simp only [predSub]
     simp only [Formula.openList]
     simp only [phi_ih (j + 1) (j' + 1)]
+  all_goals
+    sorry
 
 
 example
