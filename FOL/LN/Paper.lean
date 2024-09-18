@@ -841,20 +841,30 @@ theorem ShiftVarOpenList
         simp only [shift]
         simp only [Var.openList]
         simp
-        split
+        split_ifs
         case _ c1 =>
           have s1 : i + 1 < j + 1
           linarith
           simp only [if_pos s1]
-        case _ c1 =>
+          simp only [Var.openList]
+          simp only [c1]
+          simp
+        case _ c1 c2 =>
           have s1 : ¬ i + 1 < j + 1
           linarith
           simp only [if_neg s1]
-          split
-          case _ c2 =>
-            simp
-          case _ c2 =>
-            simp
+          simp only [Var.openList]
+          simp only [c1]
+          simp
+          simp only [c2]
+          simp
+        case _ c1 c2 =>
+          simp
+          simp only [Var.openList]
+          simp only [c1]
+          simp
+          simp only [c2]
+          simp
 
 
 lemma HoldsOpenList
