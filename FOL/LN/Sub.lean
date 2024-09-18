@@ -187,6 +187,7 @@ theorem shift_sub_Var
     simp only [shift]
     simp only [str_fun_to_var_fun]
     simp
+    rfl
   case _ i =>
     cases i
     case zero =>
@@ -196,6 +197,7 @@ theorem shift_sub_Var
       simp only [Var.sub_Var]
       simp only [shift]
       simp
+      rfl
 
 
 theorem HoldsIffSubHolds
