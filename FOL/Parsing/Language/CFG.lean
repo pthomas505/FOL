@@ -319,6 +319,25 @@ lemma rtc_is_derivation_step_same_append_right
       · exact ih_3
 
 
+lemma derives_append
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (M N P Q : Str (Symbol NTS TS))
+  (h1 : Relation.ReflTransGen (is_derivation_step G) M N)
+  (h2 : Relation.ReflTransGen (is_derivation_step G) P Q) :
+  Relation.ReflTransGen (is_derivation_step G) (M ++ P) (N ++ Q) :=
+  by
+    -- (M ++ P) (N ++ P) ; (N ++ P) (N ++ Q)
+
+    have s1 : Relation.ReflTransGen (is_derivation_step G) (M ++ P) (N ++ P) :=
+      rtc_is_derivation_step_same_append_right G M N P h1
+
+    have s2 : Relation.ReflTransGen (is_derivation_step G) (N ++ P) (N ++ Q) := rtc_is_derivation_step_same_append_left G P Q N h2
+
+    exact Relation.ReflTransGen.trans s1 s2
+
+
 -------------------------------------------------------------------------------
 
 lemma leftmost_derivation_step_is_derivation_step
