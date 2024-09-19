@@ -211,6 +211,30 @@ def is_rightmost_derivation_step
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
+def CFG.LanguageOf
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  Language.Language TS :=
+  { s : Str TS | Relation.ReflTransGen (is_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+
+
+def CFG.LeftLanguageOf
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  Language.Language TS :=
+  { s : Str TS | Relation.ReflTransGen (is_leftmost_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+
+
+def CFG.RightLanguageOf
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  Language.Language TS :=
+  { s : Str TS | Relation.ReflTransGen (is_rightmost_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
+
+
 lemma is_derivation_step_same_append_left
   {NTS : Type}
   {TS : Type}
@@ -294,6 +318,8 @@ lemma rtc_is_derivation_step_same_append_right
       · exact is_derivation_step_same_append_right G a b x ih_1
       · exact ih_3
 
+
+-------------------------------------------------------------------------------
 
 lemma leftmost_derivation_step_is_derivation_step
   {NTS : Type}
@@ -521,30 +547,6 @@ example
         exact is_derivation_alt.refl lsl
       case _ sl_1 sl_2 _ ih_2 ih_3 =>
         exact is_derivation_alt.trans lsl sl_1 sl_2 ih_3 ih_2
-
-
-def CFG.LanguageOf
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  Language.Language TS :=
-  { s : Str TS | Relation.ReflTransGen (is_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
-
-
-def CFG.LeftLanguageOf
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  Language.Language TS :=
-  { s : Str TS | Relation.ReflTransGen (is_leftmost_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
-
-
-def CFG.RightLanguageOf
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  Language.Language TS :=
-  { s : Str TS | Relation.ReflTransGen (is_rightmost_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
 theorem extracted_1
