@@ -416,6 +416,20 @@ lemma slres2
       simp at h1
 
 
+lemma rgr_r8
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (sym : Symbol NTS TS)
+  (r r1 r2 : Str (Symbol NTS TS))
+  (l : NTS)
+  (h1 : r = r1 ++ [sym] ++ r2)
+  (h2 : is_derivation_step G [Symbol.nts l] r) :
+  ∃ (a b : Str (Symbol NTS TS)), is_derivation_step G [Symbol.nts l] (a ++ [sym] ++ b) :=
+  by
+    sorry
+
+
 -------------------------------------------------------------------------------
 
 lemma leftmost_derivation_step_is_derivation_step
