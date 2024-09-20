@@ -386,7 +386,6 @@ lemma res3
 lemma slres
   {NTS : Type}
   {TS : Type}
-  (G : CFG NTS TS)
   (lhs s : NTS)
   (sl_1 sl_2 : Str (Symbol NTS TS))
   (h1 : sl_1 ++ [Symbol.nts lhs] ++ sl_2 = [Symbol.nts s]) :
@@ -399,6 +398,22 @@ lemma slres
     case cons hd tl =>
       simp at h1
 
+
+lemma slres2
+  {NTS : Type}
+  {TS : Type}
+  (lhs s : NTS)
+  (sl_1 sl_2 : Str (Symbol NTS TS))
+  (h1 : sl_1 ++ [Symbol.nts lhs] ++ sl_2 = [Symbol.nts s]) :
+  (sl_1 = []) ∧ (sl_2 = []) :=
+  by
+    cases sl_1
+    case nil =>
+      simp at h1
+      simp
+      exact h1.right
+    case cons hd tl =>
+      simp at h1
 
 
 -------------------------------------------------------------------------------
