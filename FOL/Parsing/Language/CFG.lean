@@ -427,6 +427,32 @@ lemma rgr_r8
   (h2 : is_derivation_step G [Symbol.nts l] r) :
   ∃ (a b : Str (Symbol NTS TS)), is_derivation_step G [Symbol.nts l] (a ++ [sym] ++ b) :=
   by
+    apply Exists.intro r1
+    apply Exists.intro r2
+    rw [h1] at h2
+    exact h2
+
+
+def is_derivation_list
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (x y : Str (Symbol NTS TS)) :=
+  ∃ (l : Str (Symbol NTS TS)), List.Chain' (is_derivation_step G) ([x] ++ [l] ++ [y])
+
+
+lemma upgr_r7
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (u z : Str (Symbol NTS TS))
+  (x y : Str (Symbol NTS TS))
+  (h1 : is_derivation_list G u z)
+  (h2 : u = x ++ y) :
+  ∃ (x' y' : Str (Symbol NTS TS)), (z = x' ++ y') →
+    is_derivation_list G x x' ∧
+    is_derivation_list G y y' :=
+  by
     sorry
 
 
