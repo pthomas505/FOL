@@ -370,6 +370,37 @@ lemma res2
     exact Relation.ReflTransGen.refl
 
 
+lemma res3
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (a b c : Str (Symbol NTS TS))
+  (h1 : is_derivation_step G a b)
+  (h2 : Relation.ReflTransGen (is_derivation_step G) b c) :
+  Relation.ReflTransGen (is_derivation_step G) a c :=
+  by
+    apply Relation.ReflTransGen.head h1
+    exact h2
+
+
+lemma slres
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lhs s : NTS)
+  (sl_1 sl_2 : Str (Symbol NTS TS))
+  (h1 : sl_1 ++ [Symbol.nts lhs] ++ sl_2 = [Symbol.nts s]) :
+  lhs = s :=
+  by
+    cases sl_1
+    case nil =>
+      simp at h1
+      exact h1.left
+    case cons hd tl =>
+      simp at h1
+
+
+
 -------------------------------------------------------------------------------
 
 lemma leftmost_derivation_step_is_derivation_step
