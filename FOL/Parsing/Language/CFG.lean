@@ -8,6 +8,7 @@ import FOL.Parsing.Language.Kleene
 set_option autoImplicit false
 
 
+-- https://github.com/mn200/CFL-HOL
 -- https://arxiv.org/pdf/1509.02032.pdf
 -- https://core.ac.uk/download/pdf/156629067.pdf
 
@@ -336,6 +337,37 @@ lemma derives_append
     have s2 : Relation.ReflTransGen (is_derivation_step G) (N ++ P) (N ++ Q) := rtc_is_derivation_step_same_append_left G P Q N h2
 
     exact Relation.ReflTransGen.trans s1 s2
+
+
+lemma res1
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lhs: NTS)
+  (rhs: Str (Symbol NTS TS))
+  (h1 : ⟨lhs, rhs⟩ ∈ G.rule_list) :
+  is_derivation_step G [Symbol.nts lhs] rhs :=
+  by
+    simp only [is_derivation_step]
+    apply Exists.intro ⟨lhs, rhs⟩
+    apply Exists.intro []
+    apply Exists.intro []
+    simp
+    exact h1
+
+
+lemma res2
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (a b c : Str (Symbol NTS TS))
+  (h1 : is_derivation_step G a b)
+  (h2 : is_derivation_step G b c) :
+  Relation.ReflTransGen (is_derivation_step G) a c :=
+  by
+    apply Relation.ReflTransGen.head h1
+    apply Relation.ReflTransGen.head h2
+    exact Relation.ReflTransGen.refl
 
 
 -------------------------------------------------------------------------------
