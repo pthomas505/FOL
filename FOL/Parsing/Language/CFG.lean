@@ -212,6 +212,44 @@ def is_rightmost_derivation_step
       rsl = sl_1 ++ R.rhs ++ sl_2
 
 
+inductive is_derivation_alt
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop
+| refl
+  (sl : Str (Symbol NTS TS)) :
+  is_derivation_alt G sl sl
+
+| trans
+  (sl_1 sl_2 sl_3 : Str (Symbol NTS TS)) :
+  is_derivation_alt G sl_1 sl_2 →
+  is_derivation_step G sl_2 sl_3 →
+  is_derivation_alt G sl_1 sl_3
+
+
+example
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS) :
+  is_derivation_alt G = Relation.ReflTransGen (is_derivation_step G) :=
+  by
+    ext lsl rsl
+    constructor
+    · intro a1
+      induction a1
+      case _ =>
+        exact Relation.ReflTransGen.refl
+      case _ sl_1 sl_2 _ ih_2 ih_3 =>
+        exact Relation.ReflTransGen.tail ih_3 ih_2
+    · intro a1
+      induction a1
+      case _ =>
+        exact is_derivation_alt.refl lsl
+      case _ sl_1 sl_2 _ ih_2 ih_3 =>
+        exact is_derivation_alt.trans lsl sl_1 sl_2 ih_3 ih_2
+
+
 def CFG.LanguageOf
   {NTS : Type}
   {TS : Type}
@@ -453,6 +491,8 @@ lemma upgr_r7
     is_derivation_list G x x' ∧
     is_derivation_list G y y' :=
   by
+    simp only [is_derivation_list] at h1
+    rw [h2] at h1
     sorry
 
 
@@ -646,44 +686,6 @@ lemma is_derivation_step_and_is_not_leftmost_derivation_step
     rw [a6]
 
     exact ⟨sl_3, sl_4, R.rhs, sl_2, A, R.lhs, a5, a2, rfl, rfl⟩
-
-
-inductive is_derivation_alt
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  Str (Symbol NTS TS) → Str (Symbol NTS TS) → Prop
-| refl
-  (sl : Str (Symbol NTS TS)) :
-  is_derivation_alt G sl sl
-
-| trans
-  (sl_1 sl_2 sl_3 : Str (Symbol NTS TS)) :
-  is_derivation_alt G sl_1 sl_2 →
-  is_derivation_step G sl_2 sl_3 →
-  is_derivation_alt G sl_1 sl_3
-
-
-example
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS) :
-  is_derivation_alt G = Relation.ReflTransGen (is_derivation_step G) :=
-  by
-    ext lsl rsl
-    constructor
-    · intro a1
-      induction a1
-      case _ =>
-        exact Relation.ReflTransGen.refl
-      case _ sl_1 sl_2 _ ih_2 ih_3 =>
-        exact Relation.ReflTransGen.tail ih_3 ih_2
-    · intro a1
-      induction a1
-      case _ =>
-        exact is_derivation_alt.refl lsl
-      case _ sl_1 sl_2 _ ih_2 ih_3 =>
-        exact is_derivation_alt.trans lsl sl_1 sl_2 ih_3 ih_2
 
 
 theorem extracted_1
