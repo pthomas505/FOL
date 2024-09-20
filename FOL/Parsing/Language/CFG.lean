@@ -471,29 +471,24 @@ lemma rgr_r8
     exact h2
 
 
-def is_derivation_list
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS)
-  (x y : Str (Symbol NTS TS)) :=
-  ∃ (l : Str (Symbol NTS TS)), List.Chain' (is_derivation_step G) ([x] ++ [l] ++ [y])
-
-
 lemma upgr_r7
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS)
   (u z : Str (Symbol NTS TS))
   (x y : Str (Symbol NTS TS))
-  (h1 : is_derivation_list G u z)
+  (h1 : Relation.ReflTransGen (is_derivation_step G) u z)
   (h2 : u = x ++ y) :
   ∃ (x' y' : Str (Symbol NTS TS)), (z = x' ++ y') →
-    is_derivation_list G x x' ∧
-    is_derivation_list G y y' :=
+    Relation.ReflTransGen (is_derivation_step G) x x' ∧
+    Relation.ReflTransGen (is_derivation_step G) y y' :=
   by
-    simp only [is_derivation_list] at h1
-    rw [h2] at h1
-    sorry
+    apply Exists.intro x
+    apply Exists.intro y
+    intro _
+    constructor
+    · exact Relation.ReflTransGen.refl
+    · exact Relation.ReflTransGen.refl
 
 
 -------------------------------------------------------------------------------
