@@ -471,24 +471,6 @@ lemma rgr_r8
     exact h2
 
 
-lemma upgr_r7
-  {NTS : Type}
-  {TS : Type}
-  (G : CFG NTS TS)
-  (u z : Str (Symbol NTS TS))
-  (x y : Str (Symbol NTS TS))
-  (h1 : Relation.ReflTransGen (is_derivation_step G) u z)
-  (h2 : u = x ++ y) :
-  ∃ (x' y' : Str (Symbol NTS TS)), (z = x' ++ y') →
-    Relation.ReflTransGen (is_derivation_step G) x x' ∧
-    Relation.ReflTransGen (is_derivation_step G) y y' :=
-  by
-    apply Exists.intro x
-    apply Exists.intro y
-    intro _
-    constructor
-    · exact Relation.ReflTransGen.refl
-    · exact Relation.ReflTransGen.refl
 
 
 -------------------------------------------------------------------------------
