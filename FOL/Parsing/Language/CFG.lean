@@ -471,6 +471,17 @@ lemma rgr_r8
     exact h2
 
 
+lemma upgr_r11
+  {NTS : Type}
+  {TS : Type}
+  (G : CFG NTS TS)
+  (lhs rhs : NTS)
+  (h1 : is_derivation_step G [Symbol.nts lhs] [Symbol.nts rhs]) :
+  ⟨lhs, [Symbol.nts rhs]⟩ ∈ G.rule_list :=
+  by
+    simp only [is_derivation_step] at h1
+    obtain ⟨R, sl_1, sl_2, a1, a2, a3⟩ := h1
+    sorry
 
 
 -------------------------------------------------------------------------------

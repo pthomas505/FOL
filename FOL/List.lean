@@ -1,7 +1,9 @@
+import FOL.Tactics
 import FOL.FunctionUpdateITE
 
 
 set_option autoImplicit false
+--set_option pp.notation false
 
 
 theorem List.map_eq_self_iff
@@ -371,6 +373,172 @@ lemma List.exists_mem_imp_exists_rightmost_mem
           exact ⟨h1_left, c1⟩
         case inr h1_right =>
           contradiction
+
+
+-- https://github.com/mn200/CFL-HOL/blob/06c070d2d1775a933a1b667a29b035fee6a59796/lib/listLemmasScript.sml
+
+/-
+protected def append : (xs ys : List α) → List α
+  | [],    bs => bs
+  | a::as, bs => a :: List.append as bs
+-/
+
+
+lemma List.nil_append_explode
+  {α : Type}
+  (as : List α) :
+  [] ++ as = as := by
+  unfold_projs
+  unfold List.append
+  real_rfl
+
+
+lemma List.cons_append_explode
+  {α : Type}
+  (a : α)
+  (as bs : List α) :
+  (a :: as) ++ bs = a :: (as ++ bs) := by
+  unfold_projs
+  conv =>
+    lhs
+    unfold List.append
+
+
+lemma List.empty_append_right_explode
+  {α : Type}
+  (l : List α) :
+  l ++ [] = l := by
+  induction l
+  case nil =>
+    unfold_projs
+    unfold List.append
+    real_rfl
+  case cons hd tl ih =>
+    rw [List.cons_append_explode]
+    rw [ih]
+
+
+example
+  {α : Type}
+  (l1 l2 l3 : List α) :
+  (l1 ++ l2 = l1 ++ l3) ↔ (l2 = l3) :=
+  by
+    exact List.append_right_inj l1
+
+
+lemma lreseq
+  (α : Type)
+  (l1 l2 : List α)
+  (x y : α) :
+  l1 ++ [x] ++ l2 = [y] ↔ x = y ∧ l1 = [] ∧ l2 = [] :=
+  by
+    constructor
+    · intro a1
+      cases l1
+      case _ =>
+        simp at a1
+        simp
+        exact a1
+      case _ hd tl =>
+        simp at a1
+    · simp
+      intro a1 a2 a3
+      rw [a1]
+      rw [a2]
+      rw [a3]
+      simp
+
+
+lemma rgr_r9
+  {α : Type}
+  (r : List α)
+  (sym : α)
+  (h1 : sym ∈ r) :
+  ∃ r1 r2, r = r1 ++ [sym] ++ r2 :=
+  by
+    induction r
+    case nil =>
+      simp at h1
+    case cons hd tl ih =>
+      simp at h1
+      cases h1
+      case inl h1_left =>
+        rw [h1_left]
+        apply Exists.intro []
+        apply Exists.intro tl
+        simp
+      case inr h1_right =>
+        specialize ih h1_right
+        obtain ⟨r1, r2, a1⟩ := ih
+        apply Exists.intro (hd :: r1)
+        apply Exists.intro r2
+        rw [a1]
+        simp
+
+
+lemma rgr_r9b
+  {α : Type}
+  (r : List α)
+  (sym : α)
+  (h1 : ∃ (r1 r2 : List α), r = r1 ++ [sym] ++ r2) :
+  sym ∈ r :=
+  by
+    obtain ⟨r1, r2, eq⟩ := h1
+    rw [eq]
+    simp
+
+
+lemma rgr_r9eq
+  {α : Type}
+  (r : List α)
+  (sym : α) :
+  sym ∈ r ↔ (∃ r1 r2, r = r1 ++ [sym] ++ r2) :=
+  by
+    constructor
+    · intro a1
+      exact rgr_r9 r sym a1
+    · intro a1
+      exact rgr_r9b r sym a1
+
+
+lemma list_r1
+  {α : Type}
+  (v v' : List α)
+  (x : α)
+  (h1 : v = v' ++ [x]) :
+  x ∈ v :=
+  by
+    rw [h1]
+    simp
+
+
+lemma append_eq_sing
+  {α : Type}
+  (l1 l2 : List α)
+  (e : α) :
+  (l1 ++ l2 = [e]) ↔ (l1 = [e]) ∧ (l2 = []) ∨ (l1 = []) ∧ (l2 = [e]) :=
+  by
+    cases l1
+    case nil =>
+      simp
+    case cons hd tl =>
+      simp
+      simp only [and_assoc]
+
+
+lemma list_r2
+  {α : Type}
+  (sl_1 sl_2 rhs : List α)
+  (x : α)
+  (h1 : sl_1 ++ rhs ++ sl_2 = [x])
+  (h2 : ¬ rhs = []) :
+  sl_1 = [] ∧ sl_2 = [] :=
+  by
+    simp only [append_eq_sing] at h1
+    aesop
+
+
+
 
 
 #lint
