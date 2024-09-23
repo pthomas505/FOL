@@ -268,6 +268,9 @@ theorem nodup_eq_len_imp_eqv
   by sorry
 
 
+-------------------------------------------------------------------------------
+
+
 example
   {α : Type}
   (l : List α)
@@ -372,6 +375,9 @@ lemma List.exists_mem_imp_exists_rightmost_mem
           exact ⟨h1_left, c1⟩
         case inr h1_right =>
           contradiction
+
+
+-------------------------------------------------------------------------------
 
 
 -- https://github.com/mn200/CFL-HOL/blob/06c070d2d1775a933a1b667a29b035fee6a59796/lib/listLemmasScript.sml
