@@ -1,5 +1,4 @@
 import FOL.Parsing.Language.Regular
-import FOL.Parsing.Language.DFA
 
 
 set_option autoImplicit false
