@@ -3,7 +3,6 @@ import FOL.FunctionUpdateITE
 
 
 set_option autoImplicit false
---set_option pp.notation false
 
 
 theorem List.map_eq_self_iff
