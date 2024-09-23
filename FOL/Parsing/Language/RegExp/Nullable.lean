@@ -11,7 +11,7 @@ set_option autoImplicit false
 namespace RegExp
 
 
-def RegExp.is_nullable
+def is_nullable
   {α : Type} :
   RegExp α → Prop
   | char _ => False
@@ -67,11 +67,11 @@ lemma regexp_is_nullable_iff_regexp_lang_of_is_nullable
   (RE : RegExp α) :
   RE.is_nullable ↔ RE.LanguageOf.is_nullable :=
   by
-    simp only [Language.Language.is_nullable]
+    simp only [Language.is_nullable]
     exact regexp_is_nullable_iff_eps_mem_lang_of RE
 
 
-def RegExp.nullify
+def nullify
   {α : Type} :
   RegExp α → RegExp α
   | char _ => zero
@@ -91,7 +91,7 @@ lemma regexp_nullify_lang_eq_regexp_lang_nullify
     induction RE
     case char c =>
       simp only [RegExp.LanguageOf]
-      simp only [Language.Language.nullify]
+      simp only [Language.nullify]
       simp
     case epsilon =>
       simp only [RegExp.LanguageOf]
@@ -125,12 +125,12 @@ example
     rw [regexp_nullify_lang_eq_regexp_lang_nullify]
     split_ifs
     case pos c1 =>
-      simp only [Language.Language.nullify]
+      simp only [Language.nullify]
       rw [regexp_is_nullable_iff_eps_mem_lang_of] at c1
       simp only [c1]
       simp
     case neg c1 =>
-      simp only [Language.Language.nullify]
+      simp only [Language.nullify]
       rw [regexp_is_nullable_iff_eps_mem_lang_of] at c1
       simp only [c1]
       simp

@@ -27,11 +27,11 @@ def finset_regexp_language_of
   {α : Type}
   [DecidableEq α]
   (Γ : Finset (RegExp α)) :
-  Language.Language α :=
+  Language α :=
   ⋃ (R ∈ Γ), R.LanguageOf
 
 
-def RegExp.derivative_of_finset_wrt_char
+def derivative_of_finset_wrt_char
   {α : Type}
   [DecidableEq α]
   (Γ : Finset (RegExp α))
@@ -54,7 +54,7 @@ lemma regexp_lang_derivative_of_finset_wrt_char_eq_regexp_derivative_of_finset_w
     rw [Language.derivative_distrib_union_of_finset_wrt_str]
 
 
-def RegExp.derivative_of_finset_wrt_str
+def derivative_of_finset_wrt_str
   {α : Type}
   [DecidableEq α]
   (Γ : Finset (RegExp α))
@@ -89,7 +89,7 @@ def concat_finset_regexp_regexp
   else ∅
 
 
-def RegExp.partial_derivative_wrt_char
+def partial_derivative_wrt_char
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α)
@@ -107,7 +107,7 @@ def RegExp.partial_derivative_wrt_char
   | kleene_closure α => concat_finset_regexp_regexp (α.partial_derivative_wrt_char a) (RegExp.kleene_closure α)
 
 
-def RegExp.partial_derivative_of_finset_wrt_char
+def partial_derivative_of_finset_wrt_char
   {α : Type}
   [DecidableEq α]
   (Γ : Finset (RegExp α))
@@ -116,7 +116,7 @@ def RegExp.partial_derivative_of_finset_wrt_char
   Finset.biUnion Γ (fun (R : RegExp α) => partial_derivative_wrt_char R a)
 
 
-def RegExp.partial_derivative_of_finset_wrt_str_aux
+def partial_derivative_of_finset_wrt_str_aux
   {α : Type}
   [DecidableEq α]
   (Γ : Finset (RegExp α)) :
@@ -125,7 +125,7 @@ def RegExp.partial_derivative_of_finset_wrt_str_aux
   | hd :: tl => RegExp.partial_derivative_of_finset_wrt_str_aux (RegExp.partial_derivative_of_finset_wrt_char Γ hd) tl
 
 
-def RegExp.partial_derivative_wrt_str
+def partial_derivative_wrt_str
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α)
@@ -134,7 +134,7 @@ def RegExp.partial_derivative_wrt_str
   RegExp.partial_derivative_of_finset_wrt_str_aux {RE} s
 
 
-def RegExp.partial_derivative_of_finset_wrt_str
+def partial_derivative_of_finset_wrt_str
   {α : Type}
   [DecidableEq α]
   (Γ : Finset (RegExp α))

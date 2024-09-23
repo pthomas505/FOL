@@ -8,9 +8,6 @@ set_option autoImplicit false
 -- https://www.cambridge.org/core/journals/journal-of-functional-programming/article/regularexpression-derivatives-reexamined/E5734B86DEB96C61C69E5CF3C4FB0AFA
 
 
-namespace RegExp
-
-
 inductive RegExp (α : Type) : Type
   | char : α → RegExp α
   | epsilon : RegExp α
@@ -23,9 +20,12 @@ inductive RegExp (α : Type) : Type
 compile_inductive% RegExp
 
 
-def RegExp.LanguageOf
+namespace RegExp
+
+
+def LanguageOf
   {α : Type} :
-  RegExp α → Language.Language α
+  RegExp α → Language α
   | char c => {[c]}
   | epsilon => {[]}
   | zero => ∅

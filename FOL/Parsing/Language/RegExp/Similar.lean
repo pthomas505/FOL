@@ -212,7 +212,7 @@ lemma simp_kleene_closure_lang_eq_kleene_closure_lang
       rfl
 
 
-def RegExp.simp_derivative
+def simp_derivative
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α)

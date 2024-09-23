@@ -71,7 +71,7 @@ def DFA.LanguageOf
   {σ : Type}
   [DecidableEq σ]
   (D : DFA α σ) :
-  Language.Language α :=
+  Language α :=
   { s : Str α | D.accepts s }
 
 
@@ -81,7 +81,7 @@ example
   {σ : Type}
   [DecidableEq σ]
   (D : DFA α σ)
-  (L : Language.Language α)
+  (L : Language α)
   (a : α)
   (h1 : L = D.LanguageOf) :
   ∃ (D' : DFA α σ), D'.LanguageOf = Language.derivative L [a] :=

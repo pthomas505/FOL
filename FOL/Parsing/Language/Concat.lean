@@ -9,14 +9,14 @@ set_option autoImplicit false
 -- https://arxiv.org/pdf/1907.13577
 
 
-namespace Language
-
-
 /-
 Definition 10 (Language). A language L over some alphabet Σ is a subset of Σ∗, i.e. L ⊆ Σ∗.
 -/
 
 abbrev Language (α : Type) : Type := Set (Str α)
+
+
+namespace Language
 
 
 example

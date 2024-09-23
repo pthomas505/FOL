@@ -17,14 +17,14 @@ Definition 14 (Nullable). A language L is said to be nullable if ε ∈ L, and w
 -/
 
 
-def Language.is_nullable
+def is_nullable
   {α : Type}
   (L : Language α) :
   Prop :=
   [] ∈ L
 
 
-def Language.nullify
+def nullify
   {α : Type}
   [DecidableEq α]
   (L : Language α) :
@@ -35,7 +35,7 @@ def Language.nullify
   else ∅
 
 
-def Language.nullify_list
+def nullify_list
   {α : Type}
   [DecidableEq α]
   (L : List (Str α)) :

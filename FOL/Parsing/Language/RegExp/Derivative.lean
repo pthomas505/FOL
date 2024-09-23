@@ -11,7 +11,7 @@ set_option autoImplicit false
 namespace RegExp
 
 
-def RegExp.derivative
+def derivative
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α)
@@ -26,7 +26,7 @@ def RegExp.derivative
   | kleene_closure R => concat (R.derivative a) (kleene_closure R)
 
 
-def RegExp.derivative_wrt_str
+def derivative_wrt_str
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α) :
@@ -94,13 +94,13 @@ lemma regexp_lang_derivative_wrt_str_eq_regexp_derivative_lang
       exact ih (RE.derivative hd)
 
 
-def RegExp.matches
+def matches_string
   {α : Type}
   [DecidableEq α]
   (RE : RegExp α) :
   Str α → Prop
   | [] => RE.is_nullable
-  | hd :: tl => (RE.derivative hd).matches tl
+  | hd :: tl => (RE.derivative hd).matches_string tl
 
 
 instance
@@ -108,20 +108,20 @@ instance
   [DecidableEq α]
   (RE : RegExp α)
   (s : Str α) :
-  Decidable (RE.matches s) :=
+  Decidable (RE.matches_string s) :=
   by
     induction s generalizing RE
     case nil =>
-      simp only [RegExp.matches]
+      simp only [RegExp.matches_string]
       infer_instance
     case cons hd tl ih =>
-      simp only [RegExp.matches]
+      simp only [RegExp.matches_string]
       infer_instance
 
 
-#eval RegExp.matches (RegExp.char 'c') ['c']
-#eval RegExp.matches (RegExp.char 'c') ['d']
-#eval RegExp.matches (RegExp.concat (RegExp.kleene_closure (RegExp.char 'c')) (RegExp.char 'd')) ['c', 'c', 'd']
+#eval RegExp.matches_string (RegExp.char 'c') ['c']
+#eval RegExp.matches_string (RegExp.char 'c') ['d']
+#eval RegExp.matches_string (RegExp.concat (RegExp.kleene_closure (RegExp.char 'c')) (RegExp.char 'd')) ['c', 'c', 'd']
 
 
 example
@@ -129,14 +129,14 @@ example
   [DecidableEq α]
   (RE : RegExp α)
   (s : Str α) :
-  RE.matches s ↔ s ∈ RE.LanguageOf :=
+  RE.matches_string s ↔ s ∈ RE.LanguageOf :=
   by
     induction s generalizing RE
     case nil =>
-      simp only [RegExp.matches]
+      simp only [RegExp.matches_string]
       exact regexp_is_nullable_iff_eps_mem_lang_of RE
     case cons hd tl ih =>
-      simp only [RegExp.matches]
+      simp only [RegExp.matches_string]
       rw [ih]
       rw [regexp_lang_derivative_eq_regexp_derivative_lang]
       simp only [Language.derivative]

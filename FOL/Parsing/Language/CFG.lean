@@ -254,7 +254,7 @@ def CFG.LanguageOf
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
-  Language.Language TS :=
+  Language TS :=
   { s : Str TS | Relation.ReflTransGen (is_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
@@ -262,7 +262,7 @@ def CFG.LeftLanguageOf
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
-  Language.Language TS :=
+  Language TS :=
   { s : Str TS | Relation.ReflTransGen (is_leftmost_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
@@ -270,7 +270,7 @@ def CFG.RightLanguageOf
   {NTS : Type}
   {TS : Type}
   (G : CFG NTS TS) :
-  Language.Language TS :=
+  Language TS :=
   { s : Str TS | Relation.ReflTransGen (is_rightmost_derivation_step G) [Symbol.nts G.start_symbol] (s.map Symbol.ts) }
 
 
