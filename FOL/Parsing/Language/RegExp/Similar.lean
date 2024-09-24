@@ -110,6 +110,38 @@ example
       exact Language.kleene_closure_empty
 
 
+def simp_union
+  {α : Type}
+  (RE_1 RE_2 : RegExp α) :
+  RegExp α :=
+  match RE_1 with
+  | RegExp.zero => RE_2
+  | R =>
+    match RE_2 with
+    | RegExp.zero => R
+    | S => RegExp.union R S
+
+
+lemma simp_union_lang_eq_union_lang
+  {α : Type}
+  (RE_1 RE_2 : RegExp α) :
+  (simp_union RE_1 RE_2).LanguageOf = (RegExp.union RE_1 RE_2).LanguageOf :=
+  by
+    simp only [simp_union]
+
+    induction RE_1 generalizing RE_2
+    case zero =>
+      simp only [RegExp.LanguageOf]
+      simp
+    all_goals
+      cases RE_2
+      case zero =>
+        simp only [RegExp.LanguageOf]
+        simp
+      all_goals
+        rfl
+
+
 def simp_concat
   {α : Type}
   (RE_1 RE_2 : RegExp α) :
@@ -146,38 +178,6 @@ lemma simp_concat_lang_eq_concat_lang
       case zero =>
         simp only [RegExp.LanguageOf]
         simp only [Language.concat_empty_right]
-      all_goals
-        rfl
-
-
-def simp_union
-  {α : Type}
-  (RE_1 RE_2 : RegExp α) :
-  RegExp α :=
-  match RE_1 with
-  | RegExp.zero => RE_2
-  | R =>
-    match RE_2 with
-    | RegExp.zero => R
-    | S => RegExp.union R S
-
-
-lemma simp_union_lang_eq_union_lang
-  {α : Type}
-  (RE_1 RE_2 : RegExp α) :
-  (simp_union RE_1 RE_2).LanguageOf = (RegExp.union RE_1 RE_2).LanguageOf :=
-  by
-    simp only [simp_union]
-
-    induction RE_1 generalizing RE_2
-    case zero =>
-      simp only [RegExp.LanguageOf]
-      simp
-    all_goals
-      cases RE_2
-      case zero =>
-        simp only [RegExp.LanguageOf]
-        simp
       all_goals
         rfl
 
@@ -265,3 +265,39 @@ lemma simp_derivative_lang_eq_derivative_lang
       rw [R_ih]
     all_goals
       rfl
+
+
+theorem all_simp_derivative_mem_finset
+  {α : Type}
+  [DecidableEq α]
+  (RE : RegExp α) :
+  ∃ (T : Finset (RegExp α)), ∀ (a : α), simp_derivative RE a ∈ T :=
+  by
+    induction RE
+    case char c =>
+      simp only [simp_derivative]
+      apply Exists.intro {epsilon, zero}
+      intro a
+      split_ifs
+      case pos =>
+        simp
+      case neg =>
+        simp
+    case epsilon =>
+      simp only [simp_derivative]
+      apply Exists.intro {zero}
+      intro a
+      simp
+    case zero =>
+      simp only [simp_derivative]
+      apply Exists.intro {zero}
+      intro a
+      simp
+    case union R S R_ih S_ih =>
+      obtain ⟨T_R, T_R_ih⟩ := R_ih
+      obtain ⟨T_S, T_S_ih⟩ := S_ih
+      simp only [simp_derivative]
+      simp only [simp_union]
+      sorry
+    all_goals
+      sorry
