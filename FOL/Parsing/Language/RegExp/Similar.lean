@@ -7,6 +7,10 @@ set_option autoImplicit false
 -- https://arxiv.org/pdf/1907.13577
 -- https://www.cambridge.org/core/journals/journal-of-functional-programming/article/regularexpression-derivatives-reexamined/E5734B86DEB96C61C69E5CF3C4FB0AFA
 
+-- Coqlex: Generating Formally Verified Lexers
+-- https://arxiv.org/pdf/2306.12411
+-- https://gitlab.inria.fr/wouedrao/coqlex/-/blob/master/RegexpSimpl.v?ref_type=heads
+
 
 namespace RegExp
 
