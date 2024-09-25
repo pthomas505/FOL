@@ -379,9 +379,6 @@ lemma List.exists_mem_imp_exists_rightmost_mem
 
 -------------------------------------------------------------------------------
 
-
--- https://github.com/mn200/CFL-HOL/blob/06c070d2d1775a933a1b667a29b035fee6a59796/lib/listLemmasScript.sml
-
 /-
 protected def append : (xs ys : List α) → List α
   | [],    bs => bs
@@ -389,7 +386,29 @@ protected def append : (xs ys : List α) → List α
 -/
 
 
-lemma List.nil_append_explode
+lemma List.length_nil_
+  {α : Type} :
+  ([] : List α).length = 0 := by
+  unfold List.length
+  real_rfl
+
+
+lemma List.length_cons_
+  {α : Type}
+  (a : α)
+  (as : List α) :
+  (a :: as).length = as.length + 1 := by
+  induction as generalizing a
+  case nil =>
+    unfold List.length
+    rw [List.length_nil_]
+  case cons hd tl ih =>
+    unfold List.length
+    specialize ih hd
+    rw [ih]
+
+
+lemma List.nil_append_
   {α : Type}
   (as : List α) :
   [] ++ as = as := by
@@ -398,7 +417,7 @@ lemma List.nil_append_explode
   real_rfl
 
 
-lemma List.cons_append_explode
+lemma List.cons_append_
   {α : Type}
   (a : α)
   (as bs : List α) :
@@ -409,18 +428,40 @@ lemma List.cons_append_explode
     unfold List.append
 
 
-lemma List.empty_append_right_explode
+lemma List.append_nil_
   {α : Type}
-  (l : List α) :
-  l ++ [] = l := by
-  induction l
+  (as : List α) :
+  as ++ [] = as := by
+  induction as
   case nil =>
     unfold_projs
     unfold List.append
     real_rfl
   case cons hd tl ih =>
-    rw [List.cons_append_explode]
+    rw [List.cons_append_]
     rw [ih]
+
+
+lemma List.length_append_
+  {α : Type}
+  (as bs : List α) :
+  (as ++ bs).length = as.length + bs.length := by
+  induction as
+  case nil =>
+    rw [List.nil_append_]
+    rw [List.length_nil_]
+    rw [Nat.add_comm]
+    unfold_projs
+    unfold Nat.add
+    real_rfl
+  case cons hd tl ih =>
+    simp only [cons_append_, length_cons_]
+    rw [ih]
+    exact Nat.add_right_comm tl.length bs.length 1
+
+-------------------------------------------------------------------------------
+
+-- https://github.com/mn200/CFL-HOL/blob/06c070d2d1775a933a1b667a29b035fee6a59796/lib/listLemmasScript.sml
 
 
 example
