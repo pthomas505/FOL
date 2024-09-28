@@ -298,6 +298,36 @@ theorem all_simp_derivative_mem_finset
       obtain ⟨T_S, T_S_ih⟩ := S_ih
       simp only [simp_derivative]
       simp only [simp_union]
-      sorry
+      apply Exists.intro (T_R.biUnion (fun a => T_S.biUnion (fun b => {simp_union a b})))
+      intro a
+      by_cases c1 : R.simp_derivative a = zero
+      case pos =>
+        simp only [c1]
+        simp
+        apply Exists.intro (R.simp_derivative a)
+        constructor
+        · exact T_R_ih a
+        · apply Exists.intro (S.simp_derivative a)
+          constructor
+          · exact T_S_ih a
+          · simp only [c1]
+            simp only [simp_union]
+      case neg =>
+        simp only [c1]
+        simp
+        apply Exists.intro (R.simp_derivative a)
+        constructor
+        · exact T_R_ih a
+        · apply Exists.intro (S.simp_derivative a)
+          constructor
+          · exact T_S_ih a
+          · by_cases c2 : S.simp_derivative a = zero
+            case pos =>
+              simp only [c2]
+              simp only [simp_union]
+            case neg =>
+              simp only [c2]
+              simp only [simp_union]
+
     all_goals
       sorry
