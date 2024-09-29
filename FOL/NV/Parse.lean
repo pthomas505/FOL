@@ -34,18 +34,18 @@ syntax "(" "A." var_name formula ")" : formula
 syntax "(" "E." var_name formula ")" : formula
 
 
-partial def elabPredName : Syntax → MetaM Expr
-  | `(pred_name| $X:ident) =>
-    let X' : Expr := Lean.mkStrLit X.getId.toString
-    mkAppM ``PredName.mk #[X']
-
-  | _ => throwUnsupportedSyntax
-
-
 partial def elabVarName : Syntax → MetaM Expr
   | `(var_name| $x:ident) =>
     let x' : Expr := Lean.mkStrLit x.getId.toString
     mkAppM ``VarName.mk #[x']
+
+  | _ => throwUnsupportedSyntax
+
+
+partial def elabPredName : Syntax → MetaM Expr
+  | `(pred_name| $X:ident) =>
+    let X' : Expr := Lean.mkStrLit X.getId.toString
+    mkAppM ``PredName.mk #[X']
 
   | _ => throwUnsupportedSyntax
 
