@@ -13,13 +13,15 @@ namespace FOL.NV
   The type of variable names.
 -/
 structure VarName extends String
-  deriving Inhabited, DecidableEq
+  deriving Inhabited, DecidableEq, Repr
 
 instance : ToString VarName :=
   { toString := fun (x : VarName) => x.toString }
 
+/-
 instance : Repr VarName :=
   { reprPrec := fun (x : VarName) _ => x.toString.toFormat }
+-/
 
 instance : Lean.ToJson VarName :=
   { toJson := fun (x : VarName) => Lean.toJson x.toString }
@@ -34,13 +36,15 @@ instance : Lean.FromJson VarName :=
   The type of predicate names.
 -/
 structure PredName extends String
-  deriving Inhabited, DecidableEq
+  deriving Inhabited, DecidableEq, Repr
 
 instance : ToString PredName :=
   { toString := fun (X : PredName) => X.toString }
 
+/-
 instance : Repr PredName :=
   { reprPrec := fun (X : PredName) _ => X.toString.toFormat }
+-/
 
 instance : Lean.ToJson PredName :=
   { toJson := fun (X : PredName) => Lean.toJson X.toString }
@@ -55,13 +59,15 @@ instance : Lean.FromJson PredName :=
   The type of definition names.
 -/
 structure DefName extends String
-  deriving Inhabited, DecidableEq
+  deriving Inhabited, DecidableEq, Repr
 
 instance : ToString DefName :=
   { toString := fun (X : DefName) => X.toString }
 
+/-
 instance : Repr DefName :=
   { reprPrec := fun (X : DefName) _ => X.toString.toFormat }
+-/
 
 instance : Lean.ToJson DefName :=
   { toJson := fun (X : DefName) => Lean.toJson X.toString }
@@ -89,7 +95,7 @@ inductive Formula : Type
   | forall_ : VarName → Formula → Formula
   | exists_ : VarName → Formula → Formula
   | def_ : DefName → List VarName → Formula
-  deriving Inhabited, DecidableEq, Lean.ToJson, Lean.FromJson
+  deriving Inhabited, DecidableEq, Lean.ToJson, Lean.FromJson, Repr
 
 compile_inductive% Formula
 
@@ -123,8 +129,10 @@ def Formula.toString : Formula → String
 instance : ToString Formula :=
   { toString := fun (F : Formula) => F.toString }
 
+/-
 instance : Repr Formula :=
   { reprPrec := fun (F : Formula) _ => F.toString.toFormat }
+-/
 
 
 /--
