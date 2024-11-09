@@ -229,7 +229,7 @@ def one_or_more
   Parser i e (Array a) := do
     let hd ← p
     let tl ← zero_or_more p
-    return { data := hd :: tl.data }
+    return ⟨ hd :: tl.toList ⟩
 
 def one_or_more_char
   (e : Type)
@@ -265,7 +265,7 @@ def one_or_more_delimited
   Parser i e (Array a2) := do
   let hd ← p
   let tl ← zero_or_more (delimiter *> p)
-  return { data := hd :: tl.data }
+  return ⟨ hd :: tl.toList ⟩
 
 def zero_or_more_delimited
   {i e a1 a2 : Type}
@@ -291,7 +291,7 @@ def digit :=
 def name := do
   let hd ← alpha <|> char String '_'
   let tl ← zero_or_more (alpha <|> digit <|> char String '_')
-  return (Array.toList { data := hd :: tl.data }).asString
+  return (Array.toList ⟨ hd :: tl.toList ⟩ ).asString
 
 #eval parseStr name "_abc_0"
 

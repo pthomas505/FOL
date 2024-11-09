@@ -38,6 +38,7 @@ lemma eps_not_mem_str_length_gt_zero
   s.length > 0 :=
   by
     simp
+    simp only [List.length_pos]
     exact ne_of_mem_of_not_mem h2 h1
 
 
@@ -527,6 +528,7 @@ lemma exists_mem_left_str_length_lt_concat
     constructor
     · exact hu
     · simp
+      simp only [List.length_pos]
       exact ne_of_mem_of_not_mem hv h2
 
 
@@ -546,6 +548,7 @@ lemma exists_mem_right_str_length_lt_concat
     constructor
     · exact hv
     · simp
+      simp only [List.length_pos]
       exact ne_of_mem_of_not_mem hu h2
 
 

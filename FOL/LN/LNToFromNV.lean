@@ -13,10 +13,10 @@ set_option autoImplicit false
 -/
 def NVVarToLNVar
   (outer : ℕ)
-  (context : Batteries.HashMap String ℕ)
+  (context : Std.HashMap String ℕ)
   (x : String) :
   LN.Var :=
-  let opt := context.find? x
+  let opt := context.get? x
   if h : Option.isSome opt
   then
     let n := Option.get opt h
@@ -28,7 +28,7 @@ def NVVarToLNVar
 -/
 def NVToLNAux
   (outer : ℕ)
-  (context : Batteries.HashMap String ℕ) :
+  (context : Std.HashMap String ℕ) :
   NV.Formula → LN.Formula
 
   | NV.Formula.pred_ X xs => LN.Formula.pred_ X (xs.map (NVVarToLNVar outer context))
@@ -55,10 +55,10 @@ def NVToLN (F : NV.Formula) : LN.Formula :=
 -/
 def LNVarToNVVar
   (outer : ℕ)
-  (context : Batteries.HashMap ℤ String) :
+  (context : Std.HashMap ℤ String) :
   LN.Var → Option String
   | LN.Var.free_ x => Option.some x
-  | LN.Var.bound_ n => context.find? (outer - n)
+  | LN.Var.bound_ n => context.get? (outer - n)
 
 /--
   Helper function for LNToNV.
@@ -66,7 +66,7 @@ def LNVarToNVVar
 def LNToNVAux
   (c : Char)
   (outer : ℕ)
-  (context : Batteries.HashMap ℤ String) :
+  (context : Std.HashMap ℤ String) :
   LN.Formula → Option NV.Formula
 
   | LN.Formula.pred_ X xs => do

@@ -133,7 +133,6 @@ example
     simp only [One.Rec.fastReplaceFree]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
-    simp only [List.map_eq_map_iff]
     intro x _
     simp only [Function.updateITE]
     simp only [eq_comm]

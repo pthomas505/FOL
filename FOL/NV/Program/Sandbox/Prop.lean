@@ -242,31 +242,31 @@ structure Proof : Type :=
   (step_list : Array Step)
 
 def Proof.toString (x : Proof) : String :=
-  s! "{x.label} : {x.assertion}{LF}{x.step_list.data.toLFString}"
+  s! "{x.label} : {x.assertion}{LF}{x.step_list.toList.toLFString}"
 
 instance : ToString Proof :=
   { toString := fun x => x.toString }
 
 
-abbrev GlobalContext : Type := Batteries.HashMap String Proof
+abbrev GlobalContext : Type := Std.HashMap String Proof
 
 def GlobalContext.find
   (context : GlobalContext)
   (label : String) :
   Except String Proof :=
-  let opt := context.find? label
+  let opt := context.get? label
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
   else Except.error s! "{label} not found in global context."
 
 
-abbrev LocalContext : Type := Batteries.HashMap String Step
+abbrev LocalContext : Type := Std.HashMap String Step
 
 def LocalContext.find
   (context : LocalContext)
   (label : String) :
   Except String Step :=
-  let opt := context.find? label
+  let opt := context.get? label
   if h : Option.isSome opt
   then Except.ok (Option.get opt h)
   else Except.error s! "{label} not found in local context."

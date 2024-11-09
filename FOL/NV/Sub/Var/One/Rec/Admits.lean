@@ -634,9 +634,7 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
     simp only [toIsBoundAux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
-    simp only [List.map_eq_map_iff]
     intro x a1
-    simp
     by_cases c1 : v = x
     · subst c1
       simp
@@ -692,7 +690,6 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
     simp only [toIsBoundAux] at h2
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp at h2
-    simp only [List.map_eq_map_iff] at h2
 
     intro a1
     specialize h2 v a1

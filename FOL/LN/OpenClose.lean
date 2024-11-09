@@ -781,6 +781,7 @@ lemma shift_openVar
     case zero =>
       simp only [openVar]
       simp only [shift]
+      simp
     case succ i =>
       simp only [openVar]
       simp only [shift]
@@ -1035,6 +1036,7 @@ lemma lc_at_instantiate
           cases z
           case _ x =>
             simp only [Var.instantiate] at a3_right
+            simp at a3_right
           case _ j =>
             simp only [Var.lc_at] at a1
             simp only [Var.instantiate] at a3_right
@@ -1081,32 +1083,76 @@ lemma Var.instantiate_append
   by
   rcases v with _ | i; · rfl
   conv => rhs; simp only [Var.instantiate]
-  split_ifs with c1 c2 <;> simp only [Var.instantiate]
-  · rw [if_pos (by linarith)]; simp [c1]
-  · have c1' := not_lt.1 c1
-    split_ifs with c3 c4 <;> simp
-    · rw [if_neg c1, dif_pos (Nat.sub_lt_left_of_lt_add c1' c3), List.get_append]
-    · have c3' := not_lt.1 c3
-      let ⟨x, a1⟩ := (IsFreeIffExistsString (zs'.get ⟨_, c4⟩)).1 (h1 _ (List.get_mem ..))
-      simp only [a1]
-      rw [List.get_append_right', ← a1]; congr 2
-      rw [Nat.sub_sub]
-      exact Nat.le_sub_of_add_le (Nat.add_comm .. ▸ c3')
-    · exfalso; simp at *
-      zify [c1, c3] at c4; zify [c1] at c2
-      linarith
-  · have c1' := not_lt.1 c1
+  split_ifs
+  case pos c1 =>
+    have s1 : i < k + zs.length := by exact Nat.lt_add_right zs.length c1
+    have s2 : ¬ k ≤ i := by exact Nat.not_le_of_lt c1
+
+    simp only [instantiate]
+    split_ifs
+    simp
+    intro a1
+    contradiction
+  case neg c1 c2 =>
     simp at c2
-    have c3 : k + zs.length ≤ i := by zify [c1'] at c2 ⊢; linarith
-    have c4 : zs'.length ≤ i - (k + zs.length) := by zify [c1', c3] at c2 ⊢; linarith
-    rw [if_neg (not_lt.2 c3), dif_neg (not_lt.2 c4)]
-    simp; split_ifs with c5 c6
-    · simp; linarith
-    · exfalso
-      zify [not_lt.1 c5, c4, c3] at c6; zify [c1'] at c2; linarith
-    · simp at *
-      zify [c1', c2, c4, c3, c5, c6]; zify [c3] at c6
-      linarith
+    simp
+    simp only [instantiate]
+    split_ifs
+    case pos c3 =>
+      simp
+      split_ifs
+      case pos c4 =>
+        have s1 : ¬ i - k < zs.length := by omega
+        contradiction
+      case neg c4 =>
+        have s1 : i - k < zs.length := by omega
+        contradiction
+    case pos c3 c4 =>
+      have s1 : ¬ zs.length + zs'.length ≤ i - k := by omega
+      contradiction
+    case neg c3 c4 =>
+      simp
+      split_ifs
+      case pos c5 =>
+        have s1 : ¬ zs.length + zs'.length ≤ i - k := by omega
+        contradiction
+      case pos c5 c6 =>
+        have s1 : ¬ zs.length + zs'.length ≤ i - k := by omega
+        contradiction
+      case neg c5 c6 =>
+        simp
+        omega
+  case pos c1 c2 =>
+    simp only [instantiate]
+    split_ifs
+    case pos c3 =>
+      simp
+      split_ifs
+      case pos c4 =>
+        exact List.getElem_append_left' zs' c4
+      case neg c4 =>
+        have s1 : i - k < zs.length := by omega
+        contradiction
+    case pos c3 c4 =>
+      specialize h1 zs'[i - (k + zs.length)]
+      simp at h1
+      simp only [IsFreeIffExistsString zs'[i - (k + zs.length)]] at h1
+      obtain ⟨x, a1⟩ := h1
+      rw [a1]
+      simp
+      rw [← a1]
+      obtain s1 := List.getElem_append (i - k) c2
+      rw [s1]
+      have s2 : ¬ i - k < zs.length := by omega
+      split_ifs
+      congr 1
+      omega
+    case neg c3 c4 =>
+      have s1 : ¬ i - k < (zs ++ zs').length :=
+      by
+        simp
+        omega
+      contradiction
 
 
 lemma Formula.instantiate_append
@@ -1120,9 +1166,7 @@ lemma Formula.instantiate_append
   case pred_ X vs =>
     simp only [Formula.instantiate]
     simp
-    simp only [List.map_eq_map_iff]
     intro v _
-    simp
     apply Var.instantiate_append
     exact h1
   case not_ phi phi_ih =>
@@ -1169,6 +1213,7 @@ lemma lc_at_imp_lc_instantiate
         cases z
         case _ x =>
           simp only [Var.instantiate] at a2_right
+          simp at a2_right
         case _ j =>
           simp only [Var.lc_at] at h1
 
@@ -1530,10 +1575,8 @@ lemma Holds_abstract_instantiate
     simp only [Holds]
     congr! 1
     simp
-    simp only [List.map_eq_map_iff]
     intro v a1
     specialize h2 v a1
-    simp
     cases v
     case _ x =>
       simp only [Var.instantiate]

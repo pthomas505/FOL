@@ -159,7 +159,7 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
     cases h1
     case inl h1 =>
       split_ifs
-      case pos c1 | neg c1 =>
+      all_goals
         first | apply IsSub.forall_not_free_in | apply IsSub.exists_not_free_in
         subst h1
         simp only [isFreeIn]
@@ -311,17 +311,14 @@ theorem substitution_theorem
     simp only [Holds]
     congr! 1
     simp
-    simp only [List.map_eq_map_iff]
     intro x _
     simp only [Function.updateITE]
     simp only [eq_comm]
     split_ifs
     case _ c1 =>
       simp
-      simp only [if_pos c1]
     case _ c1 =>
       simp
-      simp only [if_neg c1]
   case eq_ h1_x h1_y h1_v h1_t =>
     simp only [Holds]
     simp only [Function.updateITE]

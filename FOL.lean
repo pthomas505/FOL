@@ -1,4 +1,3 @@
-import FOL.All
 import FOL.DB.DB
 import FOL.Except
 import FOL.Finset

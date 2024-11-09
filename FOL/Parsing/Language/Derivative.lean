@@ -55,9 +55,7 @@ lemma derivative_eq_derivative_list
     simp only [derivative]
     simp only [derivative_list]
     simp
-    simp only [List.mem_filter]
     simp only [List.IsPrefix]
-    simp
     constructor
     · intro a1
       apply Exists.intro (s ++ t)
@@ -494,7 +492,8 @@ theorem derivative_of_concat_wrt_str
       · by_cases hw : w = []
         · subst w; simp at *
           exact .inl ⟨[], by simpa, _, hv, rfl⟩
-        · exact .inr ⟨_, ⟨u, _, rfl, hw, rfl⟩, _, ⟨hu, rfl⟩, _, hv, rfl⟩
+        · simp only [List.length_pos]
+          exact .inr ⟨_, ⟨u, _, rfl, hw, rfl⟩, _, ⟨hu, rfl⟩, _, hv, rfl⟩
       · exact .inl ⟨_, hu, _, hv, rfl⟩
     · rintro (⟨u, hu, v, hv, rfl⟩ | ⟨_, ⟨u, v, rfl, _, rfl⟩, _, ⟨hu, rfl⟩, _, hv, rfl⟩) <;>
         exact ⟨_, hu, _, hv, by simp⟩
@@ -795,8 +794,7 @@ lemma derivative_of_kleene_closure_wrt_str
       congr! 1
       ext cs
 
-      simp
-      simp only [List.mem_filter]
+      simp only [List.length_pos]
       simp
 
       constructor

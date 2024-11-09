@@ -17,10 +17,10 @@ lemma Finset.union_subset_left_right
     constructor
     · trans C
       · exact h1
-      · exact Finset.subset_union_left C D
+      · exact Finset.subset_union_left
     · trans D
       · exact h2
-      · exact Finset.subset_union_right C D
+      · exact Finset.subset_union_right
 
 
 lemma Finset.union_subset_union_left_right
@@ -36,11 +36,11 @@ lemma Finset.union_subset_union_left_right
   · trans C ∪ E
     · exact h1
     · apply Finset.union_subset_union_left
-      exact Finset.subset_union_left C D
+      exact Finset.subset_union_left
   · trans D ∪ E
     · exact h2
     · apply Finset.union_subset_union_left
-      exact Finset.subset_union_right C D
+      exact Finset.subset_union_right
 
 
 lemma Finset.union_subset_diff
@@ -56,12 +56,12 @@ lemma Finset.union_subset_diff
   · trans C \ E
     · exact h1
     · apply Finset.sdiff_subset_sdiff
-      · exact Finset.subset_union_left C D
+      · exact Finset.subset_union_left
       · rfl
   · trans D \ E
     · exact h2
     · apply Finset.sdiff_subset_sdiff
-      · exact Finset.subset_union_right C D
+      · exact Finset.subset_union_right
       · rfl
 
 
@@ -79,13 +79,13 @@ lemma Finset.union_subset_left_right_diff
     · exact h1
     · apply Finset.union_subset_union_right
       apply Finset.sdiff_subset_sdiff
-      · exact Finset.subset_union_left C D
+      · exact Finset.subset_union_left
       · rfl
   · trans E ∪ D \ F
     · exact h2
     · apply Finset.union_subset_union_right
       apply Finset.sdiff_subset_sdiff
-      · exact Finset.subset_union_right C D
+      · exact Finset.subset_union_right
       · rfl
 
 

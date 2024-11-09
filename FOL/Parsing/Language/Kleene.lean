@@ -517,7 +517,7 @@ lemma Ardens_rule_unique_left_aux
       simp only [exp]
       simp only [concat_eps_left]
       rw [h1]
-      exact Set.subset_union_right (concat L1 X) L2
+      exact Set.subset_union_right
     case succ n ih =>
       have s1 : concat L1 (concat (exp L1 n) L2) ⊆ concat L1 X :=
       by
@@ -530,7 +530,7 @@ lemma Ardens_rule_unique_left_aux
       have s2 : concat L1 X ⊆ X :=
       by
         conv => right; rw [h1]
-        exact Set.subset_union_left (concat L1 X) L2
+        exact Set.subset_union_left
 
       trans (concat L1 X)
       · exact s1

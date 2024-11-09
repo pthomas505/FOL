@@ -114,7 +114,6 @@ lemma SubOpenFormula
     simp only [openFormulaAux]
     simp only [Formula.sub_Var]
     simp
-    simp only [List.map_eq_map_iff]
     intro v _
     exact SubOpenVar v σ k x h1
   case not_ phi phi_ih =>
@@ -149,7 +148,6 @@ lemma SubCloseFormula
     simp only [closeFormulaAux]
     simp only [Formula.sub_Var]
     simp
-    simp only [List.map_eq_map_iff]
     intro v _
     exact SubCloseVar v σ x k h1 h2
   case not_ phi phi_ih =>

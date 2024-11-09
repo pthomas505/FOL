@@ -253,16 +253,10 @@ theorem substitution_theorem_aux
 
             simp only [s2] at s1
             split_ifs
-            case pos c2 =>
-              exact s1
-            case neg _ =>
-              exact s1
+            exact s1
         case neg c1 =>
           split_ifs
-          case pos c2 =>
-            contradiction
-          case neg c2 =>
-            simp only [Holds]
+          simp only [Holds]
     case eq_ x y =>
       simp only [replace]
       simp only [Holds]

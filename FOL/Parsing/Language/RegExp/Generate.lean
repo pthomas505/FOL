@@ -10,6 +10,7 @@ set_option autoImplicit false
 namespace RegExp
 
 
+partial
 def goto
   {α : Type}
   [DecidableEq α]

@@ -224,29 +224,29 @@ instance
 
 
 
-example : EpsilonNFA.eval_from ⟨ [⟨0, 'a', [1]⟩], [⟨0, [1]⟩], [0], [1] ⟩ [] ([] : List Char) = [] := by rfl
+example : EpsilonNFA.eval_from ⟨ [⟨0, 'a', [1]⟩], [⟨0, [1]⟩], [0], [1] ⟩ [] ([] : List Char) = [] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [], [], [0], [1] ⟩ ([] : List Char) = [0] := by rfl
+example : EpsilonNFA.eval ⟨ [], [], [0], [1] ⟩ ([] : List Char) = [0] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [], [], [0], [1] ⟩ ['a'] = [] := by rfl
+example : EpsilonNFA.eval ⟨ [], [], [0], [1] ⟩ ['a'] = [] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩], [], [0], [1] ⟩ ['a'] = [1] := by rfl
+example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩], [], [0], [1] ⟩ ['a'] = [1] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩], [], [0], [1] ⟩ ['b'] = [] := by rfl
+example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩], [], [0], [1] ⟩ ['b'] = [] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [], [0], [1] ⟩ ['a'] = [1] := by rfl
+example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [], [0], [1] ⟩ ['a'] = [1] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [], [0], [1] ⟩ ['b'] = [1] := by rfl
+example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [1]⟩], [], [0], [1] ⟩ ['b'] = [1] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [], [0], [1] ⟩ ['a'] = [1] := by rfl
+example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [], [0], [1] ⟩ ['a'] = [1] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [], [0], [1] ⟩ ['b'] = [2] := by rfl
+example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'b', [2]⟩], [], [0], [1] ⟩ ['b'] = [2] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩], [], [0], [1] ⟩ ['a'] = [2, 1] := by rfl
+example : EpsilonNFA.eval ⟨ [⟨0, 'a', [1]⟩, ⟨0, 'a', [2]⟩], [], [0], [1] ⟩ ['a'] = [2, 1] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [], [⟨ 0, [1] ⟩], [0], [1] ⟩ ([] : List Char) = [1, 0] := by rfl
+example : EpsilonNFA.eval ⟨ [], [⟨ 0, [1] ⟩], [0], [1] ⟩ ([] : List Char) = [1, 0] := by with_unfolding_all rfl
 
-example : EpsilonNFA.eval ⟨ [], [⟨ 0, [1]⟩], [0], [1] ⟩ ['a'] = [] := by rfl
+example : EpsilonNFA.eval ⟨ [], [⟨ 0, [1]⟩], [0], [1] ⟩ ['a'] = [] := by with_unfolding_all rfl
 
 
 -------------------------------------------------------------------------------

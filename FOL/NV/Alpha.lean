@@ -201,9 +201,7 @@ theorem replace_empty_Holds
       simp only [Holds]
       congr! 1
       simp
-      simp only [List.map_eq_map_iff]
       intro x a1
-      simp
       simp only [Function.updateITE]
       simp only [eq_comm]
       split_ifs

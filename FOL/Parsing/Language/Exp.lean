@@ -444,7 +444,7 @@ example
     simp
     apply Exists.intro k
     constructor
-    · exact le_add_right a1
+    · exact Nat.le_add_right_of_le a1
     · exact a2
 
 

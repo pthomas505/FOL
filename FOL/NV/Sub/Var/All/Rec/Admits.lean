@@ -96,7 +96,6 @@ theorem substitution_theorem_aux
     case pred_const_ X xs | pred_var_ X xs =>
       congr! 1
       simp
-      simp only [List.map_eq_map_iff]
       intro v a1
       apply h2
       by_cases c1 : v ∈ binders

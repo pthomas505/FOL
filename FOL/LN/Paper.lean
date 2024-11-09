@@ -297,7 +297,6 @@ lemma VarOpenListFreeVarSet
       simp
       simp only [Var.freeVarSet]
       simp
-      apply List.get_mem
     case neg c1 c2 =>
       simp only [Var.freeVarSet]
       simp
@@ -555,7 +554,7 @@ lemma VarSubstFreeVarSet'
       simp
     case neg c1 =>
       simp only [Var.freeVarSet]
-      exact Finset.sdiff_subset {free_ x} {free_ z}
+      exact Finset.sdiff_subset
   case bound_ i =>
     conv =>
       lhs
@@ -1148,10 +1147,8 @@ lemma HoldsClose
     simp only [Holds]
     congr! 1
     simp
-    simp only [List.map_eq_map_iff]
     intro v a1
     specialize h2 v a1
-    simp
     cases v
     case _ x =>
       simp only [Var.openList]
@@ -1307,6 +1304,7 @@ lemma lc_at_instantiate
           cases z
           case _ x =>
             simp only [Var.openList] at a3_right
+            simp at a3_right
           case _ i' =>
             simp only [Var.lc_at] at a1
             simp only [Var.openList] at a3_right

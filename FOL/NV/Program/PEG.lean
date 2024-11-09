@@ -238,7 +238,7 @@ lemma EmptyStringPrefix
   (xs : List α) :
   List.IsPrefix [] xs :=
   by
-  exact List.nil_prefix xs
+  exact List.nil_prefix
 
 
 lemma CharPrefix

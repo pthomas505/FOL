@@ -323,14 +323,14 @@ def dft
   dft_aux g start []
 
 
-example : dft [] [0] = [0] := by rfl
-example : dft [(0, [0])] [0] = [0] := by rfl
-example : dft [(1, [1])] [0] = [0] := by rfl
-example : dft [(0, [1])] [0] = [1, 0] := by rfl
-example : dft [(0, [1]), (1, [1])] [0] = [1, 0] := by rfl
-example : dft [(0, [1]), (1, [0])] [0] = [1, 0] := by rfl
-example : dft [(0, [1]), (1, [2])] [0] = [2, 1, 0] := by rfl
-example : dft [(0, [1]), (1, [2]), (2, [0])] [0] = [2, 1, 0] := by rfl
+example : dft [] [0] = [0] := by with_unfolding_all rfl
+example : dft [(0, [0])] [0] = [0] := by with_unfolding_all rfl
+example : dft [(1, [1])] [0] = [0] := by with_unfolding_all rfl
+example : dft [(0, [1])] [0] = [1, 0] := by with_unfolding_all rfl
+example : dft [(0, [1]), (1, [1])] [0] = [1, 0] := by with_unfolding_all rfl
+example : dft [(0, [1]), (1, [0])] [0] = [1, 0] := by with_unfolding_all rfl
+example : dft [(0, [1]), (1, [2])] [0] = [2, 1, 0] := by with_unfolding_all rfl
+example : dft [(0, [1]), (1, [2]), (2, [0])] [0] = [2, 1, 0] := by with_unfolding_all rfl
 
 
 example
@@ -474,8 +474,8 @@ lemma extracted_3
       · simp
         right
         exact h1
-      · exact Set.subset_union_left ys.toFinset.toSet xs.toFinset.toSet
-    · exact Set.subset_union_right ys.toFinset.toSet xs.toFinset.toSet
+      · exact Set.subset_union_left
+    · exact Set.subset_union_right
 
 
 lemma extracted_4

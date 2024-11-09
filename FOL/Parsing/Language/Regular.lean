@@ -225,7 +225,8 @@ theorem all_derivative_of_reg_lang_wrt_str_mem_finset
         constructor
         · simp only [Set.Finite.toFinset_subset]
           exact s1 s
-        · simp
+        · simp only [List.length_pos]
+          simp
     case kleene_closure L1 _ L1_ih2 =>
       obtain ⟨T, a1⟩ := L1_ih2
 

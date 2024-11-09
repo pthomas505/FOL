@@ -62,32 +62,30 @@ theorem match_char_EpsilonNFA_toAbstract
     simp
 
 
-example : (match_char_EpsilonNFA 'a').eval [] = [0] := by rfl
-example : (match_char_EpsilonNFA 'a').eval ['a'] = [1] := by rfl
-example : (match_char_EpsilonNFA 'a').eval ['b'] = [] := by rfl
-example : (match_char_EpsilonNFA 'a').eval ['a', 'b'] = [] := by rfl
-example : (match_char_EpsilonNFA 'a').eval ['b', 'a'] = [] := by rfl
+example : (match_char_EpsilonNFA 'a').eval [] = [0] := by with_unfolding_all rfl
+example : (match_char_EpsilonNFA 'a').eval ['a'] = [1] := by with_unfolding_all rfl
+example : (match_char_EpsilonNFA 'a').eval ['b'] = [] := by with_unfolding_all rfl
+example : (match_char_EpsilonNFA 'a').eval ['a', 'b'] = [] := by with_unfolding_all rfl
+example : (match_char_EpsilonNFA 'a').eval ['b', 'a'] = [] := by with_unfolding_all rfl
 
 
 example : ¬ (match_char_EpsilonNFA 'a').accepts [] :=
-  by decide
+  by with_unfolding_all decide
 
 
 example : (match_char_EpsilonNFA 'a').accepts ['a'] :=
-  by
-    simp only [match_char_EpsilonNFA]
-    decide
+  by with_unfolding_all decide
 
 example : ¬ (match_char_EpsilonNFA 'a').accepts ['b'] :=
-  by decide
+  by with_unfolding_all decide
 
 
 example : ¬ (match_char_EpsilonNFA 'a').accepts ['a', 'b'] :=
-  by decide
+  by with_unfolding_all decide
 
 
 example : ¬ (match_char_EpsilonNFA 'a').accepts ['b', 'a'] :=
-  by decide
+  by with_unfolding_all decide
 
 
 example
@@ -209,7 +207,7 @@ example
   (match_epsilon_EpsilonNFA α).accepts [] :=
   by
     apply Exists.intro 1
-    tauto
+    with_unfolding_all tauto
 
 -------------------------------------------------------------------------------
 

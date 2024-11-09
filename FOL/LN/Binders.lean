@@ -20,10 +20,10 @@ instance (v : Var) : Decidable v.isFree :=
   cases v
   case free_ x =>
     simp only [Var.isFree]
-    exact decidableTrue
+    exact instDecidableTrue
   case bound_ i =>
     simp only [Var.isFree]
-    exact decidableFalse
+    exact instDecidableFalse
 
 
 /--
@@ -38,10 +38,10 @@ instance (v : Var) : Decidable v.isBound :=
   cases v
   case free_ x =>
     simp only [Var.isBound]
-    exact decidableFalse
+    exact instDecidableFalse
   case bound_ i =>
     simp only [Var.isBound]
-    exact decidableTrue
+    exact instDecidableTrue
 
 --------------------------------------------------
 

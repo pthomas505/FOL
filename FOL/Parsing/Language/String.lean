@@ -96,6 +96,7 @@ theorem str_append_length_left
   t.length < (s ++ t).length :=
   by
     simp
+    simp only [List.length_pos]
     exact h1
 
 
@@ -106,6 +107,7 @@ theorem str_append_length_right
   s.length < (s ++ t).length :=
   by
     simp
+    simp only [List.length_pos]
     exact h1
 
 

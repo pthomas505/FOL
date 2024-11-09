@@ -4,9 +4,6 @@ import Mathlib.Util.CompileInductive
 set_option autoImplicit false
 
 
-notation "ℕ" => Nat
-
-
 namespace NV
 
 inductive Formula : Type
@@ -88,4 +85,3 @@ def betaReduce (t : Formula) (F : Formula) : Formula :=
   betaReduceAux 0 t F
 
 end LN
-
