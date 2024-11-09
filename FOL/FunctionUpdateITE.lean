@@ -303,7 +303,19 @@ theorem Function.updateITE_not_mem_list
     case intro h1_left h1_right =>
       simp
       simp only [Function.updateITE]
-      split_ifs <;> tauto
+      split_ifs
+      case pos c1 =>
+        tauto
+      case neg c1 =>
+        constructor
+        · rfl
+        · intro a' a1
+          split_ifs
+          case pos c2 =>
+            rw [c2] at a1
+            contradiction
+          case neg c2 =>
+            rfl
 
 
 theorem Function.updateITE_not_mem_set
