@@ -9,7 +9,8 @@ require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"
 
 
-require mathlib_extra from "/home/pthomas/Desktop/github/mathlib_extra/"
+require mathlib_extra from git
+  "git@github.com:pthomas505/mathlib_extra.git"
 
 
 @[default_target]
