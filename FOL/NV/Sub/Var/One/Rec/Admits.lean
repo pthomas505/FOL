@@ -1,4 +1,4 @@
-import FOL.Finset
+import MathlibExtra.Finset
 import FOL.NV.Semantics
 import FOL.NV.Sub.Var.One.Rec.ReplaceFree
 

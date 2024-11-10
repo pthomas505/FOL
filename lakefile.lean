@@ -8,6 +8,10 @@ package «fOL» {
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"
 
+
+require mathlib_extra from "/home/pthomas/Desktop/github/mathlib_extra/"
+
+
 @[default_target]
 lean_lib «FOL» {
   globs := #[.andSubmodules `FOL]

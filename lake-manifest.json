@@ -90,6 +90,13 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": null,
    "inherited": false,
+   "configFile": "lakefile.lean"},
+  {"type": "path",
+   "scope": "",
+   "name": "mathlib_extra",
+   "manifestFile": "lake-manifest.json",
+   "inherited": false,
+   "dir": "/home/pthomas/Desktop/github/mathlib_extra/",
    "configFile": "lakefile.lean"}],
  "name": "fOL",
  "lakeDir": ".lake"}

@@ -1,5 +1,5 @@
 import FOL.LN.Binders
-import FOL.Fresh
+import MathlibExtra.Fresh
 
 
 set_option autoImplicit false

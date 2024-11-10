@@ -1,7 +1,7 @@
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finset.Basic
 
-import FOL.List
+import MathlibExtra.List
 import FOL.Parsing.Language.Kleene
 
 

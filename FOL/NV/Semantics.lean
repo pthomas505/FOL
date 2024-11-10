@@ -1,4 +1,4 @@
-import FOL.FunctionUpdateITE
+import MathlibExtra.FunctionUpdateITE
 import FOL.NV.Binders
 import FOL.NV.Definition
 

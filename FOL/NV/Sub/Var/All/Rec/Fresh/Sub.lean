@@ -1,5 +1,5 @@
-import FOL.Finset
-import FOL.FunctionUpdateITE
+import MathlibExtra.Finset
+import MathlibExtra.FunctionUpdateITE
 import FOL.NV.Formula
 import FOL.NV.Fresh
 import FOL.NV.Semantics

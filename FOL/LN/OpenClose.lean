@@ -1,7 +1,7 @@
 import FOL.LN.Binders
 import FOL.LN.Semantics
-import FOL.List
-import FOL.FunctionUpdateITE
+import MathlibExtra.List
+import MathlibExtra.FunctionUpdateITE
 
 set_option autoImplicit false
 

@@ -1,7 +1,7 @@
 import FOL.LN.Binders
 import FOL.LN.Semantics
-import FOL.List
-import FOL.Finset
+import MathlibExtra.List
+import MathlibExtra.Finset
 
 set_option autoImplicit false
 
