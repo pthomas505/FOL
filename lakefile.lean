@@ -10,7 +10,7 @@ require mathlib from git
 
 
 require mathlib_extra from git
-  "git@github.com:pthomas505/mathlib_extra.git" @ "main"
+  "https://github.com/pthomas505/mathlib_extra.git" @ "main"
 
 
 @[default_target]
