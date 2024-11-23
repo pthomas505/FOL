@@ -18,7 +18,6 @@ import FOL.NV.Binders
 import FOL.NV.Definition
 import FOL.NV.Formula
 import FOL.NV.Fresh
-import FOL.NV.Harrison.Chapter1
 import FOL.NV.Margaris.Deduct
 import FOL.NV.Margaris.Fol
 import FOL.NV.Margaris.Prop
