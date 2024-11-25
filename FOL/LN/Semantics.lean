@@ -8,7 +8,7 @@ namespace LN
 open Var Formula
 
 
-structure Interpretation (D : Type) : Type :=
+structure Interpretation (D : Type) : Type where
   (nonempty_ : Nonempty D)
   (pred_ : String → (List D → Prop))
 
