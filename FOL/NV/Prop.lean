@@ -1,5 +1,5 @@
 import MathlibExtra.FunctionUpdateITE
-import FOL.NV.Margaris.Deduct
+import FOL.NV.Deduct
 
 
 set_option autoImplicit false

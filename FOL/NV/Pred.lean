@@ -1,4 +1,4 @@
-import FOL.NV.Margaris.Prop
+import FOL.NV.Prop
 
 
 set_option autoImplicit false
