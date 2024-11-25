@@ -258,7 +258,7 @@ instance : ToString Rule :=
   { toString := fun (x : Rule) => x.toString }
 
 
-structure Sequent : Type :=
+structure Sequent : Type where
   (hypotheses : List Formula)
   (conclusion : Formula)
   deriving Inhabited, DecidableEq, Lean.ToJson, Lean.FromJson
@@ -270,7 +270,7 @@ instance : ToString Sequent :=
   { toString := fun (x : Sequent) => x.toString }
 
 
-structure CheckedSequent : Type :=
+structure CheckedSequent : Type where
   (val : Sequent)
   (prop : IsDeduct val.hypotheses val.conclusion)
 
@@ -280,7 +280,7 @@ instance : ToString CheckedSequent :=
   { toString := fun (x : CheckedSequent) => x.toString }
 
 
-structure Step : Type :=
+structure Step : Type where
   (assertion : Sequent)
   (rule : Rule)
   deriving Lean.ToJson, Lean.FromJson
@@ -292,7 +292,7 @@ instance : ToString Step :=
   { toString := fun (x : Step) => x.toString }
 
 
-structure CheckedStep : Type :=
+structure CheckedStep : Type where
   (assertion : CheckedSequent)
   (rule : Rule)
 
@@ -303,7 +303,7 @@ instance : ToString CheckedStep :=
   { toString := fun (x : CheckedStep) => x.toString }
 
 
-structure Proof : Type :=
+structure Proof : Type where
   (label : String)
   (assertion : Sequent)
   (step_list : List Step)
@@ -333,7 +333,7 @@ instance : ToString Proof :=
   { toString := fun (x : Proof) => x.toString }
 
 
-structure CheckedProof : Type :=
+structure CheckedProof : Type where
   (label : String)
   (assertion : CheckedSequent)
   (step_list : List CheckedStep)
