@@ -16,7 +16,7 @@ open Formula
 
   D is the domain of discourse.
 -/
-structure Interpretation (D : Type) : Type :=
+structure Interpretation (D : Type) : Type where
   /--
     The domain of discourse is not empty.
   -/

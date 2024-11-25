@@ -10,7 +10,7 @@ namespace FOL.NV
 open Formula
 
 
-structure Definition : Type :=
+structure Definition : Type where
 (name : DefName)
 (args : List VarName)
 (q : Formula)
