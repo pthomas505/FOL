@@ -103,7 +103,9 @@ lemma freeVarSet_sub_eq_freeVarSet_image
       _ = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) \ {x'} :=
           by simp only [Finset.image_congr_update_ite phi.freeVarSet x x' x]
       _ = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) :=
-          by exact Finset.sdiff_singleton_eq_self s3
+          by
+            simp only [Finset.sdiff_singleton_eq_erase] at *
+            exact Finset.erase_eq_of_not_mem s3
     case _ c1 =>
       simp at c1
 
@@ -122,8 +124,8 @@ lemma freeVarSet_sub_eq_freeVarSet_image
       simp
       tauto
 
-      simp only [Finset.sdiff_singleton_eq_self s2]
-
+      simp only [Finset.sdiff_singleton_eq_erase] at *
+      exact Finset.erase_eq_of_not_mem s2
 
 theorem substitution_theorem
   (D : Type)
