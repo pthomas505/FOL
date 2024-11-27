@@ -442,8 +442,21 @@ theorem isProofAltImpIsDeduct
     · simp
   case mp_ h1_phi h1_psi h1_1 h1_2 h1_ih_1 h1_ih_2 =>
     exact IsDeduct.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
-  all_goals
-    sorry
+  case def_false_ =>
+    apply IsDeduct.axiom_
+    apply IsAxiom.def_false_
+  case def_and_ h1_phi h1_psi =>
+    apply IsDeduct.axiom_
+    apply IsAxiom.def_and_
+  case def_or_ h1_phi h1_psi =>
+    apply IsDeduct.axiom_
+    apply IsAxiom.def_or_
+  case def_iff_ h1_phi h1_psi =>
+    apply IsDeduct.axiom_
+    apply IsAxiom.def_iff_
+  case def_exists_ h1_v h1_phi =>
+    apply IsDeduct.axiom_
+    apply IsAxiom.def_exists_
 
 
 theorem isDeductImpIsProofAlt
@@ -478,8 +491,16 @@ theorem isDeductImpIsProofAlt
     case gen_ h1_1_v h1_1_phi h1_1_1 h1_1_ih =>
       apply IsProofAlt.gen_
       exact h1_1_ih
-    all_goals
-      sorry
+    case def_false_ =>
+      apply IsProofAlt.def_false_
+    case def_and_ h1_1_phi h1_1_psi =>
+      apply IsProofAlt.def_and_
+    case def_or_ h1_1_phi h1_1_psi =>
+      apply IsProofAlt.def_or_
+    case def_iff_ h1_1_phi h1_1_psi =>
+      apply IsProofAlt.def_iff_
+    case def_exists_ h1_1_v h1_1_phi =>
+      apply IsProofAlt.def_exists_
   case assume_ h1_phi h1_1 =>
     simp at h1_1
   case mp_ h1_phi h1_psi h1_1 h1_2 h1_ih_1 h1_ih_2 =>
@@ -828,8 +849,7 @@ theorem T_18_2
       -- simp only [formula.and_]
       SC
     · exact h1_ih h2
-  case imp_ h1_P h1_Q h1_P' h1_Q' h1_1 h1_2 h1_ih_1
-    h1_ih_2 =>
+  case imp_ h1_P h1_Q h1_P' h1_Q' h1_1 h1_2 h1_ih_1 h1_ih_2 =>
     simp only [isBoundIn] at h2
     apply IsDeduct.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_P.iff_ h1_P'))
     · apply IsDeduct.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_Q.iff_ h1_Q'))
@@ -851,8 +871,7 @@ theorem T_18_2
         · exact a1_left
         · left
           exact a1_right
-  case forall_ h1_x h1_P h1_P' h1_1
-    h1_ih =>
+  case forall_ h1_x h1_P h1_P' h1_1 h1_ih =>
     simp only [isBoundIn] at h2
     simp at h2
     apply deduction_theorem
@@ -881,7 +900,15 @@ theorem T_18_2
         simp only [def_and_]
         -- simp only [formula.and_]
         simp only [isFreeIn]
-        sorry
+        simp
+        contrapose
+        push_neg
+        intro a2
+        apply h2
+        simp_all
+        · tauto
+        · left
+          rfl
   all_goals
     sorry
 
