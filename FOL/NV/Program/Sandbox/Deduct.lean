@@ -373,7 +373,7 @@ instance
   infer_instance
 
 
-structure Definition : Type :=
+structure Definition : Type where
 (name : DefName)
 (args : List VarName)
 (F : Formula)
