@@ -6,9 +6,6 @@ import Lean.Data.Json.Basic
 set_option autoImplicit false
 
 
-namespace FOL.NV
-
-
 /--
   The type of variable names.
 -/
@@ -127,7 +124,11 @@ instance : ToString Formula :=
 def Formula.And_ (l : List Formula) : Formula :=
   List.foldr and_ true_ l
 
-#eval And_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]
+#eval (And_ []).toString
+
+#eval (And_ [pred_var_ (PredName.mk "X") []]).toString
+
+#eval (And_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]).toString
 
 
 /--
@@ -140,7 +141,11 @@ def Formula.And_ (l : List Formula) : Formula :=
 def Formula.Or_ (l : List Formula) : Formula :=
   List.foldr or_ false_ l
 
-#eval Or_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]
+#eval (Or_ []).toString
+
+#eval (Or_ [pred_var_ (PredName.mk "X") []]).toString
+
+#eval (Or_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]).toString
 
 
 /--
@@ -149,7 +154,11 @@ def Formula.Or_ (l : List Formula) : Formula :=
 def Formula.Forall_ (xs : List VarName) (phi : Formula) : Formula :=
   List.foldr forall_ phi xs
 
-#eval Forall_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [])
+#eval (Forall_ [] (pred_var_ (PredName.mk "phi") [])).toString
+
+#eval (Forall_ [VarName.mk "x"] (pred_var_ (PredName.mk "phi") [])).toString
+
+#eval (Forall_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [])).toString
 
 
 /--
@@ -158,7 +167,11 @@ def Formula.Forall_ (xs : List VarName) (phi : Formula) : Formula :=
 def Formula.Exists_ (xs : List VarName) (phi : Formula) : Formula :=
   List.foldr exists_ phi xs
 
-#eval Exists_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [])
+#eval (Exists_ [] (pred_var_ (PredName.mk "phi") [])).toString
+
+#eval (Exists_ [VarName.mk "x"] (pred_var_ (PredName.mk "phi") [])).toString
+
+#eval (Exists_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [])).toString
 
 
 #lint
