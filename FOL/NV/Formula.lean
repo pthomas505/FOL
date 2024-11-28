@@ -13,7 +13,7 @@ structure VarName extends String
   deriving Inhabited, DecidableEq, Repr
 
 instance : ToString VarName :=
-  { toString := fun (x : VarName) => x.toString }
+  { toString := VarName.toString }
 
 
 instance : Lean.ToJson VarName :=
@@ -32,7 +32,7 @@ structure PredName extends String
   deriving Inhabited, DecidableEq, Repr
 
 instance : ToString PredName :=
-  { toString := fun (X : PredName) => X.toString }
+  { toString := PredName.toString }
 
 
 instance : Lean.ToJson PredName :=
@@ -51,7 +51,7 @@ structure DefName extends String
   deriving Inhabited, DecidableEq, Repr
 
 instance : ToString DefName :=
-  { toString := fun (X : DefName) => X.toString }
+  { toString := DefName.toString }
 
 
 instance : Lean.ToJson DefName :=
