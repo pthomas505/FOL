@@ -24,6 +24,9 @@ instance : Lean.FromJson VarName :=
     let str ← Lean.fromJson? json
     Except.ok (VarName.mk str) }
 
+#eval Lean.toJson (VarName.mk "x")
+#eval ((Lean.fromJson? "x") : Except String VarName)
+
 
 /--
   The type of predicate names.
@@ -43,6 +46,9 @@ instance : Lean.FromJson PredName :=
     let str ← Lean.fromJson? json
     Except.ok (PredName.mk str) }
 
+#eval Lean.toJson (PredName.mk "x")
+#eval ((Lean.fromJson? "x") : Except String PredName)
+
 
 /--
   The type of definition names.
@@ -61,6 +67,9 @@ instance : Lean.FromJson DefName :=
   { fromJson? := fun (json : Lean.Json) => do
     let str ← Lean.fromJson? json
     Except.ok (DefName.mk str) }
+
+#eval Lean.toJson (DefName.mk "x")
+#eval ((Lean.fromJson? "x") : Except String DefName)
 
 
 /--
