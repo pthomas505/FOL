@@ -83,7 +83,7 @@ inductive Formula : Type
   | forall_ : VarName → Formula → Formula
   | exists_ : VarName → Formula → Formula
   | def_ : DefName → List VarName → Formula
-  deriving Inhabited, DecidableEq, Lean.ToJson, Lean.FromJson, Repr
+  deriving Inhabited, DecidableEq, Repr, Lean.ToJson, Lean.FromJson
 
 compile_inductive% Formula
 
@@ -113,14 +113,8 @@ def Formula.toString : Formula → String
   | exists_ x phi => s! "(∃ {x}. {phi.toString})"
   | def_ X xs => s! "def ({X} {xs})"
 
-
 instance : ToString Formula :=
   { toString := fun (F : Formula) => F.toString }
-
-/-
-instance : Repr Formula :=
-  { reprPrec := fun (F : Formula) _ => F.toString.toFormat }
--/
 
 
 /--
@@ -131,9 +125,9 @@ instance : Repr Formula :=
   And_ [phi_0 ... phi_n] := phi_0 ∧ ... ∧ phi_n ∧ T
 -/
 def Formula.And_ (l : List Formula) : Formula :=
-  List.foldr Formula.and_ true_ l
+  List.foldr and_ true_ l
 
-#eval Formula.And_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]
+#eval And_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]
 
 
 /--
@@ -144,27 +138,27 @@ def Formula.And_ (l : List Formula) : Formula :=
   Or_ [phi_0 ... phi_n] := phi_0 ∨ ... ∨ phi_n ∨ F
 -/
 def Formula.Or_ (l : List Formula) : Formula :=
-  List.foldr Formula.or_ Formula.false_ l
+  List.foldr or_ false_ l
 
-#eval Formula.Or_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]
+#eval Or_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]
 
 
 /--
   Forall_ [x_0 ... x_n] phi := ∀ x_0 ... ∀ x_n phi
 -/
 def Formula.Forall_ (xs : List VarName) (phi : Formula) : Formula :=
-  List.foldr Formula.forall_ phi xs
+  List.foldr forall_ phi xs
 
-#eval Formula.Forall_ [VarName.mk "x", VarName.mk "y"] (Formula.pred_var_ (PredName.mk "phi") [])
+#eval Forall_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [])
 
 
 /--
   Exists_ [x_0 ... x_n] phi := ∃ x_0 ... ∃ x_n phi
 -/
 def Formula.Exists_ (xs : List VarName) (phi : Formula) : Formula :=
-  List.foldr Formula.exists_ phi xs
+  List.foldr exists_ phi xs
 
-#eval Formula.Exists_ [VarName.mk "x", VarName.mk "y"] (Formula.pred_var_ (PredName.mk "phi") [])
+#eval Exists_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [])
 
 
 #lint
