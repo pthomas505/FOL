@@ -6,8 +6,6 @@ import Mathlib.Tactic
 set_option autoImplicit false
 
 
-namespace FOL.NV
-
 open Formula
 
 

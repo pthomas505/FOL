@@ -114,7 +114,7 @@ def Formula.toString : Formula → String
     else s! "def ({X} {xs})"
 
 instance : ToString Formula :=
-  { toString := fun (F : Formula) => F.toString }
+  { toString := Formula.toString }
 
 
 /--
