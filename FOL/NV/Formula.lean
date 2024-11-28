@@ -159,9 +159,9 @@ def Formula.Forall_ (xs : List VarName) (phi : Formula) : Formula :=
 
 #eval (Forall_ [] (pred_var_ (PredName.mk "phi") [])).toString
 
-#eval (Forall_ [VarName.mk "x"] (pred_var_ (PredName.mk "phi") [])).toString
+#eval (Forall_ [VarName.mk "x"] (pred_var_ (PredName.mk "phi") [VarName.mk "x"])).toString
 
-#eval (Forall_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [])).toString
+#eval (Forall_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [VarName.mk "x", VarName.mk "y"])).toString
 
 
 /--
@@ -172,9 +172,9 @@ def Formula.Exists_ (xs : List VarName) (phi : Formula) : Formula :=
 
 #eval (Exists_ [] (pred_var_ (PredName.mk "phi") [])).toString
 
-#eval (Exists_ [VarName.mk "x"] (pred_var_ (PredName.mk "phi") [])).toString
+#eval (Exists_ [VarName.mk "x"] (pred_var_ (PredName.mk "phi") [VarName.mk "x"])).toString
 
-#eval (Exists_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [])).toString
+#eval (Exists_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [VarName.mk "x", VarName.mk "y"])).toString
 
 
 #lint
