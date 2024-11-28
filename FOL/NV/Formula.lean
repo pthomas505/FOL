@@ -108,7 +108,10 @@ def Formula.toString : Formula → String
   | iff_ phi psi => s! "({phi.toString} ↔ {psi.toString})"
   | forall_ x phi => s! "(∀ {x}. {phi.toString})"
   | exists_ x phi => s! "(∃ {x}. {phi.toString})"
-  | def_ X xs => s! "def ({X} {xs})"
+  | def_ X xs =>
+    if xs.isEmpty
+    then s! "def {X}"
+    else s! "def ({X} {xs})"
 
 instance : ToString Formula :=
   { toString := fun (F : Formula) => F.toString }
