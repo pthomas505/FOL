@@ -18,10 +18,6 @@ structure VarName extends String
 instance : ToString VarName :=
   { toString := fun (x : VarName) => x.toString }
 
-/-
-instance : Repr VarName :=
-  { reprPrec := fun (x : VarName) _ => x.toString.toFormat }
--/
 
 instance : Lean.ToJson VarName :=
   { toJson := fun (x : VarName) => Lean.toJson x.toString }
@@ -41,10 +37,6 @@ structure PredName extends String
 instance : ToString PredName :=
   { toString := fun (X : PredName) => X.toString }
 
-/-
-instance : Repr PredName :=
-  { reprPrec := fun (X : PredName) _ => X.toString.toFormat }
--/
 
 instance : Lean.ToJson PredName :=
   { toJson := fun (X : PredName) => Lean.toJson X.toString }
@@ -64,10 +56,6 @@ structure DefName extends String
 instance : ToString DefName :=
   { toString := fun (X : DefName) => X.toString }
 
-/-
-instance : Repr DefName :=
-  { reprPrec := fun (X : DefName) _ => X.toString.toFormat }
--/
 
 instance : Lean.ToJson DefName :=
   { toJson := fun (X : DefName) => Lean.toJson X.toString }
