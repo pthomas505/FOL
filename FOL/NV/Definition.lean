@@ -35,7 +35,7 @@ deriving DecidableEq
 /--
   The type of environments.
 -/
-abbrev Env : Type := List Definition
+def Env : Type := List Definition
 
 instance : Membership Definition Env :=
   inferInstanceAs (Membership Definition (List Definition))
