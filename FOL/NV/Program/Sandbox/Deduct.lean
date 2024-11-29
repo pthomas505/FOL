@@ -34,13 +34,13 @@ instance : Repr PredName_ :=
 /--
   The type of definition names.
 -/
-structure DefName extends String
+structure DefName_ extends String
   deriving Inhabited, DecidableEq
 
-instance : ToString DefName :=
+instance : ToString DefName_ :=
   { toString := fun X => X.toString }
 
-instance : Repr DefName :=
+instance : Repr DefName_ :=
   { reprPrec := fun X _ => X.toString.toFormat }
 
 
@@ -60,7 +60,7 @@ inductive Formula : Type
   | iff_ : Formula → Formula → Formula
   | forall_ : VarName_ → Formula → Formula
   | exists_ : VarName_ → Formula → Formula
-  | def_ : DefName → List VarName_ → Formula
+  | def_ : DefName_ → List VarName_ → Formula
   deriving Inhabited, DecidableEq
 
 compile_inductive% Formula
@@ -374,7 +374,7 @@ instance
 
 
 structure Definition : Type where
-(name : DefName)
+(name : DefName_)
 (args : List VarName_)
 (F : Formula)
 deriving Inhabited, DecidableEq

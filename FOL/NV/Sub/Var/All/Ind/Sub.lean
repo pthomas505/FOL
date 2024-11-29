@@ -114,7 +114,7 @@ inductive IsSubAux :
   | def_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
-    (X : DefName)
+    (X : DefName_)
     (xs : List VarName_) :
     (∀ v : VarName_, v ∈ xs → v ∉ binders → σ v ∉ binders) →
     IsSubAux σ binders (def_ X xs) (def_ X (xs.map σ))

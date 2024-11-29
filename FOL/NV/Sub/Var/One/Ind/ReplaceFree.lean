@@ -113,7 +113,7 @@ inductive IsReplaceFree : Formula → VarName_ → VarName_ → Formula → Prop
     IsReplaceFree (exists_ x phi) v t (exists_ x phi')
 
   | def_
-    (X : DefName)
+    (X : DefName_)
     (xs : List VarName_)
     (v t : VarName_) :
     IsReplaceFree (def_ X xs) v t (def_ X (xs.map fun (x : VarName_) =>

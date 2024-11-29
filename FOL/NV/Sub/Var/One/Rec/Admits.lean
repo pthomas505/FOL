@@ -161,7 +161,7 @@ inductive BoolFormula : Type
   | iff_ : BoolFormula → BoolFormula → BoolFormula
   | forall_ : Bool → BoolFormula → BoolFormula
   | exists_ : Bool → BoolFormula → BoolFormula
-  | def_ : DefName → List Bool → BoolFormula
+  | def_ : DefName_ → List Bool → BoolFormula
   deriving Inhabited, DecidableEq
 
 

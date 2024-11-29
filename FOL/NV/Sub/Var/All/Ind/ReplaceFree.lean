@@ -95,7 +95,7 @@ inductive IsReplaceFree : (VarName_ → VarName_) → Formula → Formula → Pr
 
   | def_
     (σ : VarName_ → VarName_)
-    (X : DefName)
+    (X : DefName_)
     (xs : List VarName_) :
     IsReplaceFree σ (def_ X xs) (def_ X (xs.map σ))
 

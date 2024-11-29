@@ -14,7 +14,7 @@ structure Definition : Type where
   /--
     The name.
   -/
-  (name : DefName)
+  (name : DefName_)
 
   /--
     The arguments.

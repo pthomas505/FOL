@@ -235,7 +235,7 @@ inductive var_is_free_in_ind
     var_is_free_in_ind v (exists_ x phi)
 
   | def_
-    (X : DefName)
+    (X : DefName_)
     (xs : List VarName_) :
     v ∈ xs →
     var_is_free_in_ind v (def_ X xs)

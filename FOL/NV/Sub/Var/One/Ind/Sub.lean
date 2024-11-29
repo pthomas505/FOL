@@ -115,7 +115,7 @@ inductive IsSub : Formula → VarName_ → VarName_ → Formula → Prop
     IsSub (exists_ x phi) v t (exists_ x phi')
 
   | def_
-    (X : DefName)
+    (X : DefName_)
     (xs : List VarName_)
     (v t : VarName_) :
     IsSub (def_ X xs) v t (def_ X (xs.map fun (x : VarName_) =>

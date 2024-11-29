@@ -123,7 +123,7 @@ inductive IsSub
     IsSub P zs H (exists_ x phi) (exists_ x phi')
 
   | def_
-    (X : DefName)
+    (X : DefName_)
     (xs : List VarName_) :
     IsSub P zs H (def_ X xs) (def_ X xs)
 

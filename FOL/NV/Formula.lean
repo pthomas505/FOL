@@ -53,23 +53,23 @@ instance : Lean.FromJson PredName_ :=
 /--
   The type of definition names.
 -/
-structure DefName extends String
+structure DefName_ extends String
   deriving Inhabited, DecidableEq, Repr
 
-instance : ToString DefName :=
-  { toString := DefName.toString }
+instance : ToString DefName_ :=
+  { toString := DefName_.toString }
 
 
-instance : Lean.ToJson DefName :=
-  { toJson := fun (X : DefName) => Lean.toJson X.toString }
+instance : Lean.ToJson DefName_ :=
+  { toJson := fun (X : DefName_) => Lean.toJson X.toString }
 
-instance : Lean.FromJson DefName :=
+instance : Lean.FromJson DefName_ :=
   { fromJson? := fun (json : Lean.Json) => do
     let str ← Lean.fromJson? json
-    Except.ok (DefName.mk str) }
+    Except.ok (DefName_.mk str) }
 
-#eval Lean.toJson (DefName.mk "X")
-#eval ((Lean.fromJson? "X") : Except String DefName)
+#eval Lean.toJson (DefName_.mk "X")
+#eval ((Lean.fromJson? "X") : Except String DefName_)
 
 
 /--
@@ -88,7 +88,7 @@ inductive Formula : Type
   | iff_ : Formula → Formula → Formula
   | forall_ : VarName_ → Formula → Formula
   | exists_ : VarName_ → Formula → Formula
-  | def_ : DefName → List VarName_ → Formula
+  | def_ : DefName_ → List VarName_ → Formula
   deriving Inhabited, DecidableEq, Repr, Lean.ToJson, Lean.FromJson
 
 compile_inductive% Formula
