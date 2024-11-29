@@ -188,8 +188,8 @@ theorem replace_empty_Holds
   (a : D)
   (h1 : ¬ var_is_free_in v F)
   (h2 : ¬ isBoundIn v F) :
-  Holds D I (Function.updateITE V u a) E F ↔
-    Holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fastReplaceFree u v F) :=
+  holds D I (Function.updateITE V u a) E F ↔
+    holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fastReplaceFree u v F) :=
   by
   induction E generalizing F V
   all_goals
@@ -198,7 +198,7 @@ theorem replace_empty_Holds
       simp only [var_is_free_in] at h1
 
       simp only [Sub.Var.One.Rec.fastReplaceFree]
-      simp only [Holds]
+      simp only [holds]
       congr! 1
       simp
       intro x a1
@@ -218,7 +218,7 @@ theorem replace_empty_Holds
       simp only [var_is_free_in] at h1
 
       simp only [Sub.Var.One.Rec.fastReplaceFree]
-      simp only [Holds]
+      simp only [holds]
       congr! 1
       · simp only [Function.updateITE]
         split_ifs <;> tauto
@@ -226,14 +226,14 @@ theorem replace_empty_Holds
         split_ifs <;> tauto
     case true_ | false_ =>
       simp only [Sub.Var.One.Rec.fastReplaceFree]
-      simp only [Holds]
+      simp only [holds]
     case not_ phi phi_ih =>
       simp only [var_is_free_in] at h1
 
       simp only [isBoundIn] at h2
 
       simp only [Sub.Var.One.Rec.fastReplaceFree]
-      simp only [Holds]
+      simp only [holds]
       congr! 1
       exact phi_ih V h1 h2
     case
@@ -252,7 +252,7 @@ theorem replace_empty_Holds
         cases h2
         case intro h2_left h2_right =>
           simp only [Sub.Var.One.Rec.fastReplaceFree]
-          simp only [Holds]
+          simp only [holds]
           congr! 1
           · exact phi_ih V h1_left h2_left
           · exact psi_ih V h1_right h2_right
@@ -283,7 +283,7 @@ theorem replace_empty_Holds
             case neg c2 =>
               rfl
         case neg c1 =>
-          simp only [Holds]
+          simp only [holds]
           first | apply forall_congr' | apply exists_congr
           intro d
           simp only [Function.updateITE_comm V v x d a h2_left]
@@ -293,10 +293,10 @@ theorem replace_empty_Holds
           · exact h2_right
   case nil.def_ X xs =>
     simp only [Sub.Var.One.Rec.fastReplaceFree]
-    simp only [Holds]
+    simp only [holds]
   case cons.def_ hd tl ih X xs =>
       simp only [Sub.Var.One.Rec.fastReplaceFree]
-      simp only [Holds]
+      simp only [holds]
       unfold Function.updateITE
       congr! 1
       case _ =>
@@ -350,16 +350,16 @@ theorem Holds_iff_alphaEqv_Holds
   (E : Env)
   (F F' : Formula)
   (h1 : AlphaEqv F F') :
-  Holds D I V E F ↔ Holds D I V E F' :=
+  holds D I V E F ↔ holds D I V E F' :=
   by
   induction h1 generalizing V
   case rename_forall_ h1_phi h1_x h1_y h1_1 h1_2 | rename_exists_ h1_phi h1_x h1_y h1_1 h1_2 =>
-    simp only [Holds]
+    simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     exact replace_empty_Holds D I V E h1_x h1_y h1_phi d h1_1 h1_2
   case compat_not_ h1_phi h1_phi' _ h1_ih =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     exact h1_ih V
   case
@@ -367,12 +367,12 @@ theorem Holds_iff_alphaEqv_Holds
   | compat_and_ h1_phi h1_phi' h1_psi h1_psi' _ _ h1_ih_1 h1_ih_2
   | compat_or_ h1_phi h1_phi' h1_psi h1_psi' _ _ h1_ih_1 h1_ih_2
   | compat_iff_ h1_phi h1_phi' h1_psi h1_psi' _ _ h1_ih_1 h1_ih_2 =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     · exact h1_ih_1 V
     · exact h1_ih_2 V
   case compat_forall_ h1_phi h1_psi h1_x _ h1_ih | compat_exists_ h1_phi h1_psi h1_x _ h1_ih =>
-    simp only [Holds]
+    simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     exact h1_ih (Function.updateITE V h1_x d)
@@ -382,7 +382,7 @@ theorem Holds_iff_alphaEqv_Holds
     symm
     exact h1_ih V
   case trans_ h1_phi h1_phi' h1_phi'' _ _ h1_ih_1 h1_ih_2 =>
-    trans Holds D I V E h1_phi'
+    trans holds D I V E h1_phi'
     · exact h1_ih_1 V
     · exact h1_ih_2 V
 
@@ -628,7 +628,7 @@ lemma isAlphaEqv_Holds_aux
   (binders : List (VarName × VarName))
   (h1 : AlphaEqvVarAssignment D binders V V')
   (h2 : isAlphaEqvAux binders F F') :
-  Holds D I V E F ↔ Holds D I V' E F' :=
+  holds D I V E F ↔ holds D I V' E F' :=
   by
   induction E generalizing F F' binders V V'
   all_goals
@@ -644,7 +644,7 @@ lemma isAlphaEqv_Holds_aux
     | pred_var_.pred_var_ X xs Y ys =>
       cases h2
       case intro h2_left h2_right =>
-        simp only [Holds]
+        simp only [holds]
         subst h2_left
         congr! 1
         exact aux_2 D binders xs ys V V' h1 h2_right
@@ -652,16 +652,16 @@ lemma isAlphaEqv_Holds_aux
     case eq_.eq_ x x' y y' =>
       cases h2
       case intro h2_left h2_right =>
-        simp only [Holds]
+        simp only [holds]
         congr! 1
         · exact aux_1 D binders x y V V' h1 h2_left
         · exact aux_1 D binders x' y' V V' h1 h2_right
 
     case true_.true_ | false_.false_ =>
-      simp only [Holds]
+      simp only [holds]
 
     case not_.not_ phi phi_ih phi' =>
-      simp only [Holds]
+      simp only [holds]
       congr! 1
       exact phi_ih V V' phi' binders h1 h2
 
@@ -672,7 +672,7 @@ lemma isAlphaEqv_Holds_aux
     | iff_.iff_ phi psi phi_ih psi_ih phi' psi' =>
       cases h2
       case intro h2_left h2_right =>
-        simp only [Holds]
+        simp only [holds]
         congr! 1
         · exact phi_ih V V' phi' binders h1 h2_left
         · exact psi_ih V V' psi' binders h1 h2_right
@@ -680,7 +680,7 @@ lemma isAlphaEqv_Holds_aux
     case
       forall_.forall_ x phi phi_ih y phi'
     | exists_.exists_ x phi phi_ih y phi' =>
-        simp only [Holds]
+        simp only [holds]
         first | apply forall_congr' | apply exists_congr
         intro d
         induction h1
@@ -697,9 +697,9 @@ lemma isAlphaEqv_Holds_aux
           · exact h2
 
   case nil.def_.def_ =>
-    simp only [Holds]
+    simp only [holds]
   case cons.def_.def_ hd tl ih X xs Y ys =>
-    simp only [Holds]
+    simp only [holds]
     split_ifs
     case _ c1 c2 =>
       cases h2
@@ -739,7 +739,7 @@ lemma isalphaEqv_Holds
   (E : Env)
   (F F' : Formula)
   (h1 : isAlphaEqv F F') :
-  Holds D I V E F ↔ Holds D I V E F' :=
+  holds D I V E F ↔ holds D I V E F' :=
   by
   simp only [isAlphaEqv] at h1
 

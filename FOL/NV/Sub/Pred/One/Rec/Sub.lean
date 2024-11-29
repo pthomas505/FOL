@@ -180,7 +180,7 @@ def I'
   (Interpretation.usingPred D I (
     fun (Q : PredName) (ds : List D) =>
       if Q = P ∧ ds.length = zs.length
-      then Holds D I (Function.updateListITE V zs ds) E H
+      then holds D I (Function.updateListITE V zs ds) E H
       else I.pred_var_ Q ds
   ))
 
@@ -197,8 +197,8 @@ theorem substitution_theorem_aux
   (binders : Finset VarName)
   (h1 : admitsAux P zs H binders F)
   (h2 : ∀ x : VarName, x ∉ binders → V x = V' x) :
-  Holds D (I' D I V' E P zs H) V E F ↔
-    Holds D I V E (replace P zs H F) :=
+  holds D (I' D I V' E P zs H) V E F ↔
+    holds D I V E (replace P zs H F) :=
   by
   set E_ref := E
   induction E generalizing F binders V
@@ -206,14 +206,14 @@ theorem substitution_theorem_aux
     induction F generalizing binders V
     case pred_const_ X xs =>
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
       simp only [I']
       simp only [Interpretation.usingPred]
     case pred_var_ X xs =>
         simp only [admitsAux] at h1
 
         simp only [replace]
-        simp only [Holds]
+        simp only [holds]
         simp only [I']
         simp only [Interpretation.usingPred]
         simp
@@ -225,8 +225,8 @@ theorem substitution_theorem_aux
           cases h1
           case intro h1_left h1_right =>
             have s1 :
-              Holds D I (V ∘ Function.updateListITE id zs xs) E_ref H ↔
-                Holds D I V E_ref (Sub.Var.All.Rec.fastReplaceFree (Function.updateListITE id zs xs) H) :=
+              holds D I (V ∘ Function.updateListITE id zs xs) E_ref H ↔
+                holds D I V E_ref (Sub.Var.All.Rec.fastReplaceFree (Function.updateListITE id zs xs) H) :=
               by
               exact Sub.Var.All.Rec.substitution_theorem D I V E_ref (Function.updateListITE id zs xs) H h1_left
 
@@ -234,7 +234,7 @@ theorem substitution_theorem_aux
             simp at s1
 
             have s2 :
-              Holds D I (Function.updateListITE V zs (List.map V xs)) E_ref H ↔ Holds D I (Function.updateListITE V' zs (List.map V xs)) E_ref H :=
+              holds D I (Function.updateListITE V zs (List.map V xs)) E_ref H ↔ holds D I (Function.updateListITE V' zs (List.map V xs)) E_ref H :=
               by
               apply Holds_coincide_Var
               intro v a1
@@ -256,18 +256,18 @@ theorem substitution_theorem_aux
             exact s1
         case neg c1 =>
           split_ifs
-          simp only [Holds]
+          simp only [holds]
     case eq_ x y =>
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
     case true_ | false_ =>
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
     case not_ phi phi_ih =>
       simp only [admitsAux] at h1
 
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
       congr! 1
       exact phi_ih V binders h1 h2
     case
@@ -278,7 +278,7 @@ theorem substitution_theorem_aux
       simp only [admitsAux] at h1
 
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
       cases h1
       case intro h1_left h1_right =>
         congr! 1
@@ -288,7 +288,7 @@ theorem substitution_theorem_aux
       simp only [admitsAux] at h1
 
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
       first | apply forall_congr' | apply exists_congr
       intro d
       apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
@@ -304,12 +304,12 @@ theorem substitution_theorem_aux
   case nil.def_ X xs =>
     simp only [replace]
     simp only [E_ref]
-    simp only [Holds]
+    simp only [holds]
 
   case cons.def_ hd tl ih X xs =>
     simp only [replace]
     simp only [E_ref]
-    simp only [Holds]
+    simp only [holds]
     split_ifs
     case _ c1 =>
       specialize ih (Function.updateListITE V hd.args (List.map V xs)) hd.q
@@ -338,8 +338,8 @@ theorem substitution_theorem
   (zs : List VarName)
   (H : Formula)
   (h1 : admits P zs H F) :
-  Holds D (I' D I V E P zs H) V E F ↔
-    Holds D I V E (replace P zs H F) :=
+  holds D (I' D I V E P zs H) V E F ↔
+    holds D I V E (replace P zs H F) :=
   by
   apply substitution_theorem_aux D I V V E F P zs H ∅
   · exact h1

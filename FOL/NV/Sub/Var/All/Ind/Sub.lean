@@ -138,11 +138,11 @@ theorem substitution_theorem_aux
   (h2 : ∀ v : VarName, v ∈ binders → V v = V' (σ v))
   (h3 : ∀ v : VarName, σ v ∉ binders → V v = V' (σ v))
   (h4 : ∀ v : VarName, v ∈ binders → v = σ v) :
-  Holds D I V E F ↔ Holds D I V' E F' :=
+  holds D I V E F ↔ holds D I V' E F' :=
   by
   induction h1 generalizing V V'
   case pred_const_ σ' binders' X' xs' ih_1 | pred_var_ σ' binders' X' xs' ih_1 =>
-    simp only [Holds]
+    simp only [holds]
     simp
     congr! 1
     simp only [List.map_eq_map_iff]
@@ -153,7 +153,7 @@ theorem substitution_theorem_aux
     · apply h3
       exact ih_1 x a1 c1
   case eq_ σ' binders' x y ih_1 =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     · by_cases c1 : x ∈ binders'
       · exact h2 x c1
@@ -168,9 +168,9 @@ theorem substitution_theorem_aux
         · simp
         · exact c1
   case true_ | false_ =>
-    simp only [Holds]
+    simp only [holds]
   case not_ σ' binders' phi phi' _ ih_2 =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     exact ih_2 V V' h2 h3 h4
   case
@@ -178,7 +178,7 @@ theorem substitution_theorem_aux
     | and_ σ' binders' phi psi phi' psi' _ _ phi_ih_2 psi_ih_2
     | or_ σ' binders' phi psi phi' psi' _ _ phi_ih_2 psi_ih_2
     | iff_ σ' binders' phi psi phi' psi' _ _ phi_ih_2 psi_ih_2 =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     · apply phi_ih_2 V V' h2 h3 h4
     · apply psi_ih_2 V V' h2 h3 h4
@@ -191,7 +191,7 @@ theorem substitution_theorem_aux
     simp only [← contra]
     exact h4 v a2
 
-    simp only [Holds]
+    simp only [holds]
     first | apply forall_congr'| apply exists_congr
     intro d
 
@@ -236,9 +236,9 @@ theorem substitution_theorem_aux
   case def_ σ' binders' X' xs' ih_1 =>
     induction E
     case nil =>
-      simp only [Holds]
+      simp only [holds]
     case cons hd tl ih =>
-      simp only [Holds]
+      simp only [holds]
       split_ifs
       case _ c1 c2 =>
         simp
@@ -281,7 +281,7 @@ theorem substitution_theorem
   (σ : VarName → VarName)
   (F F' : Formula)
   (h1 : IsSub σ F F') :
-  Holds D I (V ∘ σ) E F ↔ Holds D I V E F' :=
+  holds D I (V ∘ σ) E F ↔ holds D I V E F' :=
   by
   apply substitution_theorem_aux D I (V ∘ σ) V E σ ∅ F F' h1
   · simp

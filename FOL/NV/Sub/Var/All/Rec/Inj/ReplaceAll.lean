@@ -38,14 +38,14 @@ theorem substitution_theorem
   (F : Formula)
   (σ : VarName → VarName)
   (h1 : Function.Injective σ) :
-  Holds D I (V ∘ σ) E F ↔
-    Holds D I V E (replaceAll σ F) :=
+  holds D I (V ∘ σ) E F ↔
+    holds D I V E (replaceAll σ F) :=
   by
   induction F generalizing V
   all_goals
     simp only [replaceAll]
   any_goals
-    simp only [Holds]
+    simp only [holds]
   case pred_const_ X xs | pred_var_ X xs =>
     simp
   case eq_ x y =>
@@ -75,9 +75,9 @@ theorem substitution_theorem
   case def_ X xs =>
     induction E
     case nil =>
-      simp only [Holds]
+      simp only [holds]
     case cons E_hd E_tl E_ih =>
-      simp only [Holds]
+      simp only [holds]
       simp
       split_ifs
       case _ c1 =>

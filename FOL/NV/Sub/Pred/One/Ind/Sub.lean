@@ -141,16 +141,16 @@ theorem substitution_theorem
   (h1 : IsSub P zs H A B)
   (h2 : ∀ (Q : PredName) (ds : List D),
     Q = P ∧ ds.length = zs.length →
-      (Holds D I (Function.updateListITE V zs ds) E H ↔ J.pred_var_ P ds))
+      (holds D I (Function.updateListITE V zs ds) E H ↔ J.pred_var_ P ds))
   (h3_const : I.pred_const_ = J.pred_const_)
   (h3_var : ∀ (Q : PredName) (ds : List D),
     ¬ (Q = P ∧ ds.length = zs.length) →
       (I.pred_var_ Q ds ↔ J.pred_var_ Q ds)) :
-  Holds D I V E B ↔ Holds D J V E A :=
+  holds D I V E B ↔ holds D J V E A :=
   by
   induction h1 generalizing V
   case pred_const_ h1_X h1_ts =>
-    simp only [Holds]
+    simp only [holds]
     simp only [h3_const]
   case pred_not_occurs_in h1_X h1_ts h1_1 =>
     simp at h1_1
@@ -183,16 +183,16 @@ theorem substitution_theorem
     specialize h2 h1_X (List.map V h1_ts)
     simp only [s1] at h2
 
-    simp only [Holds]
+    simp only [holds]
     apply h2
     simp
     exact h1_1
   case eq_ h1_x h1_y =>
-    simp only [Holds]
+    simp only [holds]
   case true_ | false_ =>
-    simp only [Holds]
+    simp only [holds]
   case not_ h1_phi h1_phi' _ h1_ih =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     exact h1_ih V h2
   case
@@ -200,22 +200,22 @@ theorem substitution_theorem
   | and_ h1_phi h1_psi h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | or_ h1_phi h1_psi h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | iff_ h1_phi h1_psi h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2 =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     · exact h1_ih_1 V h2
     · exact h1_ih_2 V h2
   case
     forall_ h1_x h1_phi h1_phi' h1_1 _ h1_ih
   | exists_ h1_x h1_phi h1_phi' h1_1 _ h1_ih =>
-    simp only [Holds]
+    simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     apply h1_ih
     intro Q ds a1
     specialize h2 Q ds a1
     have s1 :
-      Holds D I (Function.updateListITE (Function.updateITE V h1_x d) zs ds) E H ↔
-        Holds D I (Function.updateListITE V zs ds) E H :=
+      holds D I (Function.updateListITE (Function.updateITE V h1_x d) zs ds) E H ↔
+        holds D I (Function.updateListITE V zs ds) E H :=
       by
       apply Holds_coincide_Var
       intro v a1
@@ -228,9 +228,9 @@ theorem substitution_theorem
   case def_ X xs =>
     cases E
     case nil =>
-      simp only [Holds]
+      simp only [holds]
     case cons hd tl =>
-      simp only [Holds]
+      simp only [holds]
       split_ifs
       case _ c1 =>
         apply Holds_coincide_PredVar
@@ -263,11 +263,11 @@ theorem substitution_is_valid
       pred_const_ := I.pred_const_
       pred_var_ := fun (Q : PredName) (ds : List D) =>
         if (Q = P ∧ ds.length = zs.length)
-        then Holds D I (Function.updateListITE V zs ds) E H
+        then holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ Q ds }
   obtain s1 := substitution_theorem D I J V E F P zs H F' h1
   simp only [Interpretation.pred_var_] at s1
-  have s2 : Holds D I V E F' ↔ Holds D J V E F :=
+  have s2 : holds D I V E F' ↔ holds D J V E F :=
     by
     apply s1
     · intro Q ds a1

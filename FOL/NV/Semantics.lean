@@ -51,7 +51,7 @@ instance (D : Type) [Inhabited D] : Inhabited (VarAssignment D) :=
 /--
   The evaluation of formulas to truth values.
 -/
-def Holds
+def holds
   (D : Type)
   (I : Interpretation D)
   (V : VarAssignment D) : Env → Formula → Prop
@@ -60,30 +60,30 @@ def Holds
   | _, eq_ x y => V x = V y
   | _, true_ => True
   | _, false_ => False
-  | E, not_ phi => ¬ Holds D I V E phi
+  | E, not_ phi => ¬ holds D I V E phi
   | E, imp_ phi psi =>
     have : sizeOf psi < sizeOf (imp_ phi psi) := by simp
-    Holds D I V E phi → Holds D I V E psi
+    holds D I V E phi → holds D I V E psi
   | E, and_ phi psi =>
     have : sizeOf psi < sizeOf (and_ phi psi) := by simp
-    Holds D I V E phi ∧ Holds D I V E psi
+    holds D I V E phi ∧ holds D I V E psi
   | E, or_ phi psi =>
     have : sizeOf psi < sizeOf (or_ phi psi) := by simp
-    Holds D I V E phi ∨ Holds D I V E psi
+    holds D I V E phi ∨ holds D I V E psi
   | E, iff_ phi psi =>
     have : sizeOf psi < sizeOf (iff_ phi psi) := by simp
-    Holds D I V E phi ↔ Holds D I V E psi
+    holds D I V E phi ↔ holds D I V E psi
   | E, forall_ x phi =>
     have : sizeOf phi < sizeOf (forall_ x phi) := by simp
-    ∀ (d : D), Holds D I (Function.updateITE V x d) E phi
+    ∀ (d : D), holds D I (Function.updateITE V x d) E phi
   | E, exists_ (x : VarName) (phi : Formula) =>
     have : sizeOf phi < sizeOf (exists_ x phi) := by simp
-    ∃ (d : D), Holds D I (Function.updateITE V x d) E phi
+    ∃ (d : D), holds D I (Function.updateITE V x d) E phi
   | ([] : Env), def_ _ _ => False
   | d :: E, def_ name args =>
     if name = d.name ∧ args.length = d.args.length
-    then Holds D I (Function.updateListITE V d.args (List.map V args)) E d.q
-    else Holds D I V E (def_ name args)
+    then holds D I (Function.updateListITE V d.args (List.map V args)) E d.q
+    else holds D I V E (def_ name args)
   termination_by E phi => (E.length, phi)
 
 
@@ -93,7 +93,7 @@ def Holds
   Formula.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation, variable assignment and environment.
 -/
 def Formula.IsValid (F : Formula) : Prop :=
-  ∀ (D : Type) (I : Interpretation D) (V : VarAssignment D) (E : Env), Holds D I V E F
+  ∀ (D : Type) (I : Interpretation D) (V : VarAssignment D) (E : Env), holds D I V E F
 
 
 theorem Holds_coincide_Var
@@ -103,7 +103,7 @@ theorem Holds_coincide_Var
   (E : Env)
   (F : Formula)
   (h1 : ∀ (v : VarName), var_is_free_in v F → V v = V' v) :
-  Holds D I V E F ↔ Holds D I V' E F :=
+  holds D I V E F ↔ holds D I V' E F :=
   by
   induction E generalizing F V V'
   all_goals
@@ -111,7 +111,7 @@ theorem Holds_coincide_Var
     all_goals
       simp only [var_is_free_in] at h1
 
-      simp only [Holds]
+      simp only [holds]
     case pred_const_ X xs | pred_var_ X xs =>
       congr! 1
       simp only [List.map_eq_map_iff]
@@ -180,7 +180,7 @@ theorem Holds_coincide_PredVar
   (h2 : ∀ (P : PredName) (ds : List D),
     pred_var_occurs_in P ds.length F →
       (I.pred_var_ P ds ↔ I'.pred_var_ P ds)) :
-  Holds D I V E F ↔ Holds D I' V E F :=
+  holds D I V E F ↔ holds D I' V E F :=
   by
   induction E generalizing F V
   all_goals
@@ -188,7 +188,7 @@ theorem Holds_coincide_PredVar
     all_goals
       simp only [pred_var_occurs_in] at h2
 
-      simp only [Holds]
+      simp only [holds]
     case pred_const_ X xs =>
       simp only [h1]
     case pred_var_ X xs =>
@@ -243,13 +243,13 @@ lemma Holds_coincide_Env
   (h1 : ∃ (E1 : Env), E' = E1 ++ E)
   (h2 : F.all_def_in_env E)
   (h3 : E'.nodup_) :
-  Holds D I V E' F ↔ Holds D I V E F :=
+  holds D I V E' F ↔ holds D I V E F :=
   by
   induction F generalizing V
   any_goals
     simp only [all_def_in_env] at h2
 
-    simp only [Holds]
+    simp only [holds]
   case not_ phi phi_ih =>
     congr! 1
     exact phi_ih V h2
@@ -297,7 +297,7 @@ lemma Holds_coincide_Env
           cases h3
           case intro h3_left h3_right =>
             simp
-            simp only [Holds]
+            simp only [holds]
             split_ifs
             case _ c1 =>
               cases c1

@@ -1005,8 +1005,8 @@ theorem substitution_theorem_aux
   (F : Formula)
   (h1 : fastAdmitsAux v t binders F)
   (h2 : ∀ (v : VarName), ¬ v ∈ binders → V' v = V v) :
-  Holds D I (Function.updateITE V v (V' t)) E F ↔
-    Holds D I V E (fastReplaceFree v t F) :=
+  holds D I (Function.updateITE V v (V' t)) E F ↔
+    holds D I V E (fastReplaceFree v t F) :=
   by
   induction E generalizing F binders V
   all_goals
@@ -1015,7 +1015,7 @@ theorem substitution_theorem_aux
       simp only [fastAdmitsAux] at h1
 
       simp only [fastReplaceFree]
-      simp only [Holds]
+      simp only [holds]
     case pred_const_ X xs | pred_var_ X xs =>
       simp
       congr! 1
@@ -1063,7 +1063,7 @@ theorem substitution_theorem_aux
       split_ifs
       case _ c1 =>
         subst c1
-        simp only [Holds]
+        simp only [holds]
         first | apply forall_congr' | apply exists_congr
         intro d
 
@@ -1072,7 +1072,7 @@ theorem substitution_theorem_aux
         simp only [Function.updateITE]
         split_ifs <;> rfl
       case _ c1 =>
-        simp only [Holds]
+        simp only [holds]
         first | apply forall_congr' | apply exists_congr
         intro d
 
@@ -1141,8 +1141,8 @@ theorem substitution_theorem
   (v t : VarName)
   (F : Formula)
   (h1 : fastAdmits v t F) :
-  Holds D I (Function.updateITE V v (V t)) E F ↔
-    Holds D I V E (fastReplaceFree v t F) :=
+  holds D I (Function.updateITE V v (V t)) E F ↔
+    holds D I V E (fastReplaceFree v t F) :=
   by
   simp only [fastAdmits] at h1
 

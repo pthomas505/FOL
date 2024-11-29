@@ -303,12 +303,12 @@ theorem substitution_theorem
   (v t : VarName)
   (F F' : Formula)
   (h1 : IsSub F v t F') :
-  Holds D I (Function.updateITE V v (V t)) E F ↔
-    Holds D I V E F' :=
+  holds D I (Function.updateITE V v (V t)) E F ↔
+    holds D I V E F' :=
   by
   induction h1 generalizing V
   case pred_const_ h1_X h1_xs h1_v h1_t | pred_var_ h1_X h1_xs h1_v h1_t =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     simp
     intro x _
@@ -320,14 +320,14 @@ theorem substitution_theorem
     case _ c1 =>
       simp
   case eq_ h1_x h1_y h1_v h1_t =>
-    simp only [Holds]
+    simp only [holds]
     simp only [Function.updateITE]
     simp only [eq_comm]
     congr! 1 <;> { split_ifs <;> rfl }
   case true_ _ _ | false_ _ _ =>
-    simp only [Holds]
+    simp only [holds]
   case not_ h1_phi h1_v h1_t h1_phi' _ h1_ih =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     apply h1_ih
   case
@@ -335,7 +335,7 @@ theorem substitution_theorem
   | and_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | or_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2
   | iff_ h1_phi h1_psi h1_v h1_t h1_phi' h1_psi' _ _ h1_ih_1 h1_ih_2 =>
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     · apply h1_ih_1
     · apply h1_ih_2
@@ -345,7 +345,7 @@ theorem substitution_theorem
     simp only [var_is_free_in] at h1_1
     simp at h1_1
 
-    simp only [Holds]
+    simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     apply Holds_coincide_Var
@@ -364,7 +364,7 @@ theorem substitution_theorem
   | exists_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 h1_2 _ h1_ih =>
     simp only [var_is_free_in] at h1_1
 
-    simp only [Holds]
+    simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     specialize h1_ih (Function.updateITE V h1_x d)
@@ -384,9 +384,9 @@ theorem substitution_theorem
   case def_ h1_X h1_xs h1_v h1_t =>
     induction E
     case nil =>
-      simp only [Holds]
+      simp only [holds]
     case cons hd tl ih =>
-      simp only [Holds]
+      simp only [holds]
       split_ifs
       case _ c1 c2 =>
         simp

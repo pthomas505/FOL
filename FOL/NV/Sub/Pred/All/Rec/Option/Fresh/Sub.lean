@@ -115,7 +115,7 @@ def I'
     let zs := val.fst
     let H := val.snd
     if ds.length = zs.length
-    then Holds D I (Function.updateListITE V zs ds) E H
+    then holds D I (Function.updateListITE V zs ds) E H
     else I.pred_var_ X ds
   else I.pred_var_ X ds) )
 
@@ -131,14 +131,14 @@ lemma substitution_theorem_aux
   (F : Formula)
   (h1 : ∀ (x : VarName), var_is_free_in x F → V' x = V (σ x))
   (h2 : ∀ (x : VarName), x ∈ F.pred_var_set.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
-  Holds D (I' D I V'' E τ) V' E F ↔ Holds D I V E (subAux c τ σ F) :=
+  holds D (I' D I V'' E τ) V' E F ↔ holds D I V E (subAux c τ σ F) :=
   by
   induction F generalizing V V' σ
   case pred_const_ X xs =>
     simp only [var_is_free_in] at h1
 
     simp only [subAux]
-    simp only [Holds]
+    simp only [holds]
     simp only [I']
     simp only [Interpretation.usingPred]
     simp
@@ -155,7 +155,7 @@ lemma substitution_theorem_aux
     simp only [predVarFreeVarSet] at h2
 
     simp only [subAux]
-    simp only [Holds]
+    simp only [holds]
     simp only [I']
     simp only [Interpretation.usingPred]
     simp
@@ -190,7 +190,7 @@ lemma substitution_theorem_aux
           exact a1
         · exact c3
     case _ c1 c2 =>
-      simp only [Holds]
+      simp only [holds]
       simp
       congr! 1
       simp only [List.map_eq_map_iff]
@@ -198,7 +198,7 @@ lemma substitution_theorem_aux
       simp
       exact h1 x a1
     case _ c1 =>
-      simp only [Holds]
+      simp only [holds]
       simp
       congr! 1
       simp only [List.map_eq_map_iff]
@@ -209,7 +209,7 @@ lemma substitution_theorem_aux
     simp only [var_is_free_in] at h1
 
     simp only [subAux]
-    simp only [Holds]
+    simp only [holds]
 
     have s1 : V' x = V (σ x)
     apply h1
@@ -222,14 +222,14 @@ lemma substitution_theorem_aux
     simp only [s2]
   case true_ | false_ =>
     simp only [subAux]
-    simp only [Holds]
+    simp only [holds]
   case not_ phi phi_ih =>
     simp only [var_is_free_in] at h1
 
     simp only [predVarSet] at h2
 
     simp only [subAux]
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     exact phi_ih V V' σ h1 h2
   case
@@ -242,7 +242,7 @@ lemma substitution_theorem_aux
     simp only [predVarSet] at h2
 
     simp only [subAux]
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     · apply phi_ih V V' σ
       · intro x a1
@@ -280,7 +280,7 @@ lemma substitution_theorem_aux
     simp only [subAux]
     simp only [I']
     simp only [Interpretation.usingPred]
-    simp only [Holds]
+    simp only [holds]
 
     first | apply forall_congr' | apply exists_congr
     intro d
@@ -378,11 +378,11 @@ lemma substitution_theorem_aux
 
     induction E generalizing V V' σ
     case nil =>
-      simp only [Holds]
+      simp only [holds]
     case cons E_hd E_tl E_ih =>
       simp only [var_is_free_in] at h1
 
-      simp only [Holds]
+      simp only [holds]
 
       have s1 : (List.map V' xs) = (List.map (V ∘ σ) xs)
       simp only [List.map_eq_map_iff]
@@ -393,7 +393,7 @@ lemma substitution_theorem_aux
 
       split_ifs
       case _ c1 c2 =>
-        have s2 : Holds D I (Function.updateListITE V' E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q ↔ Holds D I (Function.updateListITE V E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q
+        have s2 : holds D I (Function.updateListITE V' E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q ↔ holds D I (Function.updateListITE V E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q
         apply Holds_coincide_Var
         intro x a1
         apply Function.updateListITE_map_mem_ext
@@ -442,7 +442,7 @@ theorem substitution_theorem
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (F : Formula) :
-  Holds D (I' D I V E τ) V E F ↔ Holds D I V E (sub c τ F) :=
+  holds D (I' D I V E τ) V E F ↔ holds D I V E (sub c τ F) :=
   by
   apply substitution_theorem_aux
   · simp

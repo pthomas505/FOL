@@ -795,7 +795,7 @@ theorem soundness
   (F : Formula)
   (h1 : IsDeduct Δ F) :
   ∀ (D : Type) (I : Interpretation D) (V : VarAssignment D) (E : Env),
-  ((∀ (H : Formula), H ∈ Δ → Holds D I V E H) → Holds D I V E F) :=
+  ((∀ (H : Formula), H ∈ Δ → holds D I V E H) → holds D I V E F) :=
   by
   induction h1
   case struct_1_ Δ' H _ _ ih_2 =>
@@ -834,22 +834,22 @@ theorem soundness
     exact a1
   case prop_0_ =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
   case prop_1_ phi psi =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     tauto
   case prop_2_ phi psi chi =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     tauto
   case prop_3_ phi psi =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     tauto
   case mp_ Δ' phi psi _ _ ih_major ih_minor =>
     intro D I V E a1
-    simp only [Holds] at ih_major
+    simp only [holds] at ih_major
     apply ih_major
     · intro H' a2
       exact a1 H' a2
@@ -857,7 +857,7 @@ theorem soundness
       exact a1
   case dt_ Δ' H phi _ ih_2 =>
     intro D I V E a1
-    simp only [Holds]
+    simp only [holds]
     intro a2
     apply ih_2
     simp
@@ -866,7 +866,7 @@ theorem soundness
     · exact a1
   case pred_1_ v phi psi =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     intro a2 a3 d
     apply a2 d
     exact a3 d
@@ -874,7 +874,7 @@ theorem soundness
     intro D I V E _
     obtain s1 := FOL.NV.Sub.Var.All.Rec.Fresh.substitution_theorem D I V E (Function.updateITE id v t) freshChar phi
 
-    simp only [Holds]
+    simp only [holds]
     intro a2
     simp only [s1]
     simp only [Function.updateITE_comp_left]
@@ -882,10 +882,10 @@ theorem soundness
     exact a2 (V t)
   case pred_3_ v phi ih =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     intro a2 d
 
-    have s1 : Holds D I (Function.updateITE V v d) E phi ↔ Holds D I V E phi
+    have s1 : holds D I (Function.updateITE V v d) E phi ↔ holds D I V E phi
     {
       apply Holds_coincide_Var
       intro v' a1
@@ -902,16 +902,16 @@ theorem soundness
     exact a2
   case gen_ v phi _ ih_2 =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     intro d
     apply ih_2
     simp
   case eq_1_ v =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
   case eq_2_eq_ x_0 x_1 y_0 y_1 =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     intro a2
 
     cases a2
@@ -921,7 +921,7 @@ theorem soundness
   case eq_2_pred_var_ X xs ys ih_1 =>
     intro D I V E _
 
-    simp only [Holds]
+    simp only [holds]
     intro a1
     congr! 1
 
@@ -929,7 +929,7 @@ theorem soundness
     case _ =>
       cases ys
       case _ =>
-        simp only [Holds]
+        simp only [holds]
       case cons ys_hd ys_tl =>
         simp at ih_1
     case _ xs_hd xs_tl xs_ih =>
@@ -940,7 +940,7 @@ theorem soundness
         simp at ih_1
 
         simp at a1
-        simp only [Holds] at a1
+        simp only [holds] at a1
         cases a1
         case _ a1_left a1_right =>
           simp
@@ -949,23 +949,23 @@ theorem soundness
           · apply xs_ih ys_tl ih_1 a1_right
   case def_false_ =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     tauto
   case def_and_ phi psi =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     tauto
   case def_or_ phi psi =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     tauto
   case def_iff_ phi psi =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     tauto
   case def_exists_ v phi =>
     intro D I V E _
-    simp only [Holds]
+    simp only [holds]
     simp
   case sub_ Δ' phi τ _ ih_2 =>
     intro D I V E a1
@@ -985,7 +985,7 @@ lemma not_IsDeduct_false :
   intro contra
   obtain s1 := soundness [] false_ contra Unit default default default
   simp at s1
-  simp only [Holds] at s1
+  simp only [holds] at s1
 
 
 example :

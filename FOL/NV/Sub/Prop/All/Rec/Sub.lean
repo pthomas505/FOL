@@ -98,14 +98,14 @@ theorem substitution_theorem
   (E : Env)
   (τ : PredName → PredName)
   (F : Formula) :
-  Holds D I V E (sub τ F) ↔
-    Holds D
+  holds D I V E (sub τ F) ↔
+    holds D
       ⟨
         I.nonempty,
         I.pred_const_,
         fun (P : PredName) (ds : List D) =>
           if ds = List.nil
-          then Holds D I V E (pred_var_ (τ P) List.nil)
+          then holds D I V E (pred_var_ (τ P) List.nil)
           else I.pred_var_ P ds
       ⟩
       V E F :=
@@ -115,29 +115,29 @@ theorem substitution_theorem
     induction F generalizing V
     case pred_const_ X xs =>
       simp only [sub]
-      simp only [Holds]
+      simp only [holds]
     case pred_var_ X xs =>
         simp only [sub]
         split_ifs
         case pos c1 =>
-          simp only [Holds]
+          simp only [holds]
           simp
           simp only [if_pos c1]
         case neg c1 =>
-          simp only [Holds]
+          simp only [holds]
           simp
           simp only [if_neg c1]
     case eq_ x y =>
       simp only [sub]
-      simp only [Holds]
+      simp only [holds]
     case true_ | false_ =>
       simp only [sub]
-      simp only [Holds]
+      simp only [holds]
     case not_ phi phi_ih =>
-      simp only [Holds] at phi_ih
+      simp only [holds] at phi_ih
 
       simp only [sub]
-      simp only [Holds]
+      simp only [holds]
       congr! 1
       apply phi_ih
     case
@@ -145,32 +145,32 @@ theorem substitution_theorem
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-      simp only [Holds] at phi_ih
-      simp only [Holds] at psi_ih
+      simp only [holds] at phi_ih
+      simp only [holds] at psi_ih
 
       simp only [sub]
-      simp only [Holds]
+      simp only [holds]
       congr! 1
       · apply phi_ih
       · apply psi_ih
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [Holds] at phi_ih
+      simp only [holds] at phi_ih
 
       simp only [sub]
-      simp only [Holds]
+      simp only [holds]
       first | apply forall_congr' | apply exists_congr
       intros d
       apply phi_ih
 
   case nil.def_ X xs =>
     simp only [sub]
-    simp only [Holds]
+    simp only [holds]
   case cons.def_ hd tl ih X xs =>
-    simp only [Holds] at ih
+    simp only [holds] at ih
     simp at ih
 
     simp only [sub]
-    simp only [Holds]
+    simp only [holds]
     split_ifs
     case _ c1 =>
       specialize ih (Function.updateListITE V hd.args (List.map V xs)) hd.q

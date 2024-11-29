@@ -83,7 +83,7 @@ theorem substitution_theorem_aux
   (h2 : ∀ (v : VarName), v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
   (h2' : ∀ (v : VarName), v ∈ binders → v = σ' v)
   (h3 : ∀ (v : VarName), v ∉ binders → σ' v = σ v) :
-  Holds D I V E F ↔ Holds D I V' E (fastReplaceFree σ' F) :=
+  holds D I V E F ↔ holds D I V' E (fastReplaceFree σ' F) :=
   by
   induction E generalizing F binders V V' σ σ'
   all_goals
@@ -92,7 +92,7 @@ theorem substitution_theorem_aux
       simp only [admitsAux] at h1
 
       simp only [fastReplaceFree]
-      simp only [Holds]
+      simp only [holds]
     case pred_const_ X xs | pred_var_ X xs =>
       congr! 1
       simp
@@ -214,8 +214,8 @@ theorem substitution_theorem
   (σ : VarName → VarName)
   (F : Formula)
   (h1 : admits σ F) :
-  Holds D I (V ∘ σ) E F ↔
-    Holds D I V E (fastReplaceFree σ F) :=
+  holds D I (V ∘ σ) E F ↔
+    holds D I V E (fastReplaceFree σ F) :=
   by
   apply substitution_theorem_aux D I (V ∘ σ) V E σ σ ∅ F h1
   · simp

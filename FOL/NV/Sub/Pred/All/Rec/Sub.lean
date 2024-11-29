@@ -116,21 +116,21 @@ theorem substitution_theorem_aux
   (F : Formula)
   (h1 : admitsAux τ binders F)
   (h2 : ∀ x : VarName, x ∉ binders → V x = V' x) :
-  Holds D
+  holds D
     ⟨
       I.nonempty,
       I.pred_const_,
       fun (X : PredName) (ds : List D) =>
         if ds.length = (τ X ds.length).fst.length
-        then Holds D I (Function.updateListITE V' (τ X ds.length).fst ds) E (τ X ds.length).snd
+        then holds D I (Function.updateListITE V' (τ X ds.length).fst ds) E (τ X ds.length).snd
         else I.pred_var_ X ds
       ⟩
-      V E F ↔ Holds D I V E (replace τ F) :=
+      V E F ↔ holds D I V E (replace τ F) :=
   by
   induction F generalizing binders V
   case pred_const_ X xs =>
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
   case pred_var_ X xs =>
     simp only [admitsAux] at h1
     simp at h1
@@ -146,9 +146,9 @@ theorem substitution_theorem_aux
         simp at s1
 
         have s2 :
-          Holds D I (Function.updateListITE V (τ X xs.length).fst (List.map V xs)) E
+          holds D I (Function.updateListITE V (τ X xs.length).fst (List.map V xs)) E
             (τ X xs.length).snd ↔
-          Holds D I (Function.updateListITE V' (τ X xs.length).fst (List.map V xs)) E
+          holds D I (Function.updateListITE V' (τ X xs.length).fst (List.map V xs)) E
             (τ X xs.length).snd :=
         by
           apply Holds_coincide_Var
@@ -167,22 +167,22 @@ theorem substitution_theorem_aux
         simp only [s2] at s1
         clear s2
 
-        simp only [Holds]
+        simp only [holds]
         simp only [replace]
         simp
         simp only [if_pos h1_right_right]
         exact s1
   case eq_ x y =>
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
   case true_ | false_ =>
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
   case not_ phi phi_ih =>
     simp only [admitsAux] at h1
 
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     exact phi_ih V binders h1 h2
   case
@@ -193,7 +193,7 @@ theorem substitution_theorem_aux
     simp only [admitsAux] at h1
 
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
 
     cases h1
     case intro h1_left h1_right =>
@@ -204,7 +204,7 @@ theorem substitution_theorem_aux
     simp only [admitsAux] at h1
 
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
@@ -220,10 +220,10 @@ theorem substitution_theorem_aux
     cases E
     case nil =>
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
     case cons hd tl =>
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
       split_ifs
       case _ c1 =>
         apply Holds_coincide_PredVar
@@ -246,7 +246,7 @@ theorem substitution_theorem
   (τ : PredName → ℕ → List VarName × Formula)
   (F : Formula)
   (h1 : admits τ F) :
-  Holds D
+  holds D
     ⟨
       I.nonempty,
       I.pred_const_,
@@ -254,10 +254,10 @@ theorem substitution_theorem
         let zs := (τ X ds.length).fst
         let H := (τ X ds.length).snd
         if ds.length = zs.length
-        then Holds D I (Function.updateListITE V zs ds) E H
+        then holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ X ds
       ⟩
-      V E F ↔ Holds D I V E (replace τ F) :=
+      V E F ↔ holds D I V E (replace τ F) :=
   by
   apply substitution_theorem_aux D I V V E τ ∅ F
   · simp only [admits] at h1

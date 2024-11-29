@@ -135,20 +135,20 @@ theorem substitution_theorem
   (σ : VarName → VarName)
   (c : Char)
   (F : Formula) :
-  Holds D I V E (sub σ c F) ↔
-    Holds D I (V ∘ σ) E F :=
+  holds D I V E (sub σ c F) ↔
+    holds D I (V ∘ σ) E F :=
   by
   induction F generalizing σ V
   case pred_const_ X xs | pred_var_ X xs | eq_ x y =>
     simp only [sub]
-    simp only [Holds]
+    simp only [holds]
     simp
   case true_ | false_ =>
     simp only [sub]
-    simp only [Holds]
+    simp only [holds]
   case not_ phi phi_ih =>
     simp only [sub]
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     exact phi_ih V σ
   case
@@ -157,13 +157,13 @@ theorem substitution_theorem
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     simp only [sub]
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     · exact phi_ih V σ
     · exact psi_ih V σ
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [sub]
-    simp only [Holds]
+    simp only [holds]
 
     first | apply forall_congr' | apply exists_congr
     intro d
@@ -223,12 +223,12 @@ theorem substitution_theorem
     induction E
     case nil =>
       simp only [sub]
-      simp only [Holds]
+      simp only [holds]
     case cons E_hd E_tl E_ih =>
       simp only [sub] at E_ih
 
       simp only [sub]
-      simp only [Holds]
+      simp only [holds]
       simp
       split_ifs
       case pos c1 =>

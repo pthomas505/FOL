@@ -98,7 +98,7 @@ theorem substitution_theorem_aux
   (F : Formula)
   (h1 : admitsAux τ binders F)
   (h2 : ∀ x : VarName, x ∉ binders → V' x = V x) :
-  Holds D
+  holds D
     ⟨
       I.nonempty,
       I.pred_const_,
@@ -110,22 +110,22 @@ theorem substitution_theorem_aux
         let zs := val.fst
         let H := val.snd
         if ds.length = zs.length
-        then Holds D I (Function.updateListITE V' zs ds) E H
+        then holds D I (Function.updateListITE V' zs ds) E H
         else I.pred_var_ X ds
       else I.pred_var_ X ds
     ⟩
-    V E F ↔ Holds D I V E (replace c τ F) :=
+    V E F ↔ holds D I V E (replace c τ F) :=
   by
   induction F generalizing binders V
   case pred_const_ X xs =>
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
   case pred_var_ X xs =>
     simp only [admitsAux] at h1
     simp at h1
 
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
     simp
     split_ifs
     case _ c1 c2 =>
@@ -156,21 +156,21 @@ theorem substitution_theorem_aux
         specialize h1 v contra a1
         contradiction
     case _ c1 c2 =>
-      simp only [Holds]
+      simp only [holds]
     case _ c1 =>
-      simp only [Holds]
+      simp only [holds]
 
   case eq_ x y =>
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
   case true_ | false_ =>
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
   case not_ phi phi_ih =>
     simp only [admitsAux] at h1
 
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
     congr! 1
     exact phi_ih V binders h1 h2
   case
@@ -181,7 +181,7 @@ theorem substitution_theorem_aux
     simp only [admitsAux] at h1
 
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
 
     cases h1
     case intro h1_left h1_right =>
@@ -192,7 +192,7 @@ theorem substitution_theorem_aux
     simp only [admitsAux] at h1
 
     simp only [replace]
-    simp only [Holds]
+    simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
     apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
@@ -208,10 +208,10 @@ theorem substitution_theorem_aux
     cases E
     case nil =>
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
     case cons hd tl =>
       simp only [replace]
-      simp only [Holds]
+      simp only [holds]
       split_ifs
       case _ c1 =>
         apply Holds_coincide_PredVar
