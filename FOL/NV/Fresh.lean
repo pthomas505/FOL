@@ -45,7 +45,7 @@ lemma finset_var_name_max_len_mem
 
 
 /--
-  fresh x c xs := If the variable name x is not a member of the finite set of variable names xs then x is returned. If x is a member of xs then the character c is repeatedly appended to x until the resulting variable name is not a member of xs. The resulting variable name is then returned.
+  `fresh x c xs` := If the variable name `x` is not a member of the finite set of variable names `xs` then `x` is returned. If `x` is a member of `xs` then the character `c` is repeatedly appended to `x` until the resulting variable name is not a member of `xs`. The resulting variable name is then returned.
 -/
 def fresh
   (x : VarName)
