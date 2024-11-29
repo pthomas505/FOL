@@ -7,9 +7,6 @@ import Mathlib.Data.String.Lemmas
 set_option autoImplicit false
 
 
-open Formula
-
-
 /--
   `finset_var_name_max_len xs` := The length of the longest variable name in the finite set of variable names `xs` or 0 if the set is empty.
 -/
