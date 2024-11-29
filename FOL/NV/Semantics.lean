@@ -37,6 +37,7 @@ instance (D : Type) [Inhabited D] : Inhabited (Interpretation D) :=
     pred_var_ := fun _ _ => False
   }
 
+
 /--
   The assignment of an element of the domain of discourse to each variable.
 -/
