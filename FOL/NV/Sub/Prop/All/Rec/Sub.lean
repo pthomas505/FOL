@@ -185,12 +185,12 @@ theorem substitution_theorem
 theorem substitution_is_valid
   (F : Formula)
   (τ : PredName → PredName)
-  (h1 : F.IsValid) :
-  (sub τ F).IsValid :=
+  (h1 : F.is_valid) :
+  (sub τ F).is_valid :=
   by
-  simp only [IsValid] at h1
+  simp only [is_valid] at h1
 
-  simp only [IsValid]
+  simp only [is_valid]
   intro D I V E
   simp only [substitution_theorem D I V E τ F]
   apply h1

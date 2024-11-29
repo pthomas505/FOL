@@ -92,7 +92,7 @@ def holds
 
   Formula.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation, variable assignment and environment.
 -/
-def Formula.IsValid (F : Formula) : Prop :=
+def Formula.is_valid (F : Formula) : Prop :=
   ∀ (D : Type) (I : Interpretation D) (V : VarAssignment D) (E : Env), holds D I V E F
 
 

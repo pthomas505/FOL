@@ -352,12 +352,12 @@ theorem substitution_is_valid
   (zs : List VarName)
   (H : Formula)
   (h1 : admits P zs H F)
-  (h2 : F.IsValid) :
-  (replace P zs H F).IsValid :=
+  (h2 : F.is_valid) :
+  (replace P zs H F).is_valid :=
   by
-  simp only [IsValid] at h2
+  simp only [is_valid] at h2
 
-  simp only [IsValid]
+  simp only [is_valid]
   intro D I V E
   simp only [← substitution_theorem D I V E F P zs H h1]
   apply h2

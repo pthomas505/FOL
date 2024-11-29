@@ -251,12 +251,12 @@ theorem substitution_is_valid
   (zs : List VarName)
   (H : Formula)
   (h1 : IsSub P zs H F F')
-  (h2 : F.IsValid) :
-  F'.IsValid :=
+  (h2 : F.is_valid) :
+  F'.is_valid :=
   by
-  simp only [IsValid] at h2
+  simp only [is_valid] at h2
 
-  simp only [IsValid]
+  simp only [is_valid]
   intro D I V E
   let J : Interpretation D :=
     { nonempty := I.nonempty

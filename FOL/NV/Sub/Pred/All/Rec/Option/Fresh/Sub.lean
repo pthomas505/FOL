@@ -453,12 +453,12 @@ theorem substitution_is_valid
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (F : Formula)
-  (h1 : IsValid F) :
-  IsValid (sub c τ F) :=
+  (h1 : is_valid F) :
+  is_valid (sub c τ F) :=
   by
-  simp only [IsValid] at h1
+  simp only [is_valid] at h1
 
-  simp only [IsValid]
+  simp only [is_valid]
   intro D I V E
   simp only [← substitution_theorem]
   apply h1

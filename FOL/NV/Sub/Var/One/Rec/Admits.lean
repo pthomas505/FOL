@@ -1154,12 +1154,12 @@ theorem substitution_is_valid
   (v t : VarName)
   (F : Formula)
   (h1 : fastAdmits v t F)
-  (h2 : F.IsValid) :
-  (fastReplaceFree v t F).IsValid :=
+  (h2 : F.is_valid) :
+  (fastReplaceFree v t F).is_valid :=
   by
-  simp only [IsValid] at h2
+  simp only [is_valid] at h2
 
-  simp only [IsValid]
+  simp only [is_valid]
   intro D I V E
   simp only [← substitution_theorem D I V E v t F h1]
   apply h2

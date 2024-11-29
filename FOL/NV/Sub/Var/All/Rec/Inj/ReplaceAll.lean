@@ -100,12 +100,12 @@ theorem substitution_is_valid
   (F : Formula)
   (σ : VarName → VarName)
   (h1 : Function.Injective σ)
-  (h2 : F.IsValid) :
-  (replaceAll σ F).IsValid :=
+  (h2 : F.is_valid) :
+  (replaceAll σ F).is_valid :=
   by
-    simp only [IsValid] at h2
+    simp only [is_valid] at h2
 
-    simp only [IsValid]
+    simp only [is_valid]
     intro D I V E
     simp only [← substitution_theorem D I V E F σ h1]
     apply h2

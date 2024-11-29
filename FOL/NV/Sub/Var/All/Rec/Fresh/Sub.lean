@@ -251,12 +251,12 @@ theorem substitution_is_valid
   (σ : VarName → VarName)
   (c : Char)
   (F : Formula)
-  (h1 : IsValid F) :
-  IsValid (sub σ c F) :=
+  (h1 : is_valid F) :
+  is_valid (sub σ c F) :=
   by
-  simp only [IsValid] at h1
+  simp only [is_valid] at h1
 
-  simp only [IsValid]
+  simp only [is_valid]
   intro D I V E
   simp only [substitution_theorem]
   apply h1

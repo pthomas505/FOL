@@ -270,12 +270,12 @@ theorem substitution_is_valid
   (F : Formula)
   (τ : PredName → ℕ → List VarName × Formula)
   (h1 : admits τ F)
-  (h2 : F.IsValid) :
-  (replace τ F).IsValid :=
+  (h2 : F.is_valid) :
+  (replace τ F).is_valid :=
   by
-  simp only [IsValid] at h2
+  simp only [is_valid] at h2
 
-  simp only [IsValid]
+  simp only [is_valid]
   intro D I V E
   obtain s1 := substitution_theorem D I V E τ F h1
   simp only [← s1]

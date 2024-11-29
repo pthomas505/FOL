@@ -425,12 +425,12 @@ theorem substitution_is_valid
   (v t : VarName)
   (F F' : Formula)
   (h1 : IsSub F v t F')
-  (h2 : F.IsValid) :
-  F'.IsValid :=
+  (h2 : F.is_valid) :
+  F'.is_valid :=
   by
-  simp only [IsValid] at h2
+  simp only [is_valid] at h2
 
-  simp only [IsValid]
+  simp only [is_valid]
   intro D I V E
   simp only [← substitution_theorem D I V E v t F F' h1]
   apply h2
