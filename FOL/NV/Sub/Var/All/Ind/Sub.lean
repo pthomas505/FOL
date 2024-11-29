@@ -242,7 +242,7 @@ theorem substitution_theorem_aux
       split_ifs
       case _ c1 c2 =>
         simp
-        apply Holds_coincide_Var
+        apply holds_coincide_var
         intro v a1
 
         have s1 : List.map V xs' = List.map (V' ∘ σ') xs'

@@ -887,7 +887,7 @@ theorem soundness
 
     have s1 : holds D I (Function.updateITE V v d) E phi ↔ holds D I V E phi
     {
-      apply Holds_coincide_Var
+      apply holds_coincide_var
       intro v' a1
       simp only [Function.updateITE]
       split_ifs

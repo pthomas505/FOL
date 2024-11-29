@@ -169,7 +169,7 @@ theorem substitution_theorem
     intro d
 
     simp only [phi_ih]
-    apply Holds_coincide_Var
+    apply holds_coincide_var
     intro v a1
 
     simp
@@ -232,7 +232,7 @@ theorem substitution_theorem
       simp
       split_ifs
       case pos c1 =>
-        apply Holds_coincide_Var
+        apply holds_coincide_var
         intro v a1
         apply Function.updateListITE_map_mem_ext
         · simp

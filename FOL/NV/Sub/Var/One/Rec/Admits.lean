@@ -1095,7 +1095,7 @@ theorem substitution_theorem_aux
     case _ =>
       simp
     case _ c1 =>
-      apply Holds_coincide_Var
+      apply holds_coincide_var
       intro v' a1
       simp
       simp only [eq_comm]

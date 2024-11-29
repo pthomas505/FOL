@@ -175,7 +175,7 @@ lemma substitution_theorem_aux
       simp only [s1]
       clear s1
 
-      apply Holds_coincide_Var
+      apply holds_coincide_var
       intro x a1
       by_cases c3 : x ∈ zs
       · apply Function.updateListITE_map_mem_ext
@@ -394,7 +394,7 @@ lemma substitution_theorem_aux
       split_ifs
       case _ c1 c2 =>
         have s2 : holds D I (Function.updateListITE V' E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q ↔ holds D I (Function.updateListITE V E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q
-        apply Holds_coincide_Var
+        apply holds_coincide_var
         intro x a1
         apply Function.updateListITE_map_mem_ext
         · simp

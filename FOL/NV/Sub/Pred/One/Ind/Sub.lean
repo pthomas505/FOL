@@ -217,7 +217,7 @@ theorem substitution_theorem
       holds D I (Function.updateListITE (Function.updateITE V h1_x d) zs ds) E H ↔
         holds D I (Function.updateListITE V zs ds) E H :=
       by
-      apply Holds_coincide_Var
+      apply holds_coincide_var
       intro v a1
       apply Function.updateListITE_updateIte
       intro contra

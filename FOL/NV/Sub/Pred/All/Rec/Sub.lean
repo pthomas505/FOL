@@ -151,7 +151,7 @@ theorem substitution_theorem_aux
           holds D I (Function.updateListITE V' (τ X xs.length).fst (List.map V xs)) E
             (τ X xs.length).snd :=
         by
-          apply Holds_coincide_Var
+          apply holds_coincide_var
           intro v a1
           by_cases c1 : v ∈ (τ X xs.length).fst
           · apply Function.updateListITE_mem_eq_len V V' v (τ X xs.length).fst (List.map V xs) c1

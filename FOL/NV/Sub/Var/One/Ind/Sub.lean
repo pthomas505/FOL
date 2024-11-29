@@ -348,7 +348,7 @@ theorem substitution_theorem
     simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
-    apply Holds_coincide_Var
+    apply holds_coincide_var
     intro x a1
     simp only [Function.updateITE]
     split_ifs
@@ -369,7 +369,7 @@ theorem substitution_theorem
     intro d
     specialize h1_ih (Function.updateITE V h1_x d)
     simp only [← h1_ih]
-    apply Holds_coincide_Var
+    apply holds_coincide_var
     intro x _
     simp only [Function.updateITE]
     simp only [eq_comm]
@@ -390,7 +390,7 @@ theorem substitution_theorem
       split_ifs
       case _ c1 c2 =>
         simp
-        apply Holds_coincide_Var
+        apply holds_coincide_var
         intro v' a1
         have s1 : List.map (Function.updateITE V h1_v (V h1_t)) h1_xs = List.map (V ∘ fun (x : VarName) => if h1_v = x then h1_t else x) h1_xs
         simp only [List.map_eq_map_iff]

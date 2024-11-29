@@ -269,7 +269,7 @@ theorem replace_empty_Holds
         split_ifs
         case pos c1 =>
           subst c1
-          apply Holds_coincide_Var
+          apply holds_coincide_var
           intro x a1
           simp only [var_is_free_in] at a1
           cases a1
@@ -304,7 +304,7 @@ theorem replace_empty_Holds
       case _ c1 =>
         simp only [var_is_free_in] at h1
 
-        apply Holds_coincide_Var
+        apply holds_coincide_var
         intro v' a1
         simp
 
@@ -704,7 +704,7 @@ lemma isAlphaEqv_Holds_aux
     case _ c1 c2 =>
       cases h2
       case intro h2_left h2_right =>
-        apply Holds_coincide_Var
+        apply holds_coincide_var
         intro v a1
         simp only [aux_2 D binders xs ys V V' h1 h2_right]
         apply Function.updateListITE_mem_eq_len

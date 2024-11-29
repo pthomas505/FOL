@@ -138,7 +138,7 @@ theorem substitution_theorem_aux
       simp at s1
       simp only [s1]
 
-      apply Holds_coincide_Var
+      apply holds_coincide_var
       intro v a1
       by_cases c3 : v ∈ zs
       · apply Function.updateListITE_mem_eq_len V' V v zs (List.map V xs) c3

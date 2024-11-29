@@ -96,7 +96,7 @@ def Formula.is_valid (F : Formula) : Prop :=
   ∀ (D : Type) (I : Interpretation D) (V : VarAssignment D) (E : Env), holds D I V E F
 
 
-theorem Holds_coincide_Var
+theorem holds_coincide_var
   (D : Type)
   (I : Interpretation D)
   (V V' : VarAssignment D)

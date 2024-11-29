@@ -236,7 +236,7 @@ theorem substitution_theorem_aux
             have s2 :
               holds D I (Function.updateListITE V zs (List.map V xs)) E_ref H ↔ holds D I (Function.updateListITE V' zs (List.map V xs)) E_ref H :=
               by
-              apply Holds_coincide_Var
+              apply holds_coincide_var
               intro v a1
               by_cases c2 : v ∈ zs
               · apply Function.updateListITE_mem_eq_len V V' v zs (List.map V xs) c2
