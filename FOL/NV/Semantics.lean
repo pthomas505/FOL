@@ -12,7 +12,7 @@ open Formula_
 /--
   The interpretation of a first order language. The assignment of a denotation to each non-logical symbol.
 
-  D is the domain of discourse.
+  `D` is the domain of discourse.
 -/
 structure Interpretation_ (D : Type) : Type where
   /--
@@ -91,7 +91,7 @@ def holds
 /--
   The definition of valid formulas.
 
-  Formula_.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation, variable assignment and environment.
+  `Formula_.is_valid F` := True if and only if `F` evaluates to `True` in every combination of domain of discourse, interpretation, valuation and environment.
 -/
 def Formula_.is_valid (F : Formula_) : Prop :=
   ∀ (D : Type) (I : Interpretation_ D) (V : Valuation_ D) (E : Env_), holds D I V E F
