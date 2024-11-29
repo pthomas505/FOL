@@ -46,7 +46,7 @@ def Assignment (D : Type) : Type := VarName → D
 instance (D : Type) [Inhabited D] : Inhabited (Assignment D) :=
   by
   simp only [Assignment]
-  exact inferInstance
+  infer_instance
 
 
 /--
