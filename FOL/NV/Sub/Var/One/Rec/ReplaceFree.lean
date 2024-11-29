@@ -7,7 +7,7 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Var.One.Rec
 
-open Formula
+open Formula_
 
 
 /-
@@ -20,7 +20,7 @@ If $P$ is a formula, $v$ is a variable, and $t$ is a term, then $P(t/v)$ is the 
 /--
   Helper function for replaceFree.
 -/
-def replaceFreeAux (v t : VarName_) (binders : Finset VarName_) : Formula → Formula
+def replaceFreeAux (v t : VarName_) (binders : Finset VarName_) : Formula_ → Formula_
   | pred_const_ X xs =>
       pred_const_
       X
@@ -68,7 +68,7 @@ def replaceFreeAux (v t : VarName_) (binders : Finset VarName_) : Formula → Fo
 
   The result of replacing each free occurrence of v in P by an occurrence of t.
 -/
-def replaceFree (v t : VarName_) (F : Formula) : Formula :=
+def replaceFree (v t : VarName_) (F : Formula_) : Formula_ :=
   replaceFreeAux v t ∅ F
 
 
@@ -83,7 +83,7 @@ def replaceFree (v t : VarName_) (F : Formula) : Formula :=
 
   This is a more efficient version of replaceFree.
 -/
-def fastReplaceFree (v t : VarName_) : Formula → Formula
+def fastReplaceFree (v t : VarName_) : Formula_ → Formula_
   | pred_const_ X xs =>
       pred_const_
       X
@@ -120,7 +120,7 @@ def fastReplaceFree (v t : VarName_) : Formula → Formula
 -- replaceFree = fastReplaceFree
 
 theorem replaceFreeAux_mem_binders
-  (F : Formula)
+  (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∈ binders) :
@@ -161,7 +161,7 @@ theorem replaceFreeAux_mem_binders
 
 
 theorem replaceFreeAux_eq_fastReplaceFree
-  (F : Formula)
+  (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∉ binders) :
@@ -217,7 +217,7 @@ theorem replaceFreeAux_eq_fastReplaceFree
 
 
 theorem replaceFree_eq_fastReplaceFree
-  (F : Formula)
+  (F : Formula_)
   (v t : VarName_) :
   replaceFree v t F = fastReplaceFree v t F :=
   by
@@ -228,7 +228,7 @@ theorem replaceFree_eq_fastReplaceFree
 --
 
 theorem fastReplaceFree_self
-  (F : Formula)
+  (F : Formula_)
   (v : VarName_) :
   fastReplaceFree v v F = F :=
   by
@@ -256,7 +256,7 @@ theorem fastReplaceFree_self
 
 
 theorem not_free_in_fastReplaceFree_self
-  (F : Formula)
+  (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_is_free_in v F) :
   fastReplaceFree v t F = F :=
@@ -291,7 +291,7 @@ theorem not_free_in_fastReplaceFree_self
 
 
 theorem fastReplaceFree_inverse
-  (F : Formula)
+  (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ occursIn t F) :
   fastReplaceFree t v (fastReplaceFree v t F) = F :=
@@ -350,7 +350,7 @@ theorem fastReplaceFree_inverse
 
 
 theorem not_isFreeIn_fastReplaceFree
-  (F : Formula)
+  (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ v = t) :
   ¬ var_is_free_in v (fastReplaceFree v t F) :=

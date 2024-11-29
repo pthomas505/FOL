@@ -6,13 +6,13 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Var.One.Ind
 
-open Formula
+open Formula_
 
 
 /--
   IsSub F v t F' := True if and only if F' is the result of replacing in F each free occurrence of v by a free occurrence of t.
 -/
-inductive IsSub : Formula → VarName_ → VarName_ → Formula → Prop
+inductive IsSub : Formula_ → VarName_ → VarName_ → Formula_ → Prop
 
   | pred_const_
     (X : PredName_)
@@ -42,56 +42,56 @@ inductive IsSub : Formula → VarName_ → VarName_ → Formula → Prop
     IsSub false_ v t false_
 
   | not_
-    (phi : Formula)
+    (phi : Formula_)
     (v t : VarName_)
-    (phi' : Formula) :
+    (phi' : Formula_) :
     IsSub phi v t phi' →
     IsSub phi.not_ v t phi'.not_
 
   | imp_
-    (phi psi : Formula)
+    (phi psi : Formula_)
     (v t : VarName_)
-    (phi' psi' : Formula) :
+    (phi' psi' : Formula_) :
     IsSub phi v t phi' →
     IsSub psi v t psi' →
     IsSub (phi.imp_ psi) v t (phi'.imp_ psi')
 
   | and_
-    (phi psi : Formula)
+    (phi psi : Formula_)
     (v t : VarName_)
-    (phi' psi' : Formula) :
+    (phi' psi' : Formula_) :
     IsSub phi v t phi' →
     IsSub psi v t psi' →
     IsSub (phi.and_ psi) v t (phi'.and_ psi')
 
   | or_
-    (phi psi : Formula)
+    (phi psi : Formula_)
     (v t : VarName_)
-    (phi' psi' : Formula) :
+    (phi' psi' : Formula_) :
     IsSub phi v t phi' →
     IsSub psi v t psi' →
     IsSub (phi.or_ psi) v t (phi'.or_ psi')
 
   | iff_
-    (phi psi : Formula)
+    (phi psi : Formula_)
     (v t : VarName_)
-    (phi' psi' : Formula) :
+    (phi' psi' : Formula_) :
     IsSub phi v t phi' →
     IsSub psi v t psi' →
     IsSub (phi.iff_ psi) v t (phi'.iff_ psi')
 
   | forall_not_free_in
     (x : VarName_)
-    (phi : Formula)
+    (phi : Formula_)
     (v t : VarName_) :
     ¬ var_is_free_in v (forall_ x phi) →
     IsSub (forall_ x phi) v t (forall_ x phi)
 
   | forall_free_in
     (x : VarName_)
-    (phi : Formula)
+    (phi : Formula_)
     (v t : VarName_)
-    (phi' : Formula) :
+    (phi' : Formula_) :
     var_is_free_in v (forall_ x phi) →
     ¬ x = t →
     IsSub phi v t phi' →
@@ -99,16 +99,16 @@ inductive IsSub : Formula → VarName_ → VarName_ → Formula → Prop
 
   | exists_not_free_in
     (x : VarName_)
-    (phi : Formula)
+    (phi : Formula_)
     (v t : VarName_) :
     ¬ var_is_free_in v (exists_ x phi) →
     IsSub (exists_ x phi) v t (exists_ x phi)
 
   | exists_free_in
     (x : VarName_)
-    (phi : Formula)
+    (phi : Formula_)
     (v t : VarName_)
-    (phi' : Formula) :
+    (phi' : Formula_) :
     var_is_free_in v (exists_ x phi) →
     ¬ x = t →
     IsSub phi v t phi' →
@@ -123,7 +123,7 @@ inductive IsSub : Formula → VarName_ → VarName_ → Formula → Prop
 
 
 theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
-  (F F' : Formula)
+  (F F' : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : Rec.fastAdmitsAux v u binders F)
@@ -195,10 +195,10 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
 
 
 theorem isFreeSub_imp_fastAdmitsAux
-  (F : Formula)
+  (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : ∃ (F' : Formula), IsSub F v u F')
+  (h1 : ∃ (F' : Formula_), IsSub F v u F')
   (h2 : u ∉ binders) :
   Rec.fastAdmitsAux v u binders F :=
   by
@@ -232,7 +232,7 @@ theorem isFreeSub_imp_fastAdmitsAux
 
 
 theorem isFreeSub_imp_fastReplaceFree
-  (F F' : Formula)
+  (F F' : Formula_)
   (v u : VarName_)
   (h1 : IsSub F v u F') :
   Rec.fastReplaceFree v u F = F' :=
@@ -276,7 +276,7 @@ theorem isFreeSub_imp_fastReplaceFree
 
 
 example
-  (F F' : Formula)
+  (F F' : Formula_)
   (v u : VarName_) :
   IsSub F v u F' ↔
     Rec.fastAdmits v u F ∧ Rec.fastReplaceFree v u F = F' :=
@@ -301,7 +301,7 @@ theorem substitution_theorem
   (V : Valuation_ D)
   (E : Env)
   (v t : VarName_)
-  (F F' : Formula)
+  (F F' : Formula_)
   (h1 : IsSub F v t F') :
   holds D I (Function.updateITE V v (V t)) E F ↔
     holds D I V E F' :=
@@ -423,7 +423,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (v t : VarName_)
-  (F F' : Formula)
+  (F F' : Formula_)
   (h1 : IsSub F v t F')
   (h2 : F.is_valid) :
   F'.is_valid :=

@@ -1,6 +1,6 @@
 import Lean
 
-import FOL.NV.Formula
+import FOL.NV.Formula_
 
 
 set_option autoImplicit false
@@ -8,7 +8,7 @@ set_option autoImplicit false
 
 namespace FOL.NV
 
-open Formula
+open Formula_
 
 open Lean Elab Meta
 
@@ -57,59 +57,59 @@ partial def elabFormula : Syntax → MetaM Expr
     let xs' : Array Expr ← xs.getElems.mapM (fun x => elabVarName x)
     let xs'' : Expr ← mkListLit (.const ``VarName_ []) xs'.toList
 
-    mkAppM ``Formula.pred_var_ #[X', xs'']
+    mkAppM ``Formula_.pred_var_ #[X', xs'']
 
   | `(formula| ($x:var_name = $y:var_name)) => do
     let x' : Expr ← elabVarName x
     let y' : Expr ← elabVarName y
-    mkAppM ``Formula.eq_ #[x', y']
+    mkAppM ``Formula_.eq_ #[x', y']
 
-  | `(formula| T) => mkAppM ``Formula.true_ #[]
+  | `(formula| T) => mkAppM ``Formula_.true_ #[]
 
-  | `(formula| F) => mkAppM ``Formula.false_ #[]
+  | `(formula| F) => mkAppM ``Formula_.false_ #[]
 
   | `(formula| ~ $phi) => do
     let phi' : Expr ← elabFormula phi
-    mkAppM ``Formula.not_ #[phi']
+    mkAppM ``Formula_.not_ #[phi']
 
   | `(formula| ($phi:formula -> $psi:formula)) => do
     let phi' : Expr ← elabFormula phi
     let psi' : Expr ← elabFormula psi
-    mkAppM ``Formula.imp_ #[phi', psi']
+    mkAppM ``Formula_.imp_ #[phi', psi']
 
   | `(formula| ($phi:formula /\ $psi:formula)) => do
     let phi' : Expr ← elabFormula phi
     let psi' : Expr ← elabFormula psi
-    mkAppM ``Formula.and_ #[phi', psi']
+    mkAppM ``Formula_.and_ #[phi', psi']
 
   | `(formula| ($phi:formula \/ $psi:formula)) => do
     let phi' : Expr ← elabFormula phi
     let psi' : Expr ← elabFormula psi
-    mkAppM ``Formula.or_ #[phi', psi']
+    mkAppM ``Formula_.or_ #[phi', psi']
 
   | `(formula| ($phi:formula <-> $psi:formula)) => do
     let phi' : Expr ← elabFormula phi
     let psi' : Expr ← elabFormula psi
-    mkAppM ``Formula.iff_ #[phi', psi']
+    mkAppM ``Formula_.iff_ #[phi', psi']
 
   | `(formula| (A. $x:var_name $phi)) => do
     let x' : Expr ← elabVarName x
     let phi' : Expr ← elabFormula phi
-    mkAppM ``Formula.forall_ #[x', phi']
+    mkAppM ``Formula_.forall_ #[x', phi']
 
   | `(formula| (E. $x:var_name $phi)) => do
     let x' : Expr ← elabVarName x
     let phi' : Expr ← elabFormula phi
-    mkAppM ``Formula.exists_ #[x', phi']
+    mkAppM ``Formula_.exists_ #[x', phi']
 
   | _ => throwUnsupportedSyntax
 
 
-elab "(Formula|" p:formula ")" : term => elabFormula p
+elab "(Formula_|" p:formula ")" : term => elabFormula p
 
-#check (Formula| P () )
-#check (Formula| P (x) )
-#check (Formula| P (x, y) )
-#check (Formula| ((x = y) /\ (y = x)) )
-#check (Formula| ( A. x P () ) )
-#check (Formula| ( A. x (A. y (P (x) <-> P (y, z) ) ) ) )
+#check (Formula_| P () )
+#check (Formula_| P (x) )
+#check (Formula_| P (x, y) )
+#check (Formula_| ((x = y) /\ (y = x)) )
+#check (Formula_| ( A. x P () ) )
+#check (Formula_| ( A. x (A. y (P (x) <-> P (y, z) ) ) ) )

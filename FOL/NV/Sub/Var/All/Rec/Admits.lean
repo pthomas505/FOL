@@ -7,14 +7,14 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Var.All.Rec
 
-open Formula
+open Formula_
 
 
 /--
   Helper function for admits.
 -/
 def admitsAux
-  (σ : VarName_ → VarName_) (binders : Finset VarName_) : Formula → Prop
+  (σ : VarName_ → VarName_) (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ xs =>
       ∀ (v : VarName_), v ∈ xs → v ∉ binders → σ v ∉ binders
   | pred_var_ _ xs =>
@@ -46,7 +46,7 @@ def admitsAux
 instance
   (σ : VarName_ → VarName_)
   (binders : Finset VarName_)
-  (F : Formula) :
+  (F : Formula_) :
   Decidable (admitsAux σ binders F) :=
   by
   induction F generalizing binders
@@ -58,13 +58,13 @@ instance
 /--
   admits σ F := True if and only if there is no free occurrence of a variable in the formula F that becomes a bound occurrence in the formula (fastReplaceFree σ F).
 -/
-def admits (σ : VarName_ → VarName_) (F : Formula) : Prop :=
+def admits (σ : VarName_ → VarName_) (F : Formula_) : Prop :=
   admitsAux σ ∅ F
 
 
 instance
   (σ : VarName_ → VarName_)
-  (F : Formula) :
+  (F : Formula_) :
   Decidable (admits σ F) :=
   by
   simp only [admits]
@@ -78,7 +78,7 @@ theorem substitution_theorem_aux
   (E : Env)
   (σ σ' : VarName_ → VarName_)
   (binders : Finset VarName_)
-  (F : Formula)
+  (F : Formula_)
   (h1 : admitsAux σ binders F)
   (h2 : ∀ (v : VarName_), v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
   (h2' : ∀ (v : VarName_), v ∈ binders → v = σ' v)
@@ -212,7 +212,7 @@ theorem substitution_theorem
   (V : Valuation_ D)
   (E : Env)
   (σ : VarName_ → VarName_)
-  (F : Formula)
+  (F : Formula_)
   (h1 : admits σ F) :
   holds D I (V ∘ σ) E F ↔
     holds D I V E (fastReplaceFree σ F) :=
@@ -225,7 +225,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (σ : VarName_ → VarName_)
-  (F : Formula)
+  (F : Formula_)
   (h1 : admits σ F)
   (h2 : F.is_valid) :
   (fastReplaceFree σ F).is_valid :=

@@ -10,189 +10,189 @@ set_option autoImplicit false
 
 namespace FOL.NV
 
-open Formula
+open Formula_
 
 
 /--
   IsDeduct Δ F := True if and only if there is a deduction of F from Δ in classical propositional logic.
 -/
-inductive IsDeduct : Finset Formula → Formula → Prop
+inductive IsDeduct : Finset Formula_ → Formula_ → Prop
   | true_intro_
-    (Δ : Finset Formula) :
+    (Δ : Finset Formula_) :
     IsDeduct Δ true_
 
   | false_elim_
-    (Δ : Finset Formula)
-    (phi : Formula) :
+    (Δ : Finset Formula_)
+    (phi : Formula_) :
     IsDeduct Δ false_ →
     IsDeduct Δ phi
 
   | not_intro_
-    (Δ : Finset Formula)
-    (phi : Formula) :
+    (Δ : Finset Formula_)
+    (phi : Formula_) :
     IsDeduct (Δ ∪ {phi}) false_ →
     IsDeduct Δ (not_ phi)
 
   | not_elim_
-    (Δ : Finset Formula)
-    (phi : Formula) :
+    (Δ : Finset Formula_)
+    (phi : Formula_) :
     IsDeduct Δ (not_ phi) →
     IsDeduct Δ phi →
     IsDeduct Δ false_
 
   | imp_intro_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct (Δ ∪ {phi}) psi →
     IsDeduct Δ (phi.imp_ psi)
 
   | imp_elim_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ (phi.imp_ psi) →
     IsDeduct Δ phi →
     IsDeduct Δ psi
 
   | and_intro_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ phi →
     IsDeduct Δ psi →
     IsDeduct Δ (phi.and_ psi)
 
   | and_elim_left_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ (phi.and_ psi) →
     IsDeduct Δ phi
 
   | and_elim_right_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ (phi.and_ psi) →
     IsDeduct Δ psi
 
   | or_intro_left_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ phi →
     IsDeduct Δ (phi.or_ psi)
 
   | or_intro_right_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ psi →
     IsDeduct Δ (phi.or_ psi)
 
   | or_elim_
-    (Δ : Finset Formula)
-    (phi psi chi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi chi : Formula_) :
     IsDeduct Δ (phi.or_ psi) →
     IsDeduct (Δ ∪ {phi}) chi →
     IsDeduct (Δ ∪ {psi}) chi →
     IsDeduct Δ chi
 
   | iff_intro_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct (Δ ∪ {phi}) psi →
     IsDeduct (Δ ∪ {psi}) phi →
     IsDeduct Δ (phi.iff_ psi)
 
   | iff_elim_left_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ (phi.iff_ psi) →
     IsDeduct Δ phi →
     IsDeduct Δ psi
 
   | iff_elim_right_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ (phi.iff_ psi) →
     IsDeduct Δ psi →
     IsDeduct Δ phi
 
     -- classical
   | contra_
-    (Δ : Finset Formula)
-    (phi : Formula) :
+    (Δ : Finset Formula_)
+    (phi : Formula_) :
     IsDeduct (Δ ∪ {not_ phi}) false_ →
     IsDeduct Δ phi
 
   | refl_
-    (Δ : Finset Formula)
+    (Δ : Finset Formula_)
     (x : VarName_) :
-    IsDeduct Δ (Formula.eq_ x x)
+    IsDeduct Δ (Formula_.eq_ x x)
 
   | subst_
-    (Δ : Finset Formula)
-    (phi : Formula)
+    (Δ : Finset Formula_)
+    (phi : Formula_)
     (x y : VarName_) :
-    IsDeduct Δ (Formula.eq_ x y) →
+    IsDeduct Δ (Formula_.eq_ x y) →
     IsDeduct Δ phi →
     Sub.Var.One.Rec.fastAdmits x y phi →
     IsDeduct Δ (Sub.Var.One.Rec.fastReplaceFree x y phi)
 
   | forall_intro_
-    (Δ : Finset Formula)
-    (phi : Formula)
+    (Δ : Finset Formula_)
+    (phi : Formula_)
     (x : VarName_) :
     IsDeduct Δ phi →
-    (∀ H : Formula, H ∈ Δ → ¬ var_is_free_in x H) →
+    (∀ H : Formula_, H ∈ Δ → ¬ var_is_free_in x H) →
     IsDeduct Δ (forall_ x phi)
 
   | forall_elim_
-    (Δ : Finset Formula)
-    (phi : Formula)
+    (Δ : Finset Formula_)
+    (phi : Formula_)
     (x y : VarName_) :
     IsDeduct Δ (forall_ x phi) →
     Sub.Var.One.Rec.fastAdmits x y phi →
     IsDeduct Δ (Sub.Var.One.Rec.fastReplaceFree x y phi)
 
   | exists_intro_
-    (Δ : Finset Formula)
-    (phi : Formula)
+    (Δ : Finset Formula_)
+    (phi : Formula_)
     (x y : VarName_) :
     Sub.Var.One.Rec.fastAdmits x y phi →
     IsDeduct Δ (Sub.Var.One.Rec.fastReplaceFree x y phi) →
     IsDeduct Δ (exists_ x phi)
 
   | exists_elim_
-    (Δ : Finset Formula)
-    (phi psi : Formula)
+    (Δ : Finset Formula_)
+    (phi psi : Formula_)
     (x : VarName_) :
     IsDeduct Δ (exists_ x phi) →
     IsDeduct (Δ ∪ {phi}) psi →
-    (∀ H : Formula, H ∈ Δ →
+    (∀ H : Formula_, H ∈ Δ →
     ¬ var_is_free_in x H) →
     ¬ var_is_free_in x psi →
     IsDeduct Δ psi
 
   | pred_sub_
-    (Δ : Finset Formula)
-    (phi : Formula)
-    (τ : PredName_ → ℕ → List VarName_ × Formula) :
+    (Δ : Finset Formula_)
+    (phi : Formula_)
+    (τ : PredName_ → ℕ → List VarName_ × Formula_) :
     IsDeduct Δ phi →
     Sub.Pred.All.Rec.admits τ phi →
-    (∀ H : Formula, H ∈ Δ → Sub.Pred.All.Rec.admits τ H) →
+    (∀ H : Formula_, H ∈ Δ → Sub.Pred.All.Rec.admits τ H) →
     IsDeduct (Δ.image (Sub.Pred.All.Rec.replace τ)) (Sub.Pred.All.Rec.replace τ phi)
 
   | weaken_
-    (Δ Δ' : Finset Formula)
-    (phi : Formula) :
+    (Δ Δ' : Finset Formula_)
+    (phi : Formula_) :
     IsDeduct Δ phi →
     IsDeduct (Δ ∪ Δ') phi
 
   | hyp_
-    (Δ : Finset Formula)
-    (phi : Formula) :
+    (Δ : Finset Formula_)
+    (phi : Formula_) :
     phi ∈ Δ →
     IsDeduct Δ phi
 
   | alpha_
-    (Δ : Finset Formula)
-    (phi psi : Formula) :
+    (Δ : Finset Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ phi →
     isAlphaEqv phi psi →
     IsDeduct Δ psi

@@ -6,7 +6,7 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Prop.All.Rec
 
-open Formula
+open Formula_
 
 
 -- proposition substitution
@@ -14,7 +14,7 @@ open Formula
 /--
   The recursive simultaneous uniform substitution of all of the propositional variables in a formula.
 -/
-def sub (τ : PredName_ → PredName_) : Formula → Formula
+def sub (τ : PredName_ → PredName_) : Formula_ → Formula_
   | pred_const_ P ts => pred_const_ P ts
   | pred_var_ P ts =>
       if ts = List.nil
@@ -45,7 +45,7 @@ instance {α : Type} {xs : List α} : Decidable (xs = []) :=
 
 
 lemma sub_no_predVar
-  (F : Formula)
+  (F : Formula_)
   (τ : PredName_ → PredName_)
   (h1 : F.pred_var_set = ∅) :
   sub τ F = F :=
@@ -97,7 +97,7 @@ theorem substitution_theorem
   (V : Valuation_ D)
   (E : Env)
   (τ : PredName_ → PredName_)
-  (F : Formula) :
+  (F : Formula_) :
   holds D I V E (sub τ F) ↔
     holds D
       ⟨
@@ -183,7 +183,7 @@ theorem substitution_theorem
 
 
 theorem substitution_is_valid
-  (F : Formula)
+  (F : Formula_)
   (τ : PredName_ → PredName_)
   (h1 : F.is_valid) :
   (sub τ F).is_valid :=

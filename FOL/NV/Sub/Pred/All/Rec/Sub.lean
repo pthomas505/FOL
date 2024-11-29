@@ -6,7 +6,7 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Pred.All.Rec
 
-open Formula
+open Formula_
 
 
 -- multiple
@@ -15,8 +15,8 @@ open Formula
   The recursive simultaneous uniform substitution of all of the predicate variables in a formula.
 -/
 def replace
-  (τ : PredName_ → ℕ → (List VarName_ × Formula)) :
-  Formula → Formula
+  (τ : PredName_ → ℕ → (List VarName_ × Formula_)) :
+  Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
       let zs := (τ X xs.length).fst
@@ -50,9 +50,9 @@ def replace
 
 
 def admitsAux
-  (τ : PredName_ → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (binders : Finset VarName_) :
-  Formula → Prop
+  Formula_ → Prop
   | pred_const_ _ _ => True
   | pred_var_ X xs =>
     let zs := (τ X xs.length).fst
@@ -79,9 +79,9 @@ def admitsAux
   | def_ _ _ => True
 
 instance
-  (τ : PredName_ → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (binders : Finset VarName_)
-  (F : Formula) :
+  (F : Formula_) :
   Decidable (admitsAux τ binders F) :=
   by
   induction F generalizing binders
@@ -91,15 +91,15 @@ instance
 
 
 def admits
-  (τ : PredName_ → ℕ → List VarName_ × Formula)
-  (F : Formula) :
+  (τ : PredName_ → ℕ → List VarName_ × Formula_)
+  (F : Formula_) :
   Prop :=
   admitsAux τ ∅ F
 
 
 instance
-  (τ : PredName_ → ℕ → List VarName_ × Formula)
-  (F : Formula) :
+  (τ : PredName_ → ℕ → List VarName_ × Formula_)
+  (F : Formula_) :
   Decidable (admits τ F) :=
   by
   simp only [admits]
@@ -111,9 +111,9 @@ theorem substitution_theorem_aux
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
-  (τ : PredName_ → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (binders : Finset VarName_)
-  (F : Formula)
+  (F : Formula_)
   (h1 : admitsAux τ binders F)
   (h2 : ∀ x : VarName_, x ∉ binders → V x = V' x) :
   holds D
@@ -243,8 +243,8 @@ theorem substitution_theorem
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (τ : PredName_ → ℕ → List VarName_ × Formula)
-  (F : Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula_)
+  (F : Formula_)
   (h1 : admits τ F) :
   holds D
     ⟨
@@ -267,8 +267,8 @@ theorem substitution_theorem
 
 
 theorem substitution_is_valid
-  (F : Formula)
-  (τ : PredName_ → ℕ → List VarName_ × Formula)
+  (F : Formula_)
+  (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (h1 : admits τ F)
   (h2 : F.is_valid) :
   (replace τ F).is_valid :=

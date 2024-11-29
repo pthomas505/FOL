@@ -7,7 +7,7 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Var.All.Ind
 
-open Formula
+open Formula_
 
 
 /--
@@ -16,7 +16,7 @@ open Formula
 inductive IsSubAux :
   (VarName_ → VarName_) →
   Finset VarName_ →
-  Formula → Formula → Prop
+  Formula_ → Formula_ → Prop
 
   | pred_const_
     (σ : VarName_ → VarName_)
@@ -54,16 +54,16 @@ inductive IsSubAux :
   | not_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
-    (phi : Formula)
-    (phi' : Formula) :
+    (phi : Formula_)
+    (phi' : Formula_) :
     IsSubAux σ binders phi phi' →
     IsSubAux σ binders phi.not_ phi'.not_
 
   | imp_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsSubAux σ binders phi phi' →
     IsSubAux σ binders psi psi' →
     IsSubAux σ binders (phi.imp_ psi) (phi'.imp_ psi')
@@ -71,8 +71,8 @@ inductive IsSubAux :
   | and_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsSubAux σ binders phi phi' →
     IsSubAux σ binders psi psi' →
     IsSubAux σ binders (phi.and_ psi) (phi'.and_ psi')
@@ -80,8 +80,8 @@ inductive IsSubAux :
   | or_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsSubAux σ binders phi phi' →
     IsSubAux σ binders psi psi' →
     IsSubAux σ binders (phi.or_ psi) (phi'.or_ psi')
@@ -89,8 +89,8 @@ inductive IsSubAux :
   | iff_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsSubAux σ binders phi phi' →
     IsSubAux σ binders psi psi' →
     IsSubAux σ binders (phi.iff_ psi) (phi'.iff_ psi')
@@ -99,7 +99,7 @@ inductive IsSubAux :
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (x : VarName_)
-    (phi phi' : Formula) :
+    (phi phi' : Formula_) :
     IsSubAux (Function.updateITE σ x x) (binders ∪ {x}) phi phi' →
     IsSubAux σ binders (forall_ x phi) (forall_ x phi')
 
@@ -107,7 +107,7 @@ inductive IsSubAux :
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (x : VarName_)
-    (phi phi' : Formula) :
+    (phi phi' : Formula_) :
     IsSubAux (Function.updateITE σ x x) (binders ∪ {x}) phi phi' →
     IsSubAux σ binders (exists_ x phi) (exists_ x phi')
 
@@ -123,7 +123,7 @@ inductive IsSubAux :
 /--
   IsSub σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurrence of any variable v in the formula F by a free occurrence of σ v.
 -/
-def IsSub (σ : VarName_ → VarName_) (F F' : Formula) : Prop := IsSubAux σ ∅ F F'
+def IsSub (σ : VarName_ → VarName_) (F F' : Formula_) : Prop := IsSubAux σ ∅ F F'
 
 
 theorem substitution_theorem_aux
@@ -133,7 +133,7 @@ theorem substitution_theorem_aux
   (E : Env)
   (σ : VarName_ → VarName_)
   (binders : Finset VarName_)
-  (F F' : Formula)
+  (F F' : Formula_)
   (h1 : IsSubAux σ binders F F')
   (h2 : ∀ v : VarName_, v ∈ binders → V v = V' (σ v))
   (h3 : ∀ v : VarName_, σ v ∉ binders → V v = V' (σ v))
@@ -279,7 +279,7 @@ theorem substitution_theorem
   (V : Valuation_ D)
   (E : Env)
   (σ : VarName_ → VarName_)
-  (F F' : Formula)
+  (F F' : Formula_)
   (h1 : IsSub σ F F') :
   holds D I (V ∘ σ) E F ↔ holds D I V E F' :=
   by
@@ -291,7 +291,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (σ : VarName_ → VarName_)
-  (F F' : Formula)
+  (F F' : Formula_)
   (h1 : IsSub σ F F')
   (h2 : F.is_valid) :
   F'.is_valid :=

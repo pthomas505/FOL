@@ -6,7 +6,7 @@ import FOL.NV.Definition
 set_option autoImplicit false
 
 
-open Formula
+open Formula_
 
 
 /--
@@ -55,7 +55,7 @@ instance (D : Type) [Inhabited D] : Inhabited (Valuation_ D) :=
 def holds
   (D : Type)
   (I : Interpretation_ D)
-  (V : Valuation_ D) : Env → Formula → Prop
+  (V : Valuation_ D) : Env → Formula_ → Prop
   | _, pred_const_ X xs => I.pred_const_ X (xs.map V)
   | _, pred_var_ X xs => I.pred_var_ X (xs.map V)
   | _, eq_ x y => V x = V y
@@ -77,7 +77,7 @@ def holds
   | E, forall_ x phi =>
     have : sizeOf phi < sizeOf (forall_ x phi) := by simp
     ∀ (d : D), holds D I (Function.updateITE V x d) E phi
-  | E, exists_ (x : VarName_) (phi : Formula) =>
+  | E, exists_ (x : VarName_) (phi : Formula_) =>
     have : sizeOf phi < sizeOf (exists_ x phi) := by simp
     ∃ (d : D), holds D I (Function.updateITE V x d) E phi
   | ([] : Env), def_ _ _ => False
@@ -91,9 +91,9 @@ def holds
 /--
   The definition of valid formulas.
 
-  Formula.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation, variable assignment and environment.
+  Formula_.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation, variable assignment and environment.
 -/
-def Formula.is_valid (F : Formula) : Prop :=
+def Formula_.is_valid (F : Formula_) : Prop :=
   ∀ (D : Type) (I : Interpretation_ D) (V : Valuation_ D) (E : Env), holds D I V E F
 
 
@@ -102,7 +102,7 @@ theorem holds_coincide_var
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
-  (F : Formula)
+  (F : Formula_)
   (h1 : ∀ (v : VarName_), var_is_free_in v F → V v = V' v) :
   holds D I V E F ↔ holds D I V' E F :=
   by
@@ -176,7 +176,7 @@ theorem Holds_coincide_PredVar
   (I I' : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (F : Formula)
+  (F : Formula_)
   (h1 : I.pred_const_ = I'.pred_const_)
   (h2 : ∀ (P : PredName_) (ds : List D),
     pred_var_occurs_in P ds.length F →
@@ -240,7 +240,7 @@ lemma Holds_coincide_Env
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E E' : Env)
-  (F : Formula)
+  (F : Formula_)
   (h1 : ∃ (E1 : Env), E' = E1 ++ E)
   (h2 : F.all_def_in_env E)
   (h3 : E'.nodup_) :

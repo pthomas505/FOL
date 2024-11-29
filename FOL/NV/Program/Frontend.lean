@@ -7,7 +7,7 @@ set_option autoImplicit false
 
 namespace FOL.NV.Program.Frontend
 
-open Formula
+open Formula_
 
 
 abbrev GlobalContext : Type := Batteries.HashMap String Backend.Proof
@@ -57,7 +57,7 @@ def shift_hypothesis_left
   else Except.error "The hypothesis index is out of range."
 
 
-def assume (phi : Formula) :
+def assume (phi : Formula_) :
   Except String Backend.Step :=
     Except.ok {
       assertion := {
@@ -69,8 +69,8 @@ def assume (phi : Formula) :
 
 
 def prop_1
-  (phi : Formula)
-  (psi : Formula) :
+  (phi : Formula_)
+  (psi : Formula_) :
   Except String Backend.Step :=
     Except.ok {
       assertion := {
@@ -82,9 +82,9 @@ def prop_1
 
 
 def prop_2
-  (phi : Formula)
-  (psi : Formula)
-  (chi : Formula) :
+  (phi : Formula_)
+  (psi : Formula_)
+  (chi : Formula_) :
   Except String Backend.Step :=
     Except.ok {
       assertion := {
@@ -123,14 +123,14 @@ def mp
 def sub
   (localContext : LocalContext)
   (step_index : ℕ)
-  (xs : List (PredName_ × (List VarName_ × Formula))) :
+  (xs : List (PredName_ × (List VarName_ × Formula_))) :
   Except String Backend.Step := do
   let step ← localContext.get step_index
 
   let hypotheses := step.assertion.hypotheses
   let conclusion := step.assertion.conclusion
 
-  let τ : PredName_ → ℕ → Option (List VarName_ × Formula) := Backend.PredReplaceListToFun xs
+  let τ : PredName_ → ℕ → Option (List VarName_ × Formula_) := Backend.PredReplaceListToFun xs
 
   Except.ok {
     assertion := {
@@ -158,11 +158,11 @@ def thm
 
 inductive Command : Type
   | shift_hypothesis_left_ : ℕ → ℕ → Command
-  | assume_ : Formula → Command
-  | prop_1_ : Formula → Formula → Command
-  | prop_2_ : Formula → Formula → Formula → Command
+  | assume_ : Formula_ → Command
+  | prop_1_ : Formula_ → Formula_ → Command
+  | prop_2_ : Formula_ → Formula_ → Formula_ → Command
   | mp_ : ℕ → ℕ → Command
-  | sub_ : ℕ → List (PredName_ × (List VarName_ × Formula)) → Command
+  | sub_ : ℕ → List (PredName_ × (List VarName_ × Formula_)) → Command
   | thm_ : String → Command
 
 

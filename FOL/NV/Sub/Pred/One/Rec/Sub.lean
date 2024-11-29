@@ -6,7 +6,7 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Pred.One.Rec
 
-open Formula
+open Formula_
 
 
 -- predicate substitution
@@ -18,8 +18,8 @@ open Formula
 def replace
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula) :
-  Formula → Formula
+  (H : Formula_) :
+  Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
       if X = P ∧ xs.length = zs.length
@@ -56,8 +56,8 @@ def replace
 def admitsAux
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula)
-  (binders : Finset VarName_) : Formula → Prop
+  (H : Formula_)
+  (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ _ => True
   | pred_var_ X ts =>
       if X = P ∧ ts.length = zs.length
@@ -98,8 +98,8 @@ def admitsAux
 def admits
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula)
-  (F : Formula) :
+  (H : Formula_)
+  (F : Formula_) :
   Prop :=
   admitsAux P zs H ∅ F
 
@@ -107,8 +107,8 @@ def admits
 lemma replace_no_predVar
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula)
-  (F : Formula)
+  (H : Formula_)
+  (F : Formula_)
   (h1 : F.pred_var_set = ∅) :
   replace P zs H F = F :=
   by
@@ -175,7 +175,7 @@ def I'
   (E : Env)
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula) :
+  (H : Formula_) :
   Interpretation_ D :=
   (Interpretation_.usingPred D I (
     fun (Q : PredName_) (ds : List D) =>
@@ -190,10 +190,10 @@ theorem substitution_theorem_aux
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
-  (F : Formula)
+  (F : Formula_)
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula)
+  (H : Formula_)
   (binders : Finset VarName_)
   (h1 : admitsAux P zs H binders F)
   (h2 : ∀ x : VarName_, x ∉ binders → V x = V' x) :
@@ -333,10 +333,10 @@ theorem substitution_theorem
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (F : Formula)
+  (F : Formula_)
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula)
+  (H : Formula_)
   (h1 : admits P zs H F) :
   holds D (I' D I V E P zs H) V E F ↔
     holds D I V E (replace P zs H F) :=
@@ -347,10 +347,10 @@ theorem substitution_theorem
 
 
 theorem substitution_is_valid
-  (F : Formula)
+  (F : Formula_)
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula)
+  (H : Formula_)
   (h1 : admits P zs H F)
   (h2 : F.is_valid) :
   (replace P zs H F).is_valid :=

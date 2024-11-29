@@ -1,4 +1,4 @@
-import FOL.NV.Formula
+import FOL.NV.Formula_
 
 import Mathlib.Tactic
 
@@ -6,7 +6,7 @@ import Mathlib.Tactic
 set_option autoImplicit false
 
 
-open Formula
+open Formula_
 
 
 /-
@@ -17,9 +17,9 @@ An occurrence of a variable `v` in a formula `P` is bound if and only if it occu
 -/
 
 /--
-  `Formula.var_set F` := The set of all of the variables that have an occurrence in the formula `F`.
+  `Formula_.var_set F` := The set of all of the variables that have an occurrence in the formula `F`.
 -/
-def Formula.var_set : Formula → Finset VarName_
+def Formula_.var_set : Formula_ → Finset VarName_
   | pred_const_ _ xs => xs.toFinset
   | pred_var_ _ xs => xs.toFinset
   | eq_ x y => {x, y}
@@ -38,7 +38,7 @@ def Formula.var_set : Formula → Finset VarName_
 /--
   `var_occurs_in v F` := True if and only if there is an occurrence of the variable `v` in the formula `F`.
 -/
-def var_occurs_in (v : VarName_) : Formula → Prop
+def var_occurs_in (v : VarName_) : Formula_ → Prop
   | pred_const_ _ xs => v ∈ xs
   | pred_var_ _ xs => v ∈ xs
   | eq_ x y => v = x ∨ v = y
@@ -53,7 +53,7 @@ def var_occurs_in (v : VarName_) : Formula → Prop
   | exists_ x phi => v = x ∨ var_occurs_in v phi
   | def_ _ xs => v ∈ xs
 
-instance (v : VarName_) (F : Formula) : Decidable (var_occurs_in v F) :=
+instance (v : VarName_) (F : Formula_) : Decidable (var_occurs_in v F) :=
   by
   induction F
   all_goals
@@ -62,9 +62,9 @@ instance (v : VarName_) (F : Formula) : Decidable (var_occurs_in v F) :=
 
 
 /--
-  `Formula.bound_var_set F` := The set of all of the variables that have a bound occurrence in the formula `F`.
+  `Formula_.bound_var_set F` := The set of all of the variables that have a bound occurrence in the formula `F`.
 -/
-def Formula.bound_var_set : Formula → Finset VarName_
+def Formula_.bound_var_set : Formula_ → Finset VarName_
   | pred_const_ _ _ => ∅
   | pred_var_ _ _ => ∅
   | eq_ _ _ => ∅
@@ -83,7 +83,7 @@ def Formula.bound_var_set : Formula → Finset VarName_
 /--
   `var_is_bound_in v F` := True if and only if there is a bound occurrence of the variable `v` in the formula `F`.
 -/
-def var_is_bound_in (v : VarName_) : Formula → Prop
+def var_is_bound_in (v : VarName_) : Formula_ → Prop
   | pred_const_ _ _ => False
   | pred_var_ _ _ => False
   | eq_ _ _ => False
@@ -98,7 +98,7 @@ def var_is_bound_in (v : VarName_) : Formula → Prop
   | exists_ x phi => v = x ∨ var_is_bound_in v phi
   | def_ _ _ => False
 
-instance (v : VarName_) (F : Formula) : Decidable (var_is_bound_in v F) :=
+instance (v : VarName_) (F : Formula_) : Decidable (var_is_bound_in v F) :=
   by
   induction F
   all_goals
@@ -107,9 +107,9 @@ instance (v : VarName_) (F : Formula) : Decidable (var_is_bound_in v F) :=
 
 
 /--
-  `Formula.free_var_set F` := The set of all of the variables that have a free occurrence in the formula `F`.
+  `Formula_.free_var_set F` := The set of all of the variables that have a free occurrence in the formula `F`.
 -/
-def Formula.free_var_set : Formula → Finset VarName_
+def Formula_.free_var_set : Formula_ → Finset VarName_
   | pred_const_ _ xs => xs.toFinset
   | pred_var_ _ xs => xs.toFinset
   | eq_ x y => {x, y}
@@ -128,7 +128,7 @@ def Formula.free_var_set : Formula → Finset VarName_
 /--
   `var_is_free_in v F` := True if and only if there is a free occurrence of the variable `v` in the formula `F`.
 -/
-def var_is_free_in (v : VarName_) : Formula → Prop
+def var_is_free_in (v : VarName_) : Formula_ → Prop
   | pred_const_ _ xs => v ∈ xs
   | pred_var_ _ xs => v ∈ xs
   | eq_ x y => v = x ∨ v = y
@@ -143,7 +143,7 @@ def var_is_free_in (v : VarName_) : Formula → Prop
   | exists_ x phi => ¬ v = x ∧ var_is_free_in v phi
   | def_ _ xs => v ∈ xs
 
-instance (v : VarName_) (F : Formula) : Decidable (var_is_free_in v F) :=
+instance (v : VarName_) (F : Formula_) : Decidable (var_is_free_in v F) :=
   by
   induction F
   all_goals
@@ -156,7 +156,7 @@ instance (v : VarName_) (F : Formula) : Decidable (var_is_free_in v F) :=
 -/
 inductive var_is_free_in_ind
   (v : VarName_) :
-  Formula → Prop
+  Formula_ → Prop
 
   | pred_const_
     (X : PredName_)
@@ -176,60 +176,60 @@ inductive var_is_free_in_ind
     var_is_free_in_ind v (eq_ x y)
 
   | not_
-    (phi : Formula) :
+    (phi : Formula_) :
     var_is_free_in_ind v phi →
     var_is_free_in_ind v (not_ phi)
 
   | imp_left_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     var_is_free_in_ind v phi →
     var_is_free_in_ind v (imp_ phi psi)
 
   | imp_right_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     var_is_free_in_ind v psi →
     var_is_free_in_ind v (imp_ phi psi)
 
   | and_left_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     var_is_free_in_ind v phi →
     var_is_free_in_ind v (and_ phi psi)
 
   | and_right_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     var_is_free_in_ind v psi →
     var_is_free_in_ind v (and_ phi psi)
 
   | or_left_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     var_is_free_in_ind v phi →
     var_is_free_in_ind v (or_ phi psi)
 
   | or_right_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     var_is_free_in_ind v psi →
     var_is_free_in_ind v (or_ phi psi)
 
   | iff_left_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     var_is_free_in_ind v phi →
     var_is_free_in_ind v (iff_ phi psi)
 
   | iff_right_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     var_is_free_in_ind v psi →
     var_is_free_in_ind v (iff_ phi psi)
 
   | forall_
     (x : VarName_)
-    (phi : Formula) :
+    (phi : Formula_) :
     ¬ v = x →
     var_is_free_in_ind v phi →
     var_is_free_in_ind v (forall_ x phi)
 
   | exists_
     (x : VarName_)
-    (phi : Formula) :
+    (phi : Formula_) :
     ¬ v = x →
     var_is_free_in_ind v phi →
     var_is_free_in_ind v (exists_ x phi)
@@ -242,9 +242,9 @@ inductive var_is_free_in_ind
 
 
 /--
-  `Formula.pred_var_set F` := The set of all of the predicate variables that have an occurrence in the formula `F`.
+  `Formula_.pred_var_set F` := The set of all of the predicate variables that have an occurrence in the formula `F`.
 -/
-def Formula.pred_var_set : Formula → Finset (PredName_ × ℕ)
+def Formula_.pred_var_set : Formula_ → Finset (PredName_ × ℕ)
   | pred_const_ _ _ => ∅
   | pred_var_ X xs => {(X, xs.length)}
   | eq_ _ _ => ∅
@@ -263,7 +263,7 @@ def Formula.pred_var_set : Formula → Finset (PredName_ × ℕ)
 /--
   `pred_var_occurs_in P n F` := True if and only if there is an occurrence of the predicate variable named `P` of arity `n` in the formula `F`.
 -/
-def pred_var_occurs_in (P : PredName_) (n : ℕ) : Formula → Prop
+def pred_var_occurs_in (P : PredName_) (n : ℕ) : Formula_ → Prop
   | pred_const_ _ _ => False
   | pred_var_ X xs => P = X ∧ n = xs.length
   | eq_ _ _ => False
@@ -278,7 +278,7 @@ def pred_var_occurs_in (P : PredName_) (n : ℕ) : Formula → Prop
   | exists_ _ phi => pred_var_occurs_in P n phi
   | def_ _ _ => False
 
-instance (P : PredName_) (n : ℕ) (F : Formula) : Decidable (pred_var_occurs_in P n F) :=
+instance (P : PredName_) (n : ℕ) (F : Formula_) : Decidable (pred_var_occurs_in P n F) :=
   by
   induction F
   all_goals
@@ -289,7 +289,7 @@ instance (P : PredName_) (n : ℕ) (F : Formula) : Decidable (pred_var_occurs_in
 
 theorem var_occurs_in_iff_mem_var_set
   (v : VarName_)
-  (F : Formula) :
+  (F : Formula_) :
   var_occurs_in v F ↔ v ∈ F.var_set :=
   by
   induction F
@@ -318,7 +318,7 @@ theorem var_occurs_in_iff_mem_var_set
 
 theorem var_is_bound_in_iff_mem_bound_var_set
   (v : VarName_)
-  (F : Formula) :
+  (F : Formula_) :
   var_is_bound_in v F ↔ v ∈ F.bound_var_set :=
   by
   induction F
@@ -347,7 +347,7 @@ theorem var_is_bound_in_iff_mem_bound_var_set
 
 theorem var_is_free_in_iff_mem_free_var_set
   (v : VarName_)
-  (F : Formula) :
+  (F : Formula_) :
   var_is_free_in v F ↔ v ∈ F.free_var_set :=
   by
   induction F
@@ -376,7 +376,7 @@ theorem var_is_free_in_iff_mem_free_var_set
 
 theorem var_is_free_in_imp_var_is_free_in_ind
   (v : VarName_)
-  (F : Formula)
+  (F : Formula_)
   (h1 : var_is_free_in v F) :
   var_is_free_in_ind v F :=
   by
@@ -425,7 +425,7 @@ theorem var_is_free_in_imp_var_is_free_in_ind
 
 theorem var_is_free_in_ind_imp_var_is_free_in
   (v : VarName_)
-  (F : Formula)
+  (F : Formula_)
   (h1 : var_is_free_in_ind v F) :
   var_is_free_in v F :=
   by
@@ -437,7 +437,7 @@ theorem var_is_free_in_ind_imp_var_is_free_in
 
 theorem var_is_free_in_iff_var_is_free_in_ind
   (v : VarName_)
-  (F : Formula) :
+  (F : Formula_) :
   var_is_free_in v F ↔ var_is_free_in_ind v F :=
   by
   constructor
@@ -448,7 +448,7 @@ theorem var_is_free_in_iff_var_is_free_in_ind
 theorem pred_var_occurs_in_iff_mem_pred_var_set
   (P : PredName_)
   (n : ℕ)
-  (F : Formula) :
+  (F : Formula_) :
   pred_var_occurs_in P n F ↔ (P, n) ∈ F.pred_var_set :=
   by
   induction F
@@ -476,7 +476,7 @@ theorem pred_var_occurs_in_iff_mem_pred_var_set
 
 theorem var_is_bound_in_imp_var_occurs_in
   (v : VarName_)
-  (F : Formula)
+  (F : Formula_)
   (h1 : var_is_bound_in v F) :
   var_occurs_in v F :=
   by
@@ -490,7 +490,7 @@ theorem var_is_bound_in_imp_var_occurs_in
 
 theorem var_is_free_in_imp_var_occurs_in
   (v : VarName_)
-  (F : Formula)
+  (F : Formula_)
   (h1 : var_is_free_in v F) :
   var_occurs_in v F :=
   by

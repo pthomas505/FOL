@@ -4,7 +4,7 @@ import FOL.NV.Binders
 set_option autoImplicit false
 
 
-open Formula
+open Formula_
 
 
 /--
@@ -24,7 +24,7 @@ structure Definition : Type where
   /--
     The formula.
   -/
-  (q : Formula)
+  (q : Formula_)
 
   (nodup : args.Nodup)
   (h1 : q.free_var_set ⊆ args.toFinset)
@@ -45,9 +45,9 @@ instance : HAppend Env Env Env :=
 
 
 /--
-  `Formula.all_def_in_env E F` := True if and only if every definition that occurs in the formula `F` is in the environment `E`.
+  `Formula_.all_def_in_env E F` := True if and only if every definition that occurs in the formula `F` is in the environment `E`.
 -/
-def Formula.all_def_in_env (E : Env) : Formula → Prop
+def Formula_.all_def_in_env (E : Env) : Formula_ → Prop
 | pred_const_ _ _ => True
 | pred_var_ _ _ => True
 | eq_ _ _ => True
@@ -71,7 +71,7 @@ def Formula.all_def_in_env (E : Env) : Formula → Prop
 | def_ X xs =>
   ∃ (d : Definition), d ∈ E ∧ X = d.name ∧ xs.length = d.args.length
 
-instance (E : Env) (F : Formula) : Decidable (F.all_def_in_env E) :=
+instance (E : Env) (F : Formula_) : Decidable (F.all_def_in_env E) :=
   by
   induction F
   all_goals
@@ -103,7 +103,7 @@ def Env.well_formed : Env → Prop
   | d :: E =>
     (∀ (d' : Definition), d' ∈ E →
       d.name = d'.name → d.args.length = d'.args.length → False) ∧
-        Formula.all_def_in_env E d.q ∧ Env.well_formed E
+        Formula_.all_def_in_env E d.q ∧ Env.well_formed E
 
 instance (E : Env) : Decidable (E.well_formed) :=
   by

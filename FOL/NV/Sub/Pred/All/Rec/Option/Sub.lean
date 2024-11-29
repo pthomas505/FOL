@@ -6,13 +6,13 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Pred.All.Rec.Option
 
-open Formula
+open Formula_
 
 
 def replace
   (c : Char)
-  (τ : PredName_ → ℕ → Option (List VarName_ × Formula)) :
-  Formula → Formula
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula_)) :
+  Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
       let opt := τ X xs.length
@@ -51,8 +51,8 @@ def replace
 
 
 def admitsAux
-  (τ : PredName_ → ℕ → Option (List VarName_ × Formula))
-  (binders : Finset VarName_) : Formula → Prop
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
+  (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ _ => True
   | pred_var_ X xs =>
       let opt := τ X xs.length
@@ -93,9 +93,9 @@ theorem substitution_theorem_aux
   (V V' : Valuation_ D)
   (E : Env)
   (c : Char)
-  (τ : PredName_ → ℕ → Option (List VarName_ × Formula))
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (binders : Finset VarName_)
-  (F : Formula)
+  (F : Formula_)
   (h1 : admitsAux τ binders F)
   (h2 : ∀ x : VarName_, x ∉ binders → V' x = V x) :
   holds D

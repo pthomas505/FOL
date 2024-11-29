@@ -10,28 +10,28 @@ set_option autoImplicit false
 
 namespace FOL.NV.Program.Backend
 
-open Formula
+open Formula_
 
 
 def freshChar : Char := '+'
 
 
-inductive IsDeduct : List Formula → Formula → Prop
+inductive IsDeduct : List Formula_ → Formula_ → Prop
   | struct_1_
-    (Δ : List Formula)
-    (H phi : Formula) :
+    (Δ : List Formula_)
+    (H phi : Formula_) :
     IsDeduct Δ phi →
     IsDeduct (H :: Δ) phi
 
   | struct_2_
-    (Δ : List Formula)
-    (H phi : Formula) :
+    (Δ : List Formula_)
+    (H phi : Formula_) :
     IsDeduct (H :: H :: Δ) phi →
     IsDeduct (H :: Δ) phi
 
   | struct_3_
-    (Δ_1 Δ_2 : List Formula)
-    (H_1 H_2 phi : Formula) :
+    (Δ_1 Δ_2 : List Formula_)
+    (H_1 H_2 phi : Formula_) :
     IsDeduct (Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2) phi →
     IsDeduct (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2) phi
 
@@ -39,7 +39,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     phi ⊢ phi
   -/
   | assume_
-    (phi : Formula) :
+    (phi : Formula_) :
     IsDeduct [phi] phi
 
   /-
@@ -52,14 +52,14 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ phi → (psi → phi)
   -/
   | prop_1_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     IsDeduct [] (phi.imp_ (psi.imp_ phi))
 
   /-
     ⊢ (phi → (psi → chi)) → ((phi → psi) → (phi → chi))
   -/
   | prop_2_
-    (phi psi chi : Formula) :
+    (phi psi chi : Formula_) :
     IsDeduct []
       ((phi.imp_ (psi.imp_ chi)).imp_
         ((phi.imp_ psi).imp_ (phi.imp_ chi)))
@@ -68,7 +68,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ (¬ phi → ¬ psi) → (psi → phi)
   -/
   | prop_3_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     IsDeduct []
       (((not_ phi).imp_ (not_ psi)).imp_
         (psi.imp_ phi))
@@ -79,8 +79,8 @@ inductive IsDeduct : List Formula → Formula → Prop
     Δ ⊢ psi
   -/
   | mp_
-    (Δ : List Formula)
-    (phi psi : Formula) :
+    (Δ : List Formula_)
+    (phi psi : Formula_) :
     IsDeduct Δ (phi.imp_ psi) →
     IsDeduct Δ phi →
     IsDeduct Δ psi
@@ -90,9 +90,9 @@ inductive IsDeduct : List Formula → Formula → Prop
     Δ ⊢ H → phi
   -/
   | dt_
-    (Δ : List Formula)
-    (H : Formula)
-    (phi : Formula) :
+    (Δ : List Formula_)
+    (H : Formula_)
+    (phi : Formula_) :
     IsDeduct (H :: Δ) phi →
     IsDeduct Δ (H.imp_ phi)
 
@@ -101,7 +101,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   -/
   | pred_1_
     (v : VarName_)
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     IsDeduct [] ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi)))
 
   /-
@@ -109,7 +109,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   -/
   | pred_2_
     (v t : VarName_)
-    (phi : Formula) :
+    (phi : Formula_) :
     IsDeduct [] ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.sub (Function.updateITE id v t) freshChar phi))
 
   /-
@@ -117,7 +117,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   -/
   | pred_3_
     (v : VarName_)
-    (phi : Formula) :
+    (phi : Formula_) :
     ¬ var_is_free_in v phi →
     IsDeduct [] (phi.imp_ (forall_ v phi))
 
@@ -126,7 +126,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   -/
   | gen_
     (v : VarName_)
-    (phi : Formula) :
+    (phi : Formula_) :
     IsDeduct [] phi →
     IsDeduct [] (forall_ v phi)
 
@@ -163,14 +163,14 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ (phi ∧ psi) ↔ ¬ (phi → ¬ psi)
   -/
   | def_and_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     IsDeduct [] ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
 
   /-
     ⊢ (phi ∨ psi) ↔ ((¬ phi) → psi)
   -/
   | def_or_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     IsDeduct [] ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
 
   /-
@@ -180,7 +180,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ ¬ (((phi ↔ psi) → (¬ ((phi → psi) → ¬ (psi → phi)))) → ¬ (¬ ((phi → psi) → ¬ (psi → phi)) → (phi ↔ psi)))
   -/
   | def_iff_
-    (phi psi : Formula) :
+    (phi psi : Formula_) :
     IsDeduct [] (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
   /-
@@ -188,41 +188,41 @@ inductive IsDeduct : List Formula → Formula → Prop
   -/
   | def_exists_
     (v : VarName_)
-    (phi : Formula) :
+    (phi : Formula_) :
     IsDeduct [] ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
   | sub_
-    (Δ : List Formula)
-    (phi : Formula)
-    (τ : PredName_ → ℕ → Option (List VarName_ × Formula)) :
+    (Δ : List Formula_)
+    (phi : Formula_)
+    (τ : PredName_ → ℕ → Option (List VarName_ × Formula_)) :
     IsDeduct Δ phi →
     IsDeduct (Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)) (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi)
 
 
 inductive Rule : Type
-  | struct_1_ : List Formula → Formula → Formula → ℕ → Rule
-  | struct_2_ : List Formula → Formula → Formula → ℕ → Rule
-  | struct_3_ : List Formula → List Formula → Formula → Formula → Formula → ℕ → Rule
-  | assume_ : Formula → Rule
+  | struct_1_ : List Formula_ → Formula_ → Formula_ → ℕ → Rule
+  | struct_2_ : List Formula_ → Formula_ → Formula_ → ℕ → Rule
+  | struct_3_ : List Formula_ → List Formula_ → Formula_ → Formula_ → Formula_ → ℕ → Rule
+  | assume_ : Formula_ → Rule
   | prop_0_ : Rule
-  | prop_1_ : Formula → Formula → Rule
-  | prop_2_ : Formula → Formula → Formula → Rule
-  | prop_3_ : Formula → Formula → Rule
-  | mp_ : List Formula → Formula → Formula → ℕ → ℕ → Rule
-  | dt_ : List Formula → Formula → Formula → ℕ → Rule
-  | pred_1_ : VarName_ → Formula → Formula → Rule
-  | pred_2_ : VarName_ → VarName_ → Formula → Rule
-  | pred_3_ : VarName_ → Formula → Rule
-  | gen_ : VarName_ → Formula → ℕ → Rule
+  | prop_1_ : Formula_ → Formula_ → Rule
+  | prop_2_ : Formula_ → Formula_ → Formula_ → Rule
+  | prop_3_ : Formula_ → Formula_ → Rule
+  | mp_ : List Formula_ → Formula_ → Formula_ → ℕ → ℕ → Rule
+  | dt_ : List Formula_ → Formula_ → Formula_ → ℕ → Rule
+  | pred_1_ : VarName_ → Formula_ → Formula_ → Rule
+  | pred_2_ : VarName_ → VarName_ → Formula_ → Rule
+  | pred_3_ : VarName_ → Formula_ → Rule
+  | gen_ : VarName_ → Formula_ → ℕ → Rule
   | eq_1_ : VarName_ → Rule
   | eq_2_eq_ : VarName_ → VarName_ → VarName_ → VarName_ → Rule
   | eq_2_pred_var_ : PredName_ → List VarName_ → List VarName_ → Rule
   | def_false_ : Rule
-  | def_and_ : Formula → Formula → Rule
-  | def_or_ : Formula → Formula → Rule
-  | def_iff_ : Formula → Formula → Rule
-  | def_exists_ : VarName_ → Formula → Rule
-  | sub_ : List Formula → Formula → List (PredName_ × (List VarName_) × Formula) → ℕ → Rule
+  | def_and_ : Formula_ → Formula_ → Rule
+  | def_or_ : Formula_ → Formula_ → Rule
+  | def_iff_ : Formula_ → Formula_ → Rule
+  | def_exists_ : VarName_ → Formula_ → Rule
+  | sub_ : List Formula_ → Formula_ → List (PredName_ × (List VarName_) × Formula_) → ℕ → Rule
   | thm_ : String → Rule
   deriving Lean.ToJson, Lean.FromJson
 
@@ -259,8 +259,8 @@ instance : ToString Rule :=
 
 
 structure Sequent : Type where
-  (hypotheses : List Formula)
-  (conclusion : Formula)
+  (hypotheses : List Formula_)
+  (conclusion : Formula_)
   deriving Inhabited, DecidableEq, Lean.ToJson, Lean.FromJson
 
 def Sequent.toString (x : Sequent) : String :=
@@ -365,7 +365,7 @@ def LocalContext.get
   opt.toExcept s! "{index} not found in local context."
 
 
-def PredReplaceListToFun : List (PredName_ × (List VarName_) × Formula) → PredName_ → ℕ → Option ((List VarName_) × Formula)
+def PredReplaceListToFun : List (PredName_ × (List VarName_) × Formula_) → PredName_ → ℕ → Option ((List VarName_) × Formula_)
   | [] => fun (_ : PredName_) (_ : ℕ) => Option.none
   | (X, zs, H) :: tl =>
     fun (P : PredName_) (n : ℕ) =>
@@ -693,7 +693,7 @@ def checkRule
     }
 
   | sub_ Δ phi xs label => do
-    let τ : PredName_ → ℕ → Option ((List VarName_) × Formula) := PredReplaceListToFun xs
+    let τ : PredName_ → ℕ → Option ((List VarName_) × Formula_) := PredReplaceListToFun xs
 
     let found : CheckedStep ← localContext.get label
 
@@ -791,11 +791,11 @@ def checkProofList
 
 
 theorem soundness
-  (Δ : List Formula)
-  (F : Formula)
+  (Δ : List Formula_)
+  (F : Formula_)
   (h1 : IsDeduct Δ F) :
   ∀ (D : Type) (I : Interpretation_ D) (V : Valuation_ D) (E : Env),
-  ((∀ (H : Formula), H ∈ Δ → holds D I V E H) → holds D I V E F) :=
+  ((∀ (H : Formula_), H ∈ Δ → holds D I V E H) → holds D I V E F) :=
   by
   induction h1
   case struct_1_ Δ' H _ _ ih_2 =>

@@ -7,13 +7,13 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Var.All.Ind
 
-open Formula
+open Formula_
 
 
 /--
   IsReplaceFree σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
-inductive IsReplaceFree : (VarName_ → VarName_) → Formula → Formula → Prop
+inductive IsReplaceFree : (VarName_ → VarName_) → Formula_ → Formula_ → Prop
 
   | pred_const_
     (σ : VarName_ → VarName_)
@@ -42,39 +42,39 @@ inductive IsReplaceFree : (VarName_ → VarName_) → Formula → Formula → Pr
 
   | not_
     (σ : VarName_ → VarName_)
-    (phi : Formula)
-    (phi' : Formula) :
+    (phi : Formula_)
+    (phi' : Formula_) :
     IsReplaceFree σ phi phi' →
     IsReplaceFree σ phi.not_ phi'.not_
 
   | imp_
     (σ : VarName_ → VarName_)
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsReplaceFree σ phi phi' →
     IsReplaceFree σ psi psi' →
     IsReplaceFree σ (phi.imp_ psi) (phi'.imp_ psi')
 
   | and_
     (σ : VarName_ → VarName_)
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsReplaceFree σ phi phi' →
     IsReplaceFree σ psi psi' →
     IsReplaceFree σ (phi.and_ psi) (phi'.and_ psi')
 
   | or_
     (σ : VarName_ → VarName_)
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsReplaceFree σ phi phi' →
     IsReplaceFree σ psi psi' →
     IsReplaceFree σ (phi.or_ psi) (phi'.or_ psi')
 
   | iff_
     (σ : VarName_ → VarName_)
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsReplaceFree σ phi phi' →
     IsReplaceFree σ psi psi' →
     IsReplaceFree σ (phi.iff_ psi) (phi'.iff_ psi')
@@ -82,14 +82,14 @@ inductive IsReplaceFree : (VarName_ → VarName_) → Formula → Formula → Pr
   | forall_
     (σ : VarName_ → VarName_)
     (x : VarName_)
-    (phi phi' : Formula) :
+    (phi phi' : Formula_) :
     IsReplaceFree (Function.updateITE σ x x) phi phi' →
     IsReplaceFree σ (forall_ x phi) (forall_ x phi')
 
   | exists_
     (σ : VarName_ → VarName_)
     (x : VarName_)
-    (phi phi' : Formula) :
+    (phi phi' : Formula_) :
     IsReplaceFree (Function.updateITE σ x x) phi phi' →
     IsReplaceFree σ (exists_ x phi) (exists_ x phi')
 
@@ -101,7 +101,7 @@ inductive IsReplaceFree : (VarName_ → VarName_) → Formula → Formula → Pr
 
 
 example
-  (F F' : Formula)
+  (F F' : Formula_)
   (σ : VarName_ → VarName_)
   (h1 : Rec.fastReplaceFree σ F = F') :
   IsReplaceFree σ F F' :=
@@ -150,7 +150,7 @@ example
 
 
 example
-  (F F' : Formula)
+  (F F' : Formula_)
   (σ : VarName_ → VarName_)
   (h1 : IsReplaceFree σ F F') :
   Rec.fastReplaceFree σ F = F' :=

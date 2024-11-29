@@ -1,6 +1,6 @@
 import MathlibExtra.Finset
 import MathlibExtra.FunctionUpdateITE
-import FOL.NV.Formula
+import FOL.NV.Formula_
 import FOL.NV.Fresh
 import FOL.NV.Semantics
 
@@ -10,7 +10,7 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Var.All.Rec.Fresh
 
-open Formula
+open Formula_
 
 
 /--
@@ -19,7 +19,7 @@ open Formula
 def sub
   (σ : VarName_ → VarName_)
   (c : Char) :
-  Formula → Formula
+  Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs => pred_var_ X (xs.map σ)
   | eq_ x y => eq_ (σ x) (σ y)
@@ -48,7 +48,7 @@ def sub
 lemma freeVarSet_sub_eq_freeVarSet_image
   (σ : VarName_ → VarName_)
   (c : Char)
-  (F : Formula) :
+  (F : Formula_) :
   (sub σ c F).free_var_set = F.free_var_set.image σ :=
   by
   induction F generalizing σ
@@ -134,7 +134,7 @@ theorem substitution_theorem
   (E : Env)
   (σ : VarName_ → VarName_)
   (c : Char)
-  (F : Formula) :
+  (F : Formula_) :
   holds D I V E (sub σ c F) ↔
     holds D I (V ∘ σ) E F :=
   by
@@ -250,7 +250,7 @@ theorem substitution_theorem
 theorem substitution_is_valid
   (σ : VarName_ → VarName_)
   (c : Char)
-  (F : Formula)
+  (F : Formula_)
   (h1 : is_valid F) :
   is_valid (sub σ c F) :=
   by
@@ -268,7 +268,7 @@ theorem substitution_is_valid
 
 /-
 
-def Formula.length : Formula → ℕ
+def Formula_.length : Formula_ → ℕ
   | pred_const_ _ _ => 0
   | pred_var_ _ _ => 0
   | eq_ _ _ => 0
@@ -287,13 +287,13 @@ def Formula.length : Formula → ℕ
 lemma sub_formula_length_same
   (σ : VarName_ → VarName_)
   (c : Char)
-  (F : Formula) :
+  (F : Formula_) :
   (sub σ c F).length = F.length :=
   by
   induction F generalizing σ
   case not_ phi phi_ih =>
     simp only [sub]
-    simp only [Formula.length]
+    simp only [Formula_.length]
     simp only [phi_ih]
   case
       imp_ phi psi phi_ih psi_ih
@@ -301,24 +301,24 @@ lemma sub_formula_length_same
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     simp only [sub]
-    simp only [Formula.length]
+    simp only [Formula_.length]
     simp only [phi_ih σ]
     simp only [psi_ih σ]
   case forall_ x phi phi_ih | exists_ x phi_ih =>
     simp only [sub]
-    simp only [Formula.length]
+    simp only [Formula_.length]
     simp
     apply phi_ih
   all_goals
     simp only [sub]
-    simp only [Formula.length]
+    simp only [Formula_.length]
     simp
 
 --------------------------------------------------
 
 lemma SubId
   (c : Char)
-  (F : Formula) :
+  (F : Formula_) :
   sub id c F = F :=
   by
   induction F
@@ -350,7 +350,7 @@ def sub_alpha
   (α : VarName_ → VarName_)
   (binders : Finset VarName_)
   (c : Char) :
-  Formula → Formula
+  Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X (xs.map α)
   | pred_var_ X xs => pred_var_ X (xs.map α)
   | eq_ x y => eq_ (α x) (α y)
@@ -398,7 +398,7 @@ def sub_alpha'
   (σ : VarName_ → VarName_)
   (α : VarName_ → VarName_)
   (c : Char) :
-  Formula → (Formula × Formula)
+  Formula_ → (Formula_ × Formula_)
 | pred_const_ X xs => (pred_const_ X (xs.map σ), pred_const_ X (xs.map α))
 | pred_var_ X xs => (pred_var_ X (xs.map σ), pred_var_ X (xs.map α))
 | eq_ x y => (eq_ (σ x) (σ y), eq_ (α x) (α y))

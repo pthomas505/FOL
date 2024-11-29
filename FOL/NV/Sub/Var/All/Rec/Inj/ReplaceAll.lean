@@ -6,7 +6,7 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Var.All.Rec.Inj
 
-open Formula
+open Formula_
 
 
 /--
@@ -14,7 +14,7 @@ open Formula
 -/
 def replaceAll
   (σ : VarName_ → VarName_) :
-  Formula → Formula
+  Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs => pred_var_ X (xs.map σ)
   | eq_ x y => eq_ (σ x) (σ y)
@@ -35,7 +35,7 @@ theorem substitution_theorem
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (F : Formula)
+  (F : Formula_)
   (σ : VarName_ → VarName_)
   (h1 : Function.Injective σ) :
   holds D I (V ∘ σ) E F ↔
@@ -97,7 +97,7 @@ theorem substitution_theorem
 
 
 theorem substitution_is_valid
-  (F : Formula)
+  (F : Formula_)
   (σ : VarName_ → VarName_)
   (h1 : Function.Injective σ)
   (h2 : F.is_valid) :

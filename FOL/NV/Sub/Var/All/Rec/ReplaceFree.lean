@@ -7,13 +7,13 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Var.All.Rec
 
-open Formula
+open Formula_
 
 
 /--
   Helper function for replaceFree.
 -/
-def replaceFreeAux (σ : VarName_ → VarName_) (binders : Finset VarName_) : Formula → Formula
+def replaceFreeAux (σ : VarName_ → VarName_) (binders : Finset VarName_) : Formula_ → Formula_
   | pred_const_ X xs =>
       pred_const_
       X
@@ -58,14 +58,14 @@ def replaceFreeAux (σ : VarName_ → VarName_) (binders : Finset VarName_) : Fo
 /--
   replaceFree σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
-def replaceFree (σ : VarName_ → VarName_) (F : Formula) : Formula :=
+def replaceFree (σ : VarName_ → VarName_) (F : Formula_) : Formula_ :=
   replaceFreeAux σ ∅ F
 
 
 /--
   fastReplaceFree σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
-def fastReplaceFree (σ : VarName_ → VarName_) : Formula → Formula
+def fastReplaceFree (σ : VarName_ → VarName_) : Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs => pred_var_ X (xs.map σ)
   | eq_ x y => eq_ (σ x) (σ y)
@@ -96,7 +96,7 @@ def fastReplaceFree (σ : VarName_ → VarName_) : Formula → Formula
 
 
 theorem fastReplaceFree_id
-  (F : Formula) :
+  (F : Formula_) :
   fastReplaceFree id F = F :=
   by
   induction F
@@ -122,7 +122,7 @@ theorem fastReplaceFree_id
 
 
 example
-  (F : Formula)
+  (F : Formula_)
   (v t : VarName_) :
   fastReplaceFree (Function.updateITE id v t) F =
     One.Rec.fastReplaceFree v t F :=
@@ -168,7 +168,7 @@ example
 
 
 theorem fastReplaceFree_same_on_free
-  (F : Formula)
+  (F : Formula_)
   (σ σ' : VarName_ → VarName_)
   (h1 : ∀ (v : VarName_), var_is_free_in v F → σ v = σ' v) :
   fastReplaceFree σ F = fastReplaceFree σ' F :=
@@ -223,7 +223,7 @@ theorem fastReplaceFree_same_on_free
 
 
 theorem replaceFreeAux_same_on_free
-  (F : Formula)
+  (F : Formula_)
   (σ σ' : VarName_ → VarName_)
   (binders : Finset VarName_)
   (h1 : ∀ (v : VarName_), v ∉ binders → σ v = σ' v) :
@@ -260,7 +260,7 @@ theorem replaceFreeAux_same_on_free
 
 
 example
-  (F : Formula)
+  (F : Formula_)
   (σ : VarName_ → VarName_)
   (binders : Finset VarName_)
   (h1 : ∀ (v : VarName_), v ∈ binders → v = σ v) :

@@ -6,7 +6,7 @@ set_option autoImplicit false
 
 namespace FOL.NV.Sub.Pred.One.Ind
 
-open Formula
+open Formula_
 
 /--
   The inductive simultaneous uniform substitution of a single predicate variable in a formula.
@@ -16,8 +16,8 @@ open Formula
 inductive IsSub
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula) :
-  Formula → Formula → Prop
+  (H : Formula_) :
+  Formula_ → Formula_ → Prop
 
   | pred_const_
     (X : PredName_)
@@ -62,8 +62,8 @@ inductive IsSub
   If A = (¬ A₁) and Sub A₁ (P zⁿ / H*) B₁, then Sub A (P zⁿ / H*) (¬ B₁).
 -/
   | not_
-    (phi : Formula)
-    (phi' : Formula) :
+    (phi : Formula_)
+    (phi' : Formula_) :
     IsSub P zs H phi phi' →
     IsSub P zs H phi.not_ phi'.not_
 
@@ -72,29 +72,29 @@ inductive IsSub
 -/
 
   | imp_
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsSub P zs H phi phi' →
     IsSub P zs H psi psi' →
     IsSub P zs H (phi.imp_ psi) (phi'.imp_ psi')
 
   | and_
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsSub P zs H phi phi' →
     IsSub P zs H psi psi' →
     IsSub P zs H (phi.and_ psi) (phi'.and_ psi')
 
   | or_
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsSub P zs H phi phi' →
     IsSub P zs H psi psi' →
     IsSub P zs H (phi.or_ psi) (phi'.or_ psi')
 
   | iff_
-    (phi psi : Formula)
-    (phi' psi' : Formula) :
+    (phi psi : Formula_)
+    (phi' psi' : Formula_) :
     IsSub P zs H phi phi' →
     IsSub P zs H psi psi' →
     IsSub P zs H (phi.iff_ psi) (phi'.iff_ psi')
@@ -108,16 +108,16 @@ inductive IsSub
 
   | forall_
     (x : VarName_)
-    (phi : Formula)
-    (phi' : Formula) :
+    (phi : Formula_)
+    (phi' : Formula_) :
     ¬ var_is_free_in x H →
     IsSub P zs H phi phi' →
     IsSub P zs H (forall_ x phi) (forall_ x phi')
 
   | exists_
     (x : VarName_)
-    (phi : Formula)
-    (phi' : Formula) :
+    (phi : Formula_)
+    (phi' : Formula_) :
     ¬ var_is_free_in x H →
     IsSub P zs H phi phi' →
     IsSub P zs H (exists_ x phi) (exists_ x phi')
@@ -133,11 +133,11 @@ theorem substitution_theorem
   (I J : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (A : Formula)
+  (A : Formula_)
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula)
-  (B : Formula)
+  (H : Formula_)
+  (B : Formula_)
   (h1 : IsSub P zs H A B)
   (h2 : ∀ (Q : PredName_) (ds : List D),
     Q = P ∧ ds.length = zs.length →
@@ -246,10 +246,10 @@ theorem substitution_theorem
 
 
 theorem substitution_is_valid
-  (F F' : Formula)
+  (F F' : Formula_)
   (P : PredName_)
   (zs : List VarName_)
-  (H : Formula)
+  (H : Formula_)
   (h1 : IsSub P zs H F F')
   (h2 : F.is_valid) :
   F'.is_valid :=

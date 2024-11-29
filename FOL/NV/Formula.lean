@@ -75,30 +75,30 @@ instance : Lean.FromJson DefName_ :=
 /--
   The type of formulas.
 -/
-inductive Formula : Type
-  | pred_const_ : PredName_ → List VarName_ → Formula
-  | pred_var_ : PredName_ → List VarName_ → Formula
-  | eq_ : VarName_ → VarName_ → Formula
-  | true_ : Formula
-  | false_ : Formula
-  | not_ : Formula → Formula
-  | imp_ : Formula → Formula → Formula
-  | and_ : Formula → Formula → Formula
-  | or_ : Formula → Formula → Formula
-  | iff_ : Formula → Formula → Formula
-  | forall_ : VarName_ → Formula → Formula
-  | exists_ : VarName_ → Formula → Formula
-  | def_ : DefName_ → List VarName_ → Formula
+inductive Formula_ : Type
+  | pred_const_ : PredName_ → List VarName_ → Formula_
+  | pred_var_ : PredName_ → List VarName_ → Formula_
+  | eq_ : VarName_ → VarName_ → Formula_
+  | true_ : Formula_
+  | false_ : Formula_
+  | not_ : Formula_ → Formula_
+  | imp_ : Formula_ → Formula_ → Formula_
+  | and_ : Formula_ → Formula_ → Formula_
+  | or_ : Formula_ → Formula_ → Formula_
+  | iff_ : Formula_ → Formula_ → Formula_
+  | forall_ : VarName_ → Formula_ → Formula_
+  | exists_ : VarName_ → Formula_ → Formula_
+  | def_ : DefName_ → List VarName_ → Formula_
   deriving Inhabited, DecidableEq, Repr, Lean.ToJson, Lean.FromJson
 
-compile_inductive% Formula
+compile_inductive% Formula_
 
-open Formula
+open Formula_
 
 /--
   The string representation of formulas.
 -/
-def Formula.toString : Formula → String
+def Formula_.toString : Formula_ → String
   | pred_const_ X xs =>
     if xs.isEmpty
     then s! "{X}"
@@ -122,21 +122,21 @@ def Formula.toString : Formula → String
     then s! "def {X}"
     else s! "def ({X} {xs})"
 
-instance : ToString Formula :=
-  { toString := Formula.toString }
+instance : ToString Formula_ :=
+  { toString := Formula_.toString }
 
 
 #eval Lean.toJson (pred_const_ (PredName_.mk "X") [])
 #eval Lean.toJson (forall_ (VarName_.mk "x") (pred_const_ (PredName_.mk "X") []))
 
 /--
-  Parses a JSON formatted string into a `Formula`.
+  Parses a JSON formatted string into a `Formula_`.
 -/
 def json_string_to_formula
   (str : String) :
-  Except String Formula :=
+  Except String Formula_ :=
   match Lean.Json.parse str with
-  | Except.ok json => ((Lean.fromJson? json) : Except String Formula)
+  | Except.ok json => ((Lean.fromJson? json) : Except String Formula_)
   | Except.error e => Except.error e
 
 #eval json_string_to_formula "{\"pred_const_\": [\"X\", []]}"
@@ -150,7 +150,7 @@ def json_string_to_formula
 
   And_ [phi_0 ... phi_n] := phi_0 ∧ ... ∧ phi_n ∧ T
 -/
-def Formula.And_ (l : List Formula) : Formula :=
+def Formula_.And_ (l : List Formula_) : Formula_ :=
   List.foldr and_ true_ l
 
 #eval (And_ []).toString
@@ -167,7 +167,7 @@ def Formula.And_ (l : List Formula) : Formula :=
 
   Or_ [phi_0 ... phi_n] := phi_0 ∨ ... ∨ phi_n ∨ F
 -/
-def Formula.Or_ (l : List Formula) : Formula :=
+def Formula_.Or_ (l : List Formula_) : Formula_ :=
   List.foldr or_ false_ l
 
 #eval (Or_ []).toString
@@ -180,7 +180,7 @@ def Formula.Or_ (l : List Formula) : Formula :=
 /--
   Forall_ [x_0 ... x_n] phi := ∀ x_0 ... ∀ x_n phi
 -/
-def Formula.Forall_ (xs : List VarName_) (phi : Formula) : Formula :=
+def Formula_.Forall_ (xs : List VarName_) (phi : Formula_) : Formula_ :=
   List.foldr forall_ phi xs
 
 #eval (Forall_ [] (pred_var_ (PredName_.mk "phi") [])).toString
@@ -193,7 +193,7 @@ def Formula.Forall_ (xs : List VarName_) (phi : Formula) : Formula :=
 /--
   Exists_ [x_0 ... x_n] phi := ∃ x_0 ... ∃ x_n phi
 -/
-def Formula.Exists_ (xs : List VarName_) (phi : Formula) : Formula :=
+def Formula_.Exists_ (xs : List VarName_) (phi : Formula_) : Formula_ :=
   List.foldr exists_ phi xs
 
 #eval (Exists_ [] (pred_var_ (PredName_.mk "phi") [])).toString
