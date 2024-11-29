@@ -181,7 +181,7 @@ inductive AlphaEqv : Formula → Formula → Prop
 theorem replace_empty_Holds
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D)
+  (V : Assignment D)
   (E : Env)
   (u v : VarName)
   (F : Formula)
@@ -346,7 +346,7 @@ theorem replace_empty_Holds
 theorem Holds_iff_alphaEqv_Holds
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D)
+  (V : Assignment D)
   (E : Env)
   (F F' : Formula)
   (h1 : AlphaEqv F F') :
@@ -517,7 +517,7 @@ instance
 
 inductive AlphaEqvVarAssignment
   (D : Type) :
-  List (VarName × VarName) → VarAssignment D → VarAssignment D → Prop
+  List (VarName × VarName) → Assignment D → Assignment D → Prop
   | nil {V} :
     AlphaEqvVarAssignment D [] V V
 
@@ -530,7 +530,7 @@ theorem aux_1
   (D : Type)
   (binders : List (VarName × VarName))
   (x y : VarName)
-  (V V' : VarAssignment D)
+  (V V' : Assignment D)
   (h1 : AlphaEqvVarAssignment D binders V V')
   (h2 : isAlphaEqvVar binders x y) :
   V x = V' y :=
@@ -563,7 +563,7 @@ theorem aux_2
   (D : Type)
   (binders : List (VarName × VarName))
   (xs ys : List VarName)
-  (V V' : VarAssignment D)
+  (V V' : Assignment D)
   (h1 : AlphaEqvVarAssignment D binders V V')
   (h2 : isAlphaEqvVarList binders xs ys) :
   List.map V xs = List.map V' ys :=
@@ -622,7 +622,7 @@ lemma isAlphaEqvVarList_length
 lemma isAlphaEqv_Holds_aux
   (D : Type)
   (I : Interpretation D)
-  (V V' : VarAssignment D)
+  (V V' : Assignment D)
   (E : Env)
   (F F' : Formula)
   (binders : List (VarName × VarName))
@@ -735,7 +735,7 @@ lemma isAlphaEqv_Holds_aux
 lemma isalphaEqv_Holds
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D)
+  (V : Assignment D)
   (E : Env)
   (F F' : Formula)
   (h1 : isAlphaEqv F F') :

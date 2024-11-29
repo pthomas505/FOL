@@ -130,7 +130,7 @@ lemma freeVarSet_sub_eq_freeVarSet_image
 theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D)
+  (V : Assignment D)
   (E : Env)
   (σ : VarName → VarName)
   (c : Char)

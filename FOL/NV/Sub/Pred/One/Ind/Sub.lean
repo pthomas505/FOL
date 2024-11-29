@@ -131,7 +131,7 @@ inductive IsSub
 theorem substitution_theorem
   (D : Type)
   (I J : Interpretation D)
-  (V : VarAssignment D)
+  (V : Assignment D)
   (E : Env)
   (A : Formula)
   (P : PredName)

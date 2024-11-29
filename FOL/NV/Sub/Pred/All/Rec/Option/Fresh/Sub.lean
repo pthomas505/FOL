@@ -102,7 +102,7 @@ def Interpretation.usingPred
 def I'
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D)
+  (V : Assignment D)
   (E : Env)
   (τ : PredName → ℕ → Option (List VarName × Formula)) :
   Interpretation D :=
@@ -123,7 +123,7 @@ def I'
 lemma substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
-  (V V' V'': VarAssignment D)
+  (V V' V'': Assignment D)
   (E : Env)
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
@@ -437,7 +437,7 @@ lemma substitution_theorem_aux
 theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D)
+  (V : Assignment D)
   (E : Env)
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))

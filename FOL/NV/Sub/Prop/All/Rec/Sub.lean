@@ -94,7 +94,7 @@ lemma sub_no_predVar
 theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D)
+  (V : Assignment D)
   (E : Env)
   (τ : PredName → PredName)
   (F : Formula) :

@@ -109,7 +109,7 @@ instance
 theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
-  (V V' : VarAssignment D)
+  (V V' : Assignment D)
   (E : Env)
   (τ : PredName → ℕ → List VarName × Formula)
   (binders : Finset VarName)
@@ -241,7 +241,7 @@ theorem substitution_theorem_aux
 theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
-  (V : VarAssignment D)
+  (V : Assignment D)
   (E : Env)
   (τ : PredName → ℕ → List VarName × Formula)
   (F : Formula)

@@ -90,7 +90,7 @@ def admitsAux
 theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
-  (V V' : VarAssignment D)
+  (V V' : Assignment D)
   (E : Env)
   (c : Char)
   (τ : PredName → ℕ → Option (List VarName × Formula))
