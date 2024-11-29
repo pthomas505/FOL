@@ -34,7 +34,7 @@ theorem substitution_theorem
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (F : Formula_)
   (σ : VarName_ → VarName_)
   (h1 : Function.Injective σ) :

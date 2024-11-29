@@ -95,7 +95,7 @@ theorem substitution_theorem
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (τ : PredName_ → PredName_)
   (F : Formula_) :
   holds D I V E (sub τ F) ↔

@@ -182,7 +182,7 @@ theorem replace_empty_Holds
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (u v : VarName_)
   (F : Formula_)
   (a : D)
@@ -347,7 +347,7 @@ theorem Holds_iff_alphaEqv_Holds
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (F F' : Formula_)
   (h1 : AlphaEqv F F') :
   holds D I V E F ↔ holds D I V E F' :=
@@ -623,7 +623,7 @@ lemma isAlphaEqv_Holds_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (F F' : Formula_)
   (binders : List (VarName_ × VarName_))
   (h1 : AlphaEqvVarAssignment D binders V V')
@@ -736,7 +736,7 @@ lemma isalphaEqv_Holds
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (F F' : Formula_)
   (h1 : isAlphaEqv F F') :
   holds D I V E F ↔ holds D I V E F' :=

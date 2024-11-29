@@ -103,7 +103,7 @@ def I'
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_)) :
   Interpretation_ D :=
   (Interpretation_.usingPred D I (
@@ -124,7 +124,7 @@ lemma substitution_theorem_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' V'': Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (c : Char)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (σ : VarName_ → VarName_)
@@ -438,7 +438,7 @@ theorem substitution_theorem
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (c : Char)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (F : Formula_) :

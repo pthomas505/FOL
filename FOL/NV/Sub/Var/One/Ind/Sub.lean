@@ -299,7 +299,7 @@ theorem substitution_theorem
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (v t : VarName_)
   (F F' : Formula_)
   (h1 : IsSub F v t F') :

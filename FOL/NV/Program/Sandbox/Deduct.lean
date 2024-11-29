@@ -379,9 +379,9 @@ structure Definition_ : Type where
 (F : Formula_)
 deriving Inhabited, DecidableEq
 
-abbrev Env : Type := List Definition_
+abbrev Env_ : Type := List Definition_
 
-def Formula_.all_def_in_env (E : Env) : Formula_ → Prop
+def Formula_.all_def_in_env (E : Env_) : Formula_ → Prop
 | pred_const_ _ _ => True
 | pred_var_ _ _ => True
 | eq_ _ _ => True
@@ -405,7 +405,7 @@ def Formula_.all_def_in_env (E : Env) : Formula_ → Prop
 | def_ X xs =>
   ∃ (d : Definition_), d ∈ E ∧ X = d.name ∧ xs.length = d.args.length
 
-instance (E : Env) (F : Formula_) : Decidable (F.all_def_in_env E) :=
+instance (E : Env_) (F : Formula_) : Decidable (F.all_def_in_env E) :=
   by
   induction F
   all_goals
@@ -490,7 +490,7 @@ def replaceAllVar
   | def_ X xs => def_ X (xs.map σ)
 
 
-inductive IsConv (E : Env) : Formula_ → Formula_ → Prop
+inductive IsConv (E : Env_) : Formula_ → Formula_ → Prop
   | conv_refl
     (phi : Formula_) :
     IsConv E phi phi
@@ -537,23 +537,23 @@ inductive IsConv (E : Env) : Formula_ → Formula_ → Prop
     IsConv E (def_ d.name (d.args.map σ)) (fastReplaceFreeFun σ d.F)
 
 
-inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
+inductive IsDeduct : Env_ → List Formula_ → Formula_ → Prop
   | struct_1_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (H phi : Formula_) :
     IsDeduct E Δ phi →
     IsDeduct E (H :: Δ) phi
 
   | struct_2_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (H phi : Formula_) :
     IsDeduct E (H :: H :: Δ) phi →
     IsDeduct E (H :: Δ) phi
 
   | struct_3_
-    (E : Env)
+    (E : Env_)
     (Δ_1 Δ_2 : List Formula_)
     (H1 H2 phi : Formula_) :
     IsDeduct E (Δ_1 ++ [H1] ++ [H2] ++ Δ_2) phi →
@@ -563,7 +563,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ, phi ⊢ phi
   -/
   | assumption_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi : Formula_) :
     IsDeduct E (phi :: Δ) phi
@@ -572,7 +572,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ ⊤
   -/
   | prop_true_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_) :
     IsDeduct E Δ true_
 
@@ -580,7 +580,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ phi → (psi → phi)
   -/
   | prop_1_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi psi : Formula_) :
     IsDeduct E Δ (phi.imp_ (psi.imp_ phi))
@@ -589,7 +589,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ (phi → (psi → chi)) → ((phi → psi) → (phi → chi))
   -/
   | prop_2_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi psi chi : Formula_) :
     IsDeduct E Δ
@@ -600,7 +600,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ (¬ phi → ¬ psi) → (psi → phi)
   -/
   | prop_3_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi psi : Formula_) :
     IsDeduct E Δ
@@ -611,7 +611,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ (∀ v (phi → psi)) → ((∀ v phi) → (∀ v psi))
   -/
   | pred_1_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (v : VarName_)
     (phi psi : Formula_) :
@@ -625,7 +625,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     provided phi admits t for v
   -/
   | pred_2_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (v t : VarName_)
     (phi : Formula_) :
@@ -637,7 +637,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     provided v is not free in phi
   -/
   | pred_3_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (v : VarName_)
     (phi : Formula_) :
@@ -648,7 +648,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ v = v
   -/
   | eq_1_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (v : VarName_) :
     IsDeduct E Δ (eq_ v v)
@@ -658,7 +658,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
           (pred_const_ name [x_0 ... x_n] → pred_const_ name [y_0 ... y_n])
   -/
   | eq_2_pred_const_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (name : PredName_)
     (xs ys : List VarName_) :
@@ -672,7 +672,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
           (pred_var_ name [x_0 ... x_n] → pred_var_ name [y_0 ... y_n])
   -/
   | eq_2_pred_var_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (name : PredName_)
     (xs ys : List VarName_) :
@@ -686,7 +686,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
           ((eq_ x_0 x_1) → (eq_ y_0 y_1))
   -/
   | eq_2_eq_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (x_0 x_1 y_0 y_1 : VarName_) :
     IsDeduct E Δ
@@ -698,7 +698,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     provided v is not free in any formula in Δ
   -/
   | gen_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (v : VarName_)
     (phi : Formula_) :
@@ -712,7 +712,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ psi
   -/
   | mp_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi psi : Formula_) :
     IsDeduct E Δ (phi.imp_ psi) →
@@ -723,7 +723,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ ⊥ ↔ ¬ ⊤
   -/
   | def_false_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_) :
     IsDeduct E Δ (false_.iff_ (not_ true_))
 
@@ -731,7 +731,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ (phi ∧ psi) ↔ ¬ (phi → ¬ psi)
   -/
   | def_and_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi psi : Formula_) :
     IsDeduct E Δ ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
@@ -740,7 +740,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     Δ ⊢ (phi ∨ psi) ↔ ((¬ phi) → psi)
   -/
   | def_or_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi psi : Formula_) :
     IsDeduct E Δ ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
@@ -752,13 +752,13 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     ⊢ ¬ (((phi ↔ psi) → (¬ ((phi → psi) → ¬ (psi → phi)))) → ¬ (¬ ((phi → psi) → ¬ (psi → phi)) → (phi ↔ psi)))
   -/
   | def_iff_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi psi : Formula_) :
     IsDeduct E Δ (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
   | add_def_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (F : Formula_)
     (d : Definition_) :
@@ -771,7 +771,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     IsDeduct (d :: E) Δ F
 
   | unfold_def_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi : Formula_)
     (d : Definition_) :
@@ -781,7 +781,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     IsDeduct E Δ (unfoldDef d phi)
 
   | pred_sub_
-    (E : Env)
+    (E : Env_)
     (Δ : List Formula_)
     (phi : Formula_)
     (τ : PredName_ → ℕ → List VarName_ × Formula_) :
@@ -791,7 +791,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     IsDeduct E (Δ.map (replacePredFun τ)) (replacePredFun τ phi)
 
   | thm
-    (E : Env)
+    (E : Env_)
     (Δ Δ' : List Formula_)
     (phi : Formula_)
     (σ : Instantiation) :

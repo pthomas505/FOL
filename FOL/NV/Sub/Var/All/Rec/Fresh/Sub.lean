@@ -131,7 +131,7 @@ theorem substitution_theorem
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula_) :

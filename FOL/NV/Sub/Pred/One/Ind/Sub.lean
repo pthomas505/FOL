@@ -132,7 +132,7 @@ theorem substitution_theorem
   (D : Type)
   (I J : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (A : Formula_)
   (P : PredName_)
   (zs : List VarName_)

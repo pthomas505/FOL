@@ -999,7 +999,7 @@ theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (v t : VarName_)
   (binders : Finset VarName_)
   (F : Formula_)
@@ -1137,7 +1137,7 @@ theorem substitution_theorem
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (v t : VarName_)
   (F : Formula_)
   (h1 : fastAdmits v t F) :

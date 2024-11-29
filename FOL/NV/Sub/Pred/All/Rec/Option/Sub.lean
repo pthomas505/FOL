@@ -91,7 +91,7 @@ theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (c : Char)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (binders : Finset VarName_)

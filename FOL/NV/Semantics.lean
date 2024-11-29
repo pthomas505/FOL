@@ -55,7 +55,7 @@ instance (D : Type) [Inhabited D] : Inhabited (Valuation_ D) :=
 def holds
   (D : Type)
   (I : Interpretation_ D)
-  (V : Valuation_ D) : Env → Formula_ → Prop
+  (V : Valuation_ D) : Env_ → Formula_ → Prop
   | _, pred_const_ X xs => I.pred_const_ X (xs.map V)
   | _, pred_var_ X xs => I.pred_var_ X (xs.map V)
   | _, eq_ x y => V x = V y
@@ -80,7 +80,7 @@ def holds
   | E, exists_ (x : VarName_) (phi : Formula_) =>
     have : sizeOf phi < sizeOf (exists_ x phi) := by simp
     ∃ (d : D), holds D I (Function.updateITE V x d) E phi
-  | ([] : Env), def_ _ _ => False
+  | ([] : Env_), def_ _ _ => False
   | d :: E, def_ name args =>
     if name = d.name ∧ args.length = d.args.length
     then holds D I (Function.updateListITE V d.args (List.map V args)) E d.q
@@ -94,14 +94,14 @@ def holds
   Formula_.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation, variable assignment and environment.
 -/
 def Formula_.is_valid (F : Formula_) : Prop :=
-  ∀ (D : Type) (I : Interpretation_ D) (V : Valuation_ D) (E : Env), holds D I V E F
+  ∀ (D : Type) (I : Interpretation_ D) (V : Valuation_ D) (E : Env_), holds D I V E F
 
 
 theorem holds_coincide_var
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (F : Formula_)
   (h1 : ∀ (v : VarName_), var_is_free_in v F → V v = V' v) :
   holds D I V E F ↔ holds D I V' E F :=
@@ -175,7 +175,7 @@ theorem Holds_coincide_PredVar
   (D : Type)
   (I I' : Interpretation_ D)
   (V : Valuation_ D)
-  (E : Env)
+  (E : Env_)
   (F : Formula_)
   (h1 : I.pred_const_ = I'.pred_const_)
   (h2 : ∀ (P : PredName_) (ds : List D),
@@ -239,9 +239,9 @@ lemma Holds_coincide_Env
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
-  (E E' : Env)
+  (E E' : Env_)
   (F : Formula_)
-  (h1 : ∃ (E1 : Env), E' = E1 ++ E)
+  (h1 : ∃ (E1 : Env_), E' = E1 ++ E)
   (h2 : F.all_def_in_env E)
   (h3 : E'.nodup_) :
   holds D I V E' F ↔ holds D I V E F :=
@@ -270,7 +270,7 @@ lemma Holds_coincide_Env
     apply phi_ih
     exact h2
   case def_ X xs =>
-    simp only [Env] at *
+    simp only [Env_] at *
 
     apply Exists.elim h1
     intro E1 h1_1
@@ -281,7 +281,7 @@ lemma Holds_coincide_Env
     intro a h2_1
     clear h2
 
-    simp only [Env.nodup_] at h3
+    simp only [Env_.nodup_] at h3
 
     subst h1_1
 
