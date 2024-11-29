@@ -17,147 +17,147 @@ An occurrence of a variable `v` in a formula `P` is bound if and only if it occu
 -/
 
 /--
-  Formula.varSet F := The set of all of the variables that have an occurrence in the formula F.
+  `Formula.var_set F` := The set of all of the variables that have an occurrence in the formula `F`.
 -/
-def Formula.varSet : Formula → Finset VarName
+def Formula.var_set : Formula → Finset VarName
   | pred_const_ _ xs => xs.toFinset
   | pred_var_ _ xs => xs.toFinset
   | eq_ x y => {x, y}
   | true_ => ∅
   | false_ => ∅
-  | not_ phi => phi.varSet
-  | imp_ phi psi => phi.varSet ∪ psi.varSet
-  | and_ phi psi => phi.varSet ∪ psi.varSet
-  | or_ phi psi => phi.varSet ∪ psi.varSet
-  | iff_ phi psi => phi.varSet ∪ psi.varSet
-  | forall_ x phi => phi.varSet ∪ {x}
-  | exists_ x phi => phi.varSet ∪ {x}
+  | not_ phi => phi.var_set
+  | imp_ phi psi => phi.var_set ∪ psi.var_set
+  | and_ phi psi => phi.var_set ∪ psi.var_set
+  | or_ phi psi => phi.var_set ∪ psi.var_set
+  | iff_ phi psi => phi.var_set ∪ psi.var_set
+  | forall_ x phi => phi.var_set ∪ {x}
+  | exists_ x phi => phi.var_set ∪ {x}
   | def_ _ xs => xs.toFinset
 
 
 /--
-  occursIn v F := True if and only if there is an occurrence of the variable v in the formula F.
+  `var_occurs_in v F` := True if and only if there is an occurrence of the variable `v` in the formula `F`.
 -/
-def occursIn (v : VarName) : Formula → Prop
+def var_occurs_in (v : VarName) : Formula → Prop
   | pred_const_ _ xs => v ∈ xs
   | pred_var_ _ xs => v ∈ xs
   | eq_ x y => v = x ∨ v = y
   | true_ => False
   | false_ => False
-  | not_ phi => occursIn v phi
-  | imp_ phi psi => occursIn v phi ∨ occursIn v psi
-  | and_ phi psi => occursIn v phi ∨ occursIn v psi
-  | or_ phi psi => occursIn v phi ∨ occursIn v psi
-  | iff_ phi psi => occursIn v phi ∨ occursIn v psi
-  | forall_ x phi => v = x ∨ occursIn v phi
-  | exists_ x phi => v = x ∨ occursIn v phi
+  | not_ phi => var_occurs_in v phi
+  | imp_ phi psi => var_occurs_in v phi ∨ var_occurs_in v psi
+  | and_ phi psi => var_occurs_in v phi ∨ var_occurs_in v psi
+  | or_ phi psi => var_occurs_in v phi ∨ var_occurs_in v psi
+  | iff_ phi psi => var_occurs_in v phi ∨ var_occurs_in v psi
+  | forall_ x phi => v = x ∨ var_occurs_in v phi
+  | exists_ x phi => v = x ∨ var_occurs_in v phi
   | def_ _ xs => v ∈ xs
 
 
-instance (v : VarName) (F : Formula) : Decidable (occursIn v F) :=
+instance (v : VarName) (F : Formula) : Decidable (var_occurs_in v F) :=
   by
   induction F
   all_goals
-    simp only [occursIn]
+    simp only [var_occurs_in]
     infer_instance
 
 
 /--
-  Formula.boundVarSet F := The set of all of the variables that have a bound occurrence in the formula F.
+  `Formula.bound_var_set F` := The set of all of the variables that have a bound occurrence in the formula `F`.
 -/
-def Formula.boundVarSet : Formula → Finset VarName
+def Formula.bound_var_set : Formula → Finset VarName
   | pred_const_ _ _ => ∅
   | pred_var_ _ _ => ∅
   | eq_ _ _ => ∅
   | true_ => ∅
   | false_ => ∅
-  | not_ phi => phi.boundVarSet
-  | imp_ phi psi => phi.boundVarSet ∪ psi.boundVarSet
-  | and_ phi psi => phi.boundVarSet ∪ psi.boundVarSet
-  | or_ phi psi => phi.boundVarSet ∪ psi.boundVarSet
-  | iff_ phi psi => phi.boundVarSet ∪ psi.boundVarSet
-  | forall_ x phi => phi.boundVarSet ∪ {x}
-  | exists_ x phi => phi.boundVarSet ∪ {x}
+  | not_ phi => phi.bound_var_set
+  | imp_ phi psi => phi.bound_var_set ∪ psi.bound_var_set
+  | and_ phi psi => phi.bound_var_set ∪ psi.bound_var_set
+  | or_ phi psi => phi.bound_var_set ∪ psi.bound_var_set
+  | iff_ phi psi => phi.bound_var_set ∪ psi.bound_var_set
+  | forall_ x phi => phi.bound_var_set ∪ {x}
+  | exists_ x phi => phi.bound_var_set ∪ {x}
   | def_ _ _ => ∅
 
 
 /--
-  isBoundIn v F := True if and only if there is a bound occurrence of the variable v in the formula F.
+  `var_is_bound_in v F` := True if and only if there is a bound occurrence of the variable `v` in the formula `F`.
 -/
-def isBoundIn (v : VarName) : Formula → Prop
+def var_is_bound_in (v : VarName) : Formula → Prop
   | pred_const_ _ _ => False
   | pred_var_ _ _ => False
   | eq_ _ _ => False
   | true_ => False
   | false_ => False
-  | not_ phi => isBoundIn v phi
-  | imp_ phi psi => isBoundIn v phi ∨ isBoundIn v psi
-  | and_ phi psi => isBoundIn v phi ∨ isBoundIn v psi
-  | or_ phi psi => isBoundIn v phi ∨ isBoundIn v psi
-  | iff_ phi psi => isBoundIn v phi ∨ isBoundIn v psi
-  | forall_ x phi => v = x ∨ isBoundIn v phi
-  | exists_ x phi => v = x ∨ isBoundIn v phi
+  | not_ phi => var_is_bound_in v phi
+  | imp_ phi psi => var_is_bound_in v phi ∨ var_is_bound_in v psi
+  | and_ phi psi => var_is_bound_in v phi ∨ var_is_bound_in v psi
+  | or_ phi psi => var_is_bound_in v phi ∨ var_is_bound_in v psi
+  | iff_ phi psi => var_is_bound_in v phi ∨ var_is_bound_in v psi
+  | forall_ x phi => v = x ∨ var_is_bound_in v phi
+  | exists_ x phi => v = x ∨ var_is_bound_in v phi
   | def_ _ _ => False
 
 
-instance (v : VarName) (F : Formula) : Decidable (isBoundIn v F) :=
+instance (v : VarName) (F : Formula) : Decidable (var_is_bound_in v F) :=
   by
   induction F
   all_goals
-    simp only [isBoundIn]
+    simp only [var_is_bound_in]
     infer_instance
 
 
 /--
-  Formula.freeVarSet F := The set of all of the variables that have a free occurrence in the formula F.
+  `Formula.free_var_set F` := The set of all of the variables that have a free occurrence in the formula `F`.
 -/
-def Formula.freeVarSet : Formula → Finset VarName
+def Formula.free_var_set : Formula → Finset VarName
   | pred_const_ _ xs => xs.toFinset
   | pred_var_ _ xs => xs.toFinset
   | eq_ x y => {x, y}
   | true_ => ∅
   | false_ => ∅
-  | not_ phi => phi.freeVarSet
-  | imp_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
-  | and_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
-  | or_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
-  | iff_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
-  | forall_ x phi => phi.freeVarSet \ {x}
-  | exists_ x phi => phi.freeVarSet \ {x}
+  | not_ phi => phi.free_var_set
+  | imp_ phi psi => phi.free_var_set ∪ psi.free_var_set
+  | and_ phi psi => phi.free_var_set ∪ psi.free_var_set
+  | or_ phi psi => phi.free_var_set ∪ psi.free_var_set
+  | iff_ phi psi => phi.free_var_set ∪ psi.free_var_set
+  | forall_ x phi => phi.free_var_set \ {x}
+  | exists_ x phi => phi.free_var_set \ {x}
   | def_ _ xs => xs.toFinset
 
 
 /--
-  isFreeIn v F := True if and only if there is a free occurrence of the variable v in the formula F.
+  `var_is_free_in v F` := True if and only if there is a free occurrence of the variable `v` in the formula `F`.
 -/
-def isFreeIn (v : VarName) : Formula → Prop
+def var_is_free_in (v : VarName) : Formula → Prop
   | pred_const_ _ xs => v ∈ xs
   | pred_var_ _ xs => v ∈ xs
   | eq_ x y => v = x ∨ v = y
   | true_ => False
   | false_ => False
-  | not_ phi => isFreeIn v phi
-  | imp_ phi psi => isFreeIn v phi ∨ isFreeIn v psi
-  | and_ phi psi => isFreeIn v phi ∨ isFreeIn v psi
-  | or_ phi psi => isFreeIn v phi ∨ isFreeIn v psi
-  | iff_ phi psi => isFreeIn v phi ∨ isFreeIn v psi
-  | forall_ x phi => ¬ v = x ∧ isFreeIn v phi
-  | exists_ x phi => ¬ v = x ∧ isFreeIn v phi
+  | not_ phi => var_is_free_in v phi
+  | imp_ phi psi => var_is_free_in v phi ∨ var_is_free_in v psi
+  | and_ phi psi => var_is_free_in v phi ∨ var_is_free_in v psi
+  | or_ phi psi => var_is_free_in v phi ∨ var_is_free_in v psi
+  | iff_ phi psi => var_is_free_in v phi ∨ var_is_free_in v psi
+  | forall_ x phi => ¬ v = x ∧ var_is_free_in v phi
+  | exists_ x phi => ¬ v = x ∧ var_is_free_in v phi
   | def_ _ xs => v ∈ xs
 
 
-instance (v : VarName) (F : Formula) : Decidable (isFreeIn v F) :=
+instance (v : VarName) (F : Formula) : Decidable (var_is_free_in v F) :=
   by
   induction F
   all_goals
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     infer_instance
 
 
 /--
-  isFreeInInd v F := True if and only if there is a free occurrence of the variable v in the formula F.
+  `var_is_free_in_ind v F` := True if and only if there is a free occurrence of the variable `v` in the formula `F`.
 -/
-inductive isFreeInInd
+inductive var_is_free_in_ind
   (v : VarName) :
   Formula → Prop
 
@@ -165,140 +165,141 @@ inductive isFreeInInd
     (X : PredName)
     (xs : List VarName) :
     v ∈ xs →
-    isFreeInInd v (pred_const_ X xs)
+    var_is_free_in_ind v (pred_const_ X xs)
 
   | pred_var_
     (X : PredName)
     (xs : List VarName) :
     v ∈ xs →
-    isFreeInInd v (pred_var_ X xs)
+    var_is_free_in_ind v (pred_var_ X xs)
 
   | eq_
     (x y : VarName) :
     v = x ∨ v = y →
-    isFreeInInd v (eq_ x y)
+    var_is_free_in_ind v (eq_ x y)
 
   | not_
     (phi : Formula) :
-    isFreeInInd v phi →
-    isFreeInInd v (not_ phi)
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (not_ phi)
 
   | imp_left_
     (phi psi : Formula) :
-    isFreeInInd v phi →
-    isFreeInInd v (imp_ phi psi)
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (imp_ phi psi)
 
   | imp_right_
     (phi psi : Formula) :
-    isFreeInInd v psi →
-    isFreeInInd v (imp_ phi psi)
+    var_is_free_in_ind v psi →
+    var_is_free_in_ind v (imp_ phi psi)
 
   | and_left_
     (phi psi : Formula) :
-    isFreeInInd v phi →
-    isFreeInInd v (and_ phi psi)
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (and_ phi psi)
 
   | and_right_
     (phi psi : Formula) :
-    isFreeInInd v psi →
-    isFreeInInd v (and_ phi psi)
+    var_is_free_in_ind v psi →
+    var_is_free_in_ind v (and_ phi psi)
 
   | or_left_
     (phi psi : Formula) :
-    isFreeInInd v phi →
-    isFreeInInd v (or_ phi psi)
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (or_ phi psi)
 
   | or_right_
     (phi psi : Formula) :
-    isFreeInInd v psi →
-    isFreeInInd v (or_ phi psi)
+    var_is_free_in_ind v psi →
+    var_is_free_in_ind v (or_ phi psi)
 
   | iff_left_
     (phi psi : Formula) :
-    isFreeInInd v phi →
-    isFreeInInd v (iff_ phi psi)
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (iff_ phi psi)
 
   | iff_right_
     (phi psi : Formula) :
-    isFreeInInd v psi →
-    isFreeInInd v (iff_ phi psi)
+    var_is_free_in_ind v psi →
+    var_is_free_in_ind v (iff_ phi psi)
 
   | forall_
     (x : VarName)
     (phi : Formula) :
     ¬ v = x →
-    isFreeInInd v phi →
-    isFreeInInd v (forall_ x phi)
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (forall_ x phi)
 
   | exists_
     (x : VarName)
     (phi : Formula) :
     ¬ v = x →
-    isFreeInInd v phi →
-    isFreeInInd v (exists_ x phi)
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (exists_ x phi)
 
   | def_
     (X : DefName)
     (xs : List VarName) :
     v ∈ xs →
-    isFreeInInd v (def_ X xs)
+    var_is_free_in_ind v (def_ X xs)
 
 
 /--
-  Formula.predVarSet F := The set of all of the predicate variables that have an occurrence in the formula F.
+  `Formula.pred_var_set F` := The set of all of the predicate variables that have an occurrence in the formula `F`.
 -/
-def Formula.predVarSet : Formula → Finset (PredName × ℕ)
+def Formula.pred_var_set : Formula → Finset (PredName × ℕ)
   | pred_const_ _ _ => ∅
   | pred_var_ X xs => {(X, xs.length)}
   | eq_ _ _ => ∅
   | true_ => ∅
   | false_ => ∅
-  | not_ phi => phi.predVarSet
-  | imp_ phi psi => phi.predVarSet ∪ psi.predVarSet
-  | and_ phi psi => phi.predVarSet ∪ psi.predVarSet
-  | or_ phi psi => phi.predVarSet ∪ psi.predVarSet
-  | iff_ phi psi => phi.predVarSet ∪ psi.predVarSet
-  | forall_ _ phi => phi.predVarSet
-  | exists_ _ phi => phi.predVarSet
+  | not_ phi => phi.pred_var_set
+  | imp_ phi psi => phi.pred_var_set ∪ psi.pred_var_set
+  | and_ phi psi => phi.pred_var_set ∪ psi.pred_var_set
+  | or_ phi psi => phi.pred_var_set ∪ psi.pred_var_set
+  | iff_ phi psi => phi.pred_var_set ∪ psi.pred_var_set
+  | forall_ _ phi => phi.pred_var_set
+  | exists_ _ phi => phi.pred_var_set
   | def_ _ _ => ∅
 
 
 /--
-  predVarOccursIn P n F := True if and only if there is an occurrence of the predicate variable named P of arity n in the formula F.
+  `pred_var_occurs_in P n F` := True if and only if there is an occurrence of the predicate variable named `P` of arity `n` in the formula `F`.
 -/
-def predVarOccursIn (P : PredName) (n : ℕ) : Formula → Prop
+def pred_var_occurs_in (P : PredName) (n : ℕ) : Formula → Prop
   | pred_const_ _ _ => False
   | pred_var_ X xs => P = X ∧ n = xs.length
   | eq_ _ _ => False
   | true_ => False
   | false_ => False
-  | not_ phi => predVarOccursIn P n phi
-  | imp_ phi psi => predVarOccursIn P n phi ∨ predVarOccursIn P n psi
-  | and_ phi psi => predVarOccursIn P n phi ∨ predVarOccursIn P n psi
-  | or_ phi psi => predVarOccursIn P n phi ∨ predVarOccursIn P n psi
-  | iff_ phi psi => predVarOccursIn P n phi ∨ predVarOccursIn P n psi
-  | forall_ _ phi => predVarOccursIn P n phi
-  | exists_ _ phi => predVarOccursIn P n phi
+  | not_ phi => pred_var_occurs_in P n phi
+  | imp_ phi psi => pred_var_occurs_in P n phi ∨ pred_var_occurs_in P n psi
+  | and_ phi psi => pred_var_occurs_in P n phi ∨ pred_var_occurs_in P n psi
+  | or_ phi psi => pred_var_occurs_in P n phi ∨ pred_var_occurs_in P n psi
+  | iff_ phi psi => pred_var_occurs_in P n phi ∨ pred_var_occurs_in P n psi
+  | forall_ _ phi => pred_var_occurs_in P n phi
+  | exists_ _ phi => pred_var_occurs_in P n phi
   | def_ _ _ => False
 
 
-instance (P : PredName) (n : ℕ) (F : Formula) : Decidable (predVarOccursIn P n F) :=
+instance (P : PredName) (n : ℕ) (F : Formula) : Decidable (pred_var_occurs_in P n F) :=
   by
   induction F
   all_goals
-    simp only [predVarOccursIn]
+    simp only [pred_var_occurs_in]
     infer_instance
 
+-------------------------------------------------------------------------------
 
-theorem occursIn_iff_mem_varSet
+theorem var_occurs_in_iff_mem_var_set
   (v : VarName)
   (F : Formula) :
-  occursIn v F ↔ v ∈ F.varSet :=
+  var_occurs_in v F ↔ v ∈ F.var_set :=
   by
   induction F
   all_goals
-    simp only [occursIn]
-    simp only [Formula.varSet]
+    simp only [var_occurs_in]
+    simp only [var_set]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
   case eq_ x y =>
@@ -319,15 +320,15 @@ theorem occursIn_iff_mem_varSet
     tauto
 
 
-theorem isBoundIn_iff_mem_boundVarSet
+theorem var_is_bound_in_iff_mem_bound_var_set
   (v : VarName)
   (F : Formula) :
-  isBoundIn v F ↔ v ∈ F.boundVarSet :=
+  var_is_bound_in v F ↔ v ∈ F.bound_var_set :=
   by
   induction F
   all_goals
-    simp only [isBoundIn]
-    simp only [Formula.boundVarSet]
+    simp only [var_is_bound_in]
+    simp only [bound_var_set]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
   case eq_ x y =>
@@ -348,15 +349,15 @@ theorem isBoundIn_iff_mem_boundVarSet
     tauto
 
 
-theorem isFreeIn_iff_mem_freeVarSet
+theorem var_is_free_in_iff_mem_free_var_set
   (v : VarName)
   (F : Formula) :
-  isFreeIn v F ↔ v ∈ F.freeVarSet :=
+  var_is_free_in v F ↔ v ∈ F.free_var_set :=
   by
   induction F
   all_goals
-    simp only [isFreeIn]
-    simp only [Formula.freeVarSet]
+    simp only [var_is_free_in]
+    simp only [free_var_set]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
   case eq_ x y =>
@@ -377,19 +378,24 @@ theorem isFreeIn_iff_mem_freeVarSet
     tauto
 
 
-theorem isFreeIn_imp_isFreeInInd
+theorem var_is_free_in_imp_var_is_free_in_ind
   (v : VarName)
   (F : Formula)
-  (h1 : isFreeIn v F) :
-  isFreeInInd v F :=
+  (h1 : var_is_free_in v F) :
+  var_is_free_in_ind v F :=
   by
   induction F
   any_goals
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
   case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
-    first | exact isFreeInInd.pred_const_ X xs h1 | exact isFreeInInd.pred_var_ X xs h1 | exact isFreeInInd.eq_ x y h1 | exact isFreeInInd.def_ X xs h1
+    first
+      | apply var_is_free_in_ind.pred_const_
+      | apply var_is_free_in_ind.pred_var_
+      | apply var_is_free_in_ind.eq_
+      | apply var_is_free_in_ind.def_
+    exact h1
   case not_ phi phi_ih =>
-    apply isFreeInInd.not_
+    apply var_is_free_in_ind.not_
     exact phi_ih h1
   case
       imp_ phi psi phi_ih psi_ih
@@ -398,51 +404,61 @@ theorem isFreeIn_imp_isFreeInInd
     | iff_ phi psi phi_ih psi_ih =>
     cases h1
     case inl c1 =>
-      first | apply isFreeInInd.imp_left_ | apply isFreeInInd.and_left_ | apply isFreeInInd.or_left_ | apply isFreeInInd.iff_left_
+      first
+        | apply var_is_free_in_ind.imp_left_
+        | apply var_is_free_in_ind.and_left_
+        | apply var_is_free_in_ind.or_left_
+        | apply var_is_free_in_ind.iff_left_
       exact phi_ih c1
     case inr c1 =>
-      first | apply isFreeInInd.imp_right_ | apply isFreeInInd.and_right_ | apply isFreeInInd.or_right_ | apply isFreeInInd.iff_right_
+      first
+        | apply var_is_free_in_ind.imp_right_
+        | apply var_is_free_in_ind.and_right_
+        | apply var_is_free_in_ind.or_right_
+        | apply var_is_free_in_ind.iff_right_
       exact psi_ih c1
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     cases h1
     case _ h1_left h1_right =>
-      first | apply isFreeInInd.forall_ | apply isFreeInInd.exists_
+      first
+        | apply var_is_free_in_ind.forall_
+        | apply var_is_free_in_ind.exists_
       · exact h1_left
       · exact phi_ih h1_right
 
 
-theorem isFreeInInd_imp_isFreeIn
+theorem var_is_free_in_ind_imp_var_is_free_in
   (v : VarName)
   (F : Formula)
-  (h1 : isFreeInInd v F) :
-  isFreeIn v F :=
+  (h1 : var_is_free_in_ind v F) :
+  var_is_free_in v F :=
   by
   induction h1
   all_goals
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     tauto
 
 
-theorem isFreeIn_iff_isFreeInInd
+theorem var_is_free_in_iff_var_is_free_in_ind
   (v : VarName)
   (F : Formula) :
-  isFreeIn v F ↔ isFreeInInd v F :=
+  var_is_free_in v F ↔ var_is_free_in_ind v F :=
   by
   constructor
-  · exact isFreeIn_imp_isFreeInInd v F
-  · exact isFreeInInd_imp_isFreeIn v F
+  · apply var_is_free_in_imp_var_is_free_in_ind
+  · apply var_is_free_in_ind_imp_var_is_free_in
 
 
-theorem predVarOccursIn_iff_mem_predVarSet
+theorem pred_var_occurs_in_iff_mem_pred_var_set
   (P : PredName)
   (n : ℕ)
   (F : Formula) :
-  predVarOccursIn P n F ↔ (P, n) ∈ F.predVarSet :=
+  pred_var_occurs_in P n F ↔ (P, n) ∈ F.pred_var_set :=
   by
   induction F
   all_goals
-    simp only [predVarOccursIn]
-    simp only [Formula.predVarSet]
+    simp only [pred_var_occurs_in]
+    simp only [pred_var_set]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
   case eq_ x y =>
@@ -462,31 +478,31 @@ theorem predVarOccursIn_iff_mem_predVarSet
     tauto
 
 
-theorem isBoundIn_imp_occursIn
+theorem var_is_bound_in_imp_var_occurs_in
   (v : VarName)
   (F : Formula)
-  (h1 : isBoundIn v F) :
-  occursIn v F :=
+  (h1 : var_is_bound_in v F) :
+  var_occurs_in v F :=
   by
   induction F
   all_goals
-    simp only [isBoundIn] at h1
+    simp only [var_is_bound_in] at h1
   all_goals
-    simp only [occursIn]
+    simp only [var_occurs_in]
     tauto
 
 
-theorem isFreeIn_imp_occursIn
+theorem var_is_free_in_imp_var_occurs_in
   (v : VarName)
   (F : Formula)
-  (h1 : isFreeIn v F) :
-  occursIn v F :=
+  (h1 : var_is_free_in v F) :
+  var_occurs_in v F :=
   by
   induction F
   all_goals
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
   all_goals
-    simp only [occursIn]
+    simp only [var_occurs_in]
     tauto
 
 
