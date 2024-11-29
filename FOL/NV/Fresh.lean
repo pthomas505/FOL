@@ -1,4 +1,4 @@
-import FOL.NV.Formula_
+import FOL.NV.Formula
 
 import Mathlib.Tactic
 import Mathlib.Data.String.Lemmas
