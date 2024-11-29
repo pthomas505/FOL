@@ -53,9 +53,10 @@ def fresh
   then
     have : finset_var_name_max_len xs - x.length < finset_var_name_max_len xs + 1 - x.length :=
       by
-      obtain s1 := finset_var_name_max_len_mem x xs h
-      simp only [tsub_lt_tsub_iff_right s1]
-      simp
+      apply Nat.sub_lt_sub_right
+      · apply finset_var_name_max_len_mem
+        exact h
+      · apply lt_add_one
   fresh (VarName.mk (x.toString ++ c.toString)) c xs
   else x
   termination_by finset_var_name_max_len xs + 1 - x.length
@@ -70,9 +71,10 @@ lemma fresh_not_mem
   then
   have : finset_var_name_max_len xs - x.length < finset_var_name_max_len xs + 1 - x.length :=
     by
-    obtain s1 := finset_var_name_max_len_mem x xs h
-    simp only [tsub_lt_tsub_iff_right s1]
-    simp
+    apply Nat.sub_lt_sub_right
+    · apply finset_var_name_max_len_mem
+      exact h
+    · apply lt_add_one
   by
     unfold fresh
     split_ifs
