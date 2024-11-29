@@ -46,8 +46,8 @@ instance : Lean.FromJson PredName :=
     let str ← Lean.fromJson? json
     Except.ok (PredName.mk str) }
 
-#eval Lean.toJson (PredName.mk "x")
-#eval ((Lean.fromJson? "x") : Except String PredName)
+#eval Lean.toJson (PredName.mk "X")
+#eval ((Lean.fromJson? "X") : Except String PredName)
 
 
 /--
@@ -68,8 +68,8 @@ instance : Lean.FromJson DefName :=
     let str ← Lean.fromJson? json
     Except.ok (DefName.mk str) }
 
-#eval Lean.toJson (DefName.mk "x")
-#eval ((Lean.fromJson? "x") : Except String DefName)
+#eval Lean.toJson (DefName.mk "X")
+#eval ((Lean.fromJson? "X") : Except String DefName)
 
 
 /--
