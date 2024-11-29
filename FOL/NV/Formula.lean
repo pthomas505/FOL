@@ -133,10 +133,10 @@ instance : ToString Formula :=
   Parses a JSON formatted string into a `Formula`.
 -/
 def json_string_to_formula
-  (s : String) :
+  (str : String) :
   Except String Formula :=
-  match Lean.Json.parse s with
-  | Except.ok str => ((Lean.fromJson? str) : Except String Formula)
+  match Lean.Json.parse str with
+  | Except.ok json => ((Lean.fromJson? json) : Except String Formula)
   | Except.error e => Except.error e
 
 #eval json_string_to_formula "{\"pred_const_\": [\"X\", []]}"
