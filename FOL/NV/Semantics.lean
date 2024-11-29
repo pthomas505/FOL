@@ -1,12 +1,10 @@
 import MathlibExtra.FunctionUpdateITE
-import FOL.NV.Binders
+
 import FOL.NV.Definition
 
 
 set_option autoImplicit false
 
-
-namespace FOL.NV
 
 open Formula
 
