@@ -1,6 +1,6 @@
 import MathlibExtra.FunctionUpdateITE
 
-import FOL.NV.Definition_
+import FOL.NV.Definition
 
 
 set_option autoImplicit false
