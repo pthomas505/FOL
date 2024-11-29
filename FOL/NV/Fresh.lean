@@ -68,7 +68,7 @@ lemma fresh_not_mem
   fresh x c xs ∉ xs :=
   if h : x ∈ xs
   then
-  have : finset_var_name_max_len xs - String.length x.toString < finset_var_name_max_len xs + 1 - String.length x.toString :=
+  have : finset_var_name_max_len xs - x.length < finset_var_name_max_len xs + 1 - x.length :=
     by
     obtain s1 := finset_var_name_max_len_mem x xs h
     simp only [tsub_lt_tsub_iff_right s1]
