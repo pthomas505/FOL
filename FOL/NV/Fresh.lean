@@ -75,13 +75,11 @@ lemma fresh_not_mem
     simp
   by
     unfold fresh
-    simp
-    simp only [if_pos h]
+    split_ifs
     apply fresh_not_mem
   else by
     unfold fresh
-    simp
-    simp [if_neg h]
+    split_ifs
     exact h
   termination_by finset_var_name_max_len xs + 1 - x.length
 
