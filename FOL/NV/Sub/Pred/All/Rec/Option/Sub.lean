@@ -62,7 +62,7 @@ def admitsAux
         let zs := val.fst
         let H := val.snd
         if xs.length = zs.length
-        then binders ∩ (H.freeVarSet \ zs.toFinset) = ∅
+        then binders ∩ (H.free_var_set \ zs.toFinset) = ∅
         --then ∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)
         else True
       else True

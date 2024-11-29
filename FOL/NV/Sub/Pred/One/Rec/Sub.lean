@@ -93,7 +93,7 @@ def admitsAux
 
 
 /--
-  admits P zs H F := True if and only if there is no variable in (H.freeVarSet \ zs) that becomes a bound occurrence in the formula (replace P zs H F).
+  admits P zs H F := True if and only if there is no variable in (H.free_var_set \ zs) that becomes a bound occurrence in the formula (replace P zs H F).
 -/
 def admits
   (P : PredName)
@@ -109,7 +109,7 @@ lemma replace_no_predVar
   (zs : List VarName)
   (H : Formula)
   (F : Formula)
-  (h1 : F.predVarSet = ∅) :
+  (h1 : F.pred_var_set = ∅) :
   replace P zs H F = F :=
   by
   induction F

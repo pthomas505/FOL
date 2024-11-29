@@ -18,7 +18,7 @@ def predVarFreeVarSet
       let val := Option.get opt h
       let zs := val.fst
       let H := val.snd
-      H.freeVarSet \ zs.toFinset
+      H.free_var_set \ zs.toFinset
     else ∅
 
 
@@ -130,7 +130,7 @@ lemma substitution_theorem_aux
   (σ : VarName → VarName)
   (F : Formula)
   (h1 : ∀ (x : VarName), isFreeIn x F → V' x = V (σ x))
-  (h2 : ∀ (x : VarName), x ∈ F.predVarSet.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
+  (h2 : ∀ (x : VarName), x ∈ F.pred_var_set.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
   Holds D (I' D I V'' E τ) V' E F ↔ Holds D I V E (subAux c τ σ F) :=
   by
   induction F generalizing V V' σ

@@ -921,15 +921,15 @@ theorem C_18_3
   by
   apply
     IsDeduct.mp_
-      (Forall_ ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList (U.iff_ V))
-  · apply T_18_2 U V P_U P_V ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList h1
+      (Forall_ ((U.free_var_set ∪ V.free_var_set) ∩ P_U.boundVarSet).toList (U.iff_ V))
+  · apply T_18_2 U V P_U P_V ((U.free_var_set ∪ V.free_var_set) ∩ P_U.boundVarSet).toList h1
     intro v a1
     simp
     simp only [isFreeIn_iff_mem_freeVarSet] at a1
     simp only [isBoundIn_iff_mem_boundVarSet] at a1
     exact a1
   · simp only [Formula.Forall_]
-    induction ((U.freeVarSet ∪ V.freeVarSet) ∩ P_U.boundVarSet).toList
+    induction ((U.free_var_set ∪ V.free_var_set) ∩ P_U.boundVarSet).toList
     case _ =>
       simp
       exact h2

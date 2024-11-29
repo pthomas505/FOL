@@ -105,21 +105,21 @@ def Formula.And_ (l : List Formula) : Formula :=
 
 
 /--
-  Formula.freeVarSet F := The set of all of the variables that have a free occurrence in the formula F.
+  Formula.free_var_set F := The set of all of the variables that have a free occurrence in the formula F.
 -/
-def Formula.freeVarSet : Formula → Finset VarName
+def Formula.free_var_set : Formula → Finset VarName
   | pred_const_ _ xs => xs.toFinset
   | pred_var_ _ xs => xs.toFinset
   | eq_ x y => {x, y}
   | true_ => ∅
   | false_ => ∅
-  | not_ phi => phi.freeVarSet
-  | imp_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
-  | and_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
-  | or_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
-  | iff_ phi psi => phi.freeVarSet ∪ psi.freeVarSet
-  | forall_ x phi => phi.freeVarSet \ {x}
-  | exists_ x phi => phi.freeVarSet \ {x}
+  | not_ phi => phi.free_var_set
+  | imp_ phi psi => phi.free_var_set ∪ psi.free_var_set
+  | and_ phi psi => phi.free_var_set ∪ psi.free_var_set
+  | or_ phi psi => phi.free_var_set ∪ psi.free_var_set
+  | iff_ phi psi => phi.free_var_set ∪ psi.free_var_set
+  | forall_ x phi => phi.free_var_set \ {x}
+  | exists_ x phi => phi.free_var_set \ {x}
   | def_ _ xs => xs.toFinset
 
 
@@ -150,21 +150,21 @@ instance (v : VarName) (F : Formula) : Decidable (isFreeIn v F) :=
 
 
 /--
-  Formula.predVarSet F := The set of all of the predicate variables that have an occurrence in the formula F.
+  Formula.pred_var_set F := The set of all of the predicate variables that have an occurrence in the formula F.
 -/
-def Formula.predVarSet : Formula → Finset (PredName × ℕ)
+def Formula.pred_var_set : Formula → Finset (PredName × ℕ)
   | pred_const_ _ _ => ∅
   | pred_var_ X xs => {(X, xs.length)}
   | eq_ _ _ => ∅
   | true_ => ∅
   | false_ => ∅
-  | not_ phi => phi.predVarSet
-  | imp_ phi psi => phi.predVarSet ∪ psi.predVarSet
-  | and_ phi psi => phi.predVarSet ∪ psi.predVarSet
-  | or_ phi psi => phi.predVarSet ∪ psi.predVarSet
-  | iff_ phi psi => phi.predVarSet ∪ psi.predVarSet
-  | forall_ _ phi => phi.predVarSet
-  | exists_ _ phi => phi.predVarSet
+  | not_ phi => phi.pred_var_set
+  | imp_ phi psi => phi.pred_var_set ∪ psi.pred_var_set
+  | and_ phi psi => phi.pred_var_set ∪ psi.pred_var_set
+  | or_ phi psi => phi.pred_var_set ∪ psi.pred_var_set
+  | iff_ phi psi => phi.pred_var_set ∪ psi.pred_var_set
+  | forall_ _ phi => phi.pred_var_set
+  | exists_ _ phi => phi.pred_var_set
   | def_ _ _ => ∅
 
 
@@ -766,7 +766,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     d.F.all_def_in_env E →
     d.args.Nodup →
     (∀ v : VarName, isFreeIn v F → v ∈ d.args.toFinset) →
-    d.F.predVarSet = ∅ →
+    d.F.pred_var_set = ∅ →
     IsDeduct E Δ F →
     IsDeduct (d :: E) Δ F
 

@@ -47,7 +47,7 @@ instance {α : Type} {xs : List α} : Decidable (xs = []) :=
 lemma sub_no_predVar
   (F : Formula)
   (τ : PredName → PredName)
-  (h1 : F.predVarSet = ∅) :
+  (h1 : F.pred_var_set = ∅) :
   sub τ F = F :=
   by
   induction F

@@ -1,25 +1,40 @@
-import FOL.NV.Formula
 import FOL.NV.Binders
 
 
 set_option autoImplicit false
 
 
-namespace FOL.NV
-
 open Formula
 
 
+/--
+  The type of definitions.
+-/
 structure Definition : Type where
-(name : DefName)
-(args : List VarName)
-(q : Formula)
-(nodup : args.Nodup)
-(h1 : q.freeVarSet ⊆ args.toFinset)
-(h2 : q.predVarSet = ∅)
+  /--
+    The name.
+  -/
+  (name : DefName)
+
+  /--
+    The arguments.
+  -/
+  (args : List VarName)
+
+  /--
+    The formula.
+  -/
+  (q : Formula)
+
+  (nodup : args.Nodup)
+  (h1 : q.free_var_set ⊆ args.toFinset)
+  (h2 : q.pred_var_set = ∅)
 deriving DecidableEq
 
 
+/--
+  The type of environments.
+-/
 abbrev Env : Type := List Definition
 
 instance : Membership Definition Env :=
@@ -27,7 +42,7 @@ instance : Membership Definition Env :=
 
 
 /--
-  Formula.all_def_in_env E F := True if and only if every definition that occurs in the formula F is in the environment E.
+  `Formula.all_def_in_env E F` := True if and only if every definition that occurs in the formula `F` is in the environment `E`.
 -/
 def Formula.all_def_in_env (E : Env) : Formula → Prop
 | pred_const_ _ _ => True
@@ -57,12 +72,12 @@ instance (E : Env) (F : Formula) : Decidable (F.all_def_in_env E) :=
   by
   induction F
   all_goals
-    simp only [Formula.all_def_in_env]
+    simp only [all_def_in_env]
     infer_instance
 
 
 /--
-  Env.nodup_ E := True if and only if every definition that occurs in the environment E has a unique combination of name and argument length.
+  `Env.nodup_ E` := True if and only if every definition that occurs in the environment `E` has a unique combination of name and argument length.
 -/
 def Env.nodup_ : Env → Prop :=
   List.Pairwise (fun (d1 d2 : Definition) => d1.name = d2.name → d1.args.length = d2.args.length → False)
@@ -76,9 +91,9 @@ instance (E : Env) : Decidable (E.nodup_) :=
 
 
 /--
-  Env.WellFormed E := True if and only if
-  1. Every definition that occurs in the environment E has a unique combination of name and argument length.
-  2. Every definition that occurs in the formula of a definition d in the environment d :: E' ⊆ E occurs in the environment E'. This means there are no circular definitions.
+  `Env.WellFormed E` := True if and only if
+  1. Every definition that occurs in the environment `E` has a unique combination of name and argument length.
+  2. Every definition that occurs in the formula of a definition `d` in the environment `d :: E' ⊆ E` occurs in the environment `E'`. This means there are no circular definitions.
 -/
 def Env.WellFormed : Env → Prop
   | List.nil => True
@@ -93,3 +108,6 @@ instance (E : Env) : Decidable (E.WellFormed) :=
   all_goals
     simp only [Env.WellFormed]
     infer_instance
+
+
+#lint

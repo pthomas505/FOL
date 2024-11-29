@@ -32,14 +32,14 @@ def sub
   | iff_ phi psi => iff_ (sub σ c phi) (sub σ c psi)
   | forall_ x phi =>
     let x' : VarName :=
-      if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-      then fresh x c ((sub (Function.updateITE σ x x) c phi).freeVarSet)
+      if ∃ (y : VarName), y ∈ phi.free_var_set \ {x} ∧ σ y = x
+      then fresh x c ((sub (Function.updateITE σ x x) c phi).free_var_set)
       else x
     forall_ x' (sub (Function.updateITE σ x x') c phi)
   | exists_ x phi =>
     let x' : VarName :=
-      if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-      then fresh x c ((sub (Function.updateITE σ x x) c phi).freeVarSet)
+      if ∃ (y : VarName), y ∈ phi.free_var_set \ {x} ∧ σ y = x
+      then fresh x c ((sub (Function.updateITE σ x x) c phi).free_var_set)
       else x
     exists_ x' (sub (Function.updateITE σ x x') c phi)
   | def_ X xs => def_ X (xs.map σ)
@@ -49,7 +49,7 @@ lemma freeVarSet_sub_eq_freeVarSet_image
   (σ : VarName → VarName)
   (c : Char)
   (F : Formula) :
-  (sub σ c F).freeVarSet = F.freeVarSet.image σ :=
+  (sub σ c F).free_var_set = F.free_var_set.image σ :=
   by
   induction F generalizing σ
   all_goals
@@ -75,7 +75,7 @@ lemma freeVarSet_sub_eq_freeVarSet_image
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [phi_ih]
 
-    simp only [<- Finset.image_sdiff_singleton_updateITE phi.freeVarSet x x σ]
+    simp only [<- Finset.image_sdiff_singleton_updateITE phi.free_var_set x x σ]
 
     split_ifs
     case _ c1 =>
@@ -96,12 +96,12 @@ lemma freeVarSet_sub_eq_freeVarSet_image
       = Finset.image (Function.updateITE σ x x') (freeVarSet phi \ {x}) \ {x'} :=
           by
           {
-            apply Finset.image_sdiff_singleton phi.freeVarSet x x' (Function.updateITE σ x x')
+            apply Finset.image_sdiff_singleton phi.free_var_set x x' (Function.updateITE σ x x')
             simp only [Function.updateITE]
             simp
           }
       _ = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) \ {x'} :=
-          by simp only [Finset.image_congr_update_ite phi.freeVarSet x x' x]
+          by simp only [Finset.image_congr_update_ite phi.free_var_set x x' x]
       _ = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) :=
           by
             simp only [Finset.sdiff_singleton_eq_erase] at *
@@ -374,7 +374,7 @@ def sub_alpha
       (sub_alpha σ α binders c phi)
       (sub_alpha σ α binders c psi)
   | forall_ x phi =>
-      let free := phi.freeVarSet \ (binders ∪ {x})
+      let free := phi.free_var_set \ (binders ∪ {x})
       let replaced_free := free.image σ
       let captured := replaced_free ∩ (binders ∪ {x})
       let x' :=
@@ -383,7 +383,7 @@ def sub_alpha
         else fresh x c (replaced_free ∪ free)
       forall_ x' (sub_alpha σ (Function.updateITE α x x') (binders ∪ {x'}) c phi)
   | exists_ x phi =>
-      let free := phi.freeVarSet \ (binders ∪ {x})
+      let free := phi.free_var_set \ (binders ∪ {x})
       let replaced_free := free.image σ
       let captured := replaced_free ∩ (binders ∪ {x})
       let x' :=
@@ -411,15 +411,15 @@ def sub_alpha'
 | iff_ phi psi => ((iff_ (sub_alpha' σ α c phi).fst (sub_alpha' σ α c psi).fst), (iff_ (sub_alpha' σ α c phi).snd (sub_alpha' σ α c psi).snd))
 | forall_ x phi =>
   let x' : VarName :=
-    if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then fresh x c ((sub_alpha' (Function.updateITE σ x x) α c phi).fst.freeVarSet)
+    if ∃ (y : VarName), y ∈ phi.free_var_set \ {x} ∧ σ y = x
+    then fresh x c ((sub_alpha' (Function.updateITE σ x x) α c phi).fst.free_var_set)
     else x
   let phi' := (sub_alpha' (Function.updateITE σ x x') (Function.updateITE α x x') c phi)
   (forall_ x' phi'.fst, forall_ x' phi'.snd)
 | exists_ x phi =>
   let x' : VarName :=
-    if ∃ (y : VarName), y ∈ phi.freeVarSet \ {x} ∧ σ y = x
-    then fresh x c ((sub_alpha' (Function.updateITE σ x x) α c phi).fst.freeVarSet)
+    if ∃ (y : VarName), y ∈ phi.free_var_set \ {x} ∧ σ y = x
+    then fresh x c ((sub_alpha' (Function.updateITE σ x x) α c phi).fst.free_var_set)
     else x
   let phi' := (sub_alpha' (Function.updateITE σ x x') (Function.updateITE α x x') c phi)
   (exists_ x' phi'.fst, exists_ x' phi'.snd)

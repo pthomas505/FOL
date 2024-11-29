@@ -53,7 +53,6 @@ def var_occurs_in (v : VarName) : Formula → Prop
   | exists_ x phi => v = x ∨ var_occurs_in v phi
   | def_ _ xs => v ∈ xs
 
-
 instance (v : VarName) (F : Formula) : Decidable (var_occurs_in v F) :=
   by
   induction F
@@ -99,7 +98,6 @@ def var_is_bound_in (v : VarName) : Formula → Prop
   | exists_ x phi => v = x ∨ var_is_bound_in v phi
   | def_ _ _ => False
 
-
 instance (v : VarName) (F : Formula) : Decidable (var_is_bound_in v F) :=
   by
   induction F
@@ -144,7 +142,6 @@ def var_is_free_in (v : VarName) : Formula → Prop
   | forall_ x phi => ¬ v = x ∧ var_is_free_in v phi
   | exists_ x phi => ¬ v = x ∧ var_is_free_in v phi
   | def_ _ xs => v ∈ xs
-
 
 instance (v : VarName) (F : Formula) : Decidable (var_is_free_in v F) :=
   by
@@ -280,7 +277,6 @@ def pred_var_occurs_in (P : PredName) (n : ℕ) : Formula → Prop
   | forall_ _ phi => pred_var_occurs_in P n phi
   | exists_ _ phi => pred_var_occurs_in P n phi
   | def_ _ _ => False
-
 
 instance (P : PredName) (n : ℕ) (F : Formula) : Decidable (pred_var_occurs_in P n F) :=
   by
