@@ -12,7 +12,7 @@ set_option autoImplicit false
 -/
 def finset_var_name_max_len :
   Finset VarName → ℕ :=
-  Finset.fold (fun (m n : ℕ) => max m n) 0 (fun (x : VarName) => x.toString.length)
+  Finset.fold (fun (m n : ℕ) => max m n) 0 (fun (x : VarName) => x.length)
 
 
 lemma finset_var_name_max_len_mem
@@ -51,7 +51,7 @@ def fresh
   VarName :=
   if h : x ∈ xs
   then
-    have : finset_var_name_max_len xs - x.toString.length < finset_var_name_max_len xs + 1 - x.toString.length :=
+    have : finset_var_name_max_len xs - x.length < finset_var_name_max_len xs + 1 - x.length :=
       by
       obtain s1 := finset_var_name_max_len_mem x xs h
       simp only [tsub_lt_tsub_iff_right s1]
