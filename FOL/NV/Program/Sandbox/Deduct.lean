@@ -373,13 +373,13 @@ instance
   infer_instance
 
 
-structure Definition : Type where
+structure Definition_ : Type where
 (name : DefName_)
 (args : List VarName_)
 (F : Formula_)
 deriving Inhabited, DecidableEq
 
-abbrev Env : Type := List Definition
+abbrev Env : Type := List Definition_
 
 def Formula_.all_def_in_env (E : Env) : Formula_ → Prop
 | pred_const_ _ _ => True
@@ -403,7 +403,7 @@ def Formula_.all_def_in_env (E : Env) : Formula_ → Prop
 | forall_ _ phi => phi.all_def_in_env E
 | exists_ _ phi => phi.all_def_in_env E
 | def_ X xs =>
-  ∃ (d : Definition), d ∈ E ∧ X = d.name ∧ xs.length = d.args.length
+  ∃ (d : Definition_), d ∈ E ∧ X = d.name ∧ xs.length = d.args.length
 
 instance (E : Env) (F : Formula_) : Decidable (F.all_def_in_env E) :=
   by
@@ -414,7 +414,7 @@ instance (E : Env) (F : Formula_) : Decidable (F.all_def_in_env E) :=
 
 
 def admitsUnfoldDef
-  (d : Definition) :
+  (d : Definition_) :
   Formula_ → Prop
 | pred_const_ _ _ => True
 | pred_var_ _ _ => True
@@ -434,7 +434,7 @@ def admitsUnfoldDef
     else True
 
 instance
-  (d : Definition)
+  (d : Definition_)
   (F : Formula_) :
   Decidable (admitsUnfoldDef d F) :=
   by
@@ -445,7 +445,7 @@ instance
 
 
 def unfoldDef
-  (d : Definition) :
+  (d : Definition_) :
   Formula_ → Formula_
 | pred_const_ X xs => pred_const_ X xs
 | pred_var_ X xs => pred_var_ X xs
@@ -524,13 +524,13 @@ inductive IsConv (E : Env) : Formula_ → Formula_ → Prop
     IsConv E (forall_ x phi) (forall_ x phi')
 
   | conv_unfold
-    (d : Definition)
+    (d : Definition_)
     (σ : Instantiation) :
     d ∈ E →
     IsConv E (def_ d.name (d.args.map σ.1)) (replaceAllVar σ.1 d.F)
 
   | conv_unfold'
-    (d : Definition)
+    (d : Definition_)
     (σ : VarName_ → VarName_) :
     d ∈ E →
     admitsFun σ d.F →
@@ -761,8 +761,8 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     (E : Env)
     (Δ : List Formula_)
     (F : Formula_)
-    (d : Definition) :
-    (∀ d' : Definition, d' ∈ E → d.name = d'.name → d.args.length = d'.args.length → False) →
+    (d : Definition_) :
+    (∀ d' : Definition_, d' ∈ E → d.name = d'.name → d.args.length = d'.args.length → False) →
     d.F.all_def_in_env E →
     d.args.Nodup →
     (∀ v : VarName_, var_is_free_in v F → v ∈ d.args.toFinset) →
@@ -774,7 +774,7 @@ inductive IsDeduct : Env → List Formula_ → Formula_ → Prop
     (E : Env)
     (Δ : List Formula_)
     (phi : Formula_)
-    (d : Definition) :
+    (d : Definition_) :
     d ∈ E →
     admitsUnfoldDef d phi →
     IsDeduct E Δ phi →

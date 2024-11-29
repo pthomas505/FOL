@@ -10,7 +10,7 @@ open Formula_
 /--
   The type of definitions.
 -/
-structure Definition : Type where
+structure Definition_ : Type where
   /--
     The name.
   -/
@@ -35,13 +35,13 @@ deriving DecidableEq
 /--
   The type of environments.
 -/
-def Env : Type := List Definition
+def Env : Type := List Definition_
 
-instance : Membership Definition Env :=
-  inferInstanceAs (Membership Definition (List Definition))
+instance : Membership Definition_ Env :=
+  inferInstanceAs (Membership Definition_ (List Definition_))
 
 instance : HAppend Env Env Env :=
-  inferInstanceAs (HAppend (List Definition) (List Definition) (List Definition))
+  inferInstanceAs (HAppend (List Definition_) (List Definition_) (List Definition_))
 
 
 /--
@@ -69,7 +69,7 @@ def Formula_.all_def_in_env (E : Env) : Formula_ → Prop
 | forall_ _ phi => phi.all_def_in_env E
 | exists_ _ phi => phi.all_def_in_env E
 | def_ X xs =>
-  ∃ (d : Definition), d ∈ E ∧ X = d.name ∧ xs.length = d.args.length
+  ∃ (d : Definition_), d ∈ E ∧ X = d.name ∧ xs.length = d.args.length
 
 instance (E : Env) (F : Formula_) : Decidable (F.all_def_in_env E) :=
   by
@@ -83,7 +83,7 @@ instance (E : Env) (F : Formula_) : Decidable (F.all_def_in_env E) :=
   `Env.nodup_ E` := True if and only if every definition that occurs in the environment `E` has a unique combination of name and argument length.
 -/
 def Env.nodup_ : Env → Prop :=
-  List.Pairwise (fun (d1 d2 : Definition) => d1.name = d2.name → d1.args.length = d2.args.length → False)
+  List.Pairwise (fun (d1 d2 : Definition_) => d1.name = d2.name → d1.args.length = d2.args.length → False)
 
 instance (E : Env) : Decidable (E.nodup_) :=
   by
@@ -101,7 +101,7 @@ instance (E : Env) : Decidable (E.nodup_) :=
 def Env.well_formed : Env → Prop
   | List.nil => True
   | d :: E =>
-    (∀ (d' : Definition), d' ∈ E →
+    (∀ (d' : Definition_), d' ∈ E →
       d.name = d'.name → d.args.length = d'.args.length → False) ∧
         Formula_.all_def_in_env E d.q ∧ Env.well_formed E
 
