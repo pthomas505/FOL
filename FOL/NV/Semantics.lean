@@ -271,6 +271,8 @@ lemma Holds_coincide_Env
     apply phi_ih
     exact h2
   case def_ X xs =>
+    simp only [Env] at *
+
     apply Exists.elim h1
     intro E1 h1_1
     clear h1

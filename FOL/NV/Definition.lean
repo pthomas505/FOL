@@ -40,6 +40,9 @@ def Env : Type := List Definition
 instance : Membership Definition Env :=
   inferInstanceAs (Membership Definition (List Definition))
 
+instance : HAppend Env Env Env :=
+  inferInstanceAs (HAppend (List Definition) (List Definition) (List Definition))
+
 
 /--
   `Formula.all_def_in_env E F` := True if and only if every definition that occurs in the formula `F` is in the environment `E`.
