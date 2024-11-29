@@ -127,6 +127,7 @@ instance : ToString Formula :=
 
 
 #eval Lean.toJson (pred_const_ (PredName.mk "X") [])
+#eval Lean.toJson (forall_ (VarName.mk "x") (pred_const_ (PredName.mk "X") []))
 
 /--
   Parses a JSON formatted string into a `Formula`.
@@ -139,6 +140,7 @@ def json_string_to_formula
   | Except.error e => Except.error e
 
 #eval json_string_to_formula "{\"pred_const_\": [\"X\", []]}"
+#eval json_string_to_formula "{\"forall_\": [\"x\", {\"pred_const_\": [\"X\", []]}]}"
 
 
 /--
