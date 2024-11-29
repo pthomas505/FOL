@@ -171,7 +171,7 @@ def Interpretation.usingPred
 def I'
   (D : Type)
   (I : Interpretation D)
-  (V : Assignment D)
+  (V : Valuation_ D)
   (E : Env)
   (P : PredName)
   (zs : List VarName)
@@ -188,7 +188,7 @@ def I'
 theorem substitution_theorem_aux
   (D : Type)
   (I : Interpretation D)
-  (V V' : Assignment D)
+  (V V' : Valuation_ D)
   (E : Env)
   (F : Formula)
   (P : PredName)
@@ -331,7 +331,7 @@ theorem substitution_theorem_aux
 theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
-  (V : Assignment D)
+  (V : Valuation_ D)
   (E : Env)
   (F : Formula)
   (P : PredName)

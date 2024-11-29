@@ -794,7 +794,7 @@ theorem soundness
   (Δ : List Formula)
   (F : Formula)
   (h1 : IsDeduct Δ F) :
-  ∀ (D : Type) (I : Interpretation D) (V : Assignment D) (E : Env),
+  ∀ (D : Type) (I : Interpretation D) (V : Valuation_ D) (E : Env),
   ((∀ (H : Formula), H ∈ Δ → holds D I V E H) → holds D I V E F) :=
   by
   induction h1

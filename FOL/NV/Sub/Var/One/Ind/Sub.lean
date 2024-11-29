@@ -298,7 +298,7 @@ example
 theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
-  (V : Assignment D)
+  (V : Valuation_ D)
   (E : Env)
   (v t : VarName)
   (F F' : Formula)

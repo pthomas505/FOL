@@ -41,11 +41,11 @@ instance (D : Type) [Inhabited D] : Inhabited (Interpretation D) :=
 /--
   The assignment of an element of the domain of discourse to each variable.
 -/
-def Assignment (D : Type) : Type := VarName → D
+def Valuation_ (D : Type) : Type := VarName → D
 
-instance (D : Type) [Inhabited D] : Inhabited (Assignment D) :=
+instance (D : Type) [Inhabited D] : Inhabited (Valuation_ D) :=
   by
-  simp only [Assignment]
+  simp only [Valuation_]
   infer_instance
 
 
@@ -55,7 +55,7 @@ instance (D : Type) [Inhabited D] : Inhabited (Assignment D) :=
 def holds
   (D : Type)
   (I : Interpretation D)
-  (V : Assignment D) : Env → Formula → Prop
+  (V : Valuation_ D) : Env → Formula → Prop
   | _, pred_const_ X xs => I.pred_const_ X (xs.map V)
   | _, pred_var_ X xs => I.pred_var_ X (xs.map V)
   | _, eq_ x y => V x = V y
@@ -94,13 +94,13 @@ def holds
   Formula.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation, variable assignment and environment.
 -/
 def Formula.is_valid (F : Formula) : Prop :=
-  ∀ (D : Type) (I : Interpretation D) (V : Assignment D) (E : Env), holds D I V E F
+  ∀ (D : Type) (I : Interpretation D) (V : Valuation_ D) (E : Env), holds D I V E F
 
 
 theorem holds_coincide_var
   (D : Type)
   (I : Interpretation D)
-  (V V' : Assignment D)
+  (V V' : Valuation_ D)
   (E : Env)
   (F : Formula)
   (h1 : ∀ (v : VarName), var_is_free_in v F → V v = V' v) :
@@ -174,7 +174,7 @@ theorem holds_coincide_var
 theorem Holds_coincide_PredVar
   (D : Type)
   (I I' : Interpretation D)
-  (V : Assignment D)
+  (V : Valuation_ D)
   (E : Env)
   (F : Formula)
   (h1 : I.pred_const_ = I'.pred_const_)
@@ -238,7 +238,7 @@ theorem Holds_coincide_PredVar
 lemma Holds_coincide_Env
   (D : Type)
   (I : Interpretation D)
-  (V : Assignment D)
+  (V : Valuation_ D)
   (E E' : Env)
   (F : Formula)
   (h1 : ∃ (E1 : Env), E' = E1 ++ E)

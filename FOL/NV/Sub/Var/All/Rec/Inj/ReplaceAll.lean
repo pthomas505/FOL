@@ -33,7 +33,7 @@ def replaceAll
 theorem substitution_theorem
   (D : Type)
   (I : Interpretation D)
-  (V : Assignment D)
+  (V : Valuation_ D)
   (E : Env)
   (F : Formula)
   (σ : VarName → VarName)
