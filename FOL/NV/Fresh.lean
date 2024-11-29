@@ -7,24 +7,22 @@ import Mathlib.Data.String.Lemmas
 set_option autoImplicit false
 
 
-namespace FOL.NV
-
 open Formula
 
 
 /--
-  finset_var_name_max_len xs := The length of the longest variable name in the finite set of variable names xs or 0 if the set is empty.
+  `finset_var_name_max_len xs` := The length of the longest variable name in the finite set of variable names `xs` or 0 if the set is empty.
 -/
 def finset_var_name_max_len :
   Finset VarName → ℕ :=
-  Finset.fold (fun (m n : ℕ) => max m n) 0 (String.length ∘ VarName.toString)
+  Finset.fold (fun (m n : ℕ) => max m n) 0 (fun (x : VarName) => x.toString.length)
 
 
 lemma finset_var_name_max_len_mem
   (x : VarName)
   (xs : Finset VarName)
   (h1 : x ∈ xs) :
-  x.length <= finset_var_name_max_len xs :=
+  x.length ≤ finset_var_name_max_len xs :=
   by
   induction xs using Finset.induction_on
   case empty =>
