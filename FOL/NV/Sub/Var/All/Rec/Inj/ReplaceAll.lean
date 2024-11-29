@@ -32,7 +32,7 @@ def replaceAll
 
 theorem substitution_theorem
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (F : Formula)

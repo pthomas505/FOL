@@ -180,7 +180,7 @@ inductive AlphaEqv : Formula → Formula → Prop
 
 theorem replace_empty_Holds
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (u v : VarName)
@@ -345,7 +345,7 @@ theorem replace_empty_Holds
 
 theorem Holds_iff_alphaEqv_Holds
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (F F' : Formula)
@@ -621,7 +621,7 @@ lemma isAlphaEqvVarList_length
 
 lemma isAlphaEqv_Holds_aux
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
   (F F' : Formula)
@@ -734,7 +734,7 @@ lemma isAlphaEqv_Holds_aux
 
 lemma isalphaEqv_Holds
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (F F' : Formula)

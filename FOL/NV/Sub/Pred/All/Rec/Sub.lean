@@ -108,7 +108,7 @@ instance
 
 theorem substitution_theorem_aux
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
   (τ : PredName → ℕ → List VarName × Formula)
@@ -240,7 +240,7 @@ theorem substitution_theorem_aux
 
 theorem substitution_theorem
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (τ : PredName → ℕ → List VarName × Formula)

@@ -89,11 +89,11 @@ def sub
   subAux c τ id F
 
 
-def Interpretation.usingPred
+def Interpretation_.usingPred
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (pred_ : PredName → List D → Prop) :
-  Interpretation D := {
+  Interpretation_ D := {
     nonempty := I.nonempty
     pred_const_ := I.pred_const_
     pred_var_ := pred_ }
@@ -101,12 +101,12 @@ def Interpretation.usingPred
 
 def I'
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (τ : PredName → ℕ → Option (List VarName × Formula)) :
-  Interpretation D :=
-  (Interpretation.usingPred D I (
+  Interpretation_ D :=
+  (Interpretation_.usingPred D I (
   fun (X : PredName) (ds : List D) =>
   let opt := τ X ds.length
   if h : Option.isSome opt
@@ -122,7 +122,7 @@ def I'
 
 lemma substitution_theorem_aux
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V V' V'': Valuation_ D)
   (E : Env)
   (c : Char)
@@ -140,7 +140,7 @@ lemma substitution_theorem_aux
     simp only [subAux]
     simp only [holds]
     simp only [I']
-    simp only [Interpretation.usingPred]
+    simp only [Interpretation_.usingPred]
     simp
     congr! 1
     simp only [List.map_eq_map_iff]
@@ -157,7 +157,7 @@ lemma substitution_theorem_aux
     simp only [subAux]
     simp only [holds]
     simp only [I']
-    simp only [Interpretation.usingPred]
+    simp only [Interpretation_.usingPred]
     simp
     split_ifs
     case _ c1 c2 =>
@@ -279,7 +279,7 @@ lemma substitution_theorem_aux
 
     simp only [subAux]
     simp only [I']
-    simp only [Interpretation.usingPred]
+    simp only [Interpretation_.usingPred]
     simp only [holds]
 
     first | apply forall_congr' | apply exists_congr
@@ -411,7 +411,7 @@ lemma substitution_theorem_aux
         simp only [subAux] at E_ih
         apply Holds_coincide_PredVar
         · simp only [I']
-          simp only [Interpretation.usingPred]
+          simp only [Interpretation_.usingPred]
         · intro P ds a1
           simp only [pred_var_occurs_in_iff_mem_pred_var_set] at a1
           simp only [E_hd.h2] at a1
@@ -429,14 +429,14 @@ lemma substitution_theorem_aux
         simp only [← s2]
         apply Holds_coincide_PredVar
         · simp only [I']
-          simp only [Interpretation.usingPred]
+          simp only [Interpretation_.usingPred]
         · intro P ds a1
           simp only [pred_var_occurs_in] at a1
 
 
 theorem substitution_theorem
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (c : Char)

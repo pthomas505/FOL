@@ -997,7 +997,7 @@ theorem admitsAux_isFreeIn
 
 theorem substitution_theorem_aux
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
   (v t : VarName)
@@ -1135,7 +1135,7 @@ theorem substitution_theorem_aux
 
 theorem substitution_theorem
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (v t : VarName)

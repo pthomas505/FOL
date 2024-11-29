@@ -155,11 +155,11 @@ lemma replace_no_predVar
 /--
   Helper function for I'.
 -/
-def Interpretation.usingPred
+def Interpretation_.usingPred
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (pred_ : PredName → List D → Prop) :
-  Interpretation D := {
+  Interpretation_ D := {
     nonempty := I.nonempty
     pred_const_ := I.pred_const_
     pred_var_ := pred_ }
@@ -170,14 +170,14 @@ def Interpretation.usingPred
 -/
 def I'
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (P : PredName)
   (zs : List VarName)
   (H : Formula) :
-  Interpretation D :=
-  (Interpretation.usingPred D I (
+  Interpretation_ D :=
+  (Interpretation_.usingPred D I (
     fun (Q : PredName) (ds : List D) =>
       if Q = P ∧ ds.length = zs.length
       then holds D I (Function.updateListITE V zs ds) E H
@@ -187,7 +187,7 @@ def I'
 
 theorem substitution_theorem_aux
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
   (F : Formula)
@@ -208,14 +208,14 @@ theorem substitution_theorem_aux
       simp only [replace]
       simp only [holds]
       simp only [I']
-      simp only [Interpretation.usingPred]
+      simp only [Interpretation_.usingPred]
     case pred_var_ X xs =>
         simp only [admitsAux] at h1
 
         simp only [replace]
         simp only [holds]
         simp only [I']
-        simp only [Interpretation.usingPred]
+        simp only [Interpretation_.usingPred]
         simp
         split_ifs at h1
         case pos c1 =>
@@ -316,21 +316,21 @@ theorem substitution_theorem_aux
       simp only [replace_no_predVar P zs H hd.q hd.h2] at ih
       apply Holds_coincide_PredVar
       · simp only [I']
-        simp only [Interpretation.usingPred]
+        simp only [Interpretation_.usingPred]
       · simp only [pred_var_occurs_in_iff_mem_pred_var_set]
         simp only [hd.h2]
         simp
     case _ c1 =>
       apply Holds_coincide_PredVar
       · simp only [I']
-        simp only [Interpretation.usingPred]
+        simp only [Interpretation_.usingPred]
       · simp only [pred_var_occurs_in]
         simp
 
 
 theorem substitution_theorem
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (F : Formula)

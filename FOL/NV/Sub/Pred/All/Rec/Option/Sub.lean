@@ -89,7 +89,7 @@ def admitsAux
 
 theorem substitution_theorem_aux
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
   (c : Char)

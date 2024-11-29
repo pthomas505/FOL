@@ -130,7 +130,7 @@ inductive IsSub
 
 theorem substitution_theorem
   (D : Type)
-  (I J : Interpretation D)
+  (I J : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (A : Formula)
@@ -258,7 +258,7 @@ theorem substitution_is_valid
 
   simp only [is_valid]
   intro D I V E
-  let J : Interpretation D :=
+  let J : Interpretation_ D :=
     { nonempty := I.nonempty
       pred_const_ := I.pred_const_
       pred_var_ := fun (Q : PredName) (ds : List D) =>
@@ -266,7 +266,7 @@ theorem substitution_is_valid
         then holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ Q ds }
   obtain s1 := substitution_theorem D I J V E F P zs H F' h1
-  simp only [Interpretation.pred_var_] at s1
+  simp only [Interpretation_.pred_var_] at s1
   have s2 : holds D I V E F' ↔ holds D J V E F :=
     by
     apply s1

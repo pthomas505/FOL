@@ -14,7 +14,7 @@ open Formula
 
   D is the domain of discourse.
 -/
-structure Interpretation (D : Type) : Type where
+structure Interpretation_ (D : Type) : Type where
   /--
     The domain of discourse is not empty.
   -/
@@ -30,7 +30,7 @@ structure Interpretation (D : Type) : Type where
   -/
   (pred_var_ : PredName → (List D → Prop))
 
-instance (D : Type) [Inhabited D] : Inhabited (Interpretation D) :=
+instance (D : Type) [Inhabited D] : Inhabited (Interpretation_ D) :=
   Inhabited.mk {
     nonempty := by infer_instance
     pred_const_ := fun _ _ => False
@@ -54,7 +54,7 @@ instance (D : Type) [Inhabited D] : Inhabited (Valuation_ D) :=
 -/
 def holds
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D) : Env → Formula → Prop
   | _, pred_const_ X xs => I.pred_const_ X (xs.map V)
   | _, pred_var_ X xs => I.pred_var_ X (xs.map V)
@@ -94,12 +94,12 @@ def holds
   Formula.isValid F := True if and only if F evaluates to True in every combination of domain of discourse, interpretation, variable assignment and environment.
 -/
 def Formula.is_valid (F : Formula) : Prop :=
-  ∀ (D : Type) (I : Interpretation D) (V : Valuation_ D) (E : Env), holds D I V E F
+  ∀ (D : Type) (I : Interpretation_ D) (V : Valuation_ D) (E : Env), holds D I V E F
 
 
 theorem holds_coincide_var
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
   (F : Formula)
@@ -173,7 +173,7 @@ theorem holds_coincide_var
 
 theorem Holds_coincide_PredVar
   (D : Type)
-  (I I' : Interpretation D)
+  (I I' : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
   (F : Formula)
@@ -237,7 +237,7 @@ theorem Holds_coincide_PredVar
 
 lemma Holds_coincide_Env
   (D : Type)
-  (I : Interpretation D)
+  (I : Interpretation_ D)
   (V : Valuation_ D)
   (E E' : Env)
   (F : Formula)
