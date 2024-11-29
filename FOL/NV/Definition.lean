@@ -91,22 +91,22 @@ instance (E : Env) : Decidable (E.nodup_) :=
 
 
 /--
-  `Env.WellFormed E` := True if and only if
+  `Env.well_formed E` := True if and only if
   1. Every definition that occurs in the environment `E` has a unique combination of name and argument length.
   2. Every definition that occurs in the formula of a definition `d` in the environment `d :: E' ⊆ E` occurs in the environment `E'`. This means there are no circular definitions.
 -/
-def Env.WellFormed : Env → Prop
+def Env.well_formed : Env → Prop
   | List.nil => True
   | d :: E =>
     (∀ (d' : Definition), d' ∈ E →
       d.name = d'.name → d.args.length = d'.args.length → False) ∧
-        Formula.all_def_in_env E d.q ∧ Env.WellFormed E
+        Formula.all_def_in_env E d.q ∧ Env.well_formed E
 
-instance (E : Env) : Decidable (E.WellFormed) :=
+instance (E : Env) : Decidable (E.well_formed) :=
   by
   induction E
   all_goals
-    simp only [Env.WellFormed]
+    simp only [Env.well_formed]
     infer_instance
 
 
