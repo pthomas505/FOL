@@ -13,15 +13,15 @@ open Formula
 /--
   Helper function for replaceFree.
 -/
-def replaceFreeAux (σ : VarName → VarName) (binders : Finset VarName) : Formula → Formula
+def replaceFreeAux (σ : VarName_ → VarName_) (binders : Finset VarName_) : Formula → Formula
   | pred_const_ X xs =>
       pred_const_
       X
-      (xs.map fun (x : VarName) => if x ∉ binders then σ x else x)
+      (xs.map fun (x : VarName_) => if x ∉ binders then σ x else x)
   | pred_var_ X xs =>
       pred_var_
       X
-      (xs.map fun (x : VarName) => if x ∉ binders then σ x else x)
+      (xs.map fun (x : VarName_) => if x ∉ binders then σ x else x)
   | eq_ x y =>
       eq_
       (if x ∉ binders then σ x else x)
@@ -52,20 +52,20 @@ def replaceFreeAux (σ : VarName → VarName) (binders : Finset VarName) : Formu
   | def_ X xs =>
       def_
       X
-      (xs.map fun (x : VarName) => if x ∉ binders then σ x else x)
+      (xs.map fun (x : VarName_) => if x ∉ binders then σ x else x)
 
 
 /--
   replaceFree σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
-def replaceFree (σ : VarName → VarName) (F : Formula) : Formula :=
+def replaceFree (σ : VarName_ → VarName_) (F : Formula) : Formula :=
   replaceFreeAux σ ∅ F
 
 
 /--
   fastReplaceFree σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
-def fastReplaceFree (σ : VarName → VarName) : Formula → Formula
+def fastReplaceFree (σ : VarName_ → VarName_) : Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs => pred_var_ X (xs.map σ)
   | eq_ x y => eq_ (σ x) (σ y)
@@ -123,7 +123,7 @@ theorem fastReplaceFree_id
 
 example
   (F : Formula)
-  (v t : VarName) :
+  (v t : VarName_) :
   fastReplaceFree (Function.updateITE id v t) F =
     One.Rec.fastReplaceFree v t F :=
   by
@@ -169,8 +169,8 @@ example
 
 theorem fastReplaceFree_same_on_free
   (F : Formula)
-  (σ σ' : VarName → VarName)
-  (h1 : ∀ (v : VarName), var_is_free_in v F → σ v = σ' v) :
+  (σ σ' : VarName_ → VarName_)
+  (h1 : ∀ (v : VarName_), var_is_free_in v F → σ v = σ' v) :
   fastReplaceFree σ F = fastReplaceFree σ' F :=
   by
   induction F generalizing σ σ'
@@ -224,9 +224,9 @@ theorem fastReplaceFree_same_on_free
 
 theorem replaceFreeAux_same_on_free
   (F : Formula)
-  (σ σ' : VarName → VarName)
-  (binders : Finset VarName)
-  (h1 : ∀ (v : VarName), v ∉ binders → σ v = σ' v) :
+  (σ σ' : VarName_ → VarName_)
+  (binders : Finset VarName_)
+  (h1 : ∀ (v : VarName_), v ∉ binders → σ v = σ' v) :
   replaceFreeAux σ binders F =
     replaceFreeAux σ' binders F :=
   by
@@ -261,9 +261,9 @@ theorem replaceFreeAux_same_on_free
 
 example
   (F : Formula)
-  (σ : VarName → VarName)
-  (binders : Finset VarName)
-  (h1 : ∀ (v : VarName), v ∈ binders → v = σ v) :
+  (σ : VarName_ → VarName_)
+  (binders : Finset VarName_)
+  (h1 : ∀ (v : VarName_), v ∈ binders → v = σ v) :
   replaceFreeAux σ binders F =
     fastReplaceFree σ F :=
   by
@@ -292,7 +292,7 @@ example
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     congr! 1
 
-    have s1 : (∀ (v : VarName), v ∈ binders ∪ {x} → v = Function.updateITE σ x x v)
+    have s1 : (∀ (v : VarName_), v ∈ binders ∪ {x} → v = Function.updateITE σ x x v)
     intros v a1
     simp at a1
     simp only [Function.updateITE]

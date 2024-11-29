@@ -11,7 +11,7 @@ open Formula
 
 def replace
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName × Formula)) :
+  (τ : PredName → ℕ → Option (List VarName_ × Formula)) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
@@ -51,8 +51,8 @@ def replace
 
 
 def admitsAux
-  (τ : PredName → ℕ → Option (List VarName × Formula))
-  (binders : Finset VarName) : Formula → Prop
+  (τ : PredName → ℕ → Option (List VarName_ × Formula))
+  (binders : Finset VarName_) : Formula → Prop
   | pred_const_ _ _ => True
   | pred_var_ X xs =>
       let opt := τ X xs.length
@@ -63,7 +63,7 @@ def admitsAux
         let H := val.snd
         if xs.length = zs.length
         then binders ∩ (H.free_var_set \ zs.toFinset) = ∅
-        --then ∀ x : VarName, x ∈ binders → ¬ (var_is_free_in x H ∧ x ∉ zs)
+        --then ∀ x : VarName_, x ∈ binders → ¬ (var_is_free_in x H ∧ x ∉ zs)
         else True
       else True
   | true_ => True
@@ -93,11 +93,11 @@ theorem substitution_theorem_aux
   (V V' : Valuation_ D)
   (E : Env)
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName × Formula))
-  (binders : Finset VarName)
+  (τ : PredName → ℕ → Option (List VarName_ × Formula))
+  (binders : Finset VarName_)
   (F : Formula)
   (h1 : admitsAux τ binders F)
-  (h2 : ∀ x : VarName, x ∉ binders → V' x = V x) :
+  (h2 : ∀ x : VarName_, x ∉ binders → V' x = V x) :
   holds D
     ⟨
       I.nonempty,

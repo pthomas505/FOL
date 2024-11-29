@@ -13,19 +13,19 @@ open Formula
 
 
 inductive AlphaEqvVar :
-  List (VarName × VarName) → VarName → VarName → Prop
+  List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
 | nil
-  (x : VarName) :
+  (x : VarName_) :
   AlphaEqvVar [] x x
 
 | head
-  (binders : List (VarName × VarName))
-  (x y : VarName) :
+  (binders : List (VarName_ × VarName_))
+  (x y : VarName_) :
   AlphaEqvVar ((x, y) :: binders) x y
 
 | tail
-  (binders : List (VarName × VarName))
-  (x y x' y' : VarName) :
+  (binders : List (VarName_ × VarName_))
+  (x y x' y' : VarName_) :
   ¬ x = x' →
   ¬ y = y' →
   AlphaEqvVar binders x' y' →
@@ -33,75 +33,75 @@ inductive AlphaEqvVar :
 
 
 inductive AlphaEqv' :
-  List (VarName × VarName) → Formula → Formula → Prop
+  List (VarName_ × VarName_) → Formula → Formula → Prop
 
   | pred_var_
-    (binders : List (VarName × VarName))
+    (binders : List (VarName_ × VarName_))
     (X : PredName)
-    (xs ys : List VarName) :
+    (xs ys : List VarName_) :
     List.Forall₂ (AlphaEqvVar binders) xs ys →
     AlphaEqv' binders (pred_var_ X xs) (pred_var_ X ys)
 
   | pred_const_
-    (binders : List (VarName × VarName))
+    (binders : List (VarName_ × VarName_))
     (X : PredName)
-    (xs ys : List VarName) :
+    (xs ys : List VarName_) :
     List.Forall₂ (AlphaEqvVar binders) xs ys →
     AlphaEqv' binders (pred_const_ X xs) (pred_const_ X ys)
 
   | compat_true_
-    (binders : List (VarName × VarName)) :
+    (binders : List (VarName_ × VarName_)) :
     AlphaEqv' binders true_ true_
 
   | compat_false_
-    (binders : List (VarName × VarName)) :
+    (binders : List (VarName_ × VarName_)) :
     AlphaEqv' binders false_ false_
 
   | compat_not_
-    (binders : List (VarName × VarName))
+    (binders : List (VarName_ × VarName_))
     (phi phi' : Formula) :
     AlphaEqv' binders phi phi' →
     AlphaEqv' binders (not_ phi) (not_ phi')
 
   | compat_imp_
-    (binders : List (VarName × VarName))
+    (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula) :
     AlphaEqv' binders phi phi' →
     AlphaEqv' binders psi psi' →
     AlphaEqv' binders (imp_ phi psi) (imp_ phi' psi')
 
   | compat_and_
-    (binders : List (VarName × VarName))
+    (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula) :
     AlphaEqv' binders phi phi' →
     AlphaEqv' binders psi psi' →
     AlphaEqv' binders (and_ phi psi) (and_ phi' psi')
 
   | compat_or_
-    (binders : List (VarName × VarName))
+    (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula) :
     AlphaEqv' binders phi phi' →
     AlphaEqv' binders psi psi' →
     AlphaEqv' binders (or_ phi psi) (or_ phi' psi')
 
   | compat_iff_
-    (binders : List (VarName × VarName))
+    (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula) :
     AlphaEqv' binders phi phi' →
     AlphaEqv' binders psi psi' →
     AlphaEqv' binders (iff_ phi psi) (iff_ phi' psi')
 
   | compat_forall_
-    (binders : List (VarName × VarName))
+    (binders : List (VarName_ × VarName_))
     (phi phi' : Formula)
-    (x y : VarName) :
+    (x y : VarName_) :
     AlphaEqv' ((x, y) :: binders) phi phi' →
     AlphaEqv' binders (forall_ x phi) (forall_ y phi')
 
   | compat_exists_
-    (binders : List (VarName × VarName))
+    (binders : List (VarName_ × VarName_))
     (phi phi' : Formula)
-    (x y : VarName) :
+    (x y : VarName_) :
     AlphaEqv' ((x, y) :: binders) phi phi' →
     AlphaEqv' binders (exists_ x phi) (exists_ y phi')
 
@@ -109,14 +109,14 @@ inductive AlphaEqv' :
 inductive AlphaEqv : Formula → Formula → Prop
   | rename_forall_
     (phi : Formula)
-    (x y : VarName) :
+    (x y : VarName_) :
     ¬ var_is_free_in y phi →
     ¬ isBoundIn y phi →
     AlphaEqv (forall_ x phi) (forall_ y (Sub.Var.One.Rec.fastReplaceFree x y phi))
 
   | rename_exists_
     (phi : Formula)
-    (x y : VarName) :
+    (x y : VarName_) :
     ¬ var_is_free_in y phi →
     ¬ isBoundIn y phi →
     AlphaEqv (exists_ x phi) (exists_ y (Sub.Var.One.Rec.fastReplaceFree x y phi))
@@ -152,13 +152,13 @@ inductive AlphaEqv : Formula → Formula → Prop
 
   | compat_forall_
     (phi phi' : Formula)
-    (x : VarName) :
+    (x : VarName_) :
     AlphaEqv phi phi' →
     AlphaEqv (forall_ x phi) (forall_ x phi')
 
   | compat_exists_
     (phi phi' : Formula)
-    (x : VarName) :
+    (x : VarName_) :
     AlphaEqv phi phi' →
     AlphaEqv (exists_ x phi) (exists_ x phi')
 
@@ -183,7 +183,7 @@ theorem replace_empty_Holds
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (u v : VarName)
+  (u v : VarName_)
   (F : Formula)
   (a : D)
   (h1 : ¬ var_is_free_in v F)
@@ -308,7 +308,7 @@ theorem replace_empty_Holds
         intro v' a1
         simp
 
-        have s1 : (List.map ((fun (a_1 : VarName) => if a_1 = v then a else V a_1) ∘ fun (x : VarName) => if u = x then v else x) xs) = (List.map (fun (a_1 : VarName) => if a_1 = u then a else V a_1) xs)
+        have s1 : (List.map ((fun (a_1 : VarName_) => if a_1 = v then a else V a_1) ∘ fun (x : VarName_) => if u = x then v else x) xs) = (List.map (fun (a_1 : VarName_) => if a_1 = u then a else V a_1) xs)
         {
           simp only [List.map_eq_map_iff]
           intro x a2
@@ -387,7 +387,7 @@ theorem Holds_iff_alphaEqv_Holds
     · exact h1_ih_2 V
 
 
-def isAlphaEqvVar : List (VarName × VarName) → VarName → VarName → Prop
+def isAlphaEqvVar : List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
   | [], x, y => x = y
 
   | hd :: tl, x, y =>
@@ -396,8 +396,8 @@ def isAlphaEqvVar : List (VarName × VarName) → VarName → VarName → Prop
 
 
 instance
-  (binders : List (VarName × VarName))
-  (x y : VarName) :
+  (binders : List (VarName_ × VarName_))
+  (x y : VarName_) :
   Decidable (isAlphaEqvVar binders x y) :=
   by
   induction binders
@@ -412,8 +412,8 @@ instance
     else ¬ y = hd.snd ∧ is_alpha_eqv_var tl x y
 -/
 def isAlphaEqvVarList
-  (binders : List (VarName × VarName)) :
-  List VarName → List VarName → Prop
+  (binders : List (VarName_ × VarName_)) :
+  List VarName_ → List VarName_ → Prop
   | [], [] => True
 
   | x_hd :: x_tl, y_hd :: y_tl =>
@@ -424,8 +424,8 @@ def isAlphaEqvVarList
 
 
 instance
-  (binders : List (VarName × VarName))
-  (xs ys : List VarName) :
+  (binders : List (VarName_ × VarName_))
+  (xs ys : List VarName_) :
   Decidable (isAlphaEqvVarList binders xs ys) :=
   by
   induction xs generalizing ys
@@ -437,7 +437,7 @@ instance
 
 
 lemma isAlphaEqvVarListId
-  (xs : List VarName) :
+  (xs : List VarName_) :
   isAlphaEqvVarList [] xs xs :=
   by
   induction xs
@@ -450,7 +450,7 @@ lemma isAlphaEqvVarListId
     · exact ih
 
 
-def isAlphaEqvAux : List (VarName × VarName) → Formula → Formula → Prop
+def isAlphaEqvAux : List (VarName_ × VarName_) → Formula → Formula → Prop
   | binders, pred_const_ X xs, pred_const_ Y ys =>
       X = Y ∧ isAlphaEqvVarList binders xs ys
 
@@ -491,7 +491,7 @@ def isAlphaEqvAux : List (VarName × VarName) → Formula → Formula → Prop
 
 
 instance
-  (binders : List (VarName × VarName))
+  (binders : List (VarName_ × VarName_))
   (F F' : Formula) :
   Decidable (isAlphaEqvAux binders F F') :=
   by
@@ -517,7 +517,7 @@ instance
 
 inductive AlphaEqvVarAssignment
   (D : Type) :
-  List (VarName × VarName) → Valuation_ D → Valuation_ D → Prop
+  List (VarName_ × VarName_) → Valuation_ D → Valuation_ D → Prop
   | nil {V} :
     AlphaEqvVarAssignment D [] V V
 
@@ -528,8 +528,8 @@ inductive AlphaEqvVarAssignment
 
 theorem aux_1
   (D : Type)
-  (binders : List (VarName × VarName))
-  (x y : VarName)
+  (binders : List (VarName_ × VarName_))
+  (x y : VarName_)
   (V V' : Valuation_ D)
   (h1 : AlphaEqvVarAssignment D binders V V')
   (h2 : isAlphaEqvVar binders x y) :
@@ -561,8 +561,8 @@ theorem aux_1
 
 theorem aux_2
   (D : Type)
-  (binders : List (VarName × VarName))
-  (xs ys : List VarName)
+  (binders : List (VarName_ × VarName_))
+  (xs ys : List VarName_)
   (V V' : Valuation_ D)
   (h1 : AlphaEqvVarAssignment D binders V V')
   (h2 : isAlphaEqvVarList binders xs ys) :
@@ -594,8 +594,8 @@ theorem aux_2
 
 
 lemma isAlphaEqvVarList_length
-  (binders : List (VarName × VarName))
-  (xs ys : List VarName)
+  (binders : List (VarName_ × VarName_))
+  (xs ys : List VarName_)
   (h1 : isAlphaEqvVarList binders xs ys) :
   xs.length = ys.length :=
   by
@@ -625,7 +625,7 @@ lemma isAlphaEqv_Holds_aux
   (V V' : Valuation_ D)
   (E : Env)
   (F F' : Formula)
-  (binders : List (VarName × VarName))
+  (binders : List (VarName_ × VarName_))
   (h1 : AlphaEqvVarAssignment D binders V V')
   (h2 : isAlphaEqvAux binders F F') :
   holds D I V E F ↔ holds D I V' E F' :=

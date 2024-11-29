@@ -13,42 +13,42 @@ open Formula
 /--
   IsReplaceFree σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
-inductive IsReplaceFree : (VarName → VarName) → Formula → Formula → Prop
+inductive IsReplaceFree : (VarName_ → VarName_) → Formula → Formula → Prop
 
   | pred_const_
-    (σ : VarName → VarName)
+    (σ : VarName_ → VarName_)
     (X : PredName)
-    (xs : List VarName) :
+    (xs : List VarName_) :
     IsReplaceFree σ (pred_const_ X xs) (pred_const_ X (xs.map σ))
 
   | pred_var_
-    (σ : VarName → VarName)
+    (σ : VarName_ → VarName_)
     (X : PredName)
-    (xs : List VarName) :
+    (xs : List VarName_) :
     IsReplaceFree σ (pred_var_ X xs) (pred_var_ X (xs.map σ))
 
   | eq_
-    (σ : VarName → VarName)
-    (x y : VarName) :
+    (σ : VarName_ → VarName_)
+    (x y : VarName_) :
     IsReplaceFree σ (eq_ x y) (eq_ (σ x) (σ y))
 
   | true_
-    (σ : VarName → VarName) :
+    (σ : VarName_ → VarName_) :
     IsReplaceFree σ true_ true_
 
   | false_
-    (σ : VarName → VarName) :
+    (σ : VarName_ → VarName_) :
     IsReplaceFree σ false_ false_
 
   | not_
-    (σ : VarName → VarName)
+    (σ : VarName_ → VarName_)
     (phi : Formula)
     (phi' : Formula) :
     IsReplaceFree σ phi phi' →
     IsReplaceFree σ phi.not_ phi'.not_
 
   | imp_
-    (σ : VarName → VarName)
+    (σ : VarName_ → VarName_)
     (phi psi : Formula)
     (phi' psi' : Formula) :
     IsReplaceFree σ phi phi' →
@@ -56,7 +56,7 @@ inductive IsReplaceFree : (VarName → VarName) → Formula → Formula → Prop
     IsReplaceFree σ (phi.imp_ psi) (phi'.imp_ psi')
 
   | and_
-    (σ : VarName → VarName)
+    (σ : VarName_ → VarName_)
     (phi psi : Formula)
     (phi' psi' : Formula) :
     IsReplaceFree σ phi phi' →
@@ -64,7 +64,7 @@ inductive IsReplaceFree : (VarName → VarName) → Formula → Formula → Prop
     IsReplaceFree σ (phi.and_ psi) (phi'.and_ psi')
 
   | or_
-    (σ : VarName → VarName)
+    (σ : VarName_ → VarName_)
     (phi psi : Formula)
     (phi' psi' : Formula) :
     IsReplaceFree σ phi phi' →
@@ -72,7 +72,7 @@ inductive IsReplaceFree : (VarName → VarName) → Formula → Formula → Prop
     IsReplaceFree σ (phi.or_ psi) (phi'.or_ psi')
 
   | iff_
-    (σ : VarName → VarName)
+    (σ : VarName_ → VarName_)
     (phi psi : Formula)
     (phi' psi' : Formula) :
     IsReplaceFree σ phi phi' →
@@ -80,29 +80,29 @@ inductive IsReplaceFree : (VarName → VarName) → Formula → Formula → Prop
     IsReplaceFree σ (phi.iff_ psi) (phi'.iff_ psi')
 
   | forall_
-    (σ : VarName → VarName)
-    (x : VarName)
+    (σ : VarName_ → VarName_)
+    (x : VarName_)
     (phi phi' : Formula) :
     IsReplaceFree (Function.updateITE σ x x) phi phi' →
     IsReplaceFree σ (forall_ x phi) (forall_ x phi')
 
   | exists_
-    (σ : VarName → VarName)
-    (x : VarName)
+    (σ : VarName_ → VarName_)
+    (x : VarName_)
     (phi phi' : Formula) :
     IsReplaceFree (Function.updateITE σ x x) phi phi' →
     IsReplaceFree σ (exists_ x phi) (exists_ x phi')
 
   | def_
-    (σ : VarName → VarName)
+    (σ : VarName_ → VarName_)
     (X : DefName)
-    (xs : List VarName) :
+    (xs : List VarName_) :
     IsReplaceFree σ (def_ X xs) (def_ X (xs.map σ))
 
 
 example
   (F F' : Formula)
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (h1 : Rec.fastReplaceFree σ F = F') :
   IsReplaceFree σ F F' :=
   by
@@ -151,7 +151,7 @@ example
 
 example
   (F F' : Formula)
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (h1 : IsReplaceFree σ F F') :
   Rec.fastReplaceFree σ F = F' :=
   by

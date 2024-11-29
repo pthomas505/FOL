@@ -17,7 +17,7 @@ open Formula
   sub σ c F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v. The character c is used to generate fresh binding variables as needed to avoid free variable capture.
 -/
 def sub
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (c : Char) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map σ)
@@ -31,14 +31,14 @@ def sub
   | or_ phi psi => or_ (sub σ c phi) (sub σ c psi)
   | iff_ phi psi => iff_ (sub σ c phi) (sub σ c psi)
   | forall_ x phi =>
-    let x' : VarName :=
-      if ∃ (y : VarName), y ∈ phi.free_var_set \ {x} ∧ σ y = x
+    let x' : VarName_ :=
+      if ∃ (y : VarName_), y ∈ phi.free_var_set \ {x} ∧ σ y = x
       then fresh x c ((sub (Function.updateITE σ x x) c phi).free_var_set)
       else x
     forall_ x' (sub (Function.updateITE σ x x') c phi)
   | exists_ x phi =>
-    let x' : VarName :=
-      if ∃ (y : VarName), y ∈ phi.free_var_set \ {x} ∧ σ y = x
+    let x' : VarName_ :=
+      if ∃ (y : VarName_), y ∈ phi.free_var_set \ {x} ∧ σ y = x
       then fresh x c ((sub (Function.updateITE σ x x) c phi).free_var_set)
       else x
     exists_ x' (sub (Function.updateITE σ x x') c phi)
@@ -46,7 +46,7 @@ def sub
 
 
 lemma freeVarSet_sub_eq_freeVarSet_image
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula) :
   (sub σ c F).free_var_set = F.free_var_set.image σ :=
@@ -132,7 +132,7 @@ theorem substitution_theorem
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula) :
   holds D I V E (sub σ c F) ↔
@@ -248,7 +248,7 @@ theorem substitution_theorem
 
 
 theorem substitution_is_valid
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula)
   (h1 : is_valid F) :
@@ -285,7 +285,7 @@ def Formula.length : Formula → ℕ
 
 
 lemma sub_formula_length_same
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula) :
   (sub σ c F).length = F.length :=
@@ -346,9 +346,9 @@ lemma SubId
 --------------------------------------------------
 
 def sub_alpha
-  (σ : VarName → VarName)
-  (α : VarName → VarName)
-  (binders : Finset VarName)
+  (σ : VarName_ → VarName_)
+  (α : VarName_ → VarName_)
+  (binders : Finset VarName_)
   (c : Char) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map α)
@@ -395,8 +395,8 @@ def sub_alpha
 
 
 def sub_alpha'
-  (σ : VarName → VarName)
-  (α : VarName → VarName)
+  (σ : VarName_ → VarName_)
+  (α : VarName_ → VarName_)
   (c : Char) :
   Formula → (Formula × Formula)
 | pred_const_ X xs => (pred_const_ X (xs.map σ), pred_const_ X (xs.map α))
@@ -410,15 +410,15 @@ def sub_alpha'
 | or_ phi psi => ((or_ (sub_alpha' σ α c phi).fst (sub_alpha' σ α c psi).fst), (or_ (sub_alpha' σ α c phi).snd (sub_alpha' σ α c psi).snd))
 | iff_ phi psi => ((iff_ (sub_alpha' σ α c phi).fst (sub_alpha' σ α c psi).fst), (iff_ (sub_alpha' σ α c phi).snd (sub_alpha' σ α c psi).snd))
 | forall_ x phi =>
-  let x' : VarName :=
-    if ∃ (y : VarName), y ∈ phi.free_var_set \ {x} ∧ σ y = x
+  let x' : VarName_ :=
+    if ∃ (y : VarName_), y ∈ phi.free_var_set \ {x} ∧ σ y = x
     then fresh x c ((sub_alpha' (Function.updateITE σ x x) α c phi).fst.free_var_set)
     else x
   let phi' := (sub_alpha' (Function.updateITE σ x x') (Function.updateITE α x x') c phi)
   (forall_ x' phi'.fst, forall_ x' phi'.snd)
 | exists_ x phi =>
-  let x' : VarName :=
-    if ∃ (y : VarName), y ∈ phi.free_var_set \ {x} ∧ σ y = x
+  let x' : VarName_ :=
+    if ∃ (y : VarName_), y ∈ phi.free_var_set \ {x} ∧ σ y = x
     then fresh x c ((sub_alpha' (Function.updateITE σ x x) α c phi).fst.free_var_set)
     else x
   let phi' := (sub_alpha' (Function.updateITE σ x x') (Function.updateITE α x x') c phi)
@@ -429,9 +429,9 @@ def sub_alpha'
 
 def c := '+'
 
-def σ := (Function.updateITE id (VarName.mk "x") (VarName.mk "y"))
+def σ := (Function.updateITE id (VarName_.mk "x") (VarName_.mk "y"))
 
-def F := (forall_ (VarName.mk "y++") (forall_ (VarName.mk "y") (pred_var_ (PredName.mk "X") [VarName.mk "x", VarName.mk "y++"])))
+def F := (forall_ (VarName_.mk "y++") (forall_ (VarName_.mk "y") (pred_var_ (PredName.mk "X") [VarName_.mk "x", VarName_.mk "y++"])))
 
 def F' := (sub_alpha' σ id c F).snd
 def F'' := sub_alpha σ id ∅ c F

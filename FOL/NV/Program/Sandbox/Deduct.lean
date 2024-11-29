@@ -8,13 +8,13 @@ set_option autoImplicit false
 /--
   The type of variable names.
 -/
-structure VarName extends String
+structure VarName_ extends String
   deriving Inhabited, DecidableEq
 
-instance : ToString VarName :=
+instance : ToString VarName_ :=
   { toString := fun x => x.toString }
 
-instance : Repr VarName :=
+instance : Repr VarName_ :=
   { reprPrec := fun x _ => x.toString.toFormat }
 
 
@@ -48,9 +48,9 @@ instance : Repr DefName :=
   The type of formulas.
 -/
 inductive Formula : Type
-  | pred_const_ : PredName → List VarName → Formula
-  | pred_var_ : PredName → List VarName → Formula
-  | eq_ : VarName → VarName → Formula
+  | pred_const_ : PredName → List VarName_ → Formula
+  | pred_var_ : PredName → List VarName_ → Formula
+  | eq_ : VarName_ → VarName_ → Formula
   | true_ : Formula
   | false_ : Formula
   | not_ : Formula → Formula
@@ -58,9 +58,9 @@ inductive Formula : Type
   | and_ : Formula → Formula → Formula
   | or_ : Formula → Formula → Formula
   | iff_ : Formula → Formula → Formula
-  | forall_ : VarName → Formula → Formula
-  | exists_ : VarName → Formula → Formula
-  | def_ : DefName → List VarName → Formula
+  | forall_ : VarName_ → Formula → Formula
+  | exists_ : VarName_ → Formula → Formula
+  | def_ : DefName → List VarName_ → Formula
   deriving Inhabited, DecidableEq
 
 compile_inductive% Formula
@@ -107,7 +107,7 @@ def Formula.And_ (l : List Formula) : Formula :=
 /--
   Formula.free_var_set F := The set of all of the variables that have a free occurrence in the formula F.
 -/
-def Formula.free_var_set : Formula → Finset VarName
+def Formula.free_var_set : Formula → Finset VarName_
   | pred_const_ _ xs => xs.toFinset
   | pred_var_ _ xs => xs.toFinset
   | eq_ x y => {x, y}
@@ -126,7 +126,7 @@ def Formula.free_var_set : Formula → Finset VarName
 /--
   var_is_free_in v F := True if and only if there is a free occurrence of the variable v in the formula F.
 -/
-def var_is_free_in (v : VarName) : Formula → Prop
+def var_is_free_in (v : VarName_) : Formula → Prop
   | pred_const_ _ xs => v ∈ xs
   | pred_var_ _ xs => v ∈ xs
   | eq_ x y => v = x ∨ v = y
@@ -141,7 +141,7 @@ def var_is_free_in (v : VarName) : Formula → Prop
   | exists_ x phi => ¬ v = x ∧ var_is_free_in v phi
   | def_ _ xs => v ∈ xs
 
-instance (v : VarName) (F : Formula) : Decidable (var_is_free_in v F) :=
+instance (v : VarName_) (F : Formula) : Decidable (var_is_free_in v F) :=
   by
   induction F
   all_goals
@@ -186,7 +186,7 @@ def Function.updateIte
 /--
   fastReplaceFreeFun σ F := The simultaneous replacement of each free occurence of any variable v in the formula F by σ v.
 -/
-def fastReplaceFreeFun : (VarName → VarName) → Formula → Formula
+def fastReplaceFreeFun : (VarName_ → VarName_) → Formula → Formula
   | σ, pred_const_ X xs => pred_const_ X (xs.map σ)
   | σ, pred_var_ X xs => pred_var_ X (xs.map σ)
   | σ, eq_ x y => eq_ (σ x) (σ y)
@@ -217,12 +217,12 @@ def fastReplaceFreeFun : (VarName → VarName) → Formula → Formula
 
 
 def admitsFunAux
-  (σ : VarName → VarName) :
-  Finset VarName → Formula → Prop
+  (σ : VarName_ → VarName_) :
+  Finset VarName_ → Formula → Prop
   | binders, pred_const_ _ xs =>
-      ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
+      ∀ v : VarName_, v ∈ xs → v ∉ binders → σ v ∉ binders
   | binders, pred_var_ _ xs =>
-      ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
+      ∀ v : VarName_, v ∈ xs → v ∉ binders → σ v ∉ binders
   | binders, eq_ x y =>
       (x ∉ binders → σ x ∉ binders) ∧
       (y ∉ binders → σ y ∉ binders)
@@ -244,12 +244,12 @@ def admitsFunAux
   | binders, forall_ x phi => admitsFunAux σ (binders ∪ {x}) phi
   | binders, exists_ x phi => admitsFunAux σ (binders ∪ {x}) phi
   | binders, def_ _ xs =>
-      ∀ v : VarName, v ∈ xs → v ∉ binders → σ v ∉ binders
+      ∀ v : VarName_, v ∈ xs → v ∉ binders → σ v ∉ binders
 
 
 instance
-  (σ : VarName → VarName)
-  (binders : Finset VarName)
+  (σ : VarName_ → VarName_)
+  (binders : Finset VarName_)
   (F : Formula) :
   Decidable (admitsFunAux σ binders F) :=
   by
@@ -259,12 +259,12 @@ instance
     infer_instance
 
 
-def admitsFun (σ : VarName → VarName) (phi : Formula) : Prop :=
+def admitsFun (σ : VarName_ → VarName_) (phi : Formula) : Prop :=
   admitsFunAux σ ∅ phi
 
 
 instance
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (F : Formula) :
   Decidable (admitsFun σ F) :=
   by
@@ -290,7 +290,7 @@ def Function.updateListIte
 /--
   The recursive simultaneous uniform substitution of all of the predicate variables in a formula.
 -/
-def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formula → Formula
+def replacePredFun (τ : PredName → ℕ → (List VarName_ × Formula)) : Formula → Formula
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
       if xs.length = (τ X xs.length).fst.length
@@ -322,12 +322,12 @@ def replacePredFun (τ : PredName → ℕ → (List VarName × Formula)) : Formu
 
 
 def admitsPredFunAux
-  (τ : PredName → ℕ → List VarName × Formula) :
-  Finset VarName → Formula → Prop
+  (τ : PredName → ℕ → List VarName_ × Formula) :
+  Finset VarName_ → Formula → Prop
   | _, pred_const_ _ _ => True
   | binders, pred_var_ X xs =>
     admitsFun (Function.updateListIte id (τ X xs.length).fst xs) (τ X xs.length).snd ∧
-      (∀ x : VarName, x ∈ binders → ¬ (var_is_free_in x (τ X xs.length).snd ∧ x ∉ (τ X xs.length).fst)) ∧
+      (∀ x : VarName_, x ∈ binders → ¬ (var_is_free_in x (τ X xs.length).snd ∧ x ∉ (τ X xs.length).fst)) ∧
         xs.length = (τ X xs.length).fst.length
   | _, true_ => True
   | _, false_ => True
@@ -350,8 +350,8 @@ def admitsPredFunAux
   | _, def_ _ _ => True
 
 instance
-  (τ : PredName → ℕ → List VarName × Formula)
-  (binders : Finset VarName)
+  (τ : PredName → ℕ → List VarName_ × Formula)
+  (binders : Finset VarName_)
   (F : Formula) :
   Decidable (admitsPredFunAux τ binders F) :=
   by
@@ -361,11 +361,11 @@ instance
     infer_instance
 
 
-def admitsPredFun (τ : PredName → ℕ → List VarName × Formula) (F : Formula) : Prop :=
+def admitsPredFun (τ : PredName → ℕ → List VarName_ × Formula) (F : Formula) : Prop :=
   admitsPredFunAux τ ∅ F
 
 instance
-  (τ : PredName → ℕ → List VarName × Formula)
+  (τ : PredName → ℕ → List VarName_ × Formula)
   (F : Formula) :
   Decidable (admitsPredFun τ F) :=
   by
@@ -375,7 +375,7 @@ instance
 
 structure Definition : Type where
 (name : DefName)
-(args : List VarName)
+(args : List VarName_)
 (F : Formula)
 deriving Inhabited, DecidableEq
 
@@ -470,10 +470,10 @@ def unfoldDef
   A bijective function mapping variable names to variable names.
 -/
 def Instantiation : Type :=
-  { σ : VarName → VarName // ∃ σ' : VarName → VarName, σ ∘ σ' = id ∧ σ' ∘ σ = id }
+  { σ : VarName_ → VarName_ // ∃ σ' : VarName_ → VarName_, σ ∘ σ' = id ∧ σ' ∘ σ = id }
 
 def replaceAllVar
-  (σ : VarName → VarName) :
+  (σ : VarName_ → VarName_) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs => pred_var_ X (xs.map σ)
@@ -518,7 +518,7 @@ inductive IsConv (E : Env) : Formula → Formula → Prop
     IsConv E (imp_ phi psi) (imp_ phi' psi')
 
   | conv_forall
-    (x : VarName)
+    (x : VarName_)
     (phi phi' : Formula) :
     IsConv E phi phi' →
     IsConv E (forall_ x phi) (forall_ x phi')
@@ -531,7 +531,7 @@ inductive IsConv (E : Env) : Formula → Formula → Prop
 
   | conv_unfold'
     (d : Definition)
-    (σ : VarName → VarName) :
+    (σ : VarName_ → VarName_) :
     d ∈ E →
     admitsFun σ d.F →
     IsConv E (def_ d.name (d.args.map σ)) (fastReplaceFreeFun σ d.F)
@@ -613,7 +613,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
   | pred_1_
     (E : Env)
     (Δ : List Formula)
-    (v : VarName)
+    (v : VarName_)
     (phi psi : Formula) :
     IsDeduct E Δ
       ((forall_ v (phi.imp_ psi)).imp_
@@ -627,7 +627,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
   | pred_2_
     (E : Env)
     (Δ : List Formula)
-    (v t : VarName)
+    (v t : VarName_)
     (phi : Formula) :
     admitsFun (Function.updateIte id v t) phi →
     IsDeduct E Δ ((forall_ v phi).imp_ (fastReplaceFreeFun (Function.updateIte id v t) phi))
@@ -639,7 +639,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
   | pred_3_
     (E : Env)
     (Δ : List Formula)
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     ¬ var_is_free_in v phi →
     IsDeduct E Δ (phi.imp_ (forall_ v phi))
@@ -650,7 +650,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
   | eq_1_
     (E : Env)
     (Δ : List Formula)
-    (v : VarName) :
+    (v : VarName_) :
     IsDeduct E Δ (eq_ v v)
 
   /-
@@ -661,7 +661,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     (E : Env)
     (Δ : List Formula)
     (name : PredName)
-    (xs ys : List VarName) :
+    (xs ys : List VarName_) :
     xs.length = ys.length →
     IsDeduct E Δ
     ((And_ (List.zipWith eq_ xs ys)).imp_
@@ -675,7 +675,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     (E : Env)
     (Δ : List Formula)
     (name : PredName)
-    (xs ys : List VarName) :
+    (xs ys : List VarName_) :
     xs.length = ys.length →
     IsDeduct E Δ
     ((And_ (List.zipWith eq_ xs ys)).imp_
@@ -688,7 +688,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
   | eq_2_eq_
     (E : Env)
     (Δ : List Formula)
-    (x_0 x_1 y_0 y_1 : VarName) :
+    (x_0 x_1 y_0 y_1 : VarName_) :
     IsDeduct E Δ
     ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_
       ((eq_ x_0 x_1).imp_ (eq_ y_0 y_1)))
@@ -700,7 +700,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
   | gen_
     (E : Env)
     (Δ : List Formula)
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     (∀ H : Formula, H ∈ Δ → ¬ var_is_free_in v H) →
     IsDeduct E Δ phi →
@@ -765,7 +765,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     (∀ d' : Definition, d' ∈ E → d.name = d'.name → d.args.length = d'.args.length → False) →
     d.F.all_def_in_env E →
     d.args.Nodup →
-    (∀ v : VarName, var_is_free_in v F → v ∈ d.args.toFinset) →
+    (∀ v : VarName_, var_is_free_in v F → v ∈ d.args.toFinset) →
     d.F.pred_var_set = ∅ →
     IsDeduct E Δ F →
     IsDeduct (d :: E) Δ F
@@ -784,7 +784,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     (E : Env)
     (Δ : List Formula)
     (phi : Formula)
-    (τ : PredName → ℕ → List VarName × Formula) :
+    (τ : PredName → ℕ → List VarName_ × Formula) :
     IsDeduct E Δ phi →
     admitsPredFun τ phi →
     (∀ H : Formula, H ∈ Δ → admitsPredFun τ H) →

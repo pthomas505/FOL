@@ -100,7 +100,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ (∀ v (phi → psi)) → ((∀ v phi) → (∀ v psi))
   -/
   | pred_1_
-    (v : VarName)
+    (v : VarName_)
     (phi psi : Formula) :
     IsDeduct [] ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi)))
 
@@ -108,7 +108,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ (∀ v phi) → phi(t/v)  provided phi admits t for v
   -/
   | pred_2_
-    (v t : VarName)
+    (v t : VarName_)
     (phi : Formula) :
     IsDeduct [] ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.sub (Function.updateITE id v t) freshChar phi))
 
@@ -116,7 +116,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ phi → (∀ v phi)  provided v is not free in phi
   -/
   | pred_3_
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     ¬ var_is_free_in v phi →
     IsDeduct [] (phi.imp_ (forall_ v phi))
@@ -125,7 +125,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ phi ⇒ ⊢ ∀ v phi
   -/
   | gen_
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     IsDeduct [] phi →
     IsDeduct [] (forall_ v phi)
@@ -134,7 +134,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ v = v
   -/
   | eq_1_
-    (v : VarName) :
+    (v : VarName_) :
     IsDeduct [] (eq_ v v)
 
   /-
@@ -142,7 +142,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   -/
   | eq_2_pred_var_
     (name : PredName)
-    (xs ys : List VarName) :
+    (xs ys : List VarName_) :
     xs.length = ys.length →
     IsDeduct [] ((List.foldr and_ true_ (List.zipWith eq_ xs ys)).imp_ ((pred_var_ name xs).iff_ (pred_var_ name ys)))
 
@@ -150,7 +150,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
   -/
   | eq_2_eq_
-    (x_0 x_1 y_0 y_1 : VarName) :
+    (x_0 x_1 y_0 y_1 : VarName_) :
     IsDeduct [] ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_ ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))
 
   /-
@@ -187,14 +187,14 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ (∃ v phi) ↔ ¬ (∀ v ¬ phi)
   -/
   | def_exists_
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     IsDeduct [] ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
   | sub_
     (Δ : List Formula)
     (phi : Formula)
-    (τ : PredName → ℕ → Option (List VarName × Formula)) :
+    (τ : PredName → ℕ → Option (List VarName_ × Formula)) :
     IsDeduct Δ phi →
     IsDeduct (Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)) (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi)
 
@@ -210,19 +210,19 @@ inductive Rule : Type
   | prop_3_ : Formula → Formula → Rule
   | mp_ : List Formula → Formula → Formula → ℕ → ℕ → Rule
   | dt_ : List Formula → Formula → Formula → ℕ → Rule
-  | pred_1_ : VarName → Formula → Formula → Rule
-  | pred_2_ : VarName → VarName → Formula → Rule
-  | pred_3_ : VarName → Formula → Rule
-  | gen_ : VarName → Formula → ℕ → Rule
-  | eq_1_ : VarName → Rule
-  | eq_2_eq_ : VarName → VarName → VarName → VarName → Rule
-  | eq_2_pred_var_ : PredName → List VarName → List VarName → Rule
+  | pred_1_ : VarName_ → Formula → Formula → Rule
+  | pred_2_ : VarName_ → VarName_ → Formula → Rule
+  | pred_3_ : VarName_ → Formula → Rule
+  | gen_ : VarName_ → Formula → ℕ → Rule
+  | eq_1_ : VarName_ → Rule
+  | eq_2_eq_ : VarName_ → VarName_ → VarName_ → VarName_ → Rule
+  | eq_2_pred_var_ : PredName → List VarName_ → List VarName_ → Rule
   | def_false_ : Rule
   | def_and_ : Formula → Formula → Rule
   | def_or_ : Formula → Formula → Rule
   | def_iff_ : Formula → Formula → Rule
-  | def_exists_ : VarName → Formula → Rule
-  | sub_ : List Formula → Formula → List (PredName × (List VarName) × Formula) → ℕ → Rule
+  | def_exists_ : VarName_ → Formula → Rule
+  | sub_ : List Formula → Formula → List (PredName × (List VarName_) × Formula) → ℕ → Rule
   | thm_ : String → Rule
   deriving Lean.ToJson, Lean.FromJson
 
@@ -365,7 +365,7 @@ def LocalContext.get
   opt.toExcept s! "{index} not found in local context."
 
 
-def PredReplaceListToFun : List (PredName × (List VarName) × Formula) → PredName → ℕ → Option ((List VarName) × Formula)
+def PredReplaceListToFun : List (PredName × (List VarName_) × Formula) → PredName → ℕ → Option ((List VarName_) × Formula)
   | [] => fun (_ : PredName) (_ : ℕ) => Option.none
   | (X, zs, H) :: tl =>
     fun (P : PredName) (n : ℕ) =>
@@ -693,7 +693,7 @@ def checkRule
     }
 
   | sub_ Δ phi xs label => do
-    let τ : PredName → ℕ → Option ((List VarName) × Formula) := PredReplaceListToFun xs
+    let τ : PredName → ℕ → Option ((List VarName_) × Formula) := PredReplaceListToFun xs
 
     let found : CheckedStep ← localContext.get label
 

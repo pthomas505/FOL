@@ -11,13 +11,13 @@ set_option autoImplicit false
   `finset_var_name_max_len xs` := The length of the longest variable name in the finite set of variable names `xs` or 0 if the set is empty.
 -/
 def finset_var_name_max_len :
-  Finset VarName → ℕ :=
-  Finset.fold (fun (m n : ℕ) => max m n) 0 (fun (x : VarName) => x.length)
+  Finset VarName_ → ℕ :=
+  Finset.fold (fun (m n : ℕ) => max m n) 0 (fun (x : VarName_) => x.length)
 
 
 lemma finset_var_name_max_len_mem
-  (x : VarName)
-  (xs : Finset VarName)
+  (x : VarName_)
+  (xs : Finset VarName_)
   (h1 : x ∈ xs) :
   x.length ≤ finset_var_name_max_len xs :=
   by
@@ -45,10 +45,10 @@ lemma finset_var_name_max_len_mem
   `fresh x c xs` := If the variable name `x` is not a member of the finite set of variable names `xs` then `x` is returned. If `x` is a member of `xs` then the character `c` is repeatedly appended to `x` until the resulting variable name is not a member of `xs`. The resulting variable name is then returned.
 -/
 def fresh
-  (x : VarName)
+  (x : VarName_)
   (c : Char)
-  (xs : Finset VarName) :
-  VarName :=
+  (xs : Finset VarName_) :
+  VarName_ :=
   if h : x ∈ xs
   then
     have : finset_var_name_max_len xs - x.length < finset_var_name_max_len xs + 1 - x.length :=
@@ -57,15 +57,15 @@ def fresh
       · apply finset_var_name_max_len_mem
         exact h
       · apply lt_add_one
-  fresh (VarName.mk (x.toString ++ c.toString)) c xs
+  fresh (VarName_.mk (x.toString ++ c.toString)) c xs
   else x
   termination_by finset_var_name_max_len xs + 1 - x.length
 
 
 lemma fresh_not_mem
-  (x : VarName)
+  (x : VarName_)
   (c : Char)
-  (xs : Finset VarName) :
+  (xs : Finset VarName_) :
   fresh x c xs ∉ xs :=
   if h : x ∈ xs
   then

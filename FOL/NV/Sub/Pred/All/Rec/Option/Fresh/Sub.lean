@@ -10,7 +10,7 @@ open Formula
 
 
 def predVarFreeVarSet
-  (τ : PredName → ℕ → Option (List VarName × Formula)) :=
+  (τ : PredName → ℕ → Option (List VarName_ × Formula)) :=
   fun ((X : PredName), (n : ℕ)) =>
     let opt := τ X n
     if h : Option.isSome opt
@@ -24,8 +24,8 @@ def predVarFreeVarSet
 
 def subAux
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName × Formula))
-  (σ : VarName → VarName) :
+  (τ : PredName → ℕ → Option (List VarName_ × Formula))
+  (σ : VarName_ → VarName_) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs =>
@@ -61,18 +61,18 @@ def subAux
       (subAux c τ σ phi)
       (subAux c τ σ psi)
   | forall_ x phi =>
-      let S : Finset VarName := (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+      let S : Finset VarName_ := (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
 
-      let x' : VarName :=
+      let x' : VarName_ :=
         if x ∈ S
         then fresh x c S
         else x
 
       forall_ x' (subAux c τ (Function.updateITE σ x x') phi)
   | exists_ x phi =>
-      let S : Finset VarName := (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
+      let S : Finset VarName_ := (Finset.image (Function.updateITE σ x x) (freeVarSet phi) ∪ Finset.biUnion (predVarSet phi) (predVarFreeVarSet τ))
 
-      let x' : VarName :=
+      let x' : VarName_ :=
         if x ∈ S
         then fresh x c S
         else x
@@ -83,7 +83,7 @@ def subAux
 
 def sub
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (τ : PredName → ℕ → Option (List VarName_ × Formula))
   (F : Formula) :
   Formula :=
   subAux c τ id F
@@ -104,7 +104,7 @@ def I'
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (τ : PredName → ℕ → Option (List VarName × Formula)) :
+  (τ : PredName → ℕ → Option (List VarName_ × Formula)) :
   Interpretation_ D :=
   (Interpretation_.usingPred D I (
   fun (X : PredName) (ds : List D) =>
@@ -126,11 +126,11 @@ lemma substitution_theorem_aux
   (V V' V'': Valuation_ D)
   (E : Env)
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName × Formula))
-  (σ : VarName → VarName)
+  (τ : PredName → ℕ → Option (List VarName_ × Formula))
+  (σ : VarName_ → VarName_)
   (F : Formula)
-  (h1 : ∀ (x : VarName), var_is_free_in x F → V' x = V (σ x))
-  (h2 : ∀ (x : VarName), x ∈ F.pred_var_set.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
+  (h1 : ∀ (x : VarName_), var_is_free_in x F → V' x = V (σ x))
+  (h2 : ∀ (x : VarName_), x ∈ F.pred_var_set.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
   holds D (I' D I V'' E τ) V' E F ↔ holds D I V E (subAux c τ σ F) :=
   by
   induction F generalizing V V' σ
@@ -440,7 +440,7 @@ theorem substitution_theorem
   (V : Valuation_ D)
   (E : Env)
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (τ : PredName → ℕ → Option (List VarName_ × Formula))
   (F : Formula) :
   holds D (I' D I V E τ) V E F ↔ holds D I V E (sub c τ F) :=
   by
@@ -451,7 +451,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName × Formula))
+  (τ : PredName → ℕ → Option (List VarName_ × Formula))
   (F : Formula)
   (h1 : is_valid F) :
   is_valid (sub c τ F) :=

@@ -101,13 +101,13 @@ inductive IsAxiom : Formula → Prop
 
   -- ⊢ (∀ v (phi → psi)) → ((∀ v phi) → (∀ v psi))
   | pred_1_
-    (v : VarName)
+    (v : VarName_)
     (phi psi : Formula) :
     IsAxiom ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi)))
 
   -- ⊢ (∀ v phi) → phi(t/v)  provided phi admits t for v
   | pred_2_
-    (v t : VarName)
+    (v t : VarName_)
     (phi phi' : Formula) :
     Sub.Var.One.Rec.fastAdmits v t phi →
     Sub.Var.One.Rec.fastReplaceFree v t phi = phi' →
@@ -115,13 +115,13 @@ inductive IsAxiom : Formula → Prop
 
   -- ⊢ phi → (∀ v phi)  provided v is not free in phi
   | pred_3_
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     ¬ var_is_free_in v phi →
     IsAxiom (phi.imp_ (forall_ v phi))
 
   -- ⊢ ∀ v (v = v)
-  | eq_1_ (v : VarName) :
+  | eq_1_ (v : VarName_) :
     IsAxiom (forall_ v (eq_ v v))
 
   /-
@@ -130,7 +130,7 @@ inductive IsAxiom : Formula → Prop
   | eq_2_pred_const_
     (name : PredName)
     (n : ℕ)
-    (xs ys : Fin n → VarName) :
+    (xs ys : Fin n → VarName_) :
     IsAxiom
       (Forall_ (List.ofFn xs)
         (Forall_ (List.ofFn ys)
@@ -141,7 +141,7 @@ inductive IsAxiom : Formula → Prop
     ⊢ ∀ x_0 ∀ x_1 ∀ y_0 ∀ y_1 ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
   -/
   | eq_2_eq_
-    (x_0 x_1 y_0 y_1 : VarName) :
+    (x_0 x_1 y_0 y_1 : VarName_) :
     IsAxiom
       (forall_ x_0
         (forall_ x_1
@@ -152,7 +152,7 @@ inductive IsAxiom : Formula → Prop
 
   -- ⊢ phi ⇒ ⊢ ∀ v phi
   | gen_
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     IsAxiom phi →
     IsAxiom (forall_ v phi)
@@ -173,7 +173,7 @@ inductive IsAxiom : Formula → Prop
     IsAxiom (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
   | def_exists_
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     IsAxiom ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
@@ -237,7 +237,7 @@ inductive IsProofAlt : Formula → Prop
 
   -- ⊢ (∀ v (phi → psi)) → ((∀ v phi) → (∀ v psi))
   | pred_1_
-    (v : VarName) (phi psi : Formula) :
+    (v : VarName_) (phi psi : Formula) :
     IsProofAlt
       ((forall_ v (phi.imp_ psi)).imp_
         ((forall_ v phi).imp_
@@ -245,21 +245,21 @@ inductive IsProofAlt : Formula → Prop
 
   -- ⊢ (∀ v phi) → phi(t/v)  provided phi admits t for v
   | pred_2_
-    (v t : VarName) (phi phi' : Formula) :
+    (v t : VarName_) (phi phi' : Formula) :
     Sub.Var.One.Rec.fastAdmits v t phi →
       Sub.Var.One.Rec.fastReplaceFree v t phi = phi' →
         IsProofAlt ((forall_ v phi).imp_ phi')
 
   -- ⊢ phi → (∀ v phi)  provided v is not free in phi
   | pred_3_
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     ¬ var_is_free_in v phi →
     IsProofAlt (phi.imp_ (forall_ v phi))
 
   -- ⊢ ∀ v (v = v)
   | eq_1_
-    (v : VarName) :
+    (v : VarName_) :
     IsProofAlt (forall_ v (eq_ v v))
 
   /-
@@ -268,7 +268,7 @@ inductive IsProofAlt : Formula → Prop
   | eq_2_pred_const_
     (name : PredName)
     (n : ℕ)
-    (xs ys : Fin n → VarName) :
+    (xs ys : Fin n → VarName_) :
     IsProofAlt
       (Forall_ (List.ofFn xs)
         (Forall_ (List.ofFn ys)
@@ -279,7 +279,7 @@ inductive IsProofAlt : Formula → Prop
     ⊢ ∀ x_0 ∀ x_1 ∀ y_0 ∀ y_1 ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
   -/
   | eq_2_eq_
-    (x_0 x_1 y_0 y_1 : VarName) :
+    (x_0 x_1 y_0 y_1 : VarName_) :
     IsProofAlt
       (forall_ x_0
         (forall_ x_1
@@ -290,7 +290,7 @@ inductive IsProofAlt : Formula → Prop
 
   -- ⊢ phi ⇒ ⊢ ∀ v phi
   | gen_
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     IsProofAlt phi →
     IsProofAlt (forall_ v phi)
@@ -318,7 +318,7 @@ inductive IsProofAlt : Formula → Prop
     IsProofAlt (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
   | def_exists_
-    (v : VarName)
+    (v : VarName_)
     (phi : Formula) :
     IsProofAlt ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 

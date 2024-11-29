@@ -20,15 +20,15 @@ If $P$ is a formula, $v$ is a variable, and $t$ is a term, then $P(t/v)$ is the 
 /--
   Helper function for replaceFree.
 -/
-def replaceFreeAux (v t : VarName) (binders : Finset VarName) : Formula → Formula
+def replaceFreeAux (v t : VarName_) (binders : Finset VarName_) : Formula → Formula
   | pred_const_ X xs =>
       pred_const_
       X
-      (xs.map fun (x : VarName) => if v = x ∧ x ∉ binders then t else x)
+      (xs.map fun (x : VarName_) => if v = x ∧ x ∉ binders then t else x)
   | pred_var_ X xs =>
       pred_var_
       X
-      (xs.map fun (x : VarName) => if v = x ∧ x ∉ binders then t else x)
+      (xs.map fun (x : VarName_) => if v = x ∧ x ∉ binders then t else x)
   | eq_ x y =>
       eq_
       (if v = x ∧ x ∉ binders then t else x)
@@ -57,7 +57,7 @@ def replaceFreeAux (v t : VarName) (binders : Finset VarName) : Formula → Form
   | def_ X xs =>
       def_
       X
-      (xs.map fun (x : VarName) => if v = x ∧ x ∉ binders then t else x)
+      (xs.map fun (x : VarName_) => if v = x ∧ x ∉ binders then t else x)
 
 /--
   replaceFree v t P :=
@@ -68,7 +68,7 @@ def replaceFreeAux (v t : VarName) (binders : Finset VarName) : Formula → Form
 
   The result of replacing each free occurrence of v in P by an occurrence of t.
 -/
-def replaceFree (v t : VarName) (F : Formula) : Formula :=
+def replaceFree (v t : VarName_) (F : Formula) : Formula :=
   replaceFreeAux v t ∅ F
 
 
@@ -83,15 +83,15 @@ def replaceFree (v t : VarName) (F : Formula) : Formula :=
 
   This is a more efficient version of replaceFree.
 -/
-def fastReplaceFree (v t : VarName) : Formula → Formula
+def fastReplaceFree (v t : VarName_) : Formula → Formula
   | pred_const_ X xs =>
       pred_const_
       X
-      (xs.map fun (x : VarName) => if v = x then t else x)
+      (xs.map fun (x : VarName_) => if v = x then t else x)
   | pred_var_ X xs =>
       pred_var_
       X
-      (xs.map fun (x : VarName) => if v = x then t else x)
+      (xs.map fun (x : VarName_) => if v = x then t else x)
   | eq_ x y =>
     eq_
     (if v = x then t else x)
@@ -114,15 +114,15 @@ def fastReplaceFree (v t : VarName) : Formula → Formula
   | def_ X xs =>
       def_
       X
-      (xs.map fun (x : VarName) => if v = x then t else x)
+      (xs.map fun (x : VarName_) => if v = x then t else x)
 
 
 -- replaceFree = fastReplaceFree
 
 theorem replaceFreeAux_mem_binders
   (F : Formula)
-  (v t : VarName)
-  (binders : Finset VarName)
+  (v t : VarName_)
+  (binders : Finset VarName_)
   (h1 : v ∈ binders) :
   replaceFreeAux v t binders F = F :=
   by
@@ -162,8 +162,8 @@ theorem replaceFreeAux_mem_binders
 
 theorem replaceFreeAux_eq_fastReplaceFree
   (F : Formula)
-  (v t : VarName)
-  (binders : Finset VarName)
+  (v t : VarName_)
+  (binders : Finset VarName_)
   (h1 : v ∉ binders) :
   replaceFreeAux v t binders F =
     fastReplaceFree v t F :=
@@ -218,7 +218,7 @@ theorem replaceFreeAux_eq_fastReplaceFree
 
 theorem replaceFree_eq_fastReplaceFree
   (F : Formula)
-  (v t : VarName) :
+  (v t : VarName_) :
   replaceFree v t F = fastReplaceFree v t F :=
   by
   simp only [replaceFree]
@@ -229,7 +229,7 @@ theorem replaceFree_eq_fastReplaceFree
 
 theorem fastReplaceFree_self
   (F : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   fastReplaceFree v v F = F :=
   by
   induction F
@@ -257,7 +257,7 @@ theorem fastReplaceFree_self
 
 theorem not_free_in_fastReplaceFree_self
   (F : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (h1 : ¬ var_is_free_in v F) :
   fastReplaceFree v t F = F :=
   by
@@ -292,7 +292,7 @@ theorem not_free_in_fastReplaceFree_self
 
 theorem fastReplaceFree_inverse
   (F : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (h1 : ¬ occursIn t F) :
   fastReplaceFree t v (fastReplaceFree v t F) = F :=
   by
@@ -351,7 +351,7 @@ theorem fastReplaceFree_inverse
 
 theorem not_isFreeIn_fastReplaceFree
   (F : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (h1 : ¬ v = t) :
   ¬ var_is_free_in v (fastReplaceFree v t F) :=
   by

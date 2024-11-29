@@ -12,45 +12,45 @@ open Formula
 /--
   IsReplaceFree F v t F' := True if and only if F' is the result of replacing in F each free occurrence of v by an occurrence of t.
 -/
-inductive IsReplaceFree : Formula → VarName → VarName → Formula → Prop
+inductive IsReplaceFree : Formula → VarName_ → VarName_ → Formula → Prop
 
   | pred_const_
     (X : PredName)
-    (xs : List VarName)
-    (v t : VarName) :
-    IsReplaceFree (pred_const_ X xs) v t (pred_const_ X (xs.map fun (x : VarName) =>
+    (xs : List VarName_)
+    (v t : VarName_) :
+    IsReplaceFree (pred_const_ X xs) v t (pred_const_ X (xs.map fun (x : VarName_) =>
       if v = x then t else x))
 
   | pred_var_
     (X : PredName)
-    (xs : List VarName)
-    (v t : VarName) :
-    IsReplaceFree (pred_var_ X xs) v t (pred_var_ X (xs.map fun (x : VarName) =>
+    (xs : List VarName_)
+    (v t : VarName_) :
+    IsReplaceFree (pred_var_ X xs) v t (pred_var_ X (xs.map fun (x : VarName_) =>
       if v = x then t else x))
 
   | eq_
-    (x y : VarName)
-    (v t : VarName) :
+    (x y : VarName_)
+    (v t : VarName_) :
     IsReplaceFree (eq_ x y) v t (eq_ (if v = x then t else x) (if v = y then t else y))
 
   | true_
-    (v t : VarName) :
+    (v t : VarName_) :
     IsReplaceFree true_ v t true_
 
   | false_
-    (v t : VarName) :
+    (v t : VarName_) :
     IsReplaceFree false_ v t false_
 
   | not_
     (phi : Formula)
-    (v t : VarName)
+    (v t : VarName_)
     (phi' : Formula) :
     IsReplaceFree phi v t phi' →
     IsReplaceFree phi.not_ v t phi'.not_
 
   | imp_
     (phi psi : Formula)
-    (v t : VarName)
+    (v t : VarName_)
     (phi' psi' : Formula) :
     IsReplaceFree phi v t phi' →
     IsReplaceFree psi v t psi' →
@@ -58,7 +58,7 @@ inductive IsReplaceFree : Formula → VarName → VarName → Formula → Prop
 
   | and_
     (phi psi : Formula)
-    (v t : VarName)
+    (v t : VarName_)
     (phi' psi' : Formula) :
     IsReplaceFree phi v t phi' →
     IsReplaceFree psi v t psi' →
@@ -66,7 +66,7 @@ inductive IsReplaceFree : Formula → VarName → VarName → Formula → Prop
 
   | or_
     (phi psi : Formula)
-    (v t : VarName)
+    (v t : VarName_)
     (phi' psi' : Formula) :
     IsReplaceFree phi v t phi' →
     IsReplaceFree psi v t psi' →
@@ -74,39 +74,39 @@ inductive IsReplaceFree : Formula → VarName → VarName → Formula → Prop
 
   | iff_
     (phi psi : Formula)
-    (v t : VarName)
+    (v t : VarName_)
     (phi' psi' : Formula) :
     IsReplaceFree phi v t phi' →
     IsReplaceFree psi v t psi' →
     IsReplaceFree (phi.iff_ psi) v t (phi'.iff_ psi')
 
   | forall_not_free_in
-    (x : VarName)
+    (x : VarName_)
     (phi : Formula)
-    (v t : VarName) :
+    (v t : VarName_) :
     v = x →
     IsReplaceFree (forall_ x phi) v t (forall_ x phi)
 
   | forall_free_in
-    (x : VarName)
+    (x : VarName_)
     (phi : Formula)
-    (v t : VarName)
+    (v t : VarName_)
     (phi' : Formula) :
     ¬ v = x →
     IsReplaceFree phi v t phi' →
     IsReplaceFree (forall_ x phi) v t (forall_ x phi')
 
   | exists_not_free_in
-    (x : VarName)
+    (x : VarName_)
     (phi : Formula)
-    (v t : VarName) :
+    (v t : VarName_) :
     v = x →
     IsReplaceFree (exists_ x phi) v t (exists_ x phi)
 
   | exists_free_in
-    (x : VarName)
+    (x : VarName_)
     (phi : Formula)
-    (v t : VarName)
+    (v t : VarName_)
     (phi' : Formula) :
     ¬ v = x →
     IsReplaceFree phi v t phi' →
@@ -114,15 +114,15 @@ inductive IsReplaceFree : Formula → VarName → VarName → Formula → Prop
 
   | def_
     (X : DefName)
-    (xs : List VarName)
-    (v t : VarName) :
-    IsReplaceFree (def_ X xs) v t (def_ X (xs.map fun (x : VarName) =>
+    (xs : List VarName_)
+    (v t : VarName_) :
+    IsReplaceFree (def_ X xs) v t (def_ X (xs.map fun (x : VarName_) =>
       if v = x then t else x))
 
 
 example
   (F F' : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (h1 : IsReplaceFree F v t F') :
   Rec.fastReplaceFree v t F = F' :=
   by
@@ -155,7 +155,7 @@ example
 
 example
   (F F' : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (h1 : Rec.fastReplaceFree v t F = F') :
   IsReplaceFree F v t F' :=
   by

@@ -15,13 +15,13 @@ open Formula
 -/
 inductive IsSub
   (P : PredName)
-  (zs : List VarName)
+  (zs : List VarName_)
   (H : Formula) :
   Formula → Formula → Prop
 
   | pred_const_
     (X : PredName)
-    (xs : List VarName) :
+    (xs : List VarName_) :
     IsSub P zs H (pred_const_ X xs) (pred_const_ X xs)
 
 /-
@@ -30,7 +30,7 @@ inductive IsSub
 
   | pred_not_occurs_in
     (X : PredName)
-    (xs : List VarName) :
+    (xs : List VarName_) :
     ¬ (X = P ∧ xs.length = zs.length) →
     IsSub P zs H (pred_var_ X xs) (pred_var_ X xs)
 
@@ -44,14 +44,14 @@ inductive IsSub
 
   | pred_occurs_in
     (X : PredName)
-    (ts : List VarName) :
+    (ts : List VarName_) :
     X = P ∧ ts.length = zs.length →
     Sub.Var.All.Rec.admits (Function.updateListITE id zs ts) H →
     IsSub P zs H (pred_var_ P ts)
     (Sub.Var.All.Rec.fastReplaceFree (Function.updateListITE id zs ts) H)
 
   | eq_
-    (x y : VarName) :
+    (x y : VarName_) :
     IsSub P zs H (eq_ x y) (eq_ x y)
 
   | true_ : IsSub P zs H true_ true_
@@ -107,7 +107,7 @@ inductive IsSub
 -/
 
   | forall_
-    (x : VarName)
+    (x : VarName_)
     (phi : Formula)
     (phi' : Formula) :
     ¬ var_is_free_in x H →
@@ -115,7 +115,7 @@ inductive IsSub
     IsSub P zs H (forall_ x phi) (forall_ x phi')
 
   | exists_
-    (x : VarName)
+    (x : VarName_)
     (phi : Formula)
     (phi' : Formula) :
     ¬ var_is_free_in x H →
@@ -124,7 +124,7 @@ inductive IsSub
 
   | def_
     (X : DefName)
-    (xs : List VarName) :
+    (xs : List VarName_) :
     IsSub P zs H (def_ X xs) (def_ X xs)
 
 
@@ -135,7 +135,7 @@ theorem substitution_theorem
   (E : Env)
   (A : Formula)
   (P : PredName)
-  (zs : List VarName)
+  (zs : List VarName_)
   (H : Formula)
   (B : Formula)
   (h1 : IsSub P zs H A B)
@@ -248,7 +248,7 @@ theorem substitution_theorem
 theorem substitution_is_valid
   (F F' : Formula)
   (P : PredName)
-  (zs : List VarName)
+  (zs : List VarName_)
   (H : Formula)
   (h1 : IsSub P zs H F F')
   (h2 : F.is_valid) :

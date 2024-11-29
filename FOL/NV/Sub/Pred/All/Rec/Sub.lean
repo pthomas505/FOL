@@ -15,7 +15,7 @@ open Formula
   The recursive simultaneous uniform substitution of all of the predicate variables in a formula.
 -/
 def replace
-  (τ : PredName → ℕ → (List VarName × Formula)) :
+  (τ : PredName → ℕ → (List VarName_ × Formula)) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
@@ -50,14 +50,14 @@ def replace
 
 
 def admitsAux
-  (τ : PredName → ℕ → List VarName × Formula)
-  (binders : Finset VarName) :
+  (τ : PredName → ℕ → List VarName_ × Formula)
+  (binders : Finset VarName_) :
   Formula → Prop
   | pred_const_ _ _ => True
   | pred_var_ X xs =>
     let zs := (τ X xs.length).fst
     let H := (τ X xs.length).snd
-    Sub.Var.All.Rec.admits (Function.updateListITE id zs xs) H ∧ (∀ x : VarName, x ∈ binders → ¬ (var_is_free_in x H ∧ x ∉ zs)) ∧ xs.length = zs.length
+    Sub.Var.All.Rec.admits (Function.updateListITE id zs xs) H ∧ (∀ x : VarName_, x ∈ binders → ¬ (var_is_free_in x H ∧ x ∉ zs)) ∧ xs.length = zs.length
   | true_ => True
   | false_ => True
   | eq_ _ _ => True
@@ -79,8 +79,8 @@ def admitsAux
   | def_ _ _ => True
 
 instance
-  (τ : PredName → ℕ → List VarName × Formula)
-  (binders : Finset VarName)
+  (τ : PredName → ℕ → List VarName_ × Formula)
+  (binders : Finset VarName_)
   (F : Formula) :
   Decidable (admitsAux τ binders F) :=
   by
@@ -91,14 +91,14 @@ instance
 
 
 def admits
-  (τ : PredName → ℕ → List VarName × Formula)
+  (τ : PredName → ℕ → List VarName_ × Formula)
   (F : Formula) :
   Prop :=
   admitsAux τ ∅ F
 
 
 instance
-  (τ : PredName → ℕ → List VarName × Formula)
+  (τ : PredName → ℕ → List VarName_ × Formula)
   (F : Formula) :
   Decidable (admits τ F) :=
   by
@@ -111,11 +111,11 @@ theorem substitution_theorem_aux
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
-  (τ : PredName → ℕ → List VarName × Formula)
-  (binders : Finset VarName)
+  (τ : PredName → ℕ → List VarName_ × Formula)
+  (binders : Finset VarName_)
   (F : Formula)
   (h1 : admitsAux τ binders F)
-  (h2 : ∀ x : VarName, x ∉ binders → V x = V' x) :
+  (h2 : ∀ x : VarName_, x ∉ binders → V x = V' x) :
   holds D
     ⟨
       I.nonempty,
@@ -243,7 +243,7 @@ theorem substitution_theorem
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (τ : PredName → ℕ → List VarName × Formula)
+  (τ : PredName → ℕ → List VarName_ × Formula)
   (F : Formula)
   (h1 : admits τ F) :
   holds D
@@ -268,7 +268,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (F : Formula)
-  (τ : PredName → ℕ → List VarName × Formula)
+  (τ : PredName → ℕ → List VarName_ × Formula)
   (h1 : admits τ F)
   (h2 : F.is_valid) :
   (replace τ F).is_valid :=

@@ -21,8 +21,8 @@ def ProofEquiv (P Q : Formula) : Prop :=
   IsReplOfVarInListFun u v l_u l_v := True if and only if l_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in l_u by occurrences of v.
 -/
 def IsReplOfVarInListFun
-  (u v : VarName) :
-  List VarName → List VarName → Prop
+  (u v : VarName_) :
+  List VarName_ → List VarName_ → Prop
   | [], [] => True
   | hd_u :: tl_u, hd_v :: tl_v =>
     (hd_u = hd_v ∨ (hd_u = u ∧ hd_v = v)) ∧ IsReplOfVarInListFun u v tl_u tl_v
@@ -33,7 +33,7 @@ def IsReplOfVarInListFun
   IsReplOfVarInFormulaFun u v P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in P_u by occurrences of v.
 -/
 def IsReplOfVarInFormulaFun
-  (u v : VarName) :
+  (u v : VarName_) :
   Formula → Formula → Prop
   | pred_var_ name_u args_u, pred_var_ name_v args_v =>
       name_u = name_v ∧ IsReplOfVarInListFun u v args_u args_v
@@ -67,24 +67,24 @@ def IsReplOfVarInFormulaFun
   IsReplOfVarInFormula u v P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in P_u by occurrences of v.
 -/
 inductive IsReplOfVarInFormula
-  (u v : VarName) :
+  (u v : VarName_) :
   Formula → Formula → Prop
   | pred_const_
     (name : PredName)
     (n : ℕ)
-    (args_u args_v : Fin n → VarName) :
+    (args_u args_v : Fin n → VarName_) :
     (∀ (i : Fin n), (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →
     IsReplOfVarInFormula u v (pred_const_ name (List.ofFn args_u)) (pred_const_ name (List.ofFn args_v))
 
   | pred_var_
     (name : PredName)
     (n : ℕ)
-    (args_u args_v : Fin n → VarName) :
+    (args_u args_v : Fin n → VarName_) :
     (∀ (i : Fin n), (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →
     IsReplOfVarInFormula u v (pred_var_ name (List.ofFn args_u)) (pred_var_ name (List.ofFn args_v))
 
   | eq_
-    (x_u y_u x_v y_v : VarName) :
+    (x_u y_u x_v y_v : VarName_) :
     ((x_u = x_v) ∨ (x_u = u ∧ x_v = v)) →
     ((y_u = y_v) ∨ (y_u = u ∧ y_v = v)) →
     IsReplOfVarInFormula u v (eq_ x_u y_u) (eq_ x_v y_v)
@@ -129,13 +129,13 @@ inductive IsReplOfVarInFormula
     IsReplOfVarInFormula u v (P_u.iff_ Q_u) (P_v.iff_ Q_v)
 
   | forall_
-    (x : VarName)
+    (x : VarName_)
     (P_u P_v : Formula) :
     IsReplOfVarInFormula u v P_u P_v →
     IsReplOfVarInFormula u v (forall_ x P_u) (forall_ x P_v)
 
   | exists_
-    (x : VarName)
+    (x : VarName_)
     (P_u P_v : Formula) :
     IsReplOfVarInFormula u v P_u P_v →
     IsReplOfVarInFormula u v (exists_ x P_u) (exists_ x P_v)
@@ -215,13 +215,13 @@ inductive IsReplOfFormulaInFormula
     IsReplOfFormulaInFormula U V (P_u.iff_ Q_u) (P_v.iff_ Q_v)
 
   | forall_
-    (x : VarName)
+    (x : VarName_)
     (P_u P_v : Formula) :
     IsReplOfFormulaInFormula U V P_u P_v →
     IsReplOfFormulaInFormula U V (forall_ x P_u) (forall_ x P_v)
 
   | exists_
-    (x : VarName)
+    (x : VarName_)
     (P_u P_v : Formula) :
     IsReplOfFormulaInFormula U V P_u P_v →
     IsReplOfFormulaInFormula U V (exists_ x P_u) (exists_ x P_v)
@@ -229,7 +229,7 @@ inductive IsReplOfFormulaInFormula
 
 def Similar
   (P_u P_v : Formula)
-  (u v : VarName) :
+  (u v : VarName_) :
   Prop :=
   ¬ var_is_free_in v P_u ∧
     ¬ var_is_free_in u P_v ∧
@@ -240,7 +240,7 @@ def Similar
 -- Universal Elimination
 theorem T_17_1
   (P : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ (forall_ v P))
   (h2 : fastAdmits v t P) :
@@ -257,7 +257,7 @@ alias forall_elim := T_17_1
 
 
 theorem specId
-  (v : VarName)
+  (v : VarName_)
   (P : Formula)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ (forall_ v P)) :
@@ -275,7 +275,7 @@ alias forall_elim_id := specId
 
 theorem T_17_3
   (P : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (h1 : fastAdmits v t P) :
   IsProof ((fastReplaceFree v t P).imp_ (exists_ v P)) :=
   by
@@ -298,7 +298,7 @@ theorem T_17_3
 -- Existential Introduction
 theorem T_17_4
   (P : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (Δ : Set Formula)
   (h1 : fastAdmits v t P)
   (h2 : IsDeduct Δ (fastReplaceFree v t P)) :
@@ -315,7 +315,7 @@ alias exists_intro := T_17_4
 
 theorem existsIntroId
   (P : Formula)
-  (v : VarName)
+  (v : VarName_)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ P) :
   IsDeduct Δ (exists_ v P) :=
@@ -328,7 +328,7 @@ theorem existsIntroId
 
 theorem T_17_6
   (P : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((forall_ v P).imp_ (exists_ v P)) :=
   by
   apply deduction_theorem
@@ -341,7 +341,7 @@ theorem T_17_6
 
 theorem T_17_7
   (F : Formula)
-  (v : VarName)
+  (v : VarName_)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ F)
   (h2 : ∀ (H : Formula), H ∈ Δ → ¬ var_is_free_in v H) :
@@ -373,7 +373,7 @@ alias generalization := T_17_7
 -- Universal Introduction
 theorem univIntro
   (P : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (Δ : Set Formula)
   (h1 : ¬ occursIn t P)
   (h2 : IsDeduct Δ (fastReplaceFree v t P))
@@ -509,7 +509,7 @@ theorem isDeductImpIsProofAlt
 
 theorem T_17_10
   (P : Formula)
-  (u v : VarName) :
+  (u v : VarName_) :
   IsProof ((forall_ u (forall_ v P)).imp_ (forall_ v (forall_ u P))) :=
   by
   apply deduction_theorem
@@ -530,7 +530,7 @@ theorem T_17_10
 
 theorem T_17_11
   (P Q : Formula)
-  (v : VarName)
+  (v : VarName_)
   (h1 : ¬ var_is_free_in v Q) :
   IsProof ((forall_ v (P.imp_ Q)).imp_ ((exists_ v P).imp_ Q)) :=
   by
@@ -563,7 +563,7 @@ theorem T_17_11
 -- Rule C
 theorem T_17_12
   (P Q : Formula)
-  (v : VarName)
+  (v : VarName_)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ (exists_ v P))
   (h2 : IsDeduct (Δ ∪ {P}) Q)
@@ -587,7 +587,7 @@ alias rule_C := T_17_12
 -- Existential Elimination
 theorem existsElim
   (P Q : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ (exists_ v P))
   (h2 : IsDeduct (Δ ∪ {fastReplaceFree v t P}) Q)
@@ -626,7 +626,7 @@ theorem existsElim
 
 theorem T_17_14
   (P Q : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((exists_ v (P.and_ Q)).imp_ ((exists_ v P).and_ (exists_ v Q))) :=
   by
   apply deduction_theorem
@@ -674,7 +674,7 @@ theorem T_17_14
 
 theorem T_18_1_left
   (P Q : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((forall_ v (P.iff_ Q)).imp_ ((forall_ v P).imp_ (forall_ v Q))) :=
   by
   simp only [def_iff_]
@@ -701,7 +701,7 @@ theorem T_18_1_left
 
 theorem T_18_1_right
   (P Q : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((forall_ v (P.iff_ Q)).imp_ ((forall_ v Q).imp_ (forall_ v P))) :=
   by
   simp only [def_iff_]
@@ -728,7 +728,7 @@ theorem T_18_1_right
 
 theorem T_18_1
   (P Q : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((forall_ v (P.iff_ Q)).imp_ ((forall_ v P).iff_ (forall_ v Q))) :=
   by
   apply IsDeduct.mp_ ((forall_ v (P.iff_ Q)).imp_ ((forall_ v Q).imp_ (forall_ v P)))
@@ -743,7 +743,7 @@ theorem T_18_1
 
 
 theorem Forall_spec_id
-  (xs : List VarName)
+  (xs : List VarName_)
   (P : Formula) :
   IsProof ((Forall_ xs P).imp_ P) :=
   by
@@ -765,7 +765,7 @@ theorem Forall_spec_id
 
 
 theorem Forall_spec_id'
-  (xs : List VarName)
+  (xs : List VarName_)
   (P : Formula)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ (Forall_ xs P)) :
@@ -787,8 +787,8 @@ theorem Forall_spec_id'
 
 theorem Forall_isBoundIn
   (P : Formula)
-  (xs : List VarName)
-  (x : VarName) :
+  (xs : List VarName_)
+  (x : VarName_) :
   isBoundIn x (Forall_ xs P) ↔ x ∈ xs ∨ isBoundIn x P :=
   by
   simp only [Formula.Forall_]
@@ -804,8 +804,8 @@ theorem Forall_isBoundIn
 
 theorem Forall_isFreeIn
   (P : Formula)
-  (xs : List VarName)
-  (x : VarName) :
+  (xs : List VarName_)
+  (x : VarName_) :
   var_is_free_in x (Forall_ xs P) ↔ x ∉ xs ∧ var_is_free_in x P :=
   by
   simp only [Formula.Forall_]
@@ -823,9 +823,9 @@ theorem Forall_isFreeIn
 theorem T_18_2
   (U V : Formula)
   (P_U P_V : Formula)
-  (l : List VarName)
+  (l : List VarName_)
   (h1 : IsReplOfFormulaInFormula U V P_U P_V)
-  (h2 : ∀ (v : VarName), (var_is_free_in v U ∨ var_is_free_in v V) ∧ isBoundIn v P_U → v ∈ l) :
+  (h2 : ∀ (v : VarName_), (var_is_free_in v U ∨ var_is_free_in v V) ∧ isBoundIn v P_U → v ∈ l) :
   IsProof ((Forall_ l (U.iff_ V)).imp_ (P_U.iff_ P_V)) :=
   by
   induction h1
@@ -964,7 +964,7 @@ theorem C_18_4
 
 theorem T_18_5
   (P : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((forall_ v P).iff_ (exists_ v P.not_).not_) :=
   by
   simp only [def_exists_]
@@ -1009,7 +1009,7 @@ theorem T_18_5
 
 theorem T_18_6
   (P_u P_v : Formula)
-  (u v : VarName)
+  (u v : VarName_)
   (h1 : Similar P_u P_v u v) :
   IsProof ((forall_ u P_u).iff_ (forall_ v P_v)) :=
   by
@@ -1066,7 +1066,7 @@ theorem T_18_6
 -- Change of bound variable
 theorem T_18_7
   (P_u P_v Q Q' : Formula)
-  (u v : VarName)
+  (u v : VarName_)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ Q)
   (h2 : IsReplOfFormulaInFormula (forall_ u P_u) (forall_ v P_v) Q Q')
@@ -1080,7 +1080,7 @@ theorem T_18_7
 
 theorem similar_not
   (P_u P_v : Formula)
-  (u v : VarName)
+  (u v : VarName_)
   (h1 : Similar P_u P_v u v) :
   Similar P_u.not_ P_v.not_ u v :=
   by
@@ -1094,7 +1094,7 @@ theorem similar_not
 
 theorem T_18_8
   (P_u P_v : Formula)
-  (u v : VarName)
+  (u v : VarName_)
   (h1 : Similar P_u P_v u v) :
   IsProof ((exists_ u P_u).iff_ (exists_ v P_v)) :=
   by
@@ -1113,7 +1113,7 @@ theorem T_18_8
 theorem T18_9
   (Q Q' : Formula)
   (P_u P_v : Formula)
-  (u v : VarName)
+  (u v : VarName_)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ Q)
   (h2 : IsReplOfFormulaInFormula (exists_ u P_u) (exists_ v P_v) Q Q')
@@ -1127,7 +1127,7 @@ theorem T18_9
 
 theorem T_19_1
   (P : Formula)
-  (v : VarName)
+  (v : VarName_)
   (h1 : ¬ var_is_free_in v P) :
   IsProof ((forall_ v P).iff_ P) :=
   by
@@ -1148,7 +1148,7 @@ theorem T_19_1
 
 theorem T_19_2
   (P : Formula)
-  (u v : VarName) :
+  (u v : VarName_) :
   IsProof ((forall_ u (forall_ v P)).iff_ (forall_ v (forall_ u P))) :=
   by
   apply IsDeduct.mp_ ((forall_ u (forall_ v P)).imp_ (forall_ v (forall_ u P)))
@@ -1164,7 +1164,7 @@ theorem T_19_2
 
 theorem T_19_3
   (P : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((forall_ v P.not_).iff_ (exists_ v P).not_) :=
   by
   simp only [def_exists_]
@@ -1178,7 +1178,7 @@ theorem T_19_3
 
 theorem T_19_4
   (P : Formula)
-  (u v : VarName) :
+  (u v : VarName_) :
   IsProof ((exists_ u (forall_ v P)).imp_ (forall_ v (exists_ u P))) :=
   by
   apply deduction_theorem
@@ -1212,7 +1212,7 @@ theorem T_19_4
 
 theorem T_19_5
   (P Q : Formula)
-  (v : VarName)
+  (v : VarName_)
   (h1 : ¬ var_is_free_in v P) :
   IsProof ((forall_ v (P.iff_ Q)).imp_ (P.iff_ (forall_ v Q))) :=
   by
@@ -1229,7 +1229,7 @@ theorem T_19_5
 
 theorem T_19_6_left
   (P Q : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((forall_ v (P.iff_ Q)).imp_ ((exists_ v P).imp_ (exists_ v Q))) :=
   by
   apply deduction_theorem
@@ -1266,7 +1266,7 @@ theorem T_19_6_left
 
 theorem T_19_6_right
   (P Q : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((forall_ v (P.iff_ Q)).imp_ ((exists_ v Q).imp_ (exists_ v P))) :=
   by
   apply deduction_theorem
@@ -1291,7 +1291,7 @@ theorem T_19_6_right
 
 theorem T_19_6
   (P Q : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   IsProof ((forall_ v (P.iff_ Q)).imp_ ((exists_ v P).iff_ (exists_ v Q))) :=
   by
   apply IsDeduct.mp_ ((forall_ v (P.iff_ Q)).imp_ ((exists_ v P).imp_ (exists_ v Q)))
@@ -1309,7 +1309,7 @@ theorem T_19_6
 
 theorem T_19_TS_21_left
   (P Q : Formula)
-  (v : VarName)
+  (v : VarName_)
   (h1 : ¬ var_is_free_in v P) :
   IsProof ((forall_ v (P.imp_ Q)).imp_ (P.imp_ (forall_ v Q))) :=
   by
@@ -1330,7 +1330,7 @@ theorem T_19_TS_21_left
 
 theorem T_19_TS_21_right
   (P Q : Formula)
-  (v : VarName)
+  (v : VarName_)
   (h1 : ¬ var_is_free_in v P) :
   IsProof ((P.imp_ (forall_ v Q)).imp_ (forall_ v (P.imp_ Q))) :=
   by
@@ -1354,7 +1354,7 @@ theorem T_19_TS_21_right
 
 theorem T_19_TS_21
   (P Q : Formula)
-  (v : VarName)
+  (v : VarName_)
   (h1 : ¬ var_is_free_in v P) :
   IsProof ((forall_ v (P.imp_ Q)).iff_ (P.imp_ (forall_ v Q))) :=
   by
@@ -1370,7 +1370,7 @@ theorem T_19_TS_21
 
 
 theorem T_21_1
-  (x y : VarName) :
+  (x y : VarName_) :
   IsProof (forall_ x (forall_ y ((eq_ x y).imp_ (eq_ y x)))) :=
   by
   apply generalization
@@ -1398,7 +1398,7 @@ theorem T_21_1
 
 
 theorem T_21_2
-  (x y z : VarName) :
+  (x y z : VarName_) :
   IsProof (forall_ x (forall_ y (forall_ z (((eq_ x y).and_ (eq_ y z)).imp_ (eq_ x z))))) :=
   by
   apply generalization
@@ -1430,7 +1430,7 @@ theorem T_21_2
 
 theorem T_21_8
   (P_r P_s : Formula)
-  (r s : VarName)
+  (r s : VarName_)
   (h1 : IsReplOfVarInFormula r s P_r P_s)
   (h2 : ¬ isBoundIn r P_r)
   (h3 : ¬ isBoundIn s P_r) :

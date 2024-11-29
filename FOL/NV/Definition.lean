@@ -19,7 +19,7 @@ structure Definition : Type where
   /--
     The arguments.
   -/
-  (args : List VarName)
+  (args : List VarName_)
 
   /--
     The formula.

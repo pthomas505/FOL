@@ -13,7 +13,7 @@ open Formula
   replaceAll σ F := The simultaneous replacement of each occurrence of any variable v in the formula F by σ v.
 -/
 def replaceAll
-  (σ : VarName → VarName) :
+  (σ : VarName_ → VarName_) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs => pred_var_ X (xs.map σ)
@@ -36,7 +36,7 @@ theorem substitution_theorem
   (V : Valuation_ D)
   (E : Env)
   (F : Formula)
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (h1 : Function.Injective σ) :
   holds D I (V ∘ σ) E F ↔
     holds D I V E (replaceAll σ F) :=
@@ -98,7 +98,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (F : Formula)
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (h1 : Function.Injective σ)
   (h2 : F.is_valid) :
   (replaceAll σ F).is_valid :=

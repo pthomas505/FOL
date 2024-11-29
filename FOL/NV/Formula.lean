@@ -9,23 +9,23 @@ set_option autoImplicit false
 /--
   The type of variable names.
 -/
-structure VarName extends String
+structure VarName_ extends String
   deriving Inhabited, DecidableEq, Repr
 
-instance : ToString VarName :=
-  { toString := VarName.toString }
+instance : ToString VarName_ :=
+  { toString := VarName_.toString }
 
 
-instance : Lean.ToJson VarName :=
-  { toJson := fun (x : VarName) => Lean.toJson x.toString }
+instance : Lean.ToJson VarName_ :=
+  { toJson := fun (x : VarName_) => Lean.toJson x.toString }
 
-instance : Lean.FromJson VarName :=
+instance : Lean.FromJson VarName_ :=
   { fromJson? := fun (json : Lean.Json) => do
     let str ← Lean.fromJson? json
-    Except.ok (VarName.mk str) }
+    Except.ok (VarName_.mk str) }
 
-#eval Lean.toJson (VarName.mk "x")
-#eval ((Lean.fromJson? "x") : Except String VarName)
+#eval Lean.toJson (VarName_.mk "x")
+#eval ((Lean.fromJson? "x") : Except String VarName_)
 
 
 /--
@@ -76,9 +76,9 @@ instance : Lean.FromJson DefName :=
   The type of formulas.
 -/
 inductive Formula : Type
-  | pred_const_ : PredName → List VarName → Formula
-  | pred_var_ : PredName → List VarName → Formula
-  | eq_ : VarName → VarName → Formula
+  | pred_const_ : PredName → List VarName_ → Formula
+  | pred_var_ : PredName → List VarName_ → Formula
+  | eq_ : VarName_ → VarName_ → Formula
   | true_ : Formula
   | false_ : Formula
   | not_ : Formula → Formula
@@ -86,9 +86,9 @@ inductive Formula : Type
   | and_ : Formula → Formula → Formula
   | or_ : Formula → Formula → Formula
   | iff_ : Formula → Formula → Formula
-  | forall_ : VarName → Formula → Formula
-  | exists_ : VarName → Formula → Formula
-  | def_ : DefName → List VarName → Formula
+  | forall_ : VarName_ → Formula → Formula
+  | exists_ : VarName_ → Formula → Formula
+  | def_ : DefName → List VarName_ → Formula
   deriving Inhabited, DecidableEq, Repr, Lean.ToJson, Lean.FromJson
 
 compile_inductive% Formula
@@ -127,7 +127,7 @@ instance : ToString Formula :=
 
 
 #eval Lean.toJson (pred_const_ (PredName.mk "X") [])
-#eval Lean.toJson (forall_ (VarName.mk "x") (pred_const_ (PredName.mk "X") []))
+#eval Lean.toJson (forall_ (VarName_.mk "x") (pred_const_ (PredName.mk "X") []))
 
 /--
   Parses a JSON formatted string into a `Formula`.
@@ -180,27 +180,27 @@ def Formula.Or_ (l : List Formula) : Formula :=
 /--
   Forall_ [x_0 ... x_n] phi := ∀ x_0 ... ∀ x_n phi
 -/
-def Formula.Forall_ (xs : List VarName) (phi : Formula) : Formula :=
+def Formula.Forall_ (xs : List VarName_) (phi : Formula) : Formula :=
   List.foldr forall_ phi xs
 
 #eval (Forall_ [] (pred_var_ (PredName.mk "phi") [])).toString
 
-#eval (Forall_ [VarName.mk "x"] (pred_var_ (PredName.mk "phi") [VarName.mk "x"])).toString
+#eval (Forall_ [VarName_.mk "x"] (pred_var_ (PredName.mk "phi") [VarName_.mk "x"])).toString
 
-#eval (Forall_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [VarName.mk "x", VarName.mk "y"])).toString
+#eval (Forall_ [VarName_.mk "x", VarName_.mk "y"] (pred_var_ (PredName.mk "phi") [VarName_.mk "x", VarName_.mk "y"])).toString
 
 
 /--
   Exists_ [x_0 ... x_n] phi := ∃ x_0 ... ∃ x_n phi
 -/
-def Formula.Exists_ (xs : List VarName) (phi : Formula) : Formula :=
+def Formula.Exists_ (xs : List VarName_) (phi : Formula) : Formula :=
   List.foldr exists_ phi xs
 
 #eval (Exists_ [] (pred_var_ (PredName.mk "phi") [])).toString
 
-#eval (Exists_ [VarName.mk "x"] (pred_var_ (PredName.mk "phi") [VarName.mk "x"])).toString
+#eval (Exists_ [VarName_.mk "x"] (pred_var_ (PredName.mk "phi") [VarName_.mk "x"])).toString
 
-#eval (Exists_ [VarName.mk "x", VarName.mk "y"] (pred_var_ (PredName.mk "phi") [VarName.mk "x", VarName.mk "y"])).toString
+#eval (Exists_ [VarName_.mk "x", VarName_.mk "y"] (pred_var_ (PredName.mk "phi") [VarName_.mk "x", VarName_.mk "y"])).toString
 
 
 #lint

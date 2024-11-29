@@ -122,13 +122,13 @@ inductive IsDeduct : Finset Formula → Formula → Prop
 
   | refl_
     (Δ : Finset Formula)
-    (x : VarName) :
+    (x : VarName_) :
     IsDeduct Δ (Formula.eq_ x x)
 
   | subst_
     (Δ : Finset Formula)
     (phi : Formula)
-    (x y : VarName) :
+    (x y : VarName_) :
     IsDeduct Δ (Formula.eq_ x y) →
     IsDeduct Δ phi →
     Sub.Var.One.Rec.fastAdmits x y phi →
@@ -137,7 +137,7 @@ inductive IsDeduct : Finset Formula → Formula → Prop
   | forall_intro_
     (Δ : Finset Formula)
     (phi : Formula)
-    (x : VarName) :
+    (x : VarName_) :
     IsDeduct Δ phi →
     (∀ H : Formula, H ∈ Δ → ¬ var_is_free_in x H) →
     IsDeduct Δ (forall_ x phi)
@@ -145,7 +145,7 @@ inductive IsDeduct : Finset Formula → Formula → Prop
   | forall_elim_
     (Δ : Finset Formula)
     (phi : Formula)
-    (x y : VarName) :
+    (x y : VarName_) :
     IsDeduct Δ (forall_ x phi) →
     Sub.Var.One.Rec.fastAdmits x y phi →
     IsDeduct Δ (Sub.Var.One.Rec.fastReplaceFree x y phi)
@@ -153,7 +153,7 @@ inductive IsDeduct : Finset Formula → Formula → Prop
   | exists_intro_
     (Δ : Finset Formula)
     (phi : Formula)
-    (x y : VarName) :
+    (x y : VarName_) :
     Sub.Var.One.Rec.fastAdmits x y phi →
     IsDeduct Δ (Sub.Var.One.Rec.fastReplaceFree x y phi) →
     IsDeduct Δ (exists_ x phi)
@@ -161,7 +161,7 @@ inductive IsDeduct : Finset Formula → Formula → Prop
   | exists_elim_
     (Δ : Finset Formula)
     (phi psi : Formula)
-    (x : VarName) :
+    (x : VarName_) :
     IsDeduct Δ (exists_ x phi) →
     IsDeduct (Δ ∪ {phi}) psi →
     (∀ H : Formula, H ∈ Δ →
@@ -172,7 +172,7 @@ inductive IsDeduct : Finset Formula → Formula → Prop
   | pred_sub_
     (Δ : Finset Formula)
     (phi : Formula)
-    (τ : PredName → ℕ → List VarName × Formula) :
+    (τ : PredName → ℕ → List VarName_ × Formula) :
     IsDeduct Δ phi →
     Sub.Pred.All.Rec.admits τ phi →
     (∀ H : Formula, H ∈ Δ → Sub.Pred.All.Rec.admits τ H) →

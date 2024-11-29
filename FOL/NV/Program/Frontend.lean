@@ -123,14 +123,14 @@ def mp
 def sub
   (localContext : LocalContext)
   (step_index : ℕ)
-  (xs : List (PredName × (List VarName × Formula))) :
+  (xs : List (PredName × (List VarName_ × Formula))) :
   Except String Backend.Step := do
   let step ← localContext.get step_index
 
   let hypotheses := step.assertion.hypotheses
   let conclusion := step.assertion.conclusion
 
-  let τ : PredName → ℕ → Option (List VarName × Formula) := Backend.PredReplaceListToFun xs
+  let τ : PredName → ℕ → Option (List VarName_ × Formula) := Backend.PredReplaceListToFun xs
 
   Except.ok {
     assertion := {
@@ -162,7 +162,7 @@ inductive Command : Type
   | prop_1_ : Formula → Formula → Command
   | prop_2_ : Formula → Formula → Formula → Command
   | mp_ : ℕ → ℕ → Command
-  | sub_ : ℕ → List (PredName × (List VarName × Formula)) → Command
+  | sub_ : ℕ → List (PredName × (List VarName_ × Formula)) → Command
   | thm_ : String → Command
 
 

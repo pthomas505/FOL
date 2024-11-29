@@ -20,7 +20,7 @@ If $v$ and $u$ are variables and $P$ is a formula, then $P$ admits $u$ for $v$ i
 /--
   Helper function for admits.
 -/
-def admitsAux (v u : VarName) (binders : Finset VarName) : Formula → Prop
+def admitsAux (v u : VarName_) (binders : Finset VarName_) : Formula → Prop
   | pred_const_ _ xs =>
       v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
@@ -49,8 +49,8 @@ def admitsAux (v u : VarName) (binders : Finset VarName) : Formula → Prop
 
 
 instance
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (F : Formula) :
   Decidable (admitsAux v u binders F) :=
   by
@@ -67,12 +67,12 @@ instance
 
   v → u in P
 -/
-def admits (v u : VarName) (F : Formula) : Prop :=
+def admits (v u : VarName_) (F : Formula) : Prop :=
   admitsAux v u ∅ F
 
 
 instance
-  (v u : VarName)
+  (v u : VarName_)
   (F : Formula) :
   Decidable (admits v u F) :=
   by
@@ -83,7 +83,7 @@ instance
 /--
   Helper function for fastAdmits.
 -/
-def fastAdmitsAux (v u : VarName) (binders : Finset VarName) : Formula → Prop
+def fastAdmitsAux (v u : VarName_) (binders : Finset VarName_) : Formula → Prop
   | pred_const_ _ xs =>
       v ∈ xs → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
@@ -112,8 +112,8 @@ def fastAdmitsAux (v u : VarName) (binders : Finset VarName) : Formula → Prop
 
 
 instance
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (F : Formula) :
   Decidable (fastAdmitsAux v u binders F) :=
   by
@@ -132,12 +132,12 @@ instance
 
   This is a more efficient version of admits.
 -/
-def fastAdmits (v u : VarName) (F : Formula) : Prop :=
+def fastAdmits (v u : VarName_) (F : Formula) : Prop :=
   fastAdmitsAux v u ∅ F
 
 
 instance
-  (v u : VarName)
+  (v u : VarName_)
   (F : Formula) :
   Decidable (fastAdmits v u F) :=
   by
@@ -168,12 +168,12 @@ inductive BoolFormula : Type
 /--
   Helper function for toIsBound.
 -/
-def toIsBoundAux (binders : Finset VarName) : Formula → BoolFormula
+def toIsBoundAux (binders : Finset VarName_) : Formula → BoolFormula
   | pred_const_ X xs =>
-      BoolFormula.pred_const_ X (xs.map fun (v : VarName) => v ∈ binders)
+      BoolFormula.pred_const_ X (xs.map fun (v : VarName_) => v ∈ binders)
 
   | pred_var_ X xs =>
-      BoolFormula.pred_var_ X (xs.map fun (v : VarName) => v ∈ binders)
+      BoolFormula.pred_var_ X (xs.map fun (v : VarName_) => v ∈ binders)
 
   | eq_ x y =>
       BoolFormula.eq_ (x ∈ binders) (y ∈ binders)
@@ -203,7 +203,7 @@ def toIsBoundAux (binders : Finset VarName) : Formula → BoolFormula
       BoolFormula.forall_ True (toIsBoundAux (binders ∪ {x}) phi)
 
   | def_ X xs =>
-      BoolFormula.def_ X (xs.map fun (v : VarName) => v ∈ binders)
+      BoolFormula.def_ X (xs.map fun (v : VarName_) => v ∈ binders)
 
 /--
   Creates a BoolFormula from a formula. Each bound occurence of a variable in the formula is mapped to true in the bool formula. Each free occurence of a variable in the formula is mapped to false in the bool formula.
@@ -216,8 +216,8 @@ def toIsBound (F : Formula) : BoolFormula :=
 
 theorem admitsAux_imp_fastAdmitsAux
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : v ∉ binders)
   (h2 : admitsAux v u binders F) :
   fastAdmitsAux v u binders F :=
@@ -242,8 +242,8 @@ theorem admitsAux_imp_fastAdmitsAux
 
 theorem mem_binders_imp_admitsAux
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : v ∈ binders) :
   admitsAux v u binders F :=
   by
@@ -261,8 +261,8 @@ theorem mem_binders_imp_admitsAux
 
 theorem fastAdmitsAux_imp_admitsAux
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : fastAdmitsAux v u binders F) :
   admitsAux v u binders F :=
   by
@@ -286,7 +286,7 @@ theorem fastAdmitsAux_imp_admitsAux
 
 theorem admits_iff_fastAdmits
   (F : Formula)
-  (v u : VarName) :
+  (v u : VarName_) :
   admits v u F ↔ fastAdmits v u F :=
   by
   simp only [admits]
@@ -301,8 +301,8 @@ theorem admits_iff_fastAdmits
 
 theorem fastAdmitsAux_self
   (F : Formula)
-  (v : VarName)
-  (binders : Finset VarName)
+  (v : VarName_)
+  (binders : Finset VarName_)
   (h1 : v ∉ binders) :
   fastAdmitsAux v v binders F :=
   by
@@ -323,7 +323,7 @@ theorem fastAdmitsAux_self
 
 theorem fastAdmits_self
   (F : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   fastAdmits v v F :=
   by
   simp only [fastAdmits]
@@ -334,8 +334,8 @@ theorem fastAdmits_self
 
 theorem not_isFreeIn_imp_fastAdmitsAux
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : ¬ var_is_free_in v F) :
   fastAdmitsAux v u binders F :=
   by
@@ -350,7 +350,7 @@ theorem not_isFreeIn_imp_fastAdmitsAux
 
 theorem not_isFreeIn_imp_fastAdmits
   (F : Formula)
-  (v u : VarName)
+  (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
   fastAdmits v u F :=
   by
@@ -361,8 +361,8 @@ theorem not_isFreeIn_imp_fastAdmits
 
 theorem not_isBoundIn_imp_fastAdmitsAux
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : ¬ isBoundIn u F)
   (h2 : u ∉ binders) :
   fastAdmitsAux v u binders F :=
@@ -387,7 +387,7 @@ theorem not_isBoundIn_imp_fastAdmitsAux
 
 theorem not_isBoundIn_imp_fastAdmits
   (F : Formula)
-  (v u : VarName)
+  (v u : VarName_)
   (h1 : ¬ isBoundIn u F) :
   fastAdmits v u F :=
   by
@@ -399,8 +399,8 @@ theorem not_isBoundIn_imp_fastAdmits
 
 theorem fastReplaceFree_aux_fastAdmitsAux
   (F : Formula)
-  (v t : VarName)
-  (binders : Finset VarName)
+  (v t : VarName_)
+  (binders : Finset VarName_)
   (h1 : ¬ occursIn t F)
   (h2 : v ∉ binders) :
   fastAdmitsAux t v binders (fastReplaceFree v t F) :=
@@ -439,7 +439,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
 
 theorem fastReplaceFree_fastAdmits
   (F : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (h1 : ¬ occursIn t F) :
   fastAdmits t v (fastReplaceFree v t F) :=
   by
@@ -451,8 +451,8 @@ theorem fastReplaceFree_fastAdmits
 
 theorem replaceFreeAux_fastAdmitsAux
   (F : Formula)
-  (v t : VarName)
-  (binders : Finset VarName)
+  (v t : VarName_)
+  (binders : Finset VarName_)
   (h1 : ¬ occursIn t F) :
   fastAdmitsAux t v binders (replaceFreeAux v t binders F) :=
   by
@@ -502,7 +502,7 @@ theorem replaceFreeAux_fastAdmitsAux
 
 theorem replaceFree_fastAdmits
   (F : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (h1 : ¬ occursIn t F) :
   fastAdmits t v (replaceFree v t F) :=
   by
@@ -514,8 +514,8 @@ theorem replaceFree_fastAdmits
 
 theorem fastAdmitsAux_add_binders
   (F : Formula)
-  (v u : VarName)
-  (S T : Finset VarName)
+  (v u : VarName_)
+  (S T : Finset VarName_)
   (h1 : fastAdmitsAux v u S F)
   (h2 : u ∉ T) :
   fastAdmitsAux v u (S ∪ T) F :=
@@ -543,8 +543,8 @@ theorem fastAdmitsAux_add_binders
 
 theorem fastAdmitsAux_del_binders
   (F : Formula)
-  (v u : VarName)
-  (S T : Finset VarName)
+  (v u : VarName_)
+  (S T : Finset VarName_)
   (h1 : fastAdmitsAux v u (S ∪ T) F) :
   fastAdmitsAux v u S F :=
   by
@@ -578,8 +578,8 @@ theorem fastAdmitsAux_del_binders
 
 theorem fastAdmitsAux_isFreeIn
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : fastAdmitsAux v u binders F)
   (h2 : var_is_free_in v F) :
   u ∉ binders :=
@@ -605,8 +605,8 @@ theorem fastAdmitsAux_isFreeIn
 
 theorem fastAdmitsAux_mem_binders
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : fastAdmitsAux v u binders F)
   (h2 : u ∈ binders) :
   ¬ var_is_free_in v F :=
@@ -618,8 +618,8 @@ theorem fastAdmitsAux_mem_binders
 
 theorem fastAdmitsAux_imp_free_and_bound_unchanged
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : v ∉ binders)
   (h2 : fastAdmitsAux v u binders F) :
   toIsBoundAux binders F =
@@ -674,8 +674,8 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
 
 theorem free_and_bound_unchanged_imp_fastAdmitsAux
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : v ∉ binders)
   (h2 : toIsBoundAux binders F =
     toIsBoundAux binders (fastReplaceFree v u F)) :
@@ -739,7 +739,7 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
 
 example
   (F : Formula)
-  (v u : VarName) :
+  (v u : VarName_) :
   fastAdmits v u F ↔
     toIsBound F = toIsBound (fastReplaceFree v u F) :=
   by
@@ -756,8 +756,8 @@ example
 
 theorem admitsAux_self
   (F : Formula)
-  (v : VarName)
-  (binders : Finset VarName) :
+  (v : VarName_)
+  (binders : Finset VarName_) :
   admitsAux v v binders F := by
   induction F generalizing binders
   all_goals
@@ -768,7 +768,7 @@ theorem admitsAux_self
 
 theorem admits_self
   (F : Formula)
-  (v : VarName) :
+  (v : VarName_) :
   admits v v F :=
   by
   simp only [admits]
@@ -778,8 +778,8 @@ theorem admits_self
 
 theorem not_isFreeIn_imp_admitsAux
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : ¬ var_is_free_in v F) :
   admitsAux v u binders F :=
   by
@@ -801,7 +801,7 @@ theorem not_isFreeIn_imp_admitsAux
 
 theorem not_isFreeIn_imp_admits
   (F : Formula)
-  (v u : VarName)
+  (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
   admits v u F :=
   by
@@ -812,8 +812,8 @@ theorem not_isFreeIn_imp_admits
 
 theorem not_isBoundIn_imp_admitsAux
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : ¬ isBoundIn u F)
   (h2 : u ∉ binders) :
   admitsAux v u binders F :=
@@ -837,7 +837,7 @@ theorem not_isBoundIn_imp_admitsAux
 
 theorem not_isBoundIn_imp_admits
   (F : Formula)
-  (v u : VarName)
+  (v u : VarName_)
   (h1 : ¬ isBoundIn u F) :
   admits v u F :=
   by
@@ -849,8 +849,8 @@ theorem not_isBoundIn_imp_admits
 
 theorem replaceFreeAux_admitsAux
   (F : Formula)
-  (v t : VarName)
-  (binders : Finset VarName)
+  (v t : VarName_)
+  (binders : Finset VarName_)
   (h1 : ¬ occursIn t F) :
   admitsAux t v binders (replaceFreeAux v t binders F) :=
   by
@@ -904,7 +904,7 @@ theorem replaceFreeAux_admitsAux
 
 theorem replaceFree_admits
   (F : Formula)
-  (v t : VarName)
+  (v t : VarName_)
   (h1 : ¬ occursIn t F) :
   admits t v (replaceFree v t F) :=
   by
@@ -916,8 +916,8 @@ theorem replaceFree_admits
 
 theorem admitsAux_add_binders
   (F : Formula)
-  (v u : VarName)
-  (S T : Finset VarName)
+  (v u : VarName_)
+  (S T : Finset VarName_)
   (h1 : admitsAux v u S F)
   (h2 : u ∉ T) :
   admitsAux v u (S ∪ T) F :=
@@ -939,8 +939,8 @@ theorem admitsAux_add_binders
 
 theorem admitsAux_del_binders
   (F : Formula)
-  (v u : VarName)
-  (S T : Finset VarName)
+  (v u : VarName_)
+  (S T : Finset VarName_)
   (h1 : admitsAux v u (S ∪ T) F)
   (h2 : v ∉ T) :
   admitsAux v u S F :=
@@ -970,8 +970,8 @@ theorem admitsAux_del_binders
 
 theorem admitsAux_isFreeIn
   (F : Formula)
-  (v u : VarName)
-  (binders : Finset VarName)
+  (v u : VarName_)
+  (binders : Finset VarName_)
   (h1 : admitsAux v u binders F)
   (h2 : var_is_free_in v F)
   (h3 : v ∉ binders) :
@@ -1000,11 +1000,11 @@ theorem substitution_theorem_aux
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
-  (v t : VarName)
-  (binders : Finset VarName)
+  (v t : VarName_)
+  (binders : Finset VarName_)
   (F : Formula)
   (h1 : fastAdmitsAux v t binders F)
-  (h2 : ∀ (v : VarName), ¬ v ∈ binders → V' v = V v) :
+  (h2 : ∀ (v : VarName_), ¬ v ∈ binders → V' v = V v) :
   holds D I (Function.updateITE V v (V' t)) E F ↔
     holds D I V E (fastReplaceFree v t F) :=
   by
@@ -1101,9 +1101,9 @@ theorem substitution_theorem_aux
       simp only [eq_comm]
 
       have s1 :
-        (List.map (fun (x : VarName) =>
+        (List.map (fun (x : VarName_) =>
           if v = x then V' t else V x) xs) =
-            (List.map (V ∘ fun (x : VarName) =>
+            (List.map (V ∘ fun (x : VarName_) =>
               if v = x then t else x) xs)
       {
         simp only [List.map_eq_map_iff]
@@ -1138,7 +1138,7 @@ theorem substitution_theorem
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (v t : VarName)
+  (v t : VarName_)
   (F : Formula)
   (h1 : fastAdmits v t F) :
   holds D I (Function.updateITE V v (V t)) E F ↔
@@ -1151,7 +1151,7 @@ theorem substitution_theorem
 
 
 theorem substitution_is_valid
-  (v t : VarName)
+  (v t : VarName_)
   (F : Formula)
   (h1 : fastAdmits v t F)
   (h2 : F.is_valid) :

@@ -14,11 +14,11 @@ open Formula
   Helper function for admits.
 -/
 def admitsAux
-  (σ : VarName → VarName) (binders : Finset VarName) : Formula → Prop
+  (σ : VarName_ → VarName_) (binders : Finset VarName_) : Formula → Prop
   | pred_const_ _ xs =>
-      ∀ (v : VarName), v ∈ xs → v ∉ binders → σ v ∉ binders
+      ∀ (v : VarName_), v ∈ xs → v ∉ binders → σ v ∉ binders
   | pred_var_ _ xs =>
-      ∀ (v : VarName), v ∈ xs → v ∉ binders → σ v ∉ binders
+      ∀ (v : VarName_), v ∈ xs → v ∉ binders → σ v ∉ binders
   | eq_ x y =>
       (x ∉ binders → σ x ∉ binders) ∧
       (y ∉ binders → σ y ∉ binders)
@@ -40,12 +40,12 @@ def admitsAux
   | forall_ x phi => admitsAux σ (binders ∪ {x}) phi
   | exists_ x phi => admitsAux σ (binders ∪ {x}) phi
   | def_ _ xs =>
-      ∀ (v : VarName), v ∈ xs → v ∉ binders → σ v ∉ binders
+      ∀ (v : VarName_), v ∈ xs → v ∉ binders → σ v ∉ binders
 
 
 instance
-  (σ : VarName → VarName)
-  (binders : Finset VarName)
+  (σ : VarName_ → VarName_)
+  (binders : Finset VarName_)
   (F : Formula) :
   Decidable (admitsAux σ binders F) :=
   by
@@ -58,12 +58,12 @@ instance
 /--
   admits σ F := True if and only if there is no free occurrence of a variable in the formula F that becomes a bound occurrence in the formula (fastReplaceFree σ F).
 -/
-def admits (σ : VarName → VarName) (F : Formula) : Prop :=
+def admits (σ : VarName_ → VarName_) (F : Formula) : Prop :=
   admitsAux σ ∅ F
 
 
 instance
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (F : Formula) :
   Decidable (admits σ F) :=
   by
@@ -76,13 +76,13 @@ theorem substitution_theorem_aux
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
-  (σ σ' : VarName → VarName)
-  (binders : Finset VarName)
+  (σ σ' : VarName_ → VarName_)
+  (binders : Finset VarName_)
   (F : Formula)
   (h1 : admitsAux σ binders F)
-  (h2 : ∀ (v : VarName), v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
-  (h2' : ∀ (v : VarName), v ∈ binders → v = σ' v)
-  (h3 : ∀ (v : VarName), v ∉ binders → σ' v = σ v) :
+  (h2 : ∀ (v : VarName_), v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
+  (h2' : ∀ (v : VarName_), v ∈ binders → v = σ' v)
+  (h3 : ∀ (v : VarName_), v ∉ binders → σ' v = σ v) :
   holds D I V E F ↔ holds D I V' E (fastReplaceFree σ' F) :=
   by
   induction E generalizing F binders V V' σ σ'
@@ -211,7 +211,7 @@ theorem substitution_theorem
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (F : Formula)
   (h1 : admits σ F) :
   holds D I (V ∘ σ) E F ↔
@@ -224,7 +224,7 @@ theorem substitution_theorem
 
 
 theorem substitution_is_valid
-  (σ : VarName → VarName)
+  (σ : VarName_ → VarName_)
   (F : Formula)
   (h1 : admits σ F)
   (h2 : F.is_valid) :

@@ -37,7 +37,7 @@ syntax "(" "E." var_name formula ")" : formula
 partial def elabVarName : Syntax → MetaM Expr
   | `(var_name| $x:ident) =>
     let x' : Expr := Lean.mkStrLit x.getId.toString
-    mkAppM ``VarName.mk #[x']
+    mkAppM ``VarName_.mk #[x']
 
   | _ => throwUnsupportedSyntax
 
@@ -55,7 +55,7 @@ partial def elabFormula : Syntax → MetaM Expr
     let X' : Expr ← elabPredName X
 
     let xs' : Array Expr ← xs.getElems.mapM (fun x => elabVarName x)
-    let xs'' : Expr ← mkListLit (.const ``VarName []) xs'.toList
+    let xs'' : Expr ← mkListLit (.const ``VarName_ []) xs'.toList
 
     mkAppM ``Formula.pred_var_ #[X', xs'']
 

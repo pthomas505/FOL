@@ -41,7 +41,7 @@ instance (D : Type) [Inhabited D] : Inhabited (Interpretation_ D) :=
 /--
   The assignment of an element of the domain of discourse to each variable.
 -/
-def Valuation_ (D : Type) : Type := VarName → D
+def Valuation_ (D : Type) : Type := VarName_ → D
 
 instance (D : Type) [Inhabited D] : Inhabited (Valuation_ D) :=
   by
@@ -77,7 +77,7 @@ def holds
   | E, forall_ x phi =>
     have : sizeOf phi < sizeOf (forall_ x phi) := by simp
     ∀ (d : D), holds D I (Function.updateITE V x d) E phi
-  | E, exists_ (x : VarName) (phi : Formula) =>
+  | E, exists_ (x : VarName_) (phi : Formula) =>
     have : sizeOf phi < sizeOf (exists_ x phi) := by simp
     ∃ (d : D), holds D I (Function.updateITE V x d) E phi
   | ([] : Env), def_ _ _ => False
@@ -103,7 +103,7 @@ theorem holds_coincide_var
   (V V' : Valuation_ D)
   (E : Env)
   (F : Formula)
-  (h1 : ∀ (v : VarName), var_is_free_in v F → V v = V' v) :
+  (h1 : ∀ (v : VarName_), var_is_free_in v F → V v = V' v) :
   holds D I V E F ↔ holds D I V' E F :=
   by
   induction E generalizing F V V'
