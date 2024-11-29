@@ -258,12 +258,12 @@ theorem fastReplaceFree_self
 theorem not_free_in_fastReplaceFree_self
   (F : Formula)
   (v t : VarName)
-  (h1 : ¬ isFreeIn v F) :
+  (h1 : ¬ var_is_free_in v F) :
   fastReplaceFree v t F = F :=
   by
   induction F
   any_goals
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [fastReplaceFree]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
@@ -353,12 +353,12 @@ theorem not_isFreeIn_fastReplaceFree
   (F : Formula)
   (v t : VarName)
   (h1 : ¬ v = t) :
-  ¬ isFreeIn v (fastReplaceFree v t F) :=
+  ¬ var_is_free_in v (fastReplaceFree v t F) :=
   by
   induction F
   any_goals
     simp only [fastReplaceFree]
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x
@@ -379,12 +379,12 @@ theorem not_isFreeIn_fastReplaceFree
     simp only [fastReplaceFree]
     split_ifs
     case pos c1 =>
-      simp only [isFreeIn]
+      simp only [var_is_free_in]
       simp
       intro a1
       contradiction
     case neg c1 =>
-      simp only [isFreeIn]
+      simp only [var_is_free_in]
       simp
       intro _
       exact phi_ih

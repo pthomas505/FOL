@@ -110,7 +110,7 @@ inductive IsSub
     (x : VarName)
     (phi : Formula)
     (phi' : Formula) :
-    ¬ isFreeIn x H →
+    ¬ var_is_free_in x H →
     IsSub P zs H phi phi' →
     IsSub P zs H (forall_ x phi) (forall_ x phi')
 
@@ -118,7 +118,7 @@ inductive IsSub
     (x : VarName)
     (phi : Formula)
     (phi' : Formula) :
-    ¬ isFreeIn x H →
+    ¬ var_is_free_in x H →
     IsSub P zs H phi phi' →
     IsSub P zs H (exists_ x phi) (exists_ x phi')
 
@@ -157,7 +157,7 @@ theorem substitution_theorem
     apply Holds_coincide_PredVar
     · exact h3_const
     · intro X ds a1
-      simp only [predVarOccursIn] at a1
+      simp only [pred_var_occurs_in] at a1
       cases a1
       case intro a1_left a1_right =>
         subst a1_left
@@ -235,13 +235,13 @@ theorem substitution_theorem
       case _ c1 =>
         apply Holds_coincide_PredVar
         · exact h3_const
-        · simp only [predVarOccursIn_iff_mem_predVarSet]
+        · simp only [pred_var_occurs_in_iff_mem_pred_var_set]
           simp only [hd.h2]
           simp
       case _ c1 =>
         apply Holds_coincide_PredVar
         · exact h3_const
-        · simp only [predVarOccursIn]
+        · simp only [pred_var_occurs_in]
           simp
 
 

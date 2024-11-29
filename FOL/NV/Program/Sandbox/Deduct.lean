@@ -124,28 +124,28 @@ def Formula.free_var_set : Formula → Finset VarName
 
 
 /--
-  isFreeIn v F := True if and only if there is a free occurrence of the variable v in the formula F.
+  var_is_free_in v F := True if and only if there is a free occurrence of the variable v in the formula F.
 -/
-def isFreeIn (v : VarName) : Formula → Prop
+def var_is_free_in (v : VarName) : Formula → Prop
   | pred_const_ _ xs => v ∈ xs
   | pred_var_ _ xs => v ∈ xs
   | eq_ x y => v = x ∨ v = y
   | true_ => False
   | false_ => False
-  | not_ phi => isFreeIn v phi
-  | imp_ phi psi => isFreeIn v phi ∨ isFreeIn v psi
-  | and_ phi psi => isFreeIn v phi ∨ isFreeIn v psi
-  | or_ phi psi => isFreeIn v phi ∨ isFreeIn v psi
-  | iff_ phi psi => isFreeIn v phi ∨ isFreeIn v psi
-  | forall_ x phi => ¬ v = x ∧ isFreeIn v phi
-  | exists_ x phi => ¬ v = x ∧ isFreeIn v phi
+  | not_ phi => var_is_free_in v phi
+  | imp_ phi psi => var_is_free_in v phi ∨ var_is_free_in v psi
+  | and_ phi psi => var_is_free_in v phi ∨ var_is_free_in v psi
+  | or_ phi psi => var_is_free_in v phi ∨ var_is_free_in v psi
+  | iff_ phi psi => var_is_free_in v phi ∨ var_is_free_in v psi
+  | forall_ x phi => ¬ v = x ∧ var_is_free_in v phi
+  | exists_ x phi => ¬ v = x ∧ var_is_free_in v phi
   | def_ _ xs => v ∈ xs
 
-instance (v : VarName) (F : Formula) : Decidable (isFreeIn v F) :=
+instance (v : VarName) (F : Formula) : Decidable (var_is_free_in v F) :=
   by
   induction F
   all_goals
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     infer_instance
 
 
@@ -327,7 +327,7 @@ def admitsPredFunAux
   | _, pred_const_ _ _ => True
   | binders, pred_var_ X xs =>
     admitsFun (Function.updateListIte id (τ X xs.length).fst xs) (τ X xs.length).snd ∧
-      (∀ x : VarName, x ∈ binders → ¬ (isFreeIn x (τ X xs.length).snd ∧ x ∉ (τ X xs.length).fst)) ∧
+      (∀ x : VarName, x ∈ binders → ¬ (var_is_free_in x (τ X xs.length).snd ∧ x ∉ (τ X xs.length).fst)) ∧
         xs.length = (τ X xs.length).fst.length
   | _, true_ => True
   | _, false_ => True
@@ -641,7 +641,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     (Δ : List Formula)
     (v : VarName)
     (phi : Formula) :
-    ¬ isFreeIn v phi →
+    ¬ var_is_free_in v phi →
     IsDeduct E Δ (phi.imp_ (forall_ v phi))
 
   /-
@@ -702,7 +702,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     (Δ : List Formula)
     (v : VarName)
     (phi : Formula) :
-    (∀ H : Formula, H ∈ Δ → ¬ isFreeIn v H) →
+    (∀ H : Formula, H ∈ Δ → ¬ var_is_free_in v H) →
     IsDeduct E Δ phi →
     IsDeduct E Δ (forall_ v phi)
 
@@ -765,7 +765,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     (∀ d' : Definition, d' ∈ E → d.name = d'.name → d.args.length = d'.args.length → False) →
     d.F.all_def_in_env E →
     d.args.Nodup →
-    (∀ v : VarName, isFreeIn v F → v ∈ d.args.toFinset) →
+    (∀ v : VarName, var_is_free_in v F → v ∈ d.args.toFinset) →
     d.F.pred_var_set = ∅ →
     IsDeduct E Δ F →
     IsDeduct (d :: E) Δ F

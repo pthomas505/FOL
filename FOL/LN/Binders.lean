@@ -208,7 +208,7 @@ theorem occursIn_iff_mem_varSet
     exact phi_ih
 
 
-theorem isFreeIn_iff_mem_freeVarSet
+theorem var_is_free_in_iff_mem_free_var_set
   (v : Var)
   (F : Formula) :
   occursIn v F ∧ v.isFree ↔ v ∈ F.freeVarSet :=
@@ -320,7 +320,7 @@ theorem isBoundIn_iff_mem_boundVarSet
     exact phi_ih
 
 
-theorem isFreeIn_iff_mem_freeVarSet'
+theorem var_is_free_in_iff_mem_free_var_set'
   (v : Var)
   (F : Formula) :
   occursIn v F ∧ v.isFree ↔ v ∈ F.freeVarSet' :=

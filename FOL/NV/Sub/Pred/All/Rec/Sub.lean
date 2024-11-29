@@ -57,7 +57,7 @@ def admitsAux
   | pred_var_ X xs =>
     let zs := (τ X xs.length).fst
     let H := (τ X xs.length).snd
-    Sub.Var.All.Rec.admits (Function.updateListITE id zs xs) H ∧ (∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)) ∧ xs.length = zs.length
+    Sub.Var.All.Rec.admits (Function.updateListITE id zs xs) H ∧ (∀ x : VarName, x ∈ binders → ¬ (var_is_free_in x H ∧ x ∉ zs)) ∧ xs.length = zs.length
   | true_ => True
   | false_ => True
   | eq_ _ _ => True
@@ -228,13 +228,13 @@ theorem substitution_theorem_aux
       case _ c1 =>
         apply Holds_coincide_PredVar
         · simp
-        · simp only [predVarOccursIn_iff_mem_predVarSet]
+        · simp only [pred_var_occurs_in_iff_mem_pred_var_set]
           simp only [hd.h2]
           simp
       case _ c1 =>
         apply Holds_coincide_PredVar
         · simp
-        · simp only [predVarOccursIn]
+        · simp only [pred_var_occurs_in]
           simp
 
 

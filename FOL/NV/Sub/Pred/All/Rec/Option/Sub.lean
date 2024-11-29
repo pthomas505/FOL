@@ -63,7 +63,7 @@ def admitsAux
         let H := val.snd
         if xs.length = zs.length
         then binders ∩ (H.free_var_set \ zs.toFinset) = ∅
-        --then ∀ x : VarName, x ∈ binders → ¬ (isFreeIn x H ∧ x ∉ zs)
+        --then ∀ x : VarName, x ∈ binders → ¬ (var_is_free_in x H ∧ x ∉ zs)
         else True
       else True
   | true_ => True
@@ -148,7 +148,7 @@ theorem substitution_theorem_aux
         simp only [Function.updateListITE_not_mem V' v zs (List.map V xs) c3]
         apply h2
         intro contra
-        simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        simp only [var_is_free_in_iff_mem_free_var_set] at a1
         simp only [Finset.eq_empty_iff_forall_not_mem] at h1
         simp only [c1] at h1
         simp only [← c2] at h1
@@ -216,11 +216,11 @@ theorem substitution_theorem_aux
       case _ c1 =>
         apply Holds_coincide_PredVar
         · simp
-        · simp only [predVarOccursIn_iff_mem_predVarSet]
+        · simp only [pred_var_occurs_in_iff_mem_pred_var_set]
           simp only [hd.h2]
           simp
       case _ c1 =>
         apply Holds_coincide_PredVar
         · simp
-        · simp only [predVarOccursIn]
+        · simp only [pred_var_occurs_in]
           simp

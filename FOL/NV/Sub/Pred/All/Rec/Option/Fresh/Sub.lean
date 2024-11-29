@@ -129,13 +129,13 @@ lemma substitution_theorem_aux
   (τ : PredName → ℕ → Option (List VarName × Formula))
   (σ : VarName → VarName)
   (F : Formula)
-  (h1 : ∀ (x : VarName), isFreeIn x F → V' x = V (σ x))
+  (h1 : ∀ (x : VarName), var_is_free_in x F → V' x = V (σ x))
   (h2 : ∀ (x : VarName), x ∈ F.pred_var_set.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
   Holds D (I' D I V'' E τ) V' E F ↔ Holds D I V E (subAux c τ σ F) :=
   by
   induction F generalizing V V' σ
   case pred_const_ X xs =>
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [subAux]
     simp only [Holds]
@@ -148,7 +148,7 @@ lemma substitution_theorem_aux
     simp
     exact h1 x a1
   case pred_var_ X xs =>
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [predVarSet] at h2
     simp at h2
@@ -186,7 +186,7 @@ lemma substitution_theorem_aux
       · simp only [Function.updateListITE_not_mem V'' x zs (List.map V' xs) c3]
         simp only [Function.updateListITE_not_mem V x zs (List.map (V ∘ σ ) xs) c3]
         apply h2
-        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
           exact a1
         · exact c3
     case _ c1 c2 =>
@@ -206,7 +206,7 @@ lemma substitution_theorem_aux
       simp
       exact h1 x a1
   case eq_ x y =>
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [subAux]
     simp only [Holds]
@@ -224,7 +224,7 @@ lemma substitution_theorem_aux
     simp only [subAux]
     simp only [Holds]
   case not_ phi phi_ih =>
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [predVarSet] at h2
 
@@ -237,7 +237,7 @@ lemma substitution_theorem_aux
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [predVarSet] at h2
 
@@ -273,7 +273,7 @@ lemma substitution_theorem_aux
         apply Exists.intro a
         tauto
   case forall_ x phi ih | exists_ x phi ih =>
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [predVarSet] at h2
 
@@ -300,7 +300,7 @@ lemma substitution_theorem_aux
           simp only [← c3] at s1
           simp only [Finset.mem_union] at s1
 
-          simp only [isFreeIn_iff_mem_freeVarSet] at a1
+          simp only [var_is_free_in_iff_mem_free_var_set] at a1
 
           obtain s2 := Finset.mem_image_of_mem (Function.updateITE σ x x) a1
           simp only [Function.updateITE] at s2
@@ -327,7 +327,7 @@ lemma substitution_theorem_aux
             simp only [← c3] at c1
             simp only [Finset.mem_union] at c1
 
-            simp only [isFreeIn_iff_mem_freeVarSet] at a1
+            simp only [var_is_free_in_iff_mem_free_var_set] at a1
 
             obtain s2 := Finset.mem_image_of_mem (Function.updateITE σ (σ v) (σ v)) a1
             simp only [Function.updateITE] at s2
@@ -380,7 +380,7 @@ lemma substitution_theorem_aux
     case nil =>
       simp only [Holds]
     case cons E_hd E_tl E_ih =>
-      simp only [isFreeIn] at h1
+      simp only [var_is_free_in] at h1
 
       simp only [Holds]
 
@@ -400,7 +400,7 @@ lemma substitution_theorem_aux
         · simp
         · simp at c1
           tauto
-        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset E_hd.h1 a1
 
@@ -413,7 +413,7 @@ lemma substitution_theorem_aux
         · simp only [I']
           simp only [Interpretation.usingPred]
         · intro P ds a1
-          simp only [predVarOccursIn_iff_mem_predVarSet] at a1
+          simp only [pred_var_occurs_in_iff_mem_pred_var_set] at a1
           simp only [E_hd.h2] at a1
           simp at a1
       case _ c1 c2 =>
@@ -424,14 +424,14 @@ lemma substitution_theorem_aux
         contradiction
       case _ c1 c2 =>
         obtain s2 := E_ih V V' σ
-        simp only [isFreeIn] at s2
+        simp only [var_is_free_in] at s2
         specialize s2 h1 h2
         simp only [← s2]
         apply Holds_coincide_PredVar
         · simp only [I']
           simp only [Interpretation.usingPred]
         · intro P ds a1
-          simp only [predVarOccursIn] at a1
+          simp only [pred_var_occurs_in] at a1
 
 
 theorem substitution_theorem

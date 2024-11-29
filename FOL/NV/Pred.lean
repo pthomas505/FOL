@@ -231,8 +231,8 @@ def Similar
   (P_u P_v : Formula)
   (u v : VarName) :
   Prop :=
-  ¬ isFreeIn v P_u ∧
-    ¬ isFreeIn u P_v ∧
+  ¬ var_is_free_in v P_u ∧
+    ¬ var_is_free_in u P_v ∧
       fastAdmits u v P_u ∧
         fastAdmits v u P_v ∧ P_v = fastReplaceFree u v P_u ∧ P_u = fastReplaceFree v u P_v
 
@@ -344,7 +344,7 @@ theorem T_17_7
   (v : VarName)
   (Δ : Set Formula)
   (h1 : IsDeduct Δ F)
-  (h2 : ∀ (H : Formula), H ∈ Δ → ¬ isFreeIn v H) :
+  (h2 : ∀ (H : Formula), H ∈ Δ → ¬ var_is_free_in v H) :
   IsDeduct Δ (forall_ v F) :=
   by
   induction h1
@@ -377,7 +377,7 @@ theorem univIntro
   (Δ : Set Formula)
   (h1 : ¬ occursIn t P)
   (h2 : IsDeduct Δ (fastReplaceFree v t P))
-  (h3 : ∀ (H : Formula), H ∈ Δ → ¬ isFreeIn t H) :
+  (h3 : ∀ (H : Formula), H ∈ Δ → ¬ var_is_free_in t H) :
   IsDeduct Δ (forall_ v P) :=
   by
   rw [← fastReplaceFree_inverse P v t h1]
@@ -392,7 +392,7 @@ theorem univIntro
       · apply fastReplaceFree_fastAdmits
         exact h1
     · simp
-      simp only [isFreeIn]
+      simp only [var_is_free_in]
       simp
       intro a1 contra
       exact not_isFreeIn_fastReplaceFree P v t a1 contra
@@ -521,17 +521,17 @@ theorem T_17_10
       apply IsDeduct.assume_
       simp
     · simp
-      simp only [isFreeIn]
+      simp only [var_is_free_in]
       simp
   · simp
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp
 
 
 theorem T_17_11
   (P Q : Formula)
   (v : VarName)
-  (h1 : ¬ isFreeIn v Q) :
+  (h1 : ¬ var_is_free_in v Q) :
   IsProof ((forall_ v (P.imp_ Q)).imp_ ((exists_ v P).imp_ Q)) :=
   by
   apply deduction_theorem
@@ -552,11 +552,11 @@ theorem T_17_11
             apply IsDeduct.assume_
             simp
         · simp
-          simp only [isFreeIn]
+          simp only [var_is_free_in]
           simp
   · apply IsDeduct.axiom_
     apply IsAxiom.pred_3_
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     exact h1
 
 
@@ -567,8 +567,8 @@ theorem T_17_12
   (Δ : Set Formula)
   (h1 : IsDeduct Δ (exists_ v P))
   (h2 : IsDeduct (Δ ∪ {P}) Q)
-  (h3 : ∀ (H : Formula), H ∈ Δ → ¬ isFreeIn v H)
-  (h4 : ¬ isFreeIn v Q) :
+  (h3 : ∀ (H : Formula), H ∈ Δ → ¬ var_is_free_in v H)
+  (h4 : ¬ var_is_free_in v Q) :
   IsDeduct Δ Q :=
   by
   apply IsDeduct.mp_ (exists_ v P)
@@ -593,7 +593,7 @@ theorem existsElim
   (h2 : IsDeduct (Δ ∪ {fastReplaceFree v t P}) Q)
   (h3 : ¬ occursIn t P)
   (h4 : ¬ occursIn t Q)
-  (h5 : ∀ (H : Formula), H ∈ Δ → ¬ isFreeIn t H) : IsDeduct Δ Q :=
+  (h5 : ∀ (H : Formula), H ∈ Δ → ¬ var_is_free_in t H) : IsDeduct Δ Q :=
   by
   refine' rule_C (fastReplaceFree v t P) Q t Δ _ h2 h5 _
   · simp only [def_exists_] at h1
@@ -613,7 +613,7 @@ theorem existsElim
           cases a1
           case _ c1 =>
             subst c1
-            simp only [isFreeIn]
+            simp only [var_is_free_in]
             simp
           case _ c1 =>
             exact h5 H c1
@@ -662,13 +662,13 @@ theorem T_17_14
     simp only [def_exists_]
     -- simp only [exists_]
     simp
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp
   · simp only [def_and_]
     -- simp only [and_]
     simp only [def_exists_]
     -- simp only [exists_]
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp
 
 
@@ -695,7 +695,7 @@ theorem T_18_1_left
       apply IsDeduct.assume_
       simp
   · simp
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp
 
 
@@ -722,7 +722,7 @@ theorem T_18_1_right
       apply IsDeduct.assume_
       simp
   · simp
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp
 
 
@@ -806,7 +806,7 @@ theorem Forall_isFreeIn
   (P : Formula)
   (xs : List VarName)
   (x : VarName) :
-  isFreeIn x (Forall_ xs P) ↔ x ∉ xs ∧ isFreeIn x P :=
+  var_is_free_in x (Forall_ xs P) ↔ x ∉ xs ∧ var_is_free_in x P :=
   by
   simp only [Formula.Forall_]
   induction xs
@@ -814,7 +814,7 @@ theorem Forall_isFreeIn
     simp
   case cons xs_hd xs_tl xs_ih =>
     simp
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp only [xs_ih]
     tauto
 
@@ -825,7 +825,7 @@ theorem T_18_2
   (P_U P_V : Formula)
   (l : List VarName)
   (h1 : IsReplOfFormulaInFormula U V P_U P_V)
-  (h2 : ∀ (v : VarName), (isFreeIn v U ∨ isFreeIn v V) ∧ isBoundIn v P_U → v ∈ l) :
+  (h2 : ∀ (v : VarName), (var_is_free_in v U ∨ var_is_free_in v V) ∧ isBoundIn v P_U → v ∈ l) :
   IsProof ((Forall_ l (U.iff_ V)).imp_ (P_U.iff_ P_V)) :=
   by
   induction h1
@@ -899,7 +899,7 @@ theorem T_18_2
         -- simp only [formula.iff_]
         simp only [def_and_]
         -- simp only [formula.and_]
-        simp only [isFreeIn]
+        simp only [var_is_free_in]
         simp
         contrapose
         push_neg
@@ -925,7 +925,7 @@ theorem C_18_3
   · apply T_18_2 U V P_U P_V ((U.free_var_set ∪ V.free_var_set) ∩ P_U.boundVarSet).toList h1
     intro v a1
     simp
-    simp only [isFreeIn_iff_mem_freeVarSet] at a1
+    simp only [var_is_free_in_iff_mem_free_var_set] at a1
     simp only [isBoundIn_iff_mem_boundVarSet] at a1
     exact a1
   · simp only [Formula.Forall_]
@@ -1042,7 +1042,7 @@ theorem T_18_6
                 · intro H a1
                   simp at a1
                   subst a1
-                  simp only [isFreeIn]
+                  simp only [var_is_free_in]
                   simp
                   intro _
                   exact h1_left
@@ -1057,7 +1057,7 @@ theorem T_18_6
               · intro H a1
                 simp at a1
                 subst a1
-                simp only [isFreeIn]
+                simp only [var_is_free_in]
                 simp
                 intro _
                 exact h1_right_left
@@ -1085,7 +1085,7 @@ theorem similar_not
   Similar P_u.not_ P_v.not_ u v :=
   by
   simp only [Similar] at *
-  simp only [isFreeIn] at *
+  simp only [var_is_free_in] at *
   simp only [fastAdmits] at *
   simp only [fastAdmitsAux] at *
   simp only [fastReplaceFree] at *
@@ -1128,7 +1128,7 @@ theorem T18_9
 theorem T_19_1
   (P : Formula)
   (v : VarName)
-  (h1 : ¬ isFreeIn v P) :
+  (h1 : ¬ var_is_free_in v P) :
   IsProof ((forall_ v P).iff_ P) :=
   by
   apply IsDeduct.mp_ ((forall_ v P).imp_ P)
@@ -1196,24 +1196,24 @@ theorem T_19_4
     · simp
       simp only [def_exists_]
       -- simp only [Formula.exists_]
-      simp only [isFreeIn]
+      simp only [var_is_free_in]
       simp
     · simp only [def_exists_]
-      simp only [isFreeIn]
+      simp only [var_is_free_in]
       -- simp only [exists_]
       -- simp only [is_free_in]
       simp
   · simp
     simp only [def_exists_]
     -- simp only [Formula.exists_]
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp
 
 
 theorem T_19_5
   (P Q : Formula)
   (v : VarName)
-  (h1 : ¬ isFreeIn v P) :
+  (h1 : ¬ var_is_free_in v P) :
   IsProof ((forall_ v (P.iff_ Q)).imp_ (P.iff_ (forall_ v Q))) :=
   by
   apply IsDeduct.mp_ ((forall_ v P).iff_ P)
@@ -1256,11 +1256,11 @@ theorem T_19_6_left
   · simp only [def_exists_]
     -- simp only [exists_]
     simp
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp
   · simp only [def_exists_]
     -- simp only [exists_]
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp
 
 
@@ -1285,7 +1285,7 @@ theorem T_19_6_right
         apply IsDeduct.assume_
         simp
     · simp
-      simp only [isFreeIn]
+      simp only [var_is_free_in]
       simp
 
 
@@ -1310,7 +1310,7 @@ theorem T_19_6
 theorem T_19_TS_21_left
   (P Q : Formula)
   (v : VarName)
-  (h1 : ¬ isFreeIn v P) :
+  (h1 : ¬ var_is_free_in v P) :
   IsProof ((forall_ v (P.imp_ Q)).imp_ (P.imp_ (forall_ v Q))) :=
   by
   apply C_18_4 (forall_ v P) P ((forall_ v (P.imp_ Q)).imp_ ((forall_ v P).imp_ (forall_ v Q)))
@@ -1331,7 +1331,7 @@ theorem T_19_TS_21_left
 theorem T_19_TS_21_right
   (P Q : Formula)
   (v : VarName)
-  (h1 : ¬ isFreeIn v P) :
+  (h1 : ¬ var_is_free_in v P) :
   IsProof ((P.imp_ (forall_ v Q)).imp_ (forall_ v (P.imp_ Q))) :=
   by
   apply deduction_theorem
@@ -1347,7 +1347,7 @@ theorem T_19_TS_21_right
   · intro H a1
     simp at a1
     subst a1
-    simp only [isFreeIn]
+    simp only [var_is_free_in]
     simp
     exact h1
 
@@ -1355,7 +1355,7 @@ theorem T_19_TS_21_right
 theorem T_19_TS_21
   (P Q : Formula)
   (v : VarName)
-  (h1 : ¬ isFreeIn v P) :
+  (h1 : ¬ var_is_free_in v P) :
   IsProof ((forall_ v (P.imp_ Q)).iff_ (P.imp_ (forall_ v Q))) :=
   by
   apply IsDeduct.mp_ ((forall_ v (P.imp_ Q)).imp_ (P.imp_ (forall_ v Q)))
@@ -1553,7 +1553,7 @@ theorem T_21_8
             apply IsDeduct.mp_ (forall_ x ((eq_ r s).imp_ (P_u.iff_ P_v)))
             · apply T_19_TS_21_left
               · -- simp only [formula.eq_]
-                simp only [isFreeIn]
+                simp only [var_is_free_in]
                 push_neg
                 constructor
                 · simp only [ne_comm]

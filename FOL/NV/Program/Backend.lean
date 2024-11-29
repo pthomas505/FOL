@@ -118,7 +118,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   | pred_3_
     (v : VarName)
     (phi : Formula) :
-    ¬ isFreeIn v phi →
+    ¬ var_is_free_in v phi →
     IsDeduct [] (phi.imp_ (forall_ v phi))
 
   /-
@@ -580,7 +580,7 @@ def checkRule
       hypotheses := []
       conclusion := phi.imp_ (forall_ v phi) }
 
-    if h : ¬ isFreeIn v phi
+    if h : ¬ var_is_free_in v phi
     then Except.ok {
       val := return_val
       prop := IsDeduct.pred_3_ v phi h

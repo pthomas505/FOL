@@ -117,7 +117,7 @@ inductive IsAxiom : Formula → Prop
   | pred_3_
     (v : VarName)
     (phi : Formula) :
-    ¬ isFreeIn v phi →
+    ¬ var_is_free_in v phi →
     IsAxiom (phi.imp_ (forall_ v phi))
 
   -- ⊢ ∀ v (v = v)
@@ -254,7 +254,7 @@ inductive IsProofAlt : Formula → Prop
   | pred_3_
     (v : VarName)
     (phi : Formula) :
-    ¬ isFreeIn v phi →
+    ¬ var_is_free_in v phi →
     IsProofAlt (phi.imp_ (forall_ v phi))
 
   -- ⊢ ∀ v (v = v)

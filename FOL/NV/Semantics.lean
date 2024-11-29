@@ -104,14 +104,14 @@ theorem Holds_coincide_Var
   (V V' : VarAssignment D)
   (E : Env)
   (F : Formula)
-  (h1 : ∀ (v : VarName), isFreeIn v F → V v = V' v) :
+  (h1 : ∀ (v : VarName), var_is_free_in v F → V v = V' v) :
   Holds D I V E F ↔ Holds D I V' E F :=
   by
   induction E generalizing F V V'
   all_goals
     induction F generalizing V V'
     all_goals
-      simp only [isFreeIn] at h1
+      simp only [var_is_free_in] at h1
 
       simp only [Holds]
     case pred_const_ X xs | pred_var_ X xs =>
@@ -158,7 +158,7 @@ theorem Holds_coincide_Var
     case pos c1 =>
       apply ih
       intro v a1
-      simp only [isFreeIn_iff_mem_freeVarSet v hd.q] at a1
+      simp only [var_is_free_in_iff_mem_free_var_set v hd.q] at a1
 
       have s1 : v ∈ List.toFinset hd.args
       apply Finset.mem_of_subset hd.h1 a1
@@ -180,7 +180,7 @@ theorem Holds_coincide_PredVar
   (F : Formula)
   (h1 : I.pred_const_ = I'.pred_const_)
   (h2 : ∀ (P : PredName) (ds : List D),
-    predVarOccursIn P ds.length F →
+    pred_var_occurs_in P ds.length F →
       (I.pred_var_ P ds ↔ I'.pred_var_ P ds)) :
   Holds D I V E F ↔ Holds D I' V E F :=
   by
@@ -188,7 +188,7 @@ theorem Holds_coincide_PredVar
   all_goals
     induction F generalizing V
     all_goals
-      simp only [predVarOccursIn] at h2
+      simp only [pred_var_occurs_in] at h2
 
       simp only [Holds]
     case pred_const_ X xs =>
@@ -227,13 +227,13 @@ theorem Holds_coincide_PredVar
     case pos c1 =>
       apply ih
       intro P ds a1
-      simp only [predVarOccursIn_iff_mem_predVarSet P ds.length] at a1
+      simp only [pred_var_occurs_in_iff_mem_pred_var_set P ds.length] at a1
       simp only [hd.h2] at a1
       simp at a1
     case neg c1 =>
       apply ih
       intro P ds a1
-      simp only [predVarOccursIn] at a1
+      simp only [pred_var_occurs_in] at a1
 
 
 lemma Holds_coincide_Env

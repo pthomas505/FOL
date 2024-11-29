@@ -84,7 +84,7 @@ inductive IsSub : Formula → VarName → VarName → Formula → Prop
     (x : VarName)
     (phi : Formula)
     (v t : VarName) :
-    ¬ isFreeIn v (forall_ x phi) →
+    ¬ var_is_free_in v (forall_ x phi) →
     IsSub (forall_ x phi) v t (forall_ x phi)
 
   | forall_free_in
@@ -92,7 +92,7 @@ inductive IsSub : Formula → VarName → VarName → Formula → Prop
     (phi : Formula)
     (v t : VarName)
     (phi' : Formula) :
-    isFreeIn v (forall_ x phi) →
+    var_is_free_in v (forall_ x phi) →
     ¬ x = t →
     IsSub phi v t phi' →
     IsSub (forall_ x phi) v t (forall_ x phi')
@@ -101,7 +101,7 @@ inductive IsSub : Formula → VarName → VarName → Formula → Prop
     (x : VarName)
     (phi : Formula)
     (v t : VarName) :
-    ¬ isFreeIn v (exists_ x phi) →
+    ¬ var_is_free_in v (exists_ x phi) →
     IsSub (exists_ x phi) v t (exists_ x phi)
 
   | exists_free_in
@@ -109,7 +109,7 @@ inductive IsSub : Formula → VarName → VarName → Formula → Prop
     (phi : Formula)
     (v t : VarName)
     (phi' : Formula) :
-    isFreeIn v (exists_ x phi) →
+    var_is_free_in v (exists_ x phi) →
     ¬ x = t →
     IsSub phi v t phi' →
     IsSub (exists_ x phi) v t (exists_ x phi')
@@ -162,18 +162,18 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
       all_goals
         first | apply IsSub.forall_not_free_in | apply IsSub.exists_not_free_in
         subst h1
-        simp only [isFreeIn]
+        simp only [var_is_free_in]
         simp
     case inr h1 =>
       split_ifs
       case pos c1 =>
         first | apply IsSub.forall_not_free_in | apply IsSub.exists_not_free_in
-        simp only [isFreeIn]
+        simp only [var_is_free_in]
         tauto
       case neg c1 =>
-        by_cases c2 : isFreeIn v phi
+        by_cases c2 : var_is_free_in v phi
         · first | apply IsSub.forall_free_in | apply IsSub.exists_free_in
-          simp only [isFreeIn]
+          simp only [var_is_free_in]
           constructor
           · exact c1
           . exact c2
@@ -188,7 +188,7 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
 
           simp only [s1]
           first | apply IsSub.forall_not_free_in | apply IsSub.exists_not_free_in
-          simp only [isFreeIn]
+          simp only [var_is_free_in]
           tauto
   case def_ X xs =>
     apply IsSub.def_
@@ -211,7 +211,7 @@ theorem isFreeSub_imp_fastAdmitsAux
   case
       forall_not_free_in h1_1_x h1_1_phi h1_1_v h1_1_t h1_1_1
     | exists_not_free_in h1_1_x h1_1_phi h1_1_v h1_1_t h1_1_1 =>
-    simp only [isFreeIn] at h1_1_1
+    simp only [var_is_free_in] at h1_1_1
     simp at h1_1_1
 
     by_cases c1 : h1_1_v = h1_1_x
@@ -253,7 +253,7 @@ theorem isFreeSub_imp_fastReplaceFree
   case
     forall_not_free_in h1_x h1_phi h1_v h1_t h1_1
   | exists_not_free_in h1_x h1_phi h1_v h1_t h1_1 =>
-    simp only [isFreeIn] at h1_1
+    simp only [var_is_free_in] at h1_1
     simp at h1_1
 
     split_ifs
@@ -266,7 +266,7 @@ theorem isFreeSub_imp_fastReplaceFree
   case
     forall_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 _ _ h1_ih
   | exists_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 _ _ h1_ih =>
-    simp only [isFreeIn] at h1_1
+    simp only [var_is_free_in] at h1_1
 
     cases h1_1
     case intro h1_1_left h1_1_right =>
@@ -342,7 +342,7 @@ theorem substitution_theorem
   case
     forall_not_free_in h1_x h1_phi h1_v h1_t h1_1
   | exists_not_free_in h1_x h1_phi h1_v h1_t h1_1 =>
-    simp only [isFreeIn] at h1_1
+    simp only [var_is_free_in] at h1_1
     simp at h1_1
 
     simp only [Holds]
@@ -362,7 +362,7 @@ theorem substitution_theorem
   case
     forall_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 h1_2 _ h1_ih
   | exists_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 h1_2 _ h1_ih =>
-    simp only [isFreeIn] at h1_1
+    simp only [var_is_free_in] at h1_1
 
     simp only [Holds]
     first | apply forall_congr' | apply exists_congr
@@ -406,7 +406,7 @@ theorem substitution_theorem
 
         simp only [s1]
         apply Function.updateListITE_mem_eq_len
-        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset hd.h1 a1
         · simp

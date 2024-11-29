@@ -255,7 +255,7 @@ theorem substitution_theorem_aux
 
         simp only [s1]
         apply Function.updateListITE_mem_eq_len
-        simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        simp only [var_is_free_in_iff_mem_free_var_set] at a1
         obtain s2 := hd.h1 a1
         simp at s2
         exact s2

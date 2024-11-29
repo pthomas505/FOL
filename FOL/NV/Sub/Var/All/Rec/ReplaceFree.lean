@@ -170,12 +170,12 @@ example
 theorem fastReplaceFree_same_on_free
   (F : Formula)
   (σ σ' : VarName → VarName)
-  (h1 : ∀ (v : VarName), isFreeIn v F → σ v = σ' v) :
+  (h1 : ∀ (v : VarName), var_is_free_in v F → σ v = σ' v) :
   fastReplaceFree σ F = fastReplaceFree σ' F :=
   by
   induction F generalizing σ σ'
   all_goals
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [fastReplaceFree]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>

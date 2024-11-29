@@ -336,12 +336,12 @@ theorem not_isFreeIn_imp_fastAdmitsAux
   (F : Formula)
   (v u : VarName)
   (binders : Finset VarName)
-  (h1 : ¬ isFreeIn v F) :
+  (h1 : ¬ var_is_free_in v F) :
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [fastAdmitsAux]
   all_goals
@@ -351,7 +351,7 @@ theorem not_isFreeIn_imp_fastAdmitsAux
 theorem not_isFreeIn_imp_fastAdmits
   (F : Formula)
   (v u : VarName)
-  (h1 : ¬ isFreeIn v F) :
+  (h1 : ¬ var_is_free_in v F) :
   fastAdmits v u F :=
   by
   simp only [fastAdmits]
@@ -581,14 +581,14 @@ theorem fastAdmitsAux_isFreeIn
   (v u : VarName)
   (binders : Finset VarName)
   (h1 : fastAdmitsAux v u binders F)
-  (h2 : isFreeIn v F) :
+  (h2 : var_is_free_in v F) :
   u ∉ binders :=
   by
   induction F generalizing binders
   all_goals
     simp only [fastAdmitsAux] at h1
 
-    simp only [isFreeIn] at h2
+    simp only [var_is_free_in] at h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     cases h2
     case intro h2_left h2_right =>
@@ -609,7 +609,7 @@ theorem fastAdmitsAux_mem_binders
   (binders : Finset VarName)
   (h1 : fastAdmitsAux v u binders F)
   (h2 : u ∈ binders) :
-  ¬ isFreeIn v F :=
+  ¬ var_is_free_in v F :=
   by
   contrapose! h2
   exact fastAdmitsAux_isFreeIn F v u binders h1 h2
@@ -780,12 +780,12 @@ theorem not_isFreeIn_imp_admitsAux
   (F : Formula)
   (v u : VarName)
   (binders : Finset VarName)
-  (h1 : ¬ isFreeIn v F) :
+  (h1 : ¬ var_is_free_in v F) :
   admitsAux v u binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [isFreeIn] at h1
+    simp only [var_is_free_in] at h1
 
     simp only [admitsAux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
@@ -802,7 +802,7 @@ theorem not_isFreeIn_imp_admitsAux
 theorem not_isFreeIn_imp_admits
   (F : Formula)
   (v u : VarName)
-  (h1 : ¬ isFreeIn v F) :
+  (h1 : ¬ var_is_free_in v F) :
   admits v u F :=
   by
   simp only [admits]
@@ -973,7 +973,7 @@ theorem admitsAux_isFreeIn
   (v u : VarName)
   (binders : Finset VarName)
   (h1 : admitsAux v u binders F)
-  (h2 : isFreeIn v F)
+  (h2 : var_is_free_in v F)
   (h3 : v ∉ binders) :
   u ∉ binders :=
   by
@@ -981,7 +981,7 @@ theorem admitsAux_isFreeIn
   all_goals
     simp only [admitsAux] at h1
 
-    simp only [isFreeIn] at h2
+    simp only [var_is_free_in] at h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     cases h2
     case intro h2_left h2_right =>
@@ -1120,7 +1120,7 @@ theorem substitution_theorem_aux
 
       simp only [s1]
       apply Function.updateListITE_mem_eq_len
-      · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+      · simp only [var_is_free_in_iff_mem_free_var_set] at a1
         simp only [← List.mem_toFinset]
         exact Finset.mem_of_subset hd.h1 a1
       · simp at c1

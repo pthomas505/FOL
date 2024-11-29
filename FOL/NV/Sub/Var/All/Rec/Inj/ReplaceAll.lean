@@ -85,7 +85,7 @@ theorem substitution_theorem
         case intro c1_left c1_right =>
           apply Holds_coincide_Var
           intro v a1
-          simp only [isFreeIn_iff_mem_freeVarSet v E_hd.q] at a1
+          simp only [var_is_free_in_iff_mem_free_var_set v E_hd.q] at a1
           apply Function.updateListITE_mem_eq_len
           · simp only [<- List.mem_toFinset]
             apply Finset.mem_of_subset E_hd.h1 a1

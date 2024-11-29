@@ -69,7 +69,7 @@ def admitsAux
               The zs are the free variables in H that are being replaced by the variables in ts.
             (is_free_in x H ∧ x ∉ zs) := x is a free variable in H that is not being replaced by a variable in ts.
             -/
-          ∀ x : VarName, x ∈ binders → ¬(isFreeIn x H ∧ x ∉ zs)
+          ∀ x : VarName, x ∈ binders → ¬(var_is_free_in x H ∧ x ∉ zs)
       else True
   | eq_ _ _ => True
   | true_ => True
@@ -317,14 +317,14 @@ theorem substitution_theorem_aux
       apply Holds_coincide_PredVar
       · simp only [I']
         simp only [Interpretation.usingPred]
-      · simp only [predVarOccursIn_iff_mem_predVarSet]
+      · simp only [pred_var_occurs_in_iff_mem_pred_var_set]
         simp only [hd.h2]
         simp
     case _ c1 =>
       apply Holds_coincide_PredVar
       · simp only [I']
         simp only [Interpretation.usingPred]
-      · simp only [predVarOccursIn]
+      · simp only [pred_var_occurs_in]
         simp
 
 

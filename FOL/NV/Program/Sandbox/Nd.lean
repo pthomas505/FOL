@@ -139,7 +139,7 @@ inductive IsDeduct : Finset Formula → Formula → Prop
     (phi : Formula)
     (x : VarName) :
     IsDeduct Δ phi →
-    (∀ H : Formula, H ∈ Δ → ¬ isFreeIn x H) →
+    (∀ H : Formula, H ∈ Δ → ¬ var_is_free_in x H) →
     IsDeduct Δ (forall_ x phi)
 
   | forall_elim_
@@ -165,8 +165,8 @@ inductive IsDeduct : Finset Formula → Formula → Prop
     IsDeduct Δ (exists_ x phi) →
     IsDeduct (Δ ∪ {phi}) psi →
     (∀ H : Formula, H ∈ Δ →
-    ¬ isFreeIn x H) →
-    ¬ isFreeIn x psi →
+    ¬ var_is_free_in x H) →
+    ¬ var_is_free_in x psi →
     IsDeduct Δ psi
 
   | pred_sub_

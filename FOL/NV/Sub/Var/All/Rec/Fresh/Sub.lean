@@ -190,7 +190,7 @@ theorem substitution_theorem
           have s1 : σ v ∈ Finset.image (Function.updateITE σ x x) (freeVarSet phi)
           apply Finset.mem_image_update
           · exact c2
-          · simp only [← isFreeIn_iff_mem_freeVarSet]
+          · simp only [← var_is_free_in_iff_mem_free_var_set]
             exact a1
 
           contradiction
@@ -210,7 +210,7 @@ theorem substitution_theorem
           apply Exists.intro v
           constructor
           · simp
-            simp only [← isFreeIn_iff_mem_freeVarSet]
+            simp only [← var_is_free_in_iff_mem_free_var_set]
             tauto
           · exact contra
         }
@@ -240,7 +240,7 @@ theorem substitution_theorem
           case _ c1_left c1_right =>
             symm
             exact c1_right
-        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset E_hd.h1 a1
       case neg c1 =>

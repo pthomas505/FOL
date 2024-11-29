@@ -110,14 +110,14 @@ inductive AlphaEqv : Formula → Formula → Prop
   | rename_forall_
     (phi : Formula)
     (x y : VarName) :
-    ¬ isFreeIn y phi →
+    ¬ var_is_free_in y phi →
     ¬ isBoundIn y phi →
     AlphaEqv (forall_ x phi) (forall_ y (Sub.Var.One.Rec.fastReplaceFree x y phi))
 
   | rename_exists_
     (phi : Formula)
     (x y : VarName) :
-    ¬ isFreeIn y phi →
+    ¬ var_is_free_in y phi →
     ¬ isBoundIn y phi →
     AlphaEqv (exists_ x phi) (exists_ y (Sub.Var.One.Rec.fastReplaceFree x y phi))
 
@@ -186,7 +186,7 @@ theorem replace_empty_Holds
   (u v : VarName)
   (F : Formula)
   (a : D)
-  (h1 : ¬ isFreeIn v F)
+  (h1 : ¬ var_is_free_in v F)
   (h2 : ¬ isBoundIn v F) :
   Holds D I (Function.updateITE V u a) E F ↔
     Holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fastReplaceFree u v F) :=
@@ -195,7 +195,7 @@ theorem replace_empty_Holds
   all_goals
     induction F generalizing V
     case pred_const_ X xs | pred_var_ X xs =>
-      simp only [isFreeIn] at h1
+      simp only [var_is_free_in] at h1
 
       simp only [Sub.Var.One.Rec.fastReplaceFree]
       simp only [Holds]
@@ -215,7 +215,7 @@ theorem replace_empty_Holds
       case _ c1 c2 =>
         rfl
     case eq_ x y =>
-      simp only [isFreeIn] at h1
+      simp only [var_is_free_in] at h1
 
       simp only [Sub.Var.One.Rec.fastReplaceFree]
       simp only [Holds]
@@ -228,7 +228,7 @@ theorem replace_empty_Holds
       simp only [Sub.Var.One.Rec.fastReplaceFree]
       simp only [Holds]
     case not_ phi phi_ih =>
-      simp only [isFreeIn] at h1
+      simp only [var_is_free_in] at h1
 
       simp only [isBoundIn] at h2
 
@@ -241,7 +241,7 @@ theorem replace_empty_Holds
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      simp only [isFreeIn] at h1
+      simp only [var_is_free_in] at h1
       push_neg at h1
 
       simp only [isBoundIn] at h2
@@ -257,7 +257,7 @@ theorem replace_empty_Holds
           · exact phi_ih V h1_left h2_left
           · exact psi_ih V h1_right h2_right
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [isFreeIn] at h1
+      simp only [var_is_free_in] at h1
       push_neg at h1
 
       simp only [isBoundIn] at h2
@@ -271,7 +271,7 @@ theorem replace_empty_Holds
           subst c1
           apply Holds_coincide_Var
           intro x a1
-          simp only [isFreeIn] at a1
+          simp only [var_is_free_in] at a1
           cases a1
           case h1.intro a1_left a1_right =>
             simp only [Function.updateITE]
@@ -302,7 +302,7 @@ theorem replace_empty_Holds
       case _ =>
         simp
       case _ c1 =>
-        simp only [isFreeIn] at h1
+        simp only [var_is_free_in] at h1
 
         apply Holds_coincide_Var
         intro v' a1
@@ -328,7 +328,7 @@ theorem replace_empty_Holds
 
         simp only [s1]
         apply Function.updateListITE_mem_eq_len
-        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset hd.h1 a1
         · simp at c1
@@ -708,7 +708,7 @@ lemma isAlphaEqv_Holds_aux
         intro v a1
         simp only [aux_2 D binders xs ys V V' h1 h2_right]
         apply Function.updateListITE_mem_eq_len
-        · simp only [isFreeIn_iff_mem_freeVarSet] at a1
+        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset hd.h1 a1
         · simp
