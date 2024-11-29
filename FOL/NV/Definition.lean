@@ -99,7 +99,7 @@ instance (E : Env_) : Decidable (E.nodup_) :=
   2. Every definition that occurs in the formula of a definition `d` in the environment `d :: E' ⊆ E` occurs in the environment `E'`. This means there are no circular definitions.
 -/
 def Env_.well_formed : Env_ → Prop
-  | List.nil => True
+  | [] => True
   | d :: E =>
     (∀ (d' : Definition_), d' ∈ E →
       d.name = d'.name → d.args.length = d'.args.length → False) ∧
