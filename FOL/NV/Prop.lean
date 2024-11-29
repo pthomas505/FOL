@@ -35,7 +35,7 @@ axiom def_iff_ (phi psi : Formula) : iff_ phi psi = (phi.imp_ psi).and_ (psi.imp
 axiom def_exists_ (x : VarName_) (phi : Formula) : exists_ x phi = not_ (forall_ x (not_ phi))
 
 def def_eq_ (x y : VarName_) : Formula :=
-  pred_const_ (PredName.mk "=") [x, y]
+  pred_const_ (PredName_.mk "=") [x, y]
 
 
 /--

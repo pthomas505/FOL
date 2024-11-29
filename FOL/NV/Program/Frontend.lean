@@ -123,14 +123,14 @@ def mp
 def sub
   (localContext : LocalContext)
   (step_index : ℕ)
-  (xs : List (PredName × (List VarName_ × Formula))) :
+  (xs : List (PredName_ × (List VarName_ × Formula))) :
   Except String Backend.Step := do
   let step ← localContext.get step_index
 
   let hypotheses := step.assertion.hypotheses
   let conclusion := step.assertion.conclusion
 
-  let τ : PredName → ℕ → Option (List VarName_ × Formula) := Backend.PredReplaceListToFun xs
+  let τ : PredName_ → ℕ → Option (List VarName_ × Formula) := Backend.PredReplaceListToFun xs
 
   Except.ok {
     assertion := {
@@ -162,7 +162,7 @@ inductive Command : Type
   | prop_1_ : Formula → Formula → Command
   | prop_2_ : Formula → Formula → Formula → Command
   | mp_ : ℕ → ℕ → Command
-  | sub_ : ℕ → List (PredName × (List VarName_ × Formula)) → Command
+  | sub_ : ℕ → List (PredName_ × (List VarName_ × Formula)) → Command
   | thm_ : String → Command
 
 
@@ -269,16 +269,16 @@ def checkProofList
   Backend.checkProofList proof_list'
 
 
-def P := pred_var_ (PredName.mk "P") []
-def Q := pred_var_ (PredName.mk "Q") []
+def P := pred_var_ (PredName_.mk "P") []
+def Q := pred_var_ (PredName_.mk "Q") []
 
 #eval checkProofList (createProofList [
   ("id", [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3]),
-  ("id'", [thm_ "id", sub_ 0 [(PredName.mk "P", ([], Q))]])
+  ("id'", [thm_ "id", sub_ 0 [(PredName_.mk "P", ([], Q))]])
   ]
 )
 
 #eval createJsonProofList [
   ("id", [prop_2_ P (P.imp_ P) P, prop_1_ P (P.imp_ P), mp_ 0 1, prop_1_ P P, mp_ 2 3]),
-  ("id'", [thm_ "id", sub_ 0 [(PredName.mk "P", ([], Q))]])
+  ("id'", [thm_ "id", sub_ 0 [(PredName_.mk "P", ([], Q))]])
   ]

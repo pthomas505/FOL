@@ -128,7 +128,7 @@ inductive IsAxiom : Formula → Prop
     ⊢ ∀ x_0 ... ∀ x_n ∀ y_0 ... y_n ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) →((pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n]))
   -/
   | eq_2_pred_const_
-    (name : PredName)
+    (name : PredName_)
     (n : ℕ)
     (xs ys : Fin n → VarName_) :
     IsAxiom
@@ -266,7 +266,7 @@ inductive IsProofAlt : Formula → Prop
     ⊢ ∀ x_0 ... ∀ x_n ∀ y_0 ... y_n ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) →((pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n]))
   -/
   | eq_2_pred_const_
-    (name : PredName)
+    (name : PredName_)
     (n : ℕ)
     (xs ys : Fin n → VarName_) :
     IsProofAlt

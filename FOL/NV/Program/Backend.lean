@@ -141,7 +141,7 @@ inductive IsDeduct : List Formula → Formula → Prop
     ⊢ ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) → (pred_var_ name [x_0 ... x_n] ↔ pred_var_ name [y_0 ... y_n])
   -/
   | eq_2_pred_var_
-    (name : PredName)
+    (name : PredName_)
     (xs ys : List VarName_) :
     xs.length = ys.length →
     IsDeduct [] ((List.foldr and_ true_ (List.zipWith eq_ xs ys)).imp_ ((pred_var_ name xs).iff_ (pred_var_ name ys)))
@@ -194,7 +194,7 @@ inductive IsDeduct : List Formula → Formula → Prop
   | sub_
     (Δ : List Formula)
     (phi : Formula)
-    (τ : PredName → ℕ → Option (List VarName_ × Formula)) :
+    (τ : PredName_ → ℕ → Option (List VarName_ × Formula)) :
     IsDeduct Δ phi →
     IsDeduct (Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)) (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi)
 
@@ -216,13 +216,13 @@ inductive Rule : Type
   | gen_ : VarName_ → Formula → ℕ → Rule
   | eq_1_ : VarName_ → Rule
   | eq_2_eq_ : VarName_ → VarName_ → VarName_ → VarName_ → Rule
-  | eq_2_pred_var_ : PredName → List VarName_ → List VarName_ → Rule
+  | eq_2_pred_var_ : PredName_ → List VarName_ → List VarName_ → Rule
   | def_false_ : Rule
   | def_and_ : Formula → Formula → Rule
   | def_or_ : Formula → Formula → Rule
   | def_iff_ : Formula → Formula → Rule
   | def_exists_ : VarName_ → Formula → Rule
-  | sub_ : List Formula → Formula → List (PredName × (List VarName_) × Formula) → ℕ → Rule
+  | sub_ : List Formula → Formula → List (PredName_ × (List VarName_) × Formula) → ℕ → Rule
   | thm_ : String → Rule
   deriving Lean.ToJson, Lean.FromJson
 
@@ -365,10 +365,10 @@ def LocalContext.get
   opt.toExcept s! "{index} not found in local context."
 
 
-def PredReplaceListToFun : List (PredName × (List VarName_) × Formula) → PredName → ℕ → Option ((List VarName_) × Formula)
-  | [] => fun (_ : PredName) (_ : ℕ) => Option.none
+def PredReplaceListToFun : List (PredName_ × (List VarName_) × Formula) → PredName_ → ℕ → Option ((List VarName_) × Formula)
+  | [] => fun (_ : PredName_) (_ : ℕ) => Option.none
   | (X, zs, H) :: tl =>
-    fun (P : PredName) (n : ℕ) =>
+    fun (P : PredName_) (n : ℕ) =>
       if P = X ∧ n = zs.length
       then Option.some (zs, H)
       else PredReplaceListToFun tl P n
@@ -693,7 +693,7 @@ def checkRule
     }
 
   | sub_ Δ phi xs label => do
-    let τ : PredName → ℕ → Option ((List VarName_) × Formula) := PredReplaceListToFun xs
+    let τ : PredName_ → ℕ → Option ((List VarName_) × Formula) := PredReplaceListToFun xs
 
     let found : CheckedStep ← localContext.get label
 

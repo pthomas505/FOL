@@ -149,8 +149,8 @@ instance
   Used to label each occurrence of a variable in a formula as free or bound.
 -/
 inductive BoolFormula : Type
-  | pred_const_ : PredName → List Bool → BoolFormula
-  | pred_var_ : PredName → List Bool → BoolFormula
+  | pred_const_ : PredName_ → List Bool → BoolFormula
+  | pred_var_ : PredName_ → List Bool → BoolFormula
   | eq_ : Bool → Bool → BoolFormula
   | true_ : BoolFormula
   | false_ : BoolFormula

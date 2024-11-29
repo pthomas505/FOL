@@ -15,7 +15,7 @@ open Formula
   The recursive simultaneous uniform substitution of all of the predicate variables in a formula.
 -/
 def replace
-  (τ : PredName → ℕ → (List VarName_ × Formula)) :
+  (τ : PredName_ → ℕ → (List VarName_ × Formula)) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
@@ -50,7 +50,7 @@ def replace
 
 
 def admitsAux
-  (τ : PredName → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula)
   (binders : Finset VarName_) :
   Formula → Prop
   | pred_const_ _ _ => True
@@ -79,7 +79,7 @@ def admitsAux
   | def_ _ _ => True
 
 instance
-  (τ : PredName → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula)
   (binders : Finset VarName_)
   (F : Formula) :
   Decidable (admitsAux τ binders F) :=
@@ -91,14 +91,14 @@ instance
 
 
 def admits
-  (τ : PredName → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula)
   (F : Formula) :
   Prop :=
   admitsAux τ ∅ F
 
 
 instance
-  (τ : PredName → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula)
   (F : Formula) :
   Decidable (admits τ F) :=
   by
@@ -111,7 +111,7 @@ theorem substitution_theorem_aux
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
   (E : Env)
-  (τ : PredName → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula)
   (binders : Finset VarName_)
   (F : Formula)
   (h1 : admitsAux τ binders F)
@@ -120,7 +120,7 @@ theorem substitution_theorem_aux
     ⟨
       I.nonempty,
       I.pred_const_,
-      fun (X : PredName) (ds : List D) =>
+      fun (X : PredName_) (ds : List D) =>
         if ds.length = (τ X ds.length).fst.length
         then holds D I (Function.updateListITE V' (τ X ds.length).fst ds) E (τ X ds.length).snd
         else I.pred_var_ X ds
@@ -243,14 +243,14 @@ theorem substitution_theorem
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (τ : PredName → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula)
   (F : Formula)
   (h1 : admits τ F) :
   holds D
     ⟨
       I.nonempty,
       I.pred_const_,
-      fun (X : PredName) (ds : List D) =>
+      fun (X : PredName_) (ds : List D) =>
         let zs := (τ X ds.length).fst
         let H := (τ X ds.length).snd
         if ds.length = zs.length
@@ -268,7 +268,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (F : Formula)
-  (τ : PredName → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula)
   (h1 : admits τ F)
   (h2 : F.is_valid) :
   (replace τ F).is_valid :=

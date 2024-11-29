@@ -172,7 +172,7 @@ inductive IsDeduct : Finset Formula → Formula → Prop
   | pred_sub_
     (Δ : Finset Formula)
     (phi : Formula)
-    (τ : PredName → ℕ → List VarName_ × Formula) :
+    (τ : PredName_ → ℕ → List VarName_ × Formula) :
     IsDeduct Δ phi →
     Sub.Pred.All.Rec.admits τ phi →
     (∀ H : Formula, H ∈ Δ → Sub.Pred.All.Rec.admits τ H) →

@@ -10,8 +10,8 @@ open Formula
 
 
 def predVarFreeVarSet
-  (τ : PredName → ℕ → Option (List VarName_ × Formula)) :=
-  fun ((X : PredName), (n : ℕ)) =>
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula)) :=
+  fun ((X : PredName_), (n : ℕ)) =>
     let opt := τ X n
     if h : Option.isSome opt
     then
@@ -24,7 +24,7 @@ def predVarFreeVarSet
 
 def subAux
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName_ × Formula))
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula))
   (σ : VarName_ → VarName_) :
   Formula → Formula
   | pred_const_ X xs => pred_const_ X (xs.map σ)
@@ -83,7 +83,7 @@ def subAux
 
 def sub
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName_ × Formula))
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula))
   (F : Formula) :
   Formula :=
   subAux c τ id F
@@ -92,7 +92,7 @@ def sub
 def Interpretation_.usingPred
   (D : Type)
   (I : Interpretation_ D)
-  (pred_ : PredName → List D → Prop) :
+  (pred_ : PredName_ → List D → Prop) :
   Interpretation_ D := {
     nonempty := I.nonempty
     pred_const_ := I.pred_const_
@@ -104,10 +104,10 @@ def I'
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (τ : PredName → ℕ → Option (List VarName_ × Formula)) :
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula)) :
   Interpretation_ D :=
   (Interpretation_.usingPred D I (
-  fun (X : PredName) (ds : List D) =>
+  fun (X : PredName_) (ds : List D) =>
   let opt := τ X ds.length
   if h : Option.isSome opt
   then
@@ -126,7 +126,7 @@ lemma substitution_theorem_aux
   (V V' V'': Valuation_ D)
   (E : Env)
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName_ × Formula))
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula))
   (σ : VarName_ → VarName_)
   (F : Formula)
   (h1 : ∀ (x : VarName_), var_is_free_in x F → V' x = V (σ x))
@@ -440,7 +440,7 @@ theorem substitution_theorem
   (V : Valuation_ D)
   (E : Env)
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName_ × Formula))
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula))
   (F : Formula) :
   holds D (I' D I V E τ) V E F ↔ holds D I V E (sub c τ F) :=
   by
@@ -451,7 +451,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (c : Char)
-  (τ : PredName → ℕ → Option (List VarName_ × Formula))
+  (τ : PredName_ → ℕ → Option (List VarName_ × Formula))
   (F : Formula)
   (h1 : is_valid F) :
   is_valid (sub c τ F) :=

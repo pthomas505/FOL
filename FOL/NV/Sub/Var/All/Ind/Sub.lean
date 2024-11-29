@@ -21,7 +21,7 @@ inductive IsSubAux :
   | pred_const_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_) :
     (∀ v : VarName_, v ∈ xs → v ∉ binders → σ v ∉ binders) →
     IsSubAux σ binders (pred_const_ X xs) (pred_const_ X (xs.map σ))
@@ -29,7 +29,7 @@ inductive IsSubAux :
   | pred_var_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_) :
     (∀ v : VarName_, v ∈ xs → v ∉ binders → σ v ∉ binders) →
     IsSubAux σ binders (pred_var_ X xs) (pred_var_ X (xs.map σ))

@@ -17,13 +17,13 @@ inductive IsReplaceFree : (VarName_ → VarName_) → Formula → Formula → Pr
 
   | pred_const_
     (σ : VarName_ → VarName_)
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_) :
     IsReplaceFree σ (pred_const_ X xs) (pred_const_ X (xs.map σ))
 
   | pred_var_
     (σ : VarName_ → VarName_)
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_) :
     IsReplaceFree σ (pred_var_ X xs) (pred_var_ X (xs.map σ))
 

@@ -70,14 +70,14 @@ inductive IsReplOfVarInFormula
   (u v : VarName_) :
   Formula → Formula → Prop
   | pred_const_
-    (name : PredName)
+    (name : PredName_)
     (n : ℕ)
     (args_u args_v : Fin n → VarName_) :
     (∀ (i : Fin n), (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →
     IsReplOfVarInFormula u v (pred_const_ name (List.ofFn args_u)) (pred_const_ name (List.ofFn args_v))
 
   | pred_var_
-    (name : PredName)
+    (name : PredName_)
     (n : ℕ)
     (args_u args_v : Fin n → VarName_) :
     (∀ (i : Fin n), (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →

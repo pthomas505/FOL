@@ -31,23 +31,23 @@ instance : Lean.FromJson VarName_ :=
 /--
   The type of predicate names.
 -/
-structure PredName extends String
+structure PredName_ extends String
   deriving Inhabited, DecidableEq, Repr
 
-instance : ToString PredName :=
-  { toString := PredName.toString }
+instance : ToString PredName_ :=
+  { toString := PredName_.toString }
 
 
-instance : Lean.ToJson PredName :=
-  { toJson := fun (X : PredName) => Lean.toJson X.toString }
+instance : Lean.ToJson PredName_ :=
+  { toJson := fun (X : PredName_) => Lean.toJson X.toString }
 
-instance : Lean.FromJson PredName :=
+instance : Lean.FromJson PredName_ :=
   { fromJson? := fun (json : Lean.Json) => do
     let str ← Lean.fromJson? json
-    Except.ok (PredName.mk str) }
+    Except.ok (PredName_.mk str) }
 
-#eval Lean.toJson (PredName.mk "X")
-#eval ((Lean.fromJson? "X") : Except String PredName)
+#eval Lean.toJson (PredName_.mk "X")
+#eval ((Lean.fromJson? "X") : Except String PredName_)
 
 
 /--
@@ -76,8 +76,8 @@ instance : Lean.FromJson DefName :=
   The type of formulas.
 -/
 inductive Formula : Type
-  | pred_const_ : PredName → List VarName_ → Formula
-  | pred_var_ : PredName → List VarName_ → Formula
+  | pred_const_ : PredName_ → List VarName_ → Formula
+  | pred_var_ : PredName_ → List VarName_ → Formula
   | eq_ : VarName_ → VarName_ → Formula
   | true_ : Formula
   | false_ : Formula
@@ -126,8 +126,8 @@ instance : ToString Formula :=
   { toString := Formula.toString }
 
 
-#eval Lean.toJson (pred_const_ (PredName.mk "X") [])
-#eval Lean.toJson (forall_ (VarName_.mk "x") (pred_const_ (PredName.mk "X") []))
+#eval Lean.toJson (pred_const_ (PredName_.mk "X") [])
+#eval Lean.toJson (forall_ (VarName_.mk "x") (pred_const_ (PredName_.mk "X") []))
 
 /--
   Parses a JSON formatted string into a `Formula`.
@@ -155,9 +155,9 @@ def Formula.And_ (l : List Formula) : Formula :=
 
 #eval (And_ []).toString
 
-#eval (And_ [pred_var_ (PredName.mk "X") []]).toString
+#eval (And_ [pred_var_ (PredName_.mk "X") []]).toString
 
-#eval (And_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]).toString
+#eval (And_ [pred_var_ (PredName_.mk "X") [], pred_var_ (PredName_.mk "Y") []]).toString
 
 
 /--
@@ -172,9 +172,9 @@ def Formula.Or_ (l : List Formula) : Formula :=
 
 #eval (Or_ []).toString
 
-#eval (Or_ [pred_var_ (PredName.mk "X") []]).toString
+#eval (Or_ [pred_var_ (PredName_.mk "X") []]).toString
 
-#eval (Or_ [pred_var_ (PredName.mk "X") [], pred_var_ (PredName.mk "Y") []]).toString
+#eval (Or_ [pred_var_ (PredName_.mk "X") [], pred_var_ (PredName_.mk "Y") []]).toString
 
 
 /--
@@ -183,11 +183,11 @@ def Formula.Or_ (l : List Formula) : Formula :=
 def Formula.Forall_ (xs : List VarName_) (phi : Formula) : Formula :=
   List.foldr forall_ phi xs
 
-#eval (Forall_ [] (pred_var_ (PredName.mk "phi") [])).toString
+#eval (Forall_ [] (pred_var_ (PredName_.mk "phi") [])).toString
 
-#eval (Forall_ [VarName_.mk "x"] (pred_var_ (PredName.mk "phi") [VarName_.mk "x"])).toString
+#eval (Forall_ [VarName_.mk "x"] (pred_var_ (PredName_.mk "phi") [VarName_.mk "x"])).toString
 
-#eval (Forall_ [VarName_.mk "x", VarName_.mk "y"] (pred_var_ (PredName.mk "phi") [VarName_.mk "x", VarName_.mk "y"])).toString
+#eval (Forall_ [VarName_.mk "x", VarName_.mk "y"] (pred_var_ (PredName_.mk "phi") [VarName_.mk "x", VarName_.mk "y"])).toString
 
 
 /--
@@ -196,11 +196,11 @@ def Formula.Forall_ (xs : List VarName_) (phi : Formula) : Formula :=
 def Formula.Exists_ (xs : List VarName_) (phi : Formula) : Formula :=
   List.foldr exists_ phi xs
 
-#eval (Exists_ [] (pred_var_ (PredName.mk "phi") [])).toString
+#eval (Exists_ [] (pred_var_ (PredName_.mk "phi") [])).toString
 
-#eval (Exists_ [VarName_.mk "x"] (pred_var_ (PredName.mk "phi") [VarName_.mk "x"])).toString
+#eval (Exists_ [VarName_.mk "x"] (pred_var_ (PredName_.mk "phi") [VarName_.mk "x"])).toString
 
-#eval (Exists_ [VarName_.mk "x", VarName_.mk "y"] (pred_var_ (PredName.mk "phi") [VarName_.mk "x", VarName_.mk "y"])).toString
+#eval (Exists_ [VarName_.mk "x", VarName_.mk "y"] (pred_var_ (PredName_.mk "phi") [VarName_.mk "x", VarName_.mk "y"])).toString
 
 
 #lint

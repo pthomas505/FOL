@@ -21,13 +21,13 @@ instance : Repr VarName_ :=
 /--
   The type of predicate names.
 -/
-structure PredName extends String
+structure PredName_ extends String
   deriving Inhabited, DecidableEq
 
-instance : ToString PredName :=
+instance : ToString PredName_ :=
   { toString := fun X => X.toString }
 
-instance : Repr PredName :=
+instance : Repr PredName_ :=
   { reprPrec := fun X _ => X.toString.toFormat }
 
 
@@ -48,8 +48,8 @@ instance : Repr DefName :=
   The type of formulas.
 -/
 inductive Formula : Type
-  | pred_const_ : PredName → List VarName_ → Formula
-  | pred_var_ : PredName → List VarName_ → Formula
+  | pred_const_ : PredName_ → List VarName_ → Formula
+  | pred_var_ : PredName_ → List VarName_ → Formula
   | eq_ : VarName_ → VarName_ → Formula
   | true_ : Formula
   | false_ : Formula
@@ -152,7 +152,7 @@ instance (v : VarName_) (F : Formula) : Decidable (var_is_free_in v F) :=
 /--
   Formula.pred_var_set F := The set of all of the predicate variables that have an occurrence in the formula F.
 -/
-def Formula.pred_var_set : Formula → Finset (PredName × ℕ)
+def Formula.pred_var_set : Formula → Finset (PredName_ × ℕ)
   | pred_const_ _ _ => ∅
   | pred_var_ X xs => {(X, xs.length)}
   | eq_ _ _ => ∅
@@ -290,7 +290,7 @@ def Function.updateListIte
 /--
   The recursive simultaneous uniform substitution of all of the predicate variables in a formula.
 -/
-def replacePredFun (τ : PredName → ℕ → (List VarName_ × Formula)) : Formula → Formula
+def replacePredFun (τ : PredName_ → ℕ → (List VarName_ × Formula)) : Formula → Formula
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
       if xs.length = (τ X xs.length).fst.length
@@ -322,7 +322,7 @@ def replacePredFun (τ : PredName → ℕ → (List VarName_ × Formula)) : Form
 
 
 def admitsPredFunAux
-  (τ : PredName → ℕ → List VarName_ × Formula) :
+  (τ : PredName_ → ℕ → List VarName_ × Formula) :
   Finset VarName_ → Formula → Prop
   | _, pred_const_ _ _ => True
   | binders, pred_var_ X xs =>
@@ -350,7 +350,7 @@ def admitsPredFunAux
   | _, def_ _ _ => True
 
 instance
-  (τ : PredName → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula)
   (binders : Finset VarName_)
   (F : Formula) :
   Decidable (admitsPredFunAux τ binders F) :=
@@ -361,11 +361,11 @@ instance
     infer_instance
 
 
-def admitsPredFun (τ : PredName → ℕ → List VarName_ × Formula) (F : Formula) : Prop :=
+def admitsPredFun (τ : PredName_ → ℕ → List VarName_ × Formula) (F : Formula) : Prop :=
   admitsPredFunAux τ ∅ F
 
 instance
-  (τ : PredName → ℕ → List VarName_ × Formula)
+  (τ : PredName_ → ℕ → List VarName_ × Formula)
   (F : Formula) :
   Decidable (admitsPredFun τ F) :=
   by
@@ -660,7 +660,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
   | eq_2_pred_const_
     (E : Env)
     (Δ : List Formula)
-    (name : PredName)
+    (name : PredName_)
     (xs ys : List VarName_) :
     xs.length = ys.length →
     IsDeduct E Δ
@@ -674,7 +674,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
   | eq_2_pred_var_
     (E : Env)
     (Δ : List Formula)
-    (name : PredName)
+    (name : PredName_)
     (xs ys : List VarName_) :
     xs.length = ys.length →
     IsDeduct E Δ
@@ -784,7 +784,7 @@ inductive IsDeduct : Env → List Formula → Formula → Prop
     (E : Env)
     (Δ : List Formula)
     (phi : Formula)
-    (τ : PredName → ℕ → List VarName_ × Formula) :
+    (τ : PredName_ → ℕ → List VarName_ × Formula) :
     IsDeduct E Δ phi →
     admitsPredFun τ phi →
     (∀ H : Formula, H ∈ Δ → admitsPredFun τ H) →

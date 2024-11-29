@@ -431,7 +431,7 @@ def c := '+'
 
 def σ := (Function.updateITE id (VarName_.mk "x") (VarName_.mk "y"))
 
-def F := (forall_ (VarName_.mk "y++") (forall_ (VarName_.mk "y") (pred_var_ (PredName.mk "X") [VarName_.mk "x", VarName_.mk "y++"])))
+def F := (forall_ (VarName_.mk "y++") (forall_ (VarName_.mk "y") (pred_var_ (PredName_.mk "X") [VarName_.mk "x", VarName_.mk "y++"])))
 
 def F' := (sub_alpha' σ id c F).snd
 def F'' := sub_alpha σ id ∅ c F

@@ -14,7 +14,7 @@ open Formula
 /--
   The recursive simultaneous uniform substitution of all of the propositional variables in a formula.
 -/
-def sub (τ : PredName → PredName) : Formula → Formula
+def sub (τ : PredName_ → PredName_) : Formula → Formula
   | pred_const_ P ts => pred_const_ P ts
   | pred_var_ P ts =>
       if ts = List.nil
@@ -46,7 +46,7 @@ instance {α : Type} {xs : List α} : Decidable (xs = []) :=
 
 lemma sub_no_predVar
   (F : Formula)
-  (τ : PredName → PredName)
+  (τ : PredName_ → PredName_)
   (h1 : F.pred_var_set = ∅) :
   sub τ F = F :=
   by
@@ -96,14 +96,14 @@ theorem substitution_theorem
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (τ : PredName → PredName)
+  (τ : PredName_ → PredName_)
   (F : Formula) :
   holds D I V E (sub τ F) ↔
     holds D
       ⟨
         I.nonempty,
         I.pred_const_,
-        fun (P : PredName) (ds : List D) =>
+        fun (P : PredName_) (ds : List D) =>
           if ds = List.nil
           then holds D I V E (pred_var_ (τ P) List.nil)
           else I.pred_var_ P ds
@@ -184,7 +184,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (F : Formula)
-  (τ : PredName → PredName)
+  (τ : PredName_ → PredName_)
   (h1 : F.is_valid) :
   (sub τ F).is_valid :=
   by

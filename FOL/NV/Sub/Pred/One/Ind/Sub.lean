@@ -14,13 +14,13 @@ open Formula
   IsSub A P zs H B := The formula A is said to be transformed into the formula B by a substitution of H* for P z₁ ... zₙ, abbreviated: Sub A (P zⁿ / H*) B, iff B is obtained from A upon replacing in A each occurrence of a derivative of the name form P z₁ ... zₙ by the corresponding derivative of the substituend H*, provided that: (i) P does not occur in a component formula (∀ x A₁) of A if x is a parameter of H*, and (ii) the name variable zₖ, k = 1, ..., n, is not free in a component formula (∀ x H) of H* if P t₁ ... tₙ occurs in A with x occurring in tₖ. If conditions (i) and (ii) are not satisfied, then the indicated substitution for predicate variables is left undefined.
 -/
 inductive IsSub
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula) :
   Formula → Formula → Prop
 
   | pred_const_
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_) :
     IsSub P zs H (pred_const_ X xs) (pred_const_ X xs)
 
@@ -29,7 +29,7 @@ inductive IsSub
 -/
 
   | pred_not_occurs_in
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_) :
     ¬ (X = P ∧ xs.length = zs.length) →
     IsSub P zs H (pred_var_ X xs) (pred_var_ X xs)
@@ -43,7 +43,7 @@ inductive IsSub
   -/
 
   | pred_occurs_in
-    (X : PredName)
+    (X : PredName_)
     (ts : List VarName_) :
     X = P ∧ ts.length = zs.length →
     Sub.Var.All.Rec.admits (Function.updateListITE id zs ts) H →
@@ -134,16 +134,16 @@ theorem substitution_theorem
   (V : Valuation_ D)
   (E : Env)
   (A : Formula)
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula)
   (B : Formula)
   (h1 : IsSub P zs H A B)
-  (h2 : ∀ (Q : PredName) (ds : List D),
+  (h2 : ∀ (Q : PredName_) (ds : List D),
     Q = P ∧ ds.length = zs.length →
       (holds D I (Function.updateListITE V zs ds) E H ↔ J.pred_var_ P ds))
   (h3_const : I.pred_const_ = J.pred_const_)
-  (h3_var : ∀ (Q : PredName) (ds : List D),
+  (h3_var : ∀ (Q : PredName_) (ds : List D),
     ¬ (Q = P ∧ ds.length = zs.length) →
       (I.pred_var_ Q ds ↔ J.pred_var_ Q ds)) :
   holds D I V E B ↔ holds D J V E A :=
@@ -247,7 +247,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (F F' : Formula)
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula)
   (h1 : IsSub P zs H F F')
@@ -261,7 +261,7 @@ theorem substitution_is_valid
   let J : Interpretation_ D :=
     { nonempty := I.nonempty
       pred_const_ := I.pred_const_
-      pred_var_ := fun (Q : PredName) (ds : List D) =>
+      pred_var_ := fun (Q : PredName_) (ds : List D) =>
         if (Q = P ∧ ds.length = zs.length)
         then holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ Q ds }

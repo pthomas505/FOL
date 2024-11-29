@@ -16,7 +16,7 @@ open Formula
   The recursive simultaneous uniform substitution of a single predicate variable in a formula.
 -/
 def replace
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula) :
   Formula → Formula
@@ -54,7 +54,7 @@ def replace
   Helper function for admits.
 -/
 def admitsAux
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula)
   (binders : Finset VarName_) : Formula → Prop
@@ -96,7 +96,7 @@ def admitsAux
   admits P zs H F := True if and only if there is no variable in (H.free_var_set \ zs) that becomes a bound occurrence in the formula (replace P zs H F).
 -/
 def admits
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula)
   (F : Formula) :
@@ -105,7 +105,7 @@ def admits
 
 
 lemma replace_no_predVar
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula)
   (F : Formula)
@@ -158,7 +158,7 @@ lemma replace_no_predVar
 def Interpretation_.usingPred
   (D : Type)
   (I : Interpretation_ D)
-  (pred_ : PredName → List D → Prop) :
+  (pred_ : PredName_ → List D → Prop) :
   Interpretation_ D := {
     nonempty := I.nonempty
     pred_const_ := I.pred_const_
@@ -173,12 +173,12 @@ def I'
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env)
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula) :
   Interpretation_ D :=
   (Interpretation_.usingPred D I (
-    fun (Q : PredName) (ds : List D) =>
+    fun (Q : PredName_) (ds : List D) =>
       if Q = P ∧ ds.length = zs.length
       then holds D I (Function.updateListITE V zs ds) E H
       else I.pred_var_ Q ds
@@ -191,7 +191,7 @@ theorem substitution_theorem_aux
   (V V' : Valuation_ D)
   (E : Env)
   (F : Formula)
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula)
   (binders : Finset VarName_)
@@ -334,7 +334,7 @@ theorem substitution_theorem
   (V : Valuation_ D)
   (E : Env)
   (F : Formula)
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula)
   (h1 : admits P zs H F) :
@@ -348,7 +348,7 @@ theorem substitution_theorem
 
 theorem substitution_is_valid
   (F : Formula)
-  (P : PredName)
+  (P : PredName_)
   (zs : List VarName_)
   (H : Formula)
   (h1 : admits P zs H F)

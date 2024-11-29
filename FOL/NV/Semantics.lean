@@ -23,12 +23,12 @@ structure Interpretation_ (D : Type) : Type where
   /--
     The assignment to each predicate symbol of a function mapping lists of elements of the domain of discourse to {T, F}.
   -/
-  (pred_const_ : PredName → (List D → Prop))
+  (pred_const_ : PredName_ → (List D → Prop))
 
   /--
     The assignment to each predicate symbol of a function mapping lists of elements of the domain of discourse to {T, F}.
   -/
-  (pred_var_ : PredName → (List D → Prop))
+  (pred_var_ : PredName_ → (List D → Prop))
 
 instance (D : Type) [Inhabited D] : Inhabited (Interpretation_ D) :=
   Inhabited.mk {
@@ -178,7 +178,7 @@ theorem Holds_coincide_PredVar
   (E : Env)
   (F : Formula)
   (h1 : I.pred_const_ = I'.pred_const_)
-  (h2 : ∀ (P : PredName) (ds : List D),
+  (h2 : ∀ (P : PredName_) (ds : List D),
     pred_var_occurs_in P ds.length F →
       (I.pred_var_ P ds ↔ I'.pred_var_ P ds)) :
   holds D I V E F ↔ holds D I' V E F :=

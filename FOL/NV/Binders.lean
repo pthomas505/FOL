@@ -159,13 +159,13 @@ inductive var_is_free_in_ind
   Formula → Prop
 
   | pred_const_
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_) :
     v ∈ xs →
     var_is_free_in_ind v (pred_const_ X xs)
 
   | pred_var_
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_) :
     v ∈ xs →
     var_is_free_in_ind v (pred_var_ X xs)
@@ -244,7 +244,7 @@ inductive var_is_free_in_ind
 /--
   `Formula.pred_var_set F` := The set of all of the predicate variables that have an occurrence in the formula `F`.
 -/
-def Formula.pred_var_set : Formula → Finset (PredName × ℕ)
+def Formula.pred_var_set : Formula → Finset (PredName_ × ℕ)
   | pred_const_ _ _ => ∅
   | pred_var_ X xs => {(X, xs.length)}
   | eq_ _ _ => ∅
@@ -263,7 +263,7 @@ def Formula.pred_var_set : Formula → Finset (PredName × ℕ)
 /--
   `pred_var_occurs_in P n F` := True if and only if there is an occurrence of the predicate variable named `P` of arity `n` in the formula `F`.
 -/
-def pred_var_occurs_in (P : PredName) (n : ℕ) : Formula → Prop
+def pred_var_occurs_in (P : PredName_) (n : ℕ) : Formula → Prop
   | pred_const_ _ _ => False
   | pred_var_ X xs => P = X ∧ n = xs.length
   | eq_ _ _ => False
@@ -278,7 +278,7 @@ def pred_var_occurs_in (P : PredName) (n : ℕ) : Formula → Prop
   | exists_ _ phi => pred_var_occurs_in P n phi
   | def_ _ _ => False
 
-instance (P : PredName) (n : ℕ) (F : Formula) : Decidable (pred_var_occurs_in P n F) :=
+instance (P : PredName_) (n : ℕ) (F : Formula) : Decidable (pred_var_occurs_in P n F) :=
   by
   induction F
   all_goals
@@ -446,7 +446,7 @@ theorem var_is_free_in_iff_var_is_free_in_ind
 
 
 theorem pred_var_occurs_in_iff_mem_pred_var_set
-  (P : PredName)
+  (P : PredName_)
   (n : ℕ)
   (F : Formula) :
   pred_var_occurs_in P n F ↔ (P, n) ∈ F.pred_var_set :=

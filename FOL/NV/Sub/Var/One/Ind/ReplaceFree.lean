@@ -15,14 +15,14 @@ open Formula
 inductive IsReplaceFree : Formula → VarName_ → VarName_ → Formula → Prop
 
   | pred_const_
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_)
     (v t : VarName_) :
     IsReplaceFree (pred_const_ X xs) v t (pred_const_ X (xs.map fun (x : VarName_) =>
       if v = x then t else x))
 
   | pred_var_
-    (X : PredName)
+    (X : PredName_)
     (xs : List VarName_)
     (v t : VarName_) :
     IsReplaceFree (pred_var_ X xs) v t (pred_var_ X (xs.map fun (x : VarName_) =>

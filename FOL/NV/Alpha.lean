@@ -37,14 +37,14 @@ inductive AlphaEqv' :
 
   | pred_var_
     (binders : List (VarName_ × VarName_))
-    (X : PredName)
+    (X : PredName_)
     (xs ys : List VarName_) :
     List.Forall₂ (AlphaEqvVar binders) xs ys →
     AlphaEqv' binders (pred_var_ X xs) (pred_var_ X ys)
 
   | pred_const_
     (binders : List (VarName_ × VarName_))
-    (X : PredName)
+    (X : PredName_)
     (xs ys : List VarName_) :
     List.Forall₂ (AlphaEqvVar binders) xs ys →
     AlphaEqv' binders (pred_const_ X xs) (pred_const_ X ys)

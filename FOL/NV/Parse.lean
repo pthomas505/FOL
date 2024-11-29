@@ -45,7 +45,7 @@ partial def elabVarName : Syntax → MetaM Expr
 partial def elabPredName : Syntax → MetaM Expr
   | `(pred_name| $X:ident) =>
     let X' : Expr := Lean.mkStrLit X.getId.toString
-    mkAppM ``PredName.mk #[X']
+    mkAppM ``PredName_.mk #[X']
 
   | _ => throwUnsupportedSyntax
 
