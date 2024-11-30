@@ -449,7 +449,7 @@ def F'' := sub_alpha σ id ∅ c F
 
 #eval F' = F''
 
-#eval fastReplaceFree σ F'' = sub σ c F
-#eval fastReplaceFree σ F' = sub σ c F
+#eval fast_replace_free σ F'' = sub σ c F
+#eval fast_replace_free σ F' = sub σ c F
 
 -/

@@ -56,7 +56,7 @@ instance
 
 
 /--
-  admits σ F := True if and only if there is no free occurrence of a variable in the formula F that becomes a bound occurrence in the formula (fastReplaceFree σ F).
+  admits σ F := True if and only if there is no free occurrence of a variable in the formula F that becomes a bound occurrence in the formula (fast_replace_free σ F).
 -/
 def admits (σ : VarName_ → VarName_) (F : Formula_) : Prop :=
   admitsAux σ ∅ F
@@ -83,7 +83,7 @@ theorem substitution_theorem_aux
   (h2 : ∀ (v : VarName_), v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
   (h2' : ∀ (v : VarName_), v ∈ binders → v = σ' v)
   (h3 : ∀ (v : VarName_), v ∉ binders → σ' v = σ v) :
-  holds D I V E F ↔ holds D I V' E (fastReplaceFree σ' F) :=
+  holds D I V E F ↔ holds D I V' E (fast_replace_free σ' F) :=
   by
   induction E generalizing F binders V V' σ σ'
   all_goals
@@ -91,7 +91,7 @@ theorem substitution_theorem_aux
     all_goals
       simp only [admitsAux] at h1
 
-      simp only [fastReplaceFree]
+      simp only [fast_replace_free]
       simp only [holds]
     case pred_const_ X xs | pred_var_ X xs =>
       congr! 1
@@ -202,7 +202,7 @@ theorem substitution_theorem_aux
       contradiction
     case _ c1 c2 =>
       specialize ih V V' σ σ' binders (def_ X xs)
-      simp only [fastReplaceFree] at ih
+      simp only [fast_replace_free] at ih
       apply ih h1 h2 h2' h3
 
 
@@ -215,7 +215,7 @@ theorem substitution_theorem
   (F : Formula_)
   (h1 : admits σ F) :
   holds D I (V ∘ σ) E F ↔
-    holds D I V E (fastReplaceFree σ F) :=
+    holds D I V E (fast_replace_free σ F) :=
   by
   apply substitution_theorem_aux D I (V ∘ σ) V E σ σ ∅ F h1
   · simp
@@ -228,7 +228,7 @@ theorem substitution_is_valid
   (F : Formula_)
   (h1 : admits σ F)
   (h2 : F.is_valid) :
-  (fastReplaceFree σ F).is_valid :=
+  (fast_replace_free σ F).is_valid :=
   by
   simp only [is_valid] at h2
 

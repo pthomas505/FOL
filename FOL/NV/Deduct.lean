@@ -110,7 +110,7 @@ inductive IsAxiom : Formula_ → Prop
     (v t : VarName_)
     (phi phi' : Formula_) :
     Sub.Var.One.Rec.fastAdmits v t phi →
-    Sub.Var.One.Rec.fastReplaceFree v t phi = phi' →
+    Sub.Var.One.Rec.fast_replace_free v t phi = phi' →
     IsAxiom ((forall_ v phi).imp_ phi')
 
   -- ⊢ phi → (∀ v phi)  provided v is not free in phi
@@ -247,7 +247,7 @@ inductive IsProofAlt : Formula_ → Prop
   | pred_2_
     (v t : VarName_) (phi phi' : Formula_) :
     Sub.Var.One.Rec.fastAdmits v t phi →
-      Sub.Var.One.Rec.fastReplaceFree v t phi = phi' →
+      Sub.Var.One.Rec.fast_replace_free v t phi = phi' →
         IsProofAlt ((forall_ v phi).imp_ phi')
 
   -- ⊢ phi → (∀ v phi)  provided v is not free in phi

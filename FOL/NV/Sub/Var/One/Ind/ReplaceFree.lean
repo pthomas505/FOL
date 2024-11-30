@@ -124,11 +124,11 @@ example
   (F F' : Formula_)
   (v t : VarName_)
   (h1 : IsReplaceFree F v t F') :
-  Rec.fastReplaceFree v t F = F' :=
+  Rec.fast_replace_free v t F = F' :=
   by
   induction h1
   all_goals
-    simp only [Rec.fastReplaceFree]
+    simp only [Rec.fast_replace_free]
   case not_ phi v' t' phi' ih_1 ih_2 =>
     simp
     exact ih_2
@@ -156,13 +156,13 @@ example
 example
   (F F' : Formula_)
   (v t : VarName_)
-  (h1 : Rec.fastReplaceFree v t F = F') :
+  (h1 : Rec.fast_replace_free v t F = F') :
   IsReplaceFree F v t F' :=
   by
   subst h1
   induction F
   all_goals
-    simp only [Rec.fastReplaceFree]
+    simp only [Rec.fast_replace_free]
   case
       pred_const_ X xs
     | pred_var_ X xs

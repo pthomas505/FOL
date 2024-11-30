@@ -127,7 +127,7 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : Rec.fastAdmitsAux v u binders F)
-  (h2 : Rec.fastReplaceFree v u F = F') :
+  (h2 : Rec.fast_replace_free v u F = F') :
   IsSub F v u F' :=
   by
   subst h2
@@ -135,7 +135,7 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
   all_goals
     simp only [Rec.fastAdmitsAux] at h1
 
-    simp only [Rec.fastReplaceFree]
+    simp only [Rec.fast_replace_free]
   case pred_const_ X xs | pred_var_ X xs =>
     first | apply IsSub.pred_const_ | apply IsSub.pred_var_
   case eq_ x y =>
@@ -183,7 +183,7 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
             simp at s1
             tauto
           · exact phi_ih (binders ∪ {x}) h1
-        · have s1 : Rec.fastReplaceFree v u phi = phi
+        · have s1 : Rec.fast_replace_free v u phi = phi
           exact Rec.not_free_in_fastReplaceFree_self phi v u c2
 
           simp only [s1]
@@ -235,11 +235,11 @@ theorem isFreeSub_imp_fastReplaceFree
   (F F' : Formula_)
   (v u : VarName_)
   (h1 : IsSub F v u F') :
-  Rec.fastReplaceFree v u F = F' :=
+  Rec.fast_replace_free v u F = F' :=
   by
   induction h1
   all_goals
-    simp only [Rec.fastReplaceFree]
+    simp only [Rec.fast_replace_free]
   case not_ h1_phi h1_v h1_t h1_phi' h1_1 h1_ih =>
     tauto
   case
@@ -279,7 +279,7 @@ example
   (F F' : Formula_)
   (v u : VarName_) :
   IsSub F v u F' ↔
-    Rec.fastAdmits v u F ∧ Rec.fastReplaceFree v u F = F' :=
+    Rec.fastAdmits v u F ∧ Rec.fast_replace_free v u F = F' :=
   by
   simp only [Rec.fastAdmits]
   constructor

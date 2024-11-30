@@ -23,7 +23,7 @@ def replace
   | pred_const_ X xs => pred_const_ X xs
   | pred_var_ X xs =>
       if X = P ∧ xs.length = zs.length
-      then Sub.Var.All.Rec.fastReplaceFree (Function.updateListITE id zs xs) H
+      then Sub.Var.All.Rec.fast_replace_free (Function.updateListITE id zs xs) H
       else pred_var_ X xs
   | eq_ x y => eq_ x y
   | true_ => true_
@@ -226,7 +226,7 @@ theorem substitution_theorem_aux
           case intro h1_left h1_right =>
             have s1 :
               holds D I (V ∘ Function.updateListITE id zs xs) E_ref H ↔
-                holds D I V E_ref (Sub.Var.All.Rec.fastReplaceFree (Function.updateListITE id zs xs) H) :=
+                holds D I V E_ref (Sub.Var.All.Rec.fast_replace_free (Function.updateListITE id zs xs) H) :=
               by
               exact Sub.Var.All.Rec.substitution_theorem D I V E_ref (Function.updateListITE id zs xs) H h1_left
 

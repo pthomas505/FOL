@@ -18,9 +18,12 @@ If `P` is a formula, `v` is a variable, and `t` is a term, then `P(t/v)` is the 
 -/
 
 /--
-  Helper function for replaceFree.
+  Helper function for `replace_free`.
 -/
-def replace_free_aux (v t : VarName_) (binders : Finset VarName_) : Formula_ → Formula_
+def replace_free_aux
+  (v t : VarName_)
+  (binders : Finset VarName_) :
+  Formula_ → Formula_
   | pred_const_ X xs =>
       pred_const_
       X
@@ -60,7 +63,7 @@ def replace_free_aux (v t : VarName_) (binders : Finset VarName_) : Formula_ →
       (xs.map fun (x : VarName_) => if v = x ∧ x ∉ binders then t else x)
 
 /--
-  replaceFree v t P :=
+  replace_free v t P :=
 
   P(t/v)
 
@@ -68,12 +71,12 @@ def replace_free_aux (v t : VarName_) (binders : Finset VarName_) : Formula_ →
 
   The result of replacing each free occurrence of v in P by an occurrence of t.
 -/
-def replaceFree (v t : VarName_) (F : Formula_) : Formula_ :=
+def replace_free (v t : VarName_) (F : Formula_) : Formula_ :=
   replace_free_aux v t ∅ F
 
 
 /--
-  fastReplaceFree v t P :=
+  fast_replace_free v t P :=
 
   P(t/v)
 
@@ -81,9 +84,9 @@ def replaceFree (v t : VarName_) (F : Formula_) : Formula_ :=
 
   The result of replacing each free occurrence of v in P by an occurrence of t.
 
-  This is a more efficient version of replaceFree.
+  This is a more efficient version of replace_free.
 -/
-def fastReplaceFree (v t : VarName_) : Formula_ → Formula_
+def fast_replace_free (v t : VarName_) : Formula_ → Formula_
   | pred_const_ X xs =>
       pred_const_
       X
@@ -98,26 +101,26 @@ def fastReplaceFree (v t : VarName_) : Formula_ → Formula_
     (if v = y then t else y)
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (fastReplaceFree v t phi)
-  | imp_ phi psi => imp_ (fastReplaceFree v t phi) (fastReplaceFree v t psi)
-  | and_ phi psi => and_ (fastReplaceFree v t phi) (fastReplaceFree v t psi)
-  | or_ phi psi => or_ (fastReplaceFree v t phi) (fastReplaceFree v t psi)
-  | iff_ phi psi => iff_ (fastReplaceFree v t phi) (fastReplaceFree v t psi)
+  | not_ phi => not_ (fast_replace_free v t phi)
+  | imp_ phi psi => imp_ (fast_replace_free v t phi) (fast_replace_free v t psi)
+  | and_ phi psi => and_ (fast_replace_free v t phi) (fast_replace_free v t psi)
+  | or_ phi psi => or_ (fast_replace_free v t phi) (fast_replace_free v t psi)
+  | iff_ phi psi => iff_ (fast_replace_free v t phi) (fast_replace_free v t psi)
   | forall_ x phi =>
       if v = x
       then forall_ x phi  -- v is not free in (forall_ x phi)
-      else forall_ x (fastReplaceFree v t phi)
+      else forall_ x (fast_replace_free v t phi)
   | exists_ x phi =>
       if v = x
       then exists_ x phi  -- v is not free in (exists_ x phi)
-      else exists_ x (fastReplaceFree v t phi)
+      else exists_ x (fast_replace_free v t phi)
   | def_ X xs =>
       def_
       X
       (xs.map fun (x : VarName_) => if v = x then t else x)
 
 
--- replaceFree = fastReplaceFree
+-- replace_free = fast_replace_free
 
 theorem replaceFreeAux_mem_binders
   (F : Formula_)
@@ -166,12 +169,12 @@ theorem replaceFreeAux_eq_fastReplaceFree
   (binders : Finset VarName_)
   (h1 : v ∉ binders) :
   replace_free_aux v t binders F =
-    fastReplaceFree v t F :=
+    fast_replace_free v t F :=
   by
   induction F generalizing binders
   any_goals
     simp only [replace_free_aux]
-    simp only [fastReplaceFree]
+    simp only [fast_replace_free]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr!
     case _ x =>
@@ -219,9 +222,9 @@ theorem replaceFreeAux_eq_fastReplaceFree
 theorem replaceFree_eq_fastReplaceFree
   (F : Formula_)
   (v t : VarName_) :
-  replaceFree v t F = fastReplaceFree v t F :=
+  replace_free v t F = fast_replace_free v t F :=
   by
-  simp only [replaceFree]
+  simp only [replace_free]
   apply replaceFreeAux_eq_fastReplaceFree
   simp
 
@@ -230,11 +233,11 @@ theorem replaceFree_eq_fastReplaceFree
 theorem fastReplaceFree_self
   (F : Formula_)
   (v : VarName_) :
-  fastReplaceFree v v F = F :=
+  fast_replace_free v v F = F :=
   by
   induction F
   any_goals
-    simp only [fastReplaceFree]
+    simp only [fast_replace_free]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     simp only [List.map_eq_self_iff]
@@ -259,13 +262,13 @@ theorem not_free_in_fastReplaceFree_self
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_is_free_in v F) :
-  fastReplaceFree v t F = F :=
+  fast_replace_free v t F = F :=
   by
   induction F
   any_goals
     simp only [var_is_free_in] at h1
 
-    simp only [fastReplaceFree]
+    simp only [fast_replace_free]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     simp only [List.map_eq_self_iff]
@@ -294,13 +297,13 @@ theorem fastReplaceFree_inverse
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  fastReplaceFree t v (fastReplaceFree v t F) = F :=
+  fast_replace_free t v (fast_replace_free v t F) = F :=
   by
   induction F
   any_goals
     simp only [var_occurs_in] at h1
 
-    simp only [fastReplaceFree]
+    simp only [fast_replace_free]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr!
     simp
@@ -336,14 +339,14 @@ theorem fastReplaceFree_inverse
     case intro h1_left h1_right =>
       split_ifs
       case pos c1 =>
-        simp only [fastReplaceFree]
+        simp only [fast_replace_free]
         simp only [if_neg h1_left]
         congr!
         apply not_free_in_fastReplaceFree_self
         contrapose! h1_right
         exact var_is_free_in_imp_var_occurs_in t phi h1_right
       case neg c1 =>
-        simp only [fastReplaceFree]
+        simp only [fast_replace_free]
         simp only [if_neg h1_left]
         congr!
         exact phi_ih h1_right
@@ -353,11 +356,11 @@ theorem not_isFreeIn_fastReplaceFree
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ v = t) :
-  ¬ var_is_free_in v (fastReplaceFree v t F) :=
+  ¬ var_is_free_in v (fast_replace_free v t F) :=
   by
   induction F
   any_goals
-    simp only [fastReplaceFree]
+    simp only [fast_replace_free]
     simp only [var_is_free_in]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
@@ -376,7 +379,7 @@ theorem not_isFreeIn_fastReplaceFree
     | iff_ phi psi phi_ih psi_ih =>
     tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [fastReplaceFree]
+    simp only [fast_replace_free]
     split_ifs
     case pos c1 =>
       simp only [var_is_free_in]
