@@ -1,6 +1,6 @@
 import MathlibExtra.Finset
 import MathlibExtra.FunctionUpdateITE
-import FOL.NV.Formula_
+import FOL.NV.Formula
 import FOL.NV.Fresh
 import FOL.NV.Semantics
 
@@ -54,7 +54,7 @@ lemma freeVarSet_sub_eq_freeVarSet_image
   induction F generalizing σ
   all_goals
     simp only [sub]
-    simp only [freeVarSet]
+    simp only [free_var_set]
   case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
     apply Finset.ext
     intro a
@@ -79,37 +79,37 @@ lemma freeVarSet_sub_eq_freeVarSet_image
 
     split_ifs
     case _ c1 =>
-      obtain s1 := fresh_not_mem x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi))
+      obtain s1 := fresh_not_mem x c (Finset.image (Function.updateITE σ x x) (free_var_set phi))
 
       generalize (
-      fresh x c (Finset.image (Function.updateITE σ x x) (freeVarSet phi)) ) = x' at *
+      fresh x c (Finset.image (Function.updateITE σ x x) (free_var_set phi)) ) = x' at *
 
-      have s2 : Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) ⊆ Finset.image (Function.updateITE σ x x) (freeVarSet phi)
+      have s2 : Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) ⊆ Finset.image (Function.updateITE σ x x) (free_var_set phi)
       apply Finset.image_subset_image
       simp
 
-      have s3 : x' ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x})
+      have s3 : x' ∉ Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x})
       apply Finset.not_mem_mono s2 s1
 
       calc
-        Finset.image (Function.updateITE σ x x') (freeVarSet phi) \ {x'}
-      = Finset.image (Function.updateITE σ x x') (freeVarSet phi \ {x}) \ {x'} :=
+        Finset.image (Function.updateITE σ x x') (free_var_set phi) \ {x'}
+      = Finset.image (Function.updateITE σ x x') (free_var_set phi \ {x}) \ {x'} :=
           by
           {
             apply Finset.image_sdiff_singleton phi.free_var_set x x' (Function.updateITE σ x x')
             simp only [Function.updateITE]
             simp
           }
-      _ = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) \ {x'} :=
+      _ = Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) \ {x'} :=
           by simp only [Finset.image_congr_update_ite phi.free_var_set x x' x]
-      _ = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) :=
+      _ = Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) :=
           by
             simp only [Finset.sdiff_singleton_eq_erase] at *
             exact Finset.erase_eq_of_not_mem s3
     case _ c1 =>
       simp at c1
 
-      have s1 : Finset.image (Function.updateITE σ x x) (freeVarSet phi) \ {x} = Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x}) \ {x}
+      have s1 : Finset.image (Function.updateITE σ x x) (free_var_set phi) \ {x} = Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) \ {x}
       apply Finset.image_sdiff_singleton
       simp only [Function.updateITE]
       simp
@@ -117,7 +117,7 @@ lemma freeVarSet_sub_eq_freeVarSet_image
       simp only [s1]
       clear s1
 
-      have s2 : x ∉ Finset.image (Function.updateITE σ x x) (freeVarSet phi \ {x})
+      have s2 : x ∉ Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x})
       simp only [Finset.mem_image]
       simp
       simp only [Function.updateITE]
@@ -175,9 +175,9 @@ theorem substitution_theorem
     simp
     split_ifs
     case _ c1 =>
-      obtain s0 := fresh_not_mem x c (freeVarSet (sub (Function.updateITE σ x x) c phi))
+      obtain s0 := fresh_not_mem x c (free_var_set (sub (Function.updateITE σ x x) c phi))
 
-      generalize (fresh x c (freeVarSet (sub (Function.updateITE σ x x) c phi))) = x' at *
+      generalize (fresh x c (free_var_set (sub (Function.updateITE σ x x) c phi))) = x' at *
       by_cases c2 : v = x
       · simp only [c2]
         simp only [Function.updateITE]
@@ -187,7 +187,7 @@ theorem substitution_theorem
 
           simp only [freeVarSet_sub_eq_freeVarSet_image] at s0
 
-          have s1 : σ v ∈ Finset.image (Function.updateITE σ x x) (freeVarSet phi)
+          have s1 : σ v ∈ Finset.image (Function.updateITE σ x x) (free_var_set phi)
           apply Finset.mem_image_update
           · exact c2
           · simp only [← var_is_free_in_iff_mem_free_var_set]

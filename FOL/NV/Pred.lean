@@ -4,13 +4,13 @@ import FOL.NV.Prop
 set_option autoImplicit false
 
 
-namespace FOL.NV
+--namespace FOL.NV
 
 open Formula_
 
-open Sub.Var.One.Rec
+open FOL.NV.Sub.Var.One.Rec
 
-open Margaris
+--open Margaris
 
 
 def ProofEquiv (P Q : Formula_) : Prop :=
@@ -234,7 +234,7 @@ def Similar
   ¬ var_is_free_in v P_u ∧
     ¬ var_is_free_in u P_v ∧
       fastAdmits u v P_u ∧
-        fastAdmits v u P_v ∧ P_v = fast_replace_free u v P_u ∧ P_u = fast_replace_free v u P_v
+        fastAdmits v u P_v ∧ P_v = fast_replace_free_var_one u v P_u ∧ P_u = fast_replace_free_var_one v u P_v
 
 
 -- Universal Elimination
@@ -244,11 +244,11 @@ theorem T_17_1
   (Δ : Set Formula_)
   (h1 : IsDeduct Δ (forall_ v P))
   (h2 : fastAdmits v t P) :
-  IsDeduct Δ (fast_replace_free v t P) :=
+  IsDeduct Δ (fast_replace_free_var_one v t P) :=
   by
   apply IsDeduct.mp_ (forall_ v P)
   · apply IsDeduct.axiom_
-    apply IsAxiom.pred_2_ v t P (fast_replace_free v t P) h2
+    apply IsAxiom.pred_2_ v t P (fast_replace_free_var_one v t P) h2
     rfl
   · exact h1
 
@@ -277,7 +277,7 @@ theorem T_17_3
   (P : Formula_)
   (v t : VarName_)
   (h1 : fastAdmits v t P) :
-  IsProof ((fast_replace_free v t P).imp_ (exists_ v P)) :=
+  IsProof ((fast_replace_free_var_one v t P).imp_ (exists_ v P)) :=
   by
   simp only [fastAdmits] at h1
 
@@ -285,7 +285,7 @@ theorem T_17_3
   -- simp only [Formula_.exists_]
 
   simp only [IsProof]
-  apply IsDeduct.mp_ ((forall_ v P.not_).imp_ (fast_replace_free v t P).not_)
+  apply IsDeduct.mp_ ((forall_ v P.not_).imp_ (fast_replace_free_var_one v t P).not_)
   · SC
   · apply IsDeduct.axiom_
     apply IsAxiom.pred_2_ v t
@@ -301,10 +301,10 @@ theorem T_17_4
   (v t : VarName_)
   (Δ : Set Formula_)
   (h1 : fastAdmits v t P)
-  (h2 : IsDeduct Δ (fast_replace_free v t P)) :
+  (h2 : IsDeduct Δ (fast_replace_free_var_one v t P)) :
   IsDeduct Δ (exists_ v P) :=
   by
-  apply IsDeduct.mp_ (fast_replace_free v t P)
+  apply IsDeduct.mp_ (fast_replace_free_var_one v t P)
   · apply proof_imp_deduct
     apply T_17_3
     exact h1
@@ -376,12 +376,12 @@ theorem univIntro
   (v t : VarName_)
   (Δ : Set Formula_)
   (h1 : ¬ var_occurs_in t P)
-  (h2 : IsDeduct Δ (fast_replace_free v t P))
+  (h2 : IsDeduct Δ (fast_replace_free_var_one v t P))
   (h3 : ∀ (H : Formula_), H ∈ Δ → ¬ var_is_free_in t H) :
   IsDeduct Δ (forall_ v P) :=
   by
   rw [← fastReplaceFree_inverse P v t h1]
-  apply IsDeduct.mp_ (forall_ t (fast_replace_free v t P))
+  apply IsDeduct.mp_ (forall_ t (fast_replace_free_var_one v t P))
   · apply proof_imp_deduct
     apply deduction_theorem
     simp
@@ -396,7 +396,7 @@ theorem univIntro
       simp
       intro a1 contra
       exact not_isFreeIn_fastReplaceFree P v t a1 contra
-  · exact generalization (fast_replace_free v t P) t Δ h2 h3
+  · exact generalization (fast_replace_free_var_one v t P) t Δ h2 h3
 
 
 theorem isProofAltImpIsDeduct
@@ -590,18 +590,18 @@ theorem existsElim
   (v t : VarName_)
   (Δ : Set Formula_)
   (h1 : IsDeduct Δ (exists_ v P))
-  (h2 : IsDeduct (Δ ∪ {fast_replace_free v t P}) Q)
+  (h2 : IsDeduct (Δ ∪ {fast_replace_free_var_one v t P}) Q)
   (h3 : ¬ var_occurs_in t P)
   (h4 : ¬ var_occurs_in t Q)
   (h5 : ∀ (H : Formula_), H ∈ Δ → ¬ var_is_free_in t H) : IsDeduct Δ Q :=
   by
-  refine' rule_C (fast_replace_free v t P) Q t Δ _ h2 h5 _
+  refine' rule_C (fast_replace_free_var_one v t P) Q t Δ _ h2 h5 _
   · simp only [def_exists_] at h1
     -- simp only [exists_] at h1
     simp only [def_exists_]
     -- simp only [exists_]
     apply IsDeduct.mp_ (forall_ v P.not_).not_
-    · apply IsDeduct.mp_ ((forall_ t (fast_replace_free v t P.not_)).imp_ (forall_ v P.not_))
+    · apply IsDeduct.mp_ ((forall_ t (fast_replace_free_var_one v t P.not_)).imp_ (forall_ v P.not_))
       · SC
       · apply deduction_theorem
         apply univIntro P.not_ v t _ h3
@@ -921,15 +921,15 @@ theorem C_18_3
   by
   apply
     IsDeduct.mp_
-      (Forall_ ((U.free_var_set ∪ V.free_var_set) ∩ P_U.boundVarSet).toList (U.iff_ V))
-  · apply T_18_2 U V P_U P_V ((U.free_var_set ∪ V.free_var_set) ∩ P_U.boundVarSet).toList h1
+      (Forall_ ((U.free_var_set ∪ V.free_var_set) ∩ P_U.bound_var_set).toList (U.iff_ V))
+  · apply T_18_2 U V P_U P_V ((U.free_var_set ∪ V.free_var_set) ∩ P_U.bound_var_set).toList h1
     intro v a1
     simp
     simp only [var_is_free_in_iff_mem_free_var_set] at a1
-    simp only [isBoundIn_iff_mem_boundVarSet] at a1
+    simp only [var_is_bound_in_iff_mem_bound_var_set] at a1
     exact a1
   · simp only [Formula_.Forall_]
-    induction ((U.free_var_set ∪ V.free_var_set) ∩ P_U.boundVarSet).toList
+    induction ((U.free_var_set ∪ V.free_var_set) ∩ P_U.bound_var_set).toList
     case _ =>
       simp
       exact h2
@@ -1088,7 +1088,7 @@ theorem similar_not
   simp only [var_is_free_in] at *
   simp only [fastAdmits] at *
   simp only [fastAdmitsAux] at *
-  simp only [fast_replace_free] at *
+  simp only [fast_replace_free_var_one] at *
   tauto
 
 

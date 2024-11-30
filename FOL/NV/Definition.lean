@@ -36,6 +36,7 @@ deriving DecidableEq
   The type of environments.
 -/
 def Env_ : Type := List Definition_
+deriving Inhabited
 
 instance : Membership Definition_ Env_ :=
   inferInstanceAs (Membership Definition_ (List Definition_))

@@ -5,11 +5,11 @@ import FOL.NV.Deduct
 set_option autoImplicit false
 
 
-namespace FOL.NV
+--namespace FOL.NV
 
 open Formula_
 
-open Margaris
+--open Margaris
 
 
 axiom def_false_ : false_ = not_ true_

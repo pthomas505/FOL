@@ -112,14 +112,14 @@ inductive AlphaEqv : Formula_ → Formula_ → Prop
     (x y : VarName_) :
     ¬ var_is_free_in y phi →
     ¬ var_is_bound_in y phi →
-    AlphaEqv (forall_ x phi) (forall_ y (Sub.Var.One.Rec.fast_replace_free x y phi))
+    AlphaEqv (forall_ x phi) (forall_ y (Sub.Var.One.Rec.fast_replace_free_var_one x y phi))
 
   | rename_exists_
     (phi : Formula_)
     (x y : VarName_) :
     ¬ var_is_free_in y phi →
     ¬ var_is_bound_in y phi →
-    AlphaEqv (exists_ x phi) (exists_ y (Sub.Var.One.Rec.fast_replace_free x y phi))
+    AlphaEqv (exists_ x phi) (exists_ y (Sub.Var.One.Rec.fast_replace_free_var_one x y phi))
 
   | compat_not_
     (phi phi' : Formula_) :
@@ -189,7 +189,7 @@ theorem replace_empty_Holds
   (h1 : ¬ var_is_free_in v F)
   (h2 : ¬ var_is_bound_in v F) :
   holds D I (Function.updateITE V u a) E F ↔
-    holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fast_replace_free u v F) :=
+    holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fast_replace_free_var_one u v F) :=
   by
   induction E generalizing F V
   all_goals
@@ -197,7 +197,7 @@ theorem replace_empty_Holds
     case pred_const_ X xs | pred_var_ X xs =>
       simp only [var_is_free_in] at h1
 
-      simp only [Sub.Var.One.Rec.fast_replace_free]
+      simp only [Sub.Var.One.Rec.fast_replace_free_var_one]
       simp only [holds]
       congr! 1
       simp
@@ -217,7 +217,7 @@ theorem replace_empty_Holds
     case eq_ x y =>
       simp only [var_is_free_in] at h1
 
-      simp only [Sub.Var.One.Rec.fast_replace_free]
+      simp only [Sub.Var.One.Rec.fast_replace_free_var_one]
       simp only [holds]
       congr! 1
       · simp only [Function.updateITE]
@@ -225,14 +225,14 @@ theorem replace_empty_Holds
       · simp only [Function.updateITE]
         split_ifs <;> tauto
     case true_ | false_ =>
-      simp only [Sub.Var.One.Rec.fast_replace_free]
+      simp only [Sub.Var.One.Rec.fast_replace_free_var_one]
       simp only [holds]
     case not_ phi phi_ih =>
       simp only [var_is_free_in] at h1
 
       simp only [var_is_bound_in] at h2
 
-      simp only [Sub.Var.One.Rec.fast_replace_free]
+      simp only [Sub.Var.One.Rec.fast_replace_free_var_one]
       simp only [holds]
       congr! 1
       exact phi_ih V h1 h2
@@ -251,7 +251,7 @@ theorem replace_empty_Holds
       case intro h1_left h1_right =>
         cases h2
         case intro h2_left h2_right =>
-          simp only [Sub.Var.One.Rec.fast_replace_free]
+          simp only [Sub.Var.One.Rec.fast_replace_free_var_one]
           simp only [holds]
           congr! 1
           · exact phi_ih V h1_left h2_left
@@ -265,7 +265,7 @@ theorem replace_empty_Holds
 
       cases h2
       case intro h2_left h2_right =>
-        simp only [Sub.Var.One.Rec.fast_replace_free]
+        simp only [Sub.Var.One.Rec.fast_replace_free_var_one]
         split_ifs
         case pos c1 =>
           subst c1
@@ -292,10 +292,10 @@ theorem replace_empty_Holds
           · exact h1 h2_left
           · exact h2_right
   case nil.def_ X xs =>
-    simp only [Sub.Var.One.Rec.fast_replace_free]
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one]
     simp only [holds]
   case cons.def_ hd tl ih X xs =>
-      simp only [Sub.Var.One.Rec.fast_replace_free]
+      simp only [Sub.Var.One.Rec.fast_replace_free_var_one]
       simp only [holds]
       unfold Function.updateITE
       congr! 1

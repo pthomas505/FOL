@@ -54,7 +54,7 @@ lemma sub_no_predVar
   case pred_const_ X xs =>
     simp only [sub]
   case pred_var_ X xs =>
-    simp only [predVarSet] at h1
+    simp only [pred_var_set] at h1
 
     simp at h1
   case eq_ x y =>
@@ -62,7 +62,7 @@ lemma sub_no_predVar
   case true_ | false_ =>
     simp only [sub]
   case not_ phi phi_ih =>
-    simp only [predVarSet] at h1
+    simp only [pred_var_set] at h1
 
     simp only [sub]
     congr!
@@ -72,7 +72,7 @@ lemma sub_no_predVar
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [predVarSet] at h1
+    simp only [pred_var_set] at h1
     simp only [Finset.union_eq_empty] at h1
 
     cases h1
@@ -82,7 +82,7 @@ lemma sub_no_predVar
       · exact phi_ih h1_left
       · exact psi_ih h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [predVarSet] at h1
+    simp only [pred_var_set] at h1
 
     simp only [sub]
     congr!
