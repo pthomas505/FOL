@@ -454,13 +454,13 @@ theorem replaceFreeAux_fastAdmitsAux
   (v t : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  fastAdmitsAux t v binders (replaceFreeAux v t binders F) :=
+  fastAdmitsAux t v binders (replace_free_aux v t binders F) :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_occurs_in] at h1
 
-    simp only [replaceFreeAux]
+    simp only [replace_free_aux]
     simp only [fastAdmitsAux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
@@ -852,13 +852,13 @@ theorem replaceFreeAux_admitsAux
   (v t : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  admitsAux t v binders (replaceFreeAux v t binders F) :=
+  admitsAux t v binders (replace_free_aux v t binders F) :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_occurs_in] at h1
 
-    simp only [replaceFreeAux]
+    simp only [replace_free_aux]
     simp only [admitsAux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
