@@ -122,7 +122,7 @@ def fast_replace_free (v t : VarName_) : Formula_ → Formula_
 
 -- `replace_free` = `fast_replace_free`
 
-theorem replaceFreeAux_mem_binders
+theorem replace_free_aux_mem_binders
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
@@ -208,7 +208,7 @@ theorem replaceFreeAux_eq_fastReplaceFree
     split_ifs
     case pos c1 =>
       congr! 1
-      apply replaceFreeAux_mem_binders
+      apply replace_free_aux_mem_binders
       simp
       right
       exact c1
