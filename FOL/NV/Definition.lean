@@ -103,7 +103,7 @@ def Env_.well_formed : Env_ → Prop
   | d :: E =>
     (∀ (d' : Definition_), d' ∈ E →
       d.name = d'.name → d.args.length = d'.args.length → False) ∧
-      Formula_.all_def_in_env E d.q ∧
+      all_def_in_env E d.q ∧
       Env_.well_formed E
 
 instance (E : Env_) : Decidable (E.well_formed) :=
@@ -135,6 +135,58 @@ example
       · simp only [Env_.nodup_] at ih
         apply ih
         exact h1_right_right
+
+
+/--
+  Every definition that occurs in the formula of a definition `d` in the environment `d :: E' ⊆ E` occurs in the environment `E'`. This means there are no circular definitions.
+-/
+def Env_.not_circular : Env_ → Prop
+  | [] => True
+  | d :: E => all_def_in_env E d.q ∧ Env_.not_circular E
+
+
+example
+  (E : Env_)
+  (h1 : E.well_formed) :
+  E.not_circular :=
+  by
+  induction E
+  case nil =>
+    simp only [Env_.not_circular]
+  case cons hd tl ih =>
+    simp only [Env_.well_formed] at h1
+
+    simp only [Env_.not_circular]
+    tauto
+
+
+example
+  (E : Env_)
+  (h1 : E.nodup_)
+  (h2 : E.not_circular) :
+  E.well_formed :=
+  by
+    induction E
+    case nil =>
+      simp only [Env_.well_formed]
+    case cons hd tl ih =>
+      simp only [Env_.nodup_] at h1
+      simp only [List.pairwise_cons] at h1
+      obtain ⟨h1_left, h1_right⟩ := h1
+
+      simp only [Env_.not_circular] at h2
+      obtain ⟨h2_left, h2_right⟩ := h2
+
+      simp only [Env_.nodup_] at ih
+
+      simp only [Env_.well_formed]
+      constructor
+      · exact h1_left
+      · constructor
+        · exact h2_left
+        · apply ih
+          · exact h1_right
+          · exact h2_right
 
 
 #lint
