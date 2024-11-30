@@ -14,7 +14,7 @@ open Formula_
 [margaris]
 pg. 48
 
-If $P$ is a formula, $v$ is a variable, and $t$ is a term, then $P(t/v)$ is the result of replacing each free occurrence of $v$ in $P$ by an occurrence of $t$.
+If `P` is a formula, `v` is a variable, and `t` is a term, then `P(t/v)` is the result of replacing each free occurrence of `v` in `P` by an occurrence of `t`.
 -/
 
 /--
