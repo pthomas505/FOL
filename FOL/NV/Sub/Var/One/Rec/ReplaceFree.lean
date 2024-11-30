@@ -108,11 +108,11 @@ def fast_replace_free (v t : VarName_) : Formula_ → Formula_
   | iff_ phi psi => iff_ (fast_replace_free v t phi) (fast_replace_free v t psi)
   | forall_ x phi =>
       if v = x
-      then forall_ x phi  -- v is not free in (forall_ x phi)
+      then forall_ x phi  -- `v` is not free in `forall_ x phi`
       else forall_ x (fast_replace_free v t phi)
   | exists_ x phi =>
       if v = x
-      then exists_ x phi  -- v is not free in (exists_ x phi)
+      then exists_ x phi  -- `v` is not free in `exists_ x phi`
       else exists_ x (fast_replace_free v t phi)
   | def_ X xs =>
       def_
@@ -120,7 +120,7 @@ def fast_replace_free (v t : VarName_) : Formula_ → Formula_
       (xs.map fun (x : VarName_) => if v = x then t else x)
 
 
--- replace_free = fast_replace_free
+-- `replace_free` = `fast_replace_free`
 
 theorem replaceFreeAux_mem_binders
   (F : Formula_)
