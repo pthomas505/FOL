@@ -119,22 +119,22 @@ example
   (h1 : E.well_formed) :
   E.nodup_ :=
   by
-    induction E
-    case nil =>
-      simp only [Env_.nodup_]
-      simp only [List.Pairwise.nil]
-    case cons hd tl ih =>
-      simp only [Env_.well_formed] at h1
-      simp at h1
-      obtain ⟨h1_left, ⟨h1_right_left, h1_right_right⟩⟩ := h1
+  induction E
+  case nil =>
+    simp only [Env_.nodup_]
+    simp only [List.Pairwise.nil]
+  case cons hd tl ih =>
+    simp only [Env_.well_formed] at h1
+    simp at h1
+    obtain ⟨h1_left, ⟨h1_right_left, h1_right_right⟩⟩ := h1
 
-      simp only [Env_.nodup_]
-      simp only [List.pairwise_cons]
-      constructor
-      · exact h1_left
-      · simp only [Env_.nodup_] at ih
-        apply ih
-        exact h1_right_right
+    simp only [Env_.nodup_]
+    simp only [List.pairwise_cons]
+    constructor
+    · exact h1_left
+    · simp only [Env_.nodup_] at ih
+      apply ih
+      exact h1_right_right
 
 
 /--
@@ -166,27 +166,27 @@ example
   (h2 : E.not_circular) :
   E.well_formed :=
   by
-    induction E
-    case nil =>
-      simp only [Env_.well_formed]
-    case cons hd tl ih =>
-      simp only [Env_.nodup_] at h1
-      simp only [List.pairwise_cons] at h1
-      obtain ⟨h1_left, h1_right⟩ := h1
+  induction E
+  case nil =>
+    simp only [Env_.well_formed]
+  case cons hd tl ih =>
+    simp only [Env_.nodup_] at h1
+    simp only [List.pairwise_cons] at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
-      simp only [Env_.not_circular] at h2
-      obtain ⟨h2_left, h2_right⟩ := h2
+    simp only [Env_.not_circular] at h2
+    obtain ⟨h2_left, h2_right⟩ := h2
 
-      simp only [Env_.nodup_] at ih
+    simp only [Env_.nodup_] at ih
 
-      simp only [Env_.well_formed]
-      constructor
-      · exact h1_left
-      · constructor
-        · exact h2_left
-        · apply ih
-          · exact h1_right
-          · exact h2_right
+    simp only [Env_.well_formed]
+    constructor
+    · exact h1_left
+    · constructor
+      · exact h2_left
+      · apply ih
+        · exact h1_right
+        · exact h2_right
 
 
 #lint
