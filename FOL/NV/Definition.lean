@@ -103,7 +103,8 @@ def Env_.well_formed : Env_ → Prop
   | d :: E =>
     (∀ (d' : Definition_), d' ∈ E →
       d.name = d'.name → d.args.length = d'.args.length → False) ∧
-        Formula_.all_def_in_env E d.q ∧ Env_.well_formed E
+      Formula_.all_def_in_env E d.q ∧
+      Env_.well_formed E
 
 instance (E : Env_) : Decidable (E.well_formed) :=
   by
@@ -111,6 +112,29 @@ instance (E : Env_) : Decidable (E.well_formed) :=
   all_goals
     simp only [Env_.well_formed]
     infer_instance
+
+
+example
+  (E : Env_)
+  (h1 : E.well_formed) :
+  E.nodup_ :=
+  by
+    induction E
+    case nil =>
+      simp only [Env_.nodup_]
+      simp only [List.Pairwise.nil]
+    case cons hd tl ih =>
+      simp only [Env_.well_formed] at h1
+      simp at h1
+      obtain ⟨h1_left, ⟨h1_right_left, h1_right_right⟩⟩ := h1
+
+      simp only [Env_.nodup_]
+      simp only [List.pairwise_cons]
+      constructor
+      · exact h1_left
+      · simp only [Env_.nodup_] at ih
+        apply ih
+        exact h1_right_right
 
 
 #lint

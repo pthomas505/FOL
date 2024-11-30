@@ -286,14 +286,12 @@ lemma holds_coincide_env
     simp only [all_def_in_env] at h2
     obtain ⟨d, h2_left, ⟨h2_right_left, h2_right_right⟩⟩ := h2
 
-    simp only [Env_.nodup_] at h3
-    simp at h3
-
     induction E1
     case nil =>
       simp
     case cons E1_hd E1_tl E1_ih =>
-      simp at h3
+      simp only [Env_.nodup_] at h3
+      simp only [List.cons_append, List.pairwise_cons, List.mem_append] at h3
       obtain ⟨h3_left, h3_right⟩ := h3
 
       simp
