@@ -264,13 +264,12 @@ lemma holds_coincide_env
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    cases h2
-    case intro h2_left h2_right =>
-      congr! 1
-      · apply phi_ih
-        exact h2_left
-      · apply psi_ih
-        exact h2_right
+    obtain ⟨h2_left, h2_right⟩ := h2
+    congr! 1
+    · apply phi_ih
+      exact h2_left
+    · apply psi_ih
+      exact h2_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     first
       | apply forall_congr'
