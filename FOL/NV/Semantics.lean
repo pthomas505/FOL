@@ -191,15 +191,16 @@ theorem holds_coincide_pred_var
 
       simp only [holds]
     case pred_const_ X xs =>
-      simp only [h1]
+      rw [h1]
     case pred_var_ X xs =>
       simp at h2
-      specialize h2 X (List.map V xs)
-      simp at h2
-      exact h2
+      apply h2
+      · rfl
+      · apply List.length_map
     case not_ phi phi_ih =>
       congr! 1
-      exact phi_ih V h2
+      apply phi_ih
+      exact h2
     case
         imp_ phi psi phi_ih psi_ih
       | and_ phi psi phi_ih psi_ih
@@ -217,16 +218,19 @@ theorem holds_coincide_pred_var
         right
         exact a1
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      first | apply forall_congr' | apply exists_congr
+      first
+        | apply forall_congr'
+        | apply exists_congr
       intro d
-      exact phi_ih (Function.updateITE V x d) h2
+      apply phi_ih
+      exact h2
 
   case cons.def_ hd tl ih X xs =>
     split_ifs
     case pos c1 =>
       apply ih
       intro P ds a1
-      simp only [pred_var_occurs_in_iff_mem_pred_var_set P ds.length] at a1
+      simp only [pred_var_occurs_in_iff_mem_pred_var_set] at a1
       simp only [hd.h2] at a1
       simp at a1
     case neg c1 =>
