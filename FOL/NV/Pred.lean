@@ -375,7 +375,7 @@ theorem univIntro
   (P : Formula_)
   (v t : VarName_)
   (Δ : Set Formula_)
-  (h1 : ¬ occursIn t P)
+  (h1 : ¬ var_occurs_in t P)
   (h2 : IsDeduct Δ (fastReplaceFree v t P))
   (h3 : ∀ (H : Formula_), H ∈ Δ → ¬ var_is_free_in t H) :
   IsDeduct Δ (forall_ v P) :=
@@ -591,8 +591,8 @@ theorem existsElim
   (Δ : Set Formula_)
   (h1 : IsDeduct Δ (exists_ v P))
   (h2 : IsDeduct (Δ ∪ {fastReplaceFree v t P}) Q)
-  (h3 : ¬ occursIn t P)
-  (h4 : ¬ occursIn t Q)
+  (h3 : ¬ var_occurs_in t P)
+  (h4 : ¬ var_occurs_in t Q)
   (h5 : ∀ (H : Formula_), H ∈ Δ → ¬ var_is_free_in t H) : IsDeduct Δ Q :=
   by
   refine' rule_C (fastReplaceFree v t P) Q t Δ _ h2 h5 _
@@ -620,7 +620,7 @@ theorem existsElim
     · exact h1
   · intro contra
     apply h4
-    apply isFreeIn_imp_occursIn
+    apply var_is_free_in_imp_var_occurs_in
     exact contra
 
 
@@ -789,7 +789,7 @@ theorem Forall_isBoundIn
   (P : Formula_)
   (xs : List VarName_)
   (x : VarName_) :
-  isBoundIn x (Forall_ xs P) ↔ x ∈ xs ∨ isBoundIn x P :=
+  var_is_bound_in x (Forall_ xs P) ↔ x ∈ xs ∨ var_is_bound_in x P :=
   by
   simp only [Formula_.Forall_]
   induction xs
@@ -797,7 +797,7 @@ theorem Forall_isBoundIn
     simp
   case cons xs_hd xs_tl xs_ih =>
     simp
-    simp only [isBoundIn]
+    simp only [var_is_bound_in]
     simp only [xs_ih]
     tauto
 
@@ -825,7 +825,7 @@ theorem T_18_2
   (P_U P_V : Formula_)
   (l : List VarName_)
   (h1 : IsReplOfFormulaInFormula U V P_U P_V)
-  (h2 : ∀ (v : VarName_), (var_is_free_in v U ∨ var_is_free_in v V) ∧ isBoundIn v P_U → v ∈ l) :
+  (h2 : ∀ (v : VarName_), (var_is_free_in v U ∨ var_is_free_in v V) ∧ var_is_bound_in v P_U → v ∈ l) :
   IsProof ((Forall_ l (U.iff_ V)).imp_ (P_U.iff_ P_V)) :=
   by
   induction h1
@@ -841,7 +841,7 @@ theorem T_18_2
     subst h1_2
     apply Forall_spec_id
   case not_ h1_P h1_P' h1_1 h1_ih =>
-    simp only [isBoundIn] at h2
+    simp only [var_is_bound_in] at h2
     apply IsDeduct.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_P.iff_ h1_P'))
     · simp only [def_iff_]
       -- simp only [formula.iff_]
@@ -850,7 +850,7 @@ theorem T_18_2
       SC
     · exact h1_ih h2
   case imp_ h1_P h1_Q h1_P' h1_Q' h1_1 h1_2 h1_ih_1 h1_ih_2 =>
-    simp only [isBoundIn] at h2
+    simp only [var_is_bound_in] at h2
     apply IsDeduct.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_P.iff_ h1_P'))
     · apply IsDeduct.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_Q.iff_ h1_Q'))
       · simp only [def_iff_]
@@ -872,7 +872,7 @@ theorem T_18_2
         · left
           exact a1_right
   case forall_ h1_x h1_P h1_P' h1_1 h1_ih =>
-    simp only [isBoundIn] at h2
+    simp only [var_is_bound_in] at h2
     simp at h2
     apply deduction_theorem
     simp
@@ -1432,8 +1432,8 @@ theorem T_21_8
   (P_r P_s : Formula_)
   (r s : VarName_)
   (h1 : IsReplOfVarInFormula r s P_r P_s)
-  (h2 : ¬ isBoundIn r P_r)
-  (h3 : ¬ isBoundIn s P_r) :
+  (h2 : ¬ var_is_bound_in r P_r)
+  (h3 : ¬ var_is_bound_in s P_r) :
   IsProof ((eq_ r s).imp_ (P_r.iff_ P_s)) :=
   by
   induction h1
@@ -1503,8 +1503,8 @@ theorem T_21_8
             intro i
             apply h1_1
   case not_ P_u P_v h1_1 h1_ih =>
-    simp only [isBoundIn] at h2
-    simp only [isBoundIn] at h3
+    simp only [var_is_bound_in] at h2
+    simp only [var_is_bound_in] at h3
     specialize h1_ih h2 h3
     apply IsDeduct.mp_ ((eq_ r s).imp_ (P_u.iff_ P_v))
     · simp only [def_iff_]
@@ -1515,11 +1515,11 @@ theorem T_21_8
     · exact h1_ih
   case imp_ P_u Q_u P_v Q_v h1_1 h1_2 h1_ih_1
     h1_ih_2 =>
-    simp only [isBoundIn] at h2
+    simp only [var_is_bound_in] at h2
     push_neg at h2
     cases h2
     case intro h2_left h2_right =>
-      simp only [isBoundIn] at h3
+      simp only [var_is_bound_in] at h3
       push_neg at h3
       cases h3
       case intro h3_left h3_right =>
@@ -1535,11 +1535,11 @@ theorem T_21_8
           · exact h1_ih_1
         · exact h1_ih_2
   case forall_ x P_u P_v h1_1 h1_ih =>
-    simp only [isBoundIn] at h2
+    simp only [var_is_bound_in] at h2
     push_neg at h2
     cases h2
     case _ h2_left h2_right =>
-      simp only [isBoundIn] at h3
+      simp only [var_is_bound_in] at h3
       push_neg at h3
       cases h3
       case _ h3_left h3_right =>

@@ -111,14 +111,14 @@ inductive AlphaEqv : Formula_ → Formula_ → Prop
     (phi : Formula_)
     (x y : VarName_) :
     ¬ var_is_free_in y phi →
-    ¬ isBoundIn y phi →
+    ¬ var_is_bound_in y phi →
     AlphaEqv (forall_ x phi) (forall_ y (Sub.Var.One.Rec.fastReplaceFree x y phi))
 
   | rename_exists_
     (phi : Formula_)
     (x y : VarName_) :
     ¬ var_is_free_in y phi →
-    ¬ isBoundIn y phi →
+    ¬ var_is_bound_in y phi →
     AlphaEqv (exists_ x phi) (exists_ y (Sub.Var.One.Rec.fastReplaceFree x y phi))
 
   | compat_not_
@@ -187,7 +187,7 @@ theorem replace_empty_Holds
   (F : Formula_)
   (a : D)
   (h1 : ¬ var_is_free_in v F)
-  (h2 : ¬ isBoundIn v F) :
+  (h2 : ¬ var_is_bound_in v F) :
   holds D I (Function.updateITE V u a) E F ↔
     holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fastReplaceFree u v F) :=
   by
@@ -230,7 +230,7 @@ theorem replace_empty_Holds
     case not_ phi phi_ih =>
       simp only [var_is_free_in] at h1
 
-      simp only [isBoundIn] at h2
+      simp only [var_is_bound_in] at h2
 
       simp only [Sub.Var.One.Rec.fastReplaceFree]
       simp only [holds]
@@ -244,7 +244,7 @@ theorem replace_empty_Holds
       simp only [var_is_free_in] at h1
       push_neg at h1
 
-      simp only [isBoundIn] at h2
+      simp only [var_is_bound_in] at h2
       push_neg at h2
 
       cases h1
@@ -260,7 +260,7 @@ theorem replace_empty_Holds
       simp only [var_is_free_in] at h1
       push_neg at h1
 
-      simp only [isBoundIn] at h2
+      simp only [var_is_bound_in] at h2
       push_neg at h2
 
       cases h2
