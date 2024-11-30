@@ -409,7 +409,7 @@ lemma substitution_theorem_aux
         clear s2
 
         simp only [subAux] at E_ih
-        apply Holds_coincide_PredVar
+        apply holds_coincide_pred_var
         · simp only [I']
           simp only [Interpretation_.usingPred]
         · intro P ds a1
@@ -427,7 +427,7 @@ lemma substitution_theorem_aux
         simp only [var_is_free_in] at s2
         specialize s2 h1 h2
         simp only [← s2]
-        apply Holds_coincide_PredVar
+        apply holds_coincide_pred_var
         · simp only [I']
           simp only [Interpretation_.usingPred]
         · intro P ds a1

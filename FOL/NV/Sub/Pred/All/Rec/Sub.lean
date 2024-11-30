@@ -226,13 +226,13 @@ theorem substitution_theorem_aux
       simp only [holds]
       split_ifs
       case _ c1 =>
-        apply Holds_coincide_PredVar
+        apply holds_coincide_pred_var
         · simp
         · simp only [pred_var_occurs_in_iff_mem_pred_var_set]
           simp only [hd.h2]
           simp
       case _ c1 =>
-        apply Holds_coincide_PredVar
+        apply holds_coincide_pred_var
         · simp
         · simp only [pred_var_occurs_in]
           simp

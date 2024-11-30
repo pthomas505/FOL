@@ -154,7 +154,7 @@ theorem substitution_theorem
     simp only [h3_const]
   case pred_not_occurs_in h1_X h1_ts h1_1 =>
     simp at h1_1
-    apply Holds_coincide_PredVar
+    apply holds_coincide_pred_var
     · exact h3_const
     · intro X ds a1
       simp only [pred_var_occurs_in] at a1
@@ -233,13 +233,13 @@ theorem substitution_theorem
       simp only [holds]
       split_ifs
       case _ c1 =>
-        apply Holds_coincide_PredVar
+        apply holds_coincide_pred_var
         · exact h3_const
         · simp only [pred_var_occurs_in_iff_mem_pred_var_set]
           simp only [hd.h2]
           simp
       case _ c1 =>
-        apply Holds_coincide_PredVar
+        apply holds_coincide_pred_var
         · exact h3_const
         · simp only [pred_var_occurs_in]
           simp

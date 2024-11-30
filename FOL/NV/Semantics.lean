@@ -120,24 +120,24 @@ theorem holds_coincide_var
     case eq_ x y =>
       simp at h1
 
-      cases h1
-      case intro h1_left h1_right =>
-        congr! 1
+      obtain ⟨h1_left, h1_right⟩ := h1
+      congr! 1
     case not_ phi phi_ih =>
       congr! 1
-      exact phi_ih V V' h1
+      apply phi_ih
+      exact h1
     case
         imp_ phi psi phi_ih psi_ih
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
       congr! 1
-      · apply phi_ih V V'
+      · apply phi_ih
         intro v a1
         apply h1
         left
         exact a1
-      · apply psi_ih V V'
+      · apply psi_ih
         intro v a1
         apply h1
         right
@@ -145,7 +145,9 @@ theorem holds_coincide_var
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
       simp at h1
 
-      first | apply forall_congr' | apply exists_congr
+      first
+        | apply forall_congr'
+        | apply exists_congr
       intro d
       apply phi_ih
       intro v a1
@@ -159,19 +161,17 @@ theorem holds_coincide_var
       intro v a1
       simp only [var_is_free_in_iff_mem_free_var_set v hd.q] at a1
 
-      have s1 : v ∈ List.toFinset hd.args
-      apply Finset.mem_of_subset hd.h1 a1
-
-      simp only [List.mem_toFinset] at s1
-
-      apply Function.updateListITE_fun_coincide_mem_eq_len V V' hd.args xs v h1 s1
-      tauto
+      apply Function.updateListITE_fun_coincide_mem_eq_len
+      · exact h1
+      · simp only [← List.mem_toFinset]
+        exact Finset.mem_of_subset hd.h1 a1
+      · tauto
     case neg c1 =>
       apply ih
       tauto
 
 
-theorem Holds_coincide_PredVar
+theorem holds_coincide_pred_var
   (D : Type)
   (I I' : Interpretation_ D)
   (V : Valuation_ D)

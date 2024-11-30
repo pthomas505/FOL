@@ -314,14 +314,14 @@ theorem substitution_theorem_aux
     case _ c1 =>
       specialize ih (Function.updateListITE V hd.args (List.map V xs)) hd.q
       simp only [replace_no_predVar P zs H hd.q hd.h2] at ih
-      apply Holds_coincide_PredVar
+      apply holds_coincide_pred_var
       · simp only [I']
         simp only [Interpretation_.usingPred]
       · simp only [pred_var_occurs_in_iff_mem_pred_var_set]
         simp only [hd.h2]
         simp
     case _ c1 =>
-      apply Holds_coincide_PredVar
+      apply holds_coincide_pred_var
       · simp only [I']
         simp only [Interpretation_.usingPred]
       · simp only [pred_var_occurs_in]
