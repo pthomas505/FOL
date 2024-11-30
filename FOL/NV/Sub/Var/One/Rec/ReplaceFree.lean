@@ -63,13 +63,13 @@ def replace_free_aux
       (xs.map fun (x : VarName_) => if v = x ∧ x ∉ binders then t else x)
 
 /--
-  replace_free v t P :=
+  `replace_free v t P` :=
 
-  P(t/v)
+  `P(t/v)`
 
-  v → t in P for each free occurrence of v in P
+  `v → t` in `P` for each free occurrence of `v` in `P`
 
-  The result of replacing each free occurrence of v in P by an occurrence of t.
+  The result of replacing each free occurrence of `v` in `P` by an occurrence of `t`.
 -/
 def replace_free (v t : VarName_) (F : Formula_) : Formula_ :=
   replace_free_aux v t ∅ F
