@@ -293,12 +293,12 @@ theorem not_free_in_fastReplaceFree_self
 theorem fastReplaceFree_inverse
   (F : Formula_)
   (v t : VarName_)
-  (h1 : ¬ occursIn t F) :
+  (h1 : ¬ var_occurs_in t F) :
   fastReplaceFree t v (fastReplaceFree v t F) = F :=
   by
   induction F
   any_goals
-    simp only [occursIn] at h1
+    simp only [var_occurs_in] at h1
 
     simp only [fastReplaceFree]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
@@ -341,7 +341,7 @@ theorem fastReplaceFree_inverse
         congr!
         apply not_free_in_fastReplaceFree_self
         contrapose! h1_right
-        exact isFreeIn_imp_occursIn t phi h1_right
+        exact var_is_free_in_imp_var_occurs_in t phi h1_right
       case neg c1 =>
         simp only [fastReplaceFree]
         simp only [if_neg h1_left]
