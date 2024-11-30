@@ -1,12 +1,10 @@
 import Lean
 
-import FOL.NV.Formula_
+import FOL.NV.Formula
 
 
 set_option autoImplicit false
 
-
-namespace FOL.NV
 
 open Formula_
 
