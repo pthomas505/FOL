@@ -257,7 +257,8 @@ lemma holds_coincide_env
     simp only [holds]
   case not_ phi phi_ih =>
     congr! 1
-    exact phi_ih V h2
+    apply phi_ih
+    exact h2
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
@@ -266,59 +267,53 @@ lemma holds_coincide_env
     cases h2
     case intro h2_left h2_right =>
       congr! 1
-      · exact phi_ih V h2_left
-      · exact psi_ih V h2_right
+      · apply phi_ih
+        exact h2_left
+      · apply psi_ih
+        exact h2_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    first | apply forall_congr' | apply exists_congr
+    first
+      | apply forall_congr'
+      | apply exists_congr
     intro d
     apply phi_ih
     exact h2
   case def_ X xs =>
     simp only [Env_] at *
 
-    apply Exists.elim h1
-    intro E1 h1_1
-    clear h1
+    obtain ⟨E1, h1⟩ := h1
+    subst h1
 
     simp only [all_def_in_env] at h2
-    apply Exists.elim h2
-    intro a h2_1
-    clear h2
+    obtain ⟨d, h2_left, ⟨h2_right_left, h2_right_right⟩⟩ := h2
 
     simp only [Env_.nodup_] at h3
-
-    subst h1_1
+    simp at h3
 
     induction E1
     case nil =>
       simp
     case cons E1_hd E1_tl E1_ih =>
       simp at h3
+      obtain ⟨h3_left, h3_right⟩ := h3
 
-      cases h2_1
-      case intro h2_1_left h2_1_right =>
-        cases h2_1_right
-        case intro h2_1_right_left h2_1_right_right =>
-          cases h3
-          case intro h3_left h3_right =>
-            simp
-            simp only [holds]
-            split_ifs
-            case _ c1 =>
-              cases c1
-              case intro c1_left c1_right =>
-                exfalso
-                apply h3_left a
-                · right
-                  exact h2_1_left
-                · subst c1_left
-                  exact h2_1_right_left
-                · trans List.length xs
-                  · simp only [eq_comm]
-                    exact c1_right
-                  · exact h2_1_right_right
-            case _ c1 =>
-              exact E1_ih h3_right
+      simp
+      simp only [holds]
+      split_ifs
+      case _ c1 =>
+        obtain ⟨c1_left, c1_right⟩ := c1
+        exfalso
+        apply h3_left d
+        · right
+          exact h2_left
+        · rw [← c1_left]
+          exact h2_right_left
+        · trans xs.length
+          · rw [c1_right]
+          · exact h2_right_right
+      case _ c1 =>
+        apply E1_ih
+        exact h3_right
 
 
 #lint
