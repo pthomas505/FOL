@@ -76,15 +76,15 @@ def replace_free (v t : VarName_) (F : Formula_) : Formula_ :=
 
 
 /--
-  fast_replace_free v t P :=
+  `fast_replace_free v t P` :=
 
-  P(t/v)
+  `P(t/v)`
 
-  v → t in P for each free occurrence of v in P
+  `v → t` in `P` for each free occurrence of `v` in `P`
 
-  The result of replacing each free occurrence of v in P by an occurrence of t.
+  The result of replacing each free occurrence of `v` in `P` by an occurrence of `t`.
 
-  This is a more efficient version of replace_free.
+  This is a more efficient version of `replace_free`.
 -/
 def fast_replace_free (v t : VarName_) : Formula_ → Formula_
   | pred_const_ X xs =>
