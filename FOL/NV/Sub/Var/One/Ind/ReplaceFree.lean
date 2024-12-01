@@ -10,7 +10,7 @@ open Formula_
 
 
 /--
-  is_replace_free_var_one F v t F' := True if and only if F' is the result of replacing in F each free occurrence of v by an occurrence of t.
+  `is_replace_free_var_one F v t F'` := True if and only if `F'` is the result of replacing in `F` each free occurrence of `v` by an occurrence of `t`.
 -/
 inductive is_replace_free_var_one : Formula_ → VarName_ → VarName_ → Formula_ → Prop
 
