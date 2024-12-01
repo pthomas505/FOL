@@ -71,3 +71,41 @@ theorem replace_var_one_rec_self
       rw [c1]
     case neg c1 =>
       rw [phi_ih]
+
+
+theorem not_var_occurs_in_replace_var_one_rec_self
+  (F : Formula_)
+  (v t : VarName_)
+  (h1 : ¬ var_occurs_in v F) :
+  replace_var_one_rec v t F = F :=
+  by
+  induction F
+  any_goals
+    simp only [var_occurs_in] at h1
+
+    simp only [replace_var_one_rec]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+    simp
+    simp only [List.map_eq_self_iff]
+    simp
+    intro x a1 a2
+    subst a2
+    contradiction
+  case eq_ x y =>
+    simp
+    tauto
+  case not_ phi phi_ih =>
+    tauto
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp
+    tauto
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
+
+    split_ifs
+    rw [phi_ih h1_right]
