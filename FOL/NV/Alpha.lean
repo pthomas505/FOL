@@ -11,170 +11,170 @@ namespace FOL.NV
 open Formula_
 
 
-inductive AlphaEqvVar :
+inductive are_alpha_equiv_var_ind :
   List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
 | nil
   (x : VarName_) :
-  AlphaEqvVar [] x x
+  are_alpha_equiv_var_ind [] x x
 
 | head
   (binders : List (VarName_ × VarName_))
   (x y : VarName_) :
-  AlphaEqvVar ((x, y) :: binders) x y
+  are_alpha_equiv_var_ind ((x, y) :: binders) x y
 
 | tail
   (binders : List (VarName_ × VarName_))
   (x y x' y' : VarName_) :
   ¬ x = x' →
   ¬ y = y' →
-  AlphaEqvVar binders x' y' →
-  AlphaEqvVar ((x, y) :: binders) x' y'
+  are_alpha_equiv_var_ind binders x' y' →
+  are_alpha_equiv_var_ind ((x, y) :: binders) x' y'
 
 
-inductive AlphaEqv' :
+inductive are_alpha_equiv_ind' :
   List (VarName_ × VarName_) → Formula_ → Formula_ → Prop
 
   | pred_var_
     (binders : List (VarName_ × VarName_))
     (X : PredName_)
     (xs ys : List VarName_) :
-    List.Forall₂ (AlphaEqvVar binders) xs ys →
-    AlphaEqv' binders (pred_var_ X xs) (pred_var_ X ys)
+    List.Forall₂ (are_alpha_equiv_var_ind binders) xs ys →
+    are_alpha_equiv_ind' binders (pred_var_ X xs) (pred_var_ X ys)
 
   | pred_const_
     (binders : List (VarName_ × VarName_))
     (X : PredName_)
     (xs ys : List VarName_) :
-    List.Forall₂ (AlphaEqvVar binders) xs ys →
-    AlphaEqv' binders (pred_const_ X xs) (pred_const_ X ys)
+    List.Forall₂ (are_alpha_equiv_var_ind binders) xs ys →
+    are_alpha_equiv_ind' binders (pred_const_ X xs) (pred_const_ X ys)
 
   | compat_true_
     (binders : List (VarName_ × VarName_)) :
-    AlphaEqv' binders true_ true_
+    are_alpha_equiv_ind' binders true_ true_
 
   | compat_false_
     (binders : List (VarName_ × VarName_)) :
-    AlphaEqv' binders false_ false_
+    are_alpha_equiv_ind' binders false_ false_
 
   | compat_not_
     (binders : List (VarName_ × VarName_))
     (phi phi' : Formula_) :
-    AlphaEqv' binders phi phi' →
-    AlphaEqv' binders (not_ phi) (not_ phi')
+    are_alpha_equiv_ind' binders phi phi' →
+    are_alpha_equiv_ind' binders (not_ phi) (not_ phi')
 
   | compat_imp_
     (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula_) :
-    AlphaEqv' binders phi phi' →
-    AlphaEqv' binders psi psi' →
-    AlphaEqv' binders (imp_ phi psi) (imp_ phi' psi')
+    are_alpha_equiv_ind' binders phi phi' →
+    are_alpha_equiv_ind' binders psi psi' →
+    are_alpha_equiv_ind' binders (imp_ phi psi) (imp_ phi' psi')
 
   | compat_and_
     (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula_) :
-    AlphaEqv' binders phi phi' →
-    AlphaEqv' binders psi psi' →
-    AlphaEqv' binders (and_ phi psi) (and_ phi' psi')
+    are_alpha_equiv_ind' binders phi phi' →
+    are_alpha_equiv_ind' binders psi psi' →
+    are_alpha_equiv_ind' binders (and_ phi psi) (and_ phi' psi')
 
   | compat_or_
     (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula_) :
-    AlphaEqv' binders phi phi' →
-    AlphaEqv' binders psi psi' →
-    AlphaEqv' binders (or_ phi psi) (or_ phi' psi')
+    are_alpha_equiv_ind' binders phi phi' →
+    are_alpha_equiv_ind' binders psi psi' →
+    are_alpha_equiv_ind' binders (or_ phi psi) (or_ phi' psi')
 
   | compat_iff_
     (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula_) :
-    AlphaEqv' binders phi phi' →
-    AlphaEqv' binders psi psi' →
-    AlphaEqv' binders (iff_ phi psi) (iff_ phi' psi')
+    are_alpha_equiv_ind' binders phi phi' →
+    are_alpha_equiv_ind' binders psi psi' →
+    are_alpha_equiv_ind' binders (iff_ phi psi) (iff_ phi' psi')
 
   | compat_forall_
     (binders : List (VarName_ × VarName_))
     (phi phi' : Formula_)
     (x y : VarName_) :
-    AlphaEqv' ((x, y) :: binders) phi phi' →
-    AlphaEqv' binders (forall_ x phi) (forall_ y phi')
+    are_alpha_equiv_ind' ((x, y) :: binders) phi phi' →
+    are_alpha_equiv_ind' binders (forall_ x phi) (forall_ y phi')
 
   | compat_exists_
     (binders : List (VarName_ × VarName_))
     (phi phi' : Formula_)
     (x y : VarName_) :
-    AlphaEqv' ((x, y) :: binders) phi phi' →
-    AlphaEqv' binders (exists_ x phi) (exists_ y phi')
+    are_alpha_equiv_ind' ((x, y) :: binders) phi phi' →
+    are_alpha_equiv_ind' binders (exists_ x phi) (exists_ y phi')
 
 
-inductive AlphaEqv : Formula_ → Formula_ → Prop
+inductive are_alpha_equiv_ind : Formula_ → Formula_ → Prop
   | rename_forall_
     (phi : Formula_)
     (x y : VarName_) :
     ¬ var_is_free_in y phi →
     ¬ var_is_bound_in y phi →
-    AlphaEqv (forall_ x phi) (forall_ y (Sub.Var.One.Rec.fast_replace_free_var_one_rec x y phi))
+    are_alpha_equiv_ind (forall_ x phi) (forall_ y (Sub.Var.One.Rec.fast_replace_free_var_one_rec x y phi))
 
   | rename_exists_
     (phi : Formula_)
     (x y : VarName_) :
     ¬ var_is_free_in y phi →
     ¬ var_is_bound_in y phi →
-    AlphaEqv (exists_ x phi) (exists_ y (Sub.Var.One.Rec.fast_replace_free_var_one_rec x y phi))
+    are_alpha_equiv_ind (exists_ x phi) (exists_ y (Sub.Var.One.Rec.fast_replace_free_var_one_rec x y phi))
 
   | compat_not_
     (phi phi' : Formula_) :
-    AlphaEqv phi phi' →
-    AlphaEqv (not_ phi) (not_ phi')
+    are_alpha_equiv_ind phi phi' →
+    are_alpha_equiv_ind (not_ phi) (not_ phi')
 
   | compat_imp_
     (phi phi' psi psi' : Formula_) :
-    AlphaEqv phi phi' →
-    AlphaEqv psi psi' →
-    AlphaEqv (imp_ phi psi) (imp_ phi' psi')
+    are_alpha_equiv_ind phi phi' →
+    are_alpha_equiv_ind psi psi' →
+    are_alpha_equiv_ind (imp_ phi psi) (imp_ phi' psi')
 
   | compat_and_
     (phi phi' psi psi' : Formula_) :
-    AlphaEqv phi phi' →
-    AlphaEqv psi psi' →
-    AlphaEqv (and_ phi psi) (and_ phi' psi')
+    are_alpha_equiv_ind phi phi' →
+    are_alpha_equiv_ind psi psi' →
+    are_alpha_equiv_ind (and_ phi psi) (and_ phi' psi')
 
   | compat_or_
     (phi phi' psi psi' : Formula_) :
-    AlphaEqv phi phi' →
-    AlphaEqv psi psi' →
-    AlphaEqv (or_ phi psi) (or_ phi' psi')
+    are_alpha_equiv_ind phi phi' →
+    are_alpha_equiv_ind psi psi' →
+    are_alpha_equiv_ind (or_ phi psi) (or_ phi' psi')
 
   | compat_iff_
     (phi phi' psi psi' : Formula_) :
-    AlphaEqv phi phi' →
-    AlphaEqv psi psi' →
-    AlphaEqv (iff_ phi psi) (iff_ phi' psi')
+    are_alpha_equiv_ind phi phi' →
+    are_alpha_equiv_ind psi psi' →
+    are_alpha_equiv_ind (iff_ phi psi) (iff_ phi' psi')
 
   | compat_forall_
     (phi phi' : Formula_)
     (x : VarName_) :
-    AlphaEqv phi phi' →
-    AlphaEqv (forall_ x phi) (forall_ x phi')
+    are_alpha_equiv_ind phi phi' →
+    are_alpha_equiv_ind (forall_ x phi) (forall_ x phi')
 
   | compat_exists_
     (phi phi' : Formula_)
     (x : VarName_) :
-    AlphaEqv phi phi' →
-    AlphaEqv (exists_ x phi) (exists_ x phi')
+    are_alpha_equiv_ind phi phi' →
+    are_alpha_equiv_ind (exists_ x phi) (exists_ x phi')
 
   | refl_
     (phi : Formula_) :
-    AlphaEqv phi phi
+    are_alpha_equiv_ind phi phi
 
   | symm_
     (phi phi' : Formula_) :
-    AlphaEqv phi phi' →
-    AlphaEqv phi' phi
+    are_alpha_equiv_ind phi phi' →
+    are_alpha_equiv_ind phi' phi
 
   | trans_
     (phi phi' phi'' : Formula_) :
-    AlphaEqv phi phi' →
-    AlphaEqv phi' phi'' →
-    AlphaEqv phi phi''
+    are_alpha_equiv_ind phi phi' →
+    are_alpha_equiv_ind phi' phi'' →
+    are_alpha_equiv_ind phi phi''
 
 
 theorem replace_empty_Holds
@@ -348,7 +348,7 @@ theorem Holds_iff_alphaEqv_Holds
   (V : Valuation_ D)
   (E : Env_)
   (F F' : Formula_)
-  (h1 : AlphaEqv F F') :
+  (h1 : are_alpha_equiv_ind F F') :
   holds D I V E F ↔ holds D I V E F' :=
   by
   induction h1 generalizing V
