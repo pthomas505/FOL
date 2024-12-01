@@ -332,7 +332,7 @@ theorem fast_admits_var_one_self
 
 --
 
-theorem not_isFreeIn_imp_fast_admits_var_one_aux
+theorem not_var_is_free_in_imp_fast_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -348,14 +348,14 @@ theorem not_isFreeIn_imp_fast_admits_var_one_aux
     tauto
 
 
-theorem not_isFreeIn_imp_fast_admits_var_one
+theorem not_var_is_free_in_imp_fast_admits_var_one
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
   fast_admits_var_one v u F :=
   by
   simp only [fast_admits_var_one]
-  exact not_isFreeIn_imp_fast_admits_var_one_aux F v u ∅ h1
+  exact not_var_is_free_in_imp_fast_admits_var_one_aux F v u ∅ h1
 
 --
 
@@ -422,7 +422,7 @@ theorem fastReplaceFree_aux_fast_admits_var_one_aux
         simp only [fast_admits_var_one_aux]
         subst c1
         right
-        apply not_isFreeIn_imp_fast_admits_var_one_aux
+        apply not_var_is_free_in_imp_fast_admits_var_one_aux
         intro contra
         apply h1_right
         apply var_is_free_in_imp_var_occurs_in
@@ -576,7 +576,7 @@ theorem fast_admits_var_one_aux_del_binders
 
 --
 
-theorem fast_admits_var_one_aux_isFreeIn
+theorem fast_admits_var_one_aux_var_is_free_in
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -612,7 +612,7 @@ theorem fast_admits_var_one_aux_mem_binders
   ¬ var_is_free_in v F :=
   by
   contrapose! h2
-  exact fast_admits_var_one_aux_isFreeIn F v u binders h1 h2
+  exact fast_admits_var_one_aux_var_is_free_in F v u binders h1 h2
 
 --
 
@@ -776,7 +776,7 @@ theorem admits_self
 
 --
 
-theorem not_isFreeIn_imp_admits_var_one_aux
+theorem not_var_is_free_in_imp_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -799,14 +799,14 @@ theorem not_isFreeIn_imp_admits_var_one_aux
     tauto
 
 
-theorem not_isFreeIn_imp_admits
+theorem not_var_is_free_in_imp_admits
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
   admits_var_one v u F :=
   by
   simp only [admits_var_one]
-  exact not_isFreeIn_imp_admits_var_one_aux F v u ∅ h1
+  exact not_var_is_free_in_imp_admits_var_one_aux F v u ∅ h1
 
 --
 
@@ -968,7 +968,7 @@ theorem admits_var_one_aux_del_binders
     tauto
 
 
-theorem admits_var_one_aux_isFreeIn
+theorem admits_var_one_aux_var_is_free_in
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
