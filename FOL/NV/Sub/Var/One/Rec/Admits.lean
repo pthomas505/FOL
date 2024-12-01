@@ -766,7 +766,7 @@ theorem admits_var_one_aux_self
     tauto
 
 
-theorem admits_self
+theorem admits_var_one_self
   (F : Formula_)
   (v : VarName_) :
   admits_var_one v v F :=
