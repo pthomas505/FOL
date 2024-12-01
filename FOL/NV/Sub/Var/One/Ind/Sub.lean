@@ -122,7 +122,7 @@ inductive is_sub_var_one : Formula_ → VarName_ → VarName_ → Formula_ → P
       if v = x then t else x))
 
 
-theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
+theorem fast_admits_var_one_aux_and_fast_replace_free_var_one_imp_is_sub_var_one
   (F F' : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -292,7 +292,7 @@ example
   · intro a1
     cases a1
     case intro a1_left a1_right =>
-      exact fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub F F' v u ∅ a1_left a1_right
+      exact fast_admits_var_one_aux_and_fast_replace_free_var_one_imp_is_sub_var_one F F' v u ∅ a1_left a1_right
 
 
 theorem substitution_theorem
