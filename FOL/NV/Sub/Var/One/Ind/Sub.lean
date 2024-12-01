@@ -302,9 +302,10 @@ example
   · intro a1
     constructor
     · apply isFreeSub_imp_fastAdmitsAux
-      · exact Exists.intro F' a1
+      · exact ⟨F', a1⟩
       · simp
-    · exact isFreeSub_imp_fastReplaceFree F F' v u a1
+    · apply isFreeSub_imp_fastReplaceFree
+      exact a1
   · intro a1
     cases a1
     case intro a1_left a1_right =>
