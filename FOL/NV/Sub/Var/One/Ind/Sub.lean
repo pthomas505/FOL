@@ -154,8 +154,7 @@ theorem fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    cases h1
-    case intro h1_left h1_right =>
+    obtain ⟨h1_left, h1_right⟩ := h1
     first
       | apply is_sub_var_one_ind.imp_
       | apply is_sub_var_one_ind.and_
@@ -198,7 +197,8 @@ theorem fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub
             tauto
           · exact phi_ih (binders ∪ {x}) h1
         · have s1 : Rec.fast_replace_free_var_one_rec v u phi = phi
-          exact Rec.not_var_is_free_in_fast_replace_free_var_one_rec_self phi v u c2
+          apply Rec.not_var_is_free_in_fast_replace_free_var_one_rec_self
+          exact c2
 
           simp only [s1]
           first
