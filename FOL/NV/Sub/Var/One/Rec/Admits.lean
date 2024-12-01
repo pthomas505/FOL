@@ -18,7 +18,7 @@ pg. 48
 If `v` and `u` are variables and `P` is a formula, then `P` admits `u` for `v` if and only if there is no free occurrence of `v` in `P` that becomes a bound occurrence of `u` in `P(u/v)`. If `t` is a term, then `P` admits `t` for `v` if and only if `P` admits for `v` every variable in `t`.
 -/
 /--
-  Helper function for `admits`.
+  Helper function for `admits_var_one`.
 -/
 def admits_var_one_aux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ xs =>
@@ -61,11 +61,11 @@ instance
 
 
 /--
-  admits v u P := True if and only if there is no free occurrence of the variable v in the formula P that becomes a bound occurrence of the variable u in P(u/v).
+  `admits_var_one v u P` := True if and only if there is no free occurrence of the variable `v` in the formula `P` that becomes a bound occurrence of the variable `u` in `P(u/v)`.
 
-  P admits u for v
+  `P` admits `u` for `v`
 
-  v → u in P
+  `v → u` in `P`
 -/
 def admits (v u : VarName_) (F : Formula_) : Prop :=
   admits_var_one_aux v u ∅ F
