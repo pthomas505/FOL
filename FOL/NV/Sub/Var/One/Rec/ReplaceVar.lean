@@ -109,3 +109,42 @@ theorem not_var_occurs_in_replace_var_one_rec_self
 
     split_ifs
     rw [phi_ih h1_right]
+
+
+theorem not_var_occurs_in_replace_var_one_rec
+  (F : Formula_)
+  (v t : VarName_)
+  (h1 : ¬ v = t) :
+  ¬ var_occurs_in v (replace_var_one_rec v t F) :=
+  by
+  induction F
+  any_goals
+    simp only [replace_var_one_rec]
+    simp only [var_occurs_in]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+    simp
+    intro x
+    split_ifs <;> tauto
+  case eq_ x y =>
+    split_ifs <;> tauto
+  case true_ | false_ =>
+    simp
+  case not_ phi phi_ih =>
+    exact phi_ih
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    tauto
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp only [replace_var_one_rec]
+    split_ifs
+    case pos c1 =>
+      simp only [var_occurs_in]
+      simp
+      exact ⟨h1, phi_ih⟩
+    case neg c1 =>
+      simp only [var_occurs_in]
+      simp
+      exact ⟨c1, phi_ih⟩
