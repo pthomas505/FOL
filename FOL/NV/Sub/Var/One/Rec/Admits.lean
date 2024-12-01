@@ -44,8 +44,8 @@ def admits_var_one_aux (v u : VarName_) (binders : Finset VarName_) : Formula_ �
   | forall_ x phi => admits_var_one_aux v u (binders ∪ {x}) phi
   | exists_ x phi => admits_var_one_aux v u (binders ∪ {x}) phi
   | def_ _ xs =>
-      v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of v in P
-        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
+      v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of `v` in `P`
+        u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
 
 
 instance
