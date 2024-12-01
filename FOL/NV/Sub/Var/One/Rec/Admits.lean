@@ -18,9 +18,9 @@ pg. 48
 If `v` and `u` are variables and `P` is a formula, then `P` admits `u` for `v` if and only if there is no free occurrence of `v` in `P` that becomes a bound occurrence of `u` in `P(u/v)`. If `t` is a term, then `P` admits `t` for `v` if and only if `P` admits for `v` every variable in `t`.
 -/
 /--
-  Helper function for `admits_var_one`.
+  Helper function for `admits_var_one_rec`.
 -/
-def admits_var_one_aux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
+def admits_var_one_rec_aux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ xs =>
       v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of `v` in `P`
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
@@ -32,17 +32,17 @@ def admits_var_one_aux (v u : VarName_) (binders : Finset VarName_) : Formula_ �
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | true_ => True
   | false_ => True
-  | not_ phi => admits_var_one_aux v u binders phi
+  | not_ phi => admits_var_one_rec_aux v u binders phi
   | imp_ phi psi =>
-      admits_var_one_aux v u binders phi ∧ admits_var_one_aux v u binders psi
+      admits_var_one_rec_aux v u binders phi ∧ admits_var_one_rec_aux v u binders psi
   | and_ phi psi =>
-      admits_var_one_aux v u binders phi ∧ admits_var_one_aux v u binders psi
+      admits_var_one_rec_aux v u binders phi ∧ admits_var_one_rec_aux v u binders psi
   | or_ phi psi =>
-      admits_var_one_aux v u binders phi ∧ admits_var_one_aux v u binders psi
+      admits_var_one_rec_aux v u binders phi ∧ admits_var_one_rec_aux v u binders psi
   | iff_ phi psi =>
-      admits_var_one_aux v u binders phi ∧ admits_var_one_aux v u binders psi
-  | forall_ x phi => admits_var_one_aux v u (binders ∪ {x}) phi
-  | exists_ x phi => admits_var_one_aux v u (binders ∪ {x}) phi
+      admits_var_one_rec_aux v u binders phi ∧ admits_var_one_rec_aux v u binders psi
+  | forall_ x phi => admits_var_one_rec_aux v u (binders ∪ {x}) phi
+  | exists_ x phi => admits_var_one_rec_aux v u (binders ∪ {x}) phi
   | def_ _ xs =>
       v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of `v` in `P`
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
@@ -52,38 +52,38 @@ instance
   (v u : VarName_)
   (binders : Finset VarName_)
   (F : Formula_) :
-  Decidable (admits_var_one_aux v u binders F) :=
+  Decidable (admits_var_one_rec_aux v u binders F) :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admits_var_one_aux]
+    simp only [admits_var_one_rec_aux]
     infer_instance
 
 
 /--
-  `admits_var_one v u P` := True if and only if there is no free occurrence of the variable `v` in the formula `P` that becomes a bound occurrence of the variable `u` in `P(u/v)`.
+  `admits_var_one_rec v u P` := True if and only if there is no free occurrence of the variable `v` in the formula `P` that becomes a bound occurrence of the variable `u` in `P(u/v)`.
 
   `P` admits `u` for `v`
 
   `v → u` in `P`
 -/
-def admits_var_one (v u : VarName_) (F : Formula_) : Prop :=
-  admits_var_one_aux v u ∅ F
+def admits_var_one_rec (v u : VarName_) (F : Formula_) : Prop :=
+  admits_var_one_rec_aux v u ∅ F
 
 
 instance
   (v u : VarName_)
   (F : Formula_) :
-  Decidable (admits_var_one v u F) :=
+  Decidable (admits_var_one_rec v u F) :=
   by
-  simp only [admits_var_one]
+  simp only [admits_var_one_rec]
   infer_instance
 
 
 /--
-  Helper function for `fast_admits_var_one`.
+  Helper function for `fast_admits_var_one_rec`.
 -/
-def fast_admits_var_one_aux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
+def fast_admits_var_one_rec_aux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ xs =>
       v ∈ xs → -- if there is a free occurrence of `v` in `P`
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
@@ -95,17 +95,17 @@ def fast_admits_var_one_aux (v u : VarName_) (binders : Finset VarName_) : Formu
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | true_ => True
   | false_ => True
-  | not_ phi => fast_admits_var_one_aux v u binders phi
+  | not_ phi => fast_admits_var_one_rec_aux v u binders phi
   | imp_ phi psi =>
-      fast_admits_var_one_aux v u binders phi ∧ fast_admits_var_one_aux v u binders psi
+      fast_admits_var_one_rec_aux v u binders phi ∧ fast_admits_var_one_rec_aux v u binders psi
   | and_ phi psi =>
-      fast_admits_var_one_aux v u binders phi ∧ fast_admits_var_one_aux v u binders psi
+      fast_admits_var_one_rec_aux v u binders phi ∧ fast_admits_var_one_rec_aux v u binders psi
   | or_ phi psi =>
-      fast_admits_var_one_aux v u binders phi ∧ fast_admits_var_one_aux v u binders psi
+      fast_admits_var_one_rec_aux v u binders phi ∧ fast_admits_var_one_rec_aux v u binders psi
   | iff_ phi psi =>
-      fast_admits_var_one_aux v u binders phi ∧ fast_admits_var_one_aux v u binders psi
-  | forall_ x phi => v = x ∨ fast_admits_var_one_aux v u (binders ∪ {x}) phi
-  | exists_ x phi => v = x ∨ fast_admits_var_one_aux v u (binders ∪ {x}) phi
+      fast_admits_var_one_rec_aux v u binders phi ∧ fast_admits_var_one_rec_aux v u binders psi
+  | forall_ x phi => v = x ∨ fast_admits_var_one_rec_aux v u (binders ∪ {x}) phi
+  | exists_ x phi => v = x ∨ fast_admits_var_one_rec_aux v u (binders ∪ {x}) phi
   | def_ _ xs =>
       v ∈ xs → -- if there is a free occurrence of `v` in `P`
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
@@ -115,33 +115,33 @@ instance
   (v u : VarName_)
   (binders : Finset VarName_)
   (F : Formula_) :
-  Decidable (fast_admits_var_one_aux v u binders F) :=
+  Decidable (fast_admits_var_one_rec_aux v u binders F) :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fast_admits_var_one_aux]
+    simp only [fast_admits_var_one_rec_aux]
     infer_instance
 
 
 /--
-  `fast_admits_var_one v u P` := True if and only if there is no free occurrence of the variable `v` in the formula `P` that becomes a bound occurrence of the variable `u` in `P(u/v)`.
+  `fast_admits_var_one_rec v u P` := True if and only if there is no free occurrence of the variable `v` in the formula `P` that becomes a bound occurrence of the variable `u` in `P(u/v)`.
 
   `P` admits `u` for `v`
 
   `v → u` in `P`
 
-  This is a more efficient version of `admits_var_one`.
+  This is a more efficient version of `admits_var_one_rec`.
 -/
-def fast_admits_var_one (v u : VarName_) (F : Formula_) : Prop :=
-  fast_admits_var_one_aux v u ∅ F
+def fast_admits_var_one_rec (v u : VarName_) (F : Formula_) : Prop :=
+  fast_admits_var_one_rec_aux v u ∅ F
 
 
 instance
   (v u : VarName_)
   (F : Formula_) :
-  Decidable (fast_admits_var_one v u F) :=
+  Decidable (fast_admits_var_one_rec v u F) :=
   by
-  simp only [fast_admits_var_one]
+  simp only [fast_admits_var_one_rec]
   infer_instance
 
 
@@ -166,9 +166,9 @@ inductive BoolFormula : Type
 
 
 /--
-  Helper function for `to_is_bound_var_one`.
+  Helper function for `to_is_bound_var_one_rec`.
 -/
-def to_is_bound_var_one_aux (binders : Finset VarName_) : Formula_ → BoolFormula
+def to_is_bound_var_one_rec_aux (binders : Finset VarName_) : Formula_ → BoolFormula
   | pred_const_ X xs =>
       BoolFormula.pred_const_ X (xs.map fun (v : VarName_) => v ∈ binders)
 
@@ -182,25 +182,25 @@ def to_is_bound_var_one_aux (binders : Finset VarName_) : Formula_ → BoolFormu
 
   | false_ => BoolFormula.false_
 
-  | not_ phi => BoolFormula.not_ (to_is_bound_var_one_aux binders phi)
+  | not_ phi => BoolFormula.not_ (to_is_bound_var_one_rec_aux binders phi)
 
   | imp_ phi psi =>
-      BoolFormula.imp_ (to_is_bound_var_one_aux binders phi) (to_is_bound_var_one_aux binders psi)
+      BoolFormula.imp_ (to_is_bound_var_one_rec_aux binders phi) (to_is_bound_var_one_rec_aux binders psi)
 
   | and_ phi psi =>
-      BoolFormula.and_ (to_is_bound_var_one_aux binders phi) (to_is_bound_var_one_aux binders psi)
+      BoolFormula.and_ (to_is_bound_var_one_rec_aux binders phi) (to_is_bound_var_one_rec_aux binders psi)
 
   | or_ phi psi =>
-      BoolFormula.or_ (to_is_bound_var_one_aux binders phi) (to_is_bound_var_one_aux binders psi)
+      BoolFormula.or_ (to_is_bound_var_one_rec_aux binders phi) (to_is_bound_var_one_rec_aux binders psi)
 
   | iff_ phi psi =>
-      BoolFormula.iff_ (to_is_bound_var_one_aux binders phi) (to_is_bound_var_one_aux binders psi)
+      BoolFormula.iff_ (to_is_bound_var_one_rec_aux binders phi) (to_is_bound_var_one_rec_aux binders psi)
 
   | forall_ x phi =>
-      BoolFormula.forall_ True (to_is_bound_var_one_aux (binders ∪ {x}) phi)
+      BoolFormula.forall_ True (to_is_bound_var_one_rec_aux (binders ∪ {x}) phi)
 
   | exists_ x phi =>
-      BoolFormula.forall_ True (to_is_bound_var_one_aux (binders ∪ {x}) phi)
+      BoolFormula.forall_ True (to_is_bound_var_one_rec_aux (binders ∪ {x}) phi)
 
   | def_ X xs =>
       BoolFormula.def_ X (xs.map fun (v : VarName_) => v ∈ binders)
@@ -208,25 +208,25 @@ def to_is_bound_var_one_aux (binders : Finset VarName_) : Formula_ → BoolFormu
 /--
   Creates a `BoolFormula` from a formula. Each bound occurence of a variable in the formula is mapped to true in the bool formula. Each free occurence of a variable in the formula is mapped to false in the bool formula.
 -/
-def to_is_bound_var_one (F : Formula_) : BoolFormula :=
-  to_is_bound_var_one_aux ∅ F
+def to_is_bound_var_one_rec (F : Formula_) : BoolFormula :=
+  to_is_bound_var_one_rec_aux ∅ F
 
 
--- `admits_var_one` ↔ `fast_admits_var_one`
+-- `admits_var_one_rec` ↔ `fast_admits_var_one_rec`
 
-theorem admits_var_one_aux_imp_fast_admits_var_one_aux
+theorem admits_var_one_rec_aux_imp_fast_admits_var_one_rec_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∉ binders)
-  (h2 : admits_var_one_aux v u binders F) :
-  fast_admits_var_one_aux v u binders F :=
+  (h2 : admits_var_one_rec_aux v u binders F) :
+  fast_admits_var_one_rec_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admits_var_one_aux] at h2
+    simp only [admits_var_one_rec_aux] at h2
 
-    simp only [fast_admits_var_one_aux]
+    simp only [fast_admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     by_cases c1 : v = x
     · left
@@ -240,16 +240,16 @@ theorem admits_var_one_aux_imp_fast_admits_var_one_aux
     tauto
 
 
-theorem mem_binders_imp_admits_var_one_aux
+theorem mem_binders_imp_admits_var_one_rec_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∈ binders) :
-  admits_var_one_aux v u binders F :=
+  admits_var_one_rec_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admits_var_one_aux]
+    simp only [admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     apply phi_ih
     simp
@@ -259,22 +259,22 @@ theorem mem_binders_imp_admits_var_one_aux
     tauto
 
 
-theorem fast_admits_var_one_aux_imp_admits_var_one_aux
+theorem fast_admits_var_one_rec_aux_imp_admits_var_one_rec_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : fast_admits_var_one_aux v u binders F) :
-  admits_var_one_aux v u binders F :=
+  (h1 : fast_admits_var_one_rec_aux v u binders F) :
+  admits_var_one_rec_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fast_admits_var_one_aux] at h1
+    simp only [fast_admits_var_one_rec_aux] at h1
 
-    simp only [admits_var_one_aux]
+    simp only [admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     cases h1
     case inl h1 =>
-      apply mem_binders_imp_admits_var_one_aux
+      apply mem_binders_imp_admits_var_one_rec_aux
       subst h1
       simp
     case inr h1 =>
@@ -284,31 +284,31 @@ theorem fast_admits_var_one_aux_imp_admits_var_one_aux
     tauto
 
 
-theorem admits_var_one_iff_fast_admits_var_one
+theorem admits_var_one_rec_iff_fast_admits_var_one_rec
   (F : Formula_)
   (v u : VarName_) :
-  admits_var_one v u F ↔ fast_admits_var_one v u F :=
+  admits_var_one_rec v u F ↔ fast_admits_var_one_rec v u F :=
   by
-  simp only [admits_var_one]
-  simp only [fast_admits_var_one]
+  simp only [admits_var_one_rec]
+  simp only [fast_admits_var_one_rec]
   constructor
-  · apply admits_var_one_aux_imp_fast_admits_var_one_aux
+  · apply admits_var_one_rec_aux_imp_fast_admits_var_one_rec_aux
     simp
-  · exact fast_admits_var_one_aux_imp_admits_var_one_aux F v u ∅
+  · exact fast_admits_var_one_rec_aux_imp_admits_var_one_rec_aux F v u ∅
 
 
--- `fast_admits_var_one`
+-- `fast_admits_var_one_rec`
 
-theorem fast_admits_var_one_aux_self
+theorem fast_admits_var_one_rec_aux_self
   (F : Formula_)
   (v : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∉ binders) :
-  fast_admits_var_one_aux v v binders F :=
+  fast_admits_var_one_rec_aux v v binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fast_admits_var_one_aux]
+    simp only [fast_admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     by_cases c1 : v = x
     · left
@@ -321,57 +321,57 @@ theorem fast_admits_var_one_aux_self
     tauto
 
 
-theorem fast_admits_var_one_self
+theorem fast_admits_var_one_rec_self
   (F : Formula_)
   (v : VarName_) :
-  fast_admits_var_one v v F :=
+  fast_admits_var_one_rec v v F :=
   by
-  simp only [fast_admits_var_one]
-  apply fast_admits_var_one_aux_self
+  simp only [fast_admits_var_one_rec]
+  apply fast_admits_var_one_rec_aux_self
   simp
 
 --
 
-theorem not_var_is_free_in_imp_fast_admits_var_one_aux
+theorem not_var_is_free_in_imp_fast_admits_var_one_rec_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_is_free_in v F) :
-  fast_admits_var_one_aux v u binders F :=
+  fast_admits_var_one_rec_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_is_free_in] at h1
 
-    simp only [fast_admits_var_one_aux]
+    simp only [fast_admits_var_one_rec_aux]
   all_goals
     tauto
 
 
-theorem not_var_is_free_in_imp_fast_admits_var_one
+theorem not_var_is_free_in_imp_fast_admits_var_one_rec
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
-  fast_admits_var_one v u F :=
+  fast_admits_var_one_rec v u F :=
   by
-  simp only [fast_admits_var_one]
-  exact not_var_is_free_in_imp_fast_admits_var_one_aux F v u ∅ h1
+  simp only [fast_admits_var_one_rec]
+  exact not_var_is_free_in_imp_fast_admits_var_one_rec_aux F v u ∅ h1
 
 --
 
-theorem not_var_is_bound_in_imp_fast_admits_var_one_aux
+theorem not_var_is_bound_in_imp_fast_admits_var_one_rec_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_is_bound_in u F)
   (h2 : u ∉ binders) :
-  fast_admits_var_one_aux v u binders F :=
+  fast_admits_var_one_rec_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_is_bound_in] at h1
 
-    simp only [fast_admits_var_one_aux]
+    simp only [fast_admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     push_neg at h1
 
@@ -385,33 +385,33 @@ theorem not_var_is_bound_in_imp_fast_admits_var_one_aux
     tauto
 
 
-theorem not_var_is_bound_in_imp_fast_admits_var_one
+theorem not_var_is_bound_in_imp_fast_admits_var_one_rec
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_bound_in u F) :
-  fast_admits_var_one v u F :=
+  fast_admits_var_one_rec v u F :=
   by
-  simp only [fast_admits_var_one]
-  apply not_var_is_bound_in_imp_fast_admits_var_one_aux F v u ∅ h1
+  simp only [fast_admits_var_one_rec]
+  apply not_var_is_bound_in_imp_fast_admits_var_one_rec_aux F v u ∅ h1
   simp
 
 --
 
-theorem fast_replace_free_var_one_fast_admits_var_one_aux
+theorem fast_replace_free_var_one_rec_fast_admits_var_one_rec_aux
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_occurs_in t F)
   (h2 : v ∉ binders) :
-  fast_admits_var_one_aux t v binders (fast_replace_free_var_one v t F) :=
+  fast_admits_var_one_rec_aux t v binders (fast_replace_free_var_one_rec v t F) :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_occurs_in] at h1
 
-    simp only [fast_replace_free_var_one]
+    simp only [fast_replace_free_var_one_rec]
   any_goals
-    simp only [fast_admits_var_one_aux]
+    simp only [fast_admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     push_neg at h1
 
@@ -419,16 +419,16 @@ theorem fast_replace_free_var_one_fast_admits_var_one_aux
     case intro h1_left h1_right =>
       split_ifs
       case pos c1 =>
-        simp only [fast_admits_var_one_aux]
+        simp only [fast_admits_var_one_rec_aux]
         subst c1
         right
-        apply not_var_is_free_in_imp_fast_admits_var_one_aux
+        apply not_var_is_free_in_imp_fast_admits_var_one_rec_aux
         intro contra
         apply h1_right
         apply var_is_free_in_imp_var_occurs_in
         exact contra
       case neg c1 =>
-        simp only [fast_admits_var_one_aux]
+        simp only [fast_admits_var_one_rec_aux]
         right
         apply phi_ih (binders ∪ {x}) h1_right
         simp
@@ -437,31 +437,31 @@ theorem fast_replace_free_var_one_fast_admits_var_one_aux
     tauto
 
 
-theorem fast_replace_free_var_one_fast_admits_var_one
+theorem fast_replace_free_var_one_rec_fast_admits_var_one_rec
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  fast_admits_var_one t v (fast_replace_free_var_one v t F) :=
+  fast_admits_var_one_rec t v (fast_replace_free_var_one_rec v t F) :=
   by
-  simp only [fast_admits_var_one]
-  apply fast_replace_free_var_one_fast_admits_var_one_aux F v t ∅ h1
+  simp only [fast_admits_var_one_rec]
+  apply fast_replace_free_var_one_rec_fast_admits_var_one_rec_aux F v t ∅ h1
   simp
 
 --
 
-theorem replace_free_var_one_aux_fast_admits_var_one_aux
+theorem replace_free_var_one_rec_aux_fast_admits_var_one_rec_aux
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  fast_admits_var_one_aux t v binders (replace_free_var_one_aux v t binders F) :=
+  fast_admits_var_one_rec_aux t v binders (replace_free_var_one_rec_aux v t binders F) :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_occurs_in] at h1
 
-    simp only [replace_free_var_one_aux]
-    simp only [fast_admits_var_one_aux]
+    simp only [replace_free_var_one_rec_aux]
+    simp only [fast_admits_var_one_rec_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x a1 a2
@@ -500,31 +500,31 @@ theorem replace_free_var_one_aux_fast_admits_var_one_aux
     tauto
 
 
-theorem replace_free_var_one_fast_admits_var_one
+theorem replace_free_var_one_rec_fast_admits_var_one_rec
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  fast_admits_var_one t v (replace_free_var_one v t F) :=
+  fast_admits_var_one_rec t v (replace_free_var_one_rec v t F) :=
   by
-  simp only [replace_free_var_one]
-  simp only [fast_admits_var_one]
-  exact replace_free_var_one_aux_fast_admits_var_one_aux F v t ∅ h1
+  simp only [replace_free_var_one_rec]
+  simp only [fast_admits_var_one_rec]
+  exact replace_free_var_one_rec_aux_fast_admits_var_one_rec_aux F v t ∅ h1
 
 --
 
-theorem fast_admits_var_one_aux_add_binders
+theorem fast_admits_var_one_rec_aux_add_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
-  (h1 : fast_admits_var_one_aux v u S F)
+  (h1 : fast_admits_var_one_rec_aux v u S F)
   (h2 : u ∉ T) :
-  fast_admits_var_one_aux v u (S ∪ T) F :=
+  fast_admits_var_one_rec_aux v u (S ∪ T) F :=
   by
   induction F generalizing S
   all_goals
-    simp only [fast_admits_var_one_aux] at h1
+    simp only [fast_admits_var_one_rec_aux] at h1
 
-    simp only [fast_admits_var_one_aux]
+    simp only [fast_admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp
     cases h1
@@ -541,18 +541,18 @@ theorem fast_admits_var_one_aux_add_binders
     tauto
 
 
-theorem fast_admits_var_one_aux_del_binders
+theorem fast_admits_var_one_rec_aux_del_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
-  (h1 : fast_admits_var_one_aux v u (S ∪ T) F) :
-  fast_admits_var_one_aux v u S F :=
+  (h1 : fast_admits_var_one_rec_aux v u (S ∪ T) F) :
+  fast_admits_var_one_rec_aux v u S F :=
   by
   induction F generalizing S
   all_goals
-    simp only [fast_admits_var_one_aux] at h1
+    simp only [fast_admits_var_one_rec_aux] at h1
 
-    simp only [fast_admits_var_one_aux]
+    simp only [fast_admits_var_one_rec_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp at h1
 
@@ -576,17 +576,17 @@ theorem fast_admits_var_one_aux_del_binders
 
 --
 
-theorem fast_admits_var_one_aux_var_is_free_in
+theorem fast_admits_var_one_rec_aux_var_is_free_in
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : fast_admits_var_one_aux v u binders F)
+  (h1 : fast_admits_var_one_rec_aux v u binders F)
   (h2 : var_is_free_in v F) :
   u ∉ binders :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fast_admits_var_one_aux] at h1
+    simp only [fast_admits_var_one_rec_aux] at h1
 
     simp only [var_is_free_in] at h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
@@ -597,41 +597,41 @@ theorem fast_admits_var_one_aux_var_is_free_in
         contradiction
       case inr h1 =>
         apply phi_ih
-        · exact fast_admits_var_one_aux_del_binders phi v u binders {x} h1
+        · exact fast_admits_var_one_rec_aux_del_binders phi v u binders {x} h1
         · exact h2_right
   all_goals
     tauto
 
 
-theorem fast_admits_var_one_aux_mem_binders
+theorem fast_admits_var_one_rec_aux_mem_binders
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : fast_admits_var_one_aux v u binders F)
+  (h1 : fast_admits_var_one_rec_aux v u binders F)
   (h2 : u ∈ binders) :
   ¬ var_is_free_in v F :=
   by
   contrapose! h2
-  exact fast_admits_var_one_aux_var_is_free_in F v u binders h1 h2
+  exact fast_admits_var_one_rec_aux_var_is_free_in F v u binders h1 h2
 
 --
 
-theorem fast_admits_var_one_aux_imp_free_and_bound_unchanged
+theorem fast_admits_var_one_rec_aux_imp_free_and_bound_unchanged
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∉ binders)
-  (h2 : fast_admits_var_one_aux v u binders F) :
-  to_is_bound_var_one_aux binders F =
-    to_is_bound_var_one_aux binders (fast_replace_free_var_one v u F) :=
+  (h2 : fast_admits_var_one_rec_aux v u binders F) :
+  to_is_bound_var_one_rec_aux binders F =
+    to_is_bound_var_one_rec_aux binders (fast_replace_free_var_one_rec v u F) :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fast_admits_var_one_aux] at h2
+    simp only [fast_admits_var_one_rec_aux] at h2
 
-    simp only [fast_replace_free_var_one]
+    simp only [fast_replace_free_var_one_rec]
   any_goals
-    simp only [to_is_bound_var_one_aux]
+    simp only [to_is_bound_var_one_rec_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x a1
@@ -664,7 +664,7 @@ theorem fast_admits_var_one_aux_imp_free_and_bound_unchanged
     case pos c1 =>
       rfl
     case neg c1 =>
-      simp only [to_is_bound_var_one_aux]
+      simp only [to_is_bound_var_one_rec_aux]
       simp
       apply phi_ih
       · simp
@@ -672,22 +672,22 @@ theorem fast_admits_var_one_aux_imp_free_and_bound_unchanged
       · tauto
 
 
-theorem free_and_bound_unchanged_imp_fast_admits_var_one_aux
+theorem free_and_bound_unchanged_imp_fast_admits_var_one_rec_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∉ binders)
-  (h2 : to_is_bound_var_one_aux binders F =
-    to_is_bound_var_one_aux binders (fast_replace_free_var_one v u F)) :
-  fast_admits_var_one_aux v u binders F :=
+  (h2 : to_is_bound_var_one_rec_aux binders F =
+    to_is_bound_var_one_rec_aux binders (fast_replace_free_var_one_rec v u F)) :
+  fast_admits_var_one_rec_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fast_replace_free_var_one] at h2
+    simp only [fast_replace_free_var_one_rec] at h2
 
-    simp only [fast_admits_var_one_aux]
+    simp only [fast_admits_var_one_rec_aux]
   any_goals
-    simp only [to_is_bound_var_one_aux] at h2
+    simp only [to_is_bound_var_one_rec_aux] at h2
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp at h2
 
@@ -732,7 +732,7 @@ theorem free_and_bound_unchanged_imp_fast_admits_var_one_aux
       apply phi_ih
       · simp
         tauto
-      · simp only [to_is_bound_var_one_aux] at h2
+      · simp only [to_is_bound_var_one_rec_aux] at h2
         simp at h2
         exact h2
 
@@ -740,57 +740,57 @@ theorem free_and_bound_unchanged_imp_fast_admits_var_one_aux
 example
   (F : Formula_)
   (v u : VarName_) :
-  fast_admits_var_one v u F ↔
-    to_is_bound_var_one F = to_is_bound_var_one (fast_replace_free_var_one v u F) :=
+  fast_admits_var_one_rec v u F ↔
+    to_is_bound_var_one_rec F = to_is_bound_var_one_rec (fast_replace_free_var_one_rec v u F) :=
   by
-  simp only [fast_admits_var_one]
-  simp only [to_is_bound_var_one]
+  simp only [fast_admits_var_one_rec]
+  simp only [to_is_bound_var_one_rec]
   constructor
-  · apply fast_admits_var_one_aux_imp_free_and_bound_unchanged
+  · apply fast_admits_var_one_rec_aux_imp_free_and_bound_unchanged
     simp
-  · apply free_and_bound_unchanged_imp_fast_admits_var_one_aux
+  · apply free_and_bound_unchanged_imp_fast_admits_var_one_rec_aux
     simp
 
 
 -- admits
 
-theorem admits_var_one_aux_self
+theorem admits_var_one_rec_aux_self
   (F : Formula_)
   (v : VarName_)
   (binders : Finset VarName_) :
-  admits_var_one_aux v v binders F := by
+  admits_var_one_rec_aux v v binders F := by
   induction F generalizing binders
   all_goals
-    simp only [admits_var_one_aux]
+    simp only [admits_var_one_rec_aux]
   all_goals
     tauto
 
 
-theorem admits_var_one_self
+theorem admits_var_one_rec_self
   (F : Formula_)
   (v : VarName_) :
-  admits_var_one v v F :=
+  admits_var_one_rec v v F :=
   by
-  simp only [admits_var_one]
-  apply admits_var_one_aux_self
+  simp only [admits_var_one_rec]
+  apply admits_var_one_rec_aux_self
 
 --
 
-theorem not_var_is_free_in_imp_admits_var_one_aux
+theorem not_var_is_free_in_imp_admits_var_one_rec_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_is_free_in v F) :
-  admits_var_one_aux v u binders F :=
+  admits_var_one_rec_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_is_free_in] at h1
 
-    simp only [admits_var_one_aux]
+    simp only [admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     by_cases c1 : v = x
-    · apply mem_binders_imp_admits_var_one_aux
+    · apply mem_binders_imp_admits_var_one_rec_aux
       simp
       tauto
     · apply phi_ih
@@ -799,30 +799,30 @@ theorem not_var_is_free_in_imp_admits_var_one_aux
     tauto
 
 
-theorem not_var_is_free_in_imp_admits_var_one
+theorem not_var_is_free_in_imp_admits_var_one_rec
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
-  admits_var_one v u F :=
+  admits_var_one_rec v u F :=
   by
-  simp only [admits_var_one]
-  exact not_var_is_free_in_imp_admits_var_one_aux F v u ∅ h1
+  simp only [admits_var_one_rec]
+  exact not_var_is_free_in_imp_admits_var_one_rec_aux F v u ∅ h1
 
 --
 
-theorem not_var_is_bound_in_imp_admits_var_one_aux
+theorem not_var_is_bound_in_imp_admits_var_one_rec_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_is_bound_in u F)
   (h2 : u ∉ binders) :
-  admits_var_one_aux v u binders F :=
+  admits_var_one_rec_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_is_bound_in] at h1
 
-    simp only [admits_var_one_aux]
+    simp only [admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     push_neg at h1
 
@@ -835,31 +835,31 @@ theorem not_var_is_bound_in_imp_admits_var_one_aux
     tauto
 
 
-theorem not_var_is_bound_in_imp_admits_var_one
+theorem not_var_is_bound_in_imp_admits_var_one_rec
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_bound_in u F) :
-  admits_var_one v u F :=
+  admits_var_one_rec v u F :=
   by
-  simp only [admits_var_one]
-  apply not_var_is_bound_in_imp_admits_var_one_aux F v u ∅ h1
+  simp only [admits_var_one_rec]
+  apply not_var_is_bound_in_imp_admits_var_one_rec_aux F v u ∅ h1
   simp
 
 --
 
-theorem replace_free_var_one_aux_admits_var_one_aux
+theorem replace_free_var_one_rec_aux_admits_var_one_rec_aux
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  admits_var_one_aux t v binders (replace_free_var_one_aux v t binders F) :=
+  admits_var_one_rec_aux t v binders (replace_free_var_one_rec_aux v t binders F) :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_occurs_in] at h1
 
-    simp only [replace_free_var_one_aux]
-    simp only [admits_var_one_aux]
+    simp only [replace_free_var_one_rec_aux]
+    simp only [admits_var_one_rec_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x a1 a2 a3
@@ -902,31 +902,31 @@ theorem replace_free_var_one_aux_admits_var_one_aux
     tauto
 
 
-theorem replace_free_var_one_admits_var_one
+theorem replace_free_var_one_rec_admits_var_one_rec
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  admits_var_one t v (replace_free_var_one v t F) :=
+  admits_var_one_rec t v (replace_free_var_one_rec v t F) :=
   by
-  simp only [replace_free_var_one]
-  simp only [admits_var_one]
-  exact replace_free_var_one_aux_admits_var_one_aux F v t ∅ h1
+  simp only [replace_free_var_one_rec]
+  simp only [admits_var_one_rec]
+  exact replace_free_var_one_rec_aux_admits_var_one_rec_aux F v t ∅ h1
 
 --
 
-theorem admits_var_one_aux_add_binders
+theorem admits_var_one_rec_aux_add_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
-  (h1 : admits_var_one_aux v u S F)
+  (h1 : admits_var_one_rec_aux v u S F)
   (h2 : u ∉ T) :
-  admits_var_one_aux v u (S ∪ T) F :=
+  admits_var_one_rec_aux v u (S ∪ T) F :=
   by
   induction F generalizing S
   all_goals
-    simp only [admits_var_one_aux] at h1
+    simp only [admits_var_one_rec_aux] at h1
 
-    simp only [admits_var_one_aux]
+    simp only [admits_var_one_rec_aux]
   case pred_const_ X xs | pred_var_ X xs | eq_ x y |def_ X xs =>
     simp
     tauto
@@ -937,19 +937,19 @@ theorem admits_var_one_aux_add_binders
     tauto
 
 
-theorem admits_var_one_aux_del_binders
+theorem admits_var_one_rec_aux_del_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
-  (h1 : admits_var_one_aux v u (S ∪ T) F)
+  (h1 : admits_var_one_rec_aux v u (S ∪ T) F)
   (h2 : v ∉ T) :
-  admits_var_one_aux v u S F :=
+  admits_var_one_rec_aux v u S F :=
   by
   induction F generalizing S
   all_goals
-    simp only [admits_var_one_aux] at h1
+    simp only [admits_var_one_rec_aux] at h1
 
-    simp only [admits_var_one_aux]
+    simp only [admits_var_one_rec_aux]
   case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
     simp at h1
 
@@ -968,25 +968,25 @@ theorem admits_var_one_aux_del_binders
     tauto
 
 
-theorem admits_var_one_aux_var_is_free_in
+theorem admits_var_one_rec_aux_var_is_free_in
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : admits_var_one_aux v u binders F)
+  (h1 : admits_var_one_rec_aux v u binders F)
   (h2 : var_is_free_in v F)
   (h3 : v ∉ binders) :
   u ∉ binders :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admits_var_one_aux] at h1
+    simp only [admits_var_one_rec_aux] at h1
 
     simp only [var_is_free_in] at h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     cases h2
     case intro h2_left h2_right =>
       apply phi_ih binders
-      · apply admits_var_one_aux_del_binders phi v u binders {x} h1
+      · apply admits_var_one_rec_aux_del_binders phi v u binders {x} h1
         · simp
           exact h2_left
       · exact h2_right
@@ -995,7 +995,7 @@ theorem admits_var_one_aux_var_is_free_in
     tauto
 
 
-theorem substitution_theorem_var_one_aux
+theorem substitution_theorem_var_one_rec_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
@@ -1003,18 +1003,18 @@ theorem substitution_theorem_var_one_aux
   (v t : VarName_)
   (binders : Finset VarName_)
   (F : Formula_)
-  (h1 : fast_admits_var_one_aux v t binders F)
+  (h1 : fast_admits_var_one_rec_aux v t binders F)
   (h2 : ∀ (v : VarName_), ¬ v ∈ binders → V' v = V v) :
   holds D I (Function.updateITE V v (V' t)) E F ↔
-    holds D I V E (fast_replace_free_var_one v t F) :=
+    holds D I V E (fast_replace_free_var_one_rec v t F) :=
   by
   induction E generalizing F binders V
   all_goals
     induction F generalizing binders V
     all_goals
-      simp only [fast_admits_var_one_aux] at h1
+      simp only [fast_admits_var_one_rec_aux] at h1
 
-      simp only [fast_replace_free_var_one]
+      simp only [fast_replace_free_var_one_rec]
       simp only [holds]
     case pred_const_ X xs | pred_var_ X xs =>
       simp
@@ -1128,40 +1128,40 @@ theorem substitution_theorem_var_one_aux
         tauto
     case _ _ =>
       apply ih V binders
-      · simp only [fast_admits_var_one_aux]
+      · simp only [fast_admits_var_one_rec_aux]
         exact h1
       · exact h2
 
 
-theorem substitution_theorem_var_one
+theorem substitution_theorem_var_one_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env_)
   (v t : VarName_)
   (F : Formula_)
-  (h1 : fast_admits_var_one v t F) :
+  (h1 : fast_admits_var_one_rec v t F) :
   holds D I (Function.updateITE V v (V t)) E F ↔
-    holds D I V E (fast_replace_free_var_one v t F) :=
+    holds D I V E (fast_replace_free_var_one_rec v t F) :=
   by
-  simp only [fast_admits_var_one] at h1
+  simp only [fast_admits_var_one_rec] at h1
 
-  apply substitution_theorem_var_one_aux D I V V E v t ∅ F h1
+  apply substitution_theorem_var_one_rec_aux D I V V E v t ∅ F h1
   simp
 
 
-theorem substitution_is_valid_var_one
+theorem substitution_is_valid_var_one_rec
   (v t : VarName_)
   (F : Formula_)
-  (h1 : fast_admits_var_one v t F)
+  (h1 : fast_admits_var_one_rec v t F)
   (h2 : F.is_valid) :
-  (fast_replace_free_var_one v t F).is_valid :=
+  (fast_replace_free_var_one_rec v t F).is_valid :=
   by
   simp only [is_valid] at h2
 
   simp only [is_valid]
   intro D I V E
-  simp only [← substitution_theorem_var_one D I V E v t F h1]
+  simp only [← substitution_theorem_var_one_rec D I V E v t F h1]
   apply h2
 
 

@@ -125,12 +125,12 @@ example
   (F : Formula_)
   (v t : VarName_) :
   fast_replace_free (Function.updateITE id v t) F =
-    One.Rec.fast_replace_free_var_one v t F :=
+    One.Rec.fast_replace_free_var_one_rec v t F :=
   by
   induction F
   all_goals
     simp only [fast_replace_free]
-    simp only [One.Rec.fast_replace_free_var_one]
+    simp only [One.Rec.fast_replace_free_var_one_rec]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x _

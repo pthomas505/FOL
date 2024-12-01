@@ -131,8 +131,8 @@ inductive IsDeduct : Finset Formula_ → Formula_ → Prop
     (x y : VarName_) :
     IsDeduct Δ (Formula_.eq_ x y) →
     IsDeduct Δ phi →
-    Sub.Var.One.Rec.fast_admits_var_one x y phi →
-    IsDeduct Δ (Sub.Var.One.Rec.fast_replace_free_var_one x y phi)
+    Sub.Var.One.Rec.fast_admits_var_one_rec x y phi →
+    IsDeduct Δ (Sub.Var.One.Rec.fast_replace_free_var_one_rec x y phi)
 
   | forall_intro_
     (Δ : Finset Formula_)
@@ -147,15 +147,15 @@ inductive IsDeduct : Finset Formula_ → Formula_ → Prop
     (phi : Formula_)
     (x y : VarName_) :
     IsDeduct Δ (forall_ x phi) →
-    Sub.Var.One.Rec.fast_admits_var_one x y phi →
-    IsDeduct Δ (Sub.Var.One.Rec.fast_replace_free_var_one x y phi)
+    Sub.Var.One.Rec.fast_admits_var_one_rec x y phi →
+    IsDeduct Δ (Sub.Var.One.Rec.fast_replace_free_var_one_rec x y phi)
 
   | exists_intro_
     (Δ : Finset Formula_)
     (phi : Formula_)
     (x y : VarName_) :
-    Sub.Var.One.Rec.fast_admits_var_one x y phi →
-    IsDeduct Δ (Sub.Var.One.Rec.fast_replace_free_var_one x y phi) →
+    Sub.Var.One.Rec.fast_admits_var_one_rec x y phi →
+    IsDeduct Δ (Sub.Var.One.Rec.fast_replace_free_var_one_rec x y phi) →
     IsDeduct Δ (exists_ x phi)
 
   | exists_elim_

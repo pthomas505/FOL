@@ -233,8 +233,8 @@ def Similar
   Prop :=
   ¬ var_is_free_in v P_u ∧
     ¬ var_is_free_in u P_v ∧
-      fast_admits_var_one u v P_u ∧
-        fast_admits_var_one v u P_v ∧ P_v = fast_replace_free_var_one u v P_u ∧ P_u = fast_replace_free_var_one v u P_v
+      fast_admits_var_one_rec u v P_u ∧
+        fast_admits_var_one_rec v u P_v ∧ P_v = fast_replace_free_var_one_rec u v P_u ∧ P_u = fast_replace_free_var_one_rec v u P_v
 
 
 -- Universal Elimination
@@ -243,12 +243,12 @@ theorem T_17_1
   (v t : VarName_)
   (Δ : Set Formula_)
   (h1 : IsDeduct Δ (forall_ v P))
-  (h2 : fast_admits_var_one v t P) :
-  IsDeduct Δ (fast_replace_free_var_one v t P) :=
+  (h2 : fast_admits_var_one_rec v t P) :
+  IsDeduct Δ (fast_replace_free_var_one_rec v t P) :=
   by
   apply IsDeduct.mp_ (forall_ v P)
   · apply IsDeduct.axiom_
-    apply IsAxiom.pred_2_ v t P (fast_replace_free_var_one v t P) h2
+    apply IsAxiom.pred_2_ v t P (fast_replace_free_var_one_rec v t P) h2
     rfl
   · exact h1
 
@@ -266,8 +266,8 @@ theorem specId
   apply IsDeduct.mp_ (forall_ v P)
   · apply IsDeduct.axiom_
     apply IsAxiom.pred_2_ v v P
-    · exact fast_admits_var_one_self P v
-    · exact fast_replace_free_var_one_self P v
+    · exact fast_admits_var_one_rec_self P v
+    · exact fast_replace_free_var_one_rec_self P v
   · exact h1
 
 alias forall_elim_id := specId
@@ -276,21 +276,21 @@ alias forall_elim_id := specId
 theorem T_17_3
   (P : Formula_)
   (v t : VarName_)
-  (h1 : fast_admits_var_one v t P) :
-  IsProof ((fast_replace_free_var_one v t P).imp_ (exists_ v P)) :=
+  (h1 : fast_admits_var_one_rec v t P) :
+  IsProof ((fast_replace_free_var_one_rec v t P).imp_ (exists_ v P)) :=
   by
-  simp only [fast_admits_var_one] at h1
+  simp only [fast_admits_var_one_rec] at h1
 
   simp only [def_exists_]
   -- simp only [Formula_.exists_]
 
   simp only [IsProof]
-  apply IsDeduct.mp_ ((forall_ v P.not_).imp_ (fast_replace_free_var_one v t P).not_)
+  apply IsDeduct.mp_ ((forall_ v P.not_).imp_ (fast_replace_free_var_one_rec v t P).not_)
   · SC
   · apply IsDeduct.axiom_
     apply IsAxiom.pred_2_ v t
-    · simp only [fast_admits_var_one]
-      simp only [fast_admits_var_one_aux]
+    · simp only [fast_admits_var_one_rec]
+      simp only [fast_admits_var_one_rec_aux]
       exact h1
     · rfl
 
@@ -300,11 +300,11 @@ theorem T_17_4
   (P : Formula_)
   (v t : VarName_)
   (Δ : Set Formula_)
-  (h1 : fast_admits_var_one v t P)
-  (h2 : IsDeduct Δ (fast_replace_free_var_one v t P)) :
+  (h1 : fast_admits_var_one_rec v t P)
+  (h2 : IsDeduct Δ (fast_replace_free_var_one_rec v t P)) :
   IsDeduct Δ (exists_ v P) :=
   by
-  apply IsDeduct.mp_ (fast_replace_free_var_one v t P)
+  apply IsDeduct.mp_ (fast_replace_free_var_one_rec v t P)
   · apply proof_imp_deduct
     apply T_17_3
     exact h1
@@ -321,8 +321,8 @@ theorem existsIntroId
   IsDeduct Δ (exists_ v P) :=
   by
   apply T_17_4 P v v Δ
-  · exact fast_admits_var_one_self P v
-  · simp only [fast_replace_free_var_one_self]
+  · exact fast_admits_var_one_rec_self P v
+  · simp only [fast_replace_free_var_one_rec_self]
     exact h1
 
 
@@ -376,12 +376,12 @@ theorem univIntro
   (v t : VarName_)
   (Δ : Set Formula_)
   (h1 : ¬ var_occurs_in t P)
-  (h2 : IsDeduct Δ (fast_replace_free_var_one v t P))
+  (h2 : IsDeduct Δ (fast_replace_free_var_one_rec v t P))
   (h3 : ∀ (H : Formula_), H ∈ Δ → ¬ var_is_free_in t H) :
   IsDeduct Δ (forall_ v P) :=
   by
-  rw [← fast_replace_free_var_one_inverse P v t h1]
-  apply IsDeduct.mp_ (forall_ t (fast_replace_free_var_one v t P))
+  rw [← fast_replace_free_var_one_rec_inverse P v t h1]
+  apply IsDeduct.mp_ (forall_ t (fast_replace_free_var_one_rec v t P))
   · apply proof_imp_deduct
     apply deduction_theorem
     simp
@@ -389,14 +389,14 @@ theorem univIntro
     · apply spec
       · apply IsDeduct.assume_
         simp
-      · apply fast_replace_free_var_one_fast_admits_var_one
+      · apply fast_replace_free_var_one_rec_fast_admits_var_one_rec
         exact h1
     · simp
       simp only [var_is_free_in]
       simp
       intro a1 contra
-      exact not_var_is_free_in_fast_replace_free_var_one P v t a1 contra
-  · exact generalization (fast_replace_free_var_one v t P) t Δ h2 h3
+      exact not_var_is_free_in_fast_replace_free_var_one_rec P v t a1 contra
+  · exact generalization (fast_replace_free_var_one_rec v t P) t Δ h2 h3
 
 
 theorem isProofAltImpIsDeduct
@@ -590,18 +590,18 @@ theorem existsElim
   (v t : VarName_)
   (Δ : Set Formula_)
   (h1 : IsDeduct Δ (exists_ v P))
-  (h2 : IsDeduct (Δ ∪ {fast_replace_free_var_one v t P}) Q)
+  (h2 : IsDeduct (Δ ∪ {fast_replace_free_var_one_rec v t P}) Q)
   (h3 : ¬ var_occurs_in t P)
   (h4 : ¬ var_occurs_in t Q)
   (h5 : ∀ (H : Formula_), H ∈ Δ → ¬ var_is_free_in t H) : IsDeduct Δ Q :=
   by
-  refine' rule_C (fast_replace_free_var_one v t P) Q t Δ _ h2 h5 _
+  refine' rule_C (fast_replace_free_var_one_rec v t P) Q t Δ _ h2 h5 _
   · simp only [def_exists_] at h1
     -- simp only [exists_] at h1
     simp only [def_exists_]
     -- simp only [exists_]
     apply IsDeduct.mp_ (forall_ v P.not_).not_
-    · apply IsDeduct.mp_ ((forall_ t (fast_replace_free_var_one v t P.not_)).imp_ (forall_ v P.not_))
+    · apply IsDeduct.mp_ ((forall_ t (fast_replace_free_var_one_rec v t P.not_)).imp_ (forall_ v P.not_))
       · SC
       · apply deduction_theorem
         apply univIntro P.not_ v t _ h3
@@ -640,8 +640,8 @@ theorem T_17_14
         -- simp only [formula.and_]
         SC
       · apply exists_intro P v v
-        · apply fast_admits_var_one_self
-        · simp only [fast_replace_free_var_one_self]
+        · apply fast_admits_var_one_rec_self
+        · simp only [fast_replace_free_var_one_rec_self]
           apply IsDeduct.mp_ (P.and_ Q)
           · simp only [def_and_]
             -- simp only [formula.and_]
@@ -649,8 +649,8 @@ theorem T_17_14
           · apply IsDeduct.assume_
             simp
     · apply exists_intro Q v v
-      · apply fast_admits_var_one_self
-      · simp only [fast_replace_free_var_one_self]
+      · apply fast_admits_var_one_rec_self
+      · simp only [fast_replace_free_var_one_rec_self]
         apply IsDeduct.mp_ (P.and_ Q)
         · simp only [def_and_]
           -- simp only [formula.and_]
@@ -1086,9 +1086,9 @@ theorem similar_not
   by
   simp only [Similar] at *
   simp only [var_is_free_in] at *
-  simp only [fast_admits_var_one] at *
-  simp only [fast_admits_var_one_aux] at *
-  simp only [fast_replace_free_var_one] at *
+  simp only [fast_admits_var_one_rec] at *
+  simp only [fast_admits_var_one_rec_aux] at *
+  simp only [fast_replace_free_var_one_rec] at *
   tauto
 
 
@@ -1142,8 +1142,8 @@ theorem T_19_1
       exact IsAxiom.pred_3_ v P h1
   · apply IsDeduct.axiom_
     apply IsAxiom.pred_2_ v v P P
-    · apply fast_admits_var_one_self
-    · apply fast_replace_free_var_one_self
+    · apply fast_admits_var_one_rec_self
+    · apply fast_replace_free_var_one_rec_self
 
 
 theorem T_19_2
@@ -1188,8 +1188,8 @@ theorem T_19_4
     · apply IsDeduct.assume_
       simp
     · apply exists_intro P u u
-      · apply fast_admits_var_one_self
-      · simp only [fast_replace_free_var_one_self]
+      · apply fast_admits_var_one_rec_self
+      · simp only [fast_replace_free_var_one_rec_self]
         apply specId v
         apply IsDeduct.assume_
         simp
@@ -1239,8 +1239,8 @@ theorem T_19_6_left
   · apply IsDeduct.assume_
     simp
   · apply exists_intro Q v v
-    · apply fast_admits_var_one_self
-    · simp only [fast_replace_free_var_one_self]
+    · apply fast_admits_var_one_rec_self
+    · simp only [fast_replace_free_var_one_rec_self]
       apply IsDeduct.mp_ P
       · apply IsDeduct.mp_ (P.iff_ Q)
         · simp only [def_iff_]
