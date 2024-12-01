@@ -137,11 +137,15 @@ theorem fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub
 
     simp only [Rec.fast_replace_free_var_one_rec]
   case pred_const_ X xs | pred_var_ X xs =>
-    first | apply is_sub_var_one_ind.pred_const_ | apply is_sub_var_one_ind.pred_var_
+    first
+      | apply is_sub_var_one_ind.pred_const_
+      | apply is_sub_var_one_ind.pred_var_
   case eq_ x y =>
     apply is_sub_var_one_ind.eq_
   case true_ | false_ =>
-    first | apply is_sub_var_one_ind.true_ | apply is_sub_var_one_ind.false_
+    first
+      | apply is_sub_var_one_ind.true_
+      | apply is_sub_var_one_ind.false_
   case not_ phi phi_ih =>
     apply is_sub_var_one_ind.not_
     exact phi_ih binders h1
@@ -152,7 +156,11 @@ theorem fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub
     | iff_ phi psi phi_ih psi_ih =>
     cases h1
     case intro h1_left h1_right =>
-    first | apply is_sub_var_one_ind.imp_ | apply is_sub_var_one_ind.and_ | apply is_sub_var_one_ind.or_ | apply is_sub_var_one_ind.iff_
+    first
+      | apply is_sub_var_one_ind.imp_
+      | apply is_sub_var_one_ind.and_
+      | apply is_sub_var_one_ind.or_
+      | apply is_sub_var_one_ind.iff_
     · exact phi_ih binders h1_left
     · exact psi_ih binders h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
@@ -160,19 +168,25 @@ theorem fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub
     case inl h1 =>
       split_ifs
       all_goals
-        first | apply is_sub_var_one_ind.forall_not_free_in | apply is_sub_var_one_ind.exists_not_free_in
+        first
+          | apply is_sub_var_one_ind.forall_not_free_in
+          | apply is_sub_var_one_ind.exists_not_free_in
         subst h1
         simp only [var_is_free_in]
         simp
     case inr h1 =>
       split_ifs
       case pos c1 =>
-        first | apply is_sub_var_one_ind.forall_not_free_in | apply is_sub_var_one_ind.exists_not_free_in
+        first
+          | apply is_sub_var_one_ind.forall_not_free_in
+          | apply is_sub_var_one_ind.exists_not_free_in
         simp only [var_is_free_in]
         tauto
       case neg c1 =>
         by_cases c2 : var_is_free_in v phi
-        · first | apply is_sub_var_one_ind.forall_free_in | apply is_sub_var_one_ind.exists_free_in
+        · first
+            | apply is_sub_var_one_ind.forall_free_in
+            | apply is_sub_var_one_ind.exists_free_in
           simp only [var_is_free_in]
           constructor
           · exact c1
@@ -187,7 +201,9 @@ theorem fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub
           exact Rec.not_var_is_free_in_fast_replace_free_var_one_rec_self phi v u c2
 
           simp only [s1]
-          first | apply is_sub_var_one_ind.forall_not_free_in | apply is_sub_var_one_ind.exists_not_free_in
+          first
+            | apply is_sub_var_one_ind.forall_not_free_in
+            | apply is_sub_var_one_ind.exists_not_free_in
           simp only [var_is_free_in]
           tauto
   case def_ X xs =>
