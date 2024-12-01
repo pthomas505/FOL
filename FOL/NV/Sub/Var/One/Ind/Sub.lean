@@ -311,7 +311,7 @@ example
     exact fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub_var_one_ind F F' v u ∅ a1_left a1_right
 
 
-theorem substitution_theorem
+theorem substitution_theorem_var_one_ind
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -362,7 +362,9 @@ theorem substitution_theorem
     simp at h1_1
 
     simp only [holds]
-    first | apply forall_congr' | apply exists_congr
+    first
+      | apply forall_congr'
+      | apply exists_congr
     intro d
     apply holds_coincide_var
     intro x a1
@@ -381,7 +383,9 @@ theorem substitution_theorem
     simp only [var_is_free_in] at h1_1
 
     simp only [holds]
-    first | apply forall_congr' | apply exists_congr
+    first
+      | apply forall_congr'
+      | apply exists_congr
     intro d
     specialize h1_ih (Function.updateITE V h1_x d)
     simp only [← h1_ih]
@@ -392,9 +396,8 @@ theorem substitution_theorem
     split_ifs
     case _ c1 c2 c3 =>
       subst c2
-      cases h1_1
-      case intro h1_1_left h1_1_right =>
-        contradiction
+      obtain ⟨h1_1_left, h1_1_right⟩ := h1_1
+      contradiction
     case _ | _ | _ =>
       rfl
   case def_ h1_X h1_xs h1_v h1_t =>
@@ -437,7 +440,7 @@ theorem substitution_theorem
         exact ih
 
 
-theorem substitution_is_valid
+theorem substitution_is_valid_var_one_ind
   (v t : VarName_)
   (F F' : Formula_)
   (h1 : is_sub_var_one_ind F v t F')
@@ -448,7 +451,7 @@ theorem substitution_is_valid
 
   simp only [is_valid]
   intro D I V E
-  simp only [← substitution_theorem D I V E v t F F' h1]
+  simp only [← substitution_theorem_var_one_ind D I V E v t F F' h1]
   apply h2
 
 
