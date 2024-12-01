@@ -10,7 +10,7 @@ open Formula_
 
 
 /--
-  IsSub F v t F' := True if and only if F' is the result of replacing in F each free occurrence of v by a free occurrence of t.
+  `IsSub F v t F'` := True if and only if `F'` is the result of replacing in `F` each free occurrence of `v` by a free occurrence of `t`.
 -/
 inductive IsSub : Formula_ → VarName_ → VarName_ → Formula_ → Prop
 
