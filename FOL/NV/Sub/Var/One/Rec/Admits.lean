@@ -81,9 +81,9 @@ instance
 
 
 /--
-  Helper function for fastAdmits.
+  Helper function for `fast_admits_var_one`.
 -/
-def fastAdmitsAux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
+def fast_admits_var_one_aux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ xs =>
       v ∈ xs → -- if there is a free occurrence of `v` in `P`
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
@@ -95,17 +95,17 @@ def fastAdmitsAux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Pr
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | true_ => True
   | false_ => True
-  | not_ phi => fastAdmitsAux v u binders phi
+  | not_ phi => fast_admits_var_one_aux v u binders phi
   | imp_ phi psi =>
-      fastAdmitsAux v u binders phi ∧ fastAdmitsAux v u binders psi
+      fast_admits_var_one_aux v u binders phi ∧ fast_admits_var_one_aux v u binders psi
   | and_ phi psi =>
-      fastAdmitsAux v u binders phi ∧ fastAdmitsAux v u binders psi
+      fast_admits_var_one_aux v u binders phi ∧ fast_admits_var_one_aux v u binders psi
   | or_ phi psi =>
-      fastAdmitsAux v u binders phi ∧ fastAdmitsAux v u binders psi
+      fast_admits_var_one_aux v u binders phi ∧ fast_admits_var_one_aux v u binders psi
   | iff_ phi psi =>
-      fastAdmitsAux v u binders phi ∧ fastAdmitsAux v u binders psi
-  | forall_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
-  | exists_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
+      fast_admits_var_one_aux v u binders phi ∧ fast_admits_var_one_aux v u binders psi
+  | forall_ x phi => v = x ∨ fast_admits_var_one_aux v u (binders ∪ {x}) phi
+  | exists_ x phi => v = x ∨ fast_admits_var_one_aux v u (binders ∪ {x}) phi
   | def_ _ xs =>
       v ∈ xs → -- if there is a free occurrence of `v` in `P`
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
@@ -115,33 +115,33 @@ instance
   (v u : VarName_)
   (binders : Finset VarName_)
   (F : Formula_) :
-  Decidable (fastAdmitsAux v u binders F) :=
+  Decidable (fast_admits_var_one_aux v u binders F) :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
     infer_instance
 
 
 /--
-  `fastAdmits v u P` := True if and only if there is no free occurrence of the variable `v` in the formula `P` that becomes a bound occurrence of the variable `u` in `P(u/v)`.
+  `fast_admits_var_one v u P` := True if and only if there is no free occurrence of the variable `v` in the formula `P` that becomes a bound occurrence of the variable `u` in `P(u/v)`.
 
   `P` admits `u` for `v`
 
   `v → u` in `P`
 
-  This is a more efficient version of `admits`.
+  This is a more efficient version of `admits_var_one`.
 -/
-def fastAdmits (v u : VarName_) (F : Formula_) : Prop :=
-  fastAdmitsAux v u ∅ F
+def fast_admits_var_one (v u : VarName_) (F : Formula_) : Prop :=
+  fast_admits_var_one_aux v u ∅ F
 
 
 instance
   (v u : VarName_)
   (F : Formula_) :
-  Decidable (fastAdmits v u F) :=
+  Decidable (fast_admits_var_one v u F) :=
   by
-  simp only [fastAdmits]
+  simp only [fast_admits_var_one]
   infer_instance
 
 
@@ -212,7 +212,7 @@ def toIsBound (F : Formula_) : BoolFormula :=
   toIsBoundAux ∅ F
 
 
--- `admits` ↔ `fastAdmits`
+-- `admits_var_one` ↔ `fast_admits_var_one`
 
 theorem admitsAux_imp_fastAdmitsAux
   (F : Formula_)
@@ -220,13 +220,13 @@ theorem admitsAux_imp_fastAdmitsAux
   (binders : Finset VarName_)
   (h1 : v ∉ binders)
   (h2 : admits_var_one_aux v u binders F) :
-  fastAdmitsAux v u binders F :=
+  fast_admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [admits_var_one_aux] at h2
 
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     by_cases c1 : v = x
     · left
@@ -263,12 +263,12 @@ theorem fastAdmitsAux_imp_admitsAux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : fastAdmitsAux v u binders F) :
+  (h1 : fast_admits_var_one_aux v u binders F) :
   admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fastAdmitsAux] at h1
+    simp only [fast_admits_var_one_aux] at h1
 
     simp only [admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
@@ -287,28 +287,28 @@ theorem fastAdmitsAux_imp_admitsAux
 theorem admits_iff_fastAdmits
   (F : Formula_)
   (v u : VarName_) :
-  admits_var_one v u F ↔ fastAdmits v u F :=
+  admits_var_one v u F ↔ fast_admits_var_one v u F :=
   by
   simp only [admits_var_one]
-  simp only [fastAdmits]
+  simp only [fast_admits_var_one]
   constructor
   · apply admitsAux_imp_fastAdmitsAux
     simp
   · exact fastAdmitsAux_imp_admitsAux F v u ∅
 
 
--- fastAdmits
+-- `fast_admits_var_one`
 
 theorem fastAdmitsAux_self
   (F : Formula_)
   (v : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∉ binders) :
-  fastAdmitsAux v v binders F :=
+  fast_admits_var_one_aux v v binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     by_cases c1 : v = x
     · left
@@ -324,9 +324,9 @@ theorem fastAdmitsAux_self
 theorem fastAdmits_self
   (F : Formula_)
   (v : VarName_) :
-  fastAdmits v v F :=
+  fast_admits_var_one v v F :=
   by
-  simp only [fastAdmits]
+  simp only [fast_admits_var_one]
   apply fastAdmitsAux_self
   simp
 
@@ -337,13 +337,13 @@ theorem not_isFreeIn_imp_fastAdmitsAux
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_is_free_in v F) :
-  fastAdmitsAux v u binders F :=
+  fast_admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_is_free_in] at h1
 
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
   all_goals
     tauto
 
@@ -352,9 +352,9 @@ theorem not_isFreeIn_imp_fastAdmits
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
-  fastAdmits v u F :=
+  fast_admits_var_one v u F :=
   by
-  simp only [fastAdmits]
+  simp only [fast_admits_var_one]
   exact not_isFreeIn_imp_fastAdmitsAux F v u ∅ h1
 
 --
@@ -365,13 +365,13 @@ theorem not_isBoundIn_imp_fastAdmitsAux
   (binders : Finset VarName_)
   (h1 : ¬ var_is_bound_in u F)
   (h2 : u ∉ binders) :
-  fastAdmitsAux v u binders F :=
+  fast_admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_is_bound_in] at h1
 
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     push_neg at h1
 
@@ -389,9 +389,9 @@ theorem not_isBoundIn_imp_fastAdmits
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_bound_in u F) :
-  fastAdmits v u F :=
+  fast_admits_var_one v u F :=
   by
-  simp only [fastAdmits]
+  simp only [fast_admits_var_one]
   apply not_isBoundIn_imp_fastAdmitsAux F v u ∅ h1
   simp
 
@@ -403,7 +403,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
   (binders : Finset VarName_)
   (h1 : ¬ var_occurs_in t F)
   (h2 : v ∉ binders) :
-  fastAdmitsAux t v binders (fast_replace_free_var_one v t F) :=
+  fast_admits_var_one_aux t v binders (fast_replace_free_var_one v t F) :=
   by
   induction F generalizing binders
   all_goals
@@ -411,7 +411,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
 
     simp only [fast_replace_free_var_one]
   any_goals
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     push_neg at h1
 
@@ -419,7 +419,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
     case intro h1_left h1_right =>
       split_ifs
       case pos c1 =>
-        simp only [fastAdmitsAux]
+        simp only [fast_admits_var_one_aux]
         subst c1
         right
         apply not_isFreeIn_imp_fastAdmitsAux
@@ -428,7 +428,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
         apply var_is_free_in_imp_var_occurs_in
         exact contra
       case neg c1 =>
-        simp only [fastAdmitsAux]
+        simp only [fast_admits_var_one_aux]
         right
         apply phi_ih (binders ∪ {x}) h1_right
         simp
@@ -441,9 +441,9 @@ theorem fastReplaceFree_fastAdmits
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  fastAdmits t v (fast_replace_free_var_one v t F) :=
+  fast_admits_var_one t v (fast_replace_free_var_one v t F) :=
   by
-  simp only [fastAdmits]
+  simp only [fast_admits_var_one]
   apply fastReplaceFree_aux_fastAdmitsAux F v t ∅ h1
   simp
 
@@ -454,14 +454,14 @@ theorem replaceFreeAux_fastAdmitsAux
   (v t : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  fastAdmitsAux t v binders (replace_free_var_one_aux v t binders F) :=
+  fast_admits_var_one_aux t v binders (replace_free_var_one_aux v t binders F) :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_occurs_in] at h1
 
     simp only [replace_free_var_one_aux]
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x a1 a2
@@ -504,10 +504,10 @@ theorem replaceFree_fastAdmits
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  fastAdmits t v (replace_free_var_one v t F) :=
+  fast_admits_var_one t v (replace_free_var_one v t F) :=
   by
   simp only [replace_free_var_one]
-  simp only [fastAdmits]
+  simp only [fast_admits_var_one]
   exact replaceFreeAux_fastAdmitsAux F v t ∅ h1
 
 --
@@ -516,15 +516,15 @@ theorem fastAdmitsAux_add_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
-  (h1 : fastAdmitsAux v u S F)
+  (h1 : fast_admits_var_one_aux v u S F)
   (h2 : u ∉ T) :
-  fastAdmitsAux v u (S ∪ T) F :=
+  fast_admits_var_one_aux v u (S ∪ T) F :=
   by
   induction F generalizing S
   all_goals
-    simp only [fastAdmitsAux] at h1
+    simp only [fast_admits_var_one_aux] at h1
 
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp
     cases h1
@@ -545,14 +545,14 @@ theorem fastAdmitsAux_del_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
-  (h1 : fastAdmitsAux v u (S ∪ T) F) :
-  fastAdmitsAux v u S F :=
+  (h1 : fast_admits_var_one_aux v u (S ∪ T) F) :
+  fast_admits_var_one_aux v u S F :=
   by
   induction F generalizing S
   all_goals
-    simp only [fastAdmitsAux] at h1
+    simp only [fast_admits_var_one_aux] at h1
 
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp at h1
 
@@ -580,13 +580,13 @@ theorem fastAdmitsAux_isFreeIn
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : fastAdmitsAux v u binders F)
+  (h1 : fast_admits_var_one_aux v u binders F)
   (h2 : var_is_free_in v F) :
   u ∉ binders :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fastAdmitsAux] at h1
+    simp only [fast_admits_var_one_aux] at h1
 
     simp only [var_is_free_in] at h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
@@ -607,7 +607,7 @@ theorem fastAdmitsAux_mem_binders
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : fastAdmitsAux v u binders F)
+  (h1 : fast_admits_var_one_aux v u binders F)
   (h2 : u ∈ binders) :
   ¬ var_is_free_in v F :=
   by
@@ -621,13 +621,13 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∉ binders)
-  (h2 : fastAdmitsAux v u binders F) :
+  (h2 : fast_admits_var_one_aux v u binders F) :
   toIsBoundAux binders F =
     toIsBoundAux binders (fast_replace_free_var_one v u F) :=
   by
   induction F generalizing binders
   all_goals
-    simp only [fastAdmitsAux] at h2
+    simp only [fast_admits_var_one_aux] at h2
 
     simp only [fast_replace_free_var_one]
   any_goals
@@ -679,13 +679,13 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
   (h1 : v ∉ binders)
   (h2 : toIsBoundAux binders F =
     toIsBoundAux binders (fast_replace_free_var_one v u F)) :
-  fastAdmitsAux v u binders F :=
+  fast_admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [fast_replace_free_var_one] at h2
 
-    simp only [fastAdmitsAux]
+    simp only [fast_admits_var_one_aux]
   any_goals
     simp only [toIsBoundAux] at h2
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
@@ -740,10 +740,10 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
 example
   (F : Formula_)
   (v u : VarName_) :
-  fastAdmits v u F ↔
+  fast_admits_var_one v u F ↔
     toIsBound F = toIsBound (fast_replace_free_var_one v u F) :=
   by
-  simp only [fastAdmits]
+  simp only [fast_admits_var_one]
   simp only [toIsBound]
   constructor
   · apply fastAdmitsAux_imp_free_and_bound_unchanged
@@ -1003,7 +1003,7 @@ theorem substitution_theorem_aux
   (v t : VarName_)
   (binders : Finset VarName_)
   (F : Formula_)
-  (h1 : fastAdmitsAux v t binders F)
+  (h1 : fast_admits_var_one_aux v t binders F)
   (h2 : ∀ (v : VarName_), ¬ v ∈ binders → V' v = V v) :
   holds D I (Function.updateITE V v (V' t)) E F ↔
     holds D I V E (fast_replace_free_var_one v t F) :=
@@ -1012,7 +1012,7 @@ theorem substitution_theorem_aux
   all_goals
     induction F generalizing binders V
     all_goals
-      simp only [fastAdmitsAux] at h1
+      simp only [fast_admits_var_one_aux] at h1
 
       simp only [fast_replace_free_var_one]
       simp only [holds]
@@ -1128,7 +1128,7 @@ theorem substitution_theorem_aux
         tauto
     case _ _ =>
       apply ih V binders
-      · simp only [fastAdmitsAux]
+      · simp only [fast_admits_var_one_aux]
         exact h1
       · exact h2
 
@@ -1140,11 +1140,11 @@ theorem substitution_theorem
   (E : Env_)
   (v t : VarName_)
   (F : Formula_)
-  (h1 : fastAdmits v t F) :
+  (h1 : fast_admits_var_one v t F) :
   holds D I (Function.updateITE V v (V t)) E F ↔
     holds D I V E (fast_replace_free_var_one v t F) :=
   by
-  simp only [fastAdmits] at h1
+  simp only [fast_admits_var_one] at h1
 
   apply substitution_theorem_aux D I V V E v t ∅ F h1
   simp
@@ -1153,7 +1153,7 @@ theorem substitution_theorem
 theorem substitution_is_valid
   (v t : VarName_)
   (F : Formula_)
-  (h1 : fastAdmits v t F)
+  (h1 : fast_admits_var_one v t F)
   (h2 : F.is_valid) :
   (fast_replace_free_var_one v t F).is_valid :=
   by
