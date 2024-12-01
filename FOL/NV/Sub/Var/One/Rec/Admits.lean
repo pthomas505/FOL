@@ -359,7 +359,7 @@ theorem not_var_is_free_in_imp_fast_admits_var_one
 
 --
 
-theorem not_isBoundIn_imp_fast_admits_var_one_aux
+theorem not_var_is_bound_in_imp_fast_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -385,14 +385,14 @@ theorem not_isBoundIn_imp_fast_admits_var_one_aux
     tauto
 
 
-theorem not_isBoundIn_imp_fast_admits_var_one
+theorem not_var_is_bound_in_imp_fast_admits_var_one
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_bound_in u F) :
   fast_admits_var_one v u F :=
   by
   simp only [fast_admits_var_one]
-  apply not_isBoundIn_imp_fast_admits_var_one_aux F v u ∅ h1
+  apply not_var_is_bound_in_imp_fast_admits_var_one_aux F v u ∅ h1
   simp
 
 --
@@ -810,7 +810,7 @@ theorem not_var_is_free_in_imp_admits
 
 --
 
-theorem not_isBoundIn_imp_admits_var_one_aux
+theorem not_var_is_bound_in_imp_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -835,14 +835,14 @@ theorem not_isBoundIn_imp_admits_var_one_aux
     tauto
 
 
-theorem not_isBoundIn_imp_admits
+theorem not_var_is_bound_in_imp_admits
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_bound_in u F) :
   admits_var_one v u F :=
   by
   simp only [admits_var_one]
-  apply not_isBoundIn_imp_admits_var_one_aux F v u ∅ h1
+  apply not_var_is_bound_in_imp_admits_var_one_aux F v u ∅ h1
   simp
 
 --
