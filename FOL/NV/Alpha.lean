@@ -11,98 +11,98 @@ namespace FOL.NV
 open Formula_
 
 
-inductive are_alpha_equiv_var_ind' :
+inductive are_alpha_equiv_var_ind_v3 :
   List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
 | nil
   (x : VarName_) :
-  are_alpha_equiv_var_ind' [] x x
+  are_alpha_equiv_var_ind_v3 [] x x
 
 | head
   (binders : List (VarName_ × VarName_))
   (x y : VarName_) :
-  are_alpha_equiv_var_ind' ((x, y) :: binders) x y
+  are_alpha_equiv_var_ind_v3 ((x, y) :: binders) x y
 
 | tail
   (binders : List (VarName_ × VarName_))
   (x y x' y' : VarName_) :
   ¬ x = x' →
   ¬ y = y' →
-  are_alpha_equiv_var_ind' binders x' y' →
-  are_alpha_equiv_var_ind' ((x, y) :: binders) x' y'
+  are_alpha_equiv_var_ind_v3 binders x' y' →
+  are_alpha_equiv_var_ind_v3 ((x, y) :: binders) x' y'
 
 
-inductive are_alpha_equiv_ind' :
+inductive are_alpha_equiv_ind_v3 :
   List (VarName_ × VarName_) → Formula_ → Formula_ → Prop
 
   | pred_var_
     (binders : List (VarName_ × VarName_))
     (X : PredName_)
     (xs ys : List VarName_) :
-    List.Forall₂ (are_alpha_equiv_var_ind' binders) xs ys →
-    are_alpha_equiv_ind' binders (pred_var_ X xs) (pred_var_ X ys)
+    List.Forall₂ (are_alpha_equiv_var_ind_v3 binders) xs ys →
+    are_alpha_equiv_ind_v3 binders (pred_var_ X xs) (pred_var_ X ys)
 
   | pred_const_
     (binders : List (VarName_ × VarName_))
     (X : PredName_)
     (xs ys : List VarName_) :
-    List.Forall₂ (are_alpha_equiv_var_ind' binders) xs ys →
-    are_alpha_equiv_ind' binders (pred_const_ X xs) (pred_const_ X ys)
+    List.Forall₂ (are_alpha_equiv_var_ind_v3 binders) xs ys →
+    are_alpha_equiv_ind_v3 binders (pred_const_ X xs) (pred_const_ X ys)
 
   | compat_true_
     (binders : List (VarName_ × VarName_)) :
-    are_alpha_equiv_ind' binders true_ true_
+    are_alpha_equiv_ind_v3 binders true_ true_
 
   | compat_false_
     (binders : List (VarName_ × VarName_)) :
-    are_alpha_equiv_ind' binders false_ false_
+    are_alpha_equiv_ind_v3 binders false_ false_
 
   | compat_not_
     (binders : List (VarName_ × VarName_))
     (phi phi' : Formula_) :
-    are_alpha_equiv_ind' binders phi phi' →
-    are_alpha_equiv_ind' binders (not_ phi) (not_ phi')
+    are_alpha_equiv_ind_v3 binders phi phi' →
+    are_alpha_equiv_ind_v3 binders (not_ phi) (not_ phi')
 
   | compat_imp_
     (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula_) :
-    are_alpha_equiv_ind' binders phi phi' →
-    are_alpha_equiv_ind' binders psi psi' →
-    are_alpha_equiv_ind' binders (imp_ phi psi) (imp_ phi' psi')
+    are_alpha_equiv_ind_v3 binders phi phi' →
+    are_alpha_equiv_ind_v3 binders psi psi' →
+    are_alpha_equiv_ind_v3 binders (imp_ phi psi) (imp_ phi' psi')
 
   | compat_and_
     (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula_) :
-    are_alpha_equiv_ind' binders phi phi' →
-    are_alpha_equiv_ind' binders psi psi' →
-    are_alpha_equiv_ind' binders (and_ phi psi) (and_ phi' psi')
+    are_alpha_equiv_ind_v3 binders phi phi' →
+    are_alpha_equiv_ind_v3 binders psi psi' →
+    are_alpha_equiv_ind_v3 binders (and_ phi psi) (and_ phi' psi')
 
   | compat_or_
     (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula_) :
-    are_alpha_equiv_ind' binders phi phi' →
-    are_alpha_equiv_ind' binders psi psi' →
-    are_alpha_equiv_ind' binders (or_ phi psi) (or_ phi' psi')
+    are_alpha_equiv_ind_v3 binders phi phi' →
+    are_alpha_equiv_ind_v3 binders psi psi' →
+    are_alpha_equiv_ind_v3 binders (or_ phi psi) (or_ phi' psi')
 
   | compat_iff_
     (binders : List (VarName_ × VarName_))
     (phi phi' psi psi' : Formula_) :
-    are_alpha_equiv_ind' binders phi phi' →
-    are_alpha_equiv_ind' binders psi psi' →
-    are_alpha_equiv_ind' binders (iff_ phi psi) (iff_ phi' psi')
+    are_alpha_equiv_ind_v3 binders phi phi' →
+    are_alpha_equiv_ind_v3 binders psi psi' →
+    are_alpha_equiv_ind_v3 binders (iff_ phi psi) (iff_ phi' psi')
 
   | compat_forall_
     (binders : List (VarName_ × VarName_))
     (phi phi' : Formula_)
     (x y : VarName_) :
-    are_alpha_equiv_ind' ((x, y) :: binders) phi phi' →
-    are_alpha_equiv_ind' binders (forall_ x phi) (forall_ y phi')
+    are_alpha_equiv_ind_v3 ((x, y) :: binders) phi phi' →
+    are_alpha_equiv_ind_v3 binders (forall_ x phi) (forall_ y phi')
 
   | compat_exists_
     (binders : List (VarName_ × VarName_))
     (phi phi' : Formula_)
     (x y : VarName_) :
-    are_alpha_equiv_ind' ((x, y) :: binders) phi phi' →
-    are_alpha_equiv_ind' binders (exists_ x phi) (exists_ y phi')
+    are_alpha_equiv_ind_v3 ((x, y) :: binders) phi phi' →
+    are_alpha_equiv_ind_v3 binders (exists_ x phi) (exists_ y phi')
 
 
 inductive are_alpha_equiv_ind_v2 : Formula_ → Formula_ → Prop
