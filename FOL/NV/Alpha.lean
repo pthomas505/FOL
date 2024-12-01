@@ -104,6 +104,7 @@ inductive are_alpha_equiv_ind_v3 :
     are_alpha_equiv_ind_v3 ((x, y) :: binders) phi phi' →
     are_alpha_equiv_ind_v3 binders (exists_ x phi) (exists_ y phi')
 
+-------------------------------------------------------------------------------
 
 inductive are_alpha_equiv_ind_v2 : Formula_ → Formula_ → Prop
   | rename_forall_
@@ -385,23 +386,24 @@ theorem Holds_iff_alphaEqv_Holds
     · exact h1_ih_1 V
     · exact h1_ih_2 V
 
+-------------------------------------------------------------------------------
 
-def isAlphaEqvVar : List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
+def are_alpha_equiv_var_rec : List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
   | [], x, y => x = y
 
   | hd :: tl, x, y =>
       (x = hd.fst ∧ y = hd.snd) ∨
-        ((¬ x = hd.fst ∧ ¬ y = hd.snd) ∧ isAlphaEqvVar tl x y)
+        ((¬ x = hd.fst ∧ ¬ y = hd.snd) ∧ are_alpha_equiv_var_rec tl x y)
 
 
 instance
   (binders : List (VarName_ × VarName_))
   (x y : VarName_) :
-  Decidable (isAlphaEqvVar binders x y) :=
+  Decidable (are_alpha_equiv_var_rec binders x y) :=
   by
   induction binders
   all_goals
-    simp only [isAlphaEqvVar]
+    simp only [are_alpha_equiv_var_rec]
     infer_instance
 
 
@@ -410,14 +412,14 @@ instance
     then y = hd.snd
     else ¬ y = hd.snd ∧ is_alpha_eqv_var tl x y
 -/
-def isAlphaEqvVarList
+def are_alpha_equiv_var_list_rec
   (binders : List (VarName_ × VarName_)) :
   List VarName_ → List VarName_ → Prop
   | [], [] => True
 
   | x_hd :: x_tl, y_hd :: y_tl =>
-      isAlphaEqvVar binders x_hd y_hd ∧
-        isAlphaEqvVarList binders x_tl y_tl
+      are_alpha_equiv_var_rec binders x_hd y_hd ∧
+        are_alpha_equiv_var_list_rec binders x_tl y_tl
 
   | _, _ => False
 
@@ -425,39 +427,39 @@ def isAlphaEqvVarList
 instance
   (binders : List (VarName_ × VarName_))
   (xs ys : List VarName_) :
-  Decidable (isAlphaEqvVarList binders xs ys) :=
+  Decidable (are_alpha_equiv_var_list_rec binders xs ys) :=
   by
   induction xs generalizing ys
   all_goals
     cases ys
     all_goals
-      simp only [isAlphaEqvVarList]
+      simp only [are_alpha_equiv_var_list_rec]
       infer_instance
 
 
 lemma isAlphaEqvVarListId
   (xs : List VarName_) :
-  isAlphaEqvVarList [] xs xs :=
+  are_alpha_equiv_var_list_rec [] xs xs :=
   by
   induction xs
   case nil =>
-    simp only [isAlphaEqvVarList]
+    simp only [are_alpha_equiv_var_list_rec]
   case cons hd tl ih =>
-    simp only [isAlphaEqvVarList]
+    simp only [are_alpha_equiv_var_list_rec]
     constructor
-    · simp only [isAlphaEqvVar]
+    · simp only [are_alpha_equiv_var_rec]
     · exact ih
 
 
 def isAlphaEqvAux : List (VarName_ × VarName_) → Formula_ → Formula_ → Prop
   | binders, pred_const_ X xs, pred_const_ Y ys =>
-      X = Y ∧ isAlphaEqvVarList binders xs ys
+      X = Y ∧ are_alpha_equiv_var_list_rec binders xs ys
 
   | binders, pred_var_ X xs, pred_var_ Y ys =>
-      X = Y ∧ isAlphaEqvVarList binders xs ys
+      X = Y ∧ are_alpha_equiv_var_list_rec binders xs ys
 
   | binders, eq_ x y, eq_ x' y' =>
-      isAlphaEqvVar binders x x' ∧ isAlphaEqvVar binders y y'
+      are_alpha_equiv_var_rec binders x x' ∧ are_alpha_equiv_var_rec binders y y'
 
   | _, true_, true_ => True
 
@@ -484,7 +486,7 @@ def isAlphaEqvAux : List (VarName_ × VarName_) → Formula_ → Formula_ → Pr
       isAlphaEqvAux ((x, x')::binders) phi phi'
 
   | binders, def_ X xs, def_ Y ys =>
-      X = Y ∧ isAlphaEqvVarList binders xs ys
+      X = Y ∧ are_alpha_equiv_var_list_rec binders xs ys
 
   | _, _, _ => False
 
@@ -531,17 +533,17 @@ theorem aux_1
   (x y : VarName_)
   (V V' : Valuation_ D)
   (h1 : AlphaEqvVarAssignment D binders V V')
-  (h2 : isAlphaEqvVar binders x y) :
+  (h2 : are_alpha_equiv_var_rec binders x y) :
   V x = V' y :=
   by
   induction h1
   case nil h1_V =>
-    simp only [isAlphaEqvVar] at h2
+    simp only [are_alpha_equiv_var_rec] at h2
 
     subst h2
     rfl
   case cons h1_l h1_x h1_y h1_V h1_V' h1_d _ h1_ih =>
-    simp only [isAlphaEqvVar] at h2
+    simp only [are_alpha_equiv_var_rec] at h2
 
     simp only [Function.updateITE]
     cases h2
@@ -564,7 +566,7 @@ theorem aux_2
   (xs ys : List VarName_)
   (V V' : Valuation_ D)
   (h1 : AlphaEqvVarAssignment D binders V V')
-  (h2 : isAlphaEqvVarList binders xs ys) :
+  (h2 : are_alpha_equiv_var_list_rec binders xs ys) :
   List.map V xs = List.map V' ys :=
   by
   induction xs generalizing ys
@@ -573,13 +575,13 @@ theorem aux_2
     case nil =>
       simp
     case cons ys_hd ys_tl =>
-      simp only [isAlphaEqvVarList] at h2
+      simp only [are_alpha_equiv_var_list_rec] at h2
   case cons xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
-      simp only [isAlphaEqvVarList] at h2
+      simp only [are_alpha_equiv_var_list_rec] at h2
     case cons ys_hd ys_tl =>
-      simp only [isAlphaEqvVarList] at h2
+      simp only [are_alpha_equiv_var_list_rec] at h2
 
       simp
       constructor
@@ -595,7 +597,7 @@ theorem aux_2
 lemma isAlphaEqvVarList_length
   (binders : List (VarName_ × VarName_))
   (xs ys : List VarName_)
-  (h1 : isAlphaEqvVarList binders xs ys) :
+  (h1 : are_alpha_equiv_var_list_rec binders xs ys) :
   xs.length = ys.length :=
   by
   induction xs generalizing ys
@@ -604,13 +606,13 @@ lemma isAlphaEqvVarList_length
     case nil =>
       rfl
     case cons ys_hd ys_tl =>
-      simp only [isAlphaEqvVarList] at h1
+      simp only [are_alpha_equiv_var_list_rec] at h1
   case cons xs_hd xs_tl xs_ih =>
     cases ys
     case nil =>
-      simp only [isAlphaEqvVarList] at h1
+      simp only [are_alpha_equiv_var_list_rec] at h1
     case cons ys_hd ys_tl =>
-      simp only [isAlphaEqvVarList] at h1
+      simp only [are_alpha_equiv_var_list_rec] at h1
 
       simp
       cases h1
