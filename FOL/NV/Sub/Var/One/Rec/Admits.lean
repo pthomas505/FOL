@@ -294,7 +294,7 @@ theorem admits_var_one_rec_iff_fast_admits_var_one_rec
   constructor
   · apply admits_var_one_rec_aux_imp_fast_admits_var_one_rec_aux
     simp
-  · exact fast_admits_var_one_rec_aux_imp_admits_var_one_rec_aux F v u ∅
+  · apply fast_admits_var_one_rec_aux_imp_admits_var_one_rec_aux
 
 
 -- `fast_admits_var_one_rec`
@@ -355,7 +355,8 @@ theorem not_var_is_free_in_imp_fast_admits_var_one_rec
   fast_admits_var_one_rec v u F :=
   by
   simp only [fast_admits_var_one_rec]
-  exact not_var_is_free_in_imp_fast_admits_var_one_rec_aux F v u ∅ h1
+  apply not_var_is_free_in_imp_fast_admits_var_one_rec_aux
+  exact h1
 
 --
 
@@ -508,7 +509,8 @@ theorem replace_free_var_one_rec_fast_admits_var_one_rec
   by
   simp only [replace_free_var_one_rec]
   simp only [fast_admits_var_one_rec]
-  exact replace_free_var_one_rec_aux_fast_admits_var_one_rec_aux F v t ∅ h1
+  apply replace_free_var_one_rec_aux_fast_admits_var_one_rec_aux
+  exact h1
 
 --
 
@@ -713,7 +715,9 @@ theorem free_and_bound_unchanged_imp_fast_admits_var_one_rec_aux
   case not_ phi phi_ih =>
     simp at h2
 
-    exact phi_ih binders h1 h2
+    apply phi_ih
+    · exact h1
+    · exact h2
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
@@ -806,7 +810,8 @@ theorem not_var_is_free_in_imp_admits_var_one_rec
   admits_var_one_rec v u F :=
   by
   simp only [admits_var_one_rec]
-  exact not_var_is_free_in_imp_admits_var_one_rec_aux F v u ∅ h1
+  apply not_var_is_free_in_imp_admits_var_one_rec_aux
+  exact h1
 
 --
 
@@ -910,7 +915,8 @@ theorem replace_free_var_one_rec_admits_var_one_rec
   by
   simp only [replace_free_var_one_rec]
   simp only [admits_var_one_rec]
-  exact replace_free_var_one_rec_aux_admits_var_one_rec_aux F v t ∅ h1
+  apply replace_free_var_one_rec_aux_admits_var_one_rec_aux
+  exact h1
 
 --
 
@@ -955,7 +961,8 @@ theorem admits_var_one_rec_aux_del_binders
 
     tauto
   case not_ phi phi_ih =>
-    exact phi_ih S h1
+    apply phi_ih
+    exact h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
@@ -1087,7 +1094,8 @@ theorem substitution_theorem_var_one_rec_aux
           push_neg
           intros v' a1 a2
           simp only [if_neg a2]
-          exact h2 v' a1
+          apply h2
+          exact a1
 
   case cons.def_ hd tl ih X xs =>
     unfold Function.updateITE
@@ -1113,7 +1121,8 @@ theorem substitution_theorem_var_one_rec_aux
         case _ c2 =>
           apply h2
           subst c2
-          exact h1 a2
+          apply h1
+          exact a2
         case _ c2 =>
           rfl
       }
