@@ -995,7 +995,7 @@ theorem admits_var_one_aux_var_is_free_in
     tauto
 
 
-theorem substitution_theorem_aux
+theorem substitution_theorem_var_one_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
@@ -1133,7 +1133,7 @@ theorem substitution_theorem_aux
       · exact h2
 
 
-theorem substitution_theorem
+theorem substitution_theorem_var_one
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -1146,11 +1146,11 @@ theorem substitution_theorem
   by
   simp only [fast_admits_var_one] at h1
 
-  apply substitution_theorem_aux D I V V E v t ∅ F h1
+  apply substitution_theorem_var_one_aux D I V V E v t ∅ F h1
   simp
 
 
-theorem substitution_is_valid
+theorem substitution_is_valid_var_one
   (v t : VarName_)
   (F : Formula_)
   (h1 : fast_admits_var_one v t F)
@@ -1161,7 +1161,7 @@ theorem substitution_is_valid
 
   simp only [is_valid]
   intro D I V E
-  simp only [← substitution_theorem D I V E v t F h1]
+  simp only [← substitution_theorem_var_one D I V E v t F h1]
   apply h2
 
 
