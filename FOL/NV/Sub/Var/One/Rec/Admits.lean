@@ -18,18 +18,18 @@ pg. 48
 If `v` and `u` are variables and `P` is a formula, then `P` admits `u` for `v` if and only if there is no free occurrence of `v` in `P` that becomes a bound occurrence of `u` in `P(u/v)`. If `t` is a term, then `P` admits `t` for `v` if and only if `P` admits for `v` every variable in `t`.
 -/
 /--
-  Helper function for admits.
+  Helper function for `admits`.
 -/
 def admitsAux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ xs =>
-      v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of v in P
-        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
+      v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of `v` in `P`
+        u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | pred_var_ _ xs =>
-      v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of v in P
-        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
+      v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of `v` in `P`
+        u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | eq_ x y =>
-      (v = x ∨ v = y) ∧ v ∉ binders → -- if there is a free occurrence of v in P
-        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
+      (v = x ∨ v = y) ∧ v ∉ binders → -- if there is a free occurrence of `v` in `P`
+        u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | true_ => True
   | false_ => True
   | not_ phi => admitsAux v u binders phi
