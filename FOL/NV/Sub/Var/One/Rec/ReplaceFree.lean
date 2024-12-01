@@ -122,7 +122,7 @@ def fast_replace_free_var_one (v t : VarName_) : Formula_ → Formula_
 
 -- `replace_free_var_one` = `fast_replace_free_var_one`
 
-theorem replace_free_aux_mem_binders
+theorem replace_free_var_one_aux_mem_binders
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
@@ -163,7 +163,7 @@ theorem replace_free_aux_mem_binders
     exact h1
 
 
-theorem replaceFreeAux_eq_fastReplaceFree
+theorem replace_free_var_one_aux_eq_fast_replace_free_var_one
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
@@ -208,7 +208,7 @@ theorem replaceFreeAux_eq_fastReplaceFree
     split_ifs
     case pos c1 =>
       congr! 1
-      apply replace_free_aux_mem_binders
+      apply replace_free_var_one_aux_mem_binders
       simp
       right
       exact c1
@@ -219,18 +219,18 @@ theorem replaceFreeAux_eq_fastReplaceFree
       tauto
 
 
-theorem replaceFree_eq_fastReplaceFree
+theorem replace_free_var_one_eq_fast_replace_free_var_one
   (F : Formula_)
   (v t : VarName_) :
   replace_free_var_one v t F = fast_replace_free_var_one v t F :=
   by
   simp only [replace_free_var_one]
-  apply replaceFreeAux_eq_fastReplaceFree
+  apply replace_free_var_one_aux_eq_fast_replace_free_var_one
   simp
 
 --
 
-theorem fastReplaceFree_self
+theorem fast_replace_free_var_one_self
   (F : Formula_)
   (v : VarName_) :
   fast_replace_free_var_one v v F = F :=
@@ -258,7 +258,7 @@ theorem fastReplaceFree_self
     exact phi_ih
 
 
-theorem not_free_in_fastReplaceFree_self
+theorem not_var_is_free_in_fast_replace_free_var_one_self
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_is_free_in v F) :
@@ -293,7 +293,7 @@ theorem not_free_in_fastReplaceFree_self
     tauto
 
 
-theorem fastReplaceFree_inverse
+theorem fast_replace_free_var_one_inverse
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
@@ -334,22 +334,22 @@ theorem fastReplaceFree_inverse
       congr! <;> tauto
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     push_neg at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
-    cases h1
-    case intro h1_left h1_right =>
-      split_ifs
-      case pos c1 =>
-        simp only [fast_replace_free_var_one]
-        simp only [if_neg h1_left]
-        congr!
-        apply not_free_in_fastReplaceFree_self
-        contrapose! h1_right
-        exact var_is_free_in_imp_var_occurs_in t phi h1_right
-      case neg c1 =>
-        simp only [fast_replace_free_var_one]
-        simp only [if_neg h1_left]
-        congr!
-        exact phi_ih h1_right
+    split_ifs
+    case pos c1 =>
+      simp only [fast_replace_free_var_one]
+      simp only [if_neg h1_left]
+      congr!
+      apply not_var_is_free_in_fast_replace_free_var_one_self
+      contrapose! h1_right
+      apply var_is_free_in_imp_var_occurs_in
+      exact h1_right
+    case neg c1 =>
+      simp only [fast_replace_free_var_one]
+      simp only [if_neg h1_left]
+      congr!
+      exact phi_ih h1_right
 
 
 theorem not_isFreeIn_fastReplaceFree
