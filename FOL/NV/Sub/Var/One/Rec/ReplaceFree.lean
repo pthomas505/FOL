@@ -352,7 +352,7 @@ theorem fast_replace_free_var_one_inverse
       exact phi_ih h1_right
 
 
-theorem not_isFreeIn_fastReplaceFree
+theorem not_var_is_free_in_fast_replace_free_var_one
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ v = t) :
