@@ -126,14 +126,14 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
   (F F' : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : Rec.fastAdmitsAux v u binders F)
+  (h1 : Rec.fast_admits_var_one_aux v u binders F)
   (h2 : Rec.fast_replace_free_var_one v u F = F') :
   IsSub F v u F' :=
   by
   subst h2
   induction F generalizing binders
   all_goals
-    simp only [Rec.fastAdmitsAux] at h1
+    simp only [Rec.fast_admits_var_one_aux] at h1
 
     simp only [Rec.fast_replace_free_var_one]
   case pred_const_ X xs | pred_var_ X xs =>
@@ -178,13 +178,13 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
           · exact c1
           . exact c2
           . have s1 : ¬ u ∈ binders ∪ {x}
-            exact Rec.fastAdmitsAux_isFreeIn phi v u (binders ∪ {x}) h1 c2
+            exact Rec.fast_admits_var_one_aux_var_is_free_in phi v u (binders ∪ {x}) h1 c2
 
             simp at s1
             tauto
           · exact phi_ih (binders ∪ {x}) h1
         · have s1 : Rec.fast_replace_free_var_one v u phi = phi
-          exact Rec.not_free_in_fastReplaceFree_self phi v u c2
+          exact Rec.not_var_is_free_in_fast_replace_free_var_one_self phi v u c2
 
           simp only [s1]
           first | apply IsSub.forall_not_free_in | apply IsSub.exists_not_free_in
@@ -200,14 +200,14 @@ theorem isFreeSub_imp_fastAdmitsAux
   (binders : Finset VarName_)
   (h1 : ∃ (F' : Formula_), IsSub F v u F')
   (h2 : u ∉ binders) :
-  Rec.fastAdmitsAux v u binders F :=
+  Rec.fast_admits_var_one_aux v u binders F :=
   by
   apply Exists.elim h1
   intro F' h1_1
   clear h1
   induction h1_1 generalizing binders
   all_goals
-    simp only [Rec.fastAdmitsAux]
+    simp only [Rec.fast_admits_var_one_aux]
   case
       forall_not_free_in h1_1_x h1_1_phi h1_1_v h1_1_t h1_1_1
     | exists_not_free_in h1_1_x h1_1_phi h1_1_v h1_1_t h1_1_1 =>
@@ -218,7 +218,7 @@ theorem isFreeSub_imp_fastAdmitsAux
     · left
       exact c1
     · right
-      apply Rec.not_isFreeIn_imp_fastAdmitsAux
+      apply Rec.not_var_is_free_in_imp_fast_admits_var_one_aux
       exact h1_1_1 c1
   case
       forall_free_in h1_1_x h1_1_phi h1_1_v h1_1_t _ _ h1_1_2 _ h1_1_ih
@@ -261,7 +261,7 @@ theorem isFreeSub_imp_fastReplaceFree
       rfl
     case neg c1 =>
       congr!
-      apply Rec.not_free_in_fastReplaceFree_self
+      apply Rec.not_var_is_free_in_fast_replace_free_var_one_self
       exact h1_1 c1
   case
     forall_free_in h1_x h1_phi h1_v h1_t h1_phi' h1_1 _ _ h1_ih
@@ -279,9 +279,9 @@ example
   (F F' : Formula_)
   (v u : VarName_) :
   IsSub F v u F' ↔
-    Rec.fastAdmits v u F ∧ Rec.fast_replace_free_var_one v u F = F' :=
+    Rec.fast_admits_var_one v u F ∧ Rec.fast_replace_free_var_one v u F = F' :=
   by
-  simp only [Rec.fastAdmits]
+  simp only [Rec.fast_admits_var_one]
   constructor
   · intro a1
     constructor
