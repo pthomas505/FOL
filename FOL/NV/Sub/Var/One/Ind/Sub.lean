@@ -10,82 +10,82 @@ open Formula_
 
 
 /--
-  `IsSub F v t F'` := True if and only if `F'` is the result of replacing in `F` each free occurrence of `v` by a free occurrence of `t`.
+  `is_sub_var_one F v t F'` := True if and only if `F'` is the result of replacing in `F` each free occurrence of `v` by a free occurrence of `t`.
 -/
-inductive IsSub : Formula_ → VarName_ → VarName_ → Formula_ → Prop
+inductive is_sub_var_one : Formula_ → VarName_ → VarName_ → Formula_ → Prop
 
   | pred_const_
     (X : PredName_)
     (xs : List VarName_)
     (v t : VarName_) :
-    IsSub (pred_const_ X xs) v t (pred_const_ X (xs.map fun (x : VarName_) =>
+    is_sub_var_one (pred_const_ X xs) v t (pred_const_ X (xs.map fun (x : VarName_) =>
       if v = x then t else x))
 
   | pred_var_
     (X : PredName_)
     (xs : List VarName_)
     (v t : VarName_) :
-    IsSub (pred_var_ X xs) v t (pred_var_ X (xs.map fun (x : VarName_) =>
+    is_sub_var_one (pred_var_ X xs) v t (pred_var_ X (xs.map fun (x : VarName_) =>
       if v = x then t else x))
 
   | eq_
     (x y : VarName_)
     (v t : VarName_) :
-    IsSub (eq_ x y) v t (eq_ (if v = x then t else x) (if v = y then t else y))
+    is_sub_var_one (eq_ x y) v t (eq_ (if v = x then t else x) (if v = y then t else y))
 
   | true_
     (v t : VarName_) :
-    IsSub true_ v t true_
+    is_sub_var_one true_ v t true_
 
   | false_
     (v t : VarName_) :
-    IsSub false_ v t false_
+    is_sub_var_one false_ v t false_
 
   | not_
     (phi : Formula_)
     (v t : VarName_)
     (phi' : Formula_) :
-    IsSub phi v t phi' →
-    IsSub phi.not_ v t phi'.not_
+    is_sub_var_one phi v t phi' →
+    is_sub_var_one phi.not_ v t phi'.not_
 
   | imp_
     (phi psi : Formula_)
     (v t : VarName_)
     (phi' psi' : Formula_) :
-    IsSub phi v t phi' →
-    IsSub psi v t psi' →
-    IsSub (phi.imp_ psi) v t (phi'.imp_ psi')
+    is_sub_var_one phi v t phi' →
+    is_sub_var_one psi v t psi' →
+    is_sub_var_one (phi.imp_ psi) v t (phi'.imp_ psi')
 
   | and_
     (phi psi : Formula_)
     (v t : VarName_)
     (phi' psi' : Formula_) :
-    IsSub phi v t phi' →
-    IsSub psi v t psi' →
-    IsSub (phi.and_ psi) v t (phi'.and_ psi')
+    is_sub_var_one phi v t phi' →
+    is_sub_var_one psi v t psi' →
+    is_sub_var_one (phi.and_ psi) v t (phi'.and_ psi')
 
   | or_
     (phi psi : Formula_)
     (v t : VarName_)
     (phi' psi' : Formula_) :
-    IsSub phi v t phi' →
-    IsSub psi v t psi' →
-    IsSub (phi.or_ psi) v t (phi'.or_ psi')
+    is_sub_var_one phi v t phi' →
+    is_sub_var_one psi v t psi' →
+    is_sub_var_one (phi.or_ psi) v t (phi'.or_ psi')
 
   | iff_
     (phi psi : Formula_)
     (v t : VarName_)
     (phi' psi' : Formula_) :
-    IsSub phi v t phi' →
-    IsSub psi v t psi' →
-    IsSub (phi.iff_ psi) v t (phi'.iff_ psi')
+    is_sub_var_one phi v t phi' →
+    is_sub_var_one psi v t psi' →
+    is_sub_var_one (phi.iff_ psi) v t (phi'.iff_ psi')
 
   | forall_not_free_in
     (x : VarName_)
     (phi : Formula_)
     (v t : VarName_) :
     ¬ var_is_free_in v (forall_ x phi) →
-    IsSub (forall_ x phi) v t (forall_ x phi)
+    is_sub_var_one (forall_ x phi) v t (forall_ x phi)
 
   | forall_free_in
     (x : VarName_)
@@ -94,15 +94,15 @@ inductive IsSub : Formula_ → VarName_ → VarName_ → Formula_ → Prop
     (phi' : Formula_) :
     var_is_free_in v (forall_ x phi) →
     ¬ x = t →
-    IsSub phi v t phi' →
-    IsSub (forall_ x phi) v t (forall_ x phi')
+    is_sub_var_one phi v t phi' →
+    is_sub_var_one (forall_ x phi) v t (forall_ x phi')
 
   | exists_not_free_in
     (x : VarName_)
     (phi : Formula_)
     (v t : VarName_) :
     ¬ var_is_free_in v (exists_ x phi) →
-    IsSub (exists_ x phi) v t (exists_ x phi)
+    is_sub_var_one (exists_ x phi) v t (exists_ x phi)
 
   | exists_free_in
     (x : VarName_)
@@ -111,14 +111,14 @@ inductive IsSub : Formula_ → VarName_ → VarName_ → Formula_ → Prop
     (phi' : Formula_) :
     var_is_free_in v (exists_ x phi) →
     ¬ x = t →
-    IsSub phi v t phi' →
-    IsSub (exists_ x phi) v t (exists_ x phi')
+    is_sub_var_one phi v t phi' →
+    is_sub_var_one (exists_ x phi) v t (exists_ x phi')
 
   | def_
     (X : DefName_)
     (xs : List VarName_)
     (v t : VarName_) :
-    IsSub (def_ X xs) v t (def_ X (xs.map fun (x : VarName_) =>
+    is_sub_var_one (def_ X xs) v t (def_ X (xs.map fun (x : VarName_) =>
       if v = x then t else x))
 
 
@@ -128,7 +128,7 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
   (binders : Finset VarName_)
   (h1 : Rec.fast_admits_var_one_aux v u binders F)
   (h2 : Rec.fast_replace_free_var_one v u F = F') :
-  IsSub F v u F' :=
+  is_sub_var_one F v u F' :=
   by
   subst h2
   induction F generalizing binders
@@ -137,13 +137,13 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
 
     simp only [Rec.fast_replace_free_var_one]
   case pred_const_ X xs | pred_var_ X xs =>
-    first | apply IsSub.pred_const_ | apply IsSub.pred_var_
+    first | apply is_sub_var_one.pred_const_ | apply is_sub_var_one.pred_var_
   case eq_ x y =>
-    apply IsSub.eq_
+    apply is_sub_var_one.eq_
   case true_ | false_ =>
-    first | apply IsSub.true_ | apply IsSub.false_
+    first | apply is_sub_var_one.true_ | apply is_sub_var_one.false_
   case not_ phi phi_ih =>
-    apply IsSub.not_
+    apply is_sub_var_one.not_
     exact phi_ih binders h1
   case
       imp_ phi psi phi_ih psi_ih
@@ -152,7 +152,7 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
     | iff_ phi psi phi_ih psi_ih =>
     cases h1
     case intro h1_left h1_right =>
-    first | apply IsSub.imp_ | apply IsSub.and_ | apply IsSub.or_ | apply IsSub.iff_
+    first | apply is_sub_var_one.imp_ | apply is_sub_var_one.and_ | apply is_sub_var_one.or_ | apply is_sub_var_one.iff_
     · exact phi_ih binders h1_left
     · exact psi_ih binders h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
@@ -160,19 +160,19 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
     case inl h1 =>
       split_ifs
       all_goals
-        first | apply IsSub.forall_not_free_in | apply IsSub.exists_not_free_in
+        first | apply is_sub_var_one.forall_not_free_in | apply is_sub_var_one.exists_not_free_in
         subst h1
         simp only [var_is_free_in]
         simp
     case inr h1 =>
       split_ifs
       case pos c1 =>
-        first | apply IsSub.forall_not_free_in | apply IsSub.exists_not_free_in
+        first | apply is_sub_var_one.forall_not_free_in | apply is_sub_var_one.exists_not_free_in
         simp only [var_is_free_in]
         tauto
       case neg c1 =>
         by_cases c2 : var_is_free_in v phi
-        · first | apply IsSub.forall_free_in | apply IsSub.exists_free_in
+        · first | apply is_sub_var_one.forall_free_in | apply is_sub_var_one.exists_free_in
           simp only [var_is_free_in]
           constructor
           · exact c1
@@ -187,18 +187,18 @@ theorem fastAdmitsAux_and_fastReplaceFree_imp_isFreeSub
           exact Rec.not_var_is_free_in_fast_replace_free_var_one_self phi v u c2
 
           simp only [s1]
-          first | apply IsSub.forall_not_free_in | apply IsSub.exists_not_free_in
+          first | apply is_sub_var_one.forall_not_free_in | apply is_sub_var_one.exists_not_free_in
           simp only [var_is_free_in]
           tauto
   case def_ X xs =>
-    apply IsSub.def_
+    apply is_sub_var_one.def_
 
 
 theorem isFreeSub_imp_fastAdmitsAux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : ∃ (F' : Formula_), IsSub F v u F')
+  (h1 : ∃ (F' : Formula_), is_sub_var_one F v u F')
   (h2 : u ∉ binders) :
   Rec.fast_admits_var_one_aux v u binders F :=
   by
@@ -234,7 +234,7 @@ theorem isFreeSub_imp_fastAdmitsAux
 theorem isFreeSub_imp_fastReplaceFree
   (F F' : Formula_)
   (v u : VarName_)
-  (h1 : IsSub F v u F') :
+  (h1 : is_sub_var_one F v u F') :
   Rec.fast_replace_free_var_one v u F = F' :=
   by
   induction h1
@@ -278,7 +278,7 @@ theorem isFreeSub_imp_fastReplaceFree
 example
   (F F' : Formula_)
   (v u : VarName_) :
-  IsSub F v u F' ↔
+  is_sub_var_one F v u F' ↔
     Rec.fast_admits_var_one v u F ∧ Rec.fast_replace_free_var_one v u F = F' :=
   by
   simp only [Rec.fast_admits_var_one]
@@ -302,7 +302,7 @@ theorem substitution_theorem
   (E : Env_)
   (v t : VarName_)
   (F F' : Formula_)
-  (h1 : IsSub F v t F') :
+  (h1 : is_sub_var_one F v t F') :
   holds D I (Function.updateITE V v (V t)) E F ↔
     holds D I V E F' :=
   by
@@ -424,7 +424,7 @@ theorem substitution_theorem
 theorem substitution_is_valid
   (v t : VarName_)
   (F F' : Formula_)
-  (h1 : IsSub F v t F')
+  (h1 : is_sub_var_one F v t F')
   (h2 : F.is_valid) :
   F'.is_valid :=
   by
