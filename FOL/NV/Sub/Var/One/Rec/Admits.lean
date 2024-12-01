@@ -284,7 +284,7 @@ theorem fast_admits_var_one_aux_imp_admits_var_one_aux
     tauto
 
 
-theorem admits_iff_fast_admits_var_one
+theorem admits_var_one_iff_fast_admits_var_one
   (F : Formula_)
   (v u : VarName_) :
   admits_var_one v u F ↔ fast_admits_var_one v u F :=
