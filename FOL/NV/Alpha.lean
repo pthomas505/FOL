@@ -451,7 +451,7 @@ lemma isAlphaEqvVarListId
     · exact ih
 
 
-def isAlphaEqvAux : List (VarName_ × VarName_) → Formula_ → Formula_ → Prop
+def are_alpha_equiv_rec_aux : List (VarName_ × VarName_) → Formula_ → Formula_ → Prop
   | binders, pred_const_ X xs, pred_const_ Y ys =>
       X = Y ∧ are_alpha_equiv_var_list_rec binders xs ys
 
@@ -465,25 +465,25 @@ def isAlphaEqvAux : List (VarName_ × VarName_) → Formula_ → Formula_ → Pr
 
   | _, false_, false_ => True
 
-  | binders, not_ phi, not_ phi' => isAlphaEqvAux binders phi phi'
+  | binders, not_ phi, not_ phi' => are_alpha_equiv_rec_aux binders phi phi'
 
   | binders, imp_ phi psi, imp_ phi' psi' =>
-      isAlphaEqvAux binders phi phi' ∧ isAlphaEqvAux binders psi psi'
+      are_alpha_equiv_rec_aux binders phi phi' ∧ are_alpha_equiv_rec_aux binders psi psi'
 
   | binders, and_ phi psi, and_ phi' psi' =>
-      isAlphaEqvAux binders phi phi' ∧ isAlphaEqvAux binders psi psi'
+      are_alpha_equiv_rec_aux binders phi phi' ∧ are_alpha_equiv_rec_aux binders psi psi'
 
   | binders, or_ phi psi, or_ phi' psi' =>
-      isAlphaEqvAux binders phi phi' ∧ isAlphaEqvAux binders psi psi'
+      are_alpha_equiv_rec_aux binders phi phi' ∧ are_alpha_equiv_rec_aux binders psi psi'
 
   | binders, iff_ phi psi, iff_ phi' psi' =>
-      isAlphaEqvAux binders phi phi' ∧ isAlphaEqvAux binders psi psi'
+      are_alpha_equiv_rec_aux binders phi phi' ∧ are_alpha_equiv_rec_aux binders psi psi'
 
   | binders, forall_ x phi, forall_ x' phi' =>
-      isAlphaEqvAux ((x, x')::binders) phi phi'
+      are_alpha_equiv_rec_aux ((x, x')::binders) phi phi'
 
   | binders, exists_ x phi, exists_ x' phi' =>
-      isAlphaEqvAux ((x, x')::binders) phi phi'
+      are_alpha_equiv_rec_aux ((x, x')::binders) phi phi'
 
   | binders, def_ X xs, def_ Y ys =>
       X = Y ∧ are_alpha_equiv_var_list_rec binders xs ys
@@ -494,18 +494,18 @@ def isAlphaEqvAux : List (VarName_ × VarName_) → Formula_ → Formula_ → Pr
 instance
   (binders : List (VarName_ × VarName_))
   (F F' : Formula_) :
-  Decidable (isAlphaEqvAux binders F F') :=
+  Decidable (are_alpha_equiv_rec_aux binders F F') :=
   by
   induction F generalizing F' binders
   all_goals
     cases F'
     all_goals
-      simp only [isAlphaEqvAux]
+      simp only [are_alpha_equiv_rec_aux]
       infer_instance
 
 
 def isAlphaEqv (F F' : Formula_) : Prop :=
-  isAlphaEqvAux [] F F'
+  are_alpha_equiv_rec_aux [] F F'
 
 
 instance
@@ -628,7 +628,7 @@ lemma isAlphaEqv_Holds_aux
   (F F' : Formula_)
   (binders : List (VarName_ × VarName_))
   (h1 : AlphaEqvVarAssignment D binders V V')
-  (h2 : isAlphaEqvAux binders F F') :
+  (h2 : are_alpha_equiv_rec_aux binders F F') :
   holds D I V E F ↔ holds D I V' E F' :=
   by
   induction E generalizing F F' binders V V'
@@ -638,7 +638,7 @@ lemma isAlphaEqv_Holds_aux
       cases F'
 
     any_goals
-      simp only [isAlphaEqvAux] at h2
+      simp only [are_alpha_equiv_rec_aux] at h2
 
     case
       pred_const_.pred_const_ X xs Y ys
