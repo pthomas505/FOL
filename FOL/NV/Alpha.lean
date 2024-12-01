@@ -1,5 +1,4 @@
 import FOL.NV.Sub.Var.One.Rec.ReplaceFree
-import FOL.NV.Sub.Var.One.Ind.ReplaceFree
 import FOL.NV.Semantics
 
 import Mathlib.Data.List.Defs
