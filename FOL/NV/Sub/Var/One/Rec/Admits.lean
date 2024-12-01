@@ -214,7 +214,7 @@ def to_is_bound_var_one (F : Formula_) : BoolFormula :=
 
 -- `admits_var_one` ↔ `fast_admits_var_one`
 
-theorem admits_var_one_aux_imp_fastAdmitsAux
+theorem admits_var_one_aux_imp_fast_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -259,7 +259,7 @@ theorem mem_binders_imp_admits_var_one_aux
     tauto
 
 
-theorem fastAdmitsAux_imp_admits_var_one_aux
+theorem fast_admits_var_one_aux_imp_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -284,7 +284,7 @@ theorem fastAdmitsAux_imp_admits_var_one_aux
     tauto
 
 
-theorem admits_iff_fastAdmits
+theorem admits_iff_fast_admits_var_one
   (F : Formula_)
   (v u : VarName_) :
   admits_var_one v u F ↔ fast_admits_var_one v u F :=
@@ -292,14 +292,14 @@ theorem admits_iff_fastAdmits
   simp only [admits_var_one]
   simp only [fast_admits_var_one]
   constructor
-  · apply admits_var_one_aux_imp_fastAdmitsAux
+  · apply admits_var_one_aux_imp_fast_admits_var_one_aux
     simp
-  · exact fastAdmitsAux_imp_admits_var_one_aux F v u ∅
+  · exact fast_admits_var_one_aux_imp_admits_var_one_aux F v u ∅
 
 
 -- `fast_admits_var_one`
 
-theorem fastAdmitsAux_self
+theorem fast_admits_var_one_aux_self
   (F : Formula_)
   (v : VarName_)
   (binders : Finset VarName_)
@@ -321,18 +321,18 @@ theorem fastAdmitsAux_self
     tauto
 
 
-theorem fastAdmits_self
+theorem fast_admits_var_one_self
   (F : Formula_)
   (v : VarName_) :
   fast_admits_var_one v v F :=
   by
   simp only [fast_admits_var_one]
-  apply fastAdmitsAux_self
+  apply fast_admits_var_one_aux_self
   simp
 
 --
 
-theorem not_isFreeIn_imp_fastAdmitsAux
+theorem not_isFreeIn_imp_fast_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -348,18 +348,18 @@ theorem not_isFreeIn_imp_fastAdmitsAux
     tauto
 
 
-theorem not_isFreeIn_imp_fastAdmits
+theorem not_isFreeIn_imp_fast_admits_var_one
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
   fast_admits_var_one v u F :=
   by
   simp only [fast_admits_var_one]
-  exact not_isFreeIn_imp_fastAdmitsAux F v u ∅ h1
+  exact not_isFreeIn_imp_fast_admits_var_one_aux F v u ∅ h1
 
 --
 
-theorem not_isBoundIn_imp_fastAdmitsAux
+theorem not_isBoundIn_imp_fast_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -385,19 +385,19 @@ theorem not_isBoundIn_imp_fastAdmitsAux
     tauto
 
 
-theorem not_isBoundIn_imp_fastAdmits
+theorem not_isBoundIn_imp_fast_admits_var_one
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_bound_in u F) :
   fast_admits_var_one v u F :=
   by
   simp only [fast_admits_var_one]
-  apply not_isBoundIn_imp_fastAdmitsAux F v u ∅ h1
+  apply not_isBoundIn_imp_fast_admits_var_one_aux F v u ∅ h1
   simp
 
 --
 
-theorem fastReplaceFree_aux_fastAdmitsAux
+theorem fastReplaceFree_aux_fast_admits_var_one_aux
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
@@ -422,7 +422,7 @@ theorem fastReplaceFree_aux_fastAdmitsAux
         simp only [fast_admits_var_one_aux]
         subst c1
         right
-        apply not_isFreeIn_imp_fastAdmitsAux
+        apply not_isFreeIn_imp_fast_admits_var_one_aux
         intro contra
         apply h1_right
         apply var_is_free_in_imp_var_occurs_in
@@ -437,19 +437,19 @@ theorem fastReplaceFree_aux_fastAdmitsAux
     tauto
 
 
-theorem fastReplaceFree_fastAdmits
+theorem fastReplaceFree_fast_admits_var_one
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
   fast_admits_var_one t v (fast_replace_free_var_one v t F) :=
   by
   simp only [fast_admits_var_one]
-  apply fastReplaceFree_aux_fastAdmitsAux F v t ∅ h1
+  apply fastReplaceFree_aux_fast_admits_var_one_aux F v t ∅ h1
   simp
 
 --
 
-theorem replaceFreeAux_fastAdmitsAux
+theorem replaceFreeAux_fast_admits_var_one_aux
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
@@ -500,7 +500,7 @@ theorem replaceFreeAux_fastAdmitsAux
     tauto
 
 
-theorem replaceFree_fastAdmits
+theorem replaceFree_fast_admits_var_one
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
@@ -508,11 +508,11 @@ theorem replaceFree_fastAdmits
   by
   simp only [replace_free_var_one]
   simp only [fast_admits_var_one]
-  exact replaceFreeAux_fastAdmitsAux F v t ∅ h1
+  exact replaceFreeAux_fast_admits_var_one_aux F v t ∅ h1
 
 --
 
-theorem fastAdmitsAux_add_binders
+theorem fast_admits_var_one_aux_add_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
@@ -541,7 +541,7 @@ theorem fastAdmitsAux_add_binders
     tauto
 
 
-theorem fastAdmitsAux_del_binders
+theorem fast_admits_var_one_aux_del_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
@@ -576,7 +576,7 @@ theorem fastAdmitsAux_del_binders
 
 --
 
-theorem fastAdmitsAux_isFreeIn
+theorem fast_admits_var_one_aux_isFreeIn
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -597,13 +597,13 @@ theorem fastAdmitsAux_isFreeIn
         contradiction
       case inr h1 =>
         apply phi_ih
-        · exact fastAdmitsAux_del_binders phi v u binders {x} h1
+        · exact fast_admits_var_one_aux_del_binders phi v u binders {x} h1
         · exact h2_right
   all_goals
     tauto
 
 
-theorem fastAdmitsAux_mem_binders
+theorem fast_admits_var_one_aux_mem_binders
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -612,11 +612,11 @@ theorem fastAdmitsAux_mem_binders
   ¬ var_is_free_in v F :=
   by
   contrapose! h2
-  exact fastAdmitsAux_isFreeIn F v u binders h1 h2
+  exact fast_admits_var_one_aux_isFreeIn F v u binders h1 h2
 
 --
 
-theorem fastAdmitsAux_imp_free_and_bound_unchanged
+theorem fast_admits_var_one_aux_imp_free_and_bound_unchanged
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -672,7 +672,7 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
       · tauto
 
 
-theorem free_and_bound_unchanged_imp_fastAdmitsAux
+theorem free_and_bound_unchanged_imp_fast_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -746,9 +746,9 @@ example
   simp only [fast_admits_var_one]
   simp only [to_is_bound_var_one]
   constructor
-  · apply fastAdmitsAux_imp_free_and_bound_unchanged
+  · apply fast_admits_var_one_aux_imp_free_and_bound_unchanged
     simp
-  · apply free_and_bound_unchanged_imp_fastAdmitsAux
+  · apply free_and_bound_unchanged_imp_fast_admits_var_one_aux
     simp
 
 
