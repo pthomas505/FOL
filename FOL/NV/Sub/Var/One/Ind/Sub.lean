@@ -210,7 +210,7 @@ theorem fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub
     apply is_sub_var_one_ind.def_
 
 
-theorem isFreeSub_imp_fastAdmitsAux
+theorem is_sub_var_one_ind_imp_fast_admits_var_one_rec_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -247,7 +247,7 @@ theorem isFreeSub_imp_fastAdmitsAux
     tauto
 
 
-theorem isFreeSub_imp_fastReplaceFree
+theorem is_sub_var_one_ind_imp_fast_replace_free_var_one_rec
   (F F' : Formula_)
   (v u : VarName_)
   (h1 : is_sub_var_one_ind F v u F') :
@@ -301,10 +301,10 @@ example
   constructor
   · intro a1
     constructor
-    · apply isFreeSub_imp_fastAdmitsAux
+    · apply is_sub_var_one_ind_imp_fast_admits_var_one_rec_aux
       · exact ⟨F', a1⟩
       · simp
-    · apply isFreeSub_imp_fastReplaceFree
+    · apply is_sub_var_one_ind_imp_fast_replace_free_var_one_rec
       exact a1
   · intro a1
     cases a1
