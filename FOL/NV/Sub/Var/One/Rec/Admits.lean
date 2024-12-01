@@ -214,7 +214,7 @@ def to_is_bound_var_one (F : Formula_) : BoolFormula :=
 
 -- `admits_var_one` ↔ `fast_admits_var_one`
 
-theorem admitsAux_imp_fastAdmitsAux
+theorem admits_var_one_aux_imp_fastAdmitsAux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -240,7 +240,7 @@ theorem admitsAux_imp_fastAdmitsAux
     tauto
 
 
-theorem mem_binders_imp_admitsAux
+theorem mem_binders_imp_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -259,7 +259,7 @@ theorem mem_binders_imp_admitsAux
     tauto
 
 
-theorem fastAdmitsAux_imp_admitsAux
+theorem fastAdmitsAux_imp_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -274,7 +274,7 @@ theorem fastAdmitsAux_imp_admitsAux
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     cases h1
     case inl h1 =>
-      apply mem_binders_imp_admitsAux
+      apply mem_binders_imp_admits_var_one_aux
       subst h1
       simp
     case inr h1 =>
@@ -292,9 +292,9 @@ theorem admits_iff_fastAdmits
   simp only [admits_var_one]
   simp only [fast_admits_var_one]
   constructor
-  · apply admitsAux_imp_fastAdmitsAux
+  · apply admits_var_one_aux_imp_fastAdmitsAux
     simp
-  · exact fastAdmitsAux_imp_admitsAux F v u ∅
+  · exact fastAdmitsAux_imp_admits_var_one_aux F v u ∅
 
 
 -- `fast_admits_var_one`
@@ -754,7 +754,7 @@ example
 
 -- admits
 
-theorem admitsAux_self
+theorem admits_var_one_aux_self
   (F : Formula_)
   (v : VarName_)
   (binders : Finset VarName_) :
@@ -772,11 +772,11 @@ theorem admits_self
   admits_var_one v v F :=
   by
   simp only [admits_var_one]
-  apply admitsAux_self
+  apply admits_var_one_aux_self
 
 --
 
-theorem not_isFreeIn_imp_admitsAux
+theorem not_isFreeIn_imp_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -790,7 +790,7 @@ theorem not_isFreeIn_imp_admitsAux
     simp only [admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     by_cases c1 : v = x
-    · apply mem_binders_imp_admitsAux
+    · apply mem_binders_imp_admits_var_one_aux
       simp
       tauto
     · apply phi_ih
@@ -806,11 +806,11 @@ theorem not_isFreeIn_imp_admits
   admits_var_one v u F :=
   by
   simp only [admits_var_one]
-  exact not_isFreeIn_imp_admitsAux F v u ∅ h1
+  exact not_isFreeIn_imp_admits_var_one_aux F v u ∅ h1
 
 --
 
-theorem not_isBoundIn_imp_admitsAux
+theorem not_isBoundIn_imp_admits_var_one_aux
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -842,12 +842,12 @@ theorem not_isBoundIn_imp_admits
   admits_var_one v u F :=
   by
   simp only [admits_var_one]
-  apply not_isBoundIn_imp_admitsAux F v u ∅ h1
+  apply not_isBoundIn_imp_admits_var_one_aux F v u ∅ h1
   simp
 
 --
 
-theorem replaceFreeAux_admitsAux
+theorem replaceFreeAux_admits_var_one_aux
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
@@ -910,11 +910,11 @@ theorem replaceFree_admits
   by
   simp only [replace_free_var_one]
   simp only [admits_var_one]
-  exact replaceFreeAux_admitsAux F v t ∅ h1
+  exact replaceFreeAux_admits_var_one_aux F v t ∅ h1
 
 --
 
-theorem admitsAux_add_binders
+theorem admits_var_one_aux_add_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
@@ -937,7 +937,7 @@ theorem admitsAux_add_binders
     tauto
 
 
-theorem admitsAux_del_binders
+theorem admits_var_one_aux_del_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
@@ -968,7 +968,7 @@ theorem admitsAux_del_binders
     tauto
 
 
-theorem admitsAux_isFreeIn
+theorem admits_var_one_aux_isFreeIn
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -986,7 +986,7 @@ theorem admitsAux_isFreeIn
     cases h2
     case intro h2_left h2_right =>
       apply phi_ih binders
-      · apply admitsAux_del_binders phi v u binders {x} h1
+      · apply admits_var_one_aux_del_binders phi v u binders {x} h1
         · simp
           exact h2_left
       · exact h2_right
