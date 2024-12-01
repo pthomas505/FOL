@@ -397,7 +397,7 @@ theorem not_var_is_bound_in_imp_fast_admits_var_one
 
 --
 
-theorem fastReplaceFree_aux_fast_admits_var_one_aux
+theorem fast_replace_free_var_one_fast_admits_var_one_aux
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
@@ -437,19 +437,19 @@ theorem fastReplaceFree_aux_fast_admits_var_one_aux
     tauto
 
 
-theorem fastReplaceFree_fast_admits_var_one
+theorem fast_replace_free_var_one_fast_admits_var_one
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
   fast_admits_var_one t v (fast_replace_free_var_one v t F) :=
   by
   simp only [fast_admits_var_one]
-  apply fastReplaceFree_aux_fast_admits_var_one_aux F v t ∅ h1
+  apply fast_replace_free_var_one_fast_admits_var_one_aux F v t ∅ h1
   simp
 
 --
 
-theorem replaceFreeAux_fast_admits_var_one_aux
+theorem replace_free_var_one_aux_fast_admits_var_one_aux
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
@@ -500,7 +500,7 @@ theorem replaceFreeAux_fast_admits_var_one_aux
     tauto
 
 
-theorem replaceFree_fast_admits_var_one
+theorem replace_free_var_one_fast_admits_var_one
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
@@ -508,7 +508,7 @@ theorem replaceFree_fast_admits_var_one
   by
   simp only [replace_free_var_one]
   simp only [fast_admits_var_one]
-  exact replaceFreeAux_fast_admits_var_one_aux F v t ∅ h1
+  exact replace_free_var_one_aux_fast_admits_var_one_aux F v t ∅ h1
 
 --
 
@@ -799,7 +799,7 @@ theorem not_var_is_free_in_imp_admits_var_one_aux
     tauto
 
 
-theorem not_var_is_free_in_imp_admits
+theorem not_var_is_free_in_imp_admits_var_one
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
@@ -835,7 +835,7 @@ theorem not_var_is_bound_in_imp_admits_var_one_aux
     tauto
 
 
-theorem not_var_is_bound_in_imp_admits
+theorem not_var_is_bound_in_imp_admits_var_one
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_bound_in u F) :
@@ -847,7 +847,7 @@ theorem not_var_is_bound_in_imp_admits
 
 --
 
-theorem replaceFreeAux_admits_var_one_aux
+theorem replace_free_var_one_aux_admits_var_one_aux
   (F : Formula_)
   (v t : VarName_)
   (binders : Finset VarName_)
@@ -902,7 +902,7 @@ theorem replaceFreeAux_admits_var_one_aux
     tauto
 
 
-theorem replaceFree_admits
+theorem replace_free_var_one_admits_var_one
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
@@ -910,7 +910,7 @@ theorem replaceFree_admits
   by
   simp only [replace_free_var_one]
   simp only [admits_var_one]
-  exact replaceFreeAux_admits_var_one_aux F v t ∅ h1
+  exact replace_free_var_one_aux_admits_var_one_aux F v t ∅ h1
 
 --
 
