@@ -504,15 +504,15 @@ instance
       infer_instance
 
 
-def isAlphaEqv (F F' : Formula_) : Prop :=
+def are_alpha_equiv_rec (F F' : Formula_) : Prop :=
   are_alpha_equiv_rec_aux [] F F'
 
 
 instance
   (F F' : Formula_) :
-  Decidable (isAlphaEqv F F') :=
+  Decidable (are_alpha_equiv_rec F F') :=
   by
-  simp only [isAlphaEqv]
+  simp only [are_alpha_equiv_rec]
   infer_instance
 
 
@@ -739,10 +739,10 @@ lemma isalphaEqv_Holds
   (V : Valuation_ D)
   (E : Env_)
   (F F' : Formula_)
-  (h1 : isAlphaEqv F F') :
+  (h1 : are_alpha_equiv_rec F F') :
   holds D I V E F ↔ holds D I V E F' :=
   by
-  simp only [isAlphaEqv] at h1
+  simp only [are_alpha_equiv_rec] at h1
 
   exact isAlphaEqv_Holds_aux D I V V E F F' [] AlphaEqvVarAssignment.nil h1
 
