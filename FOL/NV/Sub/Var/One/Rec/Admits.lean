@@ -67,16 +67,16 @@ instance
 
   `v → u` in `P`
 -/
-def admits (v u : VarName_) (F : Formula_) : Prop :=
+def admits_var_one (v u : VarName_) (F : Formula_) : Prop :=
   admits_var_one_aux v u ∅ F
 
 
 instance
   (v u : VarName_)
   (F : Formula_) :
-  Decidable (admits v u F) :=
+  Decidable (admits_var_one v u F) :=
   by
-  simp only [admits]
+  simp only [admits_var_one]
   infer_instance
 
 
@@ -287,9 +287,9 @@ theorem fastAdmitsAux_imp_admitsAux
 theorem admits_iff_fastAdmits
   (F : Formula_)
   (v u : VarName_) :
-  admits v u F ↔ fastAdmits v u F :=
+  admits_var_one v u F ↔ fastAdmits v u F :=
   by
-  simp only [admits]
+  simp only [admits_var_one]
   simp only [fastAdmits]
   constructor
   · apply admitsAux_imp_fastAdmitsAux
@@ -769,9 +769,9 @@ theorem admitsAux_self
 theorem admits_self
   (F : Formula_)
   (v : VarName_) :
-  admits v v F :=
+  admits_var_one v v F :=
   by
-  simp only [admits]
+  simp only [admits_var_one]
   apply admitsAux_self
 
 --
@@ -803,9 +803,9 @@ theorem not_isFreeIn_imp_admits
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_free_in v F) :
-  admits v u F :=
+  admits_var_one v u F :=
   by
-  simp only [admits]
+  simp only [admits_var_one]
   exact not_isFreeIn_imp_admitsAux F v u ∅ h1
 
 --
@@ -839,9 +839,9 @@ theorem not_isBoundIn_imp_admits
   (F : Formula_)
   (v u : VarName_)
   (h1 : ¬ var_is_bound_in u F) :
-  admits v u F :=
+  admits_var_one v u F :=
   by
-  simp only [admits]
+  simp only [admits_var_one]
   apply not_isBoundIn_imp_admitsAux F v u ∅ h1
   simp
 
@@ -906,10 +906,10 @@ theorem replaceFree_admits
   (F : Formula_)
   (v t : VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  admits t v (replace_free_var_one v t F) :=
+  admits_var_one t v (replace_free_var_one v t F) :=
   by
   simp only [replace_free_var_one]
-  simp only [admits]
+  simp only [admits_var_one]
   exact replaceFreeAux_admitsAux F v t ∅ h1
 
 --
