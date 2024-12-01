@@ -307,9 +307,8 @@ example
     · apply is_sub_var_one_ind_imp_fast_replace_free_var_one_rec
       exact a1
   · intro a1
-    cases a1
-    case intro a1_left a1_right =>
-      exact fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub_var_one_ind F F' v u ∅ a1_left a1_right
+    obtain ⟨a1_left, a1_right⟩ := a1
+    exact fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub_var_one_ind F F' v u ∅ a1_left a1_right
 
 
 theorem substitution_theorem
