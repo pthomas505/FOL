@@ -206,7 +206,7 @@ def to_is_bound_var_one_aux (binders : Finset VarName_) : Formula_ → BoolFormu
       BoolFormula.def_ X (xs.map fun (v : VarName_) => v ∈ binders)
 
 /--
-  Creates a BoolFormula from a formula. Each bound occurence of a variable in the formula is mapped to true in the bool formula. Each free occurence of a variable in the formula is mapped to false in the bool formula.
+  Creates a `BoolFormula` from a formula. Each bound occurence of a variable in the formula is mapped to true in the bool formula. Each free occurence of a variable in the formula is mapped to false in the bool formula.
 -/
 def to_is_bound_var_one (F : Formula_) : BoolFormula :=
   to_is_bound_var_one_aux ∅ F
