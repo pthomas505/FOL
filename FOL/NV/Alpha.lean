@@ -11,24 +11,24 @@ namespace FOL.NV
 open Formula_
 
 
-inductive are_alpha_equiv_var_ind :
+inductive are_alpha_equiv_var_ind' :
   List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
 | nil
   (x : VarName_) :
-  are_alpha_equiv_var_ind [] x x
+  are_alpha_equiv_var_ind' [] x x
 
 | head
   (binders : List (VarName_ × VarName_))
   (x y : VarName_) :
-  are_alpha_equiv_var_ind ((x, y) :: binders) x y
+  are_alpha_equiv_var_ind' ((x, y) :: binders) x y
 
 | tail
   (binders : List (VarName_ × VarName_))
   (x y x' y' : VarName_) :
   ¬ x = x' →
   ¬ y = y' →
-  are_alpha_equiv_var_ind binders x' y' →
-  are_alpha_equiv_var_ind ((x, y) :: binders) x' y'
+  are_alpha_equiv_var_ind' binders x' y' →
+  are_alpha_equiv_var_ind' ((x, y) :: binders) x' y'
 
 
 inductive are_alpha_equiv_ind' :
@@ -38,14 +38,14 @@ inductive are_alpha_equiv_ind' :
     (binders : List (VarName_ × VarName_))
     (X : PredName_)
     (xs ys : List VarName_) :
-    List.Forall₂ (are_alpha_equiv_var_ind binders) xs ys →
+    List.Forall₂ (are_alpha_equiv_var_ind' binders) xs ys →
     are_alpha_equiv_ind' binders (pred_var_ X xs) (pred_var_ X ys)
 
   | pred_const_
     (binders : List (VarName_ × VarName_))
     (X : PredName_)
     (xs ys : List VarName_) :
-    List.Forall₂ (are_alpha_equiv_var_ind binders) xs ys →
+    List.Forall₂ (are_alpha_equiv_var_ind' binders) xs ys →
     are_alpha_equiv_ind' binders (pred_const_ X xs) (pred_const_ X ys)
 
   | compat_true_
