@@ -85,14 +85,14 @@ instance
 -/
 def fastAdmitsAux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ xs =>
-      v ∈ xs → -- if there is a free occurrence of v in P
-        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
+      v ∈ xs → -- if there is a free occurrence of `v` in `P`
+        u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | pred_var_ _ xs =>
-      v ∈ xs → -- if there is a free occurrence of v in P
-        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
+      v ∈ xs → -- if there is a free occurrence of `v` in `P`
+        u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | eq_ x y =>
-      (v = x ∨ v = y) → -- if there is a free occurrence of v in P
-        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
+      (v = x ∨ v = y) → -- if there is a free occurrence of `v` in `P`
+        u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | true_ => True
   | false_ => True
   | not_ phi => fastAdmitsAux v u binders phi
@@ -107,8 +107,8 @@ def fastAdmitsAux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Pr
   | forall_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
   | exists_ x phi => v = x ∨ fastAdmitsAux v u (binders ∪ {x}) phi
   | def_ _ xs =>
-      v ∈ xs → -- if there is a free occurrence of v in P
-        u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
+      v ∈ xs → -- if there is a free occurrence of `v` in `P`
+        u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
 
 
 instance
@@ -124,13 +124,13 @@ instance
 
 
 /--
-  fastAdmits v u P := True if and only if there is no free occurrence of the variable v in the formula P that becomes a bound occurrence of the variable u in P(u/v).
+  `fastAdmits v u P` := True if and only if there is no free occurrence of the variable `v` in the formula `P` that becomes a bound occurrence of the variable `u` in `P(u/v)`.
 
-  P admits u for v
+  `P` admits `u` for `v`
 
-  v → u in P
+  `v → u` in `P`
 
-  This is a more efficient version of admits.
+  This is a more efficient version of `admits`.
 -/
 def fastAdmits (v u : VarName_) (F : Formula_) : Prop :=
   fastAdmitsAux v u ∅ F
@@ -166,7 +166,7 @@ inductive BoolFormula : Type
 
 
 /--
-  Helper function for toIsBound.
+  Helper function for `toIsBound`.
 -/
 def toIsBoundAux (binders : Finset VarName_) : Formula_ → BoolFormula
   | pred_const_ X xs =>
@@ -212,7 +212,7 @@ def toIsBound (F : Formula_) : BoolFormula :=
   toIsBoundAux ∅ F
 
 
--- admits ↔ fastAdmits
+-- `admits` ↔ `fastAdmits`
 
 theorem admitsAux_imp_fastAdmitsAux
   (F : Formula_)
