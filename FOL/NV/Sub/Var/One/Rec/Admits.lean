@@ -20,7 +20,7 @@ If `v` and `u` are variables and `P` is a formula, then `P` admits `u` for `v` i
 /--
   Helper function for `admits`.
 -/
-def admitsAux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
+def admits_var_one_aux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ xs =>
       v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of `v` in `P`
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
@@ -32,17 +32,17 @@ def admitsAux (v u : VarName_) (binders : Finset VarName_) : Formula_ → Prop
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
   | true_ => True
   | false_ => True
-  | not_ phi => admitsAux v u binders phi
+  | not_ phi => admits_var_one_aux v u binders phi
   | imp_ phi psi =>
-      admitsAux v u binders phi ∧ admitsAux v u binders psi
+      admits_var_one_aux v u binders phi ∧ admits_var_one_aux v u binders psi
   | and_ phi psi =>
-      admitsAux v u binders phi ∧ admitsAux v u binders psi
+      admits_var_one_aux v u binders phi ∧ admits_var_one_aux v u binders psi
   | or_ phi psi =>
-      admitsAux v u binders phi ∧ admitsAux v u binders psi
+      admits_var_one_aux v u binders phi ∧ admits_var_one_aux v u binders psi
   | iff_ phi psi =>
-      admitsAux v u binders phi ∧ admitsAux v u binders psi
-  | forall_ x phi => admitsAux v u (binders ∪ {x}) phi
-  | exists_ x phi => admitsAux v u (binders ∪ {x}) phi
+      admits_var_one_aux v u binders phi ∧ admits_var_one_aux v u binders psi
+  | forall_ x phi => admits_var_one_aux v u (binders ∪ {x}) phi
+  | exists_ x phi => admits_var_one_aux v u (binders ∪ {x}) phi
   | def_ _ xs =>
       v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of v in P
         u ∉ binders -- then it does not become a bound occurrence of u in P(u/v)
@@ -52,11 +52,11 @@ instance
   (v u : VarName_)
   (binders : Finset VarName_)
   (F : Formula_) :
-  Decidable (admitsAux v u binders F) :=
+  Decidable (admits_var_one_aux v u binders F) :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admitsAux]
+    simp only [admits_var_one_aux]
     infer_instance
 
 
@@ -68,7 +68,7 @@ instance
   v → u in P
 -/
 def admits (v u : VarName_) (F : Formula_) : Prop :=
-  admitsAux v u ∅ F
+  admits_var_one_aux v u ∅ F
 
 
 instance
@@ -219,12 +219,12 @@ theorem admitsAux_imp_fastAdmitsAux
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∉ binders)
-  (h2 : admitsAux v u binders F) :
+  (h2 : admits_var_one_aux v u binders F) :
   fastAdmitsAux v u binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admitsAux] at h2
+    simp only [admits_var_one_aux] at h2
 
     simp only [fastAdmitsAux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
@@ -245,11 +245,11 @@ theorem mem_binders_imp_admitsAux
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∈ binders) :
-  admitsAux v u binders F :=
+  admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admitsAux]
+    simp only [admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     apply phi_ih
     simp
@@ -264,13 +264,13 @@ theorem fastAdmitsAux_imp_admitsAux
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : fastAdmitsAux v u binders F) :
-  admitsAux v u binders F :=
+  admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [fastAdmitsAux] at h1
 
-    simp only [admitsAux]
+    simp only [admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     cases h1
     case inl h1 =>
@@ -758,10 +758,10 @@ theorem admitsAux_self
   (F : Formula_)
   (v : VarName_)
   (binders : Finset VarName_) :
-  admitsAux v v binders F := by
+  admits_var_one_aux v v binders F := by
   induction F generalizing binders
   all_goals
-    simp only [admitsAux]
+    simp only [admits_var_one_aux]
   all_goals
     tauto
 
@@ -781,13 +781,13 @@ theorem not_isFreeIn_imp_admitsAux
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_is_free_in v F) :
-  admitsAux v u binders F :=
+  admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_is_free_in] at h1
 
-    simp only [admitsAux]
+    simp only [admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     by_cases c1 : v = x
     · apply mem_binders_imp_admitsAux
@@ -816,13 +816,13 @@ theorem not_isBoundIn_imp_admitsAux
   (binders : Finset VarName_)
   (h1 : ¬ var_is_bound_in u F)
   (h2 : u ∉ binders) :
-  admitsAux v u binders F :=
+  admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_is_bound_in] at h1
 
-    simp only [admitsAux]
+    simp only [admits_var_one_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     push_neg at h1
 
@@ -852,14 +852,14 @@ theorem replaceFreeAux_admitsAux
   (v t : VarName_)
   (binders : Finset VarName_)
   (h1 : ¬ var_occurs_in t F) :
-  admitsAux t v binders (replace_free_var_one_aux v t binders F) :=
+  admits_var_one_aux t v binders (replace_free_var_one_aux v t binders F) :=
   by
   induction F generalizing binders
   all_goals
     simp only [var_occurs_in] at h1
 
     simp only [replace_free_var_one_aux]
-    simp only [admitsAux]
+    simp only [admits_var_one_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x a1 a2 a3
@@ -918,15 +918,15 @@ theorem admitsAux_add_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
-  (h1 : admitsAux v u S F)
+  (h1 : admits_var_one_aux v u S F)
   (h2 : u ∉ T) :
-  admitsAux v u (S ∪ T) F :=
+  admits_var_one_aux v u (S ∪ T) F :=
   by
   induction F generalizing S
   all_goals
-    simp only [admitsAux] at h1
+    simp only [admits_var_one_aux] at h1
 
-    simp only [admitsAux]
+    simp only [admits_var_one_aux]
   case pred_const_ X xs | pred_var_ X xs | eq_ x y |def_ X xs =>
     simp
     tauto
@@ -941,15 +941,15 @@ theorem admitsAux_del_binders
   (F : Formula_)
   (v u : VarName_)
   (S T : Finset VarName_)
-  (h1 : admitsAux v u (S ∪ T) F)
+  (h1 : admits_var_one_aux v u (S ∪ T) F)
   (h2 : v ∉ T) :
-  admitsAux v u S F :=
+  admits_var_one_aux v u S F :=
   by
   induction F generalizing S
   all_goals
-    simp only [admitsAux] at h1
+    simp only [admits_var_one_aux] at h1
 
-    simp only [admitsAux]
+    simp only [admits_var_one_aux]
   case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
     simp at h1
 
@@ -972,14 +972,14 @@ theorem admitsAux_isFreeIn
   (F : Formula_)
   (v u : VarName_)
   (binders : Finset VarName_)
-  (h1 : admitsAux v u binders F)
+  (h1 : admits_var_one_aux v u binders F)
   (h2 : var_is_free_in v F)
   (h3 : v ∉ binders) :
   u ∉ binders :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admitsAux] at h1
+    simp only [admits_var_one_aux] at h1
 
     simp only [var_is_free_in] at h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
