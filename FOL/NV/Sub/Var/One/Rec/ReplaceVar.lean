@@ -65,3 +65,9 @@ theorem replace_var_one_rec_self
     | iff_ phi psi phi_ih psi_ih =>
     congr!
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    split_ifs
+    case pos c1 =>
+      rw [phi_ih]
+      rw [c1]
+    case neg c1 =>
+      rw [phi_ih]
