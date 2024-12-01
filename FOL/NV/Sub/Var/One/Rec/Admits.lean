@@ -166,9 +166,9 @@ inductive BoolFormula : Type
 
 
 /--
-  Helper function for `toIsBound`.
+  Helper function for `to_is_bound_var_one`.
 -/
-def toIsBoundAux (binders : Finset VarName_) : Formula_ → BoolFormula
+def to_is_bound_var_one_aux (binders : Finset VarName_) : Formula_ → BoolFormula
   | pred_const_ X xs =>
       BoolFormula.pred_const_ X (xs.map fun (v : VarName_) => v ∈ binders)
 
@@ -182,25 +182,25 @@ def toIsBoundAux (binders : Finset VarName_) : Formula_ → BoolFormula
 
   | false_ => BoolFormula.false_
 
-  | not_ phi => BoolFormula.not_ (toIsBoundAux binders phi)
+  | not_ phi => BoolFormula.not_ (to_is_bound_var_one_aux binders phi)
 
   | imp_ phi psi =>
-      BoolFormula.imp_ (toIsBoundAux binders phi) (toIsBoundAux binders psi)
+      BoolFormula.imp_ (to_is_bound_var_one_aux binders phi) (to_is_bound_var_one_aux binders psi)
 
   | and_ phi psi =>
-      BoolFormula.and_ (toIsBoundAux binders phi) (toIsBoundAux binders psi)
+      BoolFormula.and_ (to_is_bound_var_one_aux binders phi) (to_is_bound_var_one_aux binders psi)
 
   | or_ phi psi =>
-      BoolFormula.or_ (toIsBoundAux binders phi) (toIsBoundAux binders psi)
+      BoolFormula.or_ (to_is_bound_var_one_aux binders phi) (to_is_bound_var_one_aux binders psi)
 
   | iff_ phi psi =>
-      BoolFormula.iff_ (toIsBoundAux binders phi) (toIsBoundAux binders psi)
+      BoolFormula.iff_ (to_is_bound_var_one_aux binders phi) (to_is_bound_var_one_aux binders psi)
 
   | forall_ x phi =>
-      BoolFormula.forall_ True (toIsBoundAux (binders ∪ {x}) phi)
+      BoolFormula.forall_ True (to_is_bound_var_one_aux (binders ∪ {x}) phi)
 
   | exists_ x phi =>
-      BoolFormula.forall_ True (toIsBoundAux (binders ∪ {x}) phi)
+      BoolFormula.forall_ True (to_is_bound_var_one_aux (binders ∪ {x}) phi)
 
   | def_ X xs =>
       BoolFormula.def_ X (xs.map fun (v : VarName_) => v ∈ binders)
@@ -208,8 +208,8 @@ def toIsBoundAux (binders : Finset VarName_) : Formula_ → BoolFormula
 /--
   Creates a BoolFormula from a formula. Each bound occurence of a variable in the formula is mapped to true in the bool formula. Each free occurence of a variable in the formula is mapped to false in the bool formula.
 -/
-def toIsBound (F : Formula_) : BoolFormula :=
-  toIsBoundAux ∅ F
+def to_is_bound_var_one (F : Formula_) : BoolFormula :=
+  to_is_bound_var_one_aux ∅ F
 
 
 -- `admits_var_one` ↔ `fast_admits_var_one`
@@ -622,8 +622,8 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
   (binders : Finset VarName_)
   (h1 : v ∉ binders)
   (h2 : fast_admits_var_one_aux v u binders F) :
-  toIsBoundAux binders F =
-    toIsBoundAux binders (fast_replace_free_var_one v u F) :=
+  to_is_bound_var_one_aux binders F =
+    to_is_bound_var_one_aux binders (fast_replace_free_var_one v u F) :=
   by
   induction F generalizing binders
   all_goals
@@ -631,7 +631,7 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
 
     simp only [fast_replace_free_var_one]
   any_goals
-    simp only [toIsBoundAux]
+    simp only [to_is_bound_var_one_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
     intro x a1
@@ -664,7 +664,7 @@ theorem fastAdmitsAux_imp_free_and_bound_unchanged
     case pos c1 =>
       rfl
     case neg c1 =>
-      simp only [toIsBoundAux]
+      simp only [to_is_bound_var_one_aux]
       simp
       apply phi_ih
       · simp
@@ -677,8 +677,8 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
   (v u : VarName_)
   (binders : Finset VarName_)
   (h1 : v ∉ binders)
-  (h2 : toIsBoundAux binders F =
-    toIsBoundAux binders (fast_replace_free_var_one v u F)) :
+  (h2 : to_is_bound_var_one_aux binders F =
+    to_is_bound_var_one_aux binders (fast_replace_free_var_one v u F)) :
   fast_admits_var_one_aux v u binders F :=
   by
   induction F generalizing binders
@@ -687,7 +687,7 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
 
     simp only [fast_admits_var_one_aux]
   any_goals
-    simp only [toIsBoundAux] at h2
+    simp only [to_is_bound_var_one_aux] at h2
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp at h2
 
@@ -732,7 +732,7 @@ theorem free_and_bound_unchanged_imp_fastAdmitsAux
       apply phi_ih
       · simp
         tauto
-      · simp only [toIsBoundAux] at h2
+      · simp only [to_is_bound_var_one_aux] at h2
         simp at h2
         exact h2
 
@@ -741,10 +741,10 @@ example
   (F : Formula_)
   (v u : VarName_) :
   fast_admits_var_one v u F ↔
-    toIsBound F = toIsBound (fast_replace_free_var_one v u F) :=
+    to_is_bound_var_one F = to_is_bound_var_one (fast_replace_free_var_one v u F) :=
   by
   simp only [fast_admits_var_one]
-  simp only [toIsBound]
+  simp only [to_is_bound_var_one]
   constructor
   · apply fastAdmitsAux_imp_free_and_bound_unchanged
     simp
