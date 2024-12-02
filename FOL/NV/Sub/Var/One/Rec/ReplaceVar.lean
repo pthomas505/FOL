@@ -203,3 +203,97 @@ theorem not_var_occurs_in_replace_var_one_rec
       simp only [var_occurs_in]
       simp
       exact ⟨c1, phi_ih⟩
+
+
+theorem replace_var_one_rec_free_var_set_sdiff
+  (F : Formula_)
+  (v t : VarName_)
+  (h1 : t ∉ F.var_set) :
+  F.free_var_set \ {v} = (replace_var_one_rec v t F).free_var_set \ {t} :=
+  by
+    induction F
+    all_goals
+      simp only [var_set] at h1
+    case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+      simp only [replace_var_one_rec]
+      simp only [free_var_set]
+      ext x
+      simp
+      constructor
+      · intro a1
+        obtain ⟨a1_left, a1_right⟩ := a1
+        constructor
+        · apply Exists.intro x
+          simp only [eq_comm] at a1_right
+          split_ifs
+          exact ⟨a1_left, rfl⟩
+        · intro contra
+          apply h1
+          rw [← contra]
+          simp
+          exact a1_left
+      · intro a1
+        obtain ⟨⟨y, ⟨a1_left_left, a1_left_right⟩⟩, a1_right⟩ := a1
+        split_ifs at a1_left_right
+        case pos c1 =>
+          rw [a1_left_right] at a1_right
+          contradiction
+        case neg c1 =>
+          subst a1_left_right
+          tauto
+    case eq_ x y =>
+      simp at h1
+      obtain ⟨h1_left, h1_right⟩ := h1
+
+      simp only [replace_var_one_rec]
+      simp only [free_var_set]
+      simp only [Finset.sdiff_singleton_eq_erase]
+      split_ifs
+      case pos c1 c2 =>
+        rw [← c1]
+        rw [← c2]
+        simp
+      case neg c1 c2 =>
+        rw [← c1]
+        simp_all
+      case pos c1 c2 =>
+        aesop
+      case neg c1 c2 =>
+        simp_all
+    case true_ | false_ =>
+      simp only [replace_var_one_rec]
+      simp only [free_var_set]
+      simp
+    case not_ phi phi_ih =>
+      simp only [replace_var_one_rec]
+      simp only [free_var_set]
+      exact phi_ih h1
+    case
+        imp_ phi psi phi_ih psi_ih
+      | and_ phi psi phi_ih psi_ih
+      | or_ phi psi phi_ih psi_ih
+      | iff_ phi psi phi_ih psi_ih =>
+      simp at h1
+      obtain ⟨h1_left, h1_right⟩ := h1
+
+      simp only [replace_var_one_rec]
+      simp only [free_var_set]
+      simp only [Finset.union_sdiff_distrib]
+      rw [phi_ih h1_left]
+      rw [psi_ih h1_right]
+    case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+      simp at h1
+      obtain ⟨h1_left, h1_right⟩ := h1
+
+      simp only [replace_var_one_rec]
+      split_ifs
+      case pos c1 =>
+        rw [← c1]
+        simp only [free_var_set]
+        simp
+        exact phi_ih h1_left
+      case neg c1 =>
+        simp only [free_var_set]
+        simp only [sdiff_sdiff_comm]
+        congr 1
+        exact phi_ih h1_left
