@@ -531,5 +531,30 @@ theorem mem_free_var_set_imp_mem_var_set
   apply var_is_free_in_imp_var_occurs_in
   exact h1
 
+-------------------------------------------------------------------------------
+
+theorem not_mem_var_set_imp_not_mem_bound_var_set
+  (v : VarName_)
+  (F : Formula_)
+  (h1 : v ∉ F.var_set) :
+  v ∉ F.bound_var_set :=
+  by
+  intro contra
+  apply h1
+  apply mem_bound_var_set_imp_mem_var_set
+  exact contra
+
+
+theorem not_mem_var_set_imp_not_mem_free_var_set
+  (v : VarName_)
+  (F : Formula_)
+  (h1 : v ∉ F.var_set) :
+  v ∉ F.free_var_set :=
+  by
+  intro contra
+  apply h1
+  apply mem_free_var_set_imp_mem_var_set
+  exact contra
+
 
 #lint
