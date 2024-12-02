@@ -506,6 +506,30 @@ theorem var_is_free_in_imp_var_occurs_in
 
 -------------------------------------------------------------------------------
 
+theorem mem_bound_var_set_imp_mem_var_set
+  (v : VarName_)
+  (F : Formula_)
+  (h1 : v ∈ F.bound_var_set) :
+  v ∈ F.var_set :=
+  by
+  rw [← var_is_bound_in_iff_mem_bound_var_set] at h1
+
+  rw [← var_occurs_in_iff_mem_var_set]
+  apply var_is_bound_in_imp_var_occurs_in
+  exact h1
+
+
+theorem mem_free_var_set_imp_mem_var_set
+  (v : VarName_)
+  (F : Formula_)
+  (h1 : v ∈ F.free_var_set) :
+  v ∈ F.var_set :=
+  by
+  rw [← var_is_free_in_iff_mem_free_var_set] at h1
+
+  rw [← var_occurs_in_iff_mem_var_set]
+  apply var_is_free_in_imp_var_occurs_in
+  exact h1
 
 
 #lint
