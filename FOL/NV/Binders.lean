@@ -531,6 +531,44 @@ theorem mem_free_var_set_imp_mem_var_set
   apply var_is_free_in_imp_var_occurs_in
   exact h1
 
+
+theorem mem_var_set_imp_mem_bound_var_set_or_mem_free_var_set
+  (v : VarName_)
+  (F : Formula_)
+  (h1 : v ∈ F.var_set) :
+  v ∈ F.bound_var_set ∨ v ∈ F.free_var_set :=
+  by
+  induction F
+  all_goals
+    simp only [var_set] at h1
+
+    simp only [bound_var_set]
+    simp only [free_var_set]
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
+    simp at h1
+    simp
+    exact h1
+  case eq_ x y =>
+    simp at h1
+    simp
+    exact h1
+  case true_ | false_ =>
+    tauto
+  case not_ phi phi_ih =>
+    tauto
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp at h1
+    simp
+    tauto
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp at h1
+    simp
+    tauto
+
 -------------------------------------------------------------------------------
 
 theorem not_mem_var_set_imp_not_mem_bound_var_set
