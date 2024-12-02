@@ -205,9 +205,11 @@ lemma are_alpha_equiv_ind_v1_replace_var_one_rec_fast_replace_free_var_one_rec
           | apply are_alpha_equiv_ind_v1.rename_forall_
           | apply are_alpha_equiv_ind_v1.rename_exists_
         · simp only [var_is_free_in_iff_mem_free_var_set]
-          sorry
+          apply not_mem_var_set_imp_not_mem_free_var_set
+          exact h1_left
         · simp only [var_is_bound_in_iff_mem_bound_var_set]
-          sorry
+          apply not_mem_var_set_imp_not_mem_bound_var_set
+          exact h1_left
       case neg c1 =>
         first
         | apply are_alpha_equiv_ind_v1.compat_forall_
