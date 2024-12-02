@@ -217,7 +217,7 @@ lemma are_alpha_equiv_ind_v1_replace_var_one_rec_fast_replace_free_var_one_rec
         exact phi_ih
 
 
-lemma are_alpha_equiv_v2_replace_free_replace_var
+lemma are_alpha_equiv_ind_v2_fast_replace_free_var_one_rec_replace_var_one_rec
   (F : Formula_)
   (v t : VarName_)
   (h1 : t ∉ F.var_set) :
@@ -278,6 +278,59 @@ lemma are_alpha_equiv_v2_replace_free_replace_var
         | apply are_alpha_equiv_ind_v2.compat_forall_
         | apply are_alpha_equiv_ind_v2.compat_exists_
         exact phi_ih
+
+
+lemma are_alpha_equiv_ind_v1_imp_are_alpha_equiv_ind_v2
+  (F F' : Formula_)
+  (h1 : are_alpha_equiv_ind_v1 F F') :
+  are_alpha_equiv_ind_v2 F F' :=
+  by
+    induction h1
+    case
+        rename_forall_ phi x y ih_1 ih_2
+      | rename_exists_ phi x y ih_1 ih_2 =>
+      apply are_alpha_equiv_ind_v2.trans_
+      · first
+          | apply are_alpha_equiv_ind_v2.rename_forall_
+          | apply are_alpha_equiv_ind_v2.rename_exists_
+        · exact ih_1
+        · exact ih_2
+      · first
+          | apply are_alpha_equiv_ind_v2.compat_forall_
+          | apply are_alpha_equiv_ind_v2.compat_exists_
+        apply are_alpha_equiv_ind_v2_fast_replace_free_var_one_rec_replace_var_one_rec
+        sorry
+    case compat_not_ phi phi' ih_1 ih_2 =>
+      apply are_alpha_equiv_ind_v2.compat_not_
+      exact ih_2
+    case
+        compat_imp_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+      | compat_and_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+      | compat_or_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+      | compat_iff_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4 =>
+      first
+        | apply are_alpha_equiv_ind_v2.compat_imp_
+        | apply are_alpha_equiv_ind_v2.compat_and_
+        | apply are_alpha_equiv_ind_v2.compat_or_
+        | apply are_alpha_equiv_ind_v2.compat_iff_
+      · exact ih_3
+      · exact ih_4
+    case
+        compat_forall_ phi phi' x ih_1 ih_2
+      | compat_exists_ phi phi' x ih_1 ih_2 =>
+      first
+        | apply are_alpha_equiv_ind_v2.compat_forall_
+        | apply are_alpha_equiv_ind_v2.compat_exists_
+      · exact ih_2
+    case refl_ phi =>
+      apply are_alpha_equiv_ind_v2.refl_
+    case symm_ phi phi' _ ih_2 =>
+      apply are_alpha_equiv_ind_v2.symm_
+      exact ih_2
+    case trans_ phi phi' phi'' ih_1 ih_2 ih_3 ih_4 =>
+      apply are_alpha_equiv_ind_v2.trans_ phi phi'
+      · exact ih_3
+      · exact ih_4
 
 
 -------------------------------------------------------------------------------
