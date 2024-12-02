@@ -373,6 +373,7 @@ theorem var_is_free_in_iff_mem_free_var_set
     simp
     tauto
 
+-------------------------------------------------------------------------------
 
 theorem var_is_free_in_imp_var_is_free_in_ind
   (v : VarName_)
@@ -444,6 +445,7 @@ theorem var_is_free_in_iff_var_is_free_in_ind
   · apply var_is_free_in_imp_var_is_free_in_ind
   · apply var_is_free_in_ind_imp_var_is_free_in
 
+-------------------------------------------------------------------------------
 
 theorem pred_var_occurs_in_iff_mem_pred_var_set
   (P : PredName_)
@@ -473,6 +475,7 @@ theorem pred_var_occurs_in_iff_mem_pred_var_set
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     tauto
 
+-------------------------------------------------------------------------------
 
 theorem var_is_bound_in_imp_var_occurs_in
   (v : VarName_)
@@ -500,6 +503,9 @@ theorem var_is_free_in_imp_var_occurs_in
   all_goals
     simp only [var_occurs_in]
     tauto
+
+-------------------------------------------------------------------------------
+
 
 
 #lint

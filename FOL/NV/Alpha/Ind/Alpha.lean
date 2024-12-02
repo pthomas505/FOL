@@ -156,6 +156,65 @@ inductive are_alpha_equiv_ind_v2 : Formula_ → Formula_ → Prop
     are_alpha_equiv_ind_v2 phi' phi'' →
     are_alpha_equiv_ind_v2 phi phi''
 
+-------------------------------------------------------------------------------
+
+lemma are_alpha_equiv_ind_v1_replace_var_one_rec_fast_replace_free_var_one_rec
+  (F : Formula_)
+  (v t : VarName_)
+  (h1 : t ∉ F.var_set) :
+  are_alpha_equiv_ind_v1 (replace_var_one_rec v t F) (Sub.Var.One.Rec.fast_replace_free_var_one_rec v t F) :=
+  by
+    induction F
+    case pred_const_ X xs | pred_var_ X xs | def_ X xs | eq_ x y | true_ | false_ =>
+      simp only [replace_var_one_rec]
+      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+      apply are_alpha_equiv_ind_v1.refl_
+    case not_ phi phi_ih =>
+      apply are_alpha_equiv_ind_v1.compat_not_
+      exact phi_ih h1
+    case
+        imp_ phi psi phi_ih psi_ih
+      | and_ phi psi phi_ih psi_ih
+      | or_ phi psi phi_ih psi_ih
+      | iff_ phi psi phi_ih psi_ih =>
+      simp only [var_set] at h1
+      simp at h1
+      obtain ⟨h1_left, h1_right⟩ := h1
+
+      first
+        | apply are_alpha_equiv_ind_v1.compat_imp_
+        | apply are_alpha_equiv_ind_v1.compat_and_
+        | apply are_alpha_equiv_ind_v1.compat_or_
+        | apply are_alpha_equiv_ind_v1.compat_iff_
+      · exact phi_ih h1_left
+      · exact psi_ih h1_right
+    case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+      simp only [var_set] at h1
+      simp at h1
+      obtain ⟨h1_left, h1_right⟩ := h1
+
+      specialize phi_ih h1_left
+
+      simp only [replace_var_one_rec]
+      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+      split_ifs
+      case pos c1 =>
+        subst c1
+        apply are_alpha_equiv_ind_v1.symm_
+        first
+          | apply are_alpha_equiv_ind_v1.rename_forall_
+          | apply are_alpha_equiv_ind_v1.rename_exists_
+        · simp only [var_is_free_in_iff_mem_free_var_set]
+          sorry
+        · simp only [var_is_bound_in_iff_mem_bound_var_set]
+          sorry
+      case neg c1 =>
+        first
+        | apply are_alpha_equiv_ind_v1.compat_forall_
+        | apply are_alpha_equiv_ind_v1.compat_exists_
+        exact phi_ih
+
+-------------------------------------------------------------------------------
 
 theorem replace_empty_Holds
   (D : Type)
