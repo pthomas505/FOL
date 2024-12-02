@@ -1,4 +1,5 @@
 import FOL.NV.Sub.Var.One.Rec.ReplaceFree
+import FOL.NV.Sub.Var.One.Rec.ReplaceVar
 import FOL.NV.Semantics
 
 import Mathlib.Data.List.Defs
@@ -10,6 +11,79 @@ namespace FOL.NV
 
 open Formula_
 
+
+inductive are_alpha_equiv_ind_v1 : Formula_ → Formula_ → Prop
+  | rename_forall_
+    (phi : Formula_)
+    (x y : VarName_) :
+    ¬ var_is_free_in y phi →
+    ¬ var_is_bound_in y phi →
+    are_alpha_equiv_ind_v1 (forall_ x phi) (forall_ y (replace_var_one_rec x y phi))
+
+  | rename_exists_
+    (phi : Formula_)
+    (x y : VarName_) :
+    ¬ var_is_free_in y phi →
+    ¬ var_is_bound_in y phi →
+    are_alpha_equiv_ind_v1 (exists_ x phi) (exists_ y (replace_var_one_rec x y phi))
+
+  | compat_not_
+    (phi phi' : Formula_) :
+    are_alpha_equiv_ind_v1 phi phi' →
+    are_alpha_equiv_ind_v1 (not_ phi) (not_ phi')
+
+  | compat_imp_
+    (phi phi' psi psi' : Formula_) :
+    are_alpha_equiv_ind_v1 phi phi' →
+    are_alpha_equiv_ind_v1 psi psi' →
+    are_alpha_equiv_ind_v1 (imp_ phi psi) (imp_ phi' psi')
+
+  | compat_and_
+    (phi phi' psi psi' : Formula_) :
+    are_alpha_equiv_ind_v1 phi phi' →
+    are_alpha_equiv_ind_v1 psi psi' →
+    are_alpha_equiv_ind_v1 (and_ phi psi) (and_ phi' psi')
+
+  | compat_or_
+    (phi phi' psi psi' : Formula_) :
+    are_alpha_equiv_ind_v1 phi phi' →
+    are_alpha_equiv_ind_v1 psi psi' →
+    are_alpha_equiv_ind_v1 (or_ phi psi) (or_ phi' psi')
+
+  | compat_iff_
+    (phi phi' psi psi' : Formula_) :
+    are_alpha_equiv_ind_v1 phi phi' →
+    are_alpha_equiv_ind_v1 psi psi' →
+    are_alpha_equiv_ind_v1 (iff_ phi psi) (iff_ phi' psi')
+
+  | compat_forall_
+    (phi phi' : Formula_)
+    (x : VarName_) :
+    are_alpha_equiv_ind_v1 phi phi' →
+    are_alpha_equiv_ind_v1 (forall_ x phi) (forall_ x phi')
+
+  | compat_exists_
+    (phi phi' : Formula_)
+    (x : VarName_) :
+    are_alpha_equiv_ind_v1 phi phi' →
+    are_alpha_equiv_ind_v1 (exists_ x phi) (exists_ x phi')
+
+  | refl_
+    (phi : Formula_) :
+    are_alpha_equiv_ind_v1 phi phi
+
+  | symm_
+    (phi phi' : Formula_) :
+    are_alpha_equiv_ind_v1 phi phi' →
+    are_alpha_equiv_ind_v1 phi' phi
+
+  | trans_
+    (phi phi' phi'' : Formula_) :
+    are_alpha_equiv_ind_v1 phi phi' →
+    are_alpha_equiv_ind_v1 phi' phi'' →
+    are_alpha_equiv_ind_v1 phi phi''
+
+-------------------------------------------------------------------------------
 
 inductive are_alpha_equiv_ind_v2 : Formula_ → Formula_ → Prop
   | rename_forall_
