@@ -8,6 +8,13 @@ set_option autoImplicit false
 open Formula_
 
 
+/--
+  `replace_var_one_rec v t P` :=
+
+  `v → t` in `P` for each occurrence of `v` in `P`
+
+  The result of replacing each occurrence of `v` in `P` by an occurrence of `t`.
+-/
 def replace_var_one_rec (v t : VarName_) : Formula_ → Formula_
   | pred_const_ X xs =>
       pred_const_
@@ -297,3 +304,6 @@ theorem replace_var_one_rec_free_var_set_sdiff
         simp only [sdiff_sdiff_comm]
         congr 1
         exact phi_ih h1_left
+
+
+#lint
