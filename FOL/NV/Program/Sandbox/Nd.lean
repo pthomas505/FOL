@@ -1,4 +1,4 @@
-import FOL.NV.Alpha
+import FOL.NV.Alpha.Rec.Alpha
 import FOL.NV.Sub.Var.One.Rec.Admits
 import FOL.NV.Sub.Pred.All.Rec.Sub
 
@@ -194,7 +194,7 @@ inductive IsDeduct : Finset Formula_ → Formula_ → Prop
     (Δ : Finset Formula_)
     (phi psi : Formula_) :
     IsDeduct Δ phi →
-    isAlphaEqv phi psi →
+    are_alpha_equiv_rec phi psi →
     IsDeduct Δ psi
 
 
