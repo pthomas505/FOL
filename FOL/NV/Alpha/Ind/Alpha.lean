@@ -295,22 +295,22 @@ theorem Holds_iff_alphaEqv_Holds
 
 inductive are_alpha_equiv_var_ind_v3 :
   List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
-| nil
-  (x : VarName_) :
-  are_alpha_equiv_var_ind_v3 [] x x
+  | nil
+    (x : VarName_) :
+    are_alpha_equiv_var_ind_v3 [] x x
 
-| head
-  (binders : List (VarName_ × VarName_))
-  (x y : VarName_) :
-  are_alpha_equiv_var_ind_v3 ((x, y) :: binders) x y
+  | head
+    (binders : List (VarName_ × VarName_))
+    (x y : VarName_) :
+    are_alpha_equiv_var_ind_v3 ((x, y) :: binders) x y
 
-| tail
-  (binders : List (VarName_ × VarName_))
-  (x y x' y' : VarName_) :
-  ¬ x = x' →
-  ¬ y = y' →
-  are_alpha_equiv_var_ind_v3 binders x' y' →
-  are_alpha_equiv_var_ind_v3 ((x, y) :: binders) x' y'
+  | tail
+    (binders : List (VarName_ × VarName_))
+    (x y x' y' : VarName_) :
+    ¬ x = x' →
+    ¬ y = y' →
+    are_alpha_equiv_var_ind_v3 binders x' y' →
+    are_alpha_equiv_var_ind_v3 ((x, y) :: binders) x' y'
 
 
 inductive are_alpha_equiv_ind_v3 :
