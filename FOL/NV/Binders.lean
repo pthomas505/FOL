@@ -373,7 +373,6 @@ theorem var_is_free_in_iff_mem_free_var_set
     simp
     tauto
 
--------------------------------------------------------------------------------
 
 theorem pred_var_occurs_in_iff_mem_pred_var_set
   (P : PredName_)
