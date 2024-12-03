@@ -152,96 +152,6 @@ instance (v : VarName_) (F : Formula_) : Decidable (var_is_free_in v F) :=
 
 
 /--
-  `var_is_free_in_ind v F` := True if and only if there is a free occurrence of the variable `v` in the formula `F`.
--/
-inductive var_is_free_in_ind
-  (v : VarName_) :
-  Formula_ → Prop
-
-  | pred_const_
-    (X : PredName_)
-    (xs : List VarName_) :
-    v ∈ xs →
-    var_is_free_in_ind v (pred_const_ X xs)
-
-  | pred_var_
-    (X : PredName_)
-    (xs : List VarName_) :
-    v ∈ xs →
-    var_is_free_in_ind v (pred_var_ X xs)
-
-  | eq_
-    (x y : VarName_) :
-    v = x ∨ v = y →
-    var_is_free_in_ind v (eq_ x y)
-
-  | not_
-    (phi : Formula_) :
-    var_is_free_in_ind v phi →
-    var_is_free_in_ind v (not_ phi)
-
-  | imp_left_
-    (phi psi : Formula_) :
-    var_is_free_in_ind v phi →
-    var_is_free_in_ind v (imp_ phi psi)
-
-  | imp_right_
-    (phi psi : Formula_) :
-    var_is_free_in_ind v psi →
-    var_is_free_in_ind v (imp_ phi psi)
-
-  | and_left_
-    (phi psi : Formula_) :
-    var_is_free_in_ind v phi →
-    var_is_free_in_ind v (and_ phi psi)
-
-  | and_right_
-    (phi psi : Formula_) :
-    var_is_free_in_ind v psi →
-    var_is_free_in_ind v (and_ phi psi)
-
-  | or_left_
-    (phi psi : Formula_) :
-    var_is_free_in_ind v phi →
-    var_is_free_in_ind v (or_ phi psi)
-
-  | or_right_
-    (phi psi : Formula_) :
-    var_is_free_in_ind v psi →
-    var_is_free_in_ind v (or_ phi psi)
-
-  | iff_left_
-    (phi psi : Formula_) :
-    var_is_free_in_ind v phi →
-    var_is_free_in_ind v (iff_ phi psi)
-
-  | iff_right_
-    (phi psi : Formula_) :
-    var_is_free_in_ind v psi →
-    var_is_free_in_ind v (iff_ phi psi)
-
-  | forall_
-    (x : VarName_)
-    (phi : Formula_) :
-    ¬ v = x →
-    var_is_free_in_ind v phi →
-    var_is_free_in_ind v (forall_ x phi)
-
-  | exists_
-    (x : VarName_)
-    (phi : Formula_) :
-    ¬ v = x →
-    var_is_free_in_ind v phi →
-    var_is_free_in_ind v (exists_ x phi)
-
-  | def_
-    (X : DefName_)
-    (xs : List VarName_) :
-    v ∈ xs →
-    var_is_free_in_ind v (def_ X xs)
-
-
-/--
   `Formula_.pred_var_set F` := The set of all of the predicate variables that have an occurrence in the formula `F`.
 -/
 def Formula_.pred_var_set : Formula_ → Finset (PredName_ × ℕ)
@@ -498,6 +408,96 @@ theorem mem_var_set_iff_mem_bound_var_set_or_mem_free_var_set
   apply var_occurs_in_iff_var_is_bound_in_or_var_is_free_in
 
 -------------------------------------------------------------------------------
+
+/--
+  `var_is_free_in_ind v F` := True if and only if there is a free occurrence of the variable `v` in the formula `F`.
+-/
+inductive var_is_free_in_ind
+  (v : VarName_) :
+  Formula_ → Prop
+
+  | pred_const_
+    (X : PredName_)
+    (xs : List VarName_) :
+    v ∈ xs →
+    var_is_free_in_ind v (pred_const_ X xs)
+
+  | pred_var_
+    (X : PredName_)
+    (xs : List VarName_) :
+    v ∈ xs →
+    var_is_free_in_ind v (pred_var_ X xs)
+
+  | eq_
+    (x y : VarName_) :
+    v = x ∨ v = y →
+    var_is_free_in_ind v (eq_ x y)
+
+  | not_
+    (phi : Formula_) :
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (not_ phi)
+
+  | imp_left_
+    (phi psi : Formula_) :
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (imp_ phi psi)
+
+  | imp_right_
+    (phi psi : Formula_) :
+    var_is_free_in_ind v psi →
+    var_is_free_in_ind v (imp_ phi psi)
+
+  | and_left_
+    (phi psi : Formula_) :
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (and_ phi psi)
+
+  | and_right_
+    (phi psi : Formula_) :
+    var_is_free_in_ind v psi →
+    var_is_free_in_ind v (and_ phi psi)
+
+  | or_left_
+    (phi psi : Formula_) :
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (or_ phi psi)
+
+  | or_right_
+    (phi psi : Formula_) :
+    var_is_free_in_ind v psi →
+    var_is_free_in_ind v (or_ phi psi)
+
+  | iff_left_
+    (phi psi : Formula_) :
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (iff_ phi psi)
+
+  | iff_right_
+    (phi psi : Formula_) :
+    var_is_free_in_ind v psi →
+    var_is_free_in_ind v (iff_ phi psi)
+
+  | forall_
+    (x : VarName_)
+    (phi : Formula_) :
+    ¬ v = x →
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (forall_ x phi)
+
+  | exists_
+    (x : VarName_)
+    (phi : Formula_) :
+    ¬ v = x →
+    var_is_free_in_ind v phi →
+    var_is_free_in_ind v (exists_ x phi)
+
+  | def_
+    (X : DefName_)
+    (xs : List VarName_) :
+    v ∈ xs →
+    var_is_free_in_ind v (def_ X xs)
+
 
 theorem var_is_free_in_imp_var_is_free_in_ind
   (v : VarName_)
