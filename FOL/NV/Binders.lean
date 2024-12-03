@@ -539,71 +539,36 @@ theorem var_occurs_in_imp_var_is_bound_in_or_var_is_free_in
     simp only [var_is_free_in]
     tauto
 
+
+theorem var_occurs_in_iff_var_is_bound_in_or_var_is_free_in
+  (v : VarName_)
+  (F : Formula_) :
+  var_occurs_in v F ↔ var_is_bound_in v F ∨ var_is_free_in v F :=
+  by
+  constructor
+  · intro a1
+    apply var_occurs_in_imp_var_is_bound_in_or_var_is_free_in
+    exact a1
+  · intro a1
+    cases a1
+    case _ c1 =>
+      apply var_is_bound_in_imp_var_occurs_in
+      exact c1
+    case _ c1 =>
+      apply var_is_free_in_imp_var_occurs_in
+      exact c1
+
 -------------------------------------------------------------------------------
 
-theorem mem_bound_var_set_imp_mem_var_set
+theorem mem_var_set_iff_mem_bound_var_set_or_mem_free_var_set
   (v : VarName_)
-  (F : Formula_)
-  (h1 : v ∈ F.bound_var_set) :
-  v ∈ F.var_set :=
+  (F : Formula_) :
+  v ∈ F.var_set ↔ v ∈ F.bound_var_set ∨ v ∈ F.free_var_set :=
   by
-  rw [← var_is_bound_in_iff_mem_bound_var_set] at h1
-
   rw [← var_occurs_in_iff_mem_var_set]
-  apply var_is_bound_in_imp_var_occurs_in
-  exact h1
-
-
-theorem mem_free_var_set_imp_mem_var_set
-  (v : VarName_)
-  (F : Formula_)
-  (h1 : v ∈ F.free_var_set) :
-  v ∈ F.var_set :=
-  by
-  rw [← var_is_free_in_iff_mem_free_var_set] at h1
-
-  rw [← var_occurs_in_iff_mem_var_set]
-  apply var_is_free_in_imp_var_occurs_in
-  exact h1
-
-
-theorem mem_var_set_imp_mem_bound_var_set_or_mem_free_var_set
-  (v : VarName_)
-  (F : Formula_)
-  (h1 : v ∈ F.var_set) :
-  v ∈ F.bound_var_set ∨ v ∈ F.free_var_set :=
-  by
-  rw [← var_occurs_in_iff_mem_var_set] at h1
-
   rw [← var_is_bound_in_iff_mem_bound_var_set]
   rw [← var_is_free_in_iff_mem_free_var_set]
-  apply var_occurs_in_imp_var_is_bound_in_or_var_is_free_in
-  exact h1
-
--------------------------------------------------------------------------------
-
-theorem not_mem_var_set_imp_not_mem_bound_var_set
-  (v : VarName_)
-  (F : Formula_)
-  (h1 : v ∉ F.var_set) :
-  v ∉ F.bound_var_set :=
-  by
-  intro contra
-  apply h1
-  apply mem_bound_var_set_imp_mem_var_set
-  exact contra
-
-
-theorem not_mem_var_set_imp_not_mem_free_var_set
-  (v : VarName_)
-  (F : Formula_)
-  (h1 : v ∉ F.var_set) :
-  v ∉ F.free_var_set :=
-  by
-  intro contra
-  apply h1
-  apply mem_free_var_set_imp_mem_var_set
-  exact contra
+  apply var_occurs_in_iff_var_is_bound_in_or_var_is_free_in
 
 
 #lint
