@@ -375,78 +375,6 @@ theorem var_is_free_in_iff_mem_free_var_set
 
 -------------------------------------------------------------------------------
 
-theorem var_is_free_in_imp_var_is_free_in_ind
-  (v : VarName_)
-  (F : Formula_)
-  (h1 : var_is_free_in v F) :
-  var_is_free_in_ind v F :=
-  by
-  induction F
-  any_goals
-    simp only [var_is_free_in] at h1
-  case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
-    first
-      | apply var_is_free_in_ind.pred_const_
-      | apply var_is_free_in_ind.pred_var_
-      | apply var_is_free_in_ind.eq_
-      | apply var_is_free_in_ind.def_
-    exact h1
-  case not_ phi phi_ih =>
-    apply var_is_free_in_ind.not_
-    exact phi_ih h1
-  case
-      imp_ phi psi phi_ih psi_ih
-    | and_ phi psi phi_ih psi_ih
-    | or_ phi psi phi_ih psi_ih
-    | iff_ phi psi phi_ih psi_ih =>
-    cases h1
-    case inl c1 =>
-      first
-        | apply var_is_free_in_ind.imp_left_
-        | apply var_is_free_in_ind.and_left_
-        | apply var_is_free_in_ind.or_left_
-        | apply var_is_free_in_ind.iff_left_
-      exact phi_ih c1
-    case inr c1 =>
-      first
-        | apply var_is_free_in_ind.imp_right_
-        | apply var_is_free_in_ind.and_right_
-        | apply var_is_free_in_ind.or_right_
-        | apply var_is_free_in_ind.iff_right_
-      exact psi_ih c1
-  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    cases h1
-    case _ h1_left h1_right =>
-      first
-        | apply var_is_free_in_ind.forall_
-        | apply var_is_free_in_ind.exists_
-      · exact h1_left
-      · exact phi_ih h1_right
-
-
-theorem var_is_free_in_ind_imp_var_is_free_in
-  (v : VarName_)
-  (F : Formula_)
-  (h1 : var_is_free_in_ind v F) :
-  var_is_free_in v F :=
-  by
-  induction h1
-  all_goals
-    simp only [var_is_free_in]
-    tauto
-
-
-theorem var_is_free_in_iff_var_is_free_in_ind
-  (v : VarName_)
-  (F : Formula_) :
-  var_is_free_in v F ↔ var_is_free_in_ind v F :=
-  by
-  constructor
-  · apply var_is_free_in_imp_var_is_free_in_ind
-  · apply var_is_free_in_ind_imp_var_is_free_in
-
--------------------------------------------------------------------------------
-
 theorem pred_var_occurs_in_iff_mem_pred_var_set
   (P : PredName_)
   (n : ℕ)
@@ -569,6 +497,78 @@ theorem mem_var_set_iff_mem_bound_var_set_or_mem_free_var_set
   rw [← var_is_bound_in_iff_mem_bound_var_set]
   rw [← var_is_free_in_iff_mem_free_var_set]
   apply var_occurs_in_iff_var_is_bound_in_or_var_is_free_in
+
+-------------------------------------------------------------------------------
+
+theorem var_is_free_in_imp_var_is_free_in_ind
+  (v : VarName_)
+  (F : Formula_)
+  (h1 : var_is_free_in v F) :
+  var_is_free_in_ind v F :=
+  by
+  induction F
+  any_goals
+    simp only [var_is_free_in] at h1
+  case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
+    first
+      | apply var_is_free_in_ind.pred_const_
+      | apply var_is_free_in_ind.pred_var_
+      | apply var_is_free_in_ind.eq_
+      | apply var_is_free_in_ind.def_
+    exact h1
+  case not_ phi phi_ih =>
+    apply var_is_free_in_ind.not_
+    exact phi_ih h1
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    cases h1
+    case inl c1 =>
+      first
+        | apply var_is_free_in_ind.imp_left_
+        | apply var_is_free_in_ind.and_left_
+        | apply var_is_free_in_ind.or_left_
+        | apply var_is_free_in_ind.iff_left_
+      exact phi_ih c1
+    case inr c1 =>
+      first
+        | apply var_is_free_in_ind.imp_right_
+        | apply var_is_free_in_ind.and_right_
+        | apply var_is_free_in_ind.or_right_
+        | apply var_is_free_in_ind.iff_right_
+      exact psi_ih c1
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    cases h1
+    case _ h1_left h1_right =>
+      first
+        | apply var_is_free_in_ind.forall_
+        | apply var_is_free_in_ind.exists_
+      · exact h1_left
+      · exact phi_ih h1_right
+
+
+theorem var_is_free_in_ind_imp_var_is_free_in
+  (v : VarName_)
+  (F : Formula_)
+  (h1 : var_is_free_in_ind v F) :
+  var_is_free_in v F :=
+  by
+  induction h1
+  all_goals
+    simp only [var_is_free_in]
+    tauto
+
+
+theorem var_is_free_in_iff_var_is_free_in_ind
+  (v : VarName_)
+  (F : Formula_) :
+  var_is_free_in v F ↔ var_is_free_in_ind v F :=
+  by
+  constructor
+  · apply var_is_free_in_imp_var_is_free_in_ind
+  · apply var_is_free_in_ind_imp_var_is_free_in
 
 
 #lint
