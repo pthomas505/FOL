@@ -404,7 +404,7 @@ example
   holds D I (Function.updateITE V u a) E F ↔
     holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fast_replace_free_var_one_rec u v F) :=
   by
-  induction F generalizing V E
+  induction F generalizing V
   case def_ X xs =>
     induction E
     case nil =>
