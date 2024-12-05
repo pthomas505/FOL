@@ -392,6 +392,75 @@ lemma are_alpha_equiv_ind_v1_iff_are_alpha_equiv_ind_v2
 
 -------------------------------------------------------------------------------
 
+example
+  (D : Type)
+  (I : Interpretation_ D)
+  (V : Valuation_ D)
+  (E : Env_)
+  (u v : VarName_)
+  (F : Formula_)
+  (a : D)
+  (h1 : ¬ var_occurs_in v F) :
+  holds D I (Function.updateITE V u a) E F ↔
+    holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fast_replace_free_var_one_rec u v F) :=
+  by
+  induction F generalizing V E
+  case def_ X xs =>
+    induction E
+    case nil =>
+      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+      simp only [holds]
+    case cons hd tl ih =>
+      simp only [var_occurs_in] at h1
+
+      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+      simp only [holds]
+      congr! 1
+      case _ =>
+        simp
+      case _ c1 =>
+        simp at c1
+
+        apply holds_coincide_var
+        intro y a1
+
+        simp
+        apply Function.updateListITE_map_mem_ext
+        · intro z a2
+
+          have s1 : ¬ z = v :=
+          by
+            intro contra
+            apply h1
+            rw [← contra]
+            exact a2
+
+          simp
+          by_cases c2 : z = u
+          case pos =>
+            rw [c2]
+            simp
+            simp only [Function.updateITE]
+            simp
+          case neg =>
+            split_ifs
+            case pos c3 =>
+              rw [c3] at c2
+              contradiction
+            case neg c3 =>
+              simp only [Function.updateITE]
+              split_ifs
+              rfl
+        · tauto
+        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
+          obtain s1 := hd.h1
+          obtain s2 := Finset.mem_of_subset s1 a1
+          simp only [List.mem_toFinset] at s2
+          exact s2
+  all_goals
+    sorry
+
+
 theorem replace_empty_holds
   (D : Type)
   (I : Interpretation_ D)
@@ -481,15 +550,12 @@ theorem replace_empty_holds
         simp only [var_is_free_in] at a1
         obtain ⟨a1_left, a1_right⟩ := a1
 
-        simp only [var_occurs_in_iff_var_is_bound_in_or_var_is_free_in] at h1_right
-        simp at h1_right
-        obtain ⟨h1_right_left, h1_right_right⟩ := h1_right
-
         have s1 : ¬ y = v :=
         by
           intro contra
-          apply h1_right_right
+          apply h1_right
           rw [← contra]
+          apply var_is_free_in_imp_var_occurs_in
           exact a1_right
 
         simp only [Function.updateITE]
