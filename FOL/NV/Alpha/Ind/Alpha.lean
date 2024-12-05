@@ -392,7 +392,7 @@ lemma are_alpha_equiv_ind_v1_iff_are_alpha_equiv_ind_v2
 
 -------------------------------------------------------------------------------
 
-theorem replace_empty_Holds
+theorem replace_empty_holds
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -415,18 +415,20 @@ theorem replace_empty_Holds
       congr! 1
       simp
       intro x a1
-      simp only [Function.updateITE]
-      simp only [eq_comm]
       split_ifs
-      case _ c1 c2 =>
-        rfl
-      case _ c1 c2 =>
-        contradiction
-      case _ c1 c2 =>
-        rw [← c2] at a1
-        contradiction
-      case _ c1 c2 =>
-        rfl
+      case pos c1 =>
+        rw [c1]
+        simp only [Function.updateITE]
+        simp
+      case neg c1 =>
+        have s1 : ¬ v = x :=
+        by
+          intro contra
+          apply h1
+          rw [contra]
+          exact a1
+        simp only [Function.updateITE]
+        split_ifs <;> tauto
     case eq_ x y =>
       simp only [var_occurs_in] at h1
 
@@ -460,8 +462,10 @@ theorem replace_empty_Holds
       simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
       simp only [holds]
       congr! 1
-      · exact phi_ih V h1_left
-      · exact psi_ih V h1_right
+      · apply phi_ih
+        exact h1_left
+      · apply psi_ih
+        exact h1_right
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
       simp only [var_occurs_in] at h1
       simp at h1
@@ -493,7 +497,9 @@ theorem replace_empty_Holds
         rfl
       case neg c1 =>
         simp only [holds]
-        first | apply forall_congr' | apply exists_congr
+        first
+          | apply forall_congr'
+          | apply exists_congr
         intro d
         simp only [Function.updateITE_comm V v x d a h1_left]
         simp only [Function.updateITE_comm V u x d a c1]
@@ -564,7 +570,7 @@ theorem Holds_iff_alphaEqv_Holds
     simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
-    apply replace_empty_Holds
+    apply replace_empty_holds
     exact h1_1
   case compat_not_ h1_phi h1_phi' _ h1_ih =>
     simp only [holds]
