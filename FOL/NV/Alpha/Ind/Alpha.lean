@@ -422,7 +422,8 @@ theorem replace_empty_Holds
           exact a1_right
 
         simp only [Function.updateITE]
-        split_ifs <;> rfl
+        split_ifs
+        rfl
       case neg c1 =>
         simp only [holds]
         first | apply forall_congr' | apply exists_congr
