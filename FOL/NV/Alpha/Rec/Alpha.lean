@@ -147,6 +147,9 @@ instance
   infer_instance
 
 
+/--
+  Helper definition for proof of `holds_iff_are_alpha_equiv_rec_holds`.
+-/
 inductive alpha_equiv_var_valuation
   (D : Type) :
   List (VarName_ × VarName_) → Valuation_ D → Valuation_ D → Prop
@@ -370,7 +373,7 @@ lemma isAlphaEqv_Holds_aux
       exact ih V V' (def_ X xs) (def_ Y ys) binders h1 h2
 
 
-lemma isalphaEqv_Holds
+theorem holds_iff_are_alpha_equiv_rec_holds
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -386,4 +389,4 @@ lemma isalphaEqv_Holds
   exact h1
 
 
---#lint
+#lint
