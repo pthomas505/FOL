@@ -392,7 +392,7 @@ lemma are_alpha_equiv_ind_v1_iff_are_alpha_equiv_ind_v2
 
 -------------------------------------------------------------------------------
 
-example
+theorem replace_empty_holds
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -405,6 +405,101 @@ example
     holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fast_replace_free_var_one_rec u v F) :=
   by
   induction F generalizing V
+  case pred_const_ X xs | pred_var_ X xs =>
+    simp only [var_occurs_in] at h1
+
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    simp only [holds]
+    congr! 1
+    simp
+    intro x a1
+    split_ifs
+    case pos c1 =>
+      rw [c1]
+      simp only [Function.updateITE]
+      simp
+    case neg c1 =>
+      have s1 : ¬ v = x :=
+      by
+        intro contra
+        apply h1
+        rw [contra]
+        exact a1
+      simp only [Function.updateITE]
+      split_ifs <;> tauto
+  case eq_ x y =>
+    simp only [var_occurs_in] at h1
+
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    simp only [holds]
+    congr! 1
+    · simp only [Function.updateITE]
+      split_ifs <;> tauto
+    · simp only [Function.updateITE]
+      split_ifs <;> tauto
+  case true_ | false_ =>
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    simp only [holds]
+  case not_ phi phi_ih =>
+    simp only [var_occurs_in] at h1
+
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    simp only [holds]
+    congr! 1
+    apply phi_ih
+    exact h1
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [var_occurs_in] at h1
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
+
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    simp only [holds]
+    congr! 1
+    · apply phi_ih
+      exact h1_left
+    · apply psi_ih
+      exact h1_right
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp only [var_occurs_in] at h1
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
+
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    split_ifs
+    case pos c1 =>
+      rw [c1]
+
+      apply holds_coincide_var
+      intro y a1
+      simp only [var_is_free_in] at a1
+      obtain ⟨a1_left, a1_right⟩ := a1
+
+      have s1 : ¬ y = v :=
+      by
+        intro contra
+        apply h1_right
+        rw [← contra]
+        apply var_is_free_in_imp_var_occurs_in
+        exact a1_right
+
+      simp only [Function.updateITE]
+      split_ifs
+      rfl
+    case neg c1 =>
+      simp only [holds]
+      first
+        | apply forall_congr'
+        | apply exists_congr
+      intro d
+      simp only [Function.updateITE_comm V v x d a h1_left]
+      simp only [Function.updateITE_comm V u x d a c1]
+      apply phi_ih
+      exact h1_right
   case def_ X xs =>
     induction E
     case nil =>
@@ -457,169 +552,6 @@ example
           obtain s2 := Finset.mem_of_subset s1 a1
           simp only [List.mem_toFinset] at s2
           exact s2
-  all_goals
-    sorry
-
-
-theorem replace_empty_holds
-  (D : Type)
-  (I : Interpretation_ D)
-  (V : Valuation_ D)
-  (E : Env_)
-  (u v : VarName_)
-  (F : Formula_)
-  (a : D)
-  (h1 : ¬ var_occurs_in v F) :
-  holds D I (Function.updateITE V u a) E F ↔
-    holds D I (Function.updateITE V v a) E (Sub.Var.One.Rec.fast_replace_free_var_one_rec u v F) :=
-  by
-  induction E generalizing F V
-  all_goals
-    induction F generalizing V
-    case pred_const_ X xs | pred_var_ X xs =>
-      simp only [var_occurs_in] at h1
-
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      simp only [holds]
-      congr! 1
-      simp
-      intro x a1
-      split_ifs
-      case pos c1 =>
-        rw [c1]
-        simp only [Function.updateITE]
-        simp
-      case neg c1 =>
-        have s1 : ¬ v = x :=
-        by
-          intro contra
-          apply h1
-          rw [contra]
-          exact a1
-        simp only [Function.updateITE]
-        split_ifs <;> tauto
-    case eq_ x y =>
-      simp only [var_occurs_in] at h1
-
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      simp only [holds]
-      congr! 1
-      · simp only [Function.updateITE]
-        split_ifs <;> tauto
-      · simp only [Function.updateITE]
-        split_ifs <;> tauto
-    case true_ | false_ =>
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      simp only [holds]
-    case not_ phi phi_ih =>
-      simp only [var_occurs_in] at h1
-
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      simp only [holds]
-      congr! 1
-      apply phi_ih
-      exact h1
-    case
-        imp_ phi psi phi_ih psi_ih
-      | and_ phi psi phi_ih psi_ih
-      | or_ phi psi phi_ih psi_ih
-      | iff_ phi psi phi_ih psi_ih =>
-      simp only [var_occurs_in] at h1
-      simp at h1
-      obtain ⟨h1_left, h1_right⟩ := h1
-
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      simp only [holds]
-      congr! 1
-      · apply phi_ih
-        exact h1_left
-      · apply psi_ih
-        exact h1_right
-    case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [var_occurs_in] at h1
-      simp at h1
-      obtain ⟨h1_left, h1_right⟩ := h1
-
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      split_ifs
-      case pos c1 =>
-        rw [c1]
-
-        apply holds_coincide_var
-        intro y a1
-        simp only [var_is_free_in] at a1
-        obtain ⟨a1_left, a1_right⟩ := a1
-
-        have s1 : ¬ y = v :=
-        by
-          intro contra
-          apply h1_right
-          rw [← contra]
-          apply var_is_free_in_imp_var_occurs_in
-          exact a1_right
-
-        simp only [Function.updateITE]
-        split_ifs
-        rfl
-      case neg c1 =>
-        simp only [holds]
-        first
-          | apply forall_congr'
-          | apply exists_congr
-        intro d
-        simp only [Function.updateITE_comm V v x d a h1_left]
-        simp only [Function.updateITE_comm V u x d a c1]
-        apply phi_ih
-        exact h1_right
-  case nil.def_ X xs =>
-    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-    simp only [holds]
-  case cons.def_ hd tl ih X xs =>
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      simp only [holds]
-      unfold Function.updateITE
-      congr! 1
-      case _ =>
-        simp
-      case _ c1 =>
-        simp only [var_occurs_in] at h1
-
-        apply holds_coincide_var
-        intro v' a1
-        simp
-
-        have s1 : (List.map ((fun (a_1 : VarName_) => if a_1 = v then a else V a_1) ∘ fun (x : VarName_) => if u = x then v else x) xs) = (List.map (fun (a_1 : VarName_) => if a_1 = u then a else V a_1) xs)
-        {
-          simp only [List.map_eq_map_iff]
-          intro x a2
-          simp only [eq_comm]
-          simp
-          split_ifs
-          case _ =>
-            rfl
-          case _ =>
-            contradiction
-          case _ c1 c2 =>
-            subst c2
-            contradiction
-          case _ =>
-            rfl
-        }
-
-        simp only [s1]
-        apply Function.updateListITE_mem_eq_len
-        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
-          simp only [← List.mem_toFinset]
-          apply Finset.mem_of_subset hd.h1 a1
-        · simp at c1
-          cases c1
-          case intro c1_left c1_right =>
-            simp
-            simp only [eq_comm]
-            exact c1_right
-      case _ =>
-        apply ih
-        exact h1
 
 
 theorem Holds_iff_alphaEqv_Holds
