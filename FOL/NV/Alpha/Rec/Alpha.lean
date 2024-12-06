@@ -110,10 +110,10 @@ def are_alpha_equiv_rec_aux
       are_alpha_equiv_rec_aux binders phi phi' ∧ are_alpha_equiv_rec_aux binders psi psi'
 
   | forall_ x phi, forall_ x' phi' =>
-      are_alpha_equiv_rec_aux ((x, x')::binders) phi phi'
+      are_alpha_equiv_rec_aux ((x, x') :: binders) phi phi'
 
   | exists_ x phi, exists_ x' phi' =>
-      are_alpha_equiv_rec_aux ((x, x')::binders) phi phi'
+      are_alpha_equiv_rec_aux ((x, x') :: binders) phi phi'
 
   | def_ X xs, def_ Y ys =>
       X = Y ∧ are_alpha_equiv_var_list_rec binders xs ys
@@ -147,23 +147,29 @@ instance
   infer_instance
 
 
-inductive AlphaEqvVarAssignment
+inductive alpha_equiv_var_valuation
   (D : Type) :
   List (VarName_ × VarName_) → Valuation_ D → Valuation_ D → Prop
-  | nil {V} :
-    AlphaEqvVarAssignment D [] V V
+  | nil
+    (V : Valuation_ D) :
+    alpha_equiv_var_valuation D [] V V
 
-  | cons {binders x y V V' d} :
-    AlphaEqvVarAssignment D binders V V' →
-    AlphaEqvVarAssignment D ((x, y)::binders) (Function.updateITE V x d) (Function.updateITE V' y d)
+  | cons
+    (binders : List (VarName_ × VarName_))
+    (x y : VarName_)
+    (V V' : Valuation_ D)
+    (d : D) :
+    alpha_equiv_var_valuation D binders V V' →
+    alpha_equiv_var_valuation D ((x, y) :: binders) (Function.updateITE V x d) (Function.updateITE V' y d)
 
+-------------------------------------------------------------------------------
 
 theorem aux_1
   (D : Type)
   (binders : List (VarName_ × VarName_))
   (x y : VarName_)
   (V V' : Valuation_ D)
-  (h1 : AlphaEqvVarAssignment D binders V V')
+  (h1 : alpha_equiv_var_valuation D binders V V')
   (h2 : are_alpha_equiv_var_rec binders x y) :
   V x = V' y :=
   by
@@ -196,7 +202,7 @@ theorem aux_2
   (binders : List (VarName_ × VarName_))
   (xs ys : List VarName_)
   (V V' : Valuation_ D)
-  (h1 : AlphaEqvVarAssignment D binders V V')
+  (h1 : alpha_equiv_var_valuation D binders V V')
   (h2 : are_alpha_equiv_var_list_rec binders xs ys) :
   List.map V xs = List.map V' ys :=
   by
@@ -258,7 +264,7 @@ lemma isAlphaEqv_Holds_aux
   (E : Env_)
   (F F' : Formula_)
   (binders : List (VarName_ × VarName_))
-  (h1 : AlphaEqvVarAssignment D binders V V')
+  (h1 : alpha_equiv_var_valuation D binders V V')
   (h2 : are_alpha_equiv_rec_aux binders F F') :
   holds D I V E F ↔ holds D I V' E F' :=
   by
@@ -318,13 +324,13 @@ lemma isAlphaEqv_Holds_aux
         induction h1
         case nil h1_V =>
           apply phi_ih
-          · apply AlphaEqvVarAssignment.cons
-            apply AlphaEqvVarAssignment.nil
+          · apply alpha_equiv_var_valuation.cons
+            apply alpha_equiv_var_valuation.nil
           · exact h2
         case cons h1_binders h1_x h1_y h1_V h1_V' h1_d h1_1 _ =>
           apply phi_ih
-          · apply AlphaEqvVarAssignment.cons
-            apply AlphaEqvVarAssignment.cons
+          · apply alpha_equiv_var_valuation.cons
+            apply alpha_equiv_var_valuation.cons
             exact h1_1
           · exact h2
 
@@ -375,7 +381,9 @@ lemma isalphaEqv_Holds
   by
   simp only [are_alpha_equiv_rec] at h1
 
-  exact isAlphaEqv_Holds_aux D I V V E F F' [] AlphaEqvVarAssignment.nil h1
+  apply isAlphaEqv_Holds_aux D I V V E F F' []
+  apply alpha_equiv_var_valuation.nil
+  exact h1
 
 
 --#lint
