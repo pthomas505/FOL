@@ -12,7 +12,8 @@ open Formula_
 /--
   Helper function for `are_alpha_equiv_var_list_rec`.
 -/
-def are_alpha_equiv_var_rec : List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
+def are_alpha_equiv_var_rec :
+  List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
   | [], x, y => x = y
 
   | hd :: tl, x, y =>
@@ -234,7 +235,7 @@ theorem aux_2
           exact h2_right
 
 
-lemma isAlphaEqvVarList_length
+lemma are_alpha_equiv_var_list_rec_length
   (binders : List (VarName_ × VarName_))
   (xs ys : List VarName_)
   (h1 : are_alpha_equiv_var_list_rec binders xs ys) :
@@ -260,7 +261,7 @@ lemma isAlphaEqvVarList_length
         exact xs_ih ys_tl h1_right
 
 
-lemma isAlphaEqv_Holds_aux
+lemma holds_iff_are_alpha_equiv_rec_holds_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
@@ -360,13 +361,13 @@ lemma isAlphaEqv_Holds_aux
     case _ c1 c2 =>
       cases h2
       case intro h2_left h2_right =>
-        simp only [isAlphaEqvVarList_length binders xs ys h2_right] at c1
+        simp only [are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c1
         subst h2_left
         contradiction
     case _ c1 c2 =>
       cases h2
       case intro h2_left h2_right =>
-        simp only [← isAlphaEqvVarList_length binders xs ys h2_right] at c2
+        simp only [← are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c2
         subst h2_left
         contradiction
     case _ c1 c2 =>
@@ -384,7 +385,7 @@ theorem holds_iff_are_alpha_equiv_rec_holds
   by
   simp only [are_alpha_equiv_rec] at h1
 
-  apply isAlphaEqv_Holds_aux D I V V E F F' []
+  apply holds_iff_are_alpha_equiv_rec_holds_aux D I V V E F F' []
   apply alpha_equiv_var_valuation.nil
   exact h1
 
