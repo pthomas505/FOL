@@ -392,6 +392,43 @@ lemma are_alpha_equiv_ind_v1_iff_are_alpha_equiv_ind_v2
 
 -------------------------------------------------------------------------------
 
+example
+  (F F' : Formula_)
+  (h1 : are_alpha_equiv_ind_v1 F F') :
+  F.free_var_set = F'.free_var_set :=
+  by
+  induction h1
+  case rename_forall_ phi x y ih | rename_exists_ phi x y ih =>
+    simp only [var_occurs_in_iff_mem_var_set] at ih
+
+    simp only [free_var_set]
+    apply replace_var_one_rec_free_var_set_sdiff
+    exact ih
+  case compat_not_ phi phi' ih_1 ih_2 =>
+    simp only [free_var_set]
+    exact ih_2
+  case
+      compat_imp_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+    | compat_and_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+    | compat_or_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+    | compat_iff_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4 =>
+    simp only [free_var_set]
+    rw [ih_3]
+    rw [ih_4]
+  case compat_forall_ phi phi' x ih_1 ih_2 | compat_exists_ phi phi' x ih_1 ih_2 =>
+    simp only [free_var_set]
+    rw [ih_2]
+  case refl_ phi =>
+    rfl
+  case symm_ phi phi' ih_1 ih_2 =>
+    symm
+    exact ih_2
+  case trans_ phi phi' phi'' ih_1 ih_2 ih_3 ih_4 =>
+    trans phi'.free_var_set
+    · exact ih_3
+    · exact ih_4
+
+
 theorem replace_empty_holds
   (D : Type)
   (I : Interpretation_ D)
