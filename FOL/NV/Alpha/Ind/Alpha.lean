@@ -12,6 +12,9 @@ namespace FOL.NV
 open Formula_
 
 
+/--
+  `are_alpha_equiv_ind_v1 F F'` := True if and only if `F` and `F'` are alpha equivalent.
+-/
 inductive are_alpha_equiv_ind_v1 : Formula_ → Formula_ → Prop
   | rename_forall_
     (phi : Formula_)
@@ -83,6 +86,9 @@ inductive are_alpha_equiv_ind_v1 : Formula_ → Formula_ → Prop
 
 -------------------------------------------------------------------------------
 
+/--
+  `are_alpha_equiv_ind_v2 F F'` := True if and only if `F` and `F'` are alpha equivalent.
+-/
 inductive are_alpha_equiv_ind_v2 : Formula_ → Formula_ → Prop
   | rename_forall_
     (phi : Formula_)
