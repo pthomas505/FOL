@@ -256,9 +256,9 @@ lemma are_alpha_equiv_var_list_rec_length
       simp only [are_alpha_equiv_var_list_rec] at h1
 
       simp
-      cases h1
-      case intro h1_left h1_right =>
-        exact xs_ih ys_tl h1_right
+      obtain ⟨h1_left, h1_right⟩ := h1
+      apply xs_ih
+      exact h1_right
 
 
 lemma holds_iff_are_alpha_equiv_rec_holds_aux
@@ -284,12 +284,14 @@ lemma holds_iff_are_alpha_equiv_rec_holds_aux
     case
       pred_const_.pred_const_ X xs Y ys
     | pred_var_.pred_var_ X xs Y ys =>
-      cases h2
-      case intro h2_left h2_right =>
-        simp only [holds]
-        subst h2_left
-        congr! 1
-        exact aux_2 D binders xs ys V V' h1 h2_right
+      obtain ⟨h2_left, h2_right⟩ := h2
+
+      simp only [holds]
+      subst h2_left
+      congr! 1
+      apply aux_2 D binders
+      · exact h1
+      · exact h2_right
 
     case eq_.eq_ x x' y y' =>
       cases h2
@@ -344,32 +346,26 @@ lemma holds_iff_are_alpha_equiv_rec_holds_aux
     simp only [holds]
     split_ifs
     case _ c1 c2 =>
-      cases h2
-      case intro h2_left h2_right =>
-        apply holds_coincide_var
-        intro v a1
-        simp only [aux_2 D binders xs ys V V' h1 h2_right]
-        apply Function.updateListITE_mem_eq_len
-        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
-          simp only [← List.mem_toFinset]
-          apply Finset.mem_of_subset hd.h1 a1
-        · simp
-          simp only [eq_comm]
-          cases c2
-          case intro c2_left c2_right =>
-            exact c2_right
+      obtain ⟨h2_left, h2_right⟩ := h2
+      apply holds_coincide_var
+      intro v a1
+      simp only [aux_2 D binders xs ys V V' h1 h2_right]
+      apply Function.updateListITE_mem_eq_len
+      · simp only [var_is_free_in_iff_mem_free_var_set] at a1
+        simp only [← List.mem_toFinset]
+        exact Finset.mem_of_subset hd.h1 a1
+      · simp
+        tauto
     case _ c1 c2 =>
-      cases h2
-      case intro h2_left h2_right =>
-        simp only [are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c1
-        subst h2_left
-        contradiction
+      obtain ⟨h2_left, h2_right⟩ := h2
+      simp only [are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c1
+      rw [h2_left] at c1
+      contradiction
     case _ c1 c2 =>
-      cases h2
-      case intro h2_left h2_right =>
-        simp only [← are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c2
-        subst h2_left
-        contradiction
+      obtain ⟨h2_left, h2_right⟩ := h2
+      simp only [← are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c2
+      rw [h2_left] at c1
+      contradiction
     case _ c1 c2 =>
       exact ih V V' (def_ X xs) (def_ Y ys) binders h1 h2
 
