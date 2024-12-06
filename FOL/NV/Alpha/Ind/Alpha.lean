@@ -746,4 +746,14 @@ inductive are_alpha_equiv_ind_aux_v3 :
     are_alpha_equiv_ind_aux_v3 ((x, y) :: binders) phi phi' →
     are_alpha_equiv_ind_aux_v3 binders (exists_ x phi) (exists_ y phi')
 
--------------------------------------------------------------------------------
+
+/--
+  `are_alpha_equiv_ind_v3 F F'` := True if and only if `F` and `F'` are alpha equivalent.
+-/
+def are_alpha_equiv_ind_v3
+  (F F' : Formula_) :
+  Prop :=
+  are_alpha_equiv_ind_aux_v3 [] F F'
+
+
+#lint
