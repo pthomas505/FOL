@@ -160,53 +160,53 @@ lemma are_alpha_equiv_ind_v1_replace_var_one_rec_fast_replace_free_var_one_rec
   (h1 : t ∉ F.var_set) :
   are_alpha_equiv_ind_v1 (replace_var_one_rec v t F) (Sub.Var.One.Rec.fast_replace_free_var_one_rec v t F) :=
   by
-    induction F
-    case pred_const_ X xs | pred_var_ X xs | def_ X xs | eq_ x y | true_ | false_ =>
-      simp only [replace_var_one_rec]
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      apply are_alpha_equiv_ind_v1.refl_
-    case not_ phi phi_ih =>
-      apply are_alpha_equiv_ind_v1.compat_not_
-      exact phi_ih h1
-    case
-        imp_ phi psi phi_ih psi_ih
-      | and_ phi psi phi_ih psi_ih
-      | or_ phi psi phi_ih psi_ih
-      | iff_ phi psi phi_ih psi_ih =>
-      simp only [var_set] at h1
-      simp at h1
-      obtain ⟨h1_left, h1_right⟩ := h1
+  induction F
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs | eq_ x y | true_ | false_ =>
+    simp only [replace_var_one_rec]
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    apply are_alpha_equiv_ind_v1.refl_
+  case not_ phi phi_ih =>
+    apply are_alpha_equiv_ind_v1.compat_not_
+    exact phi_ih h1
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [var_set] at h1
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
+    first
+      | apply are_alpha_equiv_ind_v1.compat_imp_
+      | apply are_alpha_equiv_ind_v1.compat_and_
+      | apply are_alpha_equiv_ind_v1.compat_or_
+      | apply are_alpha_equiv_ind_v1.compat_iff_
+    · exact phi_ih h1_left
+    · exact psi_ih h1_right
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp only [var_set] at h1
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
+
+    specialize phi_ih h1_left
+
+    simp only [replace_var_one_rec]
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    split_ifs
+    case pos c1 =>
+      subst c1
+      apply are_alpha_equiv_ind_v1.symm_
       first
-        | apply are_alpha_equiv_ind_v1.compat_imp_
-        | apply are_alpha_equiv_ind_v1.compat_and_
-        | apply are_alpha_equiv_ind_v1.compat_or_
-        | apply are_alpha_equiv_ind_v1.compat_iff_
-      · exact phi_ih h1_left
-      · exact psi_ih h1_right
-    case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [var_set] at h1
-      simp at h1
-      obtain ⟨h1_left, h1_right⟩ := h1
-
-      specialize phi_ih h1_left
-
-      simp only [replace_var_one_rec]
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      split_ifs
-      case pos c1 =>
-        subst c1
-        apply are_alpha_equiv_ind_v1.symm_
-        first
-          | apply are_alpha_equiv_ind_v1.rename_forall_
-          | apply are_alpha_equiv_ind_v1.rename_exists_
-        simp only [var_occurs_in_iff_mem_var_set]
-        exact h1_left
-      case neg c1 =>
-        first
-        | apply are_alpha_equiv_ind_v1.compat_forall_
-        | apply are_alpha_equiv_ind_v1.compat_exists_
-        exact phi_ih
+        | apply are_alpha_equiv_ind_v1.rename_forall_
+        | apply are_alpha_equiv_ind_v1.rename_exists_
+      simp only [var_occurs_in_iff_mem_var_set]
+      exact h1_left
+    case neg c1 =>
+      first
+      | apply are_alpha_equiv_ind_v1.compat_forall_
+      | apply are_alpha_equiv_ind_v1.compat_exists_
+      exact phi_ih
 
 
 lemma are_alpha_equiv_ind_v2_fast_replace_free_var_one_rec_replace_var_one_rec
@@ -215,57 +215,57 @@ lemma are_alpha_equiv_ind_v2_fast_replace_free_var_one_rec_replace_var_one_rec
   (h1 : t ∉ F.var_set) :
   are_alpha_equiv_ind_v2 (Sub.Var.One.Rec.fast_replace_free_var_one_rec v t F) (replace_var_one_rec v t F) :=
   by
-    induction F
-    case pred_const_ X xs | pred_var_ X xs | def_ X xs | eq_ x y | true_ | false_ =>
-      simp only [replace_var_one_rec]
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      apply are_alpha_equiv_ind_v2.refl_
-    case not_ phi phi_ih =>
-      apply are_alpha_equiv_ind_v2.compat_not_
-      exact phi_ih h1
-    case
-        imp_ phi psi phi_ih psi_ih
-      | and_ phi psi phi_ih psi_ih
-      | or_ phi psi phi_ih psi_ih
-      | iff_ phi psi phi_ih psi_ih =>
-      simp only [var_set] at h1
-      simp at h1
-      obtain ⟨h1_left, h1_right⟩ := h1
+  induction F
+  case pred_const_ X xs | pred_var_ X xs | def_ X xs | eq_ x y | true_ | false_ =>
+    simp only [replace_var_one_rec]
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    apply are_alpha_equiv_ind_v2.refl_
+  case not_ phi phi_ih =>
+    apply are_alpha_equiv_ind_v2.compat_not_
+    exact phi_ih h1
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [var_set] at h1
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
-      first
-        | apply are_alpha_equiv_ind_v2.compat_imp_
-        | apply are_alpha_equiv_ind_v2.compat_and_
-        | apply are_alpha_equiv_ind_v2.compat_or_
-        | apply are_alpha_equiv_ind_v2.compat_iff_
-      · exact phi_ih h1_left
-      · exact psi_ih h1_right
-    case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [var_set] at h1
-      simp at h1
-      obtain ⟨h1_left, h1_right⟩ := h1
+    first
+      | apply are_alpha_equiv_ind_v2.compat_imp_
+      | apply are_alpha_equiv_ind_v2.compat_and_
+      | apply are_alpha_equiv_ind_v2.compat_or_
+      | apply are_alpha_equiv_ind_v2.compat_iff_
+    · exact phi_ih h1_left
+    · exact psi_ih h1_right
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp only [var_set] at h1
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
-      specialize phi_ih h1_left
+    specialize phi_ih h1_left
 
-      simp only [replace_var_one_rec]
-      simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
-      split_ifs
-      case pos c1 =>
-        subst c1
-        apply are_alpha_equiv_ind_v2.trans_
-        · first
-            | apply are_alpha_equiv_ind_v2.rename_forall_ phi v t
-            | apply are_alpha_equiv_ind_v2.rename_exists_ phi v t
-          · simp only [var_occurs_in_iff_mem_var_set]
-            exact h1_left
-        · first
-            | apply are_alpha_equiv_ind_v2.compat_forall_
-            | apply are_alpha_equiv_ind_v2.compat_exists_
-          exact phi_ih
-      case neg c1 =>
-        first
-        | apply are_alpha_equiv_ind_v2.compat_forall_
-        | apply are_alpha_equiv_ind_v2.compat_exists_
+    simp only [replace_var_one_rec]
+    simp only [Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+    split_ifs
+    case pos c1 =>
+      subst c1
+      apply are_alpha_equiv_ind_v2.trans_
+      · first
+          | apply are_alpha_equiv_ind_v2.rename_forall_ phi v t
+          | apply are_alpha_equiv_ind_v2.rename_exists_ phi v t
+        · simp only [var_occurs_in_iff_mem_var_set]
+          exact h1_left
+      · first
+          | apply are_alpha_equiv_ind_v2.compat_forall_
+          | apply are_alpha_equiv_ind_v2.compat_exists_
         exact phi_ih
+    case neg c1 =>
+      first
+      | apply are_alpha_equiv_ind_v2.compat_forall_
+      | apply are_alpha_equiv_ind_v2.compat_exists_
+      exact phi_ih
 
 
 lemma are_alpha_equiv_ind_v1_imp_are_alpha_equiv_ind_v2
@@ -273,54 +273,54 @@ lemma are_alpha_equiv_ind_v1_imp_are_alpha_equiv_ind_v2
   (h1 : are_alpha_equiv_ind_v1 F F') :
   are_alpha_equiv_ind_v2 F F' :=
   by
-    induction h1
-    case
-        rename_forall_ phi x y ih_1
-      | rename_exists_ phi x y ih_1 =>
-      apply are_alpha_equiv_ind_v2.trans_
-      · first
-          | apply are_alpha_equiv_ind_v2.rename_forall_ phi x y
-          | apply are_alpha_equiv_ind_v2.rename_exists_ phi x y
-        exact ih_1
-      · first
-          | apply are_alpha_equiv_ind_v2.compat_forall_
-          | apply are_alpha_equiv_ind_v2.compat_exists_
-        apply are_alpha_equiv_ind_v2_fast_replace_free_var_one_rec_replace_var_one_rec
-        rw [← var_occurs_in_iff_mem_var_set]
-        intro contra
-        obtain s1 := var_occurs_in_imp_var_is_bound_in_or_var_is_free_in y phi contra
-        tauto
-    case compat_not_ phi phi' ih_1 ih_2 =>
-      apply are_alpha_equiv_ind_v2.compat_not_
-      exact ih_2
-    case
-        compat_imp_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
-      | compat_and_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
-      | compat_or_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
-      | compat_iff_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4 =>
-      first
-        | apply are_alpha_equiv_ind_v2.compat_imp_
-        | apply are_alpha_equiv_ind_v2.compat_and_
-        | apply are_alpha_equiv_ind_v2.compat_or_
-        | apply are_alpha_equiv_ind_v2.compat_iff_
-      · exact ih_3
-      · exact ih_4
-    case
-        compat_forall_ phi phi' x ih_1 ih_2
-      | compat_exists_ phi phi' x ih_1 ih_2 =>
-      first
+  induction h1
+  case
+      rename_forall_ phi x y ih_1
+    | rename_exists_ phi x y ih_1 =>
+    apply are_alpha_equiv_ind_v2.trans_
+    · first
+        | apply are_alpha_equiv_ind_v2.rename_forall_ phi x y
+        | apply are_alpha_equiv_ind_v2.rename_exists_ phi x y
+      exact ih_1
+    · first
         | apply are_alpha_equiv_ind_v2.compat_forall_
         | apply are_alpha_equiv_ind_v2.compat_exists_
-      · exact ih_2
-    case refl_ phi =>
-      apply are_alpha_equiv_ind_v2.refl_
-    case symm_ phi phi' _ ih_2 =>
-      apply are_alpha_equiv_ind_v2.symm_
-      exact ih_2
-    case trans_ phi phi' phi'' ih_1 ih_2 ih_3 ih_4 =>
-      apply are_alpha_equiv_ind_v2.trans_ phi phi'
-      · exact ih_3
-      · exact ih_4
+      apply are_alpha_equiv_ind_v2_fast_replace_free_var_one_rec_replace_var_one_rec
+      rw [← var_occurs_in_iff_mem_var_set]
+      intro contra
+      obtain s1 := var_occurs_in_imp_var_is_bound_in_or_var_is_free_in y phi contra
+      tauto
+  case compat_not_ phi phi' ih_1 ih_2 =>
+    apply are_alpha_equiv_ind_v2.compat_not_
+    exact ih_2
+  case
+      compat_imp_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+    | compat_and_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+    | compat_or_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+    | compat_iff_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4 =>
+    first
+      | apply are_alpha_equiv_ind_v2.compat_imp_
+      | apply are_alpha_equiv_ind_v2.compat_and_
+      | apply are_alpha_equiv_ind_v2.compat_or_
+      | apply are_alpha_equiv_ind_v2.compat_iff_
+    · exact ih_3
+    · exact ih_4
+  case
+      compat_forall_ phi phi' x ih_1 ih_2
+    | compat_exists_ phi phi' x ih_1 ih_2 =>
+    first
+      | apply are_alpha_equiv_ind_v2.compat_forall_
+      | apply are_alpha_equiv_ind_v2.compat_exists_
+    · exact ih_2
+  case refl_ phi =>
+    apply are_alpha_equiv_ind_v2.refl_
+  case symm_ phi phi' _ ih_2 =>
+    apply are_alpha_equiv_ind_v2.symm_
+    exact ih_2
+  case trans_ phi phi' phi'' ih_1 ih_2 ih_3 ih_4 =>
+    apply are_alpha_equiv_ind_v2.trans_ phi phi'
+    · exact ih_3
+    · exact ih_4
 
 
 lemma are_alpha_equiv_ind_v2_imp_are_alpha_equiv_ind_v1
@@ -328,67 +328,67 @@ lemma are_alpha_equiv_ind_v2_imp_are_alpha_equiv_ind_v1
   (h1 : are_alpha_equiv_ind_v2 F F') :
   are_alpha_equiv_ind_v1 F F' :=
   by
-    induction h1
-    case
-        rename_forall_ phi x y ih_1
-      | rename_exists_ phi x y ih_1 =>
-      apply are_alpha_equiv_ind_v1.trans_
-      · first
-          | apply are_alpha_equiv_ind_v1.rename_forall_ phi x y
-          | apply are_alpha_equiv_ind_v1.rename_exists_ phi x y
-        exact ih_1
-      · first
-          | apply are_alpha_equiv_ind_v1.compat_forall_
-          | apply are_alpha_equiv_ind_v1.compat_exists_
-        apply are_alpha_equiv_ind_v1_replace_var_one_rec_fast_replace_free_var_one_rec
-        rw [← var_occurs_in_iff_mem_var_set]
-        intro contra
-        obtain s1 := var_occurs_in_imp_var_is_bound_in_or_var_is_free_in y phi contra
-        tauto
-    case compat_not_ phi phi' ih_1 ih_2 =>
-      apply are_alpha_equiv_ind_v1.compat_not_
-      exact ih_2
-    case
-        compat_imp_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
-      | compat_and_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
-      | compat_or_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
-      | compat_iff_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4 =>
-      first
-        | apply are_alpha_equiv_ind_v1.compat_imp_
-        | apply are_alpha_equiv_ind_v1.compat_and_
-        | apply are_alpha_equiv_ind_v1.compat_or_
-        | apply are_alpha_equiv_ind_v1.compat_iff_
-      · exact ih_3
-      · exact ih_4
-    case
-        compat_forall_ phi phi' x ih_1 ih_2
-      | compat_exists_ phi phi' x ih_1 ih_2 =>
-      first
+  induction h1
+  case
+      rename_forall_ phi x y ih_1
+    | rename_exists_ phi x y ih_1 =>
+    apply are_alpha_equiv_ind_v1.trans_
+    · first
+        | apply are_alpha_equiv_ind_v1.rename_forall_ phi x y
+        | apply are_alpha_equiv_ind_v1.rename_exists_ phi x y
+      exact ih_1
+    · first
         | apply are_alpha_equiv_ind_v1.compat_forall_
         | apply are_alpha_equiv_ind_v1.compat_exists_
-      · exact ih_2
-    case refl_ phi =>
-      apply are_alpha_equiv_ind_v1.refl_
-    case symm_ phi phi' _ ih_2 =>
-      apply are_alpha_equiv_ind_v1.symm_
-      exact ih_2
-    case trans_ phi phi' phi'' ih_1 ih_2 ih_3 ih_4 =>
-      apply are_alpha_equiv_ind_v1.trans_ phi phi'
-      · exact ih_3
-      · exact ih_4
+      apply are_alpha_equiv_ind_v1_replace_var_one_rec_fast_replace_free_var_one_rec
+      rw [← var_occurs_in_iff_mem_var_set]
+      intro contra
+      obtain s1 := var_occurs_in_imp_var_is_bound_in_or_var_is_free_in y phi contra
+      tauto
+  case compat_not_ phi phi' ih_1 ih_2 =>
+    apply are_alpha_equiv_ind_v1.compat_not_
+    exact ih_2
+  case
+      compat_imp_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+    | compat_and_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+    | compat_or_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4
+    | compat_iff_ phi phi' psi psi' ih_1 ih_2 ih_3 ih_4 =>
+    first
+      | apply are_alpha_equiv_ind_v1.compat_imp_
+      | apply are_alpha_equiv_ind_v1.compat_and_
+      | apply are_alpha_equiv_ind_v1.compat_or_
+      | apply are_alpha_equiv_ind_v1.compat_iff_
+    · exact ih_3
+    · exact ih_4
+  case
+      compat_forall_ phi phi' x ih_1 ih_2
+    | compat_exists_ phi phi' x ih_1 ih_2 =>
+    first
+      | apply are_alpha_equiv_ind_v1.compat_forall_
+      | apply are_alpha_equiv_ind_v1.compat_exists_
+    · exact ih_2
+  case refl_ phi =>
+    apply are_alpha_equiv_ind_v1.refl_
+  case symm_ phi phi' _ ih_2 =>
+    apply are_alpha_equiv_ind_v1.symm_
+    exact ih_2
+  case trans_ phi phi' phi'' ih_1 ih_2 ih_3 ih_4 =>
+    apply are_alpha_equiv_ind_v1.trans_ phi phi'
+    · exact ih_3
+    · exact ih_4
 
 
 lemma are_alpha_equiv_ind_v1_iff_are_alpha_equiv_ind_v2
   (F F' : Formula_) :
   are_alpha_equiv_ind_v1 F F' ↔ are_alpha_equiv_ind_v2 F F' :=
   by
-    constructor
-    · intro a1
-      apply are_alpha_equiv_ind_v1_imp_are_alpha_equiv_ind_v2
-      exact a1
-    · intro a1
-      apply are_alpha_equiv_ind_v2_imp_are_alpha_equiv_ind_v1
-      exact a1
+  constructor
+  · intro a1
+    apply are_alpha_equiv_ind_v1_imp_are_alpha_equiv_ind_v2
+    exact a1
+  · intro a1
+    apply are_alpha_equiv_ind_v2_imp_are_alpha_equiv_ind_v1
+    exact a1
 
 -------------------------------------------------------------------------------
 
