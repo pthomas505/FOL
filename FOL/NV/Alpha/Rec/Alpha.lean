@@ -6,19 +6,18 @@ import Mathlib.Data.List.Defs
 set_option autoImplicit false
 
 
-namespace FOL.NV
-
 open Formula_
 
 
-
+/--
+  Helper function for `are_alpha_equiv_var_list_rec`.
+-/
 def are_alpha_equiv_var_rec : List (VarName_ × VarName_) → VarName_ → VarName_ → Prop
   | [], x, y => x = y
 
   | hd :: tl, x, y =>
       (x = hd.fst ∧ y = hd.snd) ∨
         ((¬ x = hd.fst ∧ ¬ y = hd.snd) ∧ are_alpha_equiv_var_rec tl x y)
-
 
 instance
   (binders : List (VarName_ × VarName_))
@@ -36,6 +35,9 @@ instance
     then y = hd.snd
     else ¬ y = hd.snd ∧ is_alpha_eqv_var tl x y
 -/
+/--
+  Helper function for `are_alpha_equiv_rec_aux`.
+-/
 def are_alpha_equiv_var_list_rec
   (binders : List (VarName_ × VarName_)) :
   List VarName_ → List VarName_ → Prop
@@ -46,7 +48,6 @@ def are_alpha_equiv_var_list_rec
         are_alpha_equiv_var_list_rec binders x_tl y_tl
 
   | _, _ => False
-
 
 instance
   (binders : List (VarName_ × VarName_))
@@ -75,6 +76,9 @@ example
     · exact ih
 
 
+/--
+  Helper function for `are_alpha_equiv_rec`.
+-/
 def are_alpha_equiv_rec_aux
   (binders : List (VarName_ × VarName_)) :
   Formula_ → Formula_ → Prop
@@ -116,7 +120,6 @@ def are_alpha_equiv_rec_aux
 
   | _, _ => False
 
-
 instance
   (binders : List (VarName_ × VarName_))
   (F F' : Formula_) :
@@ -130,9 +133,11 @@ instance
       infer_instance
 
 
+/--
+  `are_alpha_equiv_rec F F'` := True if and only if `F` and `F'` are alpha equivalent.
+-/
 def are_alpha_equiv_rec (F F' : Formula_) : Prop :=
   are_alpha_equiv_rec_aux [] F F'
-
 
 instance
   (F F' : Formula_) :
