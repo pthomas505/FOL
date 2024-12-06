@@ -591,7 +591,7 @@ theorem replace_empty_holds
           exact s2
 
 
-theorem Holds_iff_alphaEqv_Holds
+theorem holds_iff_are_alpha_equiv_ind_v2_holds
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -601,7 +601,9 @@ theorem Holds_iff_alphaEqv_Holds
   holds D I V E F ↔ holds D I V E F' :=
   by
   induction h1 generalizing V
-  case rename_forall_ h1_phi h1_x h1_y h1_1 | rename_exists_ h1_phi h1_x h1_y h1_1 =>
+  case
+    rename_forall_ h1_phi h1_x h1_y h1_1
+  | rename_exists_ h1_phi h1_x h1_y h1_1 =>
     simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
@@ -610,7 +612,7 @@ theorem Holds_iff_alphaEqv_Holds
   case compat_not_ h1_phi h1_phi' _ h1_ih =>
     simp only [holds]
     congr! 1
-    exact h1_ih V
+    apply h1_ih
   case
     compat_imp_ h1_phi h1_phi' h1_psi h1_psi' _ _ h1_ih_1 h1_ih_2
   | compat_and_ h1_phi h1_phi' h1_psi h1_psi' _ _ h1_ih_1 h1_ih_2
@@ -618,22 +620,24 @@ theorem Holds_iff_alphaEqv_Holds
   | compat_iff_ h1_phi h1_phi' h1_psi h1_psi' _ _ h1_ih_1 h1_ih_2 =>
     simp only [holds]
     congr! 1
-    · exact h1_ih_1 V
-    · exact h1_ih_2 V
-  case compat_forall_ h1_phi h1_psi h1_x _ h1_ih | compat_exists_ h1_phi h1_psi h1_x _ h1_ih =>
+    · apply h1_ih_1
+    · apply h1_ih_2
+  case
+    compat_forall_ h1_phi h1_psi h1_x _ h1_ih
+  | compat_exists_ h1_phi h1_psi h1_x _ h1_ih =>
     simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
-    exact h1_ih (Function.updateITE V h1_x d)
+    apply h1_ih
   case refl_ h1 =>
     rfl
   case symm_ h1_phi h1_phi' _ h1_ih =>
     symm
-    exact h1_ih V
+    apply h1_ih
   case trans_ h1_phi h1_phi' h1_phi'' _ _ h1_ih_1 h1_ih_2 =>
     trans holds D I V E h1_phi'
-    · exact h1_ih_1 V
-    · exact h1_ih_2 V
+    · apply h1_ih_1
+    · apply h1_ih_2
 
 -------------------------------------------------------------------------------
 
