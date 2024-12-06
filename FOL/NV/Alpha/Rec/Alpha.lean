@@ -61,7 +61,7 @@ instance
       infer_instance
 
 
-lemma isAlphaEqvVarListId
+example
   (xs : List VarName_) :
   are_alpha_equiv_var_list_rec [] xs xs :=
   by
@@ -75,44 +75,46 @@ lemma isAlphaEqvVarListId
     · exact ih
 
 
-def are_alpha_equiv_rec_aux : List (VarName_ × VarName_) → Formula_ → Formula_ → Prop
-  | binders, pred_const_ X xs, pred_const_ Y ys =>
+def are_alpha_equiv_rec_aux
+  (binders : List (VarName_ × VarName_)) :
+  Formula_ → Formula_ → Prop
+  | pred_const_ X xs, pred_const_ Y ys =>
       X = Y ∧ are_alpha_equiv_var_list_rec binders xs ys
 
-  | binders, pred_var_ X xs, pred_var_ Y ys =>
+  | pred_var_ X xs, pred_var_ Y ys =>
       X = Y ∧ are_alpha_equiv_var_list_rec binders xs ys
 
-  | binders, eq_ x y, eq_ x' y' =>
+  | eq_ x y, eq_ x' y' =>
       are_alpha_equiv_var_rec binders x x' ∧ are_alpha_equiv_var_rec binders y y'
 
-  | _, true_, true_ => True
+  | true_, true_ => True
 
-  | _, false_, false_ => True
+  | false_, false_ => True
 
-  | binders, not_ phi, not_ phi' => are_alpha_equiv_rec_aux binders phi phi'
+  | not_ phi, not_ phi' => are_alpha_equiv_rec_aux binders phi phi'
 
-  | binders, imp_ phi psi, imp_ phi' psi' =>
+  | imp_ phi psi, imp_ phi' psi' =>
       are_alpha_equiv_rec_aux binders phi phi' ∧ are_alpha_equiv_rec_aux binders psi psi'
 
-  | binders, and_ phi psi, and_ phi' psi' =>
+  | and_ phi psi, and_ phi' psi' =>
       are_alpha_equiv_rec_aux binders phi phi' ∧ are_alpha_equiv_rec_aux binders psi psi'
 
-  | binders, or_ phi psi, or_ phi' psi' =>
+  | or_ phi psi, or_ phi' psi' =>
       are_alpha_equiv_rec_aux binders phi phi' ∧ are_alpha_equiv_rec_aux binders psi psi'
 
-  | binders, iff_ phi psi, iff_ phi' psi' =>
+  | iff_ phi psi, iff_ phi' psi' =>
       are_alpha_equiv_rec_aux binders phi phi' ∧ are_alpha_equiv_rec_aux binders psi psi'
 
-  | binders, forall_ x phi, forall_ x' phi' =>
+  | forall_ x phi, forall_ x' phi' =>
       are_alpha_equiv_rec_aux ((x, x')::binders) phi phi'
 
-  | binders, exists_ x phi, exists_ x' phi' =>
+  | exists_ x phi, exists_ x' phi' =>
       are_alpha_equiv_rec_aux ((x, x')::binders) phi phi'
 
-  | binders, def_ X xs, def_ Y ys =>
+  | def_ X xs, def_ Y ys =>
       X = Y ∧ are_alpha_equiv_var_list_rec binders xs ys
 
-  | _, _, _ => False
+  | _, _ => False
 
 
 instance
