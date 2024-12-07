@@ -108,23 +108,22 @@ theorem substitution_theorem_var_all_rec_aux
         simp only [h3 v c1]
         exact h1 v a1 c1
     case eq_ x y =>
-      cases h1
-      case intro h1_left h1_right =>
-        congr! 1
-        · apply h2
-          by_cases c1 : x ∈ binders
-          · left
-            exact c1
-          · right
-            simp only [h3 x c1]
-            exact h1_left c1
-        · apply h2
-          by_cases c1 : y ∈ binders
-          · left
-            exact c1
-          · right
-            simp only [h3 y c1]
-            exact h1_right c1
+      obtain ⟨h1_left, h1_right⟩ := h1
+      congr! 1
+      · apply h2
+        by_cases c1 : x ∈ binders
+        · left
+          exact c1
+        · right
+          simp only [h3 x c1]
+          exact h1_left c1
+      · apply h2
+        by_cases c1 : y ∈ binders
+        · left
+          exact c1
+        · right
+          simp only [h3 y c1]
+          exact h1_right c1
     case not_ phi phi_ih =>
       congr! 1
       exact phi_ih V V' σ σ' binders h1 h2 h2' h3
@@ -204,9 +203,7 @@ theorem substitution_theorem_var_all_rec_aux
       simp at c2
       contradiction
     case _ c1 c2 =>
-      specialize ih V V' σ σ' binders (def_ X xs)
-      simp only [fast_replace_free_var_all_rec] at ih
-      apply ih h1 h2 h2' h3
+      exact ih V V' σ σ' binders (def_ X xs) h1 h2 h2' h3
 
 
 theorem substitution_theorem_var_all_rec
@@ -238,7 +235,7 @@ theorem substitution_is_valid_var_all_rec
   simp only [is_valid]
   intro D I V E
   simp only [← substitution_theorem_var_all_rec D I V E σ F h1]
-  exact h2 D I (V ∘ σ) E
+  apply h2
 
 
 #lint
