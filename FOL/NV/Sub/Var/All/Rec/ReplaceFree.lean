@@ -103,7 +103,7 @@ def fast_replace_free_var_all_rec
   | def_ X xs => def_ X (xs.map σ)
 
 
-theorem fastReplaceFree_id
+theorem fast_replace_free_var_all_rec_id
   (F : Formula_) :
   fast_replace_free_var_all_rec id F = F :=
   by
@@ -166,7 +166,7 @@ example
       simp
       simp only [Function.updateITE_idem]
       simp only [Function.updateITE_id]
-      apply fastReplaceFree_id
+      apply fast_replace_free_var_all_rec_id
     case neg c1 =>
       simp
       simp only [← phi_ih]
