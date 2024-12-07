@@ -57,7 +57,7 @@ instance
 
 
 /--
-  `admits_var_all_rec σ F` := True if and only if there is no free occurrence of a variable in the formula `F` that becomes a bound occurrence in the formula `fast_replace_free σ F`.
+  `admits_var_all_rec σ F` := True if and only if there is no free occurrence of a variable in the formula `F` that becomes a bound occurrence in the formula `fast_replace_free_var_all_rec σ F`.
 -/
 def admits_var_all_rec
   (σ : VarName_ → VarName_)
