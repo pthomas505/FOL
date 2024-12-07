@@ -61,14 +61,19 @@ def replace_free_var_all_rec_aux
 /--
   `replace_free_var_all_rec σ F` := The simultaneous replacement of each free occurrence of any variable `v` in the formula `F` by `σ v`.
 -/
-def replace_free_var_all_rec (σ : VarName_ → VarName_) (F : Formula_) : Formula_ :=
+def replace_free_var_all_rec
+  (σ : VarName_ → VarName_)
+  (F : Formula_) :
+  Formula_ :=
   replace_free_var_all_rec_aux σ ∅ F
 
 
 /--
-  fast_replace_free_var_all_rec σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
+  `fast_replace_free_var_all_rec σ F` := The simultaneous replacement of each free occurrence of any variable `v` in the formula `F` by `σ v`.
 -/
-def fast_replace_free_var_all_rec (σ : VarName_ → VarName_) : Formula_ → Formula_
+def fast_replace_free_var_all_rec
+  (σ : VarName_ → VarName_) :
+  Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs => pred_var_ X (xs.map σ)
   | eq_ x y => eq_ (σ x) (σ y)
