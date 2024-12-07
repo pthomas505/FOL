@@ -1,4 +1,4 @@
-import FOL.NV.Sub.Var.All.Rec.Fresh.Sub
+import FOL.NV.Sub.Var.All.Rec.Sub
 
 
 set_option autoImplicit false
