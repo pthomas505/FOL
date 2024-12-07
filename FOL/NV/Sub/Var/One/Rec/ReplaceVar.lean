@@ -25,9 +25,9 @@ def replace_var_one_rec (v t : VarName_) : Formula_ → Formula_
       X
       (xs.map fun (x : VarName_) => if v = x then t else x)
   | eq_ x y =>
-    eq_
-    (if v = x then t else x)
-    (if v = y then t else y)
+      eq_
+      (if v = x then t else x)
+      (if v = y then t else y)
   | true_ => true_
   | false_ => false_
   | not_ phi => not_ (replace_var_one_rec v t phi)

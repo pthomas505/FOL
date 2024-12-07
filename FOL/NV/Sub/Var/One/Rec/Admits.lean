@@ -47,7 +47,6 @@ def admits_var_one_rec_aux (v u : VarName_) (binders : Finset VarName_) : Formul
       v ∈ xs ∧ v ∉ binders → -- if there is a free occurrence of `v` in `P`
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
 
-
 instance
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -69,7 +68,6 @@ instance
 -/
 def admits_var_one_rec (v u : VarName_) (F : Formula_) : Prop :=
   admits_var_one_rec_aux v u ∅ F
-
 
 instance
   (v u : VarName_)
@@ -110,7 +108,6 @@ def fast_admits_var_one_rec_aux (v u : VarName_) (binders : Finset VarName_) : F
       v ∈ xs → -- if there is a free occurrence of `v` in `P`
         u ∉ binders -- then it does not become a bound occurrence of `u` in `P(u/v)`
 
-
 instance
   (v u : VarName_)
   (binders : Finset VarName_)
@@ -134,7 +131,6 @@ instance
 -/
 def fast_admits_var_one_rec (v u : VarName_) (F : Formula_) : Prop :=
   fast_admits_var_one_rec_aux v u ∅ F
-
 
 instance
   (v u : VarName_)
@@ -374,14 +370,13 @@ theorem not_var_is_bound_in_imp_fast_admits_var_one_rec_aux
 
     simp only [fast_admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    push_neg at h1
-
-    cases h1
-    case intro h1_left h1_right =>
-      right
-      apply phi_ih (binders ∪ {x}) h1_right
-      · simp
-        tauto
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
+    right
+    apply phi_ih
+    · exact h1_right
+    · simp
+      tauto
   all_goals
     tauto
 
@@ -414,25 +409,25 @@ theorem fast_replace_free_var_one_rec_fast_admits_var_one_rec_aux
   any_goals
     simp only [fast_admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    push_neg at h1
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
-    cases h1
-    case intro h1_left h1_right =>
-      split_ifs
-      case pos c1 =>
-        simp only [fast_admits_var_one_rec_aux]
-        subst c1
-        right
-        apply not_var_is_free_in_imp_fast_admits_var_one_rec_aux
-        intro contra
-        apply h1_right
-        apply var_is_free_in_imp_var_occurs_in
-        exact contra
-      case neg c1 =>
-        simp only [fast_admits_var_one_rec_aux]
-        right
-        apply phi_ih (binders ∪ {x}) h1_right
-        simp
+    split_ifs
+    case pos c1 =>
+      simp only [fast_admits_var_one_rec_aux]
+      subst c1
+      right
+      apply not_var_is_free_in_imp_fast_admits_var_one_rec_aux
+      intro contra
+      apply h1_right
+      apply var_is_free_in_imp_var_occurs_in
+      exact contra
+    case neg c1 =>
+      simp only [fast_admits_var_one_rec_aux]
+      right
+      apply phi_ih
+      · exact h1_right
+      · simp
         tauto
   all_goals
     tauto
@@ -445,8 +440,9 @@ theorem fast_replace_free_var_one_rec_fast_admits_var_one_rec
   fast_admits_var_one_rec t v (fast_replace_free_var_one_rec v t F) :=
   by
   simp only [fast_admits_var_one_rec]
-  apply fast_replace_free_var_one_rec_fast_admits_var_one_rec_aux F v t ∅ h1
-  simp
+  apply fast_replace_free_var_one_rec_fast_admits_var_one_rec_aux
+  · exact h1
+  · simp
 
 --
 
@@ -467,34 +463,28 @@ theorem replace_free_var_one_rec_aux_fast_admits_var_one_rec_aux
     simp
     intro x a1 a2
     by_cases c1 : v = x ∧ x ∉ binders
-    · cases c1
-      case _ c1_left c1_right =>
-        subst c1_left
-        exact c1_right
+    · obtain ⟨c1_left, c1_right⟩ := c1
+      rw [c1_left]
+      exact c1_right
     · push_neg at c1
       specialize a2 c1
-      subst a2
+      rw [a2] at a1
       contradiction
   case eq_ x y =>
-    push_neg at h1
-
     intros a1
     split_ifs at a1
     case _ c1 c2 =>
-      cases c1
-      case intro c1_left c1_right =>
-        subst c1_left
-        exact c1_right
+      obtain ⟨c1_left, c1_right⟩ := c1
+      rw [c1_left]
+      exact c1_right
     case _ c1 c2 =>
-      cases c1
-      case intro c1_left c1_right =>
-        subst c1_left
-        exact c1_right
+      obtain ⟨c1_left, c1_right⟩ := c1
+      rw [c1_left]
+      exact c1_right
     case _ c1 c2 =>
-      cases c2
-      case intro c2_left c2_right =>
-        subst c2_left
-        exact c2_right
+      obtain ⟨c2_left, c2_right⟩ := c2
+      rw [c2_left]
+      exact c2_right
     case _ c1 c2 =>
       tauto
   all_goals
@@ -533,10 +523,10 @@ theorem fast_admits_var_one_rec_aux_add_binders
     case inl h1 =>
       tauto
     case inr h1 =>
-      specialize phi_ih (S ∪ {x}) h1
       right
       simp only [Finset.union_right_comm_assoc]
-      exact phi_ih
+      apply phi_ih
+      exact h1
   any_goals
     simp only [Finset.mem_union]
   all_goals
@@ -592,15 +582,14 @@ theorem fast_admits_var_one_rec_aux_var_is_free_in
 
     simp only [var_is_free_in] at h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    cases h2
-    case intro h2_left h2_right =>
-      cases h1
-      case inl h1 =>
-        contradiction
-      case inr h1 =>
-        apply phi_ih
-        · exact fast_admits_var_one_rec_aux_del_binders phi v u binders {x} h1
-        · exact h2_right
+    obtain ⟨h2_left, h2_right⟩ := h2
+    cases h1
+    case inl h1 =>
+      contradiction
+    case inr h1 =>
+      apply phi_ih
+      · exact fast_admits_var_one_rec_aux_del_binders phi v u binders {x} h1
+      · exact h2_right
   all_goals
     tauto
 
@@ -700,18 +689,17 @@ theorem free_and_bound_unchanged_imp_fast_admits_var_one_rec_aux
   case eq_ x y =>
     simp at h2
 
-    cases h2
-    case intro h2_left h2_right =>
-      intros a1
-      cases a1
-      case inl a1 =>
-        subst a1
-        simp at h2_left
-        tauto
-      case inr a1 =>
-        subst a1
-        simp at h2_right
-        tauto
+    obtain ⟨h2_left, h2_right⟩ := h2
+    intros a1
+    cases a1
+    case inl a1 =>
+      subst a1
+      simp at h2_left
+      tauto
+    case inr a1 =>
+      subst a1
+      simp at h2_right
+      tauto
   case not_ phi phi_ih =>
     simp at h2
 
@@ -829,12 +817,11 @@ theorem not_var_is_bound_in_imp_admits_var_one_rec_aux
 
     simp only [admits_var_one_rec_aux]
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    push_neg at h1
-
-    cases h1
-    case intro h1_left h1_right =>
-      apply phi_ih (binders ∪ {x}) h1_right
-      simp
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
+    apply phi_ih
+    · exact h1_right
+    · simp
       tauto
   all_goals
     tauto
@@ -847,8 +834,9 @@ theorem not_var_is_bound_in_imp_admits_var_one_rec
   admits_var_one_rec v u F :=
   by
   simp only [admits_var_one_rec]
-  apply not_var_is_bound_in_imp_admits_var_one_rec_aux F v u ∅ h1
-  simp
+  apply not_var_is_bound_in_imp_admits_var_one_rec_aux
+  · exact h1
+  · simp
 
 --
 
@@ -870,39 +858,33 @@ theorem replace_free_var_one_rec_aux_admits_var_one_rec_aux
     intro x a1 a2 a3
     by_cases c1 : v = x ∧ x ∉ binders
     case pos =>
-      cases c1
-      case intro c1_left c1_right =>
-        subst c1_left
-        exact c1_right
+      obtain ⟨c1_left, c1_right⟩ := c1
+      rw [c1_left]
+      exact c1_right
     case neg =>
       simp at c1
       specialize a2 c1
-      subst a2
+      rw [a2] at a1
       contradiction
   case eq_ x y =>
-    push_neg at h1
-
-    cases h1
-    case intro h1_left h1_right =>
-      intro a1
-      split_ifs at a1
-      case _ c1 c2 =>
-        cases c1
-        case intro c1_left c1_right =>
-          subst c1_left
-          exact c1_right
-      case _ c1 c2 =>
-        cases c1
-        case intro c1_left c1_right =>
-          subst c1_left
-          exact c1_right
-      case _ c1 c2 =>
-        cases c2
-        case intro c2_left c2_right =>
-          subst c2_left
-          exact c2_right
-      case _ c1 c2 =>
-        tauto
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
+    intro a1
+    split_ifs at a1
+    case _ c1 c2 =>
+      obtain ⟨c1_left, c1_right⟩ := c1
+      rw [c1_left]
+      exact c1_right
+    case _ c1 c2 =>
+      obtain ⟨c1_left, c1_right⟩ := c1
+      rw [c1_left]
+      exact c1_right
+    case _ c1 c2 =>
+      obtain ⟨c2_left, c2_right⟩ := c2
+      rw [c2_left]
+      exact c2_right
+    case _ c1 c2 =>
+      tauto
   all_goals
     tauto
 
@@ -990,14 +972,14 @@ theorem admits_var_one_rec_aux_var_is_free_in
 
     simp only [var_is_free_in] at h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    cases h2
-    case intro h2_left h2_right =>
-      apply phi_ih binders
-      · apply admits_var_one_rec_aux_del_binders phi v u binders {x} h1
-        · simp
-          exact h2_left
-      · exact h2_right
-      · exact h3
+    obtain ⟨h2_left, h2_right⟩ := h2
+    apply phi_ih
+    · apply admits_var_one_rec_aux_del_binders phi v u binders {x}
+      · exact h1
+      · simp
+        exact h2_left
+    · exact h2_right
+    · exact h3
   all_goals
     tauto
 
@@ -1061,8 +1043,7 @@ theorem substitution_theorem_var_one_rec_aux
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      cases h1
-      case intro h1_left h1_right =>
+      obtain ⟨h1_left, h1_right⟩ := h1
       congr! 1
       · exact phi_ih V binders h1_left h2
       · exact psi_ih V binders h1_right h2
@@ -1091,7 +1072,6 @@ theorem substitution_theorem_var_one_rec_aux
           apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
           simp only [Function.updateITE]
           simp
-          push_neg
           intros v' a1 a2
           simp only [if_neg a2]
           apply h2
