@@ -267,105 +267,104 @@ lemma holds_iff_are_alpha_equiv_rec_holds_aux
   (h2 : are_alpha_equiv_rec_aux binders F F') :
   holds D I V E F ↔ holds D I V' E F' :=
   by
-  induction E generalizing F F' binders V V'
+  induction F generalizing F' binders V V'
   all_goals
-    induction F generalizing F' binders V V'
-    all_goals
-      cases F'
+    cases F'
 
-    any_goals
-      simp only [are_alpha_equiv_rec_aux] at h2
+  any_goals
+    simp only [are_alpha_equiv_rec_aux] at h2
 
-    case
-      pred_const_.pred_const_ X xs Y ys
-    | pred_var_.pred_var_ X xs Y ys =>
-      obtain ⟨h2_left, h2_right⟩ := h2
+  case
+    pred_const_.pred_const_ X xs Y ys
+  | pred_var_.pred_var_ X xs Y ys =>
+    obtain ⟨h2_left, h2_right⟩ := h2
 
-      simp only [holds]
-      rw [h2_left]
-      congr! 1
-      apply aux_2 D binders
-      · exact h1
-      · exact h2_right
-
-    case eq_.eq_ x x' y y' =>
-      cases h2
-      case intro h2_left h2_right =>
-        simp only [holds]
-        congr! 1
-        · apply aux_1 D binders
-          · exact h1
-          · exact h2_left
-        · apply aux_1 D binders
-          · exact h1
-          · exact h2_right
-
-    case true_.true_ | false_.false_ =>
-      simp only [holds]
-
-    case not_.not_ phi phi_ih phi' =>
-      simp only [holds]
-      congr! 1
-      exact phi_ih V V' phi' binders h1 h2
-
-    case
-      imp_.imp_ phi psi phi_ih psi_ih phi' psi'
-    | and_.and_ phi psi phi_ih psi_ih phi' psi'
-    | or_.or_ phi psi phi_ih psi_ih phi' psi'
-    | iff_.iff_ phi psi phi_ih psi_ih phi' psi' =>
-      obtain ⟨h2_left, h2_right⟩ := h2
-      simp only [holds]
-      congr! 1
-      · exact phi_ih V V' phi' binders h1 h2_left
-      · exact psi_ih V V' psi' binders h1 h2_right
-
-    case
-      forall_.forall_ x phi phi_ih y phi'
-    | exists_.exists_ x phi phi_ih y phi' =>
-        simp only [holds]
-        first | apply forall_congr' | apply exists_congr
-        intro d
-        induction h1
-        case nil h1_V =>
-          apply phi_ih
-          · apply alpha_equiv_var_valuation.cons
-            apply alpha_equiv_var_valuation.nil
-          · exact h2
-        case cons h1_binders h1_x h1_y h1_V h1_V' h1_d h1_1 _ =>
-          apply phi_ih
-          · apply alpha_equiv_var_valuation.cons
-            apply alpha_equiv_var_valuation.cons
-            exact h1_1
-          · exact h2
-
-  case nil.def_.def_ =>
     simp only [holds]
-  case cons.def_.def_ hd tl ih X xs Y ys =>
+    rw [h2_left]
+    congr! 1
+    apply aux_2 D binders
+    · exact h1
+    · exact h2_right
+
+  case eq_.eq_ x x' y y' =>
+    cases h2
+    case intro h2_left h2_right =>
+      simp only [holds]
+      congr! 1
+      · apply aux_1 D binders
+        · exact h1
+        · exact h2_left
+      · apply aux_1 D binders
+        · exact h1
+        · exact h2_right
+
+  case true_.true_ | false_.false_ =>
     simp only [holds]
-    split_ifs
-    case _ c1 c2 =>
-      obtain ⟨h2_left, h2_right⟩ := h2
-      apply holds_coincide_var
-      intro v a1
-      simp only [aux_2 D binders xs ys V V' h1 h2_right]
-      apply Function.updateListITE_mem_eq_len
-      · simp only [var_is_free_in_iff_mem_free_var_set] at a1
-        simp only [← List.mem_toFinset]
-        exact Finset.mem_of_subset hd.h1 a1
-      · simp
-        tauto
-    case _ c1 c2 =>
-      obtain ⟨h2_left, h2_right⟩ := h2
-      simp only [are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c1
-      rw [h2_left] at c1
-      contradiction
-    case _ c1 c2 =>
-      obtain ⟨h2_left, h2_right⟩ := h2
-      simp only [← are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c2
-      rw [h2_left] at c1
-      contradiction
-    case _ c1 c2 =>
-      exact ih V V' (def_ X xs) (def_ Y ys) binders h1 h2
+
+  case not_.not_ phi phi_ih phi' =>
+    simp only [holds]
+    congr! 1
+    exact phi_ih V V' phi' binders h1 h2
+
+  case
+    imp_.imp_ phi psi phi_ih psi_ih phi' psi'
+  | and_.and_ phi psi phi_ih psi_ih phi' psi'
+  | or_.or_ phi psi phi_ih psi_ih phi' psi'
+  | iff_.iff_ phi psi phi_ih psi_ih phi' psi' =>
+    obtain ⟨h2_left, h2_right⟩ := h2
+    simp only [holds]
+    congr! 1
+    · exact phi_ih V V' phi' binders h1 h2_left
+    · exact psi_ih V V' psi' binders h1 h2_right
+
+  case
+    forall_.forall_ x phi phi_ih y phi'
+  | exists_.exists_ x phi phi_ih y phi' =>
+      simp only [holds]
+      first | apply forall_congr' | apply exists_congr
+      intro d
+      induction h1
+      case nil h1_V =>
+        apply phi_ih
+        · apply alpha_equiv_var_valuation.cons
+          apply alpha_equiv_var_valuation.nil
+        · exact h2
+      case cons h1_binders h1_x h1_y h1_V h1_V' h1_d h1_1 _ =>
+        apply phi_ih
+        · apply alpha_equiv_var_valuation.cons
+          apply alpha_equiv_var_valuation.cons
+          exact h1_1
+        · exact h2
+  case def_.def_ X xs Y ys =>
+    induction E
+    case nil =>
+      simp only [holds]
+    case cons hd tl ih =>
+      simp only [holds]
+      split_ifs
+      case _ c1 c2 =>
+        obtain ⟨h2_left, h2_right⟩ := h2
+        apply holds_coincide_var
+        intro v a1
+        rw [aux_2 D binders xs ys V V' h1 h2_right]
+        apply Function.updateListITE_mem_eq_len
+        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
+          simp only [← List.mem_toFinset]
+          exact Finset.mem_of_subset hd.h1 a1
+        · simp
+          tauto
+      case _ c1 c2 =>
+        obtain ⟨h2_left, h2_right⟩ := h2
+        simp only [are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c1
+        rw [h2_left] at c1
+        contradiction
+      case _ c1 c2 =>
+        obtain ⟨h2_left, h2_right⟩ := h2
+        simp only [← are_alpha_equiv_var_list_rec_length binders xs ys h2_right] at c2
+        rw [h2_left] at c1
+        contradiction
+      case _ c1 c2 =>
+        apply ih
 
 
 theorem holds_iff_are_alpha_equiv_rec_holds
