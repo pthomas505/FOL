@@ -10,9 +10,9 @@ open Formula_
 
 
 /--
-  replaceAll σ F := The simultaneous replacement of each occurrence of any variable v in the formula F by σ v.
+  `replace_var_all_rec σ F` := The simultaneous replacement of each occurrence of any variable `v` in the formula `F` by `σ v`.
 -/
-def replaceAll
+def replace_var_all_rec
   (σ : VarName_ → VarName_) :
   Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X (xs.map σ)
@@ -20,17 +20,17 @@ def replaceAll
   | eq_ x y => eq_ (σ x) (σ y)
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (replaceAll σ phi)
-  | imp_ phi psi => imp_ (replaceAll σ phi) (replaceAll σ psi)
-  | and_ phi psi => and_ (replaceAll σ phi) (replaceAll σ psi)
-  | or_ phi psi => or_ (replaceAll σ phi) (replaceAll σ psi)
-  | iff_ phi psi => iff_ (replaceAll σ phi) (replaceAll σ psi)
-  | forall_ x phi => forall_ (σ x) (replaceAll σ phi)
-  | exists_ x phi => exists_ (σ x) (replaceAll σ phi)
+  | not_ phi => not_ (replace_var_all_rec σ phi)
+  | imp_ phi psi => imp_ (replace_var_all_rec σ phi) (replace_var_all_rec σ psi)
+  | and_ phi psi => and_ (replace_var_all_rec σ phi) (replace_var_all_rec σ psi)
+  | or_ phi psi => or_ (replace_var_all_rec σ phi) (replace_var_all_rec σ psi)
+  | iff_ phi psi => iff_ (replace_var_all_rec σ phi) (replace_var_all_rec σ psi)
+  | forall_ x phi => forall_ (σ x) (replace_var_all_rec σ phi)
+  | exists_ x phi => exists_ (σ x) (replace_var_all_rec σ phi)
   | def_ X xs => def_ X (xs.map σ)
 
 
-theorem substitution_theorem
+theorem substitution_theorem_var_all_rec_inj
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -39,11 +39,11 @@ theorem substitution_theorem
   (σ : VarName_ → VarName_)
   (h1 : Function.Injective σ) :
   holds D I (V ∘ σ) E F ↔
-    holds D I V E (replaceAll σ F) :=
+    holds D I V E (replace_var_all_rec σ F) :=
   by
   induction F generalizing V
   all_goals
-    simp only [replaceAll]
+    simp only [replace_var_all_rec]
   any_goals
     simp only [holds]
   case pred_const_ X xs | pred_var_ X xs =>
@@ -96,18 +96,18 @@ theorem substitution_theorem
         apply E_ih
 
 
-theorem substitution_is_valid
+theorem substitution_is_valid_var_all_rec_inj
   (F : Formula_)
   (σ : VarName_ → VarName_)
   (h1 : Function.Injective σ)
   (h2 : F.is_valid) :
-  (replaceAll σ F).is_valid :=
+  (replace_var_all_rec σ F).is_valid :=
   by
     simp only [is_valid] at h2
 
     simp only [is_valid]
     intro D I V E
-    simp only [← substitution_theorem D I V E F σ h1]
+    simp only [← substitution_theorem_var_all_rec_inj D I V E F σ h1]
     apply h2
 
 
