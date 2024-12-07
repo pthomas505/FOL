@@ -180,25 +180,21 @@ theorem aux_1
   induction h1
   case nil h1_V =>
     simp only [are_alpha_equiv_var_rec] at h2
-
-    subst h2
-    rfl
+    rw [h2]
   case cons h1_l h1_x h1_y h1_V h1_V' h1_d _ h1_ih =>
     simp only [are_alpha_equiv_var_rec] at h2
 
     simp only [Function.updateITE]
     cases h2
-    case inl h2 =>
-      cases h2
-      case intro h2_left h2_right =>
-        simp only [if_pos h2_left, if_pos h2_right]
-    case inr h2 =>
-      cases h2
-      case intro h2_left h2_right =>
-        cases h2_left
-        case intro h2_left_left h2_left_right =>
-          simp only [if_neg h2_left_left, if_neg h2_left_right]
-          exact h1_ih h2_right
+    case inl c1 =>
+      obtain ⟨c1_left, c1_right⟩ := c1
+      split_ifs
+      rfl
+    case inr c1 =>
+      obtain ⟨⟨c1_left_left, c1_left_right⟩, c1_right⟩ := c1
+      split_ifs
+      apply h1_ih
+      exact c1_right
 
 
 theorem aux_2
