@@ -11,10 +11,12 @@ open Formula_
 
 
 /--
-  Helper function for admits.
+  Helper function for `admits_var_all_rec`.
 -/
-def admitsAux
-  (σ : VarName_ → VarName_) (binders : Finset VarName_) : Formula_ → Prop
+def admits_var_all_rec_aux
+  (σ : VarName_ → VarName_)
+  (binders : Finset VarName_) :
+  Formula_ → Prop
   | pred_const_ _ xs =>
       ∀ (v : VarName_), v ∈ xs → v ∉ binders → σ v ∉ binders
   | pred_var_ _ xs =>
@@ -24,54 +26,55 @@ def admitsAux
       (y ∉ binders → σ y ∉ binders)
   | true_ => True
   | false_ => True
-  | not_ phi => admitsAux σ binders phi
+  | not_ phi => admits_var_all_rec_aux σ binders phi
   | imp_ phi psi =>
-      admitsAux σ binders phi ∧
-      admitsAux σ binders psi
+      admits_var_all_rec_aux σ binders phi ∧
+      admits_var_all_rec_aux σ binders psi
   | and_ phi psi =>
-      admitsAux σ binders phi ∧
-      admitsAux σ binders psi
+      admits_var_all_rec_aux σ binders phi ∧
+      admits_var_all_rec_aux σ binders psi
   | or_ phi psi =>
-      admitsAux σ binders phi ∧
-      admitsAux σ binders psi
+      admits_var_all_rec_aux σ binders phi ∧
+      admits_var_all_rec_aux σ binders psi
   | iff_ phi psi =>
-      admitsAux σ binders phi ∧
-      admitsAux σ binders psi
-  | forall_ x phi => admitsAux σ (binders ∪ {x}) phi
-  | exists_ x phi => admitsAux σ (binders ∪ {x}) phi
+      admits_var_all_rec_aux σ binders phi ∧
+      admits_var_all_rec_aux σ binders psi
+  | forall_ x phi => admits_var_all_rec_aux σ (binders ∪ {x}) phi
+  | exists_ x phi => admits_var_all_rec_aux σ (binders ∪ {x}) phi
   | def_ _ xs =>
       ∀ (v : VarName_), v ∈ xs → v ∉ binders → σ v ∉ binders
-
 
 instance
   (σ : VarName_ → VarName_)
   (binders : Finset VarName_)
   (F : Formula_) :
-  Decidable (admitsAux σ binders F) :=
+  Decidable (admits_var_all_rec_aux σ binders F) :=
   by
   induction F generalizing binders
   all_goals
-    simp only [admitsAux]
+    simp only [admits_var_all_rec_aux]
     infer_instance
 
 
 /--
-  admits σ F := True if and only if there is no free occurrence of a variable in the formula F that becomes a bound occurrence in the formula (fast_replace_free σ F).
+  `admits_var_all_rec σ F` := True if and only if there is no free occurrence of a variable in the formula `F` that becomes a bound occurrence in the formula `fast_replace_free σ F`.
 -/
-def admits (σ : VarName_ → VarName_) (F : Formula_) : Prop :=
-  admitsAux σ ∅ F
-
+def admits_var_all_rec
+  (σ : VarName_ → VarName_)
+  (F : Formula_) :
+  Prop :=
+  admits_var_all_rec_aux σ ∅ F
 
 instance
   (σ : VarName_ → VarName_)
   (F : Formula_) :
-  Decidable (admits σ F) :=
+  Decidable (admits_var_all_rec σ F) :=
   by
-  simp only [admits]
+  simp only [admits_var_all_rec]
   infer_instance
 
 
-theorem substitution_theorem_aux
+theorem substitution_theorem_var_all_rec_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
@@ -79,7 +82,7 @@ theorem substitution_theorem_aux
   (σ σ' : VarName_ → VarName_)
   (binders : Finset VarName_)
   (F : Formula_)
-  (h1 : admitsAux σ binders F)
+  (h1 : admits_var_all_rec_aux σ binders F)
   (h2 : ∀ (v : VarName_), v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
   (h2' : ∀ (v : VarName_), v ∈ binders → v = σ' v)
   (h3 : ∀ (v : VarName_), v ∉ binders → σ' v = σ v) :
@@ -89,7 +92,7 @@ theorem substitution_theorem_aux
   all_goals
     induction F generalizing binders V V' σ σ'
     all_goals
-      simp only [admitsAux] at h1
+      simp only [admits_var_all_rec_aux] at h1
 
       simp only [fast_replace_free_var_all_rec]
       simp only [holds]
@@ -206,27 +209,27 @@ theorem substitution_theorem_aux
       apply ih h1 h2 h2' h3
 
 
-theorem substitution_theorem
+theorem substitution_theorem_var_all_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
   (E : Env_)
   (σ : VarName_ → VarName_)
   (F : Formula_)
-  (h1 : admits σ F) :
+  (h1 : admits_var_all_rec σ F) :
   holds D I (V ∘ σ) E F ↔
     holds D I V E (fast_replace_free_var_all_rec σ F) :=
   by
-  apply substitution_theorem_aux D I (V ∘ σ) V E σ σ ∅ F h1
+  apply substitution_theorem_var_all_rec_aux D I (V ∘ σ) V E σ σ ∅ F h1
   · simp
   · simp
   · simp
 
 
-theorem substitution_is_valid
+theorem substitution_is_valid_var_all_rec
   (σ : VarName_ → VarName_)
   (F : Formula_)
-  (h1 : admits σ F)
+  (h1 : admits_var_all_rec σ F)
   (h2 : F.is_valid) :
   (fast_replace_free_var_all_rec σ F).is_valid :=
   by
@@ -234,7 +237,7 @@ theorem substitution_is_valid
 
   simp only [is_valid]
   intro D I V E
-  simp only [← substitution_theorem D I V E σ F h1]
+  simp only [← substitution_theorem_var_all_rec D I V E σ F h1]
   exact h2 D I (V ∘ σ) E
 
 
