@@ -11,9 +11,12 @@ open Formula_
 
 
 /--
-  Helper function for replace_free.
+  Helper function for `replace_free_var_all_rec`.
 -/
-def replace_free_aux (σ : VarName_ → VarName_) (binders : Finset VarName_) : Formula_ → Formula_
+def replace_free_var_all_rec_aux
+  (σ : VarName_ → VarName_)
+  (binders : Finset VarName_) :
+  Formula_ → Formula_
   | pred_const_ X xs =>
       pred_const_
       X
@@ -28,27 +31,27 @@ def replace_free_aux (σ : VarName_ → VarName_) (binders : Finset VarName_) : 
       (if y ∉ binders then σ y else y)
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (replace_free_aux σ binders phi)
+  | not_ phi => not_ (replace_free_var_all_rec_aux σ binders phi)
   | imp_ phi psi =>
       imp_
-      (replace_free_aux σ binders phi)
-      (replace_free_aux σ binders psi)
+      (replace_free_var_all_rec_aux σ binders phi)
+      (replace_free_var_all_rec_aux σ binders psi)
   | and_ phi psi =>
       and_
-      (replace_free_aux σ binders phi)
-      (replace_free_aux σ binders psi)
+      (replace_free_var_all_rec_aux σ binders phi)
+      (replace_free_var_all_rec_aux σ binders psi)
   | or_ phi psi =>
       or_
-      (replace_free_aux σ binders phi)
-      (replace_free_aux σ binders psi)
+      (replace_free_var_all_rec_aux σ binders phi)
+      (replace_free_var_all_rec_aux σ binders psi)
   | iff_ phi psi =>
       iff_
-      (replace_free_aux σ binders phi)
-      (replace_free_aux σ binders psi)
+      (replace_free_var_all_rec_aux σ binders phi)
+      (replace_free_var_all_rec_aux σ binders psi)
   | forall_ x phi =>
-      forall_ x (replace_free_aux σ (binders ∪ {x}) phi)
+      forall_ x (replace_free_var_all_rec_aux σ (binders ∪ {x}) phi)
   | exists_ x phi =>
-      exists_ x (replace_free_aux σ (binders ∪ {x}) phi)
+      exists_ x (replace_free_var_all_rec_aux σ (binders ∪ {x}) phi)
   | def_ X xs =>
       def_
       X
@@ -56,10 +59,10 @@ def replace_free_aux (σ : VarName_ → VarName_) (binders : Finset VarName_) : 
 
 
 /--
-  replace_free σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
+  replace_free_var_all_rec σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
-def replace_free (σ : VarName_ → VarName_) (F : Formula_) : Formula_ :=
-  replace_free_aux σ ∅ F
+def replace_free_var_all_rec (σ : VarName_ → VarName_) (F : Formula_) : Formula_ :=
+  replace_free_var_all_rec_aux σ ∅ F
 
 
 /--
@@ -227,12 +230,12 @@ theorem replaceFreeAux_same_on_free
   (σ σ' : VarName_ → VarName_)
   (binders : Finset VarName_)
   (h1 : ∀ (v : VarName_), v ∉ binders → σ v = σ' v) :
-  replace_free_aux σ binders F =
-    replace_free_aux σ' binders F :=
+  replace_free_var_all_rec_aux σ binders F =
+    replace_free_var_all_rec_aux σ' binders F :=
   by
   induction F generalizing binders
   all_goals
-    simp only [replace_free_aux]
+    simp only [replace_free_var_all_rec_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr! 1
     simp only [List.map_eq_map_iff]
@@ -264,13 +267,13 @@ example
   (σ : VarName_ → VarName_)
   (binders : Finset VarName_)
   (h1 : ∀ (v : VarName_), v ∈ binders → v = σ v) :
-  replace_free_aux σ binders F =
+  replace_free_var_all_rec_aux σ binders F =
     fast_replace_free σ F :=
   by
   induction F generalizing binders σ
   all_goals
     simp only [fast_replace_free]
-    simp only [replace_free_aux]
+    simp only [replace_free_var_all_rec_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr! 1
     simp only [List.map_eq_map_iff]
