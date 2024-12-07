@@ -52,15 +52,15 @@ theorem substitution_theorem_var_all_rec_inj
     simp
   case not_ phi phi_ih =>
     congr! 1
-    exact phi_ih V
+    apply phi_ih
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     congr! 1
-    · exact phi_ih V
-    · exact psi_ih V
+    · apply phi_ih
+    · apply psi_ih
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     first | apply forall_congr' | apply exists_congr
     intro a
@@ -70,8 +70,7 @@ theorem substitution_theorem_var_all_rec_inj
     apply h1
 
     simp only [← s1]
-    exact phi_ih (Function.updateITE V (σ x) a)
-
+    apply phi_ih
   case def_ X xs =>
     induction E
     case nil =>
@@ -81,16 +80,15 @@ theorem substitution_theorem_var_all_rec_inj
       simp
       split_ifs
       case _ c1 =>
-        cases c1
-        case intro c1_left c1_right =>
-          apply holds_coincide_var
-          intro v a1
-          simp only [var_is_free_in_iff_mem_free_var_set v E_hd.q] at a1
-          apply Function.updateListITE_mem_eq_len
-          · simp only [<- List.mem_toFinset]
-            apply Finset.mem_of_subset E_hd.h1 a1
-          · simp
-            simp only [c1_right]
+        obtain ⟨c1_left, c1_right⟩ := c1
+        apply holds_coincide_var
+        intro v a1
+        simp only [var_is_free_in_iff_mem_free_var_set v E_hd.q] at a1
+        apply Function.updateListITE_mem_eq_len
+        · simp only [<- List.mem_toFinset]
+          exact Finset.mem_of_subset E_hd.h1 a1
+        · simp
+          simp only [c1_right]
 
       case _ c1 =>
         apply E_ih
