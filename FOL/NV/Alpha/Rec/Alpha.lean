@@ -282,7 +282,7 @@ lemma holds_iff_are_alpha_equiv_rec_holds_aux
       obtain ⟨h2_left, h2_right⟩ := h2
 
       simp only [holds]
-      subst h2_left
+      rw [h2_left]
       congr! 1
       apply aux_2 D binders
       · exact h1
@@ -293,8 +293,12 @@ lemma holds_iff_are_alpha_equiv_rec_holds_aux
       case intro h2_left h2_right =>
         simp only [holds]
         congr! 1
-        · exact aux_1 D binders x y V V' h1 h2_left
-        · exact aux_1 D binders x' y' V V' h1 h2_right
+        · apply aux_1 D binders
+          · exact h1
+          · exact h2_left
+        · apply aux_1 D binders
+          · exact h1
+          · exact h2_right
 
     case true_.true_ | false_.false_ =>
       simp only [holds]
@@ -309,12 +313,11 @@ lemma holds_iff_are_alpha_equiv_rec_holds_aux
     | and_.and_ phi psi phi_ih psi_ih phi' psi'
     | or_.or_ phi psi phi_ih psi_ih phi' psi'
     | iff_.iff_ phi psi phi_ih psi_ih phi' psi' =>
-      cases h2
-      case intro h2_left h2_right =>
-        simp only [holds]
-        congr! 1
-        · exact phi_ih V V' phi' binders h1 h2_left
-        · exact psi_ih V V' psi' binders h1 h2_right
+      obtain ⟨h2_left, h2_right⟩ := h2
+      simp only [holds]
+      congr! 1
+      · exact phi_ih V V' phi' binders h1 h2_left
+      · exact psi_ih V V' psi' binders h1 h2_right
 
     case
       forall_.forall_ x phi phi_ih y phi'
