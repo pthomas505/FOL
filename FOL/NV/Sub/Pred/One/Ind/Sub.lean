@@ -48,7 +48,7 @@ inductive IsSub
     X = P ∧ ts.length = zs.length →
     Sub.Var.All.Rec.admits (Function.updateListITE id zs ts) H →
     IsSub P zs H (pred_var_ P ts)
-    (Sub.Var.All.Rec.fast_replace_free (Function.updateListITE id zs ts) H)
+    (Sub.Var.All.Rec.fast_replace_free_var_all_rec (Function.updateListITE id zs ts) H)
 
   | eq_
     (x y : VarName_) :

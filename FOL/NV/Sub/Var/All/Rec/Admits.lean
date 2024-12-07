@@ -83,7 +83,7 @@ theorem substitution_theorem_aux
   (h2 : ∀ (v : VarName_), v ∈ binders ∨ σ' v ∉ binders → V v = V' (σ' v))
   (h2' : ∀ (v : VarName_), v ∈ binders → v = σ' v)
   (h3 : ∀ (v : VarName_), v ∉ binders → σ' v = σ v) :
-  holds D I V E F ↔ holds D I V' E (fast_replace_free σ' F) :=
+  holds D I V E F ↔ holds D I V' E (fast_replace_free_var_all_rec σ' F) :=
   by
   induction E generalizing F binders V V' σ σ'
   all_goals
@@ -91,7 +91,7 @@ theorem substitution_theorem_aux
     all_goals
       simp only [admitsAux] at h1
 
-      simp only [fast_replace_free]
+      simp only [fast_replace_free_var_all_rec]
       simp only [holds]
     case pred_const_ X xs | pred_var_ X xs =>
       congr! 1
@@ -202,7 +202,7 @@ theorem substitution_theorem_aux
       contradiction
     case _ c1 c2 =>
       specialize ih V V' σ σ' binders (def_ X xs)
-      simp only [fast_replace_free] at ih
+      simp only [fast_replace_free_var_all_rec] at ih
       apply ih h1 h2 h2' h3
 
 
@@ -215,7 +215,7 @@ theorem substitution_theorem
   (F : Formula_)
   (h1 : admits σ F) :
   holds D I (V ∘ σ) E F ↔
-    holds D I V E (fast_replace_free σ F) :=
+    holds D I V E (fast_replace_free_var_all_rec σ F) :=
   by
   apply substitution_theorem_aux D I (V ∘ σ) V E σ σ ∅ F h1
   · simp
@@ -228,7 +228,7 @@ theorem substitution_is_valid
   (F : Formula_)
   (h1 : admits σ F)
   (h2 : F.is_valid) :
-  (fast_replace_free σ F).is_valid :=
+  (fast_replace_free_var_all_rec σ F).is_valid :=
   by
   simp only [is_valid] at h2
 

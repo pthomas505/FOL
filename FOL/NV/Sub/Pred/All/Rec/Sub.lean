@@ -22,7 +22,7 @@ def replace
       let zs := (τ X xs.length).fst
       let H := (τ X xs.length).snd
       if xs.length = zs.length
-      then Sub.Var.All.Rec.fast_replace_free (Function.updateListITE id zs xs) H
+      then Sub.Var.All.Rec.fast_replace_free_var_all_rec (Function.updateListITE id zs xs) H
       else pred_var_ X xs
   | eq_ x y => eq_ x y
   | true_ => true_

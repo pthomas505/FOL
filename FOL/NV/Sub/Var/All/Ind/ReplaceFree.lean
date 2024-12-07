@@ -103,13 +103,13 @@ inductive IsReplaceFree : (VarName_ → VarName_) → Formula_ → Formula_ → 
 example
   (F F' : Formula_)
   (σ : VarName_ → VarName_)
-  (h1 : Rec.fast_replace_free σ F = F') :
+  (h1 : Rec.fast_replace_free_var_all_rec σ F = F') :
   IsReplaceFree σ F F' :=
   by
   subst h1
   induction F generalizing σ
   all_goals
-    simp only [Rec.fast_replace_free]
+    simp only [Rec.fast_replace_free_var_all_rec]
   case pred_const_ X xs =>
     apply IsReplaceFree.pred_const_
   case pred_var_ X xs =>
@@ -153,11 +153,11 @@ example
   (F F' : Formula_)
   (σ : VarName_ → VarName_)
   (h1 : IsReplaceFree σ F F') :
-  Rec.fast_replace_free σ F = F' :=
+  Rec.fast_replace_free_var_all_rec σ F = F' :=
   by
   induction h1
   all_goals
-    simp only [Rec.fast_replace_free]
+    simp only [Rec.fast_replace_free_var_all_rec]
   case not_ σ' phi phi' ih_1 ih_2 =>
     simp
     exact ih_2
