@@ -46,7 +46,7 @@ inductive IsSub
     (X : PredName_)
     (ts : List VarName_) :
     X = P ∧ ts.length = zs.length →
-    Sub.Var.All.Rec.admits (Function.updateListITE id zs ts) H →
+    Sub.Var.All.Rec.admits_var_all_rec (Function.updateListITE id zs ts) H →
     IsSub P zs H (pred_var_ P ts)
     (Sub.Var.All.Rec.fast_replace_free_var_all_rec (Function.updateListITE id zs ts) H)
 
@@ -173,7 +173,7 @@ theorem substitution_theorem
           exact a1_right
         · exact contra
   case pred_occurs_in h1_X h1_ts h1_1 h1_2 =>
-    obtain s1 := Sub.Var.All.Rec.substitution_theorem D I V E (Function.updateListITE id zs h1_ts) H h1_2
+    obtain s1 := Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E (Function.updateListITE id zs h1_ts) H h1_2
 
     obtain s2 := Function.updateListITE_comp id V zs h1_ts
 

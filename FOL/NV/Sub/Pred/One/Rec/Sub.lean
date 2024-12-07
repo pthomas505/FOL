@@ -62,7 +62,7 @@ def admitsAux
   | pred_var_ X ts =>
       if X = P ∧ ts.length = zs.length
       then
-        Sub.Var.All.Rec.admits (Function.updateListITE id zs ts) H ∧
+        Sub.Var.All.Rec.admits_var_all_rec (Function.updateListITE id zs ts) H ∧
             /-
               Suppose F is the formula that the predicate X ts occurs in.
               Ensures that the free variables in H that are not being replaced by a variable in ts do not become bound variables in F. The bound variables in F are in the 'binders' set.
@@ -219,7 +219,7 @@ theorem substitution_theorem_aux
         simp
         split_ifs at h1
         case pos c1 =>
-          simp only [Sub.Var.All.Rec.admits] at h1
+          simp only [Sub.Var.All.Rec.admits_var_all_rec] at h1
           simp at h1
 
           cases h1
@@ -228,7 +228,7 @@ theorem substitution_theorem_aux
               holds D I (V ∘ Function.updateListITE id zs xs) E_ref H ↔
                 holds D I V E_ref (Sub.Var.All.Rec.fast_replace_free_var_all_rec (Function.updateListITE id zs xs) H) :=
               by
-              exact Sub.Var.All.Rec.substitution_theorem D I V E_ref (Function.updateListITE id zs xs) H h1_left
+              exact Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E_ref (Function.updateListITE id zs xs) H h1_left
 
             simp only [Function.updateListITE_comp] at s1
             simp at s1
