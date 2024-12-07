@@ -219,16 +219,15 @@ theorem aux_2
       simp only [are_alpha_equiv_var_list_rec] at h2
     case cons ys_hd ys_tl =>
       simp only [are_alpha_equiv_var_list_rec] at h2
+      obtain ⟨h2_left, h2_right⟩ := h2
 
       simp
       constructor
-      · cases h2
-        case left.intro h2_left h2_right =>
-          exact aux_1 D binders xs_hd ys_hd V V' h1 h2_left
-      · apply xs_ih ys_tl
-        cases h2
-        case right.intro h2_left h2_right =>
-          exact h2_right
+      · apply aux_1 D binders
+        · exact h1
+        · exact h2_left
+      · apply xs_ih
+        exact h2_right
 
 
 lemma are_alpha_equiv_var_list_rec_length
