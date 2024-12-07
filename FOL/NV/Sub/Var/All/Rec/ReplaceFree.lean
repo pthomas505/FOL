@@ -175,7 +175,7 @@ example
       tauto
 
 
-theorem fastReplaceFree_same_on_free
+theorem fast_replace_free_var_all_rec_same_on_free
   (F : Formula_)
   (σ σ' : VarName_ → VarName_)
   (h1 : ∀ (v : VarName_), var_is_free_in v F → σ v = σ' v) :
@@ -200,7 +200,8 @@ theorem fastReplaceFree_same_on_free
       rfl
   case not_ phi phi_ih =>
     congr! 1
-    exact phi_ih σ σ' h1
+    apply phi_ih
+    exact h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
@@ -230,7 +231,7 @@ theorem fastReplaceFree_same_on_free
       tauto
 
 
-theorem replaceFreeAux_same_on_free
+theorem replace_free_var_all_rec_aux_same_on_free
   (F : Formula_)
   (σ σ' : VarName_ → VarName_)
   (binders : Finset VarName_)
@@ -312,14 +313,12 @@ example
       exact c1
 
     simp only [← phi_ih (Function.updateITE σ x x) (binders ∪ {x}) s1]
-    apply replaceFreeAux_same_on_free phi σ (Function.updateITE σ x x) (binders ∪ {x})
+    apply replace_free_var_all_rec_aux_same_on_free
     simp only [Function.updateITE]
     intro v a1
     simp at a1
-    push_neg at a1
-    cases a1
-    case _ a1_left a1_right =>
-      simp only [if_neg a1_right]
+    obtain ⟨a1_left, a1_right⟩ := a1
+    simp only [if_neg a1_right]
 
 
 #lint
