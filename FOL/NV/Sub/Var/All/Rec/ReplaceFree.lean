@@ -59,52 +59,52 @@ def replace_free_var_all_rec_aux
 
 
 /--
-  replace_free_var_all_rec σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
+  `replace_free_var_all_rec σ F` := The simultaneous replacement of each free occurrence of any variable `v` in the formula `F` by `σ v`.
 -/
 def replace_free_var_all_rec (σ : VarName_ → VarName_) (F : Formula_) : Formula_ :=
   replace_free_var_all_rec_aux σ ∅ F
 
 
 /--
-  fast_replace_free σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
+  fast_replace_free_var_all_rec σ F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
 -/
-def fast_replace_free (σ : VarName_ → VarName_) : Formula_ → Formula_
+def fast_replace_free_var_all_rec (σ : VarName_ → VarName_) : Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X (xs.map σ)
   | pred_var_ X xs => pred_var_ X (xs.map σ)
   | eq_ x y => eq_ (σ x) (σ y)
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (fast_replace_free σ phi)
+  | not_ phi => not_ (fast_replace_free_var_all_rec σ phi)
   | imp_ phi psi =>
       imp_
-      (fast_replace_free σ phi)
-      (fast_replace_free σ psi)
+      (fast_replace_free_var_all_rec σ phi)
+      (fast_replace_free_var_all_rec σ psi)
   | and_ phi psi =>
       and_
-      (fast_replace_free σ phi)
-      (fast_replace_free σ psi)
+      (fast_replace_free_var_all_rec σ phi)
+      (fast_replace_free_var_all_rec σ psi)
   | or_ phi psi =>
       or_
-      (fast_replace_free σ phi)
-      (fast_replace_free σ psi)
+      (fast_replace_free_var_all_rec σ phi)
+      (fast_replace_free_var_all_rec σ psi)
   | iff_ phi psi =>
       iff_
-      (fast_replace_free σ phi)
-      (fast_replace_free σ psi)
+      (fast_replace_free_var_all_rec σ phi)
+      (fast_replace_free_var_all_rec σ psi)
   | forall_ x phi =>
-      forall_ x (fast_replace_free (Function.updateITE σ x x) phi)
+      forall_ x (fast_replace_free_var_all_rec (Function.updateITE σ x x) phi)
   | exists_ x phi =>
-      exists_ x (fast_replace_free (Function.updateITE σ x x) phi)
+      exists_ x (fast_replace_free_var_all_rec (Function.updateITE σ x x) phi)
   | def_ X xs => def_ X (xs.map σ)
 
 
 theorem fastReplaceFree_id
   (F : Formula_) :
-  fast_replace_free id F = F :=
+  fast_replace_free_var_all_rec id F = F :=
   by
   induction F
   all_goals
-    simp only [fast_replace_free]
+    simp only [fast_replace_free_var_all_rec]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr!
     simp
@@ -127,12 +127,12 @@ theorem fastReplaceFree_id
 example
   (F : Formula_)
   (v t : VarName_) :
-  fast_replace_free (Function.updateITE id v t) F =
+  fast_replace_free_var_all_rec (Function.updateITE id v t) F =
     One.Rec.fast_replace_free_var_one_rec v t F :=
   by
   induction F
   all_goals
-    simp only [fast_replace_free]
+    simp only [fast_replace_free_var_all_rec]
     simp only [One.Rec.fast_replace_free_var_one_rec]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     simp
@@ -174,13 +174,13 @@ theorem fastReplaceFree_same_on_free
   (F : Formula_)
   (σ σ' : VarName_ → VarName_)
   (h1 : ∀ (v : VarName_), var_is_free_in v F → σ v = σ' v) :
-  fast_replace_free σ F = fast_replace_free σ' F :=
+  fast_replace_free_var_all_rec σ F = fast_replace_free_var_all_rec σ' F :=
   by
   induction F generalizing σ σ'
   all_goals
     simp only [var_is_free_in] at h1
 
-    simp only [fast_replace_free]
+    simp only [fast_replace_free_var_all_rec]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr! 1
     simp only [List.map_eq_map_iff]
@@ -268,11 +268,11 @@ example
   (binders : Finset VarName_)
   (h1 : ∀ (v : VarName_), v ∈ binders → v = σ v) :
   replace_free_var_all_rec_aux σ binders F =
-    fast_replace_free σ F :=
+    fast_replace_free_var_all_rec σ F :=
   by
   induction F generalizing binders σ
   all_goals
-    simp only [fast_replace_free]
+    simp only [fast_replace_free_var_all_rec]
     simp only [replace_free_var_all_rec_aux]
   case pred_const_ X xs | pred_var_ X xs | def_ X xs =>
     congr! 1
