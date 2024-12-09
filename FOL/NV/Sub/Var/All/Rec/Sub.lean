@@ -45,7 +45,7 @@ def sub_var_all_rec
   | def_ X xs => def_ X (xs.map σ)
 
 
-lemma freeVarSet_sub_eq_freeVarSet_image
+lemma sub_var_all_rec_free_var_set_eq_free_var_set_image
   (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula_) :
@@ -56,13 +56,12 @@ lemma freeVarSet_sub_eq_freeVarSet_image
     simp only [sub_var_all_rec]
     simp only [free_var_set]
   case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
-    apply Finset.ext
-    intro a
+    ext a
     simp
   case true_ | false_ =>
     simp
   case not_ phi phi_ih =>
-    exact phi_ih σ
+    apply phi_ih
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
@@ -70,8 +69,8 @@ lemma freeVarSet_sub_eq_freeVarSet_image
     | iff_ phi psi phi_ih psi_ih =>
     simp only [Finset.image_union]
     congr!
-    · exact phi_ih σ
-    · exact psi_ih σ
+    · apply phi_ih
+    · apply psi_ih
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [phi_ih]
 
@@ -81,25 +80,24 @@ lemma freeVarSet_sub_eq_freeVarSet_image
     case _ c1 =>
       obtain s1 := fresh_not_mem x c (Finset.image (Function.updateITE σ x x) (free_var_set phi))
 
-      generalize (
-      fresh x c (Finset.image (Function.updateITE σ x x) (free_var_set phi)) ) = x' at *
+      generalize ( fresh x c (Finset.image (Function.updateITE σ x x) (free_var_set phi)) ) = x' at *
 
-      have s2 : Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) ⊆ Finset.image (Function.updateITE σ x x) (free_var_set phi)
-      apply Finset.image_subset_image
-      simp
+      have s2 : Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) ⊆ Finset.image (Function.updateITE σ x x) (free_var_set phi) :=
+      by
+        apply Finset.image_subset_image
+        simp
 
-      have s3 : x' ∉ Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x})
-      apply Finset.not_mem_mono s2 s1
+      have s3 : x' ∉ Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) :=
+      by
+        apply Finset.not_mem_mono s2 s1
 
       calc
         Finset.image (Function.updateITE σ x x') (free_var_set phi) \ {x'}
       = Finset.image (Function.updateITE σ x x') (free_var_set phi \ {x}) \ {x'} :=
           by
-          {
             apply Finset.image_sdiff_singleton phi.free_var_set x x' (Function.updateITE σ x x')
             simp only [Function.updateITE]
             simp
-          }
       _ = Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) \ {x'} :=
           by simp only [Finset.image_congr_update_ite phi.free_var_set x x' x]
       _ = Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) :=
@@ -109,25 +107,26 @@ lemma freeVarSet_sub_eq_freeVarSet_image
     case _ c1 =>
       simp at c1
 
-      have s1 : Finset.image (Function.updateITE σ x x) (free_var_set phi) \ {x} = Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) \ {x}
-      apply Finset.image_sdiff_singleton
-      simp only [Function.updateITE]
-      simp
-
+      have s1 : Finset.image (Function.updateITE σ x x) (free_var_set phi) \ {x} = Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) \ {x} :=
+      by
+        apply Finset.image_sdiff_singleton
+        simp only [Function.updateITE]
+        simp
       simp only [s1]
-      clear s1
 
-      have s2 : x ∉ Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x})
-      simp only [Finset.mem_image]
-      simp
-      simp only [Function.updateITE]
-      simp
-      tauto
+      have s2 : x ∉ Finset.image (Function.updateITE σ x x) (free_var_set phi \ {x}) :=
+      by
+        simp only [Finset.mem_image]
+        simp
+        simp only [Function.updateITE]
+        simp
+        tauto
 
       simp only [Finset.sdiff_singleton_eq_erase] at *
       exact Finset.erase_eq_of_not_mem s2
 
-theorem substitution_theorem
+
+theorem substitution_theorem_var_all_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -185,7 +184,7 @@ theorem substitution_theorem
       · by_cases c3 : σ v = x'
         · subst c3
 
-          simp only [freeVarSet_sub_eq_freeVarSet_image] at s0
+          simp only [sub_var_all_rec_free_var_set_eq_free_var_set_image] at s0
 
           have s1 : σ v ∈ Finset.image (Function.updateITE σ x x) (free_var_set phi)
           apply Finset.mem_image_update
@@ -247,7 +246,7 @@ theorem substitution_theorem
         exact E_ih
 
 
-theorem substitution_is_valid
+theorem substitution_is_valid_var_all_rec
   (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula_)
@@ -258,7 +257,7 @@ theorem substitution_is_valid
 
   simp only [is_valid]
   intro D I V E
-  simp only [substitution_theorem]
+  simp only [substitution_theorem_var_all_rec]
   apply h1
 
 
