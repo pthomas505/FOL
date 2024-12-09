@@ -14,9 +14,9 @@ open Formula_
 
 
 /--
-  sub σ c F := The simultaneous replacement of each free occurrence of any variable v in the formula F by σ v. The character c is used to generate fresh binding variables as needed to avoid free variable capture.
+  `sub_var_all_rec σ c F` := The simultaneous replacement of each free occurrence of any variable `v` in the formula `F` by `σ v`. The character `c` is used to generate fresh binding variables as needed to avoid free variable capture.
 -/
-def sub
+def sub_var_all_rec
   (σ : VarName_ → VarName_)
   (c : Char) :
   Formula_ → Formula_
@@ -25,23 +25,23 @@ def sub
   | eq_ x y => eq_ (σ x) (σ y)
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (sub σ c phi)
-  | imp_ phi psi => imp_ (sub σ c phi) (sub σ c psi)
-  | and_ phi psi => and_ (sub σ c phi) (sub σ c psi)
-  | or_ phi psi => or_ (sub σ c phi) (sub σ c psi)
-  | iff_ phi psi => iff_ (sub σ c phi) (sub σ c psi)
+  | not_ phi => not_ (sub_var_all_rec σ c phi)
+  | imp_ phi psi => imp_ (sub_var_all_rec σ c phi) (sub_var_all_rec σ c psi)
+  | and_ phi psi => and_ (sub_var_all_rec σ c phi) (sub_var_all_rec σ c psi)
+  | or_ phi psi => or_ (sub_var_all_rec σ c phi) (sub_var_all_rec σ c psi)
+  | iff_ phi psi => iff_ (sub_var_all_rec σ c phi) (sub_var_all_rec σ c psi)
   | forall_ x phi =>
     let x' : VarName_ :=
       if ∃ (y : VarName_), y ∈ phi.free_var_set \ {x} ∧ σ y = x
-      then fresh x c ((sub (Function.updateITE σ x x) c phi).free_var_set)
+      then fresh x c ((sub_var_all_rec (Function.updateITE σ x x) c phi).free_var_set)
       else x
-    forall_ x' (sub (Function.updateITE σ x x') c phi)
+    forall_ x' (sub_var_all_rec (Function.updateITE σ x x') c phi)
   | exists_ x phi =>
     let x' : VarName_ :=
       if ∃ (y : VarName_), y ∈ phi.free_var_set \ {x} ∧ σ y = x
-      then fresh x c ((sub (Function.updateITE σ x x) c phi).free_var_set)
+      then fresh x c ((sub_var_all_rec (Function.updateITE σ x x) c phi).free_var_set)
       else x
-    exists_ x' (sub (Function.updateITE σ x x') c phi)
+    exists_ x' (sub_var_all_rec (Function.updateITE σ x x') c phi)
   | def_ X xs => def_ X (xs.map σ)
 
 
@@ -49,11 +49,11 @@ lemma freeVarSet_sub_eq_freeVarSet_image
   (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula_) :
-  (sub σ c F).free_var_set = F.free_var_set.image σ :=
+  (sub_var_all_rec σ c F).free_var_set = F.free_var_set.image σ :=
   by
   induction F generalizing σ
   all_goals
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [free_var_set]
   case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
     apply Finset.ext
@@ -135,19 +135,19 @@ theorem substitution_theorem
   (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula_) :
-  holds D I V E (sub σ c F) ↔
+  holds D I V E (sub_var_all_rec σ c F) ↔
     holds D I (V ∘ σ) E F :=
   by
   induction F generalizing σ V
   case pred_const_ X xs | pred_var_ X xs | eq_ x y =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [holds]
     simp
   case true_ | false_ =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [holds]
   case not_ phi phi_ih =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [holds]
     congr! 1
     exact phi_ih V σ
@@ -156,13 +156,13 @@ theorem substitution_theorem
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [holds]
     congr! 1
     · exact phi_ih V σ
     · exact psi_ih V σ
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [holds]
 
     first | apply forall_congr' | apply exists_congr
@@ -175,9 +175,9 @@ theorem substitution_theorem
     simp
     split_ifs
     case _ c1 =>
-      obtain s0 := fresh_not_mem x c (free_var_set (sub (Function.updateITE σ x x) c phi))
+      obtain s0 := fresh_not_mem x c (free_var_set (sub_var_all_rec (Function.updateITE σ x x) c phi))
 
-      generalize (fresh x c (free_var_set (sub (Function.updateITE σ x x) c phi))) = x' at *
+      generalize (fresh x c (free_var_set (sub_var_all_rec (Function.updateITE σ x x) c phi))) = x' at *
       by_cases c2 : v = x
       · simp only [c2]
         simp only [Function.updateITE]
@@ -222,12 +222,12 @@ theorem substitution_theorem
   case def_ X xs =>
     induction E
     case nil =>
-      simp only [sub]
+      simp only [sub_var_all_rec]
       simp only [holds]
     case cons E_hd E_tl E_ih =>
-      simp only [sub] at E_ih
+      simp only [sub_var_all_rec] at E_ih
 
-      simp only [sub]
+      simp only [sub_var_all_rec]
       simp only [holds]
       simp
       split_ifs
@@ -252,7 +252,7 @@ theorem substitution_is_valid
   (c : Char)
   (F : Formula_)
   (h1 : is_valid F) :
-  is_valid (sub σ c F) :=
+  is_valid (sub_var_all_rec σ c F) :=
   by
   simp only [is_valid] at h1
 
@@ -288,11 +288,11 @@ lemma sub_formula_length_same
   (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula_) :
-  (sub σ c F).length = F.length :=
+  (sub_var_all_rec σ c F).length = F.length :=
   by
   induction F generalizing σ
   case not_ phi phi_ih =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [Formula_.length]
     simp only [phi_ih]
   case
@@ -300,17 +300,17 @@ lemma sub_formula_length_same
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [Formula_.length]
     simp only [phi_ih σ]
     simp only [psi_ih σ]
   case forall_ x phi phi_ih | exists_ x phi_ih =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [Formula_.length]
     simp
     apply phi_ih
   all_goals
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp only [Formula_.length]
     simp
 
@@ -319,26 +319,26 @@ lemma sub_formula_length_same
 lemma SubId
   (c : Char)
   (F : Formula_) :
-  sub id c F = F :=
+  sub_var_all_rec id c F = F :=
   by
   induction F
   case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp
   case true_ | false_ =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
   case not_ phi phi_ih =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     congr!
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     congr!
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [sub]
+    simp only [sub_var_all_rec]
     simp
     simp only [Function.updateITE_id]
     exact phi_ih
@@ -444,12 +444,12 @@ def F'' := sub_alpha σ id ∅ c F
 
 #eval isAlphaEqv F F''
 
-#eval sub σ c F''
+#eval sub_var_all_rec σ c F''
 #eval admitsAux σ ∅ F''
 
 #eval F' = F''
 
-#eval fast_replace_free σ F'' = sub σ c F
-#eval fast_replace_free σ F' = sub σ c F
+#eval fast_replace_free σ F'' = sub_var_all_rec σ c F
+#eval fast_replace_free σ F' = sub_var_all_rec σ c F
 
 -/
