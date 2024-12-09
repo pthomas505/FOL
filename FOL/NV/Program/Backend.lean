@@ -110,7 +110,7 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
   | pred_2_
     (v t : VarName_)
     (phi : Formula_) :
-    IsDeduct [] ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.sub (Function.updateITE id v t) freshChar phi))
+    IsDeduct [] ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.sub_var_all_rec (Function.updateITE id v t) freshChar phi))
 
   /-
     ⊢ phi → (∀ v phi)  provided v is not free in phi
@@ -568,7 +568,7 @@ def checkRule
   | pred_2_ v t phi =>
     let return_val : Sequent := {
       hypotheses := []
-      conclusion := ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.sub (Function.updateITE id v t) freshChar phi)) }
+      conclusion := ((forall_ v phi).imp_ (Sub.Var.All.Rec.Fresh.sub_var_all_rec (Function.updateITE id v t) freshChar phi)) }
 
     Except.ok {
       val := return_val
@@ -872,7 +872,7 @@ theorem soundness
     exact a3 d
   case pred_2_ v t phi =>
     intro D I V E _
-    obtain s1 := FOL.NV.Sub.Var.All.Rec.Fresh.substitution_theorem D I V E (Function.updateITE id v t) freshChar phi
+    obtain s1 := FOL.NV.Sub.Var.All.Rec.Fresh.substitution_theorem_var_all_rec D I V E (Function.updateITE id v t) freshChar phi
 
     simp only [holds]
     intro a2
