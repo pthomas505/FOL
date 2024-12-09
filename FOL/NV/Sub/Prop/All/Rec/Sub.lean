@@ -43,7 +43,7 @@ instance {α : Type} {xs : List α} : Decidable (xs = []) :=
     exact instDecidableFalse
 
 
-lemma sub_no_predVar
+lemma sub_prop_all_rec_pred_var_set_is_empty
   (F : Formula_)
   (τ : PredName_ → PredName_)
   (h1 : F.pred_var_set = ∅) :
@@ -173,7 +173,7 @@ theorem substitution_theorem_prop_all_rec
     split_ifs
     case _ c1 =>
       specialize ih (Function.updateListITE V hd.args (List.map V xs)) hd.q
-      simp only [sub_no_predVar hd.q τ hd.h2] at ih
+      simp only [sub_prop_all_rec_pred_var_set_is_empty hd.q τ hd.h2] at ih
       apply ih
     case _ c1 =>
       specialize ih V (def_ X xs)
