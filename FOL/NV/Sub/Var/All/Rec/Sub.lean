@@ -149,7 +149,7 @@ theorem substitution_theorem_var_all_rec
     simp only [sub_var_all_rec]
     simp only [holds]
     congr! 1
-    exact phi_ih V σ
+    apply phi_ih
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
@@ -158,8 +158,8 @@ theorem substitution_theorem_var_all_rec
     simp only [sub_var_all_rec]
     simp only [holds]
     congr! 1
-    · exact phi_ih V σ
-    · exact psi_ih V σ
+    · apply phi_ih
+    · apply psi_ih
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [sub_var_all_rec]
     simp only [holds]
@@ -202,8 +202,8 @@ theorem substitution_theorem_var_all_rec
       · subst c2
         simp only [Function.updateITE]
         simp
-      · have s1 : ¬ σ v = x
-        {
+      · have s1 : ¬ σ v = x :=
+        by
           intro contra
           apply c1
           apply Exists.intro v
@@ -212,7 +212,6 @@ theorem substitution_theorem_var_all_rec
             simp only [← var_is_free_in_iff_mem_free_var_set]
             tauto
           · exact contra
-        }
 
         simp only [Function.updateITE]
         simp only [if_neg c2]
@@ -235,10 +234,9 @@ theorem substitution_theorem_var_all_rec
         intro v a1
         apply Function.updateListITE_map_mem_ext
         · simp
-        · cases c1
-          case _ c1_left c1_right =>
-            symm
-            exact c1_right
+        · obtain ⟨c1_left, c1_right⟩ := c1
+          symm
+          exact c1_right
         · simp only [var_is_free_in_iff_mem_free_var_set] at a1
           simp only [← List.mem_toFinset]
           apply Finset.mem_of_subset E_hd.h1 a1
