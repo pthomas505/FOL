@@ -180,16 +180,17 @@ theorem substitution_theorem_var_all_ind_aux
     | iff_ σ' binders' phi psi phi' psi' _ _ phi_ih_2 psi_ih_2 =>
     simp only [holds]
     congr! 1
-    · apply phi_ih_2 V V' h2 h3 h4
-    · apply psi_ih_2 V V' h2 h3 h4
+    · exact phi_ih_2 V V' h2 h3 h4
+    · exact psi_ih_2 V V' h2 h3 h4
   case forall_ σ' binders' x phi phi' _ ih_2 | exists_ σ' binders' x phi phi' _ ih_2 =>
     simp at ih_2
 
-    have s1 : ∀ (v : VarName_), ¬ v = x → v ∈ binders' → ¬ σ' v = x
-    intro v a1 a2 contra
-    apply a1
-    simp only [← contra]
-    exact h4 v a2
+    have s1 : ∀ (v : VarName_), ¬ v = x → v ∈ binders' → ¬ σ' v = x :=
+    by
+      intro v a1 a2 contra
+      apply a1
+      simp only [← contra]
+      exact h4 v a2
 
     simp only [holds]
     first | apply forall_congr'| apply exists_congr
@@ -250,8 +251,8 @@ theorem substitution_theorem_var_all_ind_aux
         intro x a2
         by_cases c3 : x ∈ binders'
         · exact h2 x c3
-        · apply h3 x
-          apply ih_1 x a2 c3
+        · apply h3
+          exact ih_1 x a2 c3
 
         simp only [s1]
         apply Function.updateListITE_mem_eq_len
