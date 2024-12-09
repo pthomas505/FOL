@@ -22,7 +22,7 @@ def replace
         let zs := val.fst
         let H := val.snd
         if xs.length = zs.length
-        then Sub.Var.All.Rec.Fresh.sub (Function.updateListITE id zs xs) c H
+        then Sub.Var.All.Rec.Fresh.sub_var_all_rec (Function.updateListITE id zs xs) c H
         else pred_var_ X xs
       else pred_var_ X xs
   | eq_ x y => eq_ x y
@@ -133,7 +133,7 @@ theorem substitution_theorem_aux
       let val := Option.get opt c1
       let zs := val.fst
       let H := val.snd
-      obtain s1 := Sub.Var.All.Rec.Fresh.substitution_theorem D I V E (Function.updateListITE id zs xs) c H
+      obtain s1 := Sub.Var.All.Rec.Fresh.substitution_theorem_var_all_rec D I V E (Function.updateListITE id zs xs) c H
       simp only [Function.updateListITE_comp] at s1
       simp at s1
       simp only [s1]

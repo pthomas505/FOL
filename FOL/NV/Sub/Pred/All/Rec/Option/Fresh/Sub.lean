@@ -36,7 +36,7 @@ def subAux
         let zs := val.fst
         let H := val.snd
         if xs.length = zs.length
-        then Sub.Var.All.Rec.Fresh.sub (Function.updateListITE id zs (xs.map σ)) c H
+        then Sub.Var.All.Rec.Fresh.sub_var_all_rec (Function.updateListITE id zs (xs.map σ)) c H
         else pred_var_ X (xs.map σ)
       else pred_var_ X (xs.map σ)
   | eq_ x y => eq_ (σ x) (σ y)
@@ -168,7 +168,7 @@ lemma substitution_theorem_aux
 
       set H := (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).2
 
-      obtain s1 := Sub.Var.All.Rec.Fresh.substitution_theorem D I V E (Function.updateListITE id zs (xs.map σ)) c H
+      obtain s1 := Sub.Var.All.Rec.Fresh.substitution_theorem_var_all_rec D I V E (Function.updateListITE id zs (xs.map σ)) c H
       simp only [Function.updateListITE_comp] at s1
 
       simp at s1
@@ -321,7 +321,7 @@ lemma substitution_theorem_aux
         · simp only [if_neg c2]
           split_ifs
           case _ c3 =>
-            obtain s1 := Sub.Var.All.Rec.Fresh.freeVarSet_sub_eq_freeVarSet_image (Function.updateITE σ x x) c phi
+            obtain s1 := Sub.Var.All.Rec.Fresh.sub_var_all_rec_free_var_set_eq_free_var_set_image (Function.updateITE σ x x) c phi
             simp only [s1] at c1
 
             simp only [← c3] at c1
@@ -346,10 +346,10 @@ lemma substitution_theorem_aux
         simp only [Function.updateITE]
         split_ifs
         case _ c2 =>
-          obtain s1 := Sub.Var.All.Rec.Fresh.freeVarSet_sub_eq_freeVarSet_image (Function.updateITE σ x x) c phi
+          obtain s1 := Sub.Var.All.Rec.Fresh.sub_var_all_rec_free_var_set_eq_free_var_set_image (Function.updateITE σ x x) c phi
           simp only [← s1] at c2
 
-          obtain s2 := fresh_not_mem x c ((free_var_set (Var.All.Rec.Fresh.sub (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (pred_var_set phi) (predVarFreeVarSet τ)))
+          obtain s2 := fresh_not_mem x c ((free_var_set (Var.All.Rec.Fresh.sub_var_all_rec (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (pred_var_set phi) (predVarFreeVarSet τ)))
           simp only [← c2] at s2
           simp only [Finset.mem_union] at s2
 
