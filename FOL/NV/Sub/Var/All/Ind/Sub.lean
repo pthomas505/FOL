@@ -11,9 +11,9 @@ open Formula_
 
 
 /--
-  Helper definition for IsSub.
+  Helper definition for is_sub_var_all_ind.
 -/
-inductive IsSubAux :
+inductive is_sub_var_all_ind_aux :
   (VarName_ → VarName_) →
   Finset VarName_ →
   Formula_ → Formula_ → Prop
@@ -24,7 +24,7 @@ inductive IsSubAux :
     (X : PredName_)
     (xs : List VarName_) :
     (∀ v : VarName_, v ∈ xs → v ∉ binders → σ v ∉ binders) →
-    IsSubAux σ binders (pred_const_ X xs) (pred_const_ X (xs.map σ))
+    is_sub_var_all_ind_aux σ binders (pred_const_ X xs) (pred_const_ X (xs.map σ))
 
   | pred_var_
     (σ : VarName_ → VarName_)
@@ -32,84 +32,84 @@ inductive IsSubAux :
     (X : PredName_)
     (xs : List VarName_) :
     (∀ v : VarName_, v ∈ xs → v ∉ binders → σ v ∉ binders) →
-    IsSubAux σ binders (pred_var_ X xs) (pred_var_ X (xs.map σ))
+    is_sub_var_all_ind_aux σ binders (pred_var_ X xs) (pred_var_ X (xs.map σ))
 
   | eq_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (x y : VarName_) :
     (∀ v : VarName_, (v = x ∨ v = y) → v ∉ binders → σ v ∉ binders) →
-    IsSubAux σ binders (eq_ x y) (eq_ (σ x) (σ y))
+    is_sub_var_all_ind_aux σ binders (eq_ x y) (eq_ (σ x) (σ y))
 
   | true_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_) :
-    IsSubAux σ binders true_ true_
+    is_sub_var_all_ind_aux σ binders true_ true_
 
   | false_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_) :
-    IsSubAux σ binders false_ false_
+    is_sub_var_all_ind_aux σ binders false_ false_
 
   | not_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (phi : Formula_)
     (phi' : Formula_) :
-    IsSubAux σ binders phi phi' →
-    IsSubAux σ binders phi.not_ phi'.not_
+    is_sub_var_all_ind_aux σ binders phi phi' →
+    is_sub_var_all_ind_aux σ binders phi.not_ phi'.not_
 
   | imp_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (phi psi : Formula_)
     (phi' psi' : Formula_) :
-    IsSubAux σ binders phi phi' →
-    IsSubAux σ binders psi psi' →
-    IsSubAux σ binders (phi.imp_ psi) (phi'.imp_ psi')
+    is_sub_var_all_ind_aux σ binders phi phi' →
+    is_sub_var_all_ind_aux σ binders psi psi' →
+    is_sub_var_all_ind_aux σ binders (phi.imp_ psi) (phi'.imp_ psi')
 
   | and_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (phi psi : Formula_)
     (phi' psi' : Formula_) :
-    IsSubAux σ binders phi phi' →
-    IsSubAux σ binders psi psi' →
-    IsSubAux σ binders (phi.and_ psi) (phi'.and_ psi')
+    is_sub_var_all_ind_aux σ binders phi phi' →
+    is_sub_var_all_ind_aux σ binders psi psi' →
+    is_sub_var_all_ind_aux σ binders (phi.and_ psi) (phi'.and_ psi')
 
   | or_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (phi psi : Formula_)
     (phi' psi' : Formula_) :
-    IsSubAux σ binders phi phi' →
-    IsSubAux σ binders psi psi' →
-    IsSubAux σ binders (phi.or_ psi) (phi'.or_ psi')
+    is_sub_var_all_ind_aux σ binders phi phi' →
+    is_sub_var_all_ind_aux σ binders psi psi' →
+    is_sub_var_all_ind_aux σ binders (phi.or_ psi) (phi'.or_ psi')
 
   | iff_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (phi psi : Formula_)
     (phi' psi' : Formula_) :
-    IsSubAux σ binders phi phi' →
-    IsSubAux σ binders psi psi' →
-    IsSubAux σ binders (phi.iff_ psi) (phi'.iff_ psi')
+    is_sub_var_all_ind_aux σ binders phi phi' →
+    is_sub_var_all_ind_aux σ binders psi psi' →
+    is_sub_var_all_ind_aux σ binders (phi.iff_ psi) (phi'.iff_ psi')
 
   | forall_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (x : VarName_)
     (phi phi' : Formula_) :
-    IsSubAux (Function.updateITE σ x x) (binders ∪ {x}) phi phi' →
-    IsSubAux σ binders (forall_ x phi) (forall_ x phi')
+    is_sub_var_all_ind_aux (Function.updateITE σ x x) (binders ∪ {x}) phi phi' →
+    is_sub_var_all_ind_aux σ binders (forall_ x phi) (forall_ x phi')
 
   | exists_
     (σ : VarName_ → VarName_)
     (binders : Finset VarName_)
     (x : VarName_)
     (phi phi' : Formula_) :
-    IsSubAux (Function.updateITE σ x x) (binders ∪ {x}) phi phi' →
-    IsSubAux σ binders (exists_ x phi) (exists_ x phi')
+    is_sub_var_all_ind_aux (Function.updateITE σ x x) (binders ∪ {x}) phi phi' →
+    is_sub_var_all_ind_aux σ binders (exists_ x phi) (exists_ x phi')
 
   | def_
     (σ : VarName_ → VarName_)
@@ -117,13 +117,13 @@ inductive IsSubAux :
     (X : DefName_)
     (xs : List VarName_) :
     (∀ v : VarName_, v ∈ xs → v ∉ binders → σ v ∉ binders) →
-    IsSubAux σ binders (def_ X xs) (def_ X (xs.map σ))
+    is_sub_var_all_ind_aux σ binders (def_ X xs) (def_ X (xs.map σ))
 
 
 /--
-  IsSub σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurrence of any variable v in the formula F by a free occurrence of σ v.
+  is_sub_var_all_ind σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurrence of any variable v in the formula F by a free occurrence of σ v.
 -/
-def IsSub (σ : VarName_ → VarName_) (F F' : Formula_) : Prop := IsSubAux σ ∅ F F'
+def is_sub_var_all_ind (σ : VarName_ → VarName_) (F F' : Formula_) : Prop := is_sub_var_all_ind_aux σ ∅ F F'
 
 
 theorem substitution_theorem_aux
@@ -134,7 +134,7 @@ theorem substitution_theorem_aux
   (σ : VarName_ → VarName_)
   (binders : Finset VarName_)
   (F F' : Formula_)
-  (h1 : IsSubAux σ binders F F')
+  (h1 : is_sub_var_all_ind_aux σ binders F F')
   (h2 : ∀ v : VarName_, v ∈ binders → V v = V' (σ v))
   (h3 : ∀ v : VarName_, σ v ∉ binders → V v = V' (σ v))
   (h4 : ∀ v : VarName_, v ∈ binders → v = σ v) :
@@ -280,7 +280,7 @@ theorem substitution_theorem
   (E : Env_)
   (σ : VarName_ → VarName_)
   (F F' : Formula_)
-  (h1 : IsSub σ F F') :
+  (h1 : is_sub_var_all_ind σ F F') :
   holds D I (V ∘ σ) E F ↔ holds D I V E F' :=
   by
   apply substitution_theorem_aux D I (V ∘ σ) V E σ ∅ F F' h1
@@ -292,7 +292,7 @@ theorem substitution_theorem
 theorem substitution_is_valid
   (σ : VarName_ → VarName_)
   (F F' : Formula_)
-  (h1 : IsSub σ F F')
+  (h1 : is_sub_var_all_ind σ F F')
   (h2 : F.is_valid) :
   F'.is_valid :=
   by
