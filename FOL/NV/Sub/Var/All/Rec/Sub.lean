@@ -258,6 +258,35 @@ theorem substitution_is_valid_var_all_rec
   simp only [substitution_theorem_var_all_rec]
   apply h1
 
+-------------------------------------------------------------------------------
+
+lemma sub_var_all_rec_id
+  (c : Char)
+  (F : Formula_) :
+  sub_var_all_rec id c F = F :=
+  by
+  induction F
+  case pred_const_ X xs | pred_var_ X xs | eq_ x y | def_ X xs =>
+    simp only [sub_var_all_rec]
+    simp
+  case true_ | false_ =>
+    simp only [sub_var_all_rec]
+  case not_ phi phi_ih =>
+    simp only [sub_var_all_rec]
+    congr!
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [sub_var_all_rec]
+    congr!
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
+    simp only [sub_var_all_rec]
+    simp
+    simp only [Function.updateITE_id]
+    exact phi_ih
+
 
 #lint
 
