@@ -11,7 +11,7 @@ open Formula_
 
 
 /--
-  is_replace_free_var_all_ind σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurrence of any variable v in the formula F by σ v.
+  `is_replace_free_var_all_ind σ F F'` := True if and only if `F'` is the result of the simultaneous replacement of each free occurrence of any variable `v` in the formula `F` by `σ v`.
 -/
 inductive is_replace_free_var_all_ind : (VarName_ → VarName_) → Formula_ → Formula_ → Prop
 
