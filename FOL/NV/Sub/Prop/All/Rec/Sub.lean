@@ -32,7 +32,6 @@ def sub_prop_all_rec (τ : PredName_ → PredName_) : Formula_ → Formula_
   | exists_ x phi => exists_ x (sub_prop_all_rec τ phi)
   | def_ P ts => def_ P ts
 
-
 instance {α : Type} {xs : List α} : Decidable (xs = []) :=
   by
   cases xs
@@ -91,7 +90,7 @@ lemma sub_no_predVar
     simp only [sub_prop_all_rec]
 
 
-theorem substitution_theorem
+theorem substitution_theorem_prop_all_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -182,7 +181,7 @@ theorem substitution_theorem
       exact ih
 
 
-theorem substitution_is_valid
+theorem substitution_is_valid_prop_all_rec
   (F : Formula_)
   (τ : PredName_ → PredName_)
   (h1 : F.is_valid) :
@@ -192,7 +191,7 @@ theorem substitution_is_valid
 
   simp only [is_valid]
   intro D I V E
-  simp only [substitution_theorem D I V E τ F]
+  simp only [substitution_theorem_prop_all_rec D I V E τ F]
   apply h1
 
 
