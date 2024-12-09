@@ -11,7 +11,7 @@ open Formula_
 
 
 /--
-  Helper definition for is_sub_var_all_ind.
+  Helper definition for `is_sub_var_all_ind`.
 -/
 inductive is_sub_var_all_ind_aux :
   (VarName_ → VarName_) →
@@ -121,7 +121,7 @@ inductive is_sub_var_all_ind_aux :
 
 
 /--
-  is_sub_var_all_ind σ F F' := True if and only if F' is the result of the simultaneous replacement of each free occurrence of any variable v in the formula F by a free occurrence of σ v.
+  `is_sub_var_all_ind σ F F'` := True if and only if `F'` is the result of the simultaneous replacement of each free occurrence of any variable `v` in the formula `F` by a free occurrence of `σ v`.
 -/
 def is_sub_var_all_ind (σ : VarName_ → VarName_) (F F' : Formula_) : Prop := is_sub_var_all_ind_aux σ ∅ F F'
 
