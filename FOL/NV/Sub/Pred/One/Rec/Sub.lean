@@ -64,10 +64,10 @@ def admits_pred_one_rec_aux
       then
         Sub.Var.All.Rec.admits_var_all_rec (Function.updateListITE id zs ts) H ∧
             /-
-              Suppose F is the formula that the predicate X ts occurs in.
-              Ensures that the free variables in H that are not being replaced by a variable in ts do not become bound variables in F. The bound variables in F are in the 'binders' set.
-              The zs are the free variables in H that are being replaced by the variables in ts.
-            (is_free_in x H ∧ x ∉ zs) := x is a free variable in H that is not being replaced by a variable in ts.
+              Suppose `F` is the formula that the predicate `X ts` occurs in.
+              Ensures that the free variables in `H` that are not being replaced by a variable in `ts` do not become bound variables in `F`. The bound variables in `F` are in the `binders` set.
+              The `zs` are the free variables in `H` that are being replaced by the variables in `ts`.
+              `is_free_in x H ∧ x ∉ zs` := `x` is a free variable in `H` that is not being replaced by a variable in `ts`.
             -/
           ∀ x : VarName_, x ∈ binders → ¬(var_is_free_in x H ∧ x ∉ zs)
       else True
@@ -93,7 +93,7 @@ def admits_pred_one_rec_aux
 
 
 /--
-  admits_pred_one_rec P zs H F := True if and only if there is no variable in (H.free_var_set \ zs) that becomes a bound occurrence in the formula (replace_pred_one_rec P zs H F).
+  `admits_pred_one_rec P zs H F` := True if and only if there is no variable in `H.free_var_set \ zs` that becomes a bound occurrence in the formula `replace_pred_one_rec P zs H F`.
 -/
 def admits_pred_one_rec
   (P : PredName_)
@@ -153,7 +153,7 @@ lemma replace_no_predVar
 
 
 /--
-  Helper function for I'.
+  Helper function for `I'`.
 -/
 def Interpretation_.usingPred
   (D : Type)
