@@ -135,13 +135,12 @@ lemma replace_pred_one_rec_pred_var_set_is_empty
     | iff_ phi psi phi_ih psi_ih =>
     simp only [pred_var_set] at h1
     simp only [Finset.union_eq_empty] at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
-    cases h1
-    case intro h1_left h1_right =>
-      simp only [replace_pred_one_rec]
-      congr!
-      · exact phi_ih h1_left
-      · exact psi_ih h1_right
+    simp only [replace_pred_one_rec]
+    congr!
+    · exact phi_ih h1_left
+    · exact psi_ih h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [pred_var_set] at h1
 
