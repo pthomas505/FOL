@@ -104,7 +104,7 @@ def admits_pred_one_rec
   admits_pred_one_rec_aux P zs H ∅ F
 
 
-lemma replace_no_predVar
+lemma replace_pred_one_rec_pred_var_set_is_empty
   (P : PredName_)
   (zs : List VarName_)
   (H : Formula_)
@@ -313,7 +313,7 @@ theorem substitution_theorem_pred_one_rec_aux
     split_ifs
     case _ c1 =>
       specialize ih (Function.updateListITE V hd.args (List.map V xs)) hd.q
-      simp only [replace_no_predVar P zs H hd.q hd.h2] at ih
+      simp only [replace_pred_one_rec_pred_var_set_is_empty P zs H hd.q hd.h2] at ih
       apply holds_coincide_pred_var
       · simp only [I']
         simp only [Interpretation_.usingPred]
