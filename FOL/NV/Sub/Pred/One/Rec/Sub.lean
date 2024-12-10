@@ -13,9 +13,9 @@ open Formula_
 -- single
 -- https://math.stackexchange.com/a/1374989
 /--
-  The recursive simultaneous uniform substitution of a single predicate variable in a formula.
+  The simultaneous replacement of a predicate variable in a formula.
 -/
-def replace
+def replace_pred_one_rec
   (P : PredName_)
   (zs : List VarName_)
   (H : Formula_) :
@@ -28,25 +28,25 @@ def replace
   | eq_ x y => eq_ x y
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (replace P zs H phi)
+  | not_ phi => not_ (replace_pred_one_rec P zs H phi)
   | imp_ phi psi =>
       imp_
-      (replace P zs H phi)
-      (replace P zs H psi)
+      (replace_pred_one_rec P zs H phi)
+      (replace_pred_one_rec P zs H psi)
   | and_ phi psi =>
       and_
-      (replace P zs H phi)
-      (replace P zs H psi)
+      (replace_pred_one_rec P zs H phi)
+      (replace_pred_one_rec P zs H psi)
   | or_ phi psi =>
       or_
-      (replace P zs H phi)
-      (replace P zs H psi)
+      (replace_pred_one_rec P zs H phi)
+      (replace_pred_one_rec P zs H psi)
   | iff_ phi psi =>
       iff_
-      (replace P zs H phi)
-      (replace P zs H psi)
-  | forall_ x phi => forall_ x (replace P zs H phi)
-  | exists_ x phi => exists_ x (replace P zs H phi)
+      (replace_pred_one_rec P zs H phi)
+      (replace_pred_one_rec P zs H psi)
+  | forall_ x phi => forall_ x (replace_pred_one_rec P zs H phi)
+  | exists_ x phi => exists_ x (replace_pred_one_rec P zs H phi)
   | def_ X xs => def_ X xs
 
 
@@ -93,7 +93,7 @@ def admitsAux
 
 
 /--
-  admits P zs H F := True if and only if there is no variable in (H.free_var_set \ zs) that becomes a bound occurrence in the formula (replace P zs H F).
+  admits P zs H F := True if and only if there is no variable in (H.free_var_set \ zs) that becomes a bound occurrence in the formula (replace_pred_one_rec P zs H F).
 -/
 def admits
   (P : PredName_)
@@ -110,22 +110,22 @@ lemma replace_no_predVar
   (H : Formula_)
   (F : Formula_)
   (h1 : F.pred_var_set = ∅) :
-  replace P zs H F = F :=
+  replace_pred_one_rec P zs H F = F :=
   by
   induction F
   case pred_const_ X xs =>
-    simp only [replace]
+    simp only [replace_pred_one_rec]
   case pred_var_ X xs =>
     simp only [pred_var_set] at h1
     simp at h1
   case eq_ x y =>
-    simp only [replace]
+    simp only [replace_pred_one_rec]
   case true_ | false_ =>
-    simp only [replace]
+    simp only [replace_pred_one_rec]
   case not_ phi phi_ih =>
     simp only [pred_var_set] at h1
 
-    simp only [replace]
+    simp only [replace_pred_one_rec]
     congr!
     exact phi_ih h1
   case
@@ -138,18 +138,18 @@ lemma replace_no_predVar
 
     cases h1
     case intro h1_left h1_right =>
-      simp only [replace]
+      simp only [replace_pred_one_rec]
       congr!
       · exact phi_ih h1_left
       · exact psi_ih h1_right
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [pred_var_set] at h1
 
-    simp only [replace]
+    simp only [replace_pred_one_rec]
     congr!
     exact phi_ih h1
   case def_ X xs =>
-    simp only [replace]
+    simp only [replace_pred_one_rec]
 
 
 /--
@@ -198,21 +198,21 @@ theorem substitution_theorem_aux
   (h1 : admitsAux P zs H binders F)
   (h2 : ∀ x : VarName_, x ∉ binders → V x = V' x) :
   holds D (I' D I V' E P zs H) V E F ↔
-    holds D I V E (replace P zs H F) :=
+    holds D I V E (replace_pred_one_rec P zs H F) :=
   by
   set E_ref := E
   induction E generalizing F binders V
   all_goals
     induction F generalizing binders V
     case pred_const_ X xs =>
-      simp only [replace]
+      simp only [replace_pred_one_rec]
       simp only [holds]
       simp only [I']
       simp only [Interpretation_.usingPred]
     case pred_var_ X xs =>
         simp only [admitsAux] at h1
 
-        simp only [replace]
+        simp only [replace_pred_one_rec]
         simp only [holds]
         simp only [I']
         simp only [Interpretation_.usingPred]
@@ -258,15 +258,15 @@ theorem substitution_theorem_aux
           split_ifs
           simp only [holds]
     case eq_ x y =>
-      simp only [replace]
+      simp only [replace_pred_one_rec]
       simp only [holds]
     case true_ | false_ =>
-      simp only [replace]
+      simp only [replace_pred_one_rec]
       simp only [holds]
     case not_ phi phi_ih =>
       simp only [admitsAux] at h1
 
-      simp only [replace]
+      simp only [replace_pred_one_rec]
       simp only [holds]
       congr! 1
       exact phi_ih V binders h1 h2
@@ -277,7 +277,7 @@ theorem substitution_theorem_aux
       | iff_ phi psi phi_ih psi_ih =>
       simp only [admitsAux] at h1
 
-      simp only [replace]
+      simp only [replace_pred_one_rec]
       simp only [holds]
       cases h1
       case intro h1_left h1_right =>
@@ -287,7 +287,7 @@ theorem substitution_theorem_aux
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
       simp only [admitsAux] at h1
 
-      simp only [replace]
+      simp only [replace_pred_one_rec]
       simp only [holds]
       first | apply forall_congr' | apply exists_congr
       intro d
@@ -302,12 +302,12 @@ theorem substitution_theorem_aux
         exact h2 v a1_left
 
   case nil.def_ X xs =>
-    simp only [replace]
+    simp only [replace_pred_one_rec]
     simp only [E_ref]
     simp only [holds]
 
   case cons.def_ hd tl ih X xs =>
-    simp only [replace]
+    simp only [replace_pred_one_rec]
     simp only [E_ref]
     simp only [holds]
     split_ifs
@@ -339,7 +339,7 @@ theorem substitution_theorem
   (H : Formula_)
   (h1 : admits P zs H F) :
   holds D (I' D I V E P zs H) V E F ↔
-    holds D I V E (replace P zs H F) :=
+    holds D I V E (replace_pred_one_rec P zs H F) :=
   by
   apply substitution_theorem_aux D I V V E F P zs H ∅
   · exact h1
@@ -353,7 +353,7 @@ theorem substitution_is_valid
   (H : Formula_)
   (h1 : admits P zs H F)
   (h2 : F.is_valid) :
-  (replace P zs H F).is_valid :=
+  (replace_pred_one_rec P zs H F).is_valid :=
   by
   simp only [is_valid] at h2
 
