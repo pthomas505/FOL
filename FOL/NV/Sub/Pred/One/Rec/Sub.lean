@@ -155,7 +155,7 @@ lemma replace_pred_one_rec_pred_var_set_is_empty
 /--
   Helper function for `I'`.
 -/
-def Interpretation_.usingPred
+def Interpretation_.using_pred
   (D : Type)
   (I : Interpretation_ D)
   (pred_ : PredName_ → List D → Prop) :
@@ -177,7 +177,7 @@ def I'
   (zs : List VarName_)
   (H : Formula_) :
   Interpretation_ D :=
-  (Interpretation_.usingPred D I (
+  (Interpretation_.using_pred D I (
     fun (Q : PredName_) (ds : List D) =>
       if Q = P ∧ ds.length = zs.length
       then holds D I (Function.updateListITE V zs ds) E H
@@ -208,14 +208,14 @@ theorem substitution_theorem_pred_one_rec_aux
       simp only [replace_pred_one_rec]
       simp only [holds]
       simp only [I']
-      simp only [Interpretation_.usingPred]
+      simp only [Interpretation_.using_pred]
     case pred_var_ X xs =>
         simp only [admits_pred_one_rec_aux] at h1
 
         simp only [replace_pred_one_rec]
         simp only [holds]
         simp only [I']
-        simp only [Interpretation_.usingPred]
+        simp only [Interpretation_.using_pred]
         simp
         split_ifs at h1
         case pos c1 =>
@@ -316,14 +316,14 @@ theorem substitution_theorem_pred_one_rec_aux
       simp only [replace_pred_one_rec_pred_var_set_is_empty P zs H hd.q hd.h2] at ih
       apply holds_coincide_pred_var
       · simp only [I']
-        simp only [Interpretation_.usingPred]
+        simp only [Interpretation_.using_pred]
       · simp only [pred_var_occurs_in_iff_mem_pred_var_set]
         simp only [hd.h2]
         simp
     case _ c1 =>
       apply holds_coincide_pred_var
       · simp only [I']
-        simp only [Interpretation_.usingPred]
+        simp only [Interpretation_.using_pred]
       · simp only [pred_var_occurs_in]
         simp
 
