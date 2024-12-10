@@ -209,50 +209,50 @@ theorem substitution_theorem_pred_one_rec_aux
       simp only [I']
       simp only [Interpretation_.using_pred]
     case pred_var_ X xs =>
-        simp only [admits_pred_one_rec_aux] at h1
+      simp only [admits_pred_one_rec_aux] at h1
 
-        simp only [replace_pred_one_rec]
+      simp only [replace_pred_one_rec]
+      simp only [holds]
+      simp only [I']
+      simp only [Interpretation_.using_pred]
+      simp
+      split_ifs at h1
+      case pos c1 =>
+        simp only [Sub.Var.All.Rec.admits_var_all_rec] at h1
+        simp at h1
+        obtain ⟨h1_left, h1_right⟩ := h1
+
+        have s1 :
+          holds D I (V ∘ Function.updateListITE id zs xs) E_ref H ↔
+            holds D I V E_ref (Sub.Var.All.Rec.fast_replace_free_var_all_rec (Function.updateListITE id zs xs) H) := Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E_ref (Function.updateListITE id zs xs) H h1_left
+
+        simp only [Function.updateListITE_comp] at s1
+        simp at s1
+
+        have s2 :
+          holds D I (Function.updateListITE V zs (List.map V xs)) E_ref H ↔ holds D I (Function.updateListITE V' zs (List.map V xs)) E_ref H :=
+          by
+          apply holds_coincide_var
+          intro v a1
+          by_cases c2 : v ∈ zs
+          · apply Function.updateListITE_mem_eq_len V V' v zs (List.map V xs) c2
+            cases c1
+            case pos.intro c1_left c1_right =>
+              simp
+              symm
+              exact c1_right
+          · by_cases c3 : v ∈ binders
+            · specialize h1_right v c3 a1
+              contradiction
+            · apply Function.updateListITE_mem'
+              exact h2 v c3
+
+        simp only [s2] at s1
+        split_ifs
+        exact s1
+      case neg c1 =>
+        split_ifs
         simp only [holds]
-        simp only [I']
-        simp only [Interpretation_.using_pred]
-        simp
-        split_ifs at h1
-        case pos c1 =>
-          simp only [Sub.Var.All.Rec.admits_var_all_rec] at h1
-          simp at h1
-          obtain ⟨h1_left, h1_right⟩ := h1
-
-          have s1 :
-            holds D I (V ∘ Function.updateListITE id zs xs) E_ref H ↔
-              holds D I V E_ref (Sub.Var.All.Rec.fast_replace_free_var_all_rec (Function.updateListITE id zs xs) H) := Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E_ref (Function.updateListITE id zs xs) H h1_left
-
-          simp only [Function.updateListITE_comp] at s1
-          simp at s1
-
-          have s2 :
-            holds D I (Function.updateListITE V zs (List.map V xs)) E_ref H ↔ holds D I (Function.updateListITE V' zs (List.map V xs)) E_ref H :=
-            by
-            apply holds_coincide_var
-            intro v a1
-            by_cases c2 : v ∈ zs
-            · apply Function.updateListITE_mem_eq_len V V' v zs (List.map V xs) c2
-              cases c1
-              case pos.intro c1_left c1_right =>
-                simp
-                symm
-                exact c1_right
-            · by_cases c3 : v ∈ binders
-              · specialize h1_right v c3 a1
-                contradiction
-              · apply Function.updateListITE_mem'
-                exact h2 v c3
-
-          simp only [s2] at s1
-          split_ifs
-          exact s1
-        case neg c1 =>
-          split_ifs
-          simp only [holds]
     case eq_ x y =>
       simp only [replace_pred_one_rec]
       simp only [holds]
