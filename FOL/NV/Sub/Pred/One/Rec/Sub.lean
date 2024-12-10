@@ -51,9 +51,9 @@ def replace_pred_one_rec
 
 
 /--
-  Helper function for admits.
+  Helper function for `admits_pred_one_rec`.
 -/
-def admitsAux
+def admits_pred_one_rec_aux
   (P : PredName_)
   (zs : List VarName_)
   (H : Formula_)
@@ -74,34 +74,34 @@ def admitsAux
   | eq_ _ _ => True
   | true_ => True
   | false_ => True
-  | not_ phi => admitsAux P zs H binders phi
+  | not_ phi => admits_pred_one_rec_aux P zs H binders phi
   | imp_ phi psi =>
-      admitsAux P zs H binders phi ∧
-      admitsAux P zs H binders psi
+      admits_pred_one_rec_aux P zs H binders phi ∧
+      admits_pred_one_rec_aux P zs H binders psi
   | and_ phi psi =>
-      admitsAux P zs H binders phi ∧
-      admitsAux P zs H binders psi
+      admits_pred_one_rec_aux P zs H binders phi ∧
+      admits_pred_one_rec_aux P zs H binders psi
   | or_ phi psi =>
-      admitsAux P zs H binders phi ∧
-      admitsAux P zs H binders psi
+      admits_pred_one_rec_aux P zs H binders phi ∧
+      admits_pred_one_rec_aux P zs H binders psi
   | iff_ phi psi =>
-      admitsAux P zs H binders phi ∧
-      admitsAux P zs H binders psi
-  | forall_ x phi => admitsAux P zs H (binders ∪ {x}) phi
-  | exists_ x phi => admitsAux P zs H (binders ∪ {x}) phi
+      admits_pred_one_rec_aux P zs H binders phi ∧
+      admits_pred_one_rec_aux P zs H binders psi
+  | forall_ x phi => admits_pred_one_rec_aux P zs H (binders ∪ {x}) phi
+  | exists_ x phi => admits_pred_one_rec_aux P zs H (binders ∪ {x}) phi
   | def_ _ _ => True
 
 
 /--
-  admits P zs H F := True if and only if there is no variable in (H.free_var_set \ zs) that becomes a bound occurrence in the formula (replace_pred_one_rec P zs H F).
+  admits_pred_one_rec P zs H F := True if and only if there is no variable in (H.free_var_set \ zs) that becomes a bound occurrence in the formula (replace_pred_one_rec P zs H F).
 -/
-def admits
+def admits_pred_one_rec
   (P : PredName_)
   (zs : List VarName_)
   (H : Formula_)
   (F : Formula_) :
   Prop :=
-  admitsAux P zs H ∅ F
+  admits_pred_one_rec_aux P zs H ∅ F
 
 
 lemma replace_no_predVar
@@ -195,7 +195,7 @@ theorem substitution_theorem_aux
   (zs : List VarName_)
   (H : Formula_)
   (binders : Finset VarName_)
-  (h1 : admitsAux P zs H binders F)
+  (h1 : admits_pred_one_rec_aux P zs H binders F)
   (h2 : ∀ x : VarName_, x ∉ binders → V x = V' x) :
   holds D (I' D I V' E P zs H) V E F ↔
     holds D I V E (replace_pred_one_rec P zs H F) :=
@@ -210,7 +210,7 @@ theorem substitution_theorem_aux
       simp only [I']
       simp only [Interpretation_.usingPred]
     case pred_var_ X xs =>
-        simp only [admitsAux] at h1
+        simp only [admits_pred_one_rec_aux] at h1
 
         simp only [replace_pred_one_rec]
         simp only [holds]
@@ -264,7 +264,7 @@ theorem substitution_theorem_aux
       simp only [replace_pred_one_rec]
       simp only [holds]
     case not_ phi phi_ih =>
-      simp only [admitsAux] at h1
+      simp only [admits_pred_one_rec_aux] at h1
 
       simp only [replace_pred_one_rec]
       simp only [holds]
@@ -275,7 +275,7 @@ theorem substitution_theorem_aux
       | and_ phi psi phi_ih psi_ih
       | or_ phi psi phi_ih psi_ih
       | iff_ phi psi phi_ih psi_ih =>
-      simp only [admitsAux] at h1
+      simp only [admits_pred_one_rec_aux] at h1
 
       simp only [replace_pred_one_rec]
       simp only [holds]
@@ -285,7 +285,7 @@ theorem substitution_theorem_aux
         · exact phi_ih V binders h1_left h2
         · exact psi_ih V binders h1_right h2
     case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-      simp only [admitsAux] at h1
+      simp only [admits_pred_one_rec_aux] at h1
 
       simp only [replace_pred_one_rec]
       simp only [holds]
@@ -337,7 +337,7 @@ theorem substitution_theorem
   (P : PredName_)
   (zs : List VarName_)
   (H : Formula_)
-  (h1 : admits P zs H F) :
+  (h1 : admits_pred_one_rec P zs H F) :
   holds D (I' D I V E P zs H) V E F ↔
     holds D I V E (replace_pred_one_rec P zs H F) :=
   by
@@ -351,7 +351,7 @@ theorem substitution_is_valid
   (P : PredName_)
   (zs : List VarName_)
   (H : Formula_)
-  (h1 : admits P zs H F)
+  (h1 : admits_pred_one_rec P zs H F)
   (h2 : F.is_valid) :
   (replace_pred_one_rec P zs H F).is_valid :=
   by
