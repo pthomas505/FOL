@@ -128,7 +128,7 @@ inductive is_sub_pred_one_ind
     is_sub_pred_one_ind P zs H (def_ X xs) (def_ X xs)
 
 
-theorem substitution_theorem
+theorem substitution_theorem_pred_one_ind
   (D : Type)
   (I J : Interpretation_ D)
   (V : Valuation_ D)
@@ -245,7 +245,7 @@ theorem substitution_theorem
           simp
 
 
-theorem substitution_is_valid
+theorem substitution_is_valid_pred_one_ind
   (F F' : Formula_)
   (P : PredName_)
   (zs : List VarName_)
@@ -265,7 +265,7 @@ theorem substitution_is_valid
         if (Q = P ∧ ds.length = zs.length)
         then holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ Q ds }
-  obtain s1 := substitution_theorem D I J V E F P zs H F' h1
+  obtain s1 := substitution_theorem_pred_one_ind D I J V E F P zs H F' h1
   simp only [Interpretation_.pred_var_] at s1
   have s2 : holds D I V E F' ↔ holds D J V E F :=
     by
