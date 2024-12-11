@@ -96,7 +96,6 @@ def admits_pred_all_rec
   Prop :=
   admits_pred_all_rec_aux τ ∅ F
 
-
 instance
   (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (F : Formula_) :
@@ -106,7 +105,7 @@ instance
   infer_instance
 
 
-theorem substitution_theorem_aux
+theorem substitution_theorem_pred_all_rec_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
@@ -259,7 +258,7 @@ theorem substitution_theorem
       ⟩
       V E F ↔ holds D I V E (replace_pred_all_rec τ F) :=
   by
-  apply substitution_theorem_aux D I V V E τ ∅ F
+  apply substitution_theorem_pred_all_rec_aux D I V V E τ ∅ F
   · simp only [admits_pred_all_rec] at h1
     exact h1
   · intro X _
