@@ -265,7 +265,7 @@ theorem substitution_theorem_pred_all_rec
     rfl
 
 
-theorem substitution_is_valid
+theorem substitution_is_valid_pred_all_rec
   (F : Formula_)
   (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (h1 : admits_pred_all_rec τ F)
