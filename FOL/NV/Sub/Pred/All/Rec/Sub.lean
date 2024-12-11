@@ -137,43 +137,41 @@ theorem substitution_theorem_pred_all_rec_aux
     simp only [admits_pred_all_rec_aux] at h1
     simp at h1
 
-    cases h1
-    case intro h1_left h1_right =>
-      cases h1_right
-      case intro h1_right_left h1_right_right =>
-        obtain s1 :=
-        Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E (Function.updateListITE id (τ X xs.length).fst xs)
-          (τ X xs.length).snd h1_left
-        simp only [Function.updateListITE_comp] at s1
-        simp at s1
+    obtain ⟨h1_left, ⟨h1_right_left, h1_right_right⟩⟩ := h1
 
-        have s2 :
-          holds D I (Function.updateListITE V (τ X xs.length).fst (List.map V xs)) E
-            (τ X xs.length).snd ↔
-          holds D I (Function.updateListITE V' (τ X xs.length).fst (List.map V xs)) E
-            (τ X xs.length).snd :=
-        by
-          apply holds_coincide_var
-          intro v a1
-          by_cases c1 : v ∈ (τ X xs.length).fst
-          · apply Function.updateListITE_mem_eq_len V V' v (τ X xs.length).fst (List.map V xs) c1
-            simp
-            symm
-            exact h1_right_right
-          · by_cases c2 : v ∈ binders
-            · specialize h1_right_left v c2 a1
-              contradiction
-            · specialize h2 v c2
-              apply Function.updateListITE_mem'
-              exact h2
-        simp only [s2] at s1
-        clear s2
+    obtain s1 :=
+    Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E (Function.updateListITE id (τ X xs.length).fst xs)
+      (τ X xs.length).snd h1_left
+    simp only [Function.updateListITE_comp] at s1
+    simp at s1
 
-        simp only [holds]
-        simp only [replace_pred_all_rec]
+    have s2 :
+      holds D I (Function.updateListITE V (τ X xs.length).fst (List.map V xs)) E
+        (τ X xs.length).snd ↔
+      holds D I (Function.updateListITE V' (τ X xs.length).fst (List.map V xs)) E
+        (τ X xs.length).snd :=
+    by
+      apply holds_coincide_var
+      intro v a1
+      by_cases c1 : v ∈ (τ X xs.length).fst
+      · apply Function.updateListITE_mem_eq_len V V' v (τ X xs.length).fst (List.map V xs) c1
         simp
-        simp only [if_pos h1_right_right]
-        exact s1
+        symm
+        exact h1_right_right
+      · by_cases c2 : v ∈ binders
+        · specialize h1_right_left v c2 a1
+          contradiction
+        · specialize h2 v c2
+          apply Function.updateListITE_mem'
+          exact h2
+    simp only [s2] at s1
+    clear s2
+
+    simp only [holds]
+    simp only [replace_pred_all_rec]
+    simp
+    simp only [if_pos h1_right_right]
+    exact s1
   case eq_ x y =>
     simp only [replace_pred_all_rec]
     simp only [holds]
@@ -197,11 +195,10 @@ theorem substitution_theorem_pred_all_rec_aux
     simp only [replace_pred_all_rec]
     simp only [holds]
 
-    cases h1
-    case intro h1_left h1_right =>
-      congr! 1
-      · exact phi_ih V binders h1_left h2
-      · exact psi_ih V binders h1_right h2
+    obtain ⟨h1_left, h1_right⟩ := h1
+    congr! 1
+    · exact phi_ih V binders h1_left h2
+    · exact psi_ih V binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [admits_pred_all_rec_aux] at h1
 
@@ -213,11 +210,9 @@ theorem substitution_theorem_pred_all_rec_aux
     intro v a1
     simp only [Function.updateITE]
     simp at a1
-    push_neg at a1
-    cases a1
-    case h.intro a1_left a1_right =>
-      simp only [if_neg a1_right]
-      exact h2 v a1_left
+    obtain ⟨a1_left, a1_right⟩ := a1
+    simp only [if_neg a1_right]
+    exact h2 v a1_left
   case def_ X xs =>
     cases E
     case nil =>
