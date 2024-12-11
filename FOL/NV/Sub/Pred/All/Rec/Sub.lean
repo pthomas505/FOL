@@ -237,7 +237,7 @@ theorem substitution_theorem_pred_all_rec_aux
           simp
 
 
-theorem substitution_theorem
+theorem substitution_theorem_pred_all_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -276,7 +276,7 @@ theorem substitution_is_valid
 
   simp only [is_valid]
   intro D I V E
-  obtain s1 := substitution_theorem D I V E τ F h1
+  obtain s1 := substitution_theorem_pred_all_rec D I V E τ F h1
   simp only [← s1]
   apply h2
 
