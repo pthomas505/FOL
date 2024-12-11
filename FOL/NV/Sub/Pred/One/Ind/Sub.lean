@@ -9,9 +9,9 @@ namespace FOL.NV.Sub.Pred.One.Ind
 open Formula_
 
 /--
-  The inductive simultaneous uniform substitution of a single predicate variable in a formula.
+  The simultaneous substitution of a predicate variable in a formula.
 
-  is_sub_pred_one_ind A P zs H B := The formula A is said to be transformed into the formula B by a substitution of H* for P z₁ ... zₙ, abbreviated: Sub A (P zⁿ / H*) B, iff B is obtained from A upon replacing in A each occurrence of a derivative of the name form P z₁ ... zₙ by the corresponding derivative of the substituend H*, provided that: (i) P does not occur in a component formula (∀ x A₁) of A if x is a parameter of H*, and (ii) the name variable zₖ, k = 1, ..., n, is not free in a component formula (∀ x H) of H* if P t₁ ... tₙ occurs in A with x occurring in tₖ. If conditions (i) and (ii) are not satisfied, then the indicated substitution for predicate variables is left undefined.
+  `is_sub_pred_one_ind A P zs H B` := The formula `A` is said to be transformed into the formula `B` by a substitution of `H*` for `P z₁ ... zₙ`, abbreviated: `Sub A (P zⁿ / H*) B`, iff `B` is obtained from `A` upon replacing in `A` each occurrence of a derivative of the name form `P z₁ ... zₙ` by the corresponding derivative of the substituend `H*`, provided that: (i) `P` does not occur in a component formula `(∀ x A₁)` of `A` if `x` is a parameter of `H*`, and (ii) the name variable `zₖ`, `k = 1, ..., n`, is not free in a component formula `(∀ x H)` of `H*` if `P t₁ ... tₙ` occurs in `A` with `x` occurring in `tₖ`. If conditions (i) and (ii) are not satisfied, then the indicated substitution for predicate variables is left undefined.
 -/
 inductive is_sub_pred_one_ind
   (P : PredName_)
