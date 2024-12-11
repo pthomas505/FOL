@@ -25,7 +25,7 @@ inductive is_sub_pred_one_ind
     is_sub_pred_one_ind P zs H (pred_const_ X xs) (pred_const_ X xs)
 
 /-
-  If A is an atomic formula not containing P then Sub A (P zⁿ / H*) A.
+  If `A` is an atomic formula not containing `P` then `Sub A (P zⁿ / H*) A`.
 -/
 
   | pred_not_occurs_in
@@ -35,9 +35,9 @@ inductive is_sub_pred_one_ind
     is_sub_pred_one_ind P zs H (pred_var_ X xs) (pred_var_ X xs)
 
   /-
-  If A = P t₁ ... tₙ and Sf H* (zⁿ / tⁿ) B, then Sub A (P zⁿ / H*) B.
+  If `A = P t₁ ... tₙ` and `Sf H* (zⁿ / tⁿ) B`, then `Sub A (P zⁿ / H*) B`.
 
-  Sf H* (zⁿ / tⁿ) B :=
+  `Sf H* (zⁿ / tⁿ) B` :=
     admits_fun (function.update_list_ite id zs.to_list ts.to_list) H* ∧
     fast_replace_free_fun (function.update_list_ite id zs.to_list ts.to_list) H* = B
   -/
@@ -59,7 +59,7 @@ inductive is_sub_pred_one_ind
   | false_ : is_sub_pred_one_ind P zs H false_ false_
 
 /-
-  If A = (¬ A₁) and Sub A₁ (P zⁿ / H*) B₁, then Sub A (P zⁿ / H*) (¬ B₁).
+  If `A = (¬ A₁)` and `Sub A₁ (P zⁿ / H*) B₁`, then `Sub A (P zⁿ / H*) (¬ B₁)`.
 -/
   | not_
     (phi : Formula_)
@@ -68,7 +68,7 @@ inductive is_sub_pred_one_ind
     is_sub_pred_one_ind P zs H phi.not_ phi'.not_
 
 /-
-  If A = (A₁ → A₂), Sub A₁ (P zⁿ / H*) B₁, and Sub A₂ (P zⁿ / H*) B₂, then Sub A (P zⁿ / H*) (B₁ → B₁).
+  If `A = (A₁ → A₂)`, `Sub A₁ (P zⁿ / H*) B₁`, and `Sub A₂ (P zⁿ / H*) B₂`, then `Sub A (P zⁿ / H*) (B₁ → B₁)`.
 -/
 
   | imp_
@@ -101,9 +101,9 @@ inductive is_sub_pred_one_ind
 
 
 /-
-  If A = (∀ x A₁) and P does not occur in A then Sub A (P zⁿ / H*) A.
+  If `A = (∀ x A₁)` and `P` does not occur in `A` then `Sub A (P zⁿ / H*) A`.
 
-  If A = (∀ x A₁), P occurs in A, x is not free in H*, and Sub A₁ (P zⁿ / H*) B₁, then Sub A (P zⁿ / H*) (∀ x B₁).
+  If `A = (∀ x A₁)`, `P` occurs in `A`, `x` is not free in `H*`, and `Sub A₁ (P zⁿ / H*) B₁`, then `Sub A (P zⁿ / H*) (∀ x B₁)`.
 -/
 
   | forall_
