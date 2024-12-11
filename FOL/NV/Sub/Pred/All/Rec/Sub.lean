@@ -12,9 +12,9 @@ open Formula_
 -- multiple
 
 /--
-  The recursive simultaneous uniform substitution of all of the predicate variables in a formula.
+  The simultaneous substitution of all of the predicate variables in a formula.
 -/
-def replace
+def replace_pred_all_rec
   (τ : PredName_ → ℕ → (List VarName_ × Formula_)) :
   Formula_ → Formula_
   | pred_const_ X xs => pred_const_ X xs
@@ -27,25 +27,25 @@ def replace
   | eq_ x y => eq_ x y
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (replace τ phi)
+  | not_ phi => not_ (replace_pred_all_rec τ phi)
   | imp_ phi psi =>
       imp_
-      (replace τ phi)
-      (replace τ psi)
+      (replace_pred_all_rec τ phi)
+      (replace_pred_all_rec τ psi)
   | and_ phi psi =>
       and_
-      (replace τ phi)
-      (replace τ psi)
+      (replace_pred_all_rec τ phi)
+      (replace_pred_all_rec τ psi)
   | or_ phi psi =>
       or_
-      (replace τ phi)
-      (replace τ psi)
+      (replace_pred_all_rec τ phi)
+      (replace_pred_all_rec τ psi)
   | iff_ phi psi =>
       iff_
-      (replace τ phi)
-      (replace τ psi)
-  | forall_ x phi => forall_ x (replace τ phi)
-  | exists_ x phi => exists_ x (replace τ phi)
+      (replace_pred_all_rec τ phi)
+      (replace_pred_all_rec τ psi)
+  | forall_ x phi => forall_ x (replace_pred_all_rec τ phi)
+  | exists_ x phi => exists_ x (replace_pred_all_rec τ phi)
   | def_ X xs => def_ X xs
 
 
@@ -125,11 +125,11 @@ theorem substitution_theorem_aux
         then holds D I (Function.updateListITE V' (τ X ds.length).fst ds) E (τ X ds.length).snd
         else I.pred_var_ X ds
       ⟩
-      V E F ↔ holds D I V E (replace τ F) :=
+      V E F ↔ holds D I V E (replace_pred_all_rec τ F) :=
   by
   induction F generalizing binders V
   case pred_const_ X xs =>
-    simp only [replace]
+    simp only [replace_pred_all_rec]
     simp only [holds]
   case pred_var_ X xs =>
     simp only [admitsAux] at h1
@@ -168,20 +168,20 @@ theorem substitution_theorem_aux
         clear s2
 
         simp only [holds]
-        simp only [replace]
+        simp only [replace_pred_all_rec]
         simp
         simp only [if_pos h1_right_right]
         exact s1
   case eq_ x y =>
-    simp only [replace]
+    simp only [replace_pred_all_rec]
     simp only [holds]
   case true_ | false_ =>
-    simp only [replace]
+    simp only [replace_pred_all_rec]
     simp only [holds]
   case not_ phi phi_ih =>
     simp only [admitsAux] at h1
 
-    simp only [replace]
+    simp only [replace_pred_all_rec]
     simp only [holds]
     congr! 1
     exact phi_ih V binders h1 h2
@@ -192,7 +192,7 @@ theorem substitution_theorem_aux
     | iff_ phi psi phi_ih psi_ih =>
     simp only [admitsAux] at h1
 
-    simp only [replace]
+    simp only [replace_pred_all_rec]
     simp only [holds]
 
     cases h1
@@ -203,7 +203,7 @@ theorem substitution_theorem_aux
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [admitsAux] at h1
 
-    simp only [replace]
+    simp only [replace_pred_all_rec]
     simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
@@ -219,10 +219,10 @@ theorem substitution_theorem_aux
   case def_ X xs =>
     cases E
     case nil =>
-      simp only [replace]
+      simp only [replace_pred_all_rec]
       simp only [holds]
     case cons hd tl =>
-      simp only [replace]
+      simp only [replace_pred_all_rec]
       simp only [holds]
       split_ifs
       case _ c1 =>
@@ -257,7 +257,7 @@ theorem substitution_theorem
         then holds D I (Function.updateListITE V zs ds) E H
         else I.pred_var_ X ds
       ⟩
-      V E F ↔ holds D I V E (replace τ F) :=
+      V E F ↔ holds D I V E (replace_pred_all_rec τ F) :=
   by
   apply substitution_theorem_aux D I V V E τ ∅ F
   · simp only [admits] at h1
@@ -271,7 +271,7 @@ theorem substitution_is_valid
   (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (h1 : admits τ F)
   (h2 : F.is_valid) :
-  (replace τ F).is_valid :=
+  (replace_pred_all_rec τ F).is_valid :=
   by
   simp only [is_valid] at h2
 
