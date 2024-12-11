@@ -90,7 +90,7 @@ instance
     infer_instance
 
 
-def admits
+def admits_pred_all_rec
   (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (F : Formula_) :
   Prop :=
@@ -100,9 +100,9 @@ def admits
 instance
   (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (F : Formula_) :
-  Decidable (admits τ F) :=
+  Decidable (admits_pred_all_rec τ F) :=
   by
-  simp only [admits]
+  simp only [admits_pred_all_rec]
   infer_instance
 
 
@@ -245,7 +245,7 @@ theorem substitution_theorem
   (E : Env_)
   (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (F : Formula_)
-  (h1 : admits τ F) :
+  (h1 : admits_pred_all_rec τ F) :
   holds D
     ⟨
       I.nonempty,
@@ -260,7 +260,7 @@ theorem substitution_theorem
       V E F ↔ holds D I V E (replace_pred_all_rec τ F) :=
   by
   apply substitution_theorem_aux D I V V E τ ∅ F
-  · simp only [admits] at h1
+  · simp only [admits_pred_all_rec] at h1
     exact h1
   · intro X _
     rfl
@@ -269,7 +269,7 @@ theorem substitution_theorem
 theorem substitution_is_valid
   (F : Formula_)
   (τ : PredName_ → ℕ → List VarName_ × Formula_)
-  (h1 : admits τ F)
+  (h1 : admits_pred_all_rec τ F)
   (h2 : F.is_valid) :
   (replace_pred_all_rec τ F).is_valid :=
   by
