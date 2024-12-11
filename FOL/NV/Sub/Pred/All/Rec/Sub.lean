@@ -49,6 +49,9 @@ def replace_pred_all_rec
   | def_ X xs => def_ X xs
 
 
+/--
+  Helper function for `admits_pred_all_rec`.
+-/
 def admits_pred_all_rec_aux
   (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (binders : Finset VarName_) :
