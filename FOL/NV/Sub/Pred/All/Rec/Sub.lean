@@ -136,7 +136,6 @@ theorem substitution_theorem_pred_all_rec_aux
   case pred_var_ X xs =>
     simp only [admits_pred_all_rec_aux] at h1
     simp at h1
-
     obtain ⟨h1_left, ⟨h1_right_left, h1_right_right⟩⟩ := h1
 
     obtain s1 :=
@@ -146,10 +145,8 @@ theorem substitution_theorem_pred_all_rec_aux
     simp at s1
 
     have s2 :
-      holds D I (Function.updateListITE V (τ X xs.length).fst (List.map V xs)) E
-        (τ X xs.length).snd ↔
-      holds D I (Function.updateListITE V' (τ X xs.length).fst (List.map V xs)) E
-        (τ X xs.length).snd :=
+      holds D I (Function.updateListITE V (τ X xs.length).fst (List.map V xs)) E (τ X xs.length).snd ↔
+      holds D I (Function.updateListITE V' (τ X xs.length).fst (List.map V xs)) E (τ X xs.length).snd :=
     by
       apply holds_coincide_var
       intro v a1
@@ -161,11 +158,10 @@ theorem substitution_theorem_pred_all_rec_aux
       · by_cases c2 : v ∈ binders
         · specialize h1_right_left v c2 a1
           contradiction
-        · specialize h2 v c2
-          apply Function.updateListITE_mem'
-          exact h2
+        · apply Function.updateListITE_mem'
+          exact h2 v c2
+
     simp only [s2] at s1
-    clear s2
 
     simp only [holds]
     simp only [replace_pred_all_rec]
@@ -191,11 +187,10 @@ theorem substitution_theorem_pred_all_rec_aux
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     simp only [admits_pred_all_rec_aux] at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
     simp only [replace_pred_all_rec]
     simp only [holds]
-
-    obtain ⟨h1_left, h1_right⟩ := h1
     congr! 1
     · exact phi_ih V binders h1_left h2
     · exact psi_ih V binders h1_right h2
@@ -204,13 +199,16 @@ theorem substitution_theorem_pred_all_rec_aux
 
     simp only [replace_pred_all_rec]
     simp only [holds]
+
     first | apply forall_congr' | apply exists_congr
     intro d
+
     apply phi_ih (Function.updateITE V x d) (binders ∪ {x}) h1
     intro v a1
-    simp only [Function.updateITE]
     simp at a1
     obtain ⟨a1_left, a1_right⟩ := a1
+
+    simp only [Function.updateITE]
     simp only [if_neg a1_right]
     exact h2 v a1_left
   case def_ X xs =>
