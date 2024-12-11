@@ -158,20 +158,19 @@ theorem substitution_theorem_pred_one_ind
     · exact h3_const
     · intro X ds a1
       simp only [pred_var_occurs_in] at a1
-      cases a1
-      case intro a1_left a1_right =>
-        subst a1_left
-        apply h3_var
-        simp
-        intro a2
-        subst a2
-        simp at h1_1
-        intro contra
-        apply h1_1
-        trans List.length ds
-        · simp only [eq_comm]
-          exact a1_right
-        · exact contra
+      obtain ⟨a1_left, a1_right⟩ := a1
+      rw [← a1_left] at h1_1
+      apply h3_var
+      simp
+      intro a2
+      rw [a2] at h1_1
+      simp at h1_1
+      intro contra
+      apply h1_1
+      trans List.length ds
+      · simp only [eq_comm]
+        exact a1_right
+      · exact contra
   case pred_occurs_in h1_X h1_ts h1_1 h1_2 =>
     obtain s1 := Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E (Function.updateListITE id zs h1_ts) H h1_2
 
@@ -212,18 +211,19 @@ theorem substitution_theorem_pred_one_ind
     intro d
     apply h1_ih
     intro Q ds a1
-    specialize h2 Q ds a1
+
     have s1 :
       holds D I (Function.updateListITE (Function.updateITE V h1_x d) zs ds) E H ↔
         holds D I (Function.updateListITE V zs ds) E H :=
-      by
+    by
       apply holds_coincide_var
-      intro v a1
+      intro v a2
       apply Function.updateListITE_updateIte
       intro contra
-      subst contra
+      rw [contra] at a2
       contradiction
-    simp only [h2] at s1
+
+    simp only [h2 Q ds a1] at s1
     exact s1
   case def_ X xs =>
     cases E
@@ -268,11 +268,10 @@ theorem substitution_is_valid_pred_one_ind
   obtain s1 := substitution_theorem_pred_one_ind D I J V E F P zs H F' h1
   simp only [Interpretation_.pred_var_] at s1
   have s2 : holds D I V E F' ↔ holds D J V E F :=
-    by
+  by
     apply s1
     · intro Q ds a1
-      cases a1
-      case h2.intro a1_left a1_right =>
+      obtain ⟨a1_left, a1_right⟩ := a1
       simp
       simp only [if_pos a1_right]
     · simp
