@@ -248,7 +248,7 @@ theorem T_17_1
   by
   apply IsDeduct.mp_ (forall_ v P)
   · apply IsDeduct.axiom_
-    apply is_axiom.pred_2_ v t P (fast_replace_free_var_one_rec v t P) h2
+    apply is_axiom_v1.pred_2_ v t P (fast_replace_free_var_one_rec v t P) h2
     rfl
   · exact h1
 
@@ -265,7 +265,7 @@ theorem specId
   by
   apply IsDeduct.mp_ (forall_ v P)
   · apply IsDeduct.axiom_
-    apply is_axiom.pred_2_ v v P
+    apply is_axiom_v1.pred_2_ v v P
     · exact fast_admits_var_one_rec_self P v
     · exact fast_replace_free_var_one_rec_self P v
   · exact h1
@@ -288,7 +288,7 @@ theorem T_17_3
   apply IsDeduct.mp_ ((forall_ v P.not_).imp_ (fast_replace_free_var_one_rec v t P).not_)
   · SC
   · apply IsDeduct.axiom_
-    apply is_axiom.pred_2_ v t
+    apply is_axiom_v1.pred_2_ v t
     · simp only [fast_admits_var_one_rec]
       simp only [fast_admits_var_one_rec_aux]
       exact h1
@@ -350,12 +350,12 @@ theorem T_17_7
   induction h1
   case axiom_ h1_phi h1_1 =>
     apply IsDeduct.axiom_
-    apply is_axiom.gen_
+    apply is_axiom_v1.gen_
     exact h1_1
   case assume_ h1_phi h1_1 =>
     apply IsDeduct.mp_ h1_phi
     · apply IsDeduct.axiom_
-      apply is_axiom.pred_3_
+      apply is_axiom_v1.pred_3_
       exact h2 h1_phi h1_1
     · apply IsDeduct.assume_
       exact h1_1
@@ -363,7 +363,7 @@ theorem T_17_7
     apply IsDeduct.mp_ (forall_ v h1_phi)
     · apply IsDeduct.mp_ (forall_ v (h1_phi.imp_ h1_psi))
       · apply IsDeduct.axiom_
-        apply is_axiom.pred_1_
+        apply is_axiom_v1.pred_1_
       · exact h1_ih_1
     · exact h1_ih_2
 
@@ -407,35 +407,35 @@ theorem isProofAltImpIsDeduct
   induction h1
   case prop_true_ =>
     apply IsDeduct.axiom_
-    apply is_axiom.prop_true_
+    apply is_axiom_v1.prop_true_
   case prop_1_ h1_phi h1_psi =>
     apply IsDeduct.axiom_
-    apply is_axiom.prop_1_
+    apply is_axiom_v1.prop_1_
   case prop_2_ h1_phi h1_psi h1_chi =>
     apply IsDeduct.axiom_
-    apply is_axiom.prop_2_
+    apply is_axiom_v1.prop_2_
   case prop_3_ h1_phi h1_psi =>
     apply IsDeduct.axiom_
-    apply is_axiom.prop_3_
+    apply is_axiom_v1.prop_3_
   case pred_1_ h1_v h1_phi h1_psi =>
     apply IsDeduct.axiom_
-    apply is_axiom.pred_1_
+    apply is_axiom_v1.pred_1_
   case pred_2_ h1_v h1_t h1_phi h1_phi' h1_1 h1_ih_1 =>
     apply IsDeduct.axiom_
-    exact is_axiom.pred_2_ h1_v h1_t h1_phi h1_phi' h1_1 h1_ih_1
+    exact is_axiom_v1.pred_2_ h1_v h1_t h1_phi h1_phi' h1_1 h1_ih_1
   case pred_3_ h1_v h1_phi h1_1 =>
     apply IsDeduct.axiom_
-    apply is_axiom.pred_3_
+    apply is_axiom_v1.pred_3_
     exact h1_1
   case eq_1_ h1 =>
     apply IsDeduct.axiom_
-    apply is_axiom.eq_1_
+    apply is_axiom_v1.eq_1_
   case eq_2_pred_const_ h1_name h1_n h1_xs h1_ys =>
     apply IsDeduct.axiom_
-    apply is_axiom.eq_2_pred_const_
+    apply is_axiom_v1.eq_2_pred_const_
   case eq_2_eq_ h1_x_0 h1_y_0 h1_x_1 h1_y_1 =>
     apply IsDeduct.axiom_
-    apply is_axiom.eq_2_eq_
+    apply is_axiom_v1.eq_2_eq_
   case gen_ h1_v h1_phi h1_1 h1_ih =>
     apply generalization
     · exact h1_ih
@@ -444,19 +444,19 @@ theorem isProofAltImpIsDeduct
     exact IsDeduct.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
   case def_false_ =>
     apply IsDeduct.axiom_
-    apply is_axiom.def_false_
+    apply is_axiom_v1.def_false_
   case def_and_ h1_phi h1_psi =>
     apply IsDeduct.axiom_
-    apply is_axiom.def_and_
+    apply is_axiom_v1.def_and_
   case def_or_ h1_phi h1_psi =>
     apply IsDeduct.axiom_
-    apply is_axiom.def_or_
+    apply is_axiom_v1.def_or_
   case def_iff_ h1_phi h1_psi =>
     apply IsDeduct.axiom_
-    apply is_axiom.def_iff_
+    apply is_axiom_v1.def_iff_
   case def_exists_ h1_v h1_phi =>
     apply IsDeduct.axiom_
-    apply is_axiom.def_exists_
+    apply is_axiom_v1.def_exists_
 
 
 theorem isDeductImpIsProofAlt
@@ -543,7 +543,7 @@ theorem T_17_11
     · SC
     · apply IsDeduct.mp_ (forall_ v (Q.not_.imp_ P.not_))
       · apply IsDeduct.axiom_
-        apply is_axiom.pred_1_
+        apply is_axiom_v1.pred_1_
       · apply generalization
         · apply IsDeduct.mp_ (P.imp_ Q)
           · apply proof_imp_deduct
@@ -555,7 +555,7 @@ theorem T_17_11
           simp only [var_is_free_in]
           simp
   · apply IsDeduct.axiom_
-    apply is_axiom.pred_3_
+    apply is_axiom_v1.pred_3_
     simp only [var_is_free_in]
     exact h1
 
@@ -1139,9 +1139,9 @@ theorem T_19_1
       -- simp only [formula.and_]
       SC
     · apply IsDeduct.axiom_
-      exact is_axiom.pred_3_ v P h1
+      exact is_axiom_v1.pred_3_ v P h1
   · apply IsDeduct.axiom_
-    apply is_axiom.pred_2_ v v P P
+    apply is_axiom_v1.pred_2_ v v P P
     · apply fast_admits_var_one_rec_self
     · apply fast_replace_free_var_one_rec_self
 
@@ -1325,7 +1325,7 @@ theorem T_19_TS_21_left
         rfl
   · exact T_19_1 P v h1
   · apply IsDeduct.axiom_
-    apply is_axiom.pred_1_
+    apply is_axiom_v1.pred_1_
 
 
 theorem T_19_TS_21_right
@@ -1387,10 +1387,10 @@ theorem T_21_1
           apply specId x
           apply specId y
           apply IsDeduct.axiom_
-          exact is_axiom.eq_2_eq_ y x y y
+          exact is_axiom_v1.eq_2_eq_ y x y y
       · apply specId y
         apply IsDeduct.axiom_
-        exact is_axiom.eq_1_ y
+        exact is_axiom_v1.eq_1_ y
     · intro H a1
       simp at a1
   · intro H a1
@@ -1416,10 +1416,10 @@ theorem T_21_2
             apply specId z
             apply specId x
             apply IsDeduct.axiom_
-            exact is_axiom.eq_2_eq_ x z y z
+            exact is_axiom_v1.eq_2_eq_ x z y z
         · apply specId z
           apply IsDeduct.axiom_
-          exact is_axiom.eq_1_ z
+          exact is_axiom_v1.eq_1_ z
       · intro H a1
         simp at a1
     · intro H a1
@@ -1463,7 +1463,7 @@ theorem T_21_8
         · apply Forall_spec_id' (List.ofFn args_v)
           apply Forall_spec_id' (List.ofFn args_u)
           apply IsDeduct.axiom_
-          exact is_axiom.eq_2_pred_const_ name n args_u args_v
+          exact is_axiom_v1.eq_2_pred_const_ name n args_u args_v
       · clear h2
         clear h3
         simp only [And_]
@@ -1492,7 +1492,7 @@ theorem T_21_8
                   simp only [c1]
                   apply specId (args_v 0)
                   apply IsDeduct.axiom_
-                  apply is_axiom.eq_1_
+                  apply is_axiom_v1.eq_1_
               case _ c1 =>
                 cases c1
                 case _ c1_left c1_right =>
