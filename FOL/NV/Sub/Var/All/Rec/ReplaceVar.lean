@@ -30,7 +30,7 @@ def replace_var_all_rec
   | def_ X xs => def_ X (xs.map σ)
 
 
-theorem substitution_theorem_var_all_rec_inj
+theorem substitution_theorem_replace_var_all_rec_inj
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -94,7 +94,7 @@ theorem substitution_theorem_var_all_rec_inj
         apply E_ih
 
 
-theorem substitution_is_valid_var_all_rec_inj
+theorem substitution_is_valid_replace_var_all_rec_inj
   (F : Formula_)
   (σ : VarName_ → VarName_)
   (h1 : Function.Injective σ)
@@ -105,7 +105,7 @@ theorem substitution_is_valid_var_all_rec_inj
 
     simp only [is_valid]
     intro D I V E
-    simp only [← substitution_theorem_var_all_rec_inj D I V E F σ h1]
+    simp only [← substitution_theorem_replace_var_all_rec_inj D I V E F σ h1]
     apply h2
 
 
