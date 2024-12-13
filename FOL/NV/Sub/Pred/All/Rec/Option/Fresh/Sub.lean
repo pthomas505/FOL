@@ -168,7 +168,7 @@ lemma substitution_theorem_aux
 
       set H := (Option.get (τ X (List.length xs)) (_ : Option.isSome (τ X (List.length xs)) = true)).2
 
-      obtain s1 := Sub.Var.All.Rec.Fresh.substitution_theorem_var_all_rec D I V E (Function.updateListITE id zs (xs.map σ)) c H
+      obtain s1 := Sub.Var.All.Rec.Fresh.substitution_theorem_sub_var_all_rec D I V E (Function.updateListITE id zs (xs.map σ)) c H
       simp only [Function.updateListITE_comp] at s1
 
       simp at s1

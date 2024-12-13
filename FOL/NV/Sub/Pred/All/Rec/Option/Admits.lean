@@ -93,7 +93,7 @@ theorem substitution_theorem_pred_all_rec_opt_aux
       let val := Option.get opt c1
       let zs := val.fst
       let H := val.snd
-      obtain s1 := Sub.Var.All.Rec.Fresh.substitution_theorem_var_all_rec D I V E (Function.updateListITE id zs xs) c H
+      obtain s1 := Sub.Var.All.Rec.Fresh.substitution_theorem_sub_var_all_rec D I V E (Function.updateListITE id zs xs) c H
       simp only [Function.updateListITE_comp] at s1
       simp at s1
       simp only [s1]

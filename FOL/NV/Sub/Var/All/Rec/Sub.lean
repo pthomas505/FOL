@@ -126,7 +126,7 @@ lemma sub_var_all_rec_free_var_set_eq_free_var_set_image
       exact Finset.erase_eq_of_not_mem s2
 
 
-theorem substitution_theorem_var_all_rec
+theorem substitution_theorem_sub_var_all_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -244,7 +244,7 @@ theorem substitution_theorem_var_all_rec
         exact E_ih
 
 
-theorem substitution_is_valid_var_all_rec
+theorem substitution_is_valid_sub_var_all_rec
   (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula_)
@@ -255,7 +255,7 @@ theorem substitution_is_valid_var_all_rec
 
   simp only [is_valid]
   intro D I V E
-  simp only [substitution_theorem_var_all_rec]
+  simp only [substitution_theorem_sub_var_all_rec]
   apply h1
 
 -------------------------------------------------------------------------------

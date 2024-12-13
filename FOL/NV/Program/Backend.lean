@@ -872,7 +872,7 @@ theorem soundness
     exact a3 d
   case pred_2_ v t phi =>
     intro D I V E _
-    obtain s1 := FOL.NV.Sub.Var.All.Rec.Fresh.substitution_theorem_var_all_rec D I V E (Function.updateITE id v t) freshChar phi
+    obtain s1 := FOL.NV.Sub.Var.All.Rec.Fresh.substitution_theorem_sub_var_all_rec D I V E (Function.updateITE id v t) freshChar phi
 
     simp only [holds]
     intro a2
