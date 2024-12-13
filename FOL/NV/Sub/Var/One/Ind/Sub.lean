@@ -311,7 +311,7 @@ example
     exact fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub_var_one_ind F F' v u ∅ a1_left a1_right
 
 
-theorem substitution_theorem_var_one_ind
+theorem substitution_theorem_is_sub_var_one_ind
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -440,7 +440,7 @@ theorem substitution_theorem_var_one_ind
         exact ih
 
 
-theorem substitution_is_valid_var_one_ind
+theorem substitution_is_valid_is_sub_var_one_ind
   (v t : VarName_)
   (F F' : Formula_)
   (h1 : is_sub_var_one_ind F v t F')
@@ -451,7 +451,7 @@ theorem substitution_is_valid_var_one_ind
 
   simp only [is_valid]
   intro D I V E
-  simp only [← substitution_theorem_var_one_ind D I V E v t F F' h1]
+  simp only [← substitution_theorem_is_sub_var_one_ind D I V E v t F F' h1]
   apply h2
 
 
