@@ -81,7 +81,7 @@ def sub_pred_all_rec_opt_aux
   | def_ X xs => def_ X (xs.map σ)
 
 
-def sub
+def sub_pred_all_rec_opt
   (c : Char)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (F : Formula_) :
@@ -442,7 +442,7 @@ theorem substitution_theorem
   (c : Char)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (F : Formula_) :
-  holds D (I' D I V E τ) V E F ↔ holds D I V E (sub c τ F) :=
+  holds D (I' D I V E τ) V E F ↔ holds D I V E (sub_pred_all_rec_opt c τ F) :=
   by
   apply substitution_theorem_aux
   · simp
@@ -454,7 +454,7 @@ theorem substitution_is_valid
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (F : Formula_)
   (h1 : is_valid F) :
-  is_valid (sub c τ F) :=
+  is_valid (sub_pred_all_rec_opt c τ F) :=
   by
   simp only [is_valid] at h1
 
