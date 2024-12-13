@@ -74,17 +74,17 @@ theorem substitution_theorem_aux
         else I.pred_var_ X ds
       else I.pred_var_ X ds
     ⟩
-    V E F ↔ holds D I V E (replace c τ F) :=
+    V E F ↔ holds D I V E (replace_pred_all_rec_opt c τ F) :=
   by
   induction F generalizing binders V
   case pred_const_ X xs =>
-    simp only [replace]
+    simp only [replace_pred_all_rec_opt]
     simp only [holds]
   case pred_var_ X xs =>
     simp only [admitsAux] at h1
     simp at h1
 
-    simp only [replace]
+    simp only [replace_pred_all_rec_opt]
     simp only [holds]
     simp
     split_ifs
@@ -121,15 +121,15 @@ theorem substitution_theorem_aux
       simp only [holds]
 
   case eq_ x y =>
-    simp only [replace]
+    simp only [replace_pred_all_rec_opt]
     simp only [holds]
   case true_ | false_ =>
-    simp only [replace]
+    simp only [replace_pred_all_rec_opt]
     simp only [holds]
   case not_ phi phi_ih =>
     simp only [admitsAux] at h1
 
-    simp only [replace]
+    simp only [replace_pred_all_rec_opt]
     simp only [holds]
     congr! 1
     exact phi_ih V binders h1 h2
@@ -140,7 +140,7 @@ theorem substitution_theorem_aux
     | iff_ phi psi phi_ih psi_ih =>
     simp only [admitsAux] at h1
 
-    simp only [replace]
+    simp only [replace_pred_all_rec_opt]
     simp only [holds]
 
     cases h1
@@ -151,7 +151,7 @@ theorem substitution_theorem_aux
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [admitsAux] at h1
 
-    simp only [replace]
+    simp only [replace_pred_all_rec_opt]
     simp only [holds]
     first | apply forall_congr' | apply exists_congr
     intro d
@@ -167,10 +167,10 @@ theorem substitution_theorem_aux
   case def_ X xs =>
     cases E
     case nil =>
-      simp only [replace]
+      simp only [replace_pred_all_rec_opt]
       simp only [holds]
     case cons hd tl =>
-      simp only [replace]
+      simp only [replace_pred_all_rec_opt]
       simp only [holds]
       split_ifs
       case _ c1 =>

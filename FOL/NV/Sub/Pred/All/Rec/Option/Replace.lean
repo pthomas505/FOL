@@ -9,7 +9,7 @@ namespace FOL.NV.Sub.Pred.All.Rec.Option
 open Formula_
 
 
-def replace
+def replace_pred_all_rec_opt
   (c : Char)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_)) :
   Formula_ → Formula_
@@ -28,23 +28,23 @@ def replace
   | eq_ x y => eq_ x y
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (replace c τ phi)
+  | not_ phi => not_ (replace_pred_all_rec_opt c τ phi)
   | imp_ phi psi =>
       imp_
-      (replace c τ phi)
-      (replace c τ psi)
+      (replace_pred_all_rec_opt c τ phi)
+      (replace_pred_all_rec_opt c τ psi)
   | and_ phi psi =>
       and_
-      (replace c τ phi)
-      (replace c τ psi)
+      (replace_pred_all_rec_opt c τ phi)
+      (replace_pred_all_rec_opt c τ psi)
   | or_ phi psi =>
       or_
-      (replace c τ phi)
-      (replace c τ psi)
+      (replace_pred_all_rec_opt c τ phi)
+      (replace_pred_all_rec_opt c τ psi)
   | iff_ phi psi =>
       iff_
-      (replace c τ phi)
-      (replace c τ psi)
-  | forall_ x phi => forall_ x (replace c τ phi)
-  | exists_ x phi => exists_ x (replace c τ phi)
+      (replace_pred_all_rec_opt c τ phi)
+      (replace_pred_all_rec_opt c τ psi)
+  | forall_ x phi => forall_ x (replace_pred_all_rec_opt c τ phi)
+  | exists_ x phi => exists_ x (replace_pred_all_rec_opt c τ phi)
   | def_ X xs => def_ X xs
