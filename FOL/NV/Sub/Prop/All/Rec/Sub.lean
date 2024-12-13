@@ -90,7 +90,7 @@ lemma sub_prop_all_rec_pred_var_set_is_empty
     simp only [sub_prop_all_rec]
 
 
-theorem substitution_theorem_prop_all_rec
+theorem substitution_theorem_sub_prop_all_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -181,7 +181,7 @@ theorem substitution_theorem_prop_all_rec
       exact ih
 
 
-theorem substitution_is_valid_prop_all_rec
+theorem substitution_is_valid_sub_prop_all_rec
   (F : Formula_)
   (τ : PredName_ → PredName_)
   (h1 : F.is_valid) :
@@ -191,7 +191,7 @@ theorem substitution_is_valid_prop_all_rec
 
   simp only [is_valid]
   intro D I V E
-  simp only [substitution_theorem_prop_all_rec D I V E τ F]
+  simp only [substitution_theorem_sub_prop_all_rec D I V E τ F]
   apply h1
 
 
