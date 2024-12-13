@@ -9,7 +9,7 @@ namespace FOL.NV.Sub.Pred.All.Rec.Option.Fresh
 open Formula_
 
 
-def predVarFreeVarSet
+def pred_var_free_var_set
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_)) :=
   fun ((X : PredName_), (n : ℕ)) =>
     let opt := τ X n
@@ -61,7 +61,7 @@ def subAux
       (subAux c τ σ phi)
       (subAux c τ σ psi)
   | forall_ x phi =>
-      let S : Finset VarName_ := (Finset.image (Function.updateITE σ x x) (free_var_set phi) ∪ Finset.biUnion (pred_var_set phi) (predVarFreeVarSet τ))
+      let S : Finset VarName_ := (Finset.image (Function.updateITE σ x x) (free_var_set phi) ∪ Finset.biUnion (pred_var_set phi) (pred_var_free_var_set τ))
 
       let x' : VarName_ :=
         if x ∈ S
@@ -70,7 +70,7 @@ def subAux
 
       forall_ x' (subAux c τ (Function.updateITE σ x x') phi)
   | exists_ x phi =>
-      let S : Finset VarName_ := (Finset.image (Function.updateITE σ x x) (free_var_set phi) ∪ Finset.biUnion (pred_var_set phi) (predVarFreeVarSet τ))
+      let S : Finset VarName_ := (Finset.image (Function.updateITE σ x x) (free_var_set phi) ∪ Finset.biUnion (pred_var_set phi) (pred_var_free_var_set τ))
 
       let x' : VarName_ :=
         if x ∈ S
@@ -130,7 +130,7 @@ lemma substitution_theorem_aux
   (σ : VarName_ → VarName_)
   (F : Formula_)
   (h1 : ∀ (x : VarName_), var_is_free_in x F → V' x = V (σ x))
-  (h2 : ∀ (x : VarName_), x ∈ F.pred_var_set.biUnion (predVarFreeVarSet τ) → V'' x = V x) :
+  (h2 : ∀ (x : VarName_), x ∈ F.pred_var_set.biUnion (pred_var_free_var_set τ) → V'' x = V x) :
   holds D (I' D I V'' E τ) V' E F ↔ holds D I V E (subAux c τ σ F) :=
   by
   induction F generalizing V V' σ
@@ -152,7 +152,7 @@ lemma substitution_theorem_aux
 
     simp only [pred_var_set] at h2
     simp at h2
-    simp only [predVarFreeVarSet] at h2
+    simp only [pred_var_free_var_set] at h2
 
     simp only [subAux]
     simp only [holds]
@@ -296,7 +296,7 @@ lemma substitution_theorem_aux
         case _ c2 c3 =>
           contradiction
         case _ c2 c3 =>
-          obtain s1 := fresh_not_mem x c ((Finset.image (Function.updateITE σ x x) (free_var_set phi)) ∪ (Finset.biUnion (pred_var_set phi) (predVarFreeVarSet τ)))
+          obtain s1 := fresh_not_mem x c ((Finset.image (Function.updateITE σ x x) (free_var_set phi)) ∪ (Finset.biUnion (pred_var_set phi) (pred_var_free_var_set τ)))
           simp only [← c3] at s1
           simp only [Finset.mem_union] at s1
 
@@ -349,7 +349,7 @@ lemma substitution_theorem_aux
           obtain s1 := Sub.Var.All.Rec.Fresh.sub_var_all_rec_free_var_set_eq_free_var_set_image (Function.updateITE σ x x) c phi
           simp only [← s1] at c2
 
-          obtain s2 := fresh_not_mem x c ((free_var_set (Var.All.Rec.Fresh.sub_var_all_rec (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (pred_var_set phi) (predVarFreeVarSet τ)))
+          obtain s2 := fresh_not_mem x c ((free_var_set (Var.All.Rec.Fresh.sub_var_all_rec (Function.updateITE σ x x) c phi)) ∪ (Finset.biUnion (pred_var_set phi) (pred_var_free_var_set τ)))
           simp only [← c2] at s2
           simp only [Finset.mem_union] at s2
 
