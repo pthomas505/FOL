@@ -47,7 +47,7 @@ def admits_pred_all_rec_opt_aux
   | def_ _ _ => True
 
 
-theorem substitution_theorem_aux
+theorem substitution_theorem_pred_all_rec_opt_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
