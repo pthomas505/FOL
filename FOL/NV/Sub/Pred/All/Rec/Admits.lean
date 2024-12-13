@@ -71,7 +71,7 @@ instance
   infer_instance
 
 
-theorem substitution_theorem_pred_all_rec_aux
+theorem substitution_theorem_admits_pred_all_rec_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
@@ -196,7 +196,7 @@ theorem substitution_theorem_pred_all_rec_aux
           simp
 
 
-theorem substitution_theorem_pred_all_rec
+theorem substitution_theorem_admits_pred_all_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -217,14 +217,14 @@ theorem substitution_theorem_pred_all_rec
       ⟩
       V E F ↔ holds D I V E (replace_pred_all_rec τ F) :=
   by
-  apply substitution_theorem_pred_all_rec_aux D I V V E τ ∅ F
+  apply substitution_theorem_admits_pred_all_rec_aux D I V V E τ ∅ F
   · simp only [admits_pred_all_rec] at h1
     exact h1
   · intro X _
     rfl
 
 
-theorem substitution_is_valid_pred_all_rec
+theorem substitution_is_valid_admits_pred_all_rec
   (F : Formula_)
   (τ : PredName_ → ℕ → List VarName_ × Formula_)
   (h1 : admits_pred_all_rec τ F)
@@ -235,7 +235,7 @@ theorem substitution_is_valid_pred_all_rec
 
   simp only [is_valid]
   intro D I V E
-  obtain s1 := substitution_theorem_pred_all_rec D I V E τ F h1
+  obtain s1 := substitution_theorem_admits_pred_all_rec D I V E τ F h1
   simp only [← s1]
   apply h2
 
