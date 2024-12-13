@@ -1,6 +1,6 @@
 import FOL.NV.Alpha.Rec.Alpha
 import FOL.NV.Sub.Var.One.Rec.Admits
-import FOL.NV.Sub.Pred.All.Rec.Sub
+import FOL.NV.Sub.Pred.All.Rec.Admits
 
 import Mathlib.Data.Finset.Basic
 
