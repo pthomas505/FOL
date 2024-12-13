@@ -144,7 +144,7 @@ def I'
   ))
 
 
-theorem substitution_theorem_pred_one_rec_aux
+theorem substitution_theorem_admits_pred_one_rec_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
@@ -281,7 +281,7 @@ theorem substitution_theorem_pred_one_rec_aux
         simp
 
 
-theorem substitution_theorem_pred_one_rec
+theorem substitution_theorem_admits_pred_one_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -294,12 +294,12 @@ theorem substitution_theorem_pred_one_rec
   holds D (I' D I V E P zs H) V E F ↔
     holds D I V E (replace_pred_one_rec P zs H F) :=
   by
-  apply substitution_theorem_pred_one_rec_aux D I V V E F P zs H ∅
+  apply substitution_theorem_admits_pred_one_rec_aux D I V V E F P zs H ∅
   · exact h1
   · simp
 
 
-theorem substitution_is_valid_pred_one_rec
+theorem substitution_is_valid_admits_pred_one_rec
   (F : Formula_)
   (P : PredName_)
   (zs : List VarName_)
@@ -312,7 +312,7 @@ theorem substitution_is_valid_pred_one_rec
 
   simp only [is_valid]
   intro D I V E
-  simp only [← substitution_theorem_pred_one_rec D I V E F P zs H h1]
+  simp only [← substitution_theorem_admits_pred_one_rec D I V E F P zs H h1]
   apply h2
 
 
