@@ -178,7 +178,7 @@ inductive is_axiom_v1 : Formula_ → Prop
     is_axiom_v1 ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
 /--
-  is_deduct_v1 Δ F := True if and only if there is a deduction of F from Δ in classical first order logic.
+  `is_deduct_v1 Δ F` := True if and only if there is a deduction of `F` from `Δ` in classical first order logic.
 -/
 inductive is_deduct_v1 (Δ : Set Formula_) : Formula_ → Prop
 
