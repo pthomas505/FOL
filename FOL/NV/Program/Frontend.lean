@@ -134,8 +134,8 @@ def sub
 
   Except.ok {
     assertion := {
-      hypotheses := hypotheses.map (Sub.Pred.All.Rec.Option.Fresh.sub Backend.freshChar τ)
-      conclusion := Sub.Pred.All.Rec.Option.Fresh.sub Backend.freshChar τ conclusion
+      hypotheses := hypotheses.map (Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt Backend.freshChar τ)
+      conclusion := Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt Backend.freshChar τ conclusion
     }
     rule := Backend.Rule.sub_ hypotheses conclusion xs step_index
   }

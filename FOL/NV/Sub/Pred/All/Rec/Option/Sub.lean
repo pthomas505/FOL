@@ -120,7 +120,7 @@ def I'
   else I.pred_var_ X ds) )
 
 
-lemma substitution_theorem_aux
+lemma substitution_theorem_sub_pred_all_rec_opt_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' V'': Valuation_ D)
@@ -434,7 +434,7 @@ lemma substitution_theorem_aux
           simp only [pred_var_occurs_in] at a1
 
 
-theorem substitution_theorem
+theorem substitution_theorem_sub_pred_all_rec_opt
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -444,12 +444,12 @@ theorem substitution_theorem
   (F : Formula_) :
   holds D (I' D I V E τ) V E F ↔ holds D I V E (sub_pred_all_rec_opt c τ F) :=
   by
-  apply substitution_theorem_aux
+  apply substitution_theorem_sub_pred_all_rec_opt_aux
   · simp
   · simp
 
 
-theorem substitution_is_valid
+theorem substitution_is_valid_sub_pred_all_rec_opt
   (c : Char)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (F : Formula_)
@@ -460,5 +460,5 @@ theorem substitution_is_valid
 
   simp only [is_valid]
   intro D I V E
-  simp only [← substitution_theorem]
+  simp only [← substitution_theorem_sub_pred_all_rec_opt]
   apply h1

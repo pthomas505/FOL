@@ -196,7 +196,7 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
     (phi : Formula_)
     (τ : PredName_ → ℕ → Option (List VarName_ × Formula_)) :
     IsDeduct Δ phi →
-    IsDeduct (Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)) (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi)
+    IsDeduct (Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ)) (Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ phi)
 
 
 inductive Rule : Type
@@ -702,8 +702,8 @@ def checkRule
       conclusion := phi }
 
     let return_val : Sequent := {
-      hypotheses := Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ)
-      conclusion := Sub.Pred.All.Rec.Option.Fresh.sub freshChar τ phi }
+      hypotheses := Δ.map (Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ)
+      conclusion := Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ phi }
 
     if h : found.assertion.val = expected_val
     then Except.ok {
@@ -971,7 +971,7 @@ theorem soundness
     intro D I V E a1
     simp at a1
 
-    obtain s1 := Sub.Pred.All.Rec.Option.Fresh.substitution_theorem D I V E freshChar τ
+    obtain s1 := Sub.Pred.All.Rec.Option.Fresh.substitution_theorem_sub_pred_all_rec_opt D I V E freshChar τ
     simp only [← s1] at a1
     simp only [← s1]
 
