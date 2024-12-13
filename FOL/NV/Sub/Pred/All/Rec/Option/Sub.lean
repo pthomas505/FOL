@@ -22,7 +22,7 @@ def pred_var_free_var_set
     else ∅
 
 
-def subAux
+def sub_pred_all_rec_opt_aux
   (c : Char)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (σ : VarName_ → VarName_) :
@@ -43,23 +43,23 @@ def subAux
   | true_ => true_
   | false_ => false_
   | not_ phi =>
-      not_ (subAux c τ σ phi)
+      not_ (sub_pred_all_rec_opt_aux c τ σ phi)
   | imp_ phi psi =>
       imp_
-      (subAux c τ σ phi)
-      (subAux c τ σ psi)
+      (sub_pred_all_rec_opt_aux c τ σ phi)
+      (sub_pred_all_rec_opt_aux c τ σ psi)
   | and_ phi psi =>
       and_
-      (subAux c τ σ phi)
-      (subAux c τ σ psi)
+      (sub_pred_all_rec_opt_aux c τ σ phi)
+      (sub_pred_all_rec_opt_aux c τ σ psi)
   | or_ phi psi =>
       or_
-      (subAux c τ σ phi)
-      (subAux c τ σ psi)
+      (sub_pred_all_rec_opt_aux c τ σ phi)
+      (sub_pred_all_rec_opt_aux c τ σ psi)
   | iff_ phi psi =>
       iff_
-      (subAux c τ σ phi)
-      (subAux c τ σ psi)
+      (sub_pred_all_rec_opt_aux c τ σ phi)
+      (sub_pred_all_rec_opt_aux c τ σ psi)
   | forall_ x phi =>
       let S : Finset VarName_ := (Finset.image (Function.updateITE σ x x) (free_var_set phi) ∪ Finset.biUnion (pred_var_set phi) (pred_var_free_var_set τ))
 
@@ -68,7 +68,7 @@ def subAux
         then fresh x c S
         else x
 
-      forall_ x' (subAux c τ (Function.updateITE σ x x') phi)
+      forall_ x' (sub_pred_all_rec_opt_aux c τ (Function.updateITE σ x x') phi)
   | exists_ x phi =>
       let S : Finset VarName_ := (Finset.image (Function.updateITE σ x x) (free_var_set phi) ∪ Finset.biUnion (pred_var_set phi) (pred_var_free_var_set τ))
 
@@ -77,7 +77,7 @@ def subAux
         then fresh x c S
         else x
 
-      exists_ x' (subAux c τ (Function.updateITE σ x x') phi)
+      exists_ x' (sub_pred_all_rec_opt_aux c τ (Function.updateITE σ x x') phi)
   | def_ X xs => def_ X (xs.map σ)
 
 
@@ -86,7 +86,7 @@ def sub
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (F : Formula_) :
   Formula_ :=
-  subAux c τ id F
+  sub_pred_all_rec_opt_aux c τ id F
 
 
 def Interpretation_.usingPred
@@ -131,13 +131,13 @@ lemma substitution_theorem_aux
   (F : Formula_)
   (h1 : ∀ (x : VarName_), var_is_free_in x F → V' x = V (σ x))
   (h2 : ∀ (x : VarName_), x ∈ F.pred_var_set.biUnion (pred_var_free_var_set τ) → V'' x = V x) :
-  holds D (I' D I V'' E τ) V' E F ↔ holds D I V E (subAux c τ σ F) :=
+  holds D (I' D I V'' E τ) V' E F ↔ holds D I V E (sub_pred_all_rec_opt_aux c τ σ F) :=
   by
   induction F generalizing V V' σ
   case pred_const_ X xs =>
     simp only [var_is_free_in] at h1
 
-    simp only [subAux]
+    simp only [sub_pred_all_rec_opt_aux]
     simp only [holds]
     simp only [I']
     simp only [Interpretation_.usingPred]
@@ -154,7 +154,7 @@ lemma substitution_theorem_aux
     simp at h2
     simp only [pred_var_free_var_set] at h2
 
-    simp only [subAux]
+    simp only [sub_pred_all_rec_opt_aux]
     simp only [holds]
     simp only [I']
     simp only [Interpretation_.usingPred]
@@ -208,7 +208,7 @@ lemma substitution_theorem_aux
   case eq_ x y =>
     simp only [var_is_free_in] at h1
 
-    simp only [subAux]
+    simp only [sub_pred_all_rec_opt_aux]
     simp only [holds]
 
     have s1 : V' x = V (σ x)
@@ -221,14 +221,14 @@ lemma substitution_theorem_aux
     simp
     simp only [s2]
   case true_ | false_ =>
-    simp only [subAux]
+    simp only [sub_pred_all_rec_opt_aux]
     simp only [holds]
   case not_ phi phi_ih =>
     simp only [var_is_free_in] at h1
 
     simp only [pred_var_set] at h2
 
-    simp only [subAux]
+    simp only [sub_pred_all_rec_opt_aux]
     simp only [holds]
     congr! 1
     exact phi_ih V V' σ h1 h2
@@ -241,7 +241,7 @@ lemma substitution_theorem_aux
 
     simp only [pred_var_set] at h2
 
-    simp only [subAux]
+    simp only [sub_pred_all_rec_opt_aux]
     simp only [holds]
     congr! 1
     · apply phi_ih V V' σ
@@ -277,7 +277,7 @@ lemma substitution_theorem_aux
 
     simp only [pred_var_set] at h2
 
-    simp only [subAux]
+    simp only [sub_pred_all_rec_opt_aux]
     simp only [I']
     simp only [Interpretation_.usingPred]
     simp only [holds]
@@ -374,7 +374,7 @@ lemma substitution_theorem_aux
           simp only [if_neg s1]
           exact h2 v a1
   case def_ X xs =>
-    simp only [subAux]
+    simp only [sub_pred_all_rec_opt_aux]
 
     induction E generalizing V V' σ
     case nil =>
@@ -408,7 +408,7 @@ lemma substitution_theorem_aux
         simp only [← s2]
         clear s2
 
-        simp only [subAux] at E_ih
+        simp only [sub_pred_all_rec_opt_aux] at E_ih
         apply holds_coincide_pred_var
         · simp only [I']
           simp only [Interpretation_.usingPred]
