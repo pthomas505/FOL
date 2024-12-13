@@ -89,7 +89,7 @@ def sub
   sub_pred_all_rec_opt_aux c τ id F
 
 
-def Interpretation_.usingPred
+def Interpretation_.using_pred
   (D : Type)
   (I : Interpretation_ D)
   (pred_ : PredName_ → List D → Prop) :
@@ -106,7 +106,7 @@ def I'
   (E : Env_)
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_)) :
   Interpretation_ D :=
-  (Interpretation_.usingPred D I (
+  (Interpretation_.using_pred D I (
   fun (X : PredName_) (ds : List D) =>
   let opt := τ X ds.length
   if h : Option.isSome opt
@@ -140,7 +140,7 @@ lemma substitution_theorem_aux
     simp only [sub_pred_all_rec_opt_aux]
     simp only [holds]
     simp only [I']
-    simp only [Interpretation_.usingPred]
+    simp only [Interpretation_.using_pred]
     simp
     congr! 1
     simp only [List.map_eq_map_iff]
@@ -157,7 +157,7 @@ lemma substitution_theorem_aux
     simp only [sub_pred_all_rec_opt_aux]
     simp only [holds]
     simp only [I']
-    simp only [Interpretation_.usingPred]
+    simp only [Interpretation_.using_pred]
     simp
     split_ifs
     case _ c1 c2 =>
@@ -279,7 +279,7 @@ lemma substitution_theorem_aux
 
     simp only [sub_pred_all_rec_opt_aux]
     simp only [I']
-    simp only [Interpretation_.usingPred]
+    simp only [Interpretation_.using_pred]
     simp only [holds]
 
     first | apply forall_congr' | apply exists_congr
@@ -411,7 +411,7 @@ lemma substitution_theorem_aux
         simp only [sub_pred_all_rec_opt_aux] at E_ih
         apply holds_coincide_pred_var
         · simp only [I']
-          simp only [Interpretation_.usingPred]
+          simp only [Interpretation_.using_pred]
         · intro P ds a1
           simp only [pred_var_occurs_in_iff_mem_pred_var_set] at a1
           simp only [E_hd.h2] at a1
@@ -429,7 +429,7 @@ lemma substitution_theorem_aux
         simp only [← s2]
         apply holds_coincide_pred_var
         · simp only [I']
-          simp only [Interpretation_.usingPred]
+          simp only [Interpretation_.using_pred]
         · intro P ds a1
           simp only [pred_var_occurs_in] at a1
 
