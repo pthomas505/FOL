@@ -184,7 +184,7 @@ theorem substitution_theorem_pred_one_rec_aux
 
         have s1 :
           holds D I (V ∘ Function.updateListITE id zs xs) E_ref H ↔
-            holds D I V E_ref (Sub.Var.All.Rec.fast_replace_free_var_all_rec (Function.updateListITE id zs xs) H) := Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E_ref (Function.updateListITE id zs xs) H h1_left
+            holds D I V E_ref (Sub.Var.All.Rec.fast_replace_free_var_all_rec (Function.updateListITE id zs xs) H) := Sub.Var.All.Rec.substitution_theorem_admits_var_all_rec D I V E_ref (Function.updateListITE id zs xs) H h1_left
 
         simp only [Function.updateListITE_comp] at s1
         simp at s1

@@ -172,7 +172,7 @@ theorem substitution_theorem_pred_one_ind
         exact a1_right
       · exact contra
   case pred_occurs_in h1_X h1_ts h1_1 h1_2 =>
-    obtain s1 := Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E (Function.updateListITE id zs h1_ts) H h1_2
+    obtain s1 := Sub.Var.All.Rec.substitution_theorem_admits_var_all_rec D I V E (Function.updateListITE id zs h1_ts) H h1_2
 
     obtain s2 := Function.updateListITE_comp id V zs h1_ts
 

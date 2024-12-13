@@ -102,7 +102,7 @@ theorem substitution_theorem_pred_all_rec_aux
     obtain ⟨h1_left, ⟨h1_right_left, h1_right_right⟩⟩ := h1
 
     obtain s1 :=
-    Sub.Var.All.Rec.substitution_theorem_var_all_rec D I V E (Function.updateListITE id (τ X xs.length).fst xs)
+    Sub.Var.All.Rec.substitution_theorem_admits_var_all_rec D I V E (Function.updateListITE id (τ X xs.length).fst xs)
       (τ X xs.length).snd h1_left
     simp only [Function.updateListITE_comp] at s1
     simp at s1

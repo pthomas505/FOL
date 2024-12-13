@@ -74,7 +74,7 @@ instance
   infer_instance
 
 
-theorem substitution_theorem_var_all_rec_aux
+theorem substitution_theorem_admits_var_all_rec_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
@@ -206,7 +206,7 @@ theorem substitution_theorem_var_all_rec_aux
       exact ih V V' σ σ' binders (def_ X xs) h1 h2 h2' h3
 
 
-theorem substitution_theorem_var_all_rec
+theorem substitution_theorem_admits_var_all_rec
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -217,13 +217,13 @@ theorem substitution_theorem_var_all_rec
   holds D I (V ∘ σ) E F ↔
     holds D I V E (fast_replace_free_var_all_rec σ F) :=
   by
-  apply substitution_theorem_var_all_rec_aux D I (V ∘ σ) V E σ σ ∅ F h1
+  apply substitution_theorem_admits_var_all_rec_aux D I (V ∘ σ) V E σ σ ∅ F h1
   · simp
   · simp
   · simp
 
 
-theorem substitution_is_valid_var_all_rec
+theorem substitution_is_valid_admits_var_all_rec
   (σ : VarName_ → VarName_)
   (F : Formula_)
   (h1 : admits_var_all_rec σ F)
@@ -234,7 +234,7 @@ theorem substitution_is_valid_var_all_rec
 
   simp only [is_valid]
   intro D I V E
-  simp only [← substitution_theorem_var_all_rec D I V E σ F h1]
+  simp only [← substitution_theorem_admits_var_all_rec D I V E σ F h1]
   apply h2
 
 
