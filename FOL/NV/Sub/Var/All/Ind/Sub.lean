@@ -126,7 +126,7 @@ inductive is_sub_var_all_ind_aux :
 def is_sub_var_all_ind (σ : VarName_ → VarName_) (F F' : Formula_) : Prop := is_sub_var_all_ind_aux σ ∅ F F'
 
 
-theorem substitution_theorem_var_all_ind_aux
+theorem substitution_theorem_is_sub_var_all_ind_aux
   (D : Type)
   (I : Interpretation_ D)
   (V V' : Valuation_ D)
@@ -274,7 +274,7 @@ theorem substitution_theorem_var_all_ind_aux
         exact ih
 
 
-theorem substitution_theorem_var_all_ind
+theorem substitution_theorem_is_sub_var_all_ind
   (D : Type)
   (I : Interpretation_ D)
   (V : Valuation_ D)
@@ -284,13 +284,13 @@ theorem substitution_theorem_var_all_ind
   (h1 : is_sub_var_all_ind σ F F') :
   holds D I (V ∘ σ) E F ↔ holds D I V E F' :=
   by
-  apply substitution_theorem_var_all_ind_aux D I (V ∘ σ) V E σ ∅ F F' h1
+  apply substitution_theorem_is_sub_var_all_ind_aux D I (V ∘ σ) V E σ ∅ F F' h1
   · simp
   · simp
   · simp
 
 
-theorem substitution_is_valid_var_all_ind
+theorem substitution_is_valid_is_sub_var_all_ind
   (σ : VarName_ → VarName_)
   (F F' : Formula_)
   (h1 : is_sub_var_all_ind σ F F')
@@ -301,7 +301,7 @@ theorem substitution_is_valid_var_all_ind
 
   simp only [is_valid]
   intro D I V E
-  simp only [← substitution_theorem_var_all_ind D I V E σ F F' h1]
+  simp only [← substitution_theorem_is_sub_var_all_ind D I V E σ F F' h1]
   apply h2
 
 
