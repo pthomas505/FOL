@@ -10,7 +10,7 @@ open Formula_
 
 
 /--
-  IsPropAxiom F := True if and only if F is a logical axiom of classical propositional logic.
+  `is_prop_axiom F` := True if and only if `F` is a logical axiom of classical propositional logic.
 -/
 inductive is_prop_axiom : Formula_ → Prop
   -- ⊢ ⊤
@@ -49,31 +49,31 @@ inductive is_prop_axiom : Formula_ → Prop
 
 
 /--
-  IsPropDeduct Δ F := True if and only if there is a deduction of F from Δ in classical propositional logic.
+  `is_prop_deduct Δ F` := True if and only if there is a deduction of `F` from `Δ` in classical propositional logic.
 -/
-inductive IsPropDeduct (Δ : Set Formula_) : Formula_ → Prop
+inductive is_prop_deduct (Δ : Set Formula_) : Formula_ → Prop
   | axiom_
     (phi : Formula_) :
     is_prop_axiom phi →
-    IsPropDeduct Δ phi
+    is_prop_deduct Δ phi
 
   | assume_
     (phi : Formula_) :
     phi ∈ Δ →
-    IsPropDeduct Δ phi
+    is_prop_deduct Δ phi
 
   | mp_
     (phi psi : Formula_) :
-    IsPropDeduct Δ (phi.imp_ psi) →
-    IsPropDeduct Δ phi →
-    IsPropDeduct Δ psi
+    is_prop_deduct Δ (phi.imp_ psi) →
+    is_prop_deduct Δ phi →
+    is_prop_deduct Δ psi
 
 
 /--
   IsPropProof F := True if and only if there is a proof of F in classical propositional logic.
 -/
-def IsPropProof (phi : Formula_) : Prop :=
-  IsPropDeduct ∅ phi
+def is_prop_proof (phi : Formula_) : Prop :=
+  is_prop_deduct ∅ phi
 
 
 /--

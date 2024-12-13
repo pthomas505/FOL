@@ -700,7 +700,7 @@ theorem is_tauto_def_iff
 -/
 example
   (F : Formula_)
-  (h1 : IsPropProof F) :
+  (h1 : is_prop_proof F) :
   F.IsTautoPrime :=
   by
   induction h1
