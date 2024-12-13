@@ -12,40 +12,40 @@ open Formula_
 /--
   IsPropAxiom F := True if and only if F is a logical axiom of classical propositional logic.
 -/
-inductive IsPropAxiom : Formula_ → Prop
+inductive is_prop_axiom : Formula_ → Prop
   -- ⊢ ⊤
   | prop_true_ :
-    IsPropAxiom true_
+    is_prop_axiom true_
 
   -- ⊢ phi → (psi → phi)
   | prop_1_
     (phi psi : Formula_) :
-    IsPropAxiom (phi.imp_ (psi.imp_ phi))
+    is_prop_axiom (phi.imp_ (psi.imp_ phi))
 
   -- ⊢ (phi → (psi → chi)) → ((phi → psi) → (phi → chi))
   | prop_2_
     (phi psi chi : Formula_) :
-    IsPropAxiom ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi)))
+    is_prop_axiom ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi)))
 
   -- ⊢ (¬ phi → ¬ psi) → (psi → phi)
   | prop_3_
     (phi psi : Formula_) :
-    IsPropAxiom (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
+    is_prop_axiom (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
 
   | def_false_ :
-    IsPropAxiom (false_.iff_ (not_ true_))
+    is_prop_axiom (false_.iff_ (not_ true_))
 
   | def_and_
     (phi psi : Formula_) :
-    IsPropAxiom ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+    is_prop_axiom ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
 
   | def_or_
     (phi psi : Formula_) :
-    IsPropAxiom ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+    is_prop_axiom ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
 
   | def_iff_
     (phi psi : Formula_) :
-    IsPropAxiom (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+    is_prop_axiom (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
 
 /--
@@ -54,7 +54,7 @@ inductive IsPropAxiom : Formula_ → Prop
 inductive IsPropDeduct (Δ : Set Formula_) : Formula_ → Prop
   | axiom_
     (phi : Formula_) :
-    IsPropAxiom phi →
+    is_prop_axiom phi →
     IsPropDeduct Δ phi
 
   | assume_
