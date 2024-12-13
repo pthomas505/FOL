@@ -258,11 +258,11 @@ theorem T_13_5
   apply IsDeduct.mp_ (P.imp_ (P.imp_ P))
   · apply IsDeduct.mp_ (P.imp_ ((P.imp_ P).imp_ P))
     · apply IsDeduct.axiom_
-      exact IsAxiom.prop_2_ P (P.imp_ P) P
+      exact is_axiom.prop_2_ P (P.imp_ P) P
     · apply IsDeduct.axiom_
-      exact IsAxiom.prop_1_ P (P.imp_ P)
+      exact is_axiom.prop_1_ P (P.imp_ P)
   · apply IsDeduct.axiom_
-    exact IsAxiom.prop_1_ P P
+    exact is_axiom.prop_1_ P P
 
 alias prop_id := T_13_5
 
@@ -274,14 +274,14 @@ theorem T_13_6_no_deduct
   apply IsDeduct.mp_ (P.not_.imp_ (Q.not_.imp_ P.not_))
   · apply IsDeduct.mp_ (P.not_.imp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q)))
     · apply IsDeduct.axiom_
-      apply IsAxiom.prop_2_
+      apply is_axiom.prop_2_
     · apply IsDeduct.mp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q))
       · apply IsDeduct.axiom_
-        apply IsAxiom.prop_1_
+        apply is_axiom.prop_1_
       · apply IsDeduct.axiom_
-        apply IsAxiom.prop_3_
+        apply is_axiom.prop_3_
   · apply IsDeduct.axiom_
-    apply IsAxiom.prop_1_
+    apply is_axiom.prop_1_
 
 
 theorem T_14_10
@@ -340,7 +340,7 @@ theorem T_14_3
   case axiom_ h1_phi h1_1 =>
     apply IsDeduct.mp_ h1_phi
     · apply IsDeduct.axiom_
-      exact IsAxiom.prop_1_ h1_phi P
+      exact is_axiom.prop_1_ h1_phi P
     · apply IsDeduct.axiom_
       exact h1_1
   case assume_ h1_phi h1_1 =>
@@ -353,7 +353,7 @@ theorem T_14_3
     case inr h1_1 =>
       apply IsDeduct.mp_ h1_phi
       · apply IsDeduct.axiom_
-        exact IsAxiom.prop_1_ h1_phi P
+        exact is_axiom.prop_1_ h1_phi P
       · apply IsDeduct.assume_
         exact h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1
@@ -361,7 +361,7 @@ theorem T_14_3
     apply IsDeduct.mp_ (P.imp_ h1_phi)
     · apply IsDeduct.mp_ (P.imp_ (h1_phi.imp_ h1_psi))
       · apply IsDeduct.axiom_
-        exact IsAxiom.prop_2_ P h1_phi h1_psi
+        exact is_axiom.prop_2_ P h1_phi h1_psi
       · exact h1_ih_1
     · exact h1_ih_2
 
@@ -376,10 +376,10 @@ theorem T_13_6
   apply deduction_theorem
   apply IsDeduct.mp_ (Q.not_.imp_ P.not_)
   · apply IsDeduct.axiom_
-    exact IsAxiom.prop_3_ Q P
+    exact is_axiom.prop_3_ Q P
   · apply IsDeduct.mp_ P.not_
     · apply IsDeduct.axiom_
-      exact IsAxiom.prop_1_ P.not_ Q.not_
+      exact is_axiom.prop_1_ P.not_ Q.not_
     · apply IsDeduct.assume_
       simp
 
@@ -393,7 +393,7 @@ theorem T_14_5
   apply IsDeduct.mp_ P.not_.not_
   · apply IsDeduct.mp_ (P.not_.imp_ P.not_.not_.not_)
     · apply IsDeduct.axiom_
-      apply IsAxiom.prop_3_
+      apply is_axiom.prop_3_
     · apply IsDeduct.mp_ P.not_.not_
       · apply proof_imp_deduct
         apply T_13_6
@@ -410,7 +410,7 @@ theorem T_14_6
   simp only [IsProof]
   apply IsDeduct.mp_ (P.not_.not_.not_.imp_ P.not_)
   · apply IsDeduct.axiom_
-    exact IsAxiom.prop_3_ P.not_.not_ P
+    exact is_axiom.prop_3_ P.not_.not_ P
   · apply proof_imp_deduct
     exact T_14_5 P.not_
 
@@ -423,7 +423,7 @@ theorem T_14_7
   apply deduction_theorem
   apply IsDeduct.mp_ (P.not_.not_.imp_ Q.not_.not_)
   · apply IsDeduct.axiom_
-    apply IsAxiom.prop_3_
+    apply is_axiom.prop_3_
   · apply deduction_theorem
     apply IsDeduct.mp_ Q
     · apply proof_imp_deduct
@@ -463,7 +463,7 @@ theorem T_14_9
   apply deduction_theorem
   apply IsDeduct.mp_ (P.not_.imp_ (S.not_.imp_ P).not_)
   · apply IsDeduct.axiom_
-    apply IsAxiom.prop_3_
+    apply is_axiom.prop_3_
   · apply deduction_theorem
     apply IsDeduct.mp_ P.not_
     · apply IsDeduct.mp_ S.not_
@@ -818,7 +818,7 @@ theorem L_15_7
     tauto
   case true_ =>
     apply IsDeduct.axiom_
-    apply IsAxiom.prop_true_
+    apply is_axiom.prop_true_
   case false_ =>
     simp only [Formula_.primeSet] at h1
     simp at h1
@@ -873,7 +873,7 @@ theorem L_15_7
           simp only [if_pos c1] at psi_ih
           apply IsDeduct.mp_ psi
           apply IsDeduct.axiom_
-          apply IsAxiom.prop_1_
+          apply is_axiom.prop_1_
           apply psi_ih
           exact h1_right
       case _ c1 =>

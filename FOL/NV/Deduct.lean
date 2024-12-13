@@ -79,31 +79,31 @@ def is_prop_proof (phi : Formula_) : Prop :=
 /--
   IsAxiom F := True if and only if F is a logical axiom of classical first order logic.
 -/
-inductive IsAxiom : Formula_ → Prop
+inductive is_axiom : Formula_ → Prop
   -- ⊢ ⊤
   | prop_true_ :
-    IsAxiom true_
+    is_axiom true_
 
   -- ⊢ phi → (psi → phi)
   | prop_1_
     (phi psi : Formula_) :
-    IsAxiom (phi.imp_ (psi.imp_ phi))
+    is_axiom (phi.imp_ (psi.imp_ phi))
 
   -- ⊢ (phi → (psi → chi)) → ((phi → psi) → (phi → chi))
   | prop_2_
     (phi psi chi : Formula_) :
-    IsAxiom ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi)))
+    is_axiom ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi)))
 
   -- ⊢ (¬ phi → ¬ psi) → (psi → phi)
   | prop_3_
     (phi psi : Formula_) :
-    IsAxiom (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
+    is_axiom (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
 
   -- ⊢ (∀ v (phi → psi)) → ((∀ v phi) → (∀ v psi))
   | pred_1_
     (v : VarName_)
     (phi psi : Formula_) :
-    IsAxiom ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi)))
+    is_axiom ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi)))
 
   -- ⊢ (∀ v phi) → phi(t/v)  provided phi admits t for v
   | pred_2_
@@ -111,18 +111,18 @@ inductive IsAxiom : Formula_ → Prop
     (phi phi' : Formula_) :
     FOL.NV.Sub.Var.One.Rec.fast_admits_var_one_rec v t phi →
     FOL.NV.Sub.Var.One.Rec.fast_replace_free_var_one_rec v t phi = phi' →
-    IsAxiom ((forall_ v phi).imp_ phi')
+    is_axiom ((forall_ v phi).imp_ phi')
 
   -- ⊢ phi → (∀ v phi)  provided v is not free in phi
   | pred_3_
     (v : VarName_)
     (phi : Formula_) :
     ¬ var_is_free_in v phi →
-    IsAxiom (phi.imp_ (forall_ v phi))
+    is_axiom (phi.imp_ (forall_ v phi))
 
   -- ⊢ ∀ v (v = v)
   | eq_1_ (v : VarName_) :
-    IsAxiom (forall_ v (eq_ v v))
+    is_axiom (forall_ v (eq_ v v))
 
   /-
     ⊢ ∀ x_0 ... ∀ x_n ∀ y_0 ... y_n ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) →((pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n]))
@@ -131,7 +131,7 @@ inductive IsAxiom : Formula_ → Prop
     (name : PredName_)
     (n : ℕ)
     (xs ys : Fin n → VarName_) :
-    IsAxiom
+    is_axiom
       (Forall_ (List.ofFn xs)
         (Forall_ (List.ofFn ys)
           ((And_ (List.ofFn fun i : Fin n => eq_ (xs i) (ys i))).imp_
@@ -142,7 +142,7 @@ inductive IsAxiom : Formula_ → Prop
   -/
   | eq_2_eq_
     (x_0 x_1 y_0 y_1 : VarName_) :
-    IsAxiom
+    is_axiom
       (forall_ x_0
         (forall_ x_1
           (forall_ y_0
@@ -154,28 +154,28 @@ inductive IsAxiom : Formula_ → Prop
   | gen_
     (v : VarName_)
     (phi : Formula_) :
-    IsAxiom phi →
-    IsAxiom (forall_ v phi)
+    is_axiom phi →
+    is_axiom (forall_ v phi)
 
   | def_false_ :
-    IsAxiom (false_.iff_ (not_ true_))
+    is_axiom (false_.iff_ (not_ true_))
 
   | def_and_
     (phi psi : Formula_) :
-    IsAxiom ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+    is_axiom ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
 
   | def_or_
     (phi psi : Formula_) :
-    IsAxiom ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+    is_axiom ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
 
   | def_iff_
     (phi psi : Formula_) :
-    IsAxiom (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+    is_axiom (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
   | def_exists_
     (v : VarName_)
     (phi : Formula_) :
-    IsAxiom ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
+    is_axiom ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
 /--
   IsDeduct Δ F := True if and only if there is a deduction of F from Δ in classical first order logic.
@@ -184,7 +184,7 @@ inductive IsDeduct (Δ : Set Formula_) : Formula_ → Prop
 
   | axiom_
     (phi : Formula_) :
-    IsAxiom phi →
+    is_axiom phi →
     IsDeduct Δ phi
 
   | assume_
