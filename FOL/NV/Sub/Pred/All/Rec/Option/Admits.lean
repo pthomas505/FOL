@@ -10,7 +10,7 @@ namespace FOL.NV.Sub.Pred.All.Rec.Option
 open Formula_
 
 
-def admitsAux
+def admits_pred_all_rec_opt_aux
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (binders : Finset VarName_) : Formula_ → Prop
   | pred_const_ _ _ => True
@@ -29,21 +29,21 @@ def admitsAux
   | true_ => True
   | false_ => True
   | eq_ _ _ => True
-  | not_ phi => admitsAux τ binders phi
+  | not_ phi => admits_pred_all_rec_opt_aux τ binders phi
   | imp_ phi psi =>
-      admitsAux τ binders phi ∧
-      admitsAux τ binders psi
+      admits_pred_all_rec_opt_aux τ binders phi ∧
+      admits_pred_all_rec_opt_aux τ binders psi
   | and_ phi psi =>
-      admitsAux τ binders phi ∧
-      admitsAux τ binders psi
+      admits_pred_all_rec_opt_aux τ binders phi ∧
+      admits_pred_all_rec_opt_aux τ binders psi
   | or_ phi psi =>
-      admitsAux τ binders phi ∧
-      admitsAux τ binders psi
+      admits_pred_all_rec_opt_aux τ binders phi ∧
+      admits_pred_all_rec_opt_aux τ binders psi
   | iff_ phi psi =>
-      admitsAux τ binders phi ∧
-      admitsAux τ binders psi
-  | forall_ x phi => admitsAux τ (binders ∪ {x}) phi
-  | exists_ x phi => admitsAux τ (binders ∪ {x}) phi
+      admits_pred_all_rec_opt_aux τ binders phi ∧
+      admits_pred_all_rec_opt_aux τ binders psi
+  | forall_ x phi => admits_pred_all_rec_opt_aux τ (binders ∪ {x}) phi
+  | exists_ x phi => admits_pred_all_rec_opt_aux τ (binders ∪ {x}) phi
   | def_ _ _ => True
 
 
@@ -56,7 +56,7 @@ theorem substitution_theorem_aux
   (τ : PredName_ → ℕ → Option (List VarName_ × Formula_))
   (binders : Finset VarName_)
   (F : Formula_)
-  (h1 : admitsAux τ binders F)
+  (h1 : admits_pred_all_rec_opt_aux τ binders F)
   (h2 : ∀ x : VarName_, x ∉ binders → V' x = V x) :
   holds D
     ⟨
@@ -81,7 +81,7 @@ theorem substitution_theorem_aux
     simp only [replace_pred_all_rec_opt]
     simp only [holds]
   case pred_var_ X xs =>
-    simp only [admitsAux] at h1
+    simp only [admits_pred_all_rec_opt_aux] at h1
     simp at h1
 
     simp only [replace_pred_all_rec_opt]
@@ -127,7 +127,7 @@ theorem substitution_theorem_aux
     simp only [replace_pred_all_rec_opt]
     simp only [holds]
   case not_ phi phi_ih =>
-    simp only [admitsAux] at h1
+    simp only [admits_pred_all_rec_opt_aux] at h1
 
     simp only [replace_pred_all_rec_opt]
     simp only [holds]
@@ -138,7 +138,7 @@ theorem substitution_theorem_aux
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [admitsAux] at h1
+    simp only [admits_pred_all_rec_opt_aux] at h1
 
     simp only [replace_pred_all_rec_opt]
     simp only [holds]
@@ -149,7 +149,7 @@ theorem substitution_theorem_aux
       · exact phi_ih V binders h1_left h2
       · exact psi_ih V binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
-    simp only [admitsAux] at h1
+    simp only [admits_pred_all_rec_opt_aux] at h1
 
     simp only [replace_pred_all_rec_opt]
     simp only [holds]
