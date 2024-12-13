@@ -77,7 +77,7 @@ def is_prop_proof (phi : Formula_) : Prop :=
 
 
 /--
-  `is_axiom F` := True if and only if `F` is a logical axiom of classical first order logic.
+  `is_axiom_v1 F` := True if and only if `F` is a logical axiom of classical first order logic.
 -/
 inductive is_axiom_v1 : Formula_ → Prop
   -- ⊢ ⊤
@@ -178,32 +178,32 @@ inductive is_axiom_v1 : Formula_ → Prop
     is_axiom_v1 ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
 /--
-  IsDeduct Δ F := True if and only if there is a deduction of F from Δ in classical first order logic.
+  is_deduct_v1 Δ F := True if and only if there is a deduction of F from Δ in classical first order logic.
 -/
-inductive IsDeduct (Δ : Set Formula_) : Formula_ → Prop
+inductive is_deduct_v1 (Δ : Set Formula_) : Formula_ → Prop
 
   | axiom_
     (phi : Formula_) :
     is_axiom_v1 phi →
-    IsDeduct Δ phi
+    is_deduct_v1 Δ phi
 
   | assume_
     (phi : Formula_) :
     phi ∈ Δ →
-    IsDeduct Δ phi
+    is_deduct_v1 Δ phi
 
   | mp_
     (phi psi : Formula_) :
-    IsDeduct Δ (phi.imp_ psi) →
-    IsDeduct Δ phi →
-    IsDeduct Δ psi
+    is_deduct_v1 Δ (phi.imp_ psi) →
+    is_deduct_v1 Δ phi →
+    is_deduct_v1 Δ psi
 
 
 /--
   IsProof F := True if and only if there is a proof of F in classical first order logic.
 -/
 def IsProof (F : Formula_) : Prop :=
-  IsDeduct ∅ F
+  is_deduct_v1 ∅ F
 
 
 /--

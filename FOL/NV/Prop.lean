@@ -255,13 +255,13 @@ theorem T_13_5
   IsProof (P.imp_ P) :=
   by
   simp only [IsProof]
-  apply IsDeduct.mp_ (P.imp_ (P.imp_ P))
-  · apply IsDeduct.mp_ (P.imp_ ((P.imp_ P).imp_ P))
-    · apply IsDeduct.axiom_
+  apply is_deduct_v1.mp_ (P.imp_ (P.imp_ P))
+  · apply is_deduct_v1.mp_ (P.imp_ ((P.imp_ P).imp_ P))
+    · apply is_deduct_v1.axiom_
       exact is_axiom_v1.prop_2_ P (P.imp_ P) P
-    · apply IsDeduct.axiom_
+    · apply is_deduct_v1.axiom_
       exact is_axiom_v1.prop_1_ P (P.imp_ P)
-  · apply IsDeduct.axiom_
+  · apply is_deduct_v1.axiom_
     exact is_axiom_v1.prop_1_ P P
 
 alias prop_id := T_13_5
@@ -271,37 +271,37 @@ theorem T_13_6_no_deduct
   (P Q : Formula_) :
   IsProof (P.not_.imp_ (P.imp_ Q)) :=
   by
-  apply IsDeduct.mp_ (P.not_.imp_ (Q.not_.imp_ P.not_))
-  · apply IsDeduct.mp_ (P.not_.imp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q)))
-    · apply IsDeduct.axiom_
+  apply is_deduct_v1.mp_ (P.not_.imp_ (Q.not_.imp_ P.not_))
+  · apply is_deduct_v1.mp_ (P.not_.imp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q)))
+    · apply is_deduct_v1.axiom_
       apply is_axiom_v1.prop_2_
-    · apply IsDeduct.mp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q))
-      · apply IsDeduct.axiom_
+    · apply is_deduct_v1.mp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q))
+      · apply is_deduct_v1.axiom_
         apply is_axiom_v1.prop_1_
-      · apply IsDeduct.axiom_
+      · apply is_deduct_v1.axiom_
         apply is_axiom_v1.prop_3_
-  · apply IsDeduct.axiom_
+  · apply is_deduct_v1.axiom_
     apply is_axiom_v1.prop_1_
 
 
 theorem T_14_10
   (F : Formula_)
   (Δ : Set Formula_)
-  (h1 : IsDeduct Δ F) :
-  ∀ Γ : Set Formula_, IsDeduct (Δ ∪ Γ) F :=
+  (h1 : is_deduct_v1 Δ F) :
+  ∀ Γ : Set Formula_, is_deduct_v1 (Δ ∪ Γ) F :=
   by
   intro Γ
   induction h1
   case axiom_ h1_phi h1_1 =>
-    apply IsDeduct.axiom_
+    apply is_deduct_v1.axiom_
     exact h1_1
   case assume_ h1_phi h1_1 =>
-    apply IsDeduct.assume_
+    apply is_deduct_v1.assume_
     simp
     left
     exact h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1 h1_ih_2 =>
-    apply IsDeduct.mp_ h1_phi
+    apply is_deduct_v1.mp_ h1_phi
     · exact h1_ih_1
     · exact h1_ih_2
 
@@ -309,8 +309,8 @@ theorem T_14_10
 theorem T_14_10_comm
   (Q : Formula_)
   (Δ : Set Formula_)
-  (h1 : IsDeduct Δ Q) :
-  ∀ Γ : Set Formula_, IsDeduct (Γ ∪ Δ) Q :=
+  (h1 : is_deduct_v1 Δ Q) :
+  ∀ Γ : Set Formula_, is_deduct_v1 (Γ ∪ Δ) Q :=
   by
   simp only [Set.union_comm]
   exact T_14_10 Q Δ h1
@@ -319,7 +319,7 @@ theorem T_14_10_comm
 theorem C_14_11
   (P : Formula_)
   (h1 : IsProof P) :
-  ∀ Δ : Set Formula_, IsDeduct Δ P :=
+  ∀ Δ : Set Formula_, is_deduct_v1 Δ P :=
   by
   intro Δ
   obtain s1 := T_14_10 P ∅ h1 Δ
@@ -333,15 +333,15 @@ alias proof_imp_deduct := C_14_11
 theorem T_14_3
   (P Q : Formula_)
   (Δ : Set Formula_)
-  (h1 : IsDeduct (Δ ∪ {P}) Q) :
-  IsDeduct Δ (P.imp_ Q) :=
+  (h1 : is_deduct_v1 (Δ ∪ {P}) Q) :
+  is_deduct_v1 Δ (P.imp_ Q) :=
   by
   induction h1
   case axiom_ h1_phi h1_1 =>
-    apply IsDeduct.mp_ h1_phi
-    · apply IsDeduct.axiom_
+    apply is_deduct_v1.mp_ h1_phi
+    · apply is_deduct_v1.axiom_
       exact is_axiom_v1.prop_1_ h1_phi P
-    · apply IsDeduct.axiom_
+    · apply is_deduct_v1.axiom_
       exact h1_1
   case assume_ h1_phi h1_1 =>
     simp at h1_1
@@ -351,16 +351,16 @@ theorem T_14_3
       apply proof_imp_deduct
       exact prop_id h1_phi
     case inr h1_1 =>
-      apply IsDeduct.mp_ h1_phi
-      · apply IsDeduct.axiom_
+      apply is_deduct_v1.mp_ h1_phi
+      · apply is_deduct_v1.axiom_
         exact is_axiom_v1.prop_1_ h1_phi P
-      · apply IsDeduct.assume_
+      · apply is_deduct_v1.assume_
         exact h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1
     h1_ih_2 =>
-    apply IsDeduct.mp_ (P.imp_ h1_phi)
-    · apply IsDeduct.mp_ (P.imp_ (h1_phi.imp_ h1_psi))
-      · apply IsDeduct.axiom_
+    apply is_deduct_v1.mp_ (P.imp_ h1_phi)
+    · apply is_deduct_v1.mp_ (P.imp_ (h1_phi.imp_ h1_psi))
+      · apply is_deduct_v1.axiom_
         exact is_axiom_v1.prop_2_ P h1_phi h1_psi
       · exact h1_ih_1
     · exact h1_ih_2
@@ -374,13 +374,13 @@ theorem T_13_6
   by
   simp only [IsProof]
   apply deduction_theorem
-  apply IsDeduct.mp_ (Q.not_.imp_ P.not_)
-  · apply IsDeduct.axiom_
+  apply is_deduct_v1.mp_ (Q.not_.imp_ P.not_)
+  · apply is_deduct_v1.axiom_
     exact is_axiom_v1.prop_3_ Q P
-  · apply IsDeduct.mp_ P.not_
-    · apply IsDeduct.axiom_
+  · apply is_deduct_v1.mp_ P.not_
+    · apply is_deduct_v1.axiom_
       exact is_axiom_v1.prop_1_ P.not_ Q.not_
-    · apply IsDeduct.assume_
+    · apply is_deduct_v1.assume_
       simp
 
 
@@ -390,16 +390,16 @@ theorem T_14_5
   by
   simp only [IsProof]
   apply deduction_theorem
-  apply IsDeduct.mp_ P.not_.not_
-  · apply IsDeduct.mp_ (P.not_.imp_ P.not_.not_.not_)
-    · apply IsDeduct.axiom_
+  apply is_deduct_v1.mp_ P.not_.not_
+  · apply is_deduct_v1.mp_ (P.not_.imp_ P.not_.not_.not_)
+    · apply is_deduct_v1.axiom_
       apply is_axiom_v1.prop_3_
-    · apply IsDeduct.mp_ P.not_.not_
+    · apply is_deduct_v1.mp_ P.not_.not_
       · apply proof_imp_deduct
         apply T_13_6
-      · apply IsDeduct.assume_
+      · apply is_deduct_v1.assume_
         simp
-  · apply IsDeduct.assume_
+  · apply is_deduct_v1.assume_
     simp
 
 
@@ -408,8 +408,8 @@ theorem T_14_6
   IsProof (P.imp_ P.not_.not_) :=
   by
   simp only [IsProof]
-  apply IsDeduct.mp_ (P.not_.not_.not_.imp_ P.not_)
-  · apply IsDeduct.axiom_
+  apply is_deduct_v1.mp_ (P.not_.not_.not_.imp_ P.not_)
+  · apply is_deduct_v1.axiom_
     exact is_axiom_v1.prop_3_ P.not_.not_ P
   · apply proof_imp_deduct
     exact T_14_5 P.not_
@@ -421,20 +421,20 @@ theorem T_14_7
   by
   simp only [IsProof]
   apply deduction_theorem
-  apply IsDeduct.mp_ (P.not_.not_.imp_ Q.not_.not_)
-  · apply IsDeduct.axiom_
+  apply is_deduct_v1.mp_ (P.not_.not_.imp_ Q.not_.not_)
+  · apply is_deduct_v1.axiom_
     apply is_axiom_v1.prop_3_
   · apply deduction_theorem
-    apply IsDeduct.mp_ Q
+    apply is_deduct_v1.mp_ Q
     · apply proof_imp_deduct
       apply T_14_6
-    · apply IsDeduct.mp_ P
-      · apply IsDeduct.assume_
+    · apply is_deduct_v1.mp_ P
+      · apply is_deduct_v1.assume_
         simp
-      · apply IsDeduct.mp_ P.not_.not_
+      · apply is_deduct_v1.mp_ P.not_.not_
         · apply proof_imp_deduct
           apply T_14_5
-        · apply IsDeduct.assume_
+        · apply is_deduct_v1.assume_
           simp
 
 
@@ -444,14 +444,14 @@ theorem T_14_8
   by
   simp only [IsProof]
   apply deduction_theorem
-  apply IsDeduct.mp_ ((Q.imp_ R).imp_ R)
+  apply is_deduct_v1.mp_ ((Q.imp_ R).imp_ R)
   · apply proof_imp_deduct
     apply T_14_7
   · apply deduction_theorem
-    apply IsDeduct.mp_ Q
-    · apply IsDeduct.assume_
+    apply is_deduct_v1.mp_ Q
+    · apply is_deduct_v1.assume_
       simp
-    · apply IsDeduct.assume_
+    · apply is_deduct_v1.assume_
       simp
 
 
@@ -461,45 +461,45 @@ theorem T_14_9
   by
   simp only [IsProof]
   apply deduction_theorem
-  apply IsDeduct.mp_ (P.not_.imp_ (S.not_.imp_ P).not_)
-  · apply IsDeduct.axiom_
+  apply is_deduct_v1.mp_ (P.not_.imp_ (S.not_.imp_ P).not_)
+  · apply is_deduct_v1.axiom_
     apply is_axiom_v1.prop_3_
   · apply deduction_theorem
-    apply IsDeduct.mp_ P.not_
-    · apply IsDeduct.mp_ S.not_
+    apply is_deduct_v1.mp_ P.not_
+    · apply is_deduct_v1.mp_ S.not_
       · apply proof_imp_deduct
         apply T_14_8
-      · apply IsDeduct.mp_ P.not_
-        · apply IsDeduct.mp_ (S.imp_ P)
+      · apply is_deduct_v1.mp_ P.not_
+        · apply is_deduct_v1.mp_ (S.imp_ P)
           · apply proof_imp_deduct
             apply T_14_7
-          · apply IsDeduct.assume_
+          · apply is_deduct_v1.assume_
             simp
-        · apply IsDeduct.assume_
+        · apply is_deduct_v1.assume_
           simp
-    · apply IsDeduct.assume_
+    · apply is_deduct_v1.assume_
       simp
 
 
 theorem deductionTheoremConverse
   (P Q : Formula_)
   (Δ : Set Formula_)
-  (h1 : IsDeduct Δ (P.imp_ Q)) :
-  IsDeduct (Δ ∪ {P}) Q :=
+  (h1 : is_deduct_v1 Δ (P.imp_ Q)) :
+  is_deduct_v1 (Δ ∪ {P}) Q :=
   by
-  apply IsDeduct.mp_ P
+  apply is_deduct_v1.mp_ P
   · exact T_14_10 (P.imp_ Q) Δ h1 {P}
-  · apply IsDeduct.assume_
+  · apply is_deduct_v1.assume_
     simp
 
 
 theorem T_14_12
   (P Q : Formula_)
   (Δ Γ : Set Formula_)
-  (h1 : IsDeduct Δ P)
-  (h2 : IsDeduct Γ (P.imp_ Q)) :
-  IsDeduct (Δ ∪ Γ) Q := by
-  apply IsDeduct.mp_ P
+  (h1 : is_deduct_v1 Δ P)
+  (h2 : is_deduct_v1 Γ (P.imp_ Q)) :
+  is_deduct_v1 (Δ ∪ Γ) Q := by
+  apply is_deduct_v1.mp_ P
   · apply T_14_10_comm
     exact h2
   · apply T_14_10
@@ -510,9 +510,9 @@ theorem C_14_14
   (P Q : Formula_)
   (Γ : Set Formula_)
   (h1 : IsProof P)
-  (h2 : IsDeduct Γ (P.imp_ Q)) :
-  IsDeduct Γ Q := by
-  apply IsDeduct.mp_ P
+  (h2 : is_deduct_v1 Γ (P.imp_ Q)) :
+  is_deduct_v1 Γ Q := by
+  apply is_deduct_v1.mp_ P
   · exact h2
   · apply proof_imp_deduct
     exact h1
@@ -523,10 +523,10 @@ alias mp_proof_deduct := C_14_14
 theorem C_14_15
   (P Q : Formula_)
   (Δ : Set Formula_)
-  (h1 : IsDeduct Δ P)
+  (h1 : is_deduct_v1 Δ P)
   (h2 : IsProof (P.imp_ Q)) :
-  IsDeduct Δ Q := by
-  apply IsDeduct.mp_ P
+  is_deduct_v1 Δ Q := by
+  apply is_deduct_v1.mp_ P
   · apply proof_imp_deduct
     exact h2
   · exact h1
@@ -537,23 +537,23 @@ alias mp_deduct_proof := C_14_15
 theorem T_14_16
   (F : Formula_)
   (Δ Γ : Set Formula_)
-  (h1 : IsDeduct Γ F)
-  (h2 : ∀ H : Formula_, H ∈ Γ → IsDeduct Δ H) :
-  IsDeduct Δ F :=
+  (h1 : is_deduct_v1 Γ F)
+  (h2 : ∀ H : Formula_, H ∈ Γ → is_deduct_v1 Δ H) :
+  is_deduct_v1 Δ F :=
   by
   induction h1
   case axiom_ h1_phi h1_1 =>
-    apply IsDeduct.axiom_
+    apply is_deduct_v1.axiom_
     exact h1_1
   case assume_ h1_phi h1_1 => exact h2 h1_phi h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1 h1_ih_2 =>
-    exact IsDeduct.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
+    exact is_deduct_v1.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
 
 
 theorem C_14_17
   (Q : Formula_)
   (Γ : Set Formula_)
-  (h1 : IsDeduct Γ Q)
+  (h1 : is_deduct_v1 Γ Q)
   (h2 : ∀ P : Formula_, P ∈ Γ → IsProof P) :
   IsProof Q :=
   by
@@ -778,7 +778,7 @@ theorem L_15_7
   (h1 : F.primeSet.toSet ⊆ Δ_U)
   (h2 : Δ_U' = Δ_U.image (evalPrimeFfToNot V))
   (h3 : F' = evalPrimeFfToNot V F) :
-  IsDeduct Δ_U' F' :=
+  is_deduct_v1 Δ_U' F' :=
   by
   subst h2
   subst h3
@@ -790,7 +790,7 @@ theorem L_15_7
 
     simp only [evalPrimeFfToNot]
     simp only [Formula_.evalPrime]
-    apply IsDeduct.assume_
+    apply is_deduct_v1.assume_
     simp
     apply Exists.intro F
     tauto
@@ -801,7 +801,7 @@ theorem L_15_7
 
     simp only [evalPrimeFfToNot]
     simp only [Formula_.evalPrime]
-    apply IsDeduct.assume_
+    apply is_deduct_v1.assume_
     simp
     apply Exists.intro F
     tauto
@@ -812,12 +812,12 @@ theorem L_15_7
 
     simp only [evalPrimeFfToNot]
     simp only [Formula_.evalPrime]
-    apply IsDeduct.assume_
+    apply is_deduct_v1.assume_
     simp
     apply Exists.intro F
     tauto
   case true_ =>
-    apply IsDeduct.axiom_
+    apply is_deduct_v1.axiom_
     apply is_axiom_v1.prop_true_
   case false_ =>
     simp only [Formula_.primeSet] at h1
@@ -839,7 +839,7 @@ theorem L_15_7
     case _ c1 =>
       simp only [c1] at phi_ih
       simp at phi_ih
-      apply IsDeduct.mp_ phi
+      apply is_deduct_v1.mp_ phi
       apply proof_imp_deduct
       apply T_14_6
       exact phi_ih h1
@@ -865,14 +865,14 @@ theorem L_15_7
         cases c1
         case _ c1 =>
           simp only [if_neg c1] at phi_ih
-          apply IsDeduct.mp_ (not_ phi)
+          apply is_deduct_v1.mp_ (not_ phi)
           apply proof_imp_deduct
           apply T_13_6
           apply phi_ih h1_left
         case _ c1 =>
           simp only [if_pos c1] at psi_ih
-          apply IsDeduct.mp_ psi
-          apply IsDeduct.axiom_
+          apply is_deduct_v1.mp_ psi
+          apply is_deduct_v1.axiom_
           apply is_axiom_v1.prop_1_
           apply psi_ih
           exact h1_right
@@ -883,8 +883,8 @@ theorem L_15_7
         case intro c1_left c1_right =>
           simp only [if_pos c1_left] at phi_ih
           simp only [if_neg c1_right] at psi_ih
-          apply IsDeduct.mp_ psi.not_
-          · apply IsDeduct.mp_ phi
+          apply is_deduct_v1.mp_ psi.not_
+          · apply is_deduct_v1.mp_ phi
             · apply proof_imp_deduct
               apply T_14_8
             · exact phi_ih h1_left
@@ -897,7 +897,7 @@ theorem L_15_7
 
     simp only [evalPrimeFfToNot]
     simp only [Formula_.evalPrime]
-    apply IsDeduct.assume_
+    apply is_deduct_v1.assume_
     simp
     apply Exists.intro F
     tauto
@@ -908,7 +908,7 @@ theorem L_15_7
 
     simp only [evalPrimeFfToNot]
     simp only [Formula_.evalPrime]
-    apply IsDeduct.assume_
+    apply is_deduct_v1.assume_
     simp
     apply Exists.intro F
     tauto
@@ -919,12 +919,12 @@ theorem L_15_7
 theorem T_14_9_Deduct
   (P U : Formula_)
   (Δ : Set Formula_)
-  (h1 : IsDeduct (Δ ∪ {U}) P)
-  (h2 : IsDeduct (Δ ∪ {U.not_}) P) :
-  IsDeduct Δ P :=
+  (h1 : is_deduct_v1 (Δ ∪ {U}) P)
+  (h2 : is_deduct_v1 (Δ ∪ {U.not_}) P) :
+  is_deduct_v1 Δ P :=
   by
-  apply IsDeduct.mp_ (U.not_.imp_ P)
-  · apply IsDeduct.mp_ (U.imp_ P)
+  apply is_deduct_v1.mp_ (U.not_.imp_ P)
+  · apply is_deduct_v1.mp_ (U.imp_ P)
     · apply proof_imp_deduct
       apply T_14_9
     · apply deduction_theorem
@@ -1002,8 +1002,8 @@ theorem propCompleteAuxAux
   (h1_Δ : ∀ U' : Formula_, U' ∈ Δ → U'.IsPrime)
   (h1_U : U.IsPrime)
   (h2 : U ∉ Δ)
-  (h3 : ∀ V : VarBoolAssignment, IsDeduct (Δ.image (evalPrimeFfToNot V) ∪ {evalPrimeFfToNot V U}) P) :
-  ∀ V : VarBoolAssignment, IsDeduct (Δ.image (evalPrimeFfToNot V)) P :=
+  (h3 : ∀ V : VarBoolAssignment, is_deduct_v1 (Δ.image (evalPrimeFfToNot V) ∪ {evalPrimeFfToNot V U}) P) :
+  ∀ V : VarBoolAssignment, is_deduct_v1 (Δ.image (evalPrimeFfToNot V)) P :=
   by
   intro V
   apply T_14_9_Deduct P U (Δ.image (evalPrimeFfToNot V))
@@ -1025,8 +1025,8 @@ theorem propCompleteAux
   (P : Formula_)
   (Δ_U : Finset Formula_)
   (h1 : Δ_U ⊆ P.primeSet)
-  (h2 : ∀ V : VarBoolAssignment, IsDeduct (Δ_U.image (evalPrimeFfToNot V)) P) :
-  IsDeduct ∅ P :=
+  (h2 : ∀ V : VarBoolAssignment, is_deduct_v1 (Δ_U.image (evalPrimeFfToNot V)) P) :
+  is_deduct_v1 ∅ P :=
   by
   induction Δ_U using Finset.induction_on
   case empty =>
