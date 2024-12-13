@@ -70,14 +70,14 @@ inductive is_prop_deduct (Δ : Set Formula_) : Formula_ → Prop
 
 
 /--
-  IsPropProof F := True if and only if there is a proof of F in classical propositional logic.
+  `is_prop_proof F` := True if and only if there is a proof of `F` in classical propositional logic.
 -/
 def is_prop_proof (phi : Formula_) : Prop :=
   is_prop_deduct ∅ phi
 
 
 /--
-  IsAxiom F := True if and only if F is a logical axiom of classical first order logic.
+  `is_axiom F` := True if and only if `F` is a logical axiom of classical first order logic.
 -/
 inductive is_axiom : Formula_ → Prop
   -- ⊢ ⊤
