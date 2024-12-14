@@ -191,7 +191,7 @@ theorem substitution_theorem_admits_pred_one_rec_aux
 
         have s2 :
           holds D I (Function.updateListITE V zs (List.map V xs)) E_ref H ↔ holds D I (Function.updateListITE V' zs (List.map V xs)) E_ref H :=
-          by
+        by
           apply holds_coincide_var
           intro v a1
           by_cases c2 : v ∈ zs
