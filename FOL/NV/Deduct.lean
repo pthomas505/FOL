@@ -75,7 +75,7 @@ def is_prop_proof (phi : Formula_) : Prop :=
 
 
 /--
-  `is_axiom_v1 F` := True if and only if `F` is a logical axiom of classical first order logic.
+  `is_axiom_v1 F` := True if and only if `F` is an axiom of classical first order logic.
 -/
 inductive is_axiom_v1 : Formula_ → Prop
   -- ⊢ ⊤
