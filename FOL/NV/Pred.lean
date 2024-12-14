@@ -401,7 +401,7 @@ theorem univIntro
 
 theorem isProofAltImpIsDeduct
   (F : Formula_)
-  (h1 : IsProofAlt F) :
+  (h1 : is_proof_v2 F) :
   is_deduct_v1 ∅ F :=
   by
   induction h1
@@ -462,49 +462,49 @@ theorem isProofAltImpIsDeduct
 theorem isDeductImpIsProofAlt
   (F : Formula_)
   (h1 : is_deduct_v1 ∅ F) :
-  IsProofAlt F :=
+  is_proof_v2 F :=
   by
   induction h1
   case axiom_ h1_phi h1_1 =>
     induction h1_1
     case prop_true_ =>
-      apply IsProofAlt.prop_true_
+      apply is_proof_v2.prop_true_
     case prop_1_ h1_1_phi h1_1_psi =>
-      apply IsProofAlt.prop_1_
+      apply is_proof_v2.prop_1_
     case prop_2_ h1_1_phi h1_1_psi h1_1_chi =>
-      apply IsProofAlt.prop_2_
+      apply is_proof_v2.prop_2_
     case prop_3_ h1_1_phi h1_1_psi =>
-      apply IsProofAlt.prop_3_
+      apply is_proof_v2.prop_3_
     case pred_1_ h1_1_v h1_1_phi h1_1_psi =>
-      apply IsProofAlt.pred_1_
+      apply is_proof_v2.pred_1_
     case pred_2_ h1_1_v h1_1_t h1_1_phi h1_1_1 h1_1_ih_1 h1_1_ih_2 =>
-      apply IsProofAlt.pred_2_ h1_1_v h1_1_t h1_1_phi h1_1_1 h1_1_ih_1 h1_1_ih_2
+      apply is_proof_v2.pred_2_ h1_1_v h1_1_t h1_1_phi h1_1_1 h1_1_ih_1 h1_1_ih_2
     case pred_3_ h1_1_v h1_1_phi h1_1_1 =>
-      apply IsProofAlt.pred_3_
+      apply is_proof_v2.pred_3_
       exact h1_1_1
     case eq_1_ h1_1 =>
-      apply IsProofAlt.eq_1_
+      apply is_proof_v2.eq_1_
     case eq_2_pred_const_ h1_1_name h1_1_n h1_1_xs h1_1_ys =>
-      apply IsProofAlt.eq_2_pred_const_
+      apply is_proof_v2.eq_2_pred_const_
     case eq_2_eq_ h1_1_x_0 h1_1_y_0 h1_1_x_1 h1_1_y_1 =>
-      apply IsProofAlt.eq_2_eq_
+      apply is_proof_v2.eq_2_eq_
     case gen_ h1_1_v h1_1_phi h1_1_1 h1_1_ih =>
-      apply IsProofAlt.gen_
+      apply is_proof_v2.gen_
       exact h1_1_ih
     case def_false_ =>
-      apply IsProofAlt.def_false_
+      apply is_proof_v2.def_false_
     case def_and_ h1_1_phi h1_1_psi =>
-      apply IsProofAlt.def_and_
+      apply is_proof_v2.def_and_
     case def_or_ h1_1_phi h1_1_psi =>
-      apply IsProofAlt.def_or_
+      apply is_proof_v2.def_or_
     case def_iff_ h1_1_phi h1_1_psi =>
-      apply IsProofAlt.def_iff_
+      apply is_proof_v2.def_iff_
     case def_exists_ h1_1_v h1_1_phi =>
-      apply IsProofAlt.def_exists_
+      apply is_proof_v2.def_exists_
   case assume_ h1_phi h1_1 =>
     simp at h1_1
   case mp_ h1_phi h1_psi h1_1 h1_2 h1_ih_1 h1_ih_2 =>
-    exact IsProofAlt.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
+    exact is_proof_v2.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
 
 
 theorem T_17_10

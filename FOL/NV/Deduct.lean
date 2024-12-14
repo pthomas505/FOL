@@ -200,45 +200,45 @@ inductive is_deduct_v1 (Δ : Set Formula_) : Formula_ → Prop
 
 
 /--
-  IsProof F := True if and only if there is a proof of F in classical first order logic.
+  `is_proof_v1 F` := True if and only if there is a proof of `F` in classical first order logic.
 -/
 def is_proof_v1 (F : Formula_) : Prop :=
   is_deduct_v1 ∅ F
 
 
 /--
-  IsProofAlt F := True if and only if there is a proof of F in classical first order logic.
+  `is_proof_v2 F` := True if and only if there is a proof of `F` in classical first order logic.
 
-  This definition is equivalent to IsProof.
+  This definition is equivalent to `is_proof_v1`.
 -/
-inductive IsProofAlt : Formula_ → Prop
+inductive is_proof_v2 : Formula_ → Prop
 
   -- ⊢ ⊤
-  | prop_true_ : IsProofAlt true_
+  | prop_true_ : is_proof_v2 true_
 
   -- ⊢ phi → (psi → phi)
   | prop_1_
     (phi psi : Formula_) :
-    IsProofAlt (phi.imp_ (psi.imp_ phi))
+    is_proof_v2 (phi.imp_ (psi.imp_ phi))
 
   -- ⊢ (phi → (psi → chi)) → ((phi → psi) → (phi → chi))
   | prop_2_
     (phi psi chi : Formula_) :
-    IsProofAlt
+    is_proof_v2
       ((phi.imp_ (psi.imp_ chi)).imp_
         ((phi.imp_ psi).imp_ (phi.imp_ chi)))
 
   -- ⊢ (¬ phi → ¬ psi) → (psi → phi)
   | prop_3_
     (phi psi : Formula_) :
-    IsProofAlt
+    is_proof_v2
       (((not_ phi).imp_ (not_ psi)).imp_
         (psi.imp_ phi))
 
   -- ⊢ (∀ v (phi → psi)) → ((∀ v phi) → (∀ v psi))
   | pred_1_
     (v : VarName_) (phi psi : Formula_) :
-    IsProofAlt
+    is_proof_v2
       ((forall_ v (phi.imp_ psi)).imp_
         ((forall_ v phi).imp_
           (forall_ v psi)))
@@ -248,19 +248,19 @@ inductive IsProofAlt : Formula_ → Prop
     (v t : VarName_) (phi phi' : Formula_) :
     FOL.NV.Sub.Var.One.Rec.fast_admits_var_one_rec v t phi →
       FOL.NV.Sub.Var.One.Rec.fast_replace_free_var_one_rec v t phi = phi' →
-        IsProofAlt ((forall_ v phi).imp_ phi')
+        is_proof_v2 ((forall_ v phi).imp_ phi')
 
   -- ⊢ phi → (∀ v phi)  provided v is not free in phi
   | pred_3_
     (v : VarName_)
     (phi : Formula_) :
     ¬ var_is_free_in v phi →
-    IsProofAlt (phi.imp_ (forall_ v phi))
+    is_proof_v2 (phi.imp_ (forall_ v phi))
 
   -- ⊢ ∀ v (v = v)
   | eq_1_
     (v : VarName_) :
-    IsProofAlt (forall_ v (eq_ v v))
+    is_proof_v2 (forall_ v (eq_ v v))
 
   /-
     ⊢ ∀ x_0 ... ∀ x_n ∀ y_0 ... y_n ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) →((pred_ name [x_0 ... x_n] ↔ pred_ name [y_0 ... y_n]))
@@ -269,7 +269,7 @@ inductive IsProofAlt : Formula_ → Prop
     (name : PredName_)
     (n : ℕ)
     (xs ys : Fin n → VarName_) :
-    IsProofAlt
+    is_proof_v2
       (Forall_ (List.ofFn xs)
         (Forall_ (List.ofFn ys)
           ((And_ (List.ofFn fun i : Fin n => eq_ (xs i) (ys i))).imp_
@@ -280,7 +280,7 @@ inductive IsProofAlt : Formula_ → Prop
   -/
   | eq_2_eq_
     (x_0 x_1 y_0 y_1 : VarName_) :
-    IsProofAlt
+    is_proof_v2
       (forall_ x_0
         (forall_ x_1
           (forall_ y_0
@@ -292,34 +292,34 @@ inductive IsProofAlt : Formula_ → Prop
   | gen_
     (v : VarName_)
     (phi : Formula_) :
-    IsProofAlt phi →
-    IsProofAlt (forall_ v phi)
+    is_proof_v2 phi →
+    is_proof_v2 (forall_ v phi)
 
   -- ⊢ phi → psi ⇒ ⊢ phi ⇒ ⊢ psi
   | mp_
     (phi psi : Formula_) :
-    IsProofAlt (phi.imp_ psi) →
-    IsProofAlt phi →
-    IsProofAlt psi
+    is_proof_v2 (phi.imp_ psi) →
+    is_proof_v2 phi →
+    is_proof_v2 psi
 
   | def_false_ :
-    IsProofAlt (false_.iff_ (not_ true_))
+    is_proof_v2 (false_.iff_ (not_ true_))
 
   | def_and_
     (phi psi : Formula_) :
-    IsProofAlt ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+    is_proof_v2 ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
 
   | def_or_
     (phi psi : Formula_) :
-    IsProofAlt ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+    is_proof_v2 ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
 
   | def_iff_
     (phi psi : Formula_) :
-    IsProofAlt (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+    is_proof_v2 (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
   | def_exists_
     (v : VarName_)
     (phi : Formula_) :
-    IsProofAlt ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
+    is_proof_v2 ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
 #lint
