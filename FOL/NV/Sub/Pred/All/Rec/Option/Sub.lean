@@ -356,26 +356,24 @@ lemma substitution_theorem_sub_pred_all_rec_opt_aux
           simp only [Finset.mem_union] at s2
 
           push_neg at s2
-          cases s2
-          case _ s2_left s2_right =>
-            contradiction
+          obtain ⟨s2_left, s2_right⟩ := s2
+          contradiction
         case _ c2 =>
           exact h2 v a1
       case _ c1 =>
         simp only [Finset.mem_union] at c1
         push_neg at c1
-        cases c1
-        case _ c1_left c1_right =>
-          have s1 : ¬ v = x :=
-          by
-            intro contra
-            apply c1_right
-            subst contra
-            exact a1
+        obtain ⟨c1_left, c1_right⟩ := c1
+        have s1 : ¬ v = x :=
+        by
+          intro contra
+          apply c1_right
+          subst contra
+          exact a1
 
-          simp only [Function.updateITE]
-          simp only [if_neg s1]
-          exact h2 v a1
+        simp only [Function.updateITE]
+        simp only [if_neg s1]
+        exact h2 v a1
   case def_ X xs =>
     simp only [sub_pred_all_rec_opt_aux]
 
