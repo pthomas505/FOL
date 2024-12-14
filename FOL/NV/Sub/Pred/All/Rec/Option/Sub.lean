@@ -211,14 +211,16 @@ lemma substitution_theorem_sub_pred_all_rec_opt_aux
     simp only [sub_pred_all_rec_opt_aux]
     simp only [holds]
 
-    have s1 : V' x = V (σ x)
-    apply h1
-    simp
+    have s1 : V' x = V (σ x) :=
+    by
+      apply h1
+      simp
     simp only [s1]
 
-    have s2 : V' y = V (σ y)
-    apply h1
-    simp
+    have s2 : V' y = V (σ y) :=
+    by
+      apply h1
+      simp
     simp only [s2]
   case true_ | false_ =>
     simp only [sub_pred_all_rec_opt_aux]
@@ -364,11 +366,12 @@ lemma substitution_theorem_sub_pred_all_rec_opt_aux
         push_neg at c1
         cases c1
         case _ c1_left c1_right =>
-          have s1 : ¬ v = x
-          intro contra
-          apply c1_right
-          subst contra
-          exact a1
+          have s1 : ¬ v = x :=
+          by
+            intro contra
+            apply c1_right
+            subst contra
+            exact a1
 
           simp only [Function.updateITE]
           simp only [if_neg s1]
@@ -384,29 +387,29 @@ lemma substitution_theorem_sub_pred_all_rec_opt_aux
 
       simp only [holds]
 
-      have s1 : (List.map V' xs) = (List.map (V ∘ σ) xs)
-      simp only [List.map_eq_map_iff]
-      intro x a1
-      exact h1 x a1
+      have s1 : (List.map V' xs) = (List.map (V ∘ σ) xs) :=
+      by
+        simp only [List.map_eq_map_iff]
+        intro x a1
+        exact h1 x a1
       simp only [s1]
-      clear s1
 
       split_ifs
       case _ c1 c2 =>
-        have s2 : holds D I (Function.updateListITE V' E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q ↔ holds D I (Function.updateListITE V E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q
-        apply holds_coincide_var
-        intro x a1
-        apply Function.updateListITE_map_mem_ext
-        · simp
-        · simp at c1
-          tauto
-        · simp only [var_is_free_in_iff_mem_free_var_set] at a1
-          simp only [← List.mem_toFinset]
-          apply Finset.mem_of_subset E_hd.h1 a1
+        have s2 : holds D I (Function.updateListITE V' E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q ↔ holds D I (Function.updateListITE V E_hd.args (List.map (V ∘ σ) xs)) E_tl E_hd.q :=
+        by
+          apply holds_coincide_var
+          intro x a1
+          apply Function.updateListITE_map_mem_ext
+          · simp
+          · simp at c1
+            tauto
+          · simp only [var_is_free_in_iff_mem_free_var_set] at a1
+            simp only [← List.mem_toFinset]
+            apply Finset.mem_of_subset E_hd.h1 a1
 
         simp
         simp only [← s2]
-        clear s2
 
         simp only [sub_pred_all_rec_opt_aux] at E_ih
         apply holds_coincide_pred_var
