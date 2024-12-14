@@ -301,16 +301,17 @@ example
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     congr! 1
 
-    have s1 : (∀ (v : VarName_), v ∈ binders ∪ {x} → v = Function.updateITE σ x x v)
-    intros v a1
-    simp at a1
-    simp only [Function.updateITE]
-    cases a1
-    case _ c1 =>
-      split_ifs <;> tauto
-    case _ c1 =>
-      simp only [if_pos c1]
-      exact c1
+    have s1 : (∀ (v : VarName_), v ∈ binders ∪ {x} → v = Function.updateITE σ x x v) :=
+    by
+      intros v a1
+      simp at a1
+      simp only [Function.updateITE]
+      cases a1
+      case _ c1 =>
+        split_ifs <;> tauto
+      case _ c1 =>
+        simp only [if_pos c1]
+        exact c1
 
     simp only [← phi_ih (Function.updateITE σ x x) (binders ∪ {x}) s1]
     apply replace_free_var_all_rec_aux_same_on_free

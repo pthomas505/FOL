@@ -1092,8 +1092,8 @@ theorem substitution_theorem_fast_admits_var_one_rec_aux
         (List.map (fun (x : VarName_) =>
           if v = x then V' t else V x) xs) =
             (List.map (V ∘ fun (x : VarName_) =>
-              if v = x then t else x) xs)
-      {
+              if v = x then t else x) xs) :=
+      by
         simp only [List.map_eq_map_iff]
         intro x a2
         simp
@@ -1105,7 +1105,6 @@ theorem substitution_theorem_fast_admits_var_one_rec_aux
           exact a2
         case _ c2 =>
           rfl
-      }
 
       simp only [s1]
       apply Function.updateListITE_mem_eq_len

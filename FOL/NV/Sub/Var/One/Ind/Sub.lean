@@ -190,15 +190,15 @@ theorem fast_admits_var_one_rec_aux_and_fast_replace_free_var_one_rec_imp_is_sub
           constructor
           · exact c1
           . exact c2
-          . have s1 : ¬ u ∈ binders ∪ {x}
-            exact Rec.fast_admits_var_one_rec_aux_var_is_free_in phi v u (binders ∪ {x}) h1 c2
+          . have s1 : ¬ u ∈ binders ∪ {x} := Rec.fast_admits_var_one_rec_aux_var_is_free_in phi v u (binders ∪ {x}) h1 c2
 
             simp at s1
             tauto
           · exact phi_ih (binders ∪ {x}) h1
-        · have s1 : Rec.fast_replace_free_var_one_rec v u phi = phi
-          apply Rec.not_var_is_free_in_fast_replace_free_var_one_rec_self
-          exact c2
+        · have s1 : Rec.fast_replace_free_var_one_rec v u phi = phi :=
+          by
+            apply Rec.not_var_is_free_in_fast_replace_free_var_one_rec_self
+            exact c2
 
           simp only [s1]
           first
@@ -411,17 +411,18 @@ theorem substitution_theorem_is_sub_var_one_ind
         simp
         apply holds_coincide_var
         intro v' a1
-        have s1 : List.map (Function.updateITE V h1_v (V h1_t)) h1_xs = List.map (V ∘ fun (x : VarName_) => if h1_v = x then h1_t else x) h1_xs
-        simp only [List.map_eq_map_iff]
-        intro x _
-        simp only [Function.updateITE]
-        simp only [eq_comm]
-        simp
-        split_ifs
-        case _ c3 =>
-          simp only [if_pos c3]
-        case _ c3 =>
-          simp only [if_neg c3]
+        have s1 : List.map (Function.updateITE V h1_v (V h1_t)) h1_xs = List.map (V ∘ fun (x : VarName_) => if h1_v = x then h1_t else x) h1_xs :=
+        by
+          simp only [List.map_eq_map_iff]
+          intro x _
+          simp only [Function.updateITE]
+          simp only [eq_comm]
+          simp
+          split_ifs
+          case _ c3 =>
+            simp only [if_pos c3]
+          case _ c3 =>
+            simp only [if_neg c3]
 
         simp only [s1]
         apply Function.updateListITE_mem_eq_len

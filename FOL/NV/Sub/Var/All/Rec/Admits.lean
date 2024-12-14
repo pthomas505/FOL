@@ -173,8 +173,8 @@ theorem substitution_theorem_admits_var_all_rec_aux
     split_ifs
     case _ c1 c2 =>
       simp
-      have s1 : List.map V xs = List.map (V' ∘ σ') xs
-      {
+      have s1 : List.map V xs = List.map (V' ∘ σ') xs :=
+      by
         simp only [List.map_eq_map_iff]
         intro x a1
         simp
@@ -185,7 +185,6 @@ theorem substitution_theorem_admits_var_all_rec_aux
         · right
           simp only [h3 x c3]
           exact h1 x a1 c3
-      }
 
       simp only [s1]
       apply holds_coincide_var

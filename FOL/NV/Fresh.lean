@@ -52,7 +52,7 @@ def fresh
   if h : x ∈ xs
   then
     have : finset_var_name_max_len xs - x.length < finset_var_name_max_len xs + 1 - x.length :=
-      by
+    by
       apply Nat.sub_lt_sub_right
       · apply finset_var_name_max_len_mem
         exact h
@@ -70,7 +70,7 @@ lemma fresh_not_mem
   if h : x ∈ xs
   then
   have : finset_var_name_max_len xs - x.length < finset_var_name_max_len xs + 1 - x.length :=
-    by
+  by
     apply Nat.sub_lt_sub_right
     · apply finset_var_name_max_len_mem
       exact h

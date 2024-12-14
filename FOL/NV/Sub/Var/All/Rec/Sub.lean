@@ -186,11 +186,12 @@ theorem substitution_theorem_sub_var_all_rec
 
           simp only [sub_var_all_rec_free_var_set_eq_free_var_set_image] at s0
 
-          have s1 : σ v ∈ Finset.image (Function.updateITE σ x x) (free_var_set phi)
-          apply Finset.mem_image_update
-          · exact c2
-          · simp only [← var_is_free_in_iff_mem_free_var_set]
-            exact a1
+          have s1 : σ v ∈ Finset.image (Function.updateITE σ x x) (free_var_set phi) :=
+          by
+            apply Finset.mem_image_update
+            · exact c2
+            · simp only [← var_is_free_in_iff_mem_free_var_set]
+              exact a1
 
           contradiction
         · simp only [Function.updateITE]

@@ -246,13 +246,14 @@ theorem substitution_theorem_is_sub_var_all_ind_aux
         apply holds_coincide_var
         intro v a1
 
-        have s1 : List.map V xs' = List.map (V' ∘ σ') xs'
-        simp only [List.map_eq_map_iff]
-        intro x a2
-        by_cases c3 : x ∈ binders'
-        · exact h2 x c3
-        · apply h3
-          exact ih_1 x a2 c3
+        have s1 : List.map V xs' = List.map (V' ∘ σ') xs' :=
+        by
+          simp only [List.map_eq_map_iff]
+          intro x a2
+          by_cases c3 : x ∈ binders'
+          · exact h2 x c3
+          · apply h3
+            exact ih_1 x a2 c3
 
         simp only [s1]
         apply Function.updateListITE_mem_eq_len

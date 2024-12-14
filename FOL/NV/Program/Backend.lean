@@ -885,8 +885,8 @@ theorem soundness
     simp only [holds]
     intro a2 d
 
-    have s1 : holds D I (Function.updateITE V v d) E phi ↔ holds D I V E phi
-    {
+    have s1 : holds D I (Function.updateITE V v d) E phi ↔ holds D I V E phi :=
+    by
       apply holds_coincide_var
       intro v' a1
       simp only [Function.updateITE]
@@ -896,7 +896,6 @@ theorem soundness
         contradiction
       case _ c1 =>
         rfl
-    }
 
     simp only [s1]
     exact a2

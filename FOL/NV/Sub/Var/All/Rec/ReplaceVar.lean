@@ -65,9 +65,10 @@ theorem substitution_theorem_replace_var_all_rec_inj
     first | apply forall_congr' | apply exists_congr
     intro a
 
-    have s1 : Function.updateITE V (σ x) a ∘ σ = Function.updateITE (V ∘ σ) x a
-    apply Function.updateITE_comp_right_injective
-    apply h1
+    have s1 : Function.updateITE V (σ x) a ∘ σ = Function.updateITE (V ∘ σ) x a :=
+    by
+      apply Function.updateITE_comp_right_injective
+      apply h1
 
     simp only [← s1]
     apply phi_ih
