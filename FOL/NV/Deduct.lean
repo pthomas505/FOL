@@ -4,13 +4,11 @@ import FOL.NV.Sub.Var.One.Rec.Admits
 set_option autoImplicit false
 
 
---namespace FOL.NV.Margaris
-
 open Formula_
 
 
 /--
-  `is_prop_axiom F` := True if and only if `F` is a logical axiom of classical propositional logic.
+  `is_prop_axiom F` := True if and only if `F` is an axiom of classical propositional logic.
 -/
 inductive is_prop_axiom : Formula_ → Prop
   -- ⊢ ⊤
