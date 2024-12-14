@@ -119,7 +119,6 @@ theorem substitution_theorem_admits_pred_all_rec_opt_aux
       simp only [holds]
     case _ c1 =>
       simp only [holds]
-
   case eq_ x y =>
     simp only [replace_pred_all_rec_opt]
     simp only [holds]
@@ -139,15 +138,14 @@ theorem substitution_theorem_admits_pred_all_rec_opt_aux
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
     simp only [admits_pred_all_rec_opt_aux] at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
     simp only [replace_pred_all_rec_opt]
     simp only [holds]
 
-    cases h1
-    case intro h1_left h1_right =>
-      congr! 1
-      · exact phi_ih V binders h1_left h2
-      · exact psi_ih V binders h1_right h2
+    congr! 1
+    · exact phi_ih V binders h1_left h2
+    · exact psi_ih V binders h1_right h2
   case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp only [admits_pred_all_rec_opt_aux] at h1
 
@@ -159,11 +157,9 @@ theorem substitution_theorem_admits_pred_all_rec_opt_aux
     intro v a1
     simp only [Function.updateITE]
     simp at a1
-    push_neg at a1
-    cases a1
-    case h.intro a1_left a1_right =>
-      simp only [if_neg a1_right]
-      exact h2 v a1_left
+    obtain ⟨a1_left, a1_right⟩ := a1
+    simp only [if_neg a1_right]
+    exact h2 v a1_left
   case def_ X xs =>
     cases E
     case nil =>
