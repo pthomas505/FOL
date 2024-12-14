@@ -252,9 +252,9 @@ example
 
 theorem T_13_5
   (P : Formula_) :
-  IsProof (P.imp_ P) :=
+  is_proof_v1 (P.imp_ P) :=
   by
-  simp only [IsProof]
+  simp only [is_proof_v1]
   apply is_deduct_v1.mp_ (P.imp_ (P.imp_ P))
   · apply is_deduct_v1.mp_ (P.imp_ ((P.imp_ P).imp_ P))
     · apply is_deduct_v1.axiom_
@@ -269,7 +269,7 @@ alias prop_id := T_13_5
 
 theorem T_13_6_no_deduct
   (P Q : Formula_) :
-  IsProof (P.not_.imp_ (P.imp_ Q)) :=
+  is_proof_v1 (P.not_.imp_ (P.imp_ Q)) :=
   by
   apply is_deduct_v1.mp_ (P.not_.imp_ (Q.not_.imp_ P.not_))
   · apply is_deduct_v1.mp_ (P.not_.imp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q)))
@@ -318,7 +318,7 @@ theorem T_14_10_comm
 
 theorem C_14_11
   (P : Formula_)
-  (h1 : IsProof P) :
+  (h1 : is_proof_v1 P) :
   ∀ Δ : Set Formula_, is_deduct_v1 Δ P :=
   by
   intro Δ
@@ -370,9 +370,9 @@ alias deduction_theorem := T_14_3
 
 theorem T_13_6
   (P Q : Formula_) :
-  IsProof (P.not_.imp_ (P.imp_ Q)) :=
+  is_proof_v1 (P.not_.imp_ (P.imp_ Q)) :=
   by
-  simp only [IsProof]
+  simp only [is_proof_v1]
   apply deduction_theorem
   apply is_deduct_v1.mp_ (Q.not_.imp_ P.not_)
   · apply is_deduct_v1.axiom_
@@ -386,9 +386,9 @@ theorem T_13_6
 
 theorem T_14_5
   (P : Formula_) :
-  IsProof (P.not_.not_.imp_ P) :=
+  is_proof_v1 (P.not_.not_.imp_ P) :=
   by
-  simp only [IsProof]
+  simp only [is_proof_v1]
   apply deduction_theorem
   apply is_deduct_v1.mp_ P.not_.not_
   · apply is_deduct_v1.mp_ (P.not_.imp_ P.not_.not_.not_)
@@ -405,9 +405,9 @@ theorem T_14_5
 
 theorem T_14_6
   (P : Formula_) :
-  IsProof (P.imp_ P.not_.not_) :=
+  is_proof_v1 (P.imp_ P.not_.not_) :=
   by
-  simp only [IsProof]
+  simp only [is_proof_v1]
   apply is_deduct_v1.mp_ (P.not_.not_.not_.imp_ P.not_)
   · apply is_deduct_v1.axiom_
     exact is_axiom_v1.prop_3_ P.not_.not_ P
@@ -417,9 +417,9 @@ theorem T_14_6
 
 theorem T_14_7
   (P Q : Formula_) :
-  IsProof ((P.imp_ Q).imp_ (Q.not_.imp_ P.not_)) :=
+  is_proof_v1 ((P.imp_ Q).imp_ (Q.not_.imp_ P.not_)) :=
   by
-  simp only [IsProof]
+  simp only [is_proof_v1]
   apply deduction_theorem
   apply is_deduct_v1.mp_ (P.not_.not_.imp_ Q.not_.not_)
   · apply is_deduct_v1.axiom_
@@ -440,9 +440,9 @@ theorem T_14_7
 
 theorem T_14_8
   (Q R : Formula_) :
-  IsProof (Q.imp_ (R.not_.imp_ (Q.imp_ R).not_)) :=
+  is_proof_v1 (Q.imp_ (R.not_.imp_ (Q.imp_ R).not_)) :=
   by
-  simp only [IsProof]
+  simp only [is_proof_v1]
   apply deduction_theorem
   apply is_deduct_v1.mp_ ((Q.imp_ R).imp_ R)
   · apply proof_imp_deduct
@@ -457,9 +457,9 @@ theorem T_14_8
 
 theorem T_14_9
   (P S : Formula_) :
-  IsProof ((S.imp_ P).imp_ ((S.not_.imp_ P).imp_ P)) :=
+  is_proof_v1 ((S.imp_ P).imp_ ((S.not_.imp_ P).imp_ P)) :=
   by
-  simp only [IsProof]
+  simp only [is_proof_v1]
   apply deduction_theorem
   apply is_deduct_v1.mp_ (P.not_.imp_ (S.not_.imp_ P).not_)
   · apply is_deduct_v1.axiom_
@@ -509,7 +509,7 @@ theorem T_14_12
 theorem C_14_14
   (P Q : Formula_)
   (Γ : Set Formula_)
-  (h1 : IsProof P)
+  (h1 : is_proof_v1 P)
   (h2 : is_deduct_v1 Γ (P.imp_ Q)) :
   is_deduct_v1 Γ Q := by
   apply is_deduct_v1.mp_ P
@@ -524,7 +524,7 @@ theorem C_14_15
   (P Q : Formula_)
   (Δ : Set Formula_)
   (h1 : is_deduct_v1 Δ P)
-  (h2 : IsProof (P.imp_ Q)) :
+  (h2 : is_proof_v1 (P.imp_ Q)) :
   is_deduct_v1 Δ Q := by
   apply is_deduct_v1.mp_ P
   · apply proof_imp_deduct
@@ -554,12 +554,12 @@ theorem C_14_17
   (Q : Formula_)
   (Γ : Set Formula_)
   (h1 : is_deduct_v1 Γ Q)
-  (h2 : ∀ P : Formula_, P ∈ Γ → IsProof P) :
-  IsProof Q :=
+  (h2 : ∀ P : Formula_, P ∈ Γ → is_proof_v1 P) :
+  is_proof_v1 Q :=
   by
-  simp only [IsProof] at h2
+  simp only [is_proof_v1] at h2
 
-  simp only [IsProof]
+  simp only [is_proof_v1]
   exact T_14_16 Q ∅ Γ h1 h2
 
 
@@ -1063,9 +1063,9 @@ theorem propCompleteAux
 theorem prop_complete
   (P : Formula_)
   (h1 : P.IsTautoPrime) :
-  IsProof P :=
+  is_proof_v1 P :=
   by
-  simp only [IsProof]
+  simp only [is_proof_v1]
   apply propCompleteAux P P.primeSet
   · rfl
   · intro V

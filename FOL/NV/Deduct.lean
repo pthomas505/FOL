@@ -202,7 +202,7 @@ inductive is_deduct_v1 (Δ : Set Formula_) : Formula_ → Prop
 /--
   IsProof F := True if and only if there is a proof of F in classical first order logic.
 -/
-def IsProof (F : Formula_) : Prop :=
+def is_proof_v1 (F : Formula_) : Prop :=
   is_deduct_v1 ∅ F
 
 
