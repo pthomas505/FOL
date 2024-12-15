@@ -94,7 +94,7 @@ def Formula_.is_tauto_prime (P : Formula_) : Prop :=
   ∀ V : PropValuation_, eval_prime V P
 
 
-def eval_primeFfToNot
+def eval_prime_ff_to_not
   (V : PropValuation_)
   (P : Formula_) :
   Formula_ :=
@@ -746,8 +746,8 @@ theorem L_15_7
   (V : PropValuation_)
   (Δ_U' : Set Formula_)
   (h1 : F.prime_set.toSet ⊆ Δ_U)
-  (h2 : Δ_U' = Δ_U.image (eval_primeFfToNot V))
-  (h3 : F' = eval_primeFfToNot V F) :
+  (h2 : Δ_U' = Δ_U.image (eval_prime_ff_to_not V))
+  (h3 : F' = eval_prime_ff_to_not V F) :
   is_deduct_v1 Δ_U' F' :=
   by
   subst h2
@@ -758,7 +758,7 @@ theorem L_15_7
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
@@ -769,7 +769,7 @@ theorem L_15_7
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
@@ -780,7 +780,7 @@ theorem L_15_7
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
@@ -793,16 +793,16 @@ theorem L_15_7
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     simp
     sorry
   case not_ phi phi_ih =>
     simp only [Formula_.prime_set] at h1
 
-    simp only [eval_primeFfToNot] at phi_ih
+    simp only [eval_prime_ff_to_not] at phi_ih
 
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     simp
     split_ifs
@@ -821,10 +821,10 @@ theorem L_15_7
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_primeFfToNot] at phi_ih
-    simp only [eval_primeFfToNot] at psi_ih
+    simp only [eval_prime_ff_to_not] at phi_ih
+    simp only [eval_prime_ff_to_not] at psi_ih
 
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
 
     cases h1
     case intro h1_left h1_right =>
@@ -865,7 +865,7 @@ theorem L_15_7
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
@@ -876,7 +876,7 @@ theorem L_15_7
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
@@ -903,41 +903,41 @@ theorem T_14_9_Deduct
     exact h2
 
 
-theorem eval_primeFfToNot_of_function_updateIte_true
+theorem eval_prime_ff_to_not_of_function_updateIte_true
   (F F' : Formula_)
   (V : PropValuation_)
   (h1 : F.is_prime) :
-  eval_primeFfToNot (Function.updateITE V F' true) F =
-    Function.updateITE (eval_primeFfToNot V) F' F F :=
+  eval_prime_ff_to_not (Function.updateITE V F' true) F =
+    Function.updateITE (eval_prime_ff_to_not V) F' F F :=
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     unfold Function.updateITE
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     split_ifs <;> tauto
   case true_ | false_ | not_ | imp_ | and_ | or_ | iff_ =>
     simp only [Formula_.is_prime] at h1
 
 
-theorem eval_primeFfToNot_of_function_updateIte_false
+theorem eval_prime_ff_to_not_of_function_updateIte_false
   (F F' : Formula_)
   (V : PropValuation_)
   (h1 : F.is_prime) :
-  eval_primeFfToNot (Function.updateITE V F' false) F =
-    Function.updateITE (eval_primeFfToNot V) F' F.not_ F :=
+  eval_prime_ff_to_not (Function.updateITE V F' false) F =
+    Function.updateITE (eval_prime_ff_to_not V) F' F.not_ F :=
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     unfold Function.updateITE
-    simp only [eval_primeFfToNot]
+    simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     split_ifs <;> tauto
   case true_ | false_ | not_ | imp_ | and_ | or_ | iff_ =>
     simp only [Formula_.is_prime] at h1
 
 
-theorem image_of_eval_primeFfToNot_of_function_updateIte
+theorem image_of_eval_prime_ff_to_not_of_function_updateIte
   (U : Formula_)
   (Δ : Set Formula_)
   (V : PropValuation_)
@@ -945,20 +945,20 @@ theorem image_of_eval_primeFfToNot_of_function_updateIte
   (h1_Δ : ∀ U' : Formula_, U' ∈ Δ → U'.is_prime)
   (h1_U : U.is_prime)
   (h2 : U ∉ Δ) :
-  Δ.image (eval_primeFfToNot (Function.updateITE V U b)) =
-    Δ.image (eval_primeFfToNot V) :=
+  Δ.image (eval_prime_ff_to_not (Function.updateITE V U b)) =
+    Δ.image (eval_prime_ff_to_not V) :=
   by
   apply Set.image_congr
   intro U' a1
   specialize h1_Δ U' a1
   cases b
-  · simp only [eval_primeFfToNot_of_function_updateIte_false U' U V h1_Δ]
+  · simp only [eval_prime_ff_to_not_of_function_updateIte_false U' U V h1_Δ]
     simp only [Function.updateITE]
     simp
     intro a2
     subst a2
     contradiction
-  · simp only [eval_primeFfToNot_of_function_updateIte_true U' U V h1_Δ]
+  · simp only [eval_prime_ff_to_not_of_function_updateIte_true U' U V h1_Δ]
     simp only [Function.updateITE]
     simp
     intro a2
@@ -972,20 +972,20 @@ theorem propCompleteAuxAux
   (h1_Δ : ∀ U' : Formula_, U' ∈ Δ → U'.is_prime)
   (h1_U : U.is_prime)
   (h2 : U ∉ Δ)
-  (h3 : ∀ V : PropValuation_, is_deduct_v1 (Δ.image (eval_primeFfToNot V) ∪ {eval_primeFfToNot V U}) P) :
-  ∀ V : PropValuation_, is_deduct_v1 (Δ.image (eval_primeFfToNot V)) P :=
+  (h3 : ∀ V : PropValuation_, is_deduct_v1 (Δ.image (eval_prime_ff_to_not V) ∪ {eval_prime_ff_to_not V U}) P) :
+  ∀ V : PropValuation_, is_deduct_v1 (Δ.image (eval_prime_ff_to_not V)) P :=
   by
   intro V
-  apply T_14_9_Deduct P U (Δ.image (eval_primeFfToNot V))
+  apply T_14_9_Deduct P U (Δ.image (eval_prime_ff_to_not V))
   · specialize h3 (Function.updateITE V U true)
-    simp only [image_of_eval_primeFfToNot_of_function_updateIte U Δ V true h1_Δ h1_U h2] at h3
-    simp only [eval_primeFfToNot_of_function_updateIte_true U U V h1_U] at h3
+    simp only [image_of_eval_prime_ff_to_not_of_function_updateIte U Δ V true h1_Δ h1_U h2] at h3
+    simp only [eval_prime_ff_to_not_of_function_updateIte_true U U V h1_U] at h3
     simp only [Function.updateITE] at h3
     simp only [eq_self_iff_true, if_true] at h3
     exact h3
   · specialize h3 (Function.updateITE V U Bool.false)
-    simp only [image_of_eval_primeFfToNot_of_function_updateIte U Δ V false h1_Δ h1_U h2] at h3
-    simp only [eval_primeFfToNot_of_function_updateIte_false U U V h1_U] at h3
+    simp only [image_of_eval_prime_ff_to_not_of_function_updateIte U Δ V false h1_Δ h1_U h2] at h3
+    simp only [eval_prime_ff_to_not_of_function_updateIte_false U U V h1_U] at h3
     simp only [Function.updateITE] at h3
     simp only [eq_self_iff_true, if_true] at h3
     exact h3
@@ -995,7 +995,7 @@ theorem propCompleteAux
   (P : Formula_)
   (Δ_U : Finset Formula_)
   (h1 : Δ_U ⊆ P.prime_set)
-  (h2 : ∀ V : PropValuation_, is_deduct_v1 (Δ_U.image (eval_primeFfToNot V)) P) :
+  (h2 : ∀ V : PropValuation_, is_deduct_v1 (Δ_U.image (eval_prime_ff_to_not V)) P) :
   is_deduct_v1 ∅ P :=
   by
   induction Δ_U using Finset.induction_on
@@ -1039,11 +1039,11 @@ theorem prop_complete
   apply propCompleteAux P P.prime_set
   · rfl
   · intro V
-    apply L_15_7 P P P.prime_set V (P.prime_set.image (eval_primeFfToNot V))
+    apply L_15_7 P P P.prime_set V (P.prime_set.image (eval_prime_ff_to_not V))
     · rfl
     · simp only [Finset.coe_image]
     · simp only [Formula_.is_tauto_prime] at h1
-      simp only [eval_primeFfToNot]
+      simp only [eval_prime_ff_to_not]
       specialize h1 V
       simp only [if_pos h1]
 
