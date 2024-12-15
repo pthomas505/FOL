@@ -27,17 +27,17 @@ def Formula_.is_prime : Formula_ → Prop
   | def_ _ _ => True
 
 
-def Formula_.primeSet : Formula_ → Finset Formula_
+def Formula_.prime_set : Formula_ → Finset Formula_
   | pred_const_ X xs => {pred_const_ X xs}
   | pred_var_ X xs => {pred_var_ X xs}
   | eq_ x y => {eq_ x y}
   | true_ => ∅
   | false_ => ∅
-  | not_ phi => phi.primeSet
-  | imp_ phi psi => phi.primeSet ∪ psi.primeSet
-  | and_ phi psi => phi.primeSet ∪ psi.primeSet
-  | or_ phi psi => phi.primeSet ∪ psi.primeSet
-  | iff_ phi psi => phi.primeSet ∪ psi.primeSet
+  | not_ phi => phi.prime_set
+  | imp_ phi psi => phi.prime_set ∪ psi.prime_set
+  | and_ phi psi => phi.prime_set ∪ psi.prime_set
+  | or_ phi psi => phi.prime_set ∪ psi.prime_set
+  | iff_ phi psi => phi.prime_set ∪ psi.prime_set
   | forall_ x phi => {forall_ x phi}
   | exists_ x phi => {exists_ x phi}
   | def_ X xs => {def_ X xs}
@@ -119,12 +119,12 @@ theorem evalPrime_prime
 example
   (F : Formula_)
   (V V' : VarBoolAssignment)
-  (h1 : ∀ H : Formula_, H ∈ F.primeSet → V H = V' H) :
+  (h1 : ∀ H : Formula_, H ∈ F.prime_set → V H = V' H) :
   F.evalPrime V ↔ F.evalPrime V' :=
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
 
     simp only [Formula_.evalPrime]
     congr! 1
@@ -133,7 +133,7 @@ example
   case true_ | false_ =>
     simp only [Formula_.evalPrime]
   case not_ phi phi_ih =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
 
     simp only [Formula_.evalPrime]
     congr! 1
@@ -143,7 +143,7 @@ example
   | and_ phi psi phi_ih psi_ih
   | or_ phi psi phi_ih psi_ih
   | iff_ phi psi phi_ih psi_ih =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
 
     simp only [Formula_.evalPrime]
@@ -698,43 +698,43 @@ example
     exact is_tauto_mp h1_phi h1_psi h1_ih_1 h1_ih_2
 
 
-theorem mem_primeSet_isPrime
+theorem mem_prime_set_isPrime
   (F F' : Formula_)
-  (h1 : F' ∈ F.primeSet) :
+  (h1 : F' ∈ F.prime_set) :
   F'.is_prime :=
   by
   induction F
   case pred_const_ | pred_var_ =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
     subst h1
     simp only [Formula_.is_prime]
   case true_ | false_ =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
   case eq_ x y =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
     subst h1
     simp only [Formula_.is_prime]
   case not_ phi phi_ih =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     exact phi_ih h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
     tauto
   case forall_ x phi | exists_ x phi =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
     subst h1
     simp only [Formula_.is_prime]
   case def_ =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
     subst h1
     simp only [Formula_.is_prime]
@@ -745,7 +745,7 @@ theorem L_15_7
   (Δ_U : Set Formula_)
   (V : VarBoolAssignment)
   (Δ_U' : Set Formula_)
-  (h1 : F.primeSet.toSet ⊆ Δ_U)
+  (h1 : F.prime_set.toSet ⊆ Δ_U)
   (h2 : Δ_U' = Δ_U.image (evalPrimeFfToNot V))
   (h3 : F' = evalPrimeFfToNot V F) :
   is_deduct_v1 Δ_U' F' :=
@@ -755,7 +755,7 @@ theorem L_15_7
   induction F
   case pred_const_ X xs =>
     let F := pred_const_ X xs
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
 
     simp only [evalPrimeFfToNot]
@@ -766,7 +766,7 @@ theorem L_15_7
     tauto
   case pred_var_ X xs =>
     let F := pred_var_ X xs
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
 
     simp only [evalPrimeFfToNot]
@@ -777,7 +777,7 @@ theorem L_15_7
     tauto
   case eq_ x y =>
     let F := eq_ x y
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
 
     simp only [evalPrimeFfToNot]
@@ -790,7 +790,7 @@ theorem L_15_7
     apply is_deduct_v1.axiom_
     apply is_axiom_v1.prop_true_
   case false_ =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
 
     simp only [evalPrimeFfToNot]
@@ -798,7 +798,7 @@ theorem L_15_7
     simp
     sorry
   case not_ phi phi_ih =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
 
     simp only [evalPrimeFfToNot] at phi_ih
 
@@ -818,7 +818,7 @@ theorem L_15_7
       simp at phi_ih
       exact phi_ih h1
   case imp_ phi psi phi_ih psi_ih =>
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
 
     simp only [evalPrimeFfToNot] at phi_ih
@@ -862,7 +862,7 @@ theorem L_15_7
   case forall_ x phi phi_ih =>
     let F := forall_ x phi
 
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
 
     simp only [evalPrimeFfToNot]
@@ -873,7 +873,7 @@ theorem L_15_7
     tauto
   case def_ X xs =>
     let F := def_ X xs
-    simp only [Formula_.primeSet] at h1
+    simp only [Formula_.prime_set] at h1
     simp at h1
 
     simp only [evalPrimeFfToNot]
@@ -994,7 +994,7 @@ theorem propCompleteAuxAux
 theorem propCompleteAux
   (P : Formula_)
   (Δ_U : Finset Formula_)
-  (h1 : Δ_U ⊆ P.primeSet)
+  (h1 : Δ_U ⊆ P.prime_set)
   (h2 : ∀ V : VarBoolAssignment, is_deduct_v1 (Δ_U.image (evalPrimeFfToNot V)) P) :
   is_deduct_v1 ∅ P :=
   by
@@ -1017,10 +1017,10 @@ theorem propCompleteAux
         simp
         apply propCompleteAuxAux P U Δ_U
         · intro U' a1
-          apply mem_primeSet_isPrime P U'
+          apply mem_prime_set_isPrime P U'
           apply h1_right
           exact a1
-        · apply mem_primeSet_isPrime P U
+        · apply mem_prime_set_isPrime P U
           exact h1_left
         · exact Δ_U_1
         · simp
@@ -1036,10 +1036,10 @@ theorem prop_complete
   is_proof_v1 P :=
   by
   simp only [is_proof_v1]
-  apply propCompleteAux P P.primeSet
+  apply propCompleteAux P P.prime_set
   · rfl
   · intro V
-    apply L_15_7 P P P.primeSet V (P.primeSet.image (evalPrimeFfToNot V))
+    apply L_15_7 P P P.prime_set V (P.prime_set.image (evalPrimeFfToNot V))
     · rfl
     · simp only [Finset.coe_image]
     · simp only [Formula_.IsTautoPrime] at h1
