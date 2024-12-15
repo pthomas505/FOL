@@ -159,12 +159,12 @@ example
       exact a1
 
 
-theorem eval_prime_replace_prime_eq_eval_prime_eval_prime
+theorem eval_prime_replace_prime_iff_eval_prime_eval_prime
   (F : Formula_)
   (σ : Formula_ → Formula_)
   (V : PropValuation_) :
   eval_prime V (replace_prime σ F) ↔
-    eval_prime (fun H : Formula_ => eval_prime V (σ H)) F :=
+    eval_prime (fun (H : Formula_) => eval_prime V (σ H)) F :=
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
@@ -187,7 +187,7 @@ theorem eval_prime_replace_prime_eq_eval_prime_eval_prime
     congr! 1
 
 
-theorem isTautoPrime_imp_isTautoPrime_replace_prime
+example
   (P : Formula_)
   (h1 : P.is_tauto_prime)
   (σ : Formula_ → Formula_) :
@@ -197,7 +197,7 @@ theorem isTautoPrime_imp_isTautoPrime_replace_prime
 
   simp only [Formula_.is_tauto_prime]
   intro V
-  simp only [eval_prime_replace_prime_eq_eval_prime_eval_prime P σ V]
+  simp only [eval_prime_replace_prime_iff_eval_prime_eval_prime P σ V]
   apply h1
 
 
@@ -209,7 +209,7 @@ example
   eval_prime V (replace_prime (Function.updateITE σ R P) S) ↔
     eval_prime V (replace_prime (Function.updateITE σ R Q) S) :=
   by
-  simp only [eval_prime_replace_prime_eq_eval_prime_eval_prime]
+  simp only [eval_prime_replace_prime_iff_eval_prime_eval_prime]
   congr! 1
   funext Q'
   simp only [Function.updateITE]
