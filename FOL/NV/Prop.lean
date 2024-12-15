@@ -59,11 +59,11 @@ def Formula_.replace_prime (σ : Formula_ → Formula_) : Formula_ → Formula_
   | def_ X xs => σ (def_ X xs)
 
 
-def VarBoolAssignment := Formula_ → Bool
+def PropValuation_ := Formula_ → Bool
   deriving Inhabited
 
 
-def Formula_.evalPrime (V : VarBoolAssignment) : Formula_ → Prop
+def Formula_.evalPrime (V : PropValuation_) : Formula_ → Prop
   | pred_const_ X xs => V (pred_const_ X xs)
   | pred_var_ X xs => V (pred_var_ X xs)
   | eq_ x y => V (eq_ x y)
@@ -80,7 +80,7 @@ def Formula_.evalPrime (V : VarBoolAssignment) : Formula_ → Prop
 
 
 instance
-  (V : VarBoolAssignment)
+  (V : PropValuation_)
   (F : Formula_) :
   Decidable (Formula_.evalPrime V F) :=
   by
@@ -91,11 +91,11 @@ instance
 
 
 def Formula_.IsTautoPrime (P : Formula_) : Prop :=
-  ∀ V : VarBoolAssignment, P.evalPrime V
+  ∀ V : PropValuation_, P.evalPrime V
 
 
 def evalPrimeFfToNot
-  (V : VarBoolAssignment)
+  (V : PropValuation_)
   (P : Formula_) :
   Formula_ :=
   if Formula_.evalPrime V P
@@ -105,7 +105,7 @@ def evalPrimeFfToNot
 
 theorem evalPrime_prime
   (F : Formula_)
-  (V : VarBoolAssignment)
+  (V : PropValuation_)
   (h1 : F.is_prime) :
   F.evalPrime V = V F :=
   by
@@ -118,7 +118,7 @@ theorem evalPrime_prime
 
 example
   (F : Formula_)
-  (V V' : VarBoolAssignment)
+  (V V' : PropValuation_)
   (h1 : ∀ H : Formula_, H ∈ F.prime_set → V H = V' H) :
   F.evalPrime V ↔ F.evalPrime V' :=
   by
@@ -163,7 +163,7 @@ example
 theorem evalPrime_replace_prime_eq_evalPrime_evalPrime
   (F : Formula_)
   (σ : Formula_ → Formula_)
-  (V : VarBoolAssignment) :
+  (V : PropValuation_) :
   (F.replace_prime σ).evalPrime V ↔
     F.evalPrime fun H : Formula_ => (σ H).evalPrime V :=
   by
@@ -204,7 +204,7 @@ theorem isTautoPrime_imp_isTautoPrime_replace_prime
 
 example
   (P Q R S : Formula_)
-  (V : VarBoolAssignment)
+  (V : PropValuation_)
   (σ : Formula_ → Formula_)
   (h1 : P.evalPrime V ↔ Q.evalPrime V) :
   (S.replace_prime (Function.updateITE σ R P)).evalPrime V ↔
@@ -535,7 +535,7 @@ theorem C_14_17
 
 theorem eval_not
   (P : Formula_)
-  (V : VarBoolAssignment) :
+  (V : PropValuation_) :
   Formula_.evalPrime V (not_ P) ↔
     ¬ Formula_.evalPrime V P :=
   by
@@ -544,7 +544,7 @@ theorem eval_not
 
 theorem eval_imp
   (P Q : Formula_)
-  (V : VarBoolAssignment) :
+  (V : PropValuation_) :
   Formula_.evalPrime V (imp_ P Q) ↔
     (Formula_.evalPrime V P → Formula_.evalPrime V Q) :=
   by
@@ -552,7 +552,7 @@ theorem eval_imp
 
 
 theorem eval_false
-  (V : VarBoolAssignment) :
+  (V : PropValuation_) :
   Formula_.evalPrime V false_ ↔
     False :=
   by
@@ -561,7 +561,7 @@ theorem eval_false
 
 theorem eval_and
   (P Q : Formula_)
-  (V : VarBoolAssignment) :
+  (V : PropValuation_) :
   Formula_.evalPrime V (and_ P Q) ↔
     (Formula_.evalPrime V P ∧ Formula_.evalPrime V Q) :=
   by
@@ -570,7 +570,7 @@ theorem eval_and
 
 theorem eval_or
   (P Q : Formula_)
-  (V : VarBoolAssignment) :
+  (V : PropValuation_) :
   Formula_.evalPrime V (or_ P Q) ↔
     (Formula_.evalPrime V P ∨ Formula_.evalPrime V Q) :=
   by
@@ -579,7 +579,7 @@ theorem eval_or
 
 theorem eval_iff
   (P Q : Formula_)
-  (V : VarBoolAssignment) :
+  (V : PropValuation_) :
   Formula_.evalPrime V (iff_ P Q) ↔
     (Formula_.evalPrime V P ↔ Formula_.evalPrime V Q) :=
   by
@@ -743,7 +743,7 @@ theorem mem_prime_set_isPrime
 theorem L_15_7
   (F F' : Formula_)
   (Δ_U : Set Formula_)
-  (V : VarBoolAssignment)
+  (V : PropValuation_)
   (Δ_U' : Set Formula_)
   (h1 : F.prime_set.toSet ⊆ Δ_U)
   (h2 : Δ_U' = Δ_U.image (evalPrimeFfToNot V))
@@ -905,7 +905,7 @@ theorem T_14_9_Deduct
 
 theorem evalPrimeFfToNot_of_function_updateIte_true
   (F F' : Formula_)
-  (V : VarBoolAssignment)
+  (V : PropValuation_)
   (h1 : F.is_prime) :
   evalPrimeFfToNot (Function.updateITE V F' true) F =
     Function.updateITE (evalPrimeFfToNot V) F' F F :=
@@ -922,7 +922,7 @@ theorem evalPrimeFfToNot_of_function_updateIte_true
 
 theorem evalPrimeFfToNot_of_function_updateIte_false
   (F F' : Formula_)
-  (V : VarBoolAssignment)
+  (V : PropValuation_)
   (h1 : F.is_prime) :
   evalPrimeFfToNot (Function.updateITE V F' false) F =
     Function.updateITE (evalPrimeFfToNot V) F' F.not_ F :=
@@ -940,7 +940,7 @@ theorem evalPrimeFfToNot_of_function_updateIte_false
 theorem image_of_evalPrimeFfToNot_of_function_updateIte
   (U : Formula_)
   (Δ : Set Formula_)
-  (V : VarBoolAssignment)
+  (V : PropValuation_)
   (b : Bool)
   (h1_Δ : ∀ U' : Formula_, U' ∈ Δ → U'.is_prime)
   (h1_U : U.is_prime)
@@ -972,8 +972,8 @@ theorem propCompleteAuxAux
   (h1_Δ : ∀ U' : Formula_, U' ∈ Δ → U'.is_prime)
   (h1_U : U.is_prime)
   (h2 : U ∉ Δ)
-  (h3 : ∀ V : VarBoolAssignment, is_deduct_v1 (Δ.image (evalPrimeFfToNot V) ∪ {evalPrimeFfToNot V U}) P) :
-  ∀ V : VarBoolAssignment, is_deduct_v1 (Δ.image (evalPrimeFfToNot V)) P :=
+  (h3 : ∀ V : PropValuation_, is_deduct_v1 (Δ.image (evalPrimeFfToNot V) ∪ {evalPrimeFfToNot V U}) P) :
+  ∀ V : PropValuation_, is_deduct_v1 (Δ.image (evalPrimeFfToNot V)) P :=
   by
   intro V
   apply T_14_9_Deduct P U (Δ.image (evalPrimeFfToNot V))
@@ -995,7 +995,7 @@ theorem propCompleteAux
   (P : Formula_)
   (Δ_U : Finset Formula_)
   (h1 : Δ_U ⊆ P.prime_set)
-  (h2 : ∀ V : VarBoolAssignment, is_deduct_v1 (Δ_U.image (evalPrimeFfToNot V)) P) :
+  (h2 : ∀ V : PropValuation_, is_deduct_v1 (Δ_U.image (evalPrimeFfToNot V)) P) :
   is_deduct_v1 ∅ P :=
   by
   induction Δ_U using Finset.induction_on
