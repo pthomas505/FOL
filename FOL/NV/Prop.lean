@@ -43,17 +43,17 @@ def Formula_.prime_set : Formula_ → Finset Formula_
   | def_ X xs => {def_ X xs}
 
 
-def Formula_.replace_prime (σ : Formula_ → Formula_) : Formula_ → Formula_
+def replace_prime (σ : Formula_ → Formula_) : Formula_ → Formula_
   | pred_const_ X xs => σ (pred_const_ X xs)
   | pred_var_ X xs => σ (pred_var_ X xs)
   | eq_ x y => σ (eq_ x y)
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (phi.replace_prime σ)
-  | imp_ phi psi => imp_ (phi.replace_prime σ) (psi.replace_prime σ)
-  | and_ phi psi => and_ (phi.replace_prime σ) (psi.replace_prime σ)
-  | or_ phi psi => or_ (phi.replace_prime σ) (psi.replace_prime σ)
-  | iff_ phi psi => iff_ (phi.replace_prime σ) (psi.replace_prime σ)
+  | not_ phi => not_ (replace_prime σ phi)
+  | imp_ phi psi => imp_ (replace_prime σ phi) (replace_prime σ psi)
+  | and_ phi psi => and_ (replace_prime σ phi) (replace_prime σ psi)
+  | or_ phi psi => or_ (replace_prime σ phi) (replace_prime σ psi)
+  | iff_ phi psi => iff_ (replace_prime σ phi) (replace_prime σ psi)
   | forall_ x phi => σ (forall_ x phi)
   | exists_ x phi => σ (exists_ x phi)
   | def_ X xs => σ (def_ X xs)
@@ -164,18 +164,18 @@ theorem evalPrime_replace_prime_eq_evalPrime_evalPrime
   (F : Formula_)
   (σ : Formula_ → Formula_)
   (V : PropValuation_) :
-  (F.replace_prime σ).evalPrime V ↔
+  (replace_prime σ F).evalPrime V ↔
     F.evalPrime fun H : Formula_ => (σ H).evalPrime V :=
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
-    simp only [Formula_.replace_prime]
+    simp only [replace_prime]
     simp only [Formula_.evalPrime]
     simp
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    simp only [Formula_.replace_prime]
+    simp only [replace_prime]
     simp only [Formula_.evalPrime]
     congr! 1
   case
@@ -183,7 +183,7 @@ theorem evalPrime_replace_prime_eq_evalPrime_evalPrime
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [Formula_.replace_prime]
+    simp only [replace_prime]
     simp only [Formula_.evalPrime]
     congr! 1
 
@@ -192,7 +192,7 @@ theorem isTautoPrime_imp_isTautoPrime_replace_prime
   (P : Formula_)
   (h1 : P.IsTautoPrime)
   (σ : Formula_ → Formula_) :
-  (Formula_.replace_prime σ P).IsTautoPrime :=
+  (replace_prime σ P).IsTautoPrime :=
   by
   simp only [Formula_.IsTautoPrime] at h1
 
@@ -207,8 +207,8 @@ example
   (V : PropValuation_)
   (σ : Formula_ → Formula_)
   (h1 : P.evalPrime V ↔ Q.evalPrime V) :
-  (S.replace_prime (Function.updateITE σ R P)).evalPrime V ↔
-    (S.replace_prime (Function.updateITE σ R Q)).evalPrime V :=
+  (replace_prime (Function.updateITE σ R P) S).evalPrime V ↔
+    (replace_prime (Function.updateITE σ R Q) S).evalPrime V :=
   by
   simp only [evalPrime_replace_prime_eq_evalPrime_evalPrime]
   congr! 1
