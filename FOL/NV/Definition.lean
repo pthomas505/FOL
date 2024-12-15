@@ -46,33 +46,33 @@ instance : HAppend Env_ Env_ Env_ :=
 
 
 /--
-  `Formula_.all_def_in_env E F` := True if and only if every definition that occurs in the formula `F` is in the environment `E`.
+  `all_def_in_env E F` := True if and only if every definition that occurs in the formula `F` is in the environment `E`.
 -/
-def Formula_.all_def_in_env (E : Env_) : Formula_ → Prop
+def all_def_in_env (E : Env_) : Formula_ → Prop
 | pred_const_ _ _ => True
 | pred_var_ _ _ => True
 | eq_ _ _ => True
 | true_ => True
 | false_ => True
-| not_ phi => phi.all_def_in_env E
+| not_ phi => all_def_in_env E phi
 | imp_ phi psi =>
-    phi.all_def_in_env E ∧
-    psi.all_def_in_env E
+    all_def_in_env E phi ∧
+    all_def_in_env E psi
 | and_ phi psi =>
-    phi.all_def_in_env E ∧
-    psi.all_def_in_env E
+    all_def_in_env E phi ∧
+    all_def_in_env E psi
 | or_ phi psi =>
-    phi.all_def_in_env E ∧
-    psi.all_def_in_env E
+    all_def_in_env E phi ∧
+    all_def_in_env E psi
 | iff_ phi psi =>
-    phi.all_def_in_env E ∧
-    psi.all_def_in_env E
-| forall_ _ phi => phi.all_def_in_env E
-| exists_ _ phi => phi.all_def_in_env E
+    all_def_in_env E phi ∧
+    all_def_in_env E psi
+| forall_ _ phi => all_def_in_env E phi
+| exists_ _ phi => all_def_in_env E phi
 | def_ X xs =>
   ∃ (d : Definition_), d ∈ E ∧ X = d.name ∧ xs.length = d.args.length
 
-instance (E : Env_) (F : Formula_) : Decidable (F.all_def_in_env E) :=
+instance (E : Env_) (F : Formula_) : Decidable (all_def_in_env E F) :=
   by
   induction F
   all_goals

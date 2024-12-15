@@ -246,7 +246,7 @@ lemma holds_coincide_env
   (E E' : Env_)
   (F : Formula_)
   (h1 : ∃ (E1 : Env_), E' = E1 ++ E)
-  (h2 : F.all_def_in_env E)
+  (h2 : all_def_in_env E F)
   (h3 : E'.nodup_) :
   holds D I V E' F ↔ holds D I V E F :=
   by
