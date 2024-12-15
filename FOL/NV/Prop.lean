@@ -43,17 +43,17 @@ def Formula_.prime_set : Formula_ → Finset Formula_
   | def_ X xs => {def_ X xs}
 
 
-def Formula_.substPrime (σ : Formula_ → Formula_) : Formula_ → Formula_
+def Formula_.replace_prime (σ : Formula_ → Formula_) : Formula_ → Formula_
   | pred_const_ X xs => σ (pred_const_ X xs)
   | pred_var_ X xs => σ (pred_var_ X xs)
   | eq_ x y => σ (eq_ x y)
   | true_ => true_
   | false_ => false_
-  | not_ phi => not_ (phi.substPrime σ)
-  | imp_ phi psi => imp_ (phi.substPrime σ) (psi.substPrime σ)
-  | and_ phi psi => and_ (phi.substPrime σ) (psi.substPrime σ)
-  | or_ phi psi => or_ (phi.substPrime σ) (psi.substPrime σ)
-  | iff_ phi psi => iff_ (phi.substPrime σ) (psi.substPrime σ)
+  | not_ phi => not_ (phi.replace_prime σ)
+  | imp_ phi psi => imp_ (phi.replace_prime σ) (psi.replace_prime σ)
+  | and_ phi psi => and_ (phi.replace_prime σ) (psi.replace_prime σ)
+  | or_ phi psi => or_ (phi.replace_prime σ) (psi.replace_prime σ)
+  | iff_ phi psi => iff_ (phi.replace_prime σ) (psi.replace_prime σ)
   | forall_ x phi => σ (forall_ x phi)
   | exists_ x phi => σ (exists_ x phi)
   | def_ X xs => σ (def_ X xs)
@@ -160,22 +160,22 @@ example
       exact a1
 
 
-theorem evalPrime_substPrime_eq_evalPrime_evalPrime
+theorem evalPrime_replace_prime_eq_evalPrime_evalPrime
   (F : Formula_)
   (σ : Formula_ → Formula_)
   (V : VarBoolAssignment) :
-  (F.substPrime σ).evalPrime V ↔
+  (F.replace_prime σ).evalPrime V ↔
     F.evalPrime fun H : Formula_ => (σ H).evalPrime V :=
   by
   induction F
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
-    simp only [Formula_.substPrime]
+    simp only [Formula_.replace_prime]
     simp only [Formula_.evalPrime]
     simp
   case true_ | false_ =>
     rfl
   case not_ phi phi_ih =>
-    simp only [Formula_.substPrime]
+    simp only [Formula_.replace_prime]
     simp only [Formula_.evalPrime]
     congr! 1
   case
@@ -183,22 +183,22 @@ theorem evalPrime_substPrime_eq_evalPrime_evalPrime
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [Formula_.substPrime]
+    simp only [Formula_.replace_prime]
     simp only [Formula_.evalPrime]
     congr! 1
 
 
-theorem isTautoPrime_imp_isTautoPrime_substPrime
+theorem isTautoPrime_imp_isTautoPrime_replace_prime
   (P : Formula_)
   (h1 : P.IsTautoPrime)
   (σ : Formula_ → Formula_) :
-  (Formula_.substPrime σ P).IsTautoPrime :=
+  (Formula_.replace_prime σ P).IsTautoPrime :=
   by
   simp only [Formula_.IsTautoPrime] at h1
 
   simp only [Formula_.IsTautoPrime]
   intro V
-  simp only [evalPrime_substPrime_eq_evalPrime_evalPrime P σ V]
+  simp only [evalPrime_replace_prime_eq_evalPrime_evalPrime P σ V]
   apply h1
 
 
@@ -207,10 +207,10 @@ example
   (V : VarBoolAssignment)
   (σ : Formula_ → Formula_)
   (h1 : P.evalPrime V ↔ Q.evalPrime V) :
-  (S.substPrime (Function.updateITE σ R P)).evalPrime V ↔
-    (S.substPrime (Function.updateITE σ R Q)).evalPrime V :=
+  (S.replace_prime (Function.updateITE σ R P)).evalPrime V ↔
+    (S.replace_prime (Function.updateITE σ R Q)).evalPrime V :=
   by
-  simp only [evalPrime_substPrime_eq_evalPrime_evalPrime]
+  simp only [evalPrime_replace_prime_eq_evalPrime_evalPrime]
   congr! 1
   funext Q'
   simp only [Function.updateITE]
