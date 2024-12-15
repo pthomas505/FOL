@@ -78,7 +78,6 @@ def eval_prime (V : PropValuation_) : Formula_ → Prop
   | exists_ x phi => V (exists_ x phi)
   | def_ X xs => V (def_ X xs)
 
-
 instance
   (V : PropValuation_)
   (F : Formula_) :
