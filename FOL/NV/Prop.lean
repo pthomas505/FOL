@@ -8,32 +8,6 @@ set_option autoImplicit false
 open Formula_
 
 
-axiom def_false_ : false_ = not_ true_
-
-/--
-  phi ∨ psi := ¬ phi → psi
--/
-axiom def_or_ (phi psi : Formula_) : or_ phi psi = (not_ phi).imp_ psi
-
-/--
-phi ∧ psi := ¬ ( phi → ¬ psi )
--/
-axiom def_and_ (phi psi : Formula_) : and_ phi psi = not_ (phi.imp_ (not_ psi))
-
-/--
-  phi ↔ psi := ( phi → psi ) ∧ ( psi → phi )
--/
-axiom def_iff_ (phi psi : Formula_) : iff_ phi psi = (phi.imp_ psi).and_ (psi.imp_ phi)
-
-/--
-  ∃ x phi := ¬ ∀ x ¬ phi
--/
-axiom def_exists_ (x : VarName_) (phi : Formula_) : exists_ x phi = not_ (forall_ x (not_ phi))
-
-def def_eq_ (x y : VarName_) : Formula_ :=
-  pred_const_ (PredName_.mk "=") [x, y]
-
-
 /--
   Used for the soundness and completeness proofs of classical propositional logic.
 -/
