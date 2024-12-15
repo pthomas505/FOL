@@ -11,7 +11,7 @@ open Formula_
 /--
   Used for the soundness and completeness proofs of classical propositional logic.
 -/
-def Formula_.IsPrime : Formula_ → Prop
+def Formula_.is_prime : Formula_ → Prop
   | pred_const_ _ _ => True
   | pred_var_ _ _ => True
   | eq_ _ _ => True
@@ -106,12 +106,12 @@ def evalPrimeFfToNot
 theorem evalPrime_prime
   (F : Formula_)
   (V : VarBoolAssignment)
-  (h1 : F.IsPrime) :
+  (h1 : F.is_prime) :
   F.evalPrime V = V F :=
   by
   induction F
   case true_ | false_ | not_ | imp_ | and_ | or_ | iff_ =>
-    simp only [Formula_.IsPrime] at h1
+    simp only [Formula_.is_prime] at h1
   case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
     rfl
 
@@ -701,14 +701,14 @@ example
 theorem mem_primeSet_isPrime
   (F F' : Formula_)
   (h1 : F' ∈ F.primeSet) :
-  F'.IsPrime :=
+  F'.is_prime :=
   by
   induction F
   case pred_const_ | pred_var_ =>
     simp only [Formula_.primeSet] at h1
     simp at h1
     subst h1
-    simp only [Formula_.IsPrime]
+    simp only [Formula_.is_prime]
   case true_ | false_ =>
     simp only [Formula_.primeSet] at h1
     simp at h1
@@ -716,7 +716,7 @@ theorem mem_primeSet_isPrime
     simp only [Formula_.primeSet] at h1
     simp at h1
     subst h1
-    simp only [Formula_.IsPrime]
+    simp only [Formula_.is_prime]
   case not_ phi phi_ih =>
     simp only [Formula_.primeSet] at h1
     exact phi_ih h1
@@ -732,12 +732,12 @@ theorem mem_primeSet_isPrime
     simp only [Formula_.primeSet] at h1
     simp at h1
     subst h1
-    simp only [Formula_.IsPrime]
+    simp only [Formula_.is_prime]
   case def_ =>
     simp only [Formula_.primeSet] at h1
     simp at h1
     subst h1
-    simp only [Formula_.IsPrime]
+    simp only [Formula_.is_prime]
 
 
 theorem L_15_7
@@ -906,7 +906,7 @@ theorem T_14_9_Deduct
 theorem evalPrimeFfToNot_of_function_updateIte_true
   (F F' : Formula_)
   (V : VarBoolAssignment)
-  (h1 : F.IsPrime) :
+  (h1 : F.is_prime) :
   evalPrimeFfToNot (Function.updateITE V F' true) F =
     Function.updateITE (evalPrimeFfToNot V) F' F F :=
   by
@@ -917,13 +917,13 @@ theorem evalPrimeFfToNot_of_function_updateIte_true
     simp only [Formula_.evalPrime]
     split_ifs <;> tauto
   case true_ | false_ | not_ | imp_ | and_ | or_ | iff_ =>
-    simp only [Formula_.IsPrime] at h1
+    simp only [Formula_.is_prime] at h1
 
 
 theorem evalPrimeFfToNot_of_function_updateIte_false
   (F F' : Formula_)
   (V : VarBoolAssignment)
-  (h1 : F.IsPrime) :
+  (h1 : F.is_prime) :
   evalPrimeFfToNot (Function.updateITE V F' false) F =
     Function.updateITE (evalPrimeFfToNot V) F' F.not_ F :=
   by
@@ -934,7 +934,7 @@ theorem evalPrimeFfToNot_of_function_updateIte_false
     simp only [Formula_.evalPrime]
     split_ifs <;> tauto
   case true_ | false_ | not_ | imp_ | and_ | or_ | iff_ =>
-    simp only [Formula_.IsPrime] at h1
+    simp only [Formula_.is_prime] at h1
 
 
 theorem image_of_evalPrimeFfToNot_of_function_updateIte
@@ -942,8 +942,8 @@ theorem image_of_evalPrimeFfToNot_of_function_updateIte
   (Δ : Set Formula_)
   (V : VarBoolAssignment)
   (b : Bool)
-  (h1_Δ : ∀ U' : Formula_, U' ∈ Δ → U'.IsPrime)
-  (h1_U : U.IsPrime)
+  (h1_Δ : ∀ U' : Formula_, U' ∈ Δ → U'.is_prime)
+  (h1_U : U.is_prime)
   (h2 : U ∉ Δ) :
   Δ.image (evalPrimeFfToNot (Function.updateITE V U b)) =
     Δ.image (evalPrimeFfToNot V) :=
@@ -969,8 +969,8 @@ theorem image_of_evalPrimeFfToNot_of_function_updateIte
 theorem propCompleteAuxAux
   (P U : Formula_)
   (Δ : Set Formula_)
-  (h1_Δ : ∀ U' : Formula_, U' ∈ Δ → U'.IsPrime)
-  (h1_U : U.IsPrime)
+  (h1_Δ : ∀ U' : Formula_, U' ∈ Δ → U'.is_prime)
+  (h1_U : U.is_prime)
   (h2 : U ∉ Δ)
   (h3 : ∀ V : VarBoolAssignment, is_deduct_v1 (Δ.image (evalPrimeFfToNot V) ∪ {evalPrimeFfToNot V U}) P) :
   ∀ V : VarBoolAssignment, is_deduct_v1 (Δ.image (evalPrimeFfToNot V)) P :=
