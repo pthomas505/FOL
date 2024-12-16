@@ -233,18 +233,18 @@ example
 
 
 theorem T_13_5
-  (P : Formula_) :
-  is_proof_v1 (P.imp_ P) :=
+  (F : Formula_) :
+  is_proof_v1 (F.imp_ F) :=
   by
   simp only [is_proof_v1]
-  apply is_deduct_v1.mp_ (P.imp_ (P.imp_ P))
-  · apply is_deduct_v1.mp_ (P.imp_ ((P.imp_ P).imp_ P))
+  apply is_deduct_v1.mp_ (F.imp_ (F.imp_ F))
+  · apply is_deduct_v1.mp_ (F.imp_ ((F.imp_ F).imp_ F))
     · apply is_deduct_v1.axiom_
-      exact is_axiom_v1.prop_2_ P (P.imp_ P) P
+      exact is_axiom_v1.prop_2_ F (F.imp_ F) F
     · apply is_deduct_v1.axiom_
-      exact is_axiom_v1.prop_1_ P (P.imp_ P)
+      exact is_axiom_v1.prop_1_ F (F.imp_ F)
   · apply is_deduct_v1.axiom_
-    exact is_axiom_v1.prop_1_ P P
+    exact is_axiom_v1.prop_1_ F F
 
 alias prop_id := T_13_5
 
