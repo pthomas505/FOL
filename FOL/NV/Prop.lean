@@ -471,14 +471,15 @@ theorem deduction_theorem_converse
   is_deduct_v1 (Δ ∪ {P}) Q :=
   by
   apply is_deduct_v1.mp_ P
-  · exact T_14_10 Δ (P.imp_ Q) h1 {P}
+  · apply T_14_10
+    exact h1
   · apply is_deduct_v1.assume_
     simp
 
 
 theorem T_14_12
-  (P Q : Formula_)
   (Δ Γ : Set Formula_)
+  (P Q : Formula_)
   (h1 : is_deduct_v1 Δ P)
   (h2 : is_deduct_v1 Γ (P.imp_ Q)) :
   is_deduct_v1 (Δ ∪ Γ) Q := by
@@ -490,8 +491,8 @@ theorem T_14_12
 
 
 theorem C_14_14
-  (P Q : Formula_)
   (Γ : Set Formula_)
+  (P Q : Formula_)
   (h1 : is_proof_v1 P)
   (h2 : is_deduct_v1 Γ (P.imp_ Q)) :
   is_deduct_v1 Γ Q := by
