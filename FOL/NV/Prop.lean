@@ -144,30 +144,30 @@ example
     congr! 1
     exact phi_ih h1
   case
-    imp_ phi psi phi_ih psi_ih
-  | and_ phi psi phi_ih psi_ih
-  | or_ phi psi phi_ih psi_ih
-  | iff_ phi psi phi_ih psi_ih =>
-    simp only [Formula_.prime_set] at h1
-    simp at h1
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+      simp only [Formula_.prime_set] at h1
+      simp at h1
 
-    have s1 : eval_prime V phi ↔ eval_prime V' phi :=
-    by
-      apply phi_ih
-      intro H a1
-      apply h1
-      tauto
+      have s1 : eval_prime V phi ↔ eval_prime V' phi :=
+      by
+        apply phi_ih
+        intro H a1
+        apply h1
+        tauto
 
-    have s2 : eval_prime V psi ↔ eval_prime V' psi :=
-    by
-      apply psi_ih
-      intro H a1
-      apply h1
-      tauto
+      have s2 : eval_prime V psi ↔ eval_prime V' psi :=
+      by
+        apply psi_ih
+        intro H a1
+        apply h1
+        tauto
 
-    simp only [eval_prime]
-    rw [s1]
-    rw [s2]
+      simp only [eval_prime]
+      rw [s1]
+      rw [s2]
 
 
 theorem eval_prime_replace_prime_iff_eval_prime_eval_prime
@@ -178,7 +178,13 @@ theorem eval_prime_replace_prime_iff_eval_prime_eval_prime
     eval_prime (fun (H : Formula_) => eval_prime V (σ H)) F :=
   by
   induction F
-  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
+  case
+      pred_const_ X xs
+    | pred_var_ X xs
+    | eq_ x y
+    | forall_ x phi ih
+    | exists_ x phi ih
+    | def_ X xs =>
     simp only [replace_prime]
     simp only [eval_prime]
     simp
