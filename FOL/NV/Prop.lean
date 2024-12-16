@@ -103,8 +103,8 @@ def eval_prime_ff_to_not
 
 
 theorem eval_prime_prime
-  (F : Formula_)
   (V : PropValuation_)
+  (F : Formula_)
   (h1 : F.is_prime) :
   eval_prime V F = V F :=
   by
