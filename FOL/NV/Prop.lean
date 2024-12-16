@@ -393,9 +393,9 @@ theorem T_14_6
   simp only [is_proof_v1]
   apply is_deduct_v1.mp_ (P.not_.not_.not_.imp_ P.not_)
   · apply is_deduct_v1.axiom_
-    exact is_axiom_v1.prop_3_ P.not_.not_ P
+    apply is_axiom_v1.prop_3_
   · apply proof_imp_deduct
-    exact T_14_5 P.not_
+    apply T_14_5
 
 
 theorem T_14_7
