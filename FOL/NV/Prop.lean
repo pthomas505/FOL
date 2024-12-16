@@ -90,7 +90,7 @@ instance
 
 
 def Formula_.is_tauto_prime (P : Formula_) : Prop :=
-  ∀ V : PropValuation_, eval_prime V P
+  ∀ (V : PropValuation_), eval_prime V P
 
 
 def eval_prime_ff_to_not
@@ -109,20 +109,26 @@ theorem eval_prime_prime
   eval_prime V F = V F :=
   by
   induction F
-  case true_ | false_ | not_ | imp_ | and_ | or_ | iff_ =>
+  any_goals
     simp only [Formula_.is_prime] at h1
-  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
+  all_goals
     rfl
 
 
 example
   (F : Formula_)
   (V V' : PropValuation_)
-  (h1 : ∀ H : Formula_, H ∈ F.prime_set → V H = V' H) :
+  (h1 : ∀ (H : Formula_), H ∈ F.prime_set → V H = V' H) :
   eval_prime V F ↔ eval_prime V' F :=
   by
   induction F
-  case pred_const_ | pred_var_ | eq_ | forall_ | exists_ | def_ =>
+  case
+      pred_const_ X xs
+    | pred_var_ X xs
+    | eq_ x y
+    | forall_ x phi ih
+    | exists_ x phi ih
+    | def_ X xs =>
     simp only [Formula_.prime_set] at h1
 
     simp only [eval_prime]
@@ -145,18 +151,23 @@ example
     simp only [Formula_.prime_set] at h1
     simp at h1
 
+    have s1 : eval_prime V phi ↔ eval_prime V' phi :=
+    by
+      apply phi_ih
+      intro H a1
+      apply h1
+      tauto
+
+    have s2 : eval_prime V psi ↔ eval_prime V' psi :=
+    by
+      apply psi_ih
+      intro H a1
+      apply h1
+      tauto
+
     simp only [eval_prime]
-    congr! 1
-    · apply phi_ih
-      intro H a1
-      apply h1
-      left
-      exact a1
-    · apply psi_ih
-      intro H a1
-      apply h1
-      right
-      exact a1
+    rw [s1]
+    rw [s2]
 
 
 theorem eval_prime_replace_prime_iff_eval_prime_eval_prime
