@@ -270,7 +270,7 @@ theorem T_14_10
   (F : Formula_)
   (Δ : Set Formula_)
   (h1 : is_deduct_v1 Δ F) :
-  ∀ Γ : Set Formula_, is_deduct_v1 (Δ ∪ Γ) F :=
+  ∀ (Γ : Set Formula_), is_deduct_v1 (Δ ∪ Γ) F :=
   by
   intro Γ
   induction h1
@@ -289,22 +289,23 @@ theorem T_14_10
 
 
 theorem T_14_10_comm
-  (Q : Formula_)
   (Δ : Set Formula_)
-  (h1 : is_deduct_v1 Δ Q) :
-  ∀ Γ : Set Formula_, is_deduct_v1 (Γ ∪ Δ) Q :=
+  (F : Formula_)
+  (h1 : is_deduct_v1 Δ F) :
+  ∀ (Γ : Set Formula_), is_deduct_v1 (Γ ∪ Δ) F :=
   by
   simp only [Set.union_comm]
-  exact T_14_10 Q Δ h1
+  apply T_14_10
+  exact h1
 
 
 theorem C_14_11
-  (P : Formula_)
-  (h1 : is_proof_v1 P) :
-  ∀ Δ : Set Formula_, is_deduct_v1 Δ P :=
+  (F : Formula_)
+  (h1 : is_proof_v1 F) :
+  ∀ (Δ : Set Formula_), is_deduct_v1 Δ F :=
   by
   intro Δ
-  obtain s1 := T_14_10 P ∅ h1 Δ
+  obtain s1 := T_14_10 F ∅ h1 Δ
   simp at s1
   exact s1
 
@@ -313,8 +314,8 @@ alias proof_imp_deduct := C_14_11
 
 -- Deduction Theorem
 theorem T_14_3
-  (P Q : Formula_)
   (Δ : Set Formula_)
+  (P Q : Formula_)
   (h1 : is_deduct_v1 (Δ ∪ {P}) Q) :
   is_deduct_v1 Δ (P.imp_ Q) :=
   by
@@ -322,7 +323,7 @@ theorem T_14_3
   case axiom_ h1_phi h1_1 =>
     apply is_deduct_v1.mp_ h1_phi
     · apply is_deduct_v1.axiom_
-      exact is_axiom_v1.prop_1_ h1_phi P
+      apply is_axiom_v1.prop_1_
     · apply is_deduct_v1.axiom_
       exact h1_1
   case assume_ h1_phi h1_1 =>
@@ -331,11 +332,11 @@ theorem T_14_3
     case inl h1_1 =>
       subst h1_1
       apply proof_imp_deduct
-      exact prop_id h1_phi
+      apply prop_id
     case inr h1_1 =>
       apply is_deduct_v1.mp_ h1_phi
       · apply is_deduct_v1.axiom_
-        exact is_axiom_v1.prop_1_ h1_phi P
+        apply is_axiom_v1.prop_1_
       · apply is_deduct_v1.assume_
         exact h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1
@@ -343,7 +344,7 @@ theorem T_14_3
     apply is_deduct_v1.mp_ (P.imp_ h1_phi)
     · apply is_deduct_v1.mp_ (P.imp_ (h1_phi.imp_ h1_psi))
       · apply is_deduct_v1.axiom_
-        exact is_axiom_v1.prop_2_ P h1_phi h1_psi
+        apply is_axiom_v1.prop_2_
       · exact h1_ih_1
     · exact h1_ih_2
 
