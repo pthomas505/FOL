@@ -359,10 +359,10 @@ theorem T_13_6
   apply deduction_theorem
   apply is_deduct_v1.mp_ (Q.not_.imp_ P.not_)
   · apply is_deduct_v1.axiom_
-    exact is_axiom_v1.prop_3_ Q P
+    apply is_axiom_v1.prop_3_
   · apply is_deduct_v1.mp_ P.not_
     · apply is_deduct_v1.axiom_
-      exact is_axiom_v1.prop_1_ P.not_ Q.not_
+      apply is_axiom_v1.prop_1_
     · apply is_deduct_v1.assume_
       simp
 
