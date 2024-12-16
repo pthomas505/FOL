@@ -83,23 +83,23 @@ instance
   (F : Formula_) :
   Decidable (eval_prime V F) :=
   by
-  induction F generalizing V
+  induction F
   all_goals
     simp only [eval_prime]
     infer_instance
 
 
-def Formula_.is_tauto_prime (P : Formula_) : Prop :=
-  ∀ (V : PropValuation_), eval_prime V P
+def Formula_.is_tauto_prime (F : Formula_) : Prop :=
+  ∀ (V : PropValuation_), eval_prime V F
 
 
 def eval_prime_ff_to_not
   (V : PropValuation_)
-  (P : Formula_) :
+  (F : Formula_) :
   Formula_ :=
-  if eval_prime V P
-  then P
-  else P.not_
+  if eval_prime V F
+  then F
+  else not_ F
 
 
 theorem eval_prime_prime
