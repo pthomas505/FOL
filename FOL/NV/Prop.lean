@@ -267,8 +267,8 @@ theorem T_13_6_no_deduct
 
 
 theorem T_14_10
-  (F : Formula_)
   (Δ : Set Formula_)
+  (F : Formula_)
   (h1 : is_deduct_v1 Δ F) :
   ∀ (Γ : Set Formula_), is_deduct_v1 (Δ ∪ Γ) F :=
   by
@@ -305,7 +305,7 @@ theorem C_14_11
   ∀ (Δ : Set Formula_), is_deduct_v1 Δ F :=
   by
   intro Δ
-  obtain s1 := T_14_10 F ∅ h1 Δ
+  obtain s1 := T_14_10 ∅ F h1 Δ
   simp at s1
   exact s1
 
@@ -471,7 +471,7 @@ theorem deductionTheoremConverse
   is_deduct_v1 (Δ ∪ {P}) Q :=
   by
   apply is_deduct_v1.mp_ P
-  · exact T_14_10 (P.imp_ Q) Δ h1 {P}
+  · exact T_14_10 Δ (P.imp_ Q) h1 {P}
   · apply is_deduct_v1.assume_
     simp
 
