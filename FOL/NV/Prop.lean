@@ -178,6 +178,9 @@ theorem eval_prime_replace_prime_iff_eval_prime_eval_prime
     eval_prime (fun (H : Formula_) => eval_prime V (σ H)) F :=
   by
   induction F
+  all_goals
+    simp only [replace_prime]
+    simp only [eval_prime]
   case
       pred_const_ X xs
     | pred_var_ X xs
@@ -185,23 +188,16 @@ theorem eval_prime_replace_prime_iff_eval_prime_eval_prime
     | forall_ x phi ih
     | exists_ x phi ih
     | def_ X xs =>
-    simp only [replace_prime]
-    simp only [eval_prime]
-    simp
-  case true_ | false_ =>
-    rfl
+    simp only [decide_eq_true_eq]
   case not_ phi phi_ih =>
-    simp only [replace_prime]
-    simp only [eval_prime]
-    congr! 1
+    rw [phi_ih]
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [replace_prime]
-    simp only [eval_prime]
-    congr! 1
+    rw [phi_ih]
+    rw [psi_ih]
 
 
 example
@@ -219,9 +215,9 @@ example
 
 
 example
-  (P Q R S : Formula_)
   (V : PropValuation_)
   (σ : Formula_ → Formula_)
+  (P Q R S : Formula_)
   (h1 : eval_prime V P ↔ eval_prime V Q) :
   eval_prime V (replace_prime (Function.updateITE σ R P) S) ↔
     eval_prime V (replace_prime (Function.updateITE σ R Q) S) :=
