@@ -464,7 +464,7 @@ theorem T_14_9
       simp
 
 
-theorem deductionTheoremConverse
+theorem deduction_theorem_converse
   (P Q : Formula_)
   (Δ : Set Formula_)
   (h1 : is_deduct_v1 Δ (P.imp_ Q)) :
