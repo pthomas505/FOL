@@ -171,9 +171,9 @@ example
 
 
 theorem eval_prime_replace_prime_iff_eval_prime_eval_prime
-  (F : Formula_)
+  (V : PropValuation_)
   (σ : Formula_ → Formula_)
-  (V : PropValuation_) :
+  (F : Formula_) :
   eval_prime V (replace_prime σ F) ↔
     eval_prime (fun (H : Formula_) => eval_prime V (σ H)) F :=
   by
@@ -205,16 +205,16 @@ theorem eval_prime_replace_prime_iff_eval_prime_eval_prime
 
 
 example
-  (P : Formula_)
-  (h1 : P.is_tauto_prime)
-  (σ : Formula_ → Formula_) :
-  (replace_prime σ P).is_tauto_prime :=
+  (σ : Formula_ → Formula_)
+  (F : Formula_)
+  (h1 : F.is_tauto_prime) :
+  (replace_prime σ F).is_tauto_prime :=
   by
   simp only [Formula_.is_tauto_prime] at h1
 
   simp only [Formula_.is_tauto_prime]
   intro V
-  simp only [eval_prime_replace_prime_iff_eval_prime_eval_prime P σ V]
+  simp only [eval_prime_replace_prime_iff_eval_prime_eval_prime]
   apply h1
 
 
