@@ -116,8 +116,8 @@ theorem eval_prime_prime
 
 
 example
-  (F : Formula_)
   (V V' : PropValuation_)
+  (F : Formula_)
   (h1 : ∀ (H : Formula_), H ∈ F.prime_set → V H = V' H) :
   eval_prime V F ↔ eval_prime V' F :=
   by
