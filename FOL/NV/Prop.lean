@@ -552,6 +552,7 @@ theorem C_14_17
   exact T_14_16 ∅ Γ Q h1 h2
 
 
+/-
 theorem eval_not
   (V : PropValuation_)
   (P : Formula_) :
@@ -682,6 +683,7 @@ theorem is_tauto_def_iff
   simp only [is_tauto_prime]
   simp only [eval_iff, eval_not, eval_imp]
   tauto
+-/
 
 
 /-
@@ -695,26 +697,19 @@ example
   induction h1
   case axiom_ h1_phi h1_1 =>
     induction h1_1
-    case prop_true_ =>
-      exact is_tauto_prop_true
-    case prop_1_ h1_1_phi h1_1_psi =>
-      exact is_tauto_prop_1 h1_1_phi h1_1_psi
-    case prop_2_ h1_1_phi h1_1_psi h1_1_chi =>
-      exact is_tauto_prop_2 h1_1_phi h1_1_psi h1_1_chi
-    case prop_3_ h1_1_phi h1_1_psi =>
-      exact is_tauto_prop_3 h1_1_phi h1_1_psi
-    case def_false_ =>
-      exact is_tauto_def_false
-    case def_and_ h1_1_phi h1_1_psi =>
-      exact is_tauto_def_and h1_1_phi h1_1_psi
-    case def_or_ h1_1_phi h1_1_psi =>
-      exact is_tauto_def_or h1_1_phi h1_1_psi
-    case def_iff_ h1_1_phi h1_1_psi =>
-      exact is_tauto_def_iff h1_1_phi h1_1_psi
+    all_goals
+      simp only [is_tauto_prime]
+      simp only [eval_prime]
+      tauto
   case assume_ h1_phi h1_1 =>
     simp at h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1 h1_ih_2 =>
-    exact is_tauto_mp h1_phi h1_psi h1_ih_1 h1_ih_2
+    simp only [is_tauto_prime] at h1_ih_1
+    simp only [eval_prime] at h1_ih_1
+
+    simp only [is_tauto_prime] at h1_ih_2
+
+    tauto
 
 
 theorem mem_prime_set_isPrime
@@ -1071,7 +1066,7 @@ macro "SC" : tactic => `(tactic|(
   apply proof_imp_deduct
   apply prop_complete
   simp only [Formula_.is_tauto_prime]
-  simp only [eval_not, eval_imp]
+  simp only [eval_prime]
   tauto))
 
 
