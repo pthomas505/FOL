@@ -465,8 +465,8 @@ theorem T_14_9
 
 
 theorem deduction_theorem_converse
-  (P Q : Formula_)
   (Δ : Set Formula_)
+  (P Q : Formula_)
   (h1 : is_deduct_v1 Δ (P.imp_ Q)) :
   is_deduct_v1 (Δ ∪ {P}) Q :=
   by
@@ -482,7 +482,8 @@ theorem T_14_12
   (P Q : Formula_)
   (h1 : is_deduct_v1 Δ P)
   (h2 : is_deduct_v1 Γ (P.imp_ Q)) :
-  is_deduct_v1 (Δ ∪ Γ) Q := by
+  is_deduct_v1 (Δ ∪ Γ) Q :=
+  by
   apply is_deduct_v1.mp_ P
   · apply T_14_10_comm
     exact h2
@@ -495,7 +496,8 @@ theorem C_14_14
   (P Q : Formula_)
   (h1 : is_proof_v1 P)
   (h2 : is_deduct_v1 Γ (P.imp_ Q)) :
-  is_deduct_v1 Γ Q := by
+  is_deduct_v1 Γ Q :=
+  by
   apply is_deduct_v1.mp_ P
   · exact h2
   · apply proof_imp_deduct
@@ -505,11 +507,12 @@ alias mp_proof_deduct := C_14_14
 
 
 theorem C_14_15
-  (P Q : Formula_)
   (Δ : Set Formula_)
+  (P Q : Formula_)
   (h1 : is_deduct_v1 Δ P)
   (h2 : is_proof_v1 (P.imp_ Q)) :
-  is_deduct_v1 Δ Q := by
+  is_deduct_v1 Δ Q :=
+  by
   apply is_deduct_v1.mp_ P
   · apply proof_imp_deduct
     exact h2
@@ -519,37 +522,39 @@ alias mp_deduct_proof := C_14_15
 
 
 theorem T_14_16
-  (F : Formula_)
   (Δ Γ : Set Formula_)
+  (F : Formula_)
   (h1 : is_deduct_v1 Γ F)
-  (h2 : ∀ H : Formula_, H ∈ Γ → is_deduct_v1 Δ H) :
+  (h2 : ∀ (H : Formula_), H ∈ Γ → is_deduct_v1 Δ H) :
   is_deduct_v1 Δ F :=
   by
   induction h1
   case axiom_ h1_phi h1_1 =>
     apply is_deduct_v1.axiom_
     exact h1_1
-  case assume_ h1_phi h1_1 => exact h2 h1_phi h1_1
+  case assume_ h1_phi h1_1 =>
+    apply h2
+    exact h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1 h1_ih_2 =>
     exact is_deduct_v1.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
 
 
 theorem C_14_17
-  (Q : Formula_)
   (Γ : Set Formula_)
+  (Q : Formula_)
   (h1 : is_deduct_v1 Γ Q)
-  (h2 : ∀ P : Formula_, P ∈ Γ → is_proof_v1 P) :
+  (h2 : ∀ (P : Formula_), P ∈ Γ → is_proof_v1 P) :
   is_proof_v1 Q :=
   by
   simp only [is_proof_v1] at h2
 
   simp only [is_proof_v1]
-  exact T_14_16 Q ∅ Γ h1 h2
+  exact T_14_16 ∅ Γ Q h1 h2
 
 
 theorem eval_not
-  (P : Formula_)
-  (V : PropValuation_) :
+  (V : PropValuation_)
+  (P : Formula_) :
   eval_prime V (not_ P) ↔
     ¬ eval_prime V P :=
   by
@@ -557,8 +562,8 @@ theorem eval_not
 
 
 theorem eval_imp
-  (P Q : Formula_)
-  (V : PropValuation_) :
+  (V : PropValuation_)
+  (P Q : Formula_) :
   eval_prime V (imp_ P Q) ↔
     (eval_prime V P → eval_prime V Q) :=
   by
@@ -574,8 +579,8 @@ theorem eval_false
 
 
 theorem eval_and
-  (P Q : Formula_)
-  (V : PropValuation_) :
+  (V : PropValuation_)
+  (P Q : Formula_) :
   eval_prime V (and_ P Q) ↔
     (eval_prime V P ∧ eval_prime V Q) :=
   by
@@ -583,8 +588,8 @@ theorem eval_and
 
 
 theorem eval_or
-  (P Q : Formula_)
-  (V : PropValuation_) :
+  (V : PropValuation_)
+  (P Q : Formula_) :
   eval_prime V (or_ P Q) ↔
     (eval_prime V P ∨ eval_prime V Q) :=
   by
@@ -592,8 +597,8 @@ theorem eval_or
 
 
 theorem eval_iff
-  (P Q : Formula_)
-  (V : PropValuation_) :
+  (V : PropValuation_)
+  (P Q : Formula_) :
   eval_prime V (iff_ P Q) ↔
     (eval_prime V P ↔ eval_prime V Q) :=
   by
@@ -603,7 +608,7 @@ theorem eval_iff
 theorem is_tauto_prop_true :
   true_.is_tauto_prime :=
   by
-  simp only [Formula_.is_tauto_prime]
+  simp only [is_tauto_prime]
   simp only [eval_prime]
   simp
 
@@ -612,7 +617,7 @@ theorem is_tauto_prop_1
   (P Q : Formula_) :
   (P.imp_ (Q.imp_ P)).is_tauto_prime :=
   by
-  simp only [Formula_.is_tauto_prime]
+  simp only [is_tauto_prime]
   tauto
 
 
@@ -620,7 +625,7 @@ theorem is_tauto_prop_2
   (P Q R : Formula_) :
   ((P.imp_ (Q.imp_ R)).imp_ ((P.imp_ Q).imp_ (P.imp_ R))).is_tauto_prime :=
   by
-  simp only [Formula_.is_tauto_prime]
+  simp only [is_tauto_prime]
   tauto
 
 
@@ -628,7 +633,7 @@ theorem is_tauto_prop_3
   (P Q : Formula_) :
   (((not_ P).imp_ (not_ Q)).imp_ (Q.imp_ P)).is_tauto_prime :=
   by
-  simp only [Formula_.is_tauto_prime]
+  simp only [is_tauto_prime]
   simp only [eval_not, eval_imp]
   tauto
 
@@ -639,10 +644,10 @@ theorem is_tauto_mp
   (h2 : P.is_tauto_prime) :
   Q.is_tauto_prime :=
   by
-  simp only [Formula_.is_tauto_prime] at h1
+  simp only [is_tauto_prime] at h1
   simp only [eval_imp] at h1
 
-  simp only [Formula_.is_tauto_prime] at h2
+  simp only [is_tauto_prime] at h2
 
   tauto
 
@@ -650,7 +655,7 @@ theorem is_tauto_mp
 theorem is_tauto_def_false :
   (false_.iff_ (not_ true_)).is_tauto_prime :=
   by
-  simp only [Formula_.is_tauto_prime]
+  simp only [is_tauto_prime]
   simp only [eval_not, eval_iff]
   tauto
 
@@ -658,7 +663,7 @@ theorem is_tauto_def_and
   (P Q : Formula_) :
   ((P.and_ Q).iff_ (not_ (P.imp_ (not_ Q)))).is_tauto_prime :=
   by
-  simp only [Formula_.is_tauto_prime]
+  simp only [is_tauto_prime]
   simp only [eval_and, eval_not, eval_imp, eval_iff]
   tauto
 
@@ -666,7 +671,7 @@ theorem is_tauto_def_or
   (P Q : Formula_) :
   ((P.or_ Q).iff_ ((not_ P).imp_ Q)).is_tauto_prime :=
   by
-  simp only [Formula_.is_tauto_prime]
+  simp only [is_tauto_prime]
   simp only [eval_or, eval_not, eval_imp, eval_iff]
   tauto
 
@@ -674,7 +679,7 @@ theorem is_tauto_def_iff
   (P Q : Formula_) :
   (not_ (((P.iff_ Q).imp_ (not_ ((P.imp_ Q).imp_ (not_ (Q.imp_ P))))).imp_ (not_ ((not_ ((P.imp_ Q).imp_ (not_ (Q.imp_ P)))).imp_ (P.iff_ Q))))).is_tauto_prime :=
   by
-  simp only [Formula_.is_tauto_prime]
+  simp only [is_tauto_prime]
   simp only [eval_iff, eval_not, eval_imp]
   tauto
 
