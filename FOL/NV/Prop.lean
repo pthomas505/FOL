@@ -720,7 +720,7 @@ theorem mem_prime_set_is_prime
   induction F
   all_goals
     simp only [Formula_.prime_set] at h1
-  case pred_const_ | pred_var_ =>
+  case pred_const_ X xs | pred_var_ X xs =>
     simp at h1
     rw [h1]
     simp only [Formula_.is_prime]
@@ -739,7 +739,7 @@ theorem mem_prime_set_is_prime
     | iff_ phi psi phi_ih psi_ih =>
     simp at h1
     tauto
-  case forall_ x phi | exists_ x phi =>
+  case forall_ x phi phi_ih | exists_ x phi phi_ih =>
     simp at h1
     rw [h1]
     simp only [Formula_.is_prime]
@@ -750,17 +750,12 @@ theorem mem_prime_set_is_prime
 
 
 theorem L_15_7
-  (F F' : Formula_)
-  (Δ_U : Set Formula_)
+  (Δ : Set Formula_)
   (V : PropValuation_)
-  (Δ_U' : Set Formula_)
-  (h1 : F.prime_set.toSet ⊆ Δ_U)
-  (h2 : Δ_U' = Δ_U.image (eval_prime_ff_to_not V))
-  (h3 : F' = eval_prime_ff_to_not V F) :
-  is_deduct_v1 Δ_U' F' :=
+  (F : Formula_)
+  (h1 : F.prime_set.toSet ⊆ Δ) :
+  is_deduct_v1 (Δ.image (eval_prime_ff_to_not V)) (eval_prime_ff_to_not V F) :=
   by
-  subst h2
-  subst h3
   induction F
   case pred_const_ X xs =>
     let F := pred_const_ X xs
@@ -1044,17 +1039,20 @@ theorem prop_complete
   (h1 : P.is_tauto_prime) :
   is_proof_v1 P :=
   by
+  simp only [Formula_.is_tauto_prime] at h1
+
   simp only [is_proof_v1]
   apply propCompleteAux P P.prime_set
   · rfl
   · intro V
-    apply L_15_7 P P P.prime_set V (P.prime_set.image (eval_prime_ff_to_not V))
-    · rfl
-    · simp only [Finset.coe_image]
-    · simp only [Formula_.is_tauto_prime] at h1
-      simp only [eval_prime_ff_to_not]
-      specialize h1 V
-      simp only [if_pos h1]
+    obtain s1 := L_15_7 P.prime_set V (eval_prime_ff_to_not V P)
+
+    simp only [Finset.coe_image] at *
+    simp only [eval_prime_ff_to_not] at *
+    simp only [if_pos (h1 V)] at s1
+    apply s1
+    exact fun ⦃a⦄ a => a
+
 
 
 macro "SC" : tactic => `(tactic|(
