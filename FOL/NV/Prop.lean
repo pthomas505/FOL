@@ -757,28 +757,19 @@ theorem L_15_7
   is_deduct_v1 (Δ.image (eval_prime_ff_to_not V)) (eval_prime_ff_to_not V F) :=
   by
   induction F
-  case pred_const_ X xs =>
+  any_goals
     simp only [Formula_.prime_set] at h1
-    simp at h1
+    simp only [Finset.coe_singleton, Set.singleton_subset_iff] at h1
 
     apply is_deduct_v1.assume_
-    simp
+    simp only [Set.mem_image]
+  case pred_const_ X xs =>
     apply Exists.intro (pred_const_ X xs)
     tauto
   case pred_var_ X xs =>
-    simp only [Formula_.prime_set] at h1
-    simp at h1
-
-    apply is_deduct_v1.assume_
-    simp
     apply Exists.intro (pred_var_ X xs)
     tauto
   case eq_ x y =>
-    simp only [Formula_.prime_set] at h1
-    simp at h1
-
-    apply is_deduct_v1.assume_
-    simp
     apply Exists.intro (eq_ x y)
     tauto
   case true_ =>
@@ -815,59 +806,48 @@ theorem L_15_7
   case imp_ phi psi phi_ih psi_ih =>
     simp only [Formula_.prime_set] at h1
     simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
 
     simp only [eval_prime_ff_to_not] at phi_ih
     simp only [eval_prime_ff_to_not] at psi_ih
 
     simp only [eval_prime_ff_to_not]
 
-    cases h1
-    case intro h1_left h1_right =>
-      split_ifs
+    split_ifs
+    case _ c1 =>
+      simp only [eval_prime] at c1
+      simp only [imp_iff_not_or] at c1
+      cases c1
       case _ c1 =>
-        simp only [eval_prime] at c1
-        simp only [imp_iff_not_or] at c1
-        cases c1
-        case _ c1 =>
-          simp only [if_neg c1] at phi_ih
-          apply is_deduct_v1.mp_ (not_ phi)
-          apply proof_imp_deduct
-          apply T_13_6
-          apply phi_ih h1_left
-        case _ c1 =>
-          simp only [if_pos c1] at psi_ih
-          apply is_deduct_v1.mp_ psi
-          apply is_deduct_v1.axiom_
-          apply is_axiom_v1.prop_1_
-          apply psi_ih
-          exact h1_right
+        simp only [if_neg c1] at phi_ih
+        apply is_deduct_v1.mp_ (not_ phi)
+        apply proof_imp_deduct
+        apply T_13_6
+        apply phi_ih h1_left
       case _ c1 =>
-        simp only [eval_prime] at c1
-        simp at c1
-        cases c1
-        case intro c1_left c1_right =>
-          simp only [if_pos c1_left] at phi_ih
-          simp only [if_neg c1_right] at psi_ih
-          apply is_deduct_v1.mp_ psi.not_
-          · apply is_deduct_v1.mp_ phi
-            · apply proof_imp_deduct
-              apply T_14_8
-            · exact phi_ih h1_left
-          · exact psi_ih h1_right
+        simp only [if_pos c1] at psi_ih
+        apply is_deduct_v1.mp_ psi
+        apply is_deduct_v1.axiom_
+        apply is_axiom_v1.prop_1_
+        apply psi_ih
+        exact h1_right
+    case _ c1 =>
+      simp only [eval_prime] at c1
+      simp at c1
+      cases c1
+      case intro c1_left c1_right =>
+        simp only [if_pos c1_left] at phi_ih
+        simp only [if_neg c1_right] at psi_ih
+        apply is_deduct_v1.mp_ psi.not_
+        · apply is_deduct_v1.mp_ phi
+          · apply proof_imp_deduct
+            apply T_14_8
+          · exact phi_ih h1_left
+        · exact psi_ih h1_right
   case forall_ x phi phi_ih =>
-    simp only [Formula_.prime_set] at h1
-    simp at h1
-
-    apply is_deduct_v1.assume_
-    simp
     apply Exists.intro (forall_ x phi)
     tauto
   case def_ X xs =>
-    simp only [Formula_.prime_set] at h1
-    simp? at h1
-
-    apply is_deduct_v1.assume_
-    simp
     apply Exists.intro (def_ X xs)
     tauto
   case and_ | or_ | iff_ | exists_ =>
