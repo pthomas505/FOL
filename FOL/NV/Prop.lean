@@ -785,6 +785,7 @@ theorem L_15_7
     sorry
   case not_ phi phi_ih =>
     simp only [Formula_.prime_set] at h1
+    specialize phi_ih h1
 
     simp only [eval_prime_ff_to_not] at phi_ih
 
@@ -793,57 +794,83 @@ theorem L_15_7
     simp
     split_ifs
     case _ c1 =>
-      simp only [c1] at phi_ih
-      simp at phi_ih
+      simp only [if_pos c1] at phi_ih
+
       apply is_deduct_v1.mp_ phi
       apply proof_imp_deduct
       apply T_14_6
-      exact phi_ih h1
+      exact phi_ih
     case _ c1 =>
-      simp only [c1] at phi_ih
-      simp at phi_ih
-      exact phi_ih h1
+      simp only [if_neg c1] at phi_ih
+
+      exact phi_ih
   case imp_ phi psi phi_ih psi_ih =>
     simp only [Formula_.prime_set] at h1
     simp at h1
     obtain ⟨h1_left, h1_right⟩ := h1
 
+    specialize phi_ih h1_left
+    specialize psi_ih h1_right
+
     simp only [eval_prime_ff_to_not] at phi_ih
     simp only [eval_prime_ff_to_not] at psi_ih
 
     simp only [eval_prime_ff_to_not]
+    simp only [eval_prime]
 
-    split_ifs
-    case _ c1 =>
-      simp only [eval_prime] at c1
-      simp only [imp_iff_not_or] at c1
-      cases c1
-      case _ c1 =>
-        simp only [if_neg c1] at phi_ih
-        apply is_deduct_v1.mp_ (not_ phi)
-        apply proof_imp_deduct
-        apply T_13_6
-        apply phi_ih h1_left
-      case _ c1 =>
-        simp only [if_pos c1] at psi_ih
+    by_cases c1 : eval_prime V phi
+    case pos =>
+      simp only [if_pos c1] at phi_ih
+      by_cases c2 : eval_prime V psi
+      case pos =>
+        simp only [if_pos c2] at psi_ih
+        have s1 : eval_prime V phi → eval_prime V psi :=
+        by
+          tauto
+        simp only [if_pos s1]
+
         apply is_deduct_v1.mp_ psi
-        apply is_deduct_v1.axiom_
-        apply is_axiom_v1.prop_1_
-        apply psi_ih
-        exact h1_right
-    case _ c1 =>
-      simp only [eval_prime] at c1
-      simp at c1
-      cases c1
-      case intro c1_left c1_right =>
-        simp only [if_pos c1_left] at phi_ih
-        simp only [if_neg c1_right] at psi_ih
+        · apply is_deduct_v1.axiom_
+          apply is_axiom_v1.prop_1_
+        · exact psi_ih
+      case neg =>
+        simp only [if_neg c2] at psi_ih
+        have s1 : ¬ (eval_prime V phi → eval_prime V psi) :=
+        by
+          tauto
+        simp only [if_neg s1]
+
         apply is_deduct_v1.mp_ psi.not_
         · apply is_deduct_v1.mp_ phi
           · apply proof_imp_deduct
             apply T_14_8
-          · exact phi_ih h1_left
-        · exact psi_ih h1_right
+          · exact phi_ih
+        · exact psi_ih
+    case neg =>
+      simp only [if_neg c1] at phi_ih
+      by_cases c2 : eval_prime V psi
+      case pos =>
+        simp only [if_pos c2] at psi_ih
+        have s1 : eval_prime V phi → eval_prime V psi :=
+        by
+          tauto
+        simp only [if_pos s1]
+
+        apply is_deduct_v1.mp_ phi.not_
+        · apply proof_imp_deduct
+          apply T_13_6
+        · exact phi_ih
+      case neg =>
+        simp only [if_neg c2] at psi_ih
+        have s1 : (eval_prime V phi → eval_prime V psi) :=
+        by
+          tauto
+        simp only [if_pos s1]
+
+        apply is_deduct_v1.mp_ phi.not_
+        · apply proof_imp_deduct
+          apply T_13_6
+        · exact phi_ih
   case forall_ x phi phi_ih =>
     apply Exists.intro (forall_ x phi)
     tauto
