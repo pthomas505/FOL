@@ -712,45 +712,40 @@ example
     tauto
 
 
-theorem mem_prime_set_isPrime
+theorem mem_prime_set_is_prime
   (F F' : Formula_)
   (h1 : F' ∈ F.prime_set) :
   F'.is_prime :=
   by
   induction F
-  case pred_const_ | pred_var_ =>
+  all_goals
     simp only [Formula_.prime_set] at h1
+  case pred_const_ | pred_var_ =>
     simp at h1
-    subst h1
+    rw [h1]
     simp only [Formula_.is_prime]
   case true_ | false_ =>
-    simp only [Formula_.prime_set] at h1
     simp at h1
   case eq_ x y =>
-    simp only [Formula_.prime_set] at h1
     simp at h1
-    subst h1
+    rw [h1]
     simp only [Formula_.is_prime]
   case not_ phi phi_ih =>
-    simp only [Formula_.prime_set] at h1
     exact phi_ih h1
   case
       imp_ phi psi phi_ih psi_ih
     | and_ phi psi phi_ih psi_ih
     | or_ phi psi phi_ih psi_ih
     | iff_ phi psi phi_ih psi_ih =>
-    simp only [Formula_.prime_set] at h1
     simp at h1
     tauto
   case forall_ x phi | exists_ x phi =>
-    simp only [Formula_.prime_set] at h1
     simp at h1
-    subst h1
+    rw [h1]
     simp only [Formula_.is_prime]
   case def_ =>
-    simp only [Formula_.prime_set] at h1
     simp at h1
-    subst h1
+    rw [h1]
     simp only [Formula_.is_prime]
 
 
@@ -1031,10 +1026,10 @@ theorem propCompleteAux
         simp
         apply propCompleteAuxAux P U Δ_U
         · intro U' a1
-          apply mem_prime_set_isPrime P U'
+          apply mem_prime_set_is_prime P U'
           apply h1_right
           exact a1
-        · apply mem_prime_set_isPrime P U
+        · apply mem_prime_set_is_prime P U
           exact h1_left
         · exact Δ_U_1
         · simp
