@@ -758,48 +758,39 @@ theorem L_15_7
   by
   induction F
   case pred_const_ X xs =>
-    let F := pred_const_ X xs
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_prime_ff_to_not]
-    simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
-    apply Exists.intro F
+    apply Exists.intro (pred_const_ X xs)
     tauto
   case pred_var_ X xs =>
-    let F := pred_var_ X xs
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_prime_ff_to_not]
-    simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
-    apply Exists.intro F
+    apply Exists.intro (pred_var_ X xs)
     tauto
   case eq_ x y =>
-    let F := eq_ x y
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_prime_ff_to_not]
-    simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
-    apply Exists.intro F
+    apply Exists.intro (eq_ x y)
     tauto
   case true_ =>
     apply is_deduct_v1.axiom_
     apply is_axiom_v1.prop_true_
   case false_ =>
-    simp only [Formula_.prime_set] at h1
-    simp at h1
-
     simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     simp
+    apply is_deduct_v1.axiom_
+
+    obtain s1 := is_axiom_v1.def_false_
     sorry
   case not_ phi phi_ih =>
     simp only [Formula_.prime_set] at h1
@@ -864,27 +855,20 @@ theorem L_15_7
             · exact phi_ih h1_left
           · exact psi_ih h1_right
   case forall_ x phi phi_ih =>
-    let F := forall_ x phi
-
     simp only [Formula_.prime_set] at h1
     simp at h1
 
-    simp only [eval_prime_ff_to_not]
-    simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
-    apply Exists.intro F
+    apply Exists.intro (forall_ x phi)
     tauto
   case def_ X xs =>
-    let F := def_ X xs
     simp only [Formula_.prime_set] at h1
-    simp at h1
+    simp? at h1
 
-    simp only [eval_prime_ff_to_not]
-    simp only [eval_prime]
     apply is_deduct_v1.assume_
     simp
-    apply Exists.intro F
+    apply Exists.intro (def_ X xs)
     tauto
   case and_ | or_ | iff_ | exists_ =>
     sorry
