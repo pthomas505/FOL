@@ -163,6 +163,66 @@ inductive IsReplOfVarInFormula
     IsReplOfVarInFormula u v (exists_ x P_u) (exists_ x P_v)
 
 
+theorem extracted_1
+  (u v : VarName_)
+  (n : ℕ)
+  (args_u args_v : Fin n → VarName_)
+  (h1 : ∀ (i : Fin n), args_u i = args_v i ∨ args_u i = u ∧ args_v i = v) :
+  IsReplOfVarInListFun u v (List.ofFn args_u) (List.ofFn args_v) :=
+  by
+  induction n
+  case zero =>
+    simp_all only [IsEmpty.forall_iff, List.ofFn_zero]
+    unfold IsReplOfVarInListFun
+    trivial
+  case succ m ih =>
+    simp_all only [List.ofFn_succ]
+    unfold IsReplOfVarInListFun
+    constructor
+    · apply h1
+    · exact ih (fun i => args_u i.succ) (fun i => args_v i.succ) fun i => h1 i.succ
+
+
+example
+  (u v : VarName_)
+  (F F' : Formula_)
+  (h1 : IsReplOfVarInFormula u v F F') :
+  IsReplOfVarInFormulaFun u v F F' :=
+  by
+  induction h1
+  case
+      pred_const_ name n args_u args_v ih
+    | pred_var_ name n args_u args_v ih =>
+    unfold IsReplOfVarInFormulaFun
+    constructor
+    · rfl
+    · apply extracted_1
+      exact ih
+  case eq_ x_u y_u x_v y_v ih_1 ih_2 =>
+    unfold IsReplOfVarInFormulaFun
+    simp only [IsReplOfVarInListFun]
+    tauto
+  case true_ =>
+    simp only [IsReplOfVarInFormulaFun]
+  case false_ =>
+    simp only [IsReplOfVarInFormulaFun]
+  case not_ P_u P_v ih_1 ih_2 =>
+    unfold IsReplOfVarInFormulaFun
+    exact ih_2
+  case
+      imp_ P_u Q_u P_v Q_v ih_1 ih_2 ih_3 ih_4
+    | and_ P_u Q_u P_v Q_v ih_1 ih_2 ih_3 ih_4
+    | or_ P_u Q_u P_v Q_v ih_1 ih_2 ih_3 ih_4
+    | iff_ P_u Q_u P_v Q_v ih_1 ih_2 ih_3 ih_4 =>
+    unfold IsReplOfVarInFormulaFun
+    tauto
+  case
+      forall_ x P_u P_v ih_1 ih_2
+    | exists_ x P_u P_v ih_1 ih_2 =>
+    unfold IsReplOfVarInFormulaFun
+    tauto
+
+
 /--
   IsReplOfFormulaInFormulaFun U V P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of U in P_u by occurrences of V.
 -/

@@ -464,6 +464,164 @@ theorem T_14_9
       simp
 
 
+-- https://us.metamath.org/mpeuni/mmtheorems.html#dtl:1.2
+
+
+lemma mp2
+  (phi psi chi : Formula_)
+  (h1 : is_proof_v1 phi)
+  (h2 : is_proof_v1 psi)
+  (h3 : is_proof_v1 (phi.imp_ (psi.imp_ chi))) :
+  is_proof_v1 chi :=
+  by
+  apply is_deduct_v1.mp_ psi
+  · apply is_deduct_v1.mp_ phi
+    · exact h3
+    · exact h1
+  · exact h2
+
+
+lemma mp2b
+  (phi psi chi : Formula_)
+  (h1 : is_proof_v1 phi)
+  (h2 : is_proof_v1 (phi.imp_ psi))
+  (h3 : is_proof_v1 (psi.imp_ chi)) :
+  is_proof_v1 chi :=
+  by
+  apply is_deduct_v1.mp_ psi
+  · exact h3
+  · apply is_deduct_v1.mp_ phi
+    · exact h2
+    · exact h1
+
+
+lemma a1i
+  (phi psi : Formula_)
+  (h1 : is_proof_v1 phi) :
+  is_proof_v1 (psi.imp_ phi) :=
+  by
+  apply is_deduct_v1.mp_ phi
+  · apply is_deduct_v1.axiom_
+    apply is_axiom_v1.prop_1_
+  · exact h1
+
+
+lemma _2a1i
+  (phi psi chi : Formula_)
+  (h1 : is_proof_v1 phi) :
+  is_proof_v1 (psi.imp_ (chi.imp_ phi)) :=
+  by
+  apply a1i
+  apply a1i
+  exact h1
+
+
+lemma mp1i
+  (phi psi chi : Formula_)
+  (h1 : is_proof_v1 phi)
+  (h2 : is_proof_v1 (phi.imp_ psi)) :
+  is_proof_v1 (chi.imp_ psi) :=
+  by
+  apply a1i
+  apply is_deduct_v1.mp_ phi
+  · exact h2
+  · exact h1
+
+
+lemma a2i
+  (phi psi chi : Formula_)
+  (h1 : is_proof_v1 (phi.imp_ (psi.imp_ chi))) :
+  is_proof_v1 ((phi.imp_ psi).imp_ (phi.imp_ chi)) :=
+  by
+  apply is_deduct_v1.mp_ (phi.imp_ (psi.imp_ chi))
+  · apply is_deduct_v1.axiom_
+    apply is_axiom_v1.prop_2_
+  · exact h1
+
+
+lemma mpd
+  (phi psi chi : Formula_)
+  (h1 : is_proof_v1 (phi.imp_ psi))
+  (h2 : is_proof_v1 (phi.imp_ (psi.imp_ chi))) :
+  is_proof_v1 (phi.imp_ chi) :=
+  by
+  apply is_deduct_v1.mp_ (phi.imp_ psi)
+  · apply a2i
+    exact h2
+  · exact h1
+
+
+lemma imim2i
+  (phi psi chi : Formula_)
+  (h1 : is_proof_v1 (phi.imp_ psi)) :
+  is_proof_v1 ((chi.imp_ phi).imp_ (chi.imp_ psi)) :=
+  by
+  apply a2i
+  apply a1i
+  exact h1
+
+
+lemma syl
+  (phi psi chi : Formula_)
+  (h1 : is_proof_v1 (phi.imp_ psi))
+  (h2 : is_proof_v1 (psi.imp_ chi)) :
+  is_proof_v1 (phi.imp_ chi) :=
+  by
+  apply mpd phi psi chi
+  · exact h1
+  · apply a1i
+    exact h2
+
+
+lemma sylcom
+  (phi psi chi theta : Formula_)
+  (h1 : is_proof_v1 (phi.imp_ (psi.imp_ chi)))
+  (h2 : is_proof_v1 (psi.imp_ (chi.imp_ theta))) :
+  is_proof_v1 (phi.imp_ (psi.imp_ theta)) :=
+  by
+  apply syl phi (psi.imp_ chi)
+  · exact h1
+  · apply a2i
+    exact h2
+
+
+lemma syl6
+  (phi psi chi theta : Formula_)
+  (h1 : is_proof_v1 (phi.imp_ (psi.imp_ chi)))
+  (h2 : is_proof_v1 (chi.imp_ theta)) :
+  is_proof_v1 (phi.imp_ (psi.imp_ theta)) :=
+  by
+  apply sylcom
+  · exact h1
+  · apply a1i
+    exact h2
+
+
+lemma expi
+  (phi psi chi : Formula_)
+  (h1 : is_proof_v1 ((not_ (phi.imp_ (not_ psi))).imp_ chi)) :
+  is_proof_v1 (phi.imp_ (psi.imp_ chi)) :=
+  by
+  apply syl6
+  · sorry
+  · apply h1
+
+lemma impbi
+  (phi psi : Formula_) :
+  is_proof_v1 ((phi.imp_ psi).imp_ ((psi.imp_ phi).imp_ (phi.iff_ psi))) :=
+  by
+  sorry
+
+lemma idd
+  (phi psi : Formula_) :
+  is_proof_v1 (phi.imp_ (psi.imp_ psi)) :=
+  by
+  apply a1i
+  apply prop_id
+
+
+
+
 theorem deduction_theorem_converse
   (Δ : Set Formula_)
   (P Q : Formula_)
@@ -779,7 +937,6 @@ theorem L_15_7
     simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     simp
-    apply is_deduct_v1.axiom_
 
     obtain s1 := is_axiom_v1.def_false_
     sorry
