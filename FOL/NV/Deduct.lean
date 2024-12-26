@@ -320,4 +320,60 @@ inductive is_proof_v2 : Formula_ → Prop
     (phi : Formula_) :
     is_proof_v2 ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
+
+lemma is_prop_axiom_imp_is_axiom_v1
+  (F : Formula_)
+  (h1 : is_prop_axiom F) :
+  is_axiom_v1 F :=
+  by
+  induction h1
+  case prop_true_ =>
+    apply is_axiom_v1.prop_true_
+  case prop_1_ phi psi =>
+    apply is_axiom_v1.prop_1_
+  case prop_2_ phi psi chi =>
+    apply is_axiom_v1.prop_2_
+  case prop_3_ phi psi =>
+    apply is_axiom_v1.prop_3_
+  case def_false_ =>
+    apply is_axiom_v1.def_false_
+  case def_and_ phi psi =>
+    apply is_axiom_v1.def_and_
+  case def_or_ phi psi =>
+    apply is_axiom_v1.def_or_
+  case def_iff_ phi psi =>
+    apply is_axiom_v1.def_iff_
+
+
+lemma is_prop_deduct_imp_is_deduct_v1
+  (Δ : Set Formula_)
+  (F : Formula_)
+  (h1 : is_prop_deduct Δ F) :
+  is_deduct_v1 Δ F :=
+  by
+  induction h1
+  case axiom_ phi ih =>
+    apply is_deduct_v1.axiom_
+    apply is_prop_axiom_imp_is_axiom_v1
+    exact ih
+  case assume_ phi ih =>
+    apply is_deduct_v1.assume_
+    exact ih
+  case mp_ phi psi ih_1 ih_2 ih_3 ih_4 =>
+    apply is_deduct_v1.mp_ phi
+    · exact ih_3
+    · exact ih_4
+
+
+lemma is_prop_proof_imp_is_proof_v1
+  (F : Formula_)
+  (h1 : is_prop_proof F) :
+  is_proof_v1 F :=
+  by
+  unfold is_prop_proof at h1
+  unfold is_proof_v1
+  apply is_prop_deduct_imp_is_deduct_v1
+  exact h1
+
+
 #lint

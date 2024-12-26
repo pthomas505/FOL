@@ -203,4 +203,24 @@ def Formula_.Exists_ (xs : List VarName_) (phi : Formula_) : Formula_ :=
 #eval (Exists_ [VarName_.mk "x", VarName_.mk "y"] (pred_var_ (PredName_.mk "phi") [VarName_.mk "x", VarName_.mk "y"])).toString
 
 
+/--
+  `Formula_.no_abbrev F` := True if and only if there does not exist a subformula of the formula `F` of the form `false_`, `and_`, `or_`, `iff_`, or `exists_`.
+-/
+def Formula_.no_abbrev :
+  Formula_ → Prop
+  | pred_const_ _ _ => True
+  | pred_var_ _ _ => True
+  | eq_ _ _ => True
+  | true_ => True
+  | false_ => False
+  | not_ phi => phi.no_abbrev
+  | imp_ phi psi => phi.no_abbrev ∧ psi.no_abbrev
+  | and_ _ _ => False
+  | or_ _ _ => False
+  | iff_ _ _ => False
+  | forall_ _ phi => phi.no_abbrev
+  | exists_ _ _ => False
+  | def_ _ _ => True
+
+
 #lint
