@@ -493,6 +493,35 @@ inductive is_axiom_v3 : Formula_ → Prop
     is_axiom_v3 ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
 
+/--
+  `is_deduct_v3 Δ F` := True if and only if there is a deduction of `F` from `Δ` in classical first order logic.
+-/
+inductive is_deduct_v3 (Δ : Set Formula_) : Formula_ → Prop
+
+  | axiom_
+    (phi : Formula_) :
+    is_axiom_v3 phi →
+    is_deduct_v3 Δ phi
+
+  | assume_
+    (phi : Formula_) :
+    phi ∈ Δ →
+    is_deduct_v3 Δ phi
+
+  | mp_
+    (phi psi : Formula_) :
+    is_deduct_v3 Δ (phi.imp_ psi) →
+    is_deduct_v3 Δ phi →
+    is_deduct_v3 Δ psi
+
+
+/--
+  `is_proof_v3 F` := True if and only if there is a proof of `F` in classical first order logic.
+-/
+def is_proof_v3 (F : Formula_) : Prop :=
+  is_deduct_v3 ∅ F
+
+
 example
   (F : Formula_)
   (h1 : is_axiom_v1 F) :
