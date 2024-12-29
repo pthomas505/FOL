@@ -1,5 +1,7 @@
 import MathlibExtra.Fin
 import FOL.NV.Sub.Var.One.Rec.Admits
+import FOL.NV.Sub.Var.All.Rec.Sub
+import FOL.NV.Sub.Pred.All.Rec.Option.Sub
 
 
 set_option autoImplicit false
@@ -585,4 +587,192 @@ example
     apply is_axiom_v1.def_exists_
 
 
-#lint
+-------------------------------------------------------------------------------
+
+def freshChar : Char := '+'
+
+
+inductive IsDeduct : List Formula_ → Formula_ → Prop
+  | struct_1_
+    (Δ : List Formula_)
+    (H phi : Formula_) :
+    IsDeduct Δ phi →
+    IsDeduct (H :: Δ) phi
+
+  | struct_2_
+    (Δ : List Formula_)
+    (H phi : Formula_) :
+    IsDeduct (H :: H :: Δ) phi →
+    IsDeduct (H :: Δ) phi
+
+  | struct_3_
+    (Δ_1 Δ_2 : List Formula_)
+    (H_1 H_2 phi : Formula_) :
+    IsDeduct (Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2) phi →
+    IsDeduct (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2) phi
+
+  /-
+    phi ⊢ phi
+  -/
+  | assume_
+    (phi : Formula_) :
+    IsDeduct [phi] phi
+
+  /-
+    ⊢ ⊤
+  -/
+  | prop_0_ :
+    IsDeduct [] true_
+
+  /-
+    ⊢ phi → (psi → phi)
+  -/
+  | prop_1_
+    (phi psi : Formula_) :
+    IsDeduct [] (phi.imp_ (psi.imp_ phi))
+
+  /-
+    ⊢ (phi → (psi → chi)) → ((phi → psi) → (phi → chi))
+  -/
+  | prop_2_
+    (phi psi chi : Formula_) :
+    IsDeduct []
+      ((phi.imp_ (psi.imp_ chi)).imp_
+        ((phi.imp_ psi).imp_ (phi.imp_ chi)))
+
+  /-
+    ⊢ (¬ phi → ¬ psi) → (psi → phi)
+  -/
+  | prop_3_
+    (phi psi : Formula_) :
+    IsDeduct []
+      (((not_ phi).imp_ (not_ psi)).imp_
+        (psi.imp_ phi))
+
+  /-
+    Δ ⊢ phi → psi ⇒
+    Δ ⊢ phi ⇒
+    Δ ⊢ psi
+  -/
+  | mp_
+    (Δ : List Formula_)
+    (phi psi : Formula_) :
+    IsDeduct Δ (phi.imp_ psi) →
+    IsDeduct Δ phi →
+    IsDeduct Δ psi
+
+  /-
+    H :: Δ ⊢ phi ⇒
+    Δ ⊢ H → phi
+  -/
+  | dt_
+    (Δ : List Formula_)
+    (H : Formula_)
+    (phi : Formula_) :
+    IsDeduct (H :: Δ) phi →
+    IsDeduct Δ (H.imp_ phi)
+
+  /-
+    ⊢ (∀ v (phi → psi)) → ((∀ v phi) → (∀ v psi))
+  -/
+  | pred_1_
+    (v : VarName_)
+    (phi psi : Formula_) :
+    IsDeduct [] ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi)))
+
+  /-
+    ⊢ (∀ v phi) → phi(t/v)  provided phi admits t for v
+  -/
+  | pred_2_
+    (v t : VarName_)
+    (phi : Formula_) :
+    IsDeduct [] ((forall_ v phi).imp_ (FOL.NV.Sub.Var.All.Rec.Fresh.sub_var_all_rec (Function.updateITE id v t) freshChar phi))
+
+  /-
+    ⊢ phi → (∀ v phi)  provided v is not free in phi
+  -/
+  | pred_3_
+    (v : VarName_)
+    (phi : Formula_) :
+    ¬ var_is_free_in v phi →
+    IsDeduct [] (phi.imp_ (forall_ v phi))
+
+  /-
+    ⊢ phi ⇒ ⊢ ∀ v phi
+  -/
+  | gen_
+    (v : VarName_)
+    (phi : Formula_) :
+    IsDeduct [] phi →
+    IsDeduct [] (forall_ v phi)
+
+  /-
+    ⊢ v = v
+  -/
+  | eq_1_
+    (v : VarName_) :
+    IsDeduct [] (eq_ v v)
+
+  /-
+    ⊢ ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) → (pred_var_ name [x_0 ... x_n] ↔ pred_var_ name [y_0 ... y_n])
+  -/
+  | eq_2_pred_var_
+    (name : PredName_)
+    (xs ys : List VarName_) :
+    xs.length = ys.length →
+    IsDeduct [] ((List.foldr and_ true_ (List.zipWith eq_ xs ys)).imp_ ((pred_var_ name xs).iff_ (pred_var_ name ys)))
+
+  /-
+    ⊢ ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
+  -/
+  | eq_2_eq_
+    (x_0 x_1 y_0 y_1 : VarName_) :
+    IsDeduct [] ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_ ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))
+
+  /-
+    ⊢ ⊥ ↔ ¬ ⊤
+  -/
+  | def_false_ :
+    IsDeduct [] (false_.iff_ (not_ true_))
+
+  /-
+    ⊢ (phi ∧ psi) ↔ ¬ (phi → ¬ psi)
+  -/
+  | def_and_
+    (phi psi : Formula_) :
+    IsDeduct [] ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+
+  /-
+    ⊢ (phi ∨ psi) ↔ ((¬ phi) → psi)
+  -/
+  | def_or_
+    (phi psi : Formula_) :
+    IsDeduct [] ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+
+  /-
+    ⊢ (phi ↔ psi) ↔ ((phi → psi) ∧ (psi → phi))
+    ⊢ (phi ↔ psi) ↔ ¬ ((phi → psi) → ¬ (psi → phi))
+    ⊢ ((phi ↔ psi) → (¬ ((phi → psi) → ¬ (psi → phi)))) ∧ (¬ ((phi → psi) → ¬ (psi → phi)) → (phi ↔ psi))
+    ⊢ ¬ (((phi ↔ psi) → (¬ ((phi → psi) → ¬ (psi → phi)))) → ¬ (¬ ((phi → psi) → ¬ (psi → phi)) → (phi ↔ psi)))
+  -/
+  | def_iff_
+    (phi psi : Formula_) :
+    IsDeduct [] (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+
+  /-
+    ⊢ (∃ v phi) ↔ ¬ (∀ v ¬ phi)
+  -/
+  | def_exists_
+    (v : VarName_)
+    (phi : Formula_) :
+    IsDeduct [] ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
+
+  | sub_
+    (Δ : List Formula_)
+    (phi : Formula_)
+    (τ : PredName_ → ℕ → Option (List VarName_ × Formula_)) :
+    IsDeduct Δ phi →
+    IsDeduct (Δ.map (FOL.NV.Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ)) (FOL.NV.Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ phi)
+
+
+--#lint
