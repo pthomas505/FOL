@@ -805,55 +805,45 @@ inductive is_deduct_v4 : List Formula_ → Formula_ → Prop
 
 
 example
-  (Δ Δ' : List Formula_)
-  (F : Formula_)
-  (h1 : is_deduct_v4 Δ F) :
-  is_deduct_v4 (Δ' ++ Δ) F :=
-  by
-    induction Δ'
-    case nil =>
-      simp
-      exact h1
-    case cons hd tl ih =>
-      apply is_deduct_v4.struct_1_
-      exact ih
-
-
-example
   (Δ : List Formula_)
-  (H : Formula_)
   (F : Formula_)
+  (Γ : List Formula_)
   (h1 : is_deduct_v4 Δ F) :
-  is_deduct_v4 (Δ ++ [H]) F :=
+  is_deduct_v4 (Γ ++ Δ) F :=
   by
-    sorry
+  induction Γ
+  case nil =>
+    simp
+    exact h1
+  case cons hd tl ih =>
+    apply is_deduct_v4.struct_1_
+    exact ih
 
 
 example
-    (Δ_1 Δ_2 : List Formula_)
-    (H F : Formula_)
-    (h1 : is_deduct_v4 (Δ_1 ++ [H] ++ Δ_2) F) :
-    is_deduct_v4 (H :: Δ_1 ++ Δ_2) F :=
-    by
-    induction Δ_1 using List.reverseRecOn generalizing Δ_2
-    case nil =>
-      simp at h1
+  (Δ_1 Δ_2 : List Formula_)
+  (F : Formula_)
+  (H : Formula_)
+  (h1 : is_deduct_v4 (Δ_1 ++ [H] ++ Δ_2) F) :
+  is_deduct_v4 (H :: Δ_1 ++ Δ_2) F :=
+  by
+  induction Δ_1 using List.reverseRecOn generalizing Δ_2
+  case nil =>
+    simp at h1
 
-      simp
-      exact h1
-    case append_singleton xs x ih =>
-      simp at ih
+    simp
+    exact h1
+  case append_singleton xs x ih =>
+    simp at ih
 
-      simp at h1
+    simp at h1
 
-      simp
-      apply ih
-      obtain s1 := is_deduct_v4.struct_3_ xs Δ_2 x H F
-      simp at s1
-      apply s1
-      exact h1
-
-
+    simp
+    apply ih
+    obtain s1 := is_deduct_v4.struct_3_ xs Δ_2 x H F
+    simp at s1
+    apply s1
+    exact h1
 
 
 --#lint
