@@ -825,6 +825,33 @@ example
   (F : Formula_)
   (H : Formula_)
   (h1 : is_deduct_v4 (Δ_1 ++ [H] ++ Δ_2) F) :
+  is_deduct_v4 (Δ_1 ++ Δ_2 ++ [H]) F :=
+  by
+  induction Δ_2 generalizing Δ_1
+  case nil =>
+    simp at h1
+
+    simp
+    exact h1
+  case cons hd tl ih =>
+    specialize ih (Δ_1 ++ [hd])
+    simp at ih
+
+    simp at h1
+
+    simp
+    apply ih
+    obtain s1 := is_deduct_v4.struct_3_ Δ_1 tl H hd F
+    simp at s1
+    apply s1
+    exact h1
+
+
+example
+  (Δ_1 Δ_2 : List Formula_)
+  (F : Formula_)
+  (H : Formula_)
+  (h1 : is_deduct_v4 (Δ_1 ++ [H] ++ Δ_2) F) :
   is_deduct_v4 (H :: Δ_1 ++ Δ_2) F :=
   by
   induction Δ_1 using List.reverseRecOn generalizing Δ_2
