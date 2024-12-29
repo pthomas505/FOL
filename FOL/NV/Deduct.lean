@@ -389,6 +389,9 @@ inductive is_proof_v2 : Formula_ → Prop
 -------------------------------------------------------------------------------
 
 
+/--
+  `is_axiom_v3 F` := True if and only if `F` is an axiom of classical first order logic.
+-/
 inductive is_axiom_v3 : Formula_ → Prop
   -- `⊢ ⊤`
   | prop_true_ :
