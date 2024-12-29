@@ -583,9 +583,9 @@ example
 
 
 /--
-  IsReplOfVarInFormula u v P_u P_v := True if and only if P_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in P_u by occurrences of v.
+  `is_repl_of_var_in_formula_fin u v P_u P_v` := True if and only if `P_v` is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of `u` in `P_u` by occurrences of `v`.
 -/
-inductive IsReplOfVarInFormula
+inductive is_repl_of_var_in_formula_fin
   (u v : VarName_) :
   Formula_ → Formula_ → Prop
   | pred_const_
@@ -593,71 +593,71 @@ inductive IsReplOfVarInFormula
     (n : ℕ)
     (args_u args_v : Fin n → VarName_) :
     (∀ (i : Fin n), (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →
-    IsReplOfVarInFormula u v (pred_const_ name (List.ofFn args_u)) (pred_const_ name (List.ofFn args_v))
+    is_repl_of_var_in_formula_fin u v (pred_const_ name (List.ofFn args_u)) (pred_const_ name (List.ofFn args_v))
 
   | pred_var_
     (name : PredName_)
     (n : ℕ)
     (args_u args_v : Fin n → VarName_) :
     (∀ (i : Fin n), (args_u i = args_v i) ∨ (args_u i = u ∧ args_v i = v)) →
-    IsReplOfVarInFormula u v (pred_var_ name (List.ofFn args_u)) (pred_var_ name (List.ofFn args_v))
+    is_repl_of_var_in_formula_fin u v (pred_var_ name (List.ofFn args_u)) (pred_var_ name (List.ofFn args_v))
 
   | eq_
     (x_u y_u x_v y_v : VarName_) :
     ((x_u = x_v) ∨ (x_u = u ∧ x_v = v)) →
     ((y_u = y_v) ∨ (y_u = u ∧ y_v = v)) →
-    IsReplOfVarInFormula u v (eq_ x_u y_u) (eq_ x_v y_v)
+    is_repl_of_var_in_formula_fin u v (eq_ x_u y_u) (eq_ x_v y_v)
 
   | true_ :
-    IsReplOfVarInFormula u v true_ true_
+    is_repl_of_var_in_formula_fin u v true_ true_
 
   | false_ :
-    IsReplOfVarInFormula u v false_ false_
+    is_repl_of_var_in_formula_fin u v false_ false_
 
   | not_
     (P_u P_v : Formula_) :
-    IsReplOfVarInFormula u v P_u P_v →
-    IsReplOfVarInFormula u v P_u.not_ P_v.not_
+    is_repl_of_var_in_formula_fin u v P_u P_v →
+    is_repl_of_var_in_formula_fin u v P_u.not_ P_v.not_
 
   | imp_
     (P_u Q_u : Formula_)
     (P_v Q_v : Formula_) :
-    IsReplOfVarInFormula u v P_u P_v →
-    IsReplOfVarInFormula u v Q_u Q_v →
-    IsReplOfVarInFormula u v (P_u.imp_ Q_u) (P_v.imp_ Q_v)
+    is_repl_of_var_in_formula_fin u v P_u P_v →
+    is_repl_of_var_in_formula_fin u v Q_u Q_v →
+    is_repl_of_var_in_formula_fin u v (P_u.imp_ Q_u) (P_v.imp_ Q_v)
 
   | and_
     (P_u Q_u : Formula_)
     (P_v Q_v : Formula_) :
-    IsReplOfVarInFormula u v P_u P_v →
-    IsReplOfVarInFormula u v Q_u Q_v →
-    IsReplOfVarInFormula u v (P_u.and_ Q_u) (P_v.and_ Q_v)
+    is_repl_of_var_in_formula_fin u v P_u P_v →
+    is_repl_of_var_in_formula_fin u v Q_u Q_v →
+    is_repl_of_var_in_formula_fin u v (P_u.and_ Q_u) (P_v.and_ Q_v)
 
   | or_
     (P_u Q_u : Formula_)
     (P_v Q_v : Formula_) :
-    IsReplOfVarInFormula u v P_u P_v →
-    IsReplOfVarInFormula u v Q_u Q_v →
-    IsReplOfVarInFormula u v (P_u.or_ Q_u) (P_v.or_ Q_v)
+    is_repl_of_var_in_formula_fin u v P_u P_v →
+    is_repl_of_var_in_formula_fin u v Q_u Q_v →
+    is_repl_of_var_in_formula_fin u v (P_u.or_ Q_u) (P_v.or_ Q_v)
 
   | iff_
     (P_u Q_u : Formula_)
     (P_v Q_v : Formula_) :
-    IsReplOfVarInFormula u v P_u P_v →
-    IsReplOfVarInFormula u v Q_u Q_v →
-    IsReplOfVarInFormula u v (P_u.iff_ Q_u) (P_v.iff_ Q_v)
+    is_repl_of_var_in_formula_fin u v P_u P_v →
+    is_repl_of_var_in_formula_fin u v Q_u Q_v →
+    is_repl_of_var_in_formula_fin u v (P_u.iff_ Q_u) (P_v.iff_ Q_v)
 
   | forall_
     (x : VarName_)
     (P_u P_v : Formula_) :
-    IsReplOfVarInFormula u v P_u P_v →
-    IsReplOfVarInFormula u v (forall_ x P_u) (forall_ x P_v)
+    is_repl_of_var_in_formula_fin u v P_u P_v →
+    is_repl_of_var_in_formula_fin u v (forall_ x P_u) (forall_ x P_v)
 
   | exists_
     (x : VarName_)
     (P_u P_v : Formula_) :
-    IsReplOfVarInFormula u v P_u P_v →
-    IsReplOfVarInFormula u v (exists_ x P_u) (exists_ x P_v)
+    is_repl_of_var_in_formula_fin u v P_u P_v →
+    is_repl_of_var_in_formula_fin u v (exists_ x P_u) (exists_ x P_v)
 
 
 --#lint

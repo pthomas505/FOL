@@ -1437,7 +1437,7 @@ theorem T_21_2
 theorem T_21_8
   (P_r P_s : Formula_)
   (r s : VarName_)
-  (h1 : IsReplOfVarInFormula r s P_r P_s)
+  (h1 : is_repl_of_var_in_formula_fin r s P_r P_s)
   (h2 : ¬ var_is_bound_in r P_r)
   (h3 : ¬ var_is_bound_in s P_r) :
   is_proof_v1 ((eq_ r s).imp_ (P_r.iff_ P_s)) :=
