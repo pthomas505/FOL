@@ -592,51 +592,51 @@ example
 def freshChar : Char := '+'
 
 
-inductive IsDeduct : List Formula_ → Formula_ → Prop
+inductive is_proof_v4 : List Formula_ → Formula_ → Prop
   | struct_1_
     (Δ : List Formula_)
     (H phi : Formula_) :
-    IsDeduct Δ phi →
-    IsDeduct (H :: Δ) phi
+    is_proof_v4 Δ phi →
+    is_proof_v4 (H :: Δ) phi
 
   | struct_2_
     (Δ : List Formula_)
     (H phi : Formula_) :
-    IsDeduct (H :: H :: Δ) phi →
-    IsDeduct (H :: Δ) phi
+    is_proof_v4 (H :: H :: Δ) phi →
+    is_proof_v4 (H :: Δ) phi
 
   | struct_3_
     (Δ_1 Δ_2 : List Formula_)
     (H_1 H_2 phi : Formula_) :
-    IsDeduct (Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2) phi →
-    IsDeduct (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2) phi
+    is_proof_v4 (Δ_1 ++ [H_1] ++ [H_2] ++ Δ_2) phi →
+    is_proof_v4 (Δ_1 ++ [H_2] ++ [H_1] ++ Δ_2) phi
 
   /-
     phi ⊢ phi
   -/
   | assume_
     (phi : Formula_) :
-    IsDeduct [phi] phi
+    is_proof_v4 [phi] phi
 
   /-
     ⊢ ⊤
   -/
   | prop_0_ :
-    IsDeduct [] true_
+    is_proof_v4 [] true_
 
   /-
     ⊢ phi → (psi → phi)
   -/
   | prop_1_
     (phi psi : Formula_) :
-    IsDeduct [] (phi.imp_ (psi.imp_ phi))
+    is_proof_v4 [] (phi.imp_ (psi.imp_ phi))
 
   /-
     ⊢ (phi → (psi → chi)) → ((phi → psi) → (phi → chi))
   -/
   | prop_2_
     (phi psi chi : Formula_) :
-    IsDeduct []
+    is_proof_v4 []
       ((phi.imp_ (psi.imp_ chi)).imp_
         ((phi.imp_ psi).imp_ (phi.imp_ chi)))
 
@@ -645,7 +645,7 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
   -/
   | prop_3_
     (phi psi : Formula_) :
-    IsDeduct []
+    is_proof_v4 []
       (((not_ phi).imp_ (not_ psi)).imp_
         (psi.imp_ phi))
 
@@ -657,9 +657,9 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
   | mp_
     (Δ : List Formula_)
     (phi psi : Formula_) :
-    IsDeduct Δ (phi.imp_ psi) →
-    IsDeduct Δ phi →
-    IsDeduct Δ psi
+    is_proof_v4 Δ (phi.imp_ psi) →
+    is_proof_v4 Δ phi →
+    is_proof_v4 Δ psi
 
   /-
     H :: Δ ⊢ phi ⇒
@@ -669,8 +669,8 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
     (Δ : List Formula_)
     (H : Formula_)
     (phi : Formula_) :
-    IsDeduct (H :: Δ) phi →
-    IsDeduct Δ (H.imp_ phi)
+    is_proof_v4 (H :: Δ) phi →
+    is_proof_v4 Δ (H.imp_ phi)
 
   /-
     ⊢ (∀ v (phi → psi)) → ((∀ v phi) → (∀ v psi))
@@ -678,7 +678,7 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
   | pred_1_
     (v : VarName_)
     (phi psi : Formula_) :
-    IsDeduct [] ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi)))
+    is_proof_v4 [] ((forall_ v (phi.imp_ psi)).imp_ ((forall_ v phi).imp_ (forall_ v psi)))
 
   /-
     ⊢ (∀ v phi) → phi(t/v)  provided phi admits t for v
@@ -686,7 +686,7 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
   | pred_2_
     (v t : VarName_)
     (phi : Formula_) :
-    IsDeduct [] ((forall_ v phi).imp_ (FOL.NV.Sub.Var.All.Rec.Fresh.sub_var_all_rec (Function.updateITE id v t) freshChar phi))
+    is_proof_v4 [] ((forall_ v phi).imp_ (FOL.NV.Sub.Var.All.Rec.Fresh.sub_var_all_rec (Function.updateITE id v t) freshChar phi))
 
   /-
     ⊢ phi → (∀ v phi)  provided v is not free in phi
@@ -695,7 +695,7 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
     (v : VarName_)
     (phi : Formula_) :
     ¬ var_is_free_in v phi →
-    IsDeduct [] (phi.imp_ (forall_ v phi))
+    is_proof_v4 [] (phi.imp_ (forall_ v phi))
 
   /-
     ⊢ phi ⇒ ⊢ ∀ v phi
@@ -703,15 +703,15 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
   | gen_
     (v : VarName_)
     (phi : Formula_) :
-    IsDeduct [] phi →
-    IsDeduct [] (forall_ v phi)
+    is_proof_v4 [] phi →
+    is_proof_v4 [] (forall_ v phi)
 
   /-
     ⊢ v = v
   -/
   | eq_1_
     (v : VarName_) :
-    IsDeduct [] (eq_ v v)
+    is_proof_v4 [] (eq_ v v)
 
   /-
     ⊢ ((x_0 = y_0) ∧ ... ∧ (x_n = y_n) ∧ ⊤) → (pred_var_ name [x_0 ... x_n] ↔ pred_var_ name [y_0 ... y_n])
@@ -720,34 +720,34 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
     (name : PredName_)
     (xs ys : List VarName_) :
     xs.length = ys.length →
-    IsDeduct [] ((List.foldr and_ true_ (List.zipWith eq_ xs ys)).imp_ ((pred_var_ name xs).iff_ (pred_var_ name ys)))
+    is_proof_v4 [] ((List.foldr and_ true_ (List.zipWith eq_ xs ys)).imp_ ((pred_var_ name xs).iff_ (pred_var_ name ys)))
 
   /-
     ⊢ ((x_0 = y_0) ∧ (x_1 = y_1)) → ((eq_ x_0 x_1) ↔ (eq_ y_0 y_1))
   -/
   | eq_2_eq_
     (x_0 x_1 y_0 y_1 : VarName_) :
-    IsDeduct [] ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_ ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))
+    is_proof_v4 [] ((and_ (eq_ x_0 y_0) (eq_ x_1 y_1)).imp_ ((eq_ x_0 x_1).iff_ (eq_ y_0 y_1)))
 
   /-
     ⊢ ⊥ ↔ ¬ ⊤
   -/
   | def_false_ :
-    IsDeduct [] (false_.iff_ (not_ true_))
+    is_proof_v4 [] (false_.iff_ (not_ true_))
 
   /-
     ⊢ (phi ∧ psi) ↔ ¬ (phi → ¬ psi)
   -/
   | def_and_
     (phi psi : Formula_) :
-    IsDeduct [] ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+    is_proof_v4 [] ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
 
   /-
     ⊢ (phi ∨ psi) ↔ ((¬ phi) → psi)
   -/
   | def_or_
     (phi psi : Formula_) :
-    IsDeduct [] ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+    is_proof_v4 [] ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
 
   /-
     ⊢ (phi ↔ psi) ↔ ((phi → psi) ∧ (psi → phi))
@@ -757,7 +757,7 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
   -/
   | def_iff_
     (phi psi : Formula_) :
-    IsDeduct [] (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+    is_proof_v4 [] (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
 
   /-
     ⊢ (∃ v phi) ↔ ¬ (∀ v ¬ phi)
@@ -765,14 +765,14 @@ inductive IsDeduct : List Formula_ → Formula_ → Prop
   | def_exists_
     (v : VarName_)
     (phi : Formula_) :
-    IsDeduct [] ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
+    is_proof_v4 [] ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
   | sub_
     (Δ : List Formula_)
     (phi : Formula_)
     (τ : PredName_ → ℕ → Option (List VarName_ × Formula_)) :
-    IsDeduct Δ phi →
-    IsDeduct (Δ.map (FOL.NV.Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ)) (FOL.NV.Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ phi)
+    is_proof_v4 Δ phi →
+    is_proof_v4 (Δ.map (FOL.NV.Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ)) (FOL.NV.Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ phi)
 
 
 --#lint
