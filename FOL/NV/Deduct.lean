@@ -1,3 +1,4 @@
+import MathlibExtra.Fin
 import FOL.NV.Sub.Var.One.Rec.Admits
 
 
@@ -487,105 +488,6 @@ inductive is_axiom_v3 : Formula_ → Prop
     is_axiom_v3 ((exists_ v phi).iff_ (not_ (forall_ v (not_ phi))))
 
 
-theorem extracted_1
-  {α β : Type}
-  (f : α → α → β)
-  (n : ℕ)
-  (xs ys : Fin n → α) :
-  List.ofFn (fun (i : Fin n) => f (xs i) (ys i)) = List.zipWith f (List.ofFn xs) (List.ofFn ys) :=
-  by
-    induction n
-    case zero =>
-      simp
-    case succ m ih =>
-      simp
-      exact ih (fun i => xs i.succ) fun i => ys i.succ
-
-
-theorem extracted_2
-  {α β : Type}
-  (f : α → α → β)
-  (xs ys : List α)
-  (h1 : xs.length = ys.length) :
-  (List.ofFn fun (i : Fin xs.length) => f xs[↑i] ys[↑i]) = List.zipWith f xs ys :=
-  by
-  induction xs generalizing ys
-  case nil =>
-    simp
-  case cons xs_hd xs_tl xs_ih =>
-    cases ys
-    case nil =>
-      simp at h1
-    case cons ys_hd ys_tl =>
-      simp at h1
-
-      simp
-      apply xs_ih
-      exact h1
-
-
-theorem extracted_4
-  {α β : Type}
-  (f : α → α → β)
-  (xs_hd : α)
-  (xs_tl : List α)
-  (ys_hd : α)
-  (ys_tl : List α) :
-  (List.ofFn (fun (i : Fin (min (xs_hd :: xs_tl).length (ys_hd :: ys_tl).length)) => f (xs_hd :: xs_tl)[i] (ys_hd :: ys_tl)[i])) =
-  f xs_hd ys_hd :: List.ofFn (fun (i : Fin (min xs_tl.length ys_tl.length)) => f xs_tl[i] ys_tl[i]) :=
-  by
-    ext n z
-    induction n
-    case _ =>
-      simp
-    case _ n ih =>
-      simp
-      simp only [List.ofFnNthVal]
-      simp
-
-
-lemma extracted_5
-  {α β : Type}
-  (f : α → α → β)
-  (xs ys : List α) :
-  (List.ofFn (fun (i : Fin (min xs.length ys.length)) => f xs[↑i] ys[↑i])) = List.zipWith f xs ys :=
-  by
-  induction xs generalizing ys
-  case nil =>
-    simp
-  case cons xs_hd xs_tl xs_ih =>
-    cases ys
-    case nil =>
-      simp
-    case cons ys_hd ys_tl =>
-      simp only [List.zipWith]
-      rw [extracted_4]
-      congr
-      apply xs_ih
-
-
-lemma extracted_3
-  {α β : Type}
-  (f : α → α → β)
-  (xs ys : List α)
-  (h1 : xs.length = ys.length) :
-  ∃ (n : Nat) (fn_xs fn_ys : Fin n → α),
-    List.ofFn (fun i => f (fn_xs i) (fn_ys i)) = List.zipWith f xs ys ∧
-    List.ofFn fn_xs = xs ∧
-    List.ofFn fn_ys = ys :=
-  by
-    apply Exists.intro (xs.length)
-    apply Exists.intro (fun i => xs[i])
-    apply Exists.intro (fun i => ys[i])
-    constructor
-    · simp
-      apply extracted_2
-      exact h1
-    · constructor
-      . simp
-      · simp [h1]
-
-
 example
   (F : Formula_)
   (h1 : is_axiom_v1 F) :
@@ -593,7 +495,10 @@ example
   by
   induction h1
   case eq_2_pred_const_ name n xs ys =>
-    rw [extracted_1]
+    obtain s1 := list_of_fn_fin_zip_with_eq_list_zip_with_list_of_fn eq_ n xs ys
+    unfold Fin.zipWith at s1
+    rw [s1]
+
     apply is_axiom_v3.eq_2_pred_const_
     simp
   all_goals
@@ -607,7 +512,7 @@ example
   by
   induction h1
   case eq_2_pred_const_ name xs ys ih =>
-    obtain ⟨n, fn_xs, fn_ys, c1, c2, c3⟩ := extracted_3 eq_ xs ys ih
+    obtain ⟨n, fn_xs, fn_ys, c1, c2, c3⟩ := exists_list_of_fn_fin_zip_with_eq_len_eq_list_zip_with_and_list_of_fn_eq_list eq_ xs ys ih
     rw [← c1]
     rw [← c2]
     rw [← c3]
