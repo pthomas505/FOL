@@ -497,6 +497,23 @@ example
   is_axiom_v3 F :=
   by
   induction h1
+  case prop_true_ =>
+    exact is_axiom_v3.prop_true_
+  case prop_1_ phi psi =>
+    apply is_axiom_v3.prop_1_
+  case prop_2_ phi psi chi =>
+    apply is_axiom_v3.prop_2_
+  case prop_3_ phi psi =>
+    apply is_axiom_v3.prop_3_
+  case pred_1_ v phi psi =>
+    apply is_axiom_v3.pred_1_
+  case pred_2_ v t phi phi' ih_1 ih_2 =>
+    exact is_axiom_v3.pred_2_ v t phi phi' ih_1 ih_2
+  case pred_3_ v phi ih =>
+    apply is_axiom_v3.pred_3_
+    exact ih
+  case eq_1_ v =>
+    apply is_axiom_v3.eq_1_
   case eq_2_pred_const_ name n xs ys =>
     obtain s1 := list_of_fn_fin_zip_with_eq_list_zip_with_list_of_fn eq_ n xs ys
     unfold Fin.zipWith at s1
@@ -504,8 +521,21 @@ example
 
     apply is_axiom_v3.eq_2_pred_const_
     simp
-  all_goals
-    sorry
+  case eq_2_eq_ x_0 x_1 y_0 y_1 =>
+    apply is_axiom_v3.eq_2_eq_
+  case gen_ v phi ih_1 ih_2 =>
+    apply is_axiom_v3.gen_
+    exact ih_2
+  case def_false_ =>
+    apply is_axiom_v3.def_false_
+  case def_and_ phi psi =>
+    apply is_axiom_v3.def_and_
+  case def_or_ phi psi =>
+    apply is_axiom_v3.def_or_
+  case def_iff_ phi psi =>
+    apply is_axiom_v3.def_iff_
+  case def_exists_ v phi =>
+    apply is_axiom_v3.def_exists_
 
 
 example
@@ -514,6 +544,23 @@ example
   is_axiom_v1 F :=
   by
   induction h1
+  case prop_true_ =>
+    exact is_axiom_v1.prop_true_
+  case prop_1_ phi psi =>
+    apply is_axiom_v1.prop_1_
+  case prop_2_ phi psi chi =>
+    apply is_axiom_v1.prop_2_
+  case prop_3_ phi psi =>
+    apply is_axiom_v1.prop_3_
+  case pred_1_ v phi psi =>
+    apply is_axiom_v1.pred_1_
+  case pred_2_ v t phi phi' ih_1 ih_2 =>
+    exact is_axiom_v1.pred_2_ v t phi phi' ih_1 ih_2
+  case pred_3_ v phi ih =>
+    apply is_axiom_v1.pred_3_
+    exact ih
+  case eq_1_ v =>
+    apply is_axiom_v1.eq_1_
   case eq_2_pred_const_ name xs ys ih =>
     obtain ⟨n, fn_xs, fn_ys, c1, c2, c3⟩ := exists_list_of_fn_fin_zip_with_eq_len_eq_list_zip_with_and_list_of_fn_eq_list eq_ xs ys ih
     rw [← c1]
@@ -521,8 +568,21 @@ example
     rw [← c3]
 
     apply is_axiom_v1.eq_2_pred_const_
-  all_goals
-    sorry
+  case eq_2_eq_ x_0 x_1 y_0 y_1 =>
+    apply is_axiom_v1.eq_2_eq_
+  case gen_ v phi ih_1 ih_2 =>
+    apply is_axiom_v1.gen_
+    exact ih_2
+  case def_false_ =>
+    apply is_axiom_v1.def_false_
+  case def_and_ phi psi =>
+    apply is_axiom_v1.def_and_
+  case def_or_ phi psi =>
+    apply is_axiom_v1.def_or_
+  case def_iff_ phi psi =>
+    apply is_axiom_v1.def_iff_
+  case def_exists_ v phi =>
+    apply is_axiom_v1.def_exists_
 
 
 #lint
