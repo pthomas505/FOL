@@ -959,9 +959,10 @@ lemma is_prop_deduct_imp_is_deduct_v4
   by
   induction h1
   case axiom_ phi ih =>
-    obtain s1 := is_prop_axiom_imp_is_deduct_v4 phi ih
-    sorry
-
+    obtain s1 := is_deduct_v4_struct_1_list [] phi Δ.toList
+    simp at s1
+    apply s1
+    exact is_prop_axiom_imp_is_deduct_v4 phi ih
   case assume_ phi ih =>
     sorry
   case mp_ phi psi ih_1 ih_2 ih_3 ih_4 =>
