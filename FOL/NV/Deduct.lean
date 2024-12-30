@@ -50,31 +50,31 @@ inductive is_prop_axiom_v1 : Formula_ → Prop
 
 
 /--
-  `is_prop_deduct Δ F` := True if and only if there is a deduction of `F` from `Δ` in classical propositional logic.
+  `is_prop_deduct_v1 Δ F` := True if and only if there is a deduction of `F` from `Δ` in classical propositional logic.
 -/
-inductive is_prop_deduct (Δ : Set Formula_) : Formula_ → Prop
+inductive is_prop_deduct_v1 (Δ : Set Formula_) : Formula_ → Prop
   | axiom_
     (phi : Formula_) :
     is_prop_axiom_v1 phi →
-    is_prop_deduct Δ phi
+    is_prop_deduct_v1 Δ phi
 
   | assume_
     (phi : Formula_) :
     phi ∈ Δ →
-    is_prop_deduct Δ phi
+    is_prop_deduct_v1 Δ phi
 
   | mp_
     (phi psi : Formula_) :
-    is_prop_deduct Δ (phi.imp_ psi) →
-    is_prop_deduct Δ phi →
-    is_prop_deduct Δ psi
+    is_prop_deduct_v1 Δ (phi.imp_ psi) →
+    is_prop_deduct_v1 Δ phi →
+    is_prop_deduct_v1 Δ psi
 
 
 /--
   `is_prop_proof F` := True if and only if there is a proof of `F` in classical propositional logic.
 -/
 def is_prop_proof (phi : Formula_) : Prop :=
-  is_prop_deduct ∅ phi
+  is_prop_deduct_v1 ∅ phi
 
 
 -------------------------------------------------------------------------------
@@ -240,7 +240,7 @@ lemma is_prop_axiom_imp_is_axiom_v1
 lemma is_prop_deduct_imp_is_deduct_v1
   (Δ : Set Formula_)
   (F : Formula_)
-  (h1 : is_prop_deduct Δ F) :
+  (h1 : is_prop_deduct_v1 Δ F) :
   is_deduct_v1 Δ F :=
   by
   induction h1
@@ -979,7 +979,7 @@ lemma is_prop_axiom_imp_is_deduct_v4
 lemma is_prop_deduct_imp_is_deduct_v4
   (Δ : Finset Formula_)
   (F : Formula_)
-  (h1 : is_prop_deduct Δ F) :
+  (h1 : is_prop_deduct_v1 Δ F) :
   is_deduct_v4 Δ.toList F :=
   by
   induction h1
