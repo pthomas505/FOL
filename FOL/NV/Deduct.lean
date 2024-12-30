@@ -804,7 +804,10 @@ inductive is_deduct_v4 : List Formula_ → Formula_ → Prop
     is_deduct_v4 (Δ.map (FOL.NV.Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ)) (FOL.NV.Sub.Pred.All.Rec.Option.Fresh.sub_pred_all_rec_opt freshChar τ phi)
 
 
-example
+-------------------------------------------------------------------------------
+
+
+lemma is_deduct_v4_struct_1_list
   (Δ : List Formula_)
   (F : Formula_)
   (Γ : List Formula_)
@@ -820,57 +823,149 @@ example
     exact ih
 
 
-example
+lemma is_deduct_v4_struct_3_singleton_list
   (Δ_1 Δ_2 : List Formula_)
-  (F : Formula_)
+  (Γ : List Formula_)
   (H : Formula_)
-  (h1 : is_deduct_v4 (Δ_1 ++ [H] ++ Δ_2) F) :
-  is_deduct_v4 (Δ_1 ++ Δ_2 ++ [H]) F :=
+  (F : Formula_)
+  (h1 : is_deduct_v4 (Δ_1 ++ [H] ++ Γ ++ Δ_2) F) :
+  is_deduct_v4 (Δ_1 ++ Γ ++ [H] ++ Δ_2) F :=
   by
-  induction Δ_2 generalizing Δ_1
+  induction Γ generalizing Δ_1 Δ_2
   case nil =>
     simp at h1
-
     simp
     exact h1
-  case cons hd tl ih =>
-    specialize ih (Δ_1 ++ [hd])
-    simp at ih
+  case cons Γ_1_hd Γ_1_tl Γ_1_ih =>
+    specialize Γ_1_ih (Δ_1 ++ [Γ_1_hd])
+    simp at Γ_1_ih
 
     simp at h1
 
     simp
-    apply ih
-    obtain s1 := is_deduct_v4.struct_3_ Δ_1 tl H hd F
+    apply Γ_1_ih
+    obtain s1 := is_deduct_v4.struct_3_ Δ_1 (Γ_1_tl ++ Δ_2) H Γ_1_hd
     simp at s1
     apply s1
     exact h1
 
 
-example
+lemma is_deduct_v4_struct_3_list_list
+  (Δ_1 Δ_2 : List Formula_)
+  (Γ_1 Γ_2 : List Formula_)
+  (F : Formula_)
+  (h1 : is_deduct_v4 (Δ_1 ++ Γ_1 ++ Γ_2 ++ Δ_2) F) :
+  is_deduct_v4 (Δ_1 ++ Γ_2 ++ Γ_1 ++ Δ_2) F :=
+  by
+  induction Γ_1 generalizing Γ_2 Δ_1 Δ_2
+  case nil =>
+    simp at h1
+    simp
+    exact h1
+  case cons hd tl ih =>
+    obtain s1 := is_deduct_v4_struct_3_singleton_list Δ_1 (tl ++ Δ_2) Γ_2 hd F
+    simp at s1
+    simp
+    apply s1
+    clear s1
+
+    specialize ih (Δ_1 ++ [hd]) Δ_2 Γ_2
+    simp at ih
+    apply ih
+
+    simp at h1
+    exact h1
+
+
+lemma is_deduct_v4_struct_3_list_list_mid
+  (Δ_1 Δ_2 Δ_3 : List Formula_)
+  (Γ_1 Γ_2 : List Formula_)
+  (F : Formula_)
+  (h1 : is_deduct_v4 (Δ_1 ++ Γ_1 ++ Δ_2 ++ Γ_2 ++ Δ_3) F) :
+  is_deduct_v4 (Δ_1 ++ Γ_2 ++ Δ_2 ++ Γ_1 ++ Δ_3) F :=
+  by
+  obtain s1 := is_deduct_v4_struct_3_list_list (Δ_1 ++ Γ_2) Δ_3 Γ_1 Δ_2
+
+  obtain s2 := is_deduct_v4_struct_3_list_list Δ_1 Δ_3 (Γ_1 ++ Δ_2) Γ_2 F
+
+  simp at *
+  apply s1
+  apply s2
+  exact h1
+
+
+lemma is_deduct_v4_struct_rotate_to_first
   (Δ_1 Δ_2 : List Formula_)
   (F : Formula_)
   (H : Formula_)
   (h1 : is_deduct_v4 (Δ_1 ++ [H] ++ Δ_2) F) :
   is_deduct_v4 (H :: Δ_1 ++ Δ_2) F :=
   by
-  induction Δ_1 using List.reverseRecOn generalizing Δ_2
-  case nil =>
-    simp at h1
+  obtain s1 := is_deduct_v4_struct_3_list_list [] Δ_2 Δ_1 [H]
+  simp at s1
+  simp
+  apply s1
+  simp at h1
+  exact h1
 
-    simp
-    exact h1
-  case append_singleton xs x ih =>
-    simp at ih
 
-    simp at h1
+lemma is_deduct_v4_struct_rotate_to_last
+  (Δ_1 Δ_2 : List Formula_)
+  (F : Formula_)
+  (H : Formula_)
+  (h1 : is_deduct_v4 (Δ_1 ++ [H] ++ Δ_2) F) :
+  is_deduct_v4 (Δ_1 ++ Δ_2 ++ [H]) F :=
+  by
+  obtain s1 := is_deduct_v4_struct_3_list_list Δ_1 [] [H] Δ_2
+  simp at s1
+  simp
+  apply s1
+  simp at h1
+  exact h1
 
-    simp
-    apply ih
-    obtain s1 := is_deduct_v4.struct_3_ xs Δ_2 x H F
-    simp at s1
-    apply s1
-    exact h1
+
+-------------------------------------------------------------------------------
+
+
+lemma is_prop_axiom_imp_is_deduct_v4
+  (F : Formula_)
+  (h1 : is_prop_axiom F) :
+  is_deduct_v4 [] F :=
+  by
+  induction h1
+  case prop_true_ =>
+    apply is_deduct_v4.prop_0_
+  case prop_1_ phi psi =>
+    apply is_deduct_v4.prop_1_
+  case prop_2_ phi psi chi =>
+    apply is_deduct_v4.prop_2_
+  case prop_3_ phi psi =>
+    apply is_deduct_v4.prop_3_
+  case def_false_ =>
+    apply is_deduct_v4.def_false_
+  case def_and_ phi psi =>
+    apply is_deduct_v4.def_and_
+  case def_or_ phi psi =>
+    apply is_deduct_v4.def_or_
+  case def_iff_ phi psi =>
+    apply is_deduct_v4.def_iff_
+
+
+lemma is_prop_deduct_imp_is_deduct_v4
+  (Δ : Finset Formula_)
+  (F : Formula_)
+  (h1 : is_prop_deduct Δ F) :
+  is_deduct_v4 Δ.toList F :=
+  by
+  induction h1
+  case axiom_ phi ih =>
+    obtain s1 := is_prop_axiom_imp_is_deduct_v4 phi ih
+    sorry
+
+  case assume_ phi ih =>
+    sorry
+  case mp_ phi psi ih_1 ih_2 ih_3 ih_4 =>
+    sorry
 
 
 --#lint
