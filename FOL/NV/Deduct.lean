@@ -993,7 +993,9 @@ lemma is_prop_deduct_imp_is_deduct_v4
     simp
     exact ih
   case mp_ phi psi ih_1 ih_2 ih_3 ih_4 =>
-    sorry
+    apply is_deduct_v4.mp_ Δ.toList phi
+    · exact ih_3
+    · exact ih_4
 
 
 --#lint
