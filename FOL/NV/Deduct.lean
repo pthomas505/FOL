@@ -237,7 +237,7 @@ lemma is_prop_axiom_v1_imp_is_axiom_v1
     apply is_axiom_v1.def_iff_
 
 
-lemma is_prop_deduct_imp_is_deduct_v1
+lemma is_prop_deduct_v1_imp_is_deduct_v1
   (Δ : Set Formula_)
   (F : Formula_)
   (h1 : is_prop_deduct_v1 Δ F) :
@@ -257,14 +257,14 @@ lemma is_prop_deduct_imp_is_deduct_v1
     · exact ih_4
 
 
-lemma is_prop_proof_imp_is_proof_v1
+lemma is_prop_proof_v1_imp_is_proof_v1
   (F : Formula_)
   (h1 : is_prop_proof_v1 F) :
   is_proof_v1 F :=
   by
   unfold is_prop_proof_v1 at h1
   unfold is_proof_v1
-  apply is_prop_deduct_imp_is_deduct_v1
+  apply is_prop_deduct_v1_imp_is_deduct_v1
   exact h1
 
 
@@ -952,7 +952,7 @@ lemma is_deduct_v4_assume_mem
       exact h1
 
 
-lemma is_prop_axiom_imp_is_deduct_v4
+lemma is_prop_axiom_v1_imp_is_deduct_v4
   (F : Formula_)
   (h1 : is_prop_axiom_v1 F) :
   is_deduct_v4 [] F :=
@@ -976,7 +976,7 @@ lemma is_prop_axiom_imp_is_deduct_v4
     apply is_deduct_v4.def_iff_
 
 
-lemma is_prop_deduct_imp_is_deduct_v4
+lemma is_prop_deduct_v1_imp_is_deduct_v4
   (Δ : Finset Formula_)
   (F : Formula_)
   (h1 : is_prop_deduct_v1 Δ F) :
@@ -987,7 +987,7 @@ lemma is_prop_deduct_imp_is_deduct_v4
     obtain s1 := is_deduct_v4_struct_1_list [] phi Δ.toList
     simp at s1
     apply s1
-    exact is_prop_axiom_imp_is_deduct_v4 phi ih
+    exact is_prop_axiom_v1_imp_is_deduct_v4 phi ih
   case assume_ phi ih =>
     apply is_deduct_v4_assume_mem
     simp
