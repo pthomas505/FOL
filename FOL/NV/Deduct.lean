@@ -213,7 +213,7 @@ def is_proof_v1 (F : Formula_) : Prop :=
 -------------------------------------------------------------------------------
 
 
-lemma is_prop_axiom_imp_is_axiom_v1
+lemma is_prop_axiom_v1_imp_is_axiom_v1
   (F : Formula_)
   (h1 : is_prop_axiom_v1 F) :
   is_axiom_v1 F :=
@@ -246,7 +246,7 @@ lemma is_prop_deduct_imp_is_deduct_v1
   induction h1
   case axiom_ phi ih =>
     apply is_deduct_v1.axiom_
-    apply is_prop_axiom_imp_is_axiom_v1
+    apply is_prop_axiom_v1_imp_is_axiom_v1
     exact ih
   case assume_ phi ih =>
     apply is_deduct_v1.assume_
