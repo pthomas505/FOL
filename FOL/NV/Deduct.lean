@@ -927,6 +927,31 @@ lemma is_deduct_v4_struct_rotate_to_last
 -------------------------------------------------------------------------------
 
 
+lemma is_deduct_v4_assume_mem
+  (F : Formula_)
+  (Δ : List Formula_)
+  (h1 : F ∈ Δ) :
+  is_deduct_v4 Δ F :=
+  by
+  induction Δ
+  case nil =>
+    simp at h1
+  case cons hd tl ih =>
+    simp at h1
+    cases h1
+    case inl h1 =>
+      rw [h1]
+      obtain s1 := is_deduct_v4_struct_rotate_to_first tl [] hd hd
+      simp at s1
+      apply s1
+      apply is_deduct_v4_struct_1_list [hd] hd tl
+      apply is_deduct_v4.assume_ hd
+    case inr h1 =>
+      apply is_deduct_v4.struct_1_
+      apply ih
+      exact h1
+
+
 lemma is_prop_axiom_imp_is_deduct_v4
   (F : Formula_)
   (h1 : is_prop_axiom F) :
@@ -964,7 +989,9 @@ lemma is_prop_deduct_imp_is_deduct_v4
     apply s1
     exact is_prop_axiom_imp_is_deduct_v4 phi ih
   case assume_ phi ih =>
-    sorry
+    apply is_deduct_v4_assume_mem
+    simp
+    exact ih
   case mp_ phi psi ih_1 ih_2 ih_3 ih_4 =>
     sorry
 
