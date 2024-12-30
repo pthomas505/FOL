@@ -843,7 +843,7 @@ theorem is_tauto_def_iff
 -/
 example
   (F : Formula_)
-  (h1 : is_prop_proof F) :
+  (h1 : is_prop_proof_v1 F) :
   F.is_tauto :=
   by
   induction h1

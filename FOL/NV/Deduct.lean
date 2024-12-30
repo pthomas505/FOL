@@ -71,9 +71,9 @@ inductive is_prop_deduct_v1 (Δ : Set Formula_) : Formula_ → Prop
 
 
 /--
-  `is_prop_proof F` := True if and only if there is a proof of `F` in classical propositional logic.
+  `is_prop_proof_v1 F` := True if and only if there is a proof of `F` in classical propositional logic.
 -/
-def is_prop_proof (phi : Formula_) : Prop :=
+def is_prop_proof_v1 (phi : Formula_) : Prop :=
   is_prop_deduct_v1 ∅ phi
 
 
@@ -259,10 +259,10 @@ lemma is_prop_deduct_imp_is_deduct_v1
 
 lemma is_prop_proof_imp_is_proof_v1
   (F : Formula_)
-  (h1 : is_prop_proof F) :
+  (h1 : is_prop_proof_v1 F) :
   is_proof_v1 F :=
   by
-  unfold is_prop_proof at h1
+  unfold is_prop_proof_v1 at h1
   unfold is_proof_v1
   apply is_prop_deduct_imp_is_deduct_v1
   exact h1
