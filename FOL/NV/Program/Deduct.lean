@@ -491,6 +491,27 @@ example
       sorry
     all_goals
       sorry
+  case pred_3_ h1_v h1_phi h1_ih =>
+    apply is_deduct_v3.axiom_
+    apply is_axiom_v3.pred_3_
+    exact h1_ih
+  case gen_ h1_v h1_phi h1_ih_1 h1_ih_2 =>
+
+    simp at h1_ih_2
+    induction h1_ih_2
+    case _ h1_ih_2_phi h1_ih_2_ih =>
+      apply is_deduct_v3.axiom_
+      apply is_axiom_v3.gen_
+      exact h1_ih_2_ih
+    case _ h1_ih_2_phi h1_ih_2_ih =>
+      simp at h1_ih_2_ih
+    case _ h1_ih_2_phi h1_ih_2_psi h1_ih_2_ih_1 h1_ih_2_ih_2 h1_ih_2_ih_3 h1_ih_2_ih_4 =>
+      have s1 : is_deduct_v3 ∅ h1_ih_2_psi :=
+      by
+        apply is_deduct_v3.mp_
+        · exact h1_ih_2_ih_1
+        · exact h1_ih_2_ih_2
+      sorry
 
   all_goals
     sorry
