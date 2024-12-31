@@ -391,4 +391,38 @@ lemma is_prop_deduct_v1_imp_is_deduct_v4
     · exact ih_4
 
 
+-------------------------------------------------------------------------------
+
+
+example
+  (F : Formula_)
+  (Δ : List Formula_)
+  (h1 : is_deduct_v4 Δ F) :
+  is_deduct_v3 Δ.toFinset.toSet F :=
+  by
+  induction h1
+  case struct_1_ h1_Δ h1_H h1_phi h1_ih_1 h1_ih_2 =>
+    have s1 : (h1_H :: h1_Δ).toFinset.toSet = {h1_H} ∪ h1_Δ.toFinset.toSet :=
+    by
+      simp
+    rw [s1]
+
+    apply is_deduct_v3_weaken h1_phi h1_Δ.toFinset.toSet {h1_H}
+    exact h1_ih_2
+  case struct_2_ h1_Δ h1_H h1_phi h1_ih_1 h1_ih_2 =>
+    simp at h1_ih_2
+    simp
+    exact h1_ih_2
+  case struct_3_ h1_Δ_1 h1_Δ_2 h1_H_1 h1_H_2 h1_phi h1_ih_1 h1_ih_2 =>
+    simp at h1_ih_2
+    simp
+    have s1 : insert h1_H_2 (insert h1_H_1 ({a | a ∈ h1_Δ_1} ∪ {a | a ∈ h1_Δ_2})) = insert h1_H_1 (insert h1_H_2 ({a | a ∈ h1_Δ_1} ∪ {a | a ∈ h1_Δ_2})) :=
+    by
+      simp only [Set.insert_comm]
+    rw [s1]
+    exact h1_ih_2
+  all_goals
+    sorry
+
+
 --#lint

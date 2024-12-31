@@ -616,6 +616,28 @@ example
     apply is_axiom_v1.def_exists_
 
 
+lemma is_deduct_v3_weaken
+  (F : Formula_)
+  (Δ : Set Formula_)
+  (Γ : Set Formula_)
+  (h1 : is_deduct_v3 Δ F) :
+  is_deduct_v3 (Γ ∪ Δ) F :=
+  by
+  induction h1
+  case axiom_ phi ih =>
+    apply is_deduct_v3.axiom_
+    exact ih
+  case assume_ phi ih =>
+    apply is_deduct_v3.assume_
+    simp
+    right
+    exact ih
+  case mp_ phi psi ih_1 ih_2 ih_3 ih_4 =>
+    apply is_deduct_v3.mp_ phi
+    · exact ih_3
+    · exact ih_4
+
+
 -------------------------------------------------------------------------------
 
 
