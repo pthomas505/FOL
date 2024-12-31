@@ -3,6 +3,7 @@ import MathlibExtra.FunctionUpdateITE
 import FOL.NV.Formula
 import FOL.NV.Fresh
 import FOL.NV.Semantics
+import FOL.NV.Sub.Var.All.Rec.Admits
 
 
 set_option autoImplicit false
@@ -287,6 +288,112 @@ lemma sub_var_all_rec_id
     simp
     simp only [Function.updateITE_id]
     exact phi_ih
+
+
+example
+  (binders : Finset VarName_)
+  (σ : VarName_ → VarName_)
+  (F : Formula_)
+  (h1 : admits_var_all_rec_aux σ binders F) :
+  ∀ (v : VarName_), v ∈ F.free_var_set → v ∉ binders → σ v ∉ binders :=
+  by
+  induction F generalizing binders
+  case
+      pred_const_ X xs
+    | pred_var_ X xs
+    | eq_ x y
+    | def_ X xs =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [free_var_set]
+    simp
+    exact h1
+  case
+      true_
+    | false_ =>
+    simp only [free_var_set]
+    simp
+  case not_ phi ih =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [free_var_set]
+    apply ih
+    exact h1
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [free_var_set]
+    simp
+    tauto
+  case
+      forall_ x phi ih
+    | exists_ x phi ih =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [free_var_set]
+    intro v a1 a2
+    simp at a1
+    obtain ⟨a1_left, a1_right⟩ := a1
+    specialize ih (binders ∪ {x}) h1 v
+    simp at ih
+    specialize ih a1_left a2 a1_right
+    tauto
+
+
+example
+  (σ : VarName_ → VarName_)
+  (c : Char)
+  (F : Formula_)
+  (h1 : FOL.NV.Sub.Var.All.Rec.admits_var_all_rec σ F) :
+  sub_var_all_rec σ c F = FOL.NV.Sub.Var.All.Rec.fast_replace_free_var_all_rec σ F :=
+  by
+  induction F generalizing σ
+  case
+      pred_const_ X xs
+    | pred_var_ X xs
+    | eq_ x y
+    | true_
+    | false_
+    | def_ X xs =>
+    simp only [sub_var_all_rec]
+    simp only [fast_replace_free_var_all_rec]
+  case not_ phi ih =>
+    simp only [admits_var_all_rec] at ih
+
+    simp only [admits_var_all_rec] at h1
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [sub_var_all_rec]
+    simp only [fast_replace_free_var_all_rec]
+    congr
+    apply ih
+    exact h1
+  case forall_ x phi ih =>
+    simp only [admits_var_all_rec] at ih
+
+    simp only [admits_var_all_rec] at h1
+    simp only [admits_var_all_rec_aux] at h1
+    simp at h1
+
+    simp only [sub_var_all_rec]
+    simp only [fast_replace_free_var_all_rec]
+    split_ifs
+    case pos c1 =>
+      obtain ⟨y, ⟨c1_left, c1_right⟩⟩ := c1
+      simp at c1_left
+      obtain ⟨c1_left_left, c1_left_right⟩ := c1_left
+      sorry
+    case neg c1 =>
+      simp at c1
+      congr
+      apply ih
+      sorry
+  all_goals
+    sorry
 
 
 #lint
