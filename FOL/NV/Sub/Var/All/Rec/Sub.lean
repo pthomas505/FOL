@@ -345,6 +345,74 @@ lemma admits_var_all_rec_aux_mem_free_var_set_and_not_mem_binders
 
 
 example
+  (binders : Finset VarName_)
+  (v : VarName_)
+  (σ : VarName_ → VarName_)
+  (F : Formula_)
+  (h1 : admits_var_all_rec_aux σ ({v} ∪ binders) F) : admits_var_all_rec_aux (Function.updateITE σ v v) binders F :=
+  by
+  induction F generalizing binders
+  case
+      pred_const_ X xs
+    | pred_var_ X xs
+    | def_ X xs =>
+    simp only [admits_var_all_rec_aux] at h1
+    simp at h1
+
+    simp only [admits_var_all_rec_aux]
+    intro x a1 a2
+    simp only [Function.updateITE]
+    split_ifs
+    case pos c1 =>
+      rw [c1] at a2
+      exact a2
+    case neg c1 =>
+      specialize h1 x a1 c1 a2
+      tauto
+  case eq_ x y =>
+    simp only [admits_var_all_rec_aux] at h1
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
+
+    simp only [admits_var_all_rec_aux]
+    constructor
+    · intro a1
+      simp only [Function.updateITE]
+      split_ifs
+      case pos c1 =>
+        rw [c1] at a1
+        exact a1
+      case neg c1 =>
+        specialize h1_left c1 a1
+        tauto
+    · intro a1
+      simp only [Function.updateITE]
+      split_ifs
+      case pos c1 =>
+        rw [c1] at a1
+        exact a1
+      case neg c1 =>
+        specialize h1_right c1 a1
+        tauto
+  case true_ | false_ =>
+    simp only [admits_var_all_rec_aux]
+  case not_ phi ih =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [admits_var_all_rec_aux]
+    apply ih
+    exact h1
+
+  case forall_ x phi ih =>
+    simp only [admits_var_all_rec_aux] at h1
+    simp at h1
+
+    simp only [admits_var_all_rec_aux]
+    apply ih
+    exact h1
+
+
+example
   (σ : VarName_ → VarName_)
   (c : Char)
   (F : Formula_)
@@ -397,6 +465,7 @@ example
     congr
     apply ih
     clear ih
+    extract_goal
     sorry
 
   all_goals
