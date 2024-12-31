@@ -522,7 +522,7 @@ def is_proof_v3 (F : Formula_) : Prop :=
   is_deduct_v3 ∅ F
 
 
-example
+lemma is_axiom_v1_imp_is_axiom_v3
   (F : Formula_)
   (h1 : is_axiom_v1 F) :
   is_axiom_v3 F :=
@@ -569,7 +569,27 @@ example
     apply is_axiom_v3.def_exists_
 
 
-example
+lemma is_deduct_v1_imp_is_deduct_v3
+  (Δ : Set Formula_)
+  (F : Formula_)
+  (h1 : is_deduct_v1 Δ F) :
+  is_deduct_v3 Δ F :=
+  by
+  induction h1
+  case axiom_ h1_phi h1_ih =>
+    apply is_deduct_v3.axiom_
+    apply is_axiom_v1_imp_is_axiom_v3
+    exact h1_ih
+  case assume_ h1_phi h1_ih =>
+    apply is_deduct_v3.assume_
+    exact h1_ih
+  case mp_ h1_phi h1_psi h1_ih_1 h1_ih_2 h1_ih_3 h1_ih_4 =>
+    apply is_deduct_v3.mp_ h1_phi
+    · exact h1_ih_3
+    · exact h1_ih_4
+
+
+lemma is_axiom_v3_imp_is_axiom_v1
   (F : Formula_)
   (h1 : is_axiom_v3 F) :
   is_axiom_v1 F :=
@@ -614,6 +634,26 @@ example
     apply is_axiom_v1.def_iff_
   case def_exists_ v phi =>
     apply is_axiom_v1.def_exists_
+
+
+lemma is_deduct_v3_imp_is_deduct_v1
+  (Δ : Set Formula_)
+  (F : Formula_)
+  (h1 : is_deduct_v3 Δ F) :
+  is_deduct_v1 Δ F :=
+  by
+  induction h1
+  case axiom_ h1_phi h1_ih =>
+    apply is_deduct_v1.axiom_
+    apply is_axiom_v3_imp_is_axiom_v1
+    exact h1_ih
+  case assume_ h1_phi h1_ih =>
+    apply is_deduct_v1.assume_
+    exact h1_ih
+  case mp_ h1_phi h1_psi h1_ih_1 h1_ih_2 h1_ih_3 h1_ih_4 =>
+    apply is_deduct_v1.mp_ h1_phi
+    · exact h1_ih_3
+    · exact h1_ih_4
 
 
 lemma is_deduct_v3_weaken

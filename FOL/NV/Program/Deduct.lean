@@ -1,5 +1,6 @@
 import MathlibExtra.Fin
 import FOL.NV.Deduct
+import FOL.NV.Prop
 import FOL.NV.Sub.Var.One.Rec.Admits
 import FOL.NV.Sub.Var.All.Rec.Sub
 import FOL.NV.Sub.Pred.All.Rec.Option.Sub
@@ -421,6 +422,76 @@ example
       simp only [Set.insert_comm]
     rw [s1]
     exact h1_ih_2
+  case assume_ h1_phi =>
+    apply is_deduct_v3.assume_
+    simp
+  case prop_0_ =>
+    apply is_deduct_v3.axiom_
+    apply is_axiom_v3.prop_true_
+  case prop_1_ h1_phi h1_psi =>
+    apply is_deduct_v3.axiom_
+    apply is_axiom_v3.prop_1_
+  case prop_2_ h1_phi h1_psi h1_chi =>
+    apply is_deduct_v3.axiom_
+    apply is_axiom_v3.prop_2_
+  case prop_3_ h1_phi h1_psi =>
+    apply is_deduct_v3.axiom_
+    apply is_axiom_v3.prop_3_
+  case mp_ h1_Δ h1_phi h1_psi h1_ih_1 h1_ih_2 h1_ih_3 h1_ih_4 =>
+    apply is_deduct_v3.mp_ h1_phi
+    · exact h1_ih_3
+    · exact h1_ih_4
+  case dt_ h1_Δ h1_H h1_phi h1_ih_1 h1_ih_2 =>
+    simp at h1_ih_2
+    apply is_deduct_v1_imp_is_deduct_v3
+    apply deduction_theorem
+    apply is_deduct_v3_imp_is_deduct_v1
+    simp
+    exact h1_ih_2
+  case pred_1_ h1_v h1_phi h1_psi =>
+    apply is_deduct_v3.axiom_
+    apply is_axiom_v3.pred_1_
+  case pred_2_ h1_v h1_t h1_phi =>
+    simp
+    induction h1_phi
+    case
+        pred_const_ X xs
+      | pred_var_ X xs
+      | def_ X xs =>
+      simp only [FOL.NV.Sub.Var.All.Rec.Fresh.sub_var_all_rec]
+      apply is_deduct_v3.axiom_
+      apply is_axiom_v3.pred_2_ h1_v h1_t
+      · apply
+        FOL.NV.Sub.Var.One.Rec.not_var_is_bound_in_imp_fast_admits_var_one_rec
+        unfold var_is_bound_in
+        simp
+      · simp only [FOL.NV.Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+        unfold Function.updateITE
+        simp
+        intro a a1
+        refine if_ctx_congr ?_ (congrFun rfl) (congrFun rfl)
+        exact eq_comm
+    case eq_ x y =>
+      simp only [FOL.NV.Sub.Var.All.Rec.Fresh.sub_var_all_rec]
+      apply is_deduct_v3.axiom_
+      apply is_axiom_v3.pred_2_ h1_v h1_t
+      · apply
+        FOL.NV.Sub.Var.One.Rec.not_var_is_bound_in_imp_fast_admits_var_one_rec
+        unfold var_is_bound_in
+        simp
+      · simp only [FOL.NV.Sub.Var.One.Rec.fast_replace_free_var_one_rec]
+        unfold Function.updateITE
+        simp
+        constructor
+        · refine if_ctx_congr ?_ (congrFun rfl) (congrFun rfl)
+          exact eq_comm
+        · refine if_ctx_congr ?_ (congrFun rfl) (congrFun rfl)
+          exact eq_comm
+    case forall_ x phi ih =>
+      sorry
+    all_goals
+      sorry
+
   all_goals
     sorry
 

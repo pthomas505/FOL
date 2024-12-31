@@ -1203,15 +1203,4 @@ macro "SC" : tactic => `(tactic|(
   tauto))
 
 
-theorem prop_complete_v4
-  (P : Formula_)
-  (h1 : P.is_tauto) :
-  is_deduct_v4 [] P :=
-  by
-  obtain s1 := is_prop_deduct_v1_imp_is_deduct_v4 ∅ P
-  simp at s1
-  apply s1
-  sorry
-
-
 --#lint
