@@ -381,24 +381,22 @@ example
 
     simp only [sub_var_all_rec]
     simp only [fast_replace_free_var_all_rec]
-    split_ifs
-    case pos c1 =>
-      have s1 : ¬ ∃ y ∈ phi.free_var_set \ {x}, σ y = x :=
-      by
-        simp
-        intro v a1 a2 a3
-        apply admits_var_all_rec_aux_mem_free_var_set_and_not_mem_binders {x} σ phi h1 v a1
-        · simp
-          exact a2
-        · simp
-          exact a3
-      contradiction
-    case neg c1 =>
-      simp at c1
-      congr
-      apply ih
-      clear ih
-      sorry
+
+    have s1 : ¬ ∃ y ∈ phi.free_var_set \ {x}, σ y = x :=
+    by
+      simp
+      intro v a1 a2 a3
+      apply admits_var_all_rec_aux_mem_free_var_set_and_not_mem_binders {x} σ phi h1 v a1
+      · simp
+        exact a2
+      · simp
+        exact a3
+    simp only [if_neg s1]
+
+    congr
+    apply ih
+    sorry
+
   all_goals
     sorry
 
