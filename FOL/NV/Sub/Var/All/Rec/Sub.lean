@@ -392,9 +392,11 @@ example
       · simp
         exact a3
     simp only [if_neg s1]
+    clear s1
 
     congr
     apply ih
+    clear ih
     sorry
 
   all_goals
