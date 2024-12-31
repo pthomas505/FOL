@@ -678,14 +678,6 @@ lemma is_deduct_v3_weaken
     · exact ih_4
 
 
-example
-  (x : VarName_)
-  (F : Formula_)
-  (h1 : is_deduct_v3 ∅ F) :
-  is_deduct_v3 ∅ (forall_ x F) :=
-  by
-  sorry
-
 -------------------------------------------------------------------------------
 
 

@@ -1,6 +1,7 @@
 import MathlibExtra.Fin
 import FOL.NV.Deduct
 import FOL.NV.Prop
+import FOL.NV.Pred
 import FOL.NV.Sub.Var.One.Rec.Admits
 import FOL.NV.Sub.Var.All.Rec.Sub
 import FOL.NV.Sub.Pred.All.Rec.Option.Sub
@@ -496,22 +497,17 @@ example
     apply is_axiom_v3.pred_3_
     exact h1_ih
   case gen_ h1_v h1_phi h1_ih_1 h1_ih_2 =>
-
-    simp at h1_ih_2
-    induction h1_ih_2
-    case _ h1_ih_2_phi h1_ih_2_ih =>
-      apply is_deduct_v3.axiom_
-      apply is_axiom_v3.gen_
-      exact h1_ih_2_ih
-    case _ h1_ih_2_phi h1_ih_2_ih =>
-      simp at h1_ih_2_ih
-    case _ h1_ih_2_phi h1_ih_2_psi h1_ih_2_ih_1 h1_ih_2_ih_2 h1_ih_2_ih_3 h1_ih_2_ih_4 =>
-      have s1 : is_deduct_v3 ∅ h1_ih_2_psi :=
-      by
-        apply is_deduct_v3.mp_
-        · exact h1_ih_2_ih_1
-        · exact h1_ih_2_ih_2
-      sorry
+    apply is_deduct_v1_imp_is_deduct_v3
+    apply generalization
+    · apply is_deduct_v3_imp_is_deduct_v1
+      exact h1_ih_2
+    · simp
+  case eq_1_ h1_v =>
+    apply is_deduct_v1_imp_is_deduct_v3
+    apply spec_id h1_v
+    apply is_deduct_v3_imp_is_deduct_v1
+    apply is_deduct_v3.axiom_
+    apply is_axiom_v3.eq_1_
 
   all_goals
     sorry
