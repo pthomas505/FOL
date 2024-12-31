@@ -290,7 +290,7 @@ lemma sub_var_all_rec_id
     exact phi_ih
 
 
-example
+lemma admits_var_all_rec_aux_mem_free_var_set_and_not_mem_binders
   (binders : Finset VarName_)
   (σ : VarName_ → VarName_)
   (F : Formula_)
@@ -383,14 +383,21 @@ example
     simp only [fast_replace_free_var_all_rec]
     split_ifs
     case pos c1 =>
-      obtain ⟨y, ⟨c1_left, c1_right⟩⟩ := c1
-      simp at c1_left
-      obtain ⟨c1_left_left, c1_left_right⟩ := c1_left
-      sorry
+      have s1 : ¬ ∃ y ∈ phi.free_var_set \ {x}, σ y = x :=
+      by
+        simp
+        intro v a1 a2 a3
+        apply admits_var_all_rec_aux_mem_free_var_set_and_not_mem_binders {x} σ phi h1 v a1
+        · simp
+          exact a2
+        · simp
+          exact a3
+      contradiction
     case neg c1 =>
       simp at c1
       congr
       apply ih
+      clear ih
       sorry
   all_goals
     sorry
