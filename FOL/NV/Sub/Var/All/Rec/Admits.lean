@@ -237,4 +237,136 @@ theorem substitution_is_valid_admits_var_all_rec
   apply h2
 
 
+lemma admits_var_all_rec_aux_mem_free_var_set_and_not_mem_binders
+  (binders : Finset VarName_)
+  (σ : VarName_ → VarName_)
+  (F : Formula_)
+  (h1 : admits_var_all_rec_aux σ binders F) :
+  ∀ (v : VarName_), v ∈ F.free_var_set → v ∉ binders → σ v ∉ binders :=
+  by
+  induction F generalizing binders
+  case
+      pred_const_ X xs
+    | pred_var_ X xs
+    | eq_ x y
+    | def_ X xs =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [free_var_set]
+    simp
+    exact h1
+  case
+      true_
+    | false_ =>
+    simp only [free_var_set]
+    simp
+  case not_ phi ih =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [free_var_set]
+    apply ih
+    exact h1
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [free_var_set]
+    simp
+    tauto
+  case
+      forall_ x phi ih
+    | exists_ x phi ih =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [free_var_set]
+    intro v a1 a2
+    simp at a1
+    obtain ⟨a1_left, a1_right⟩ := a1
+    specialize ih (binders ∪ {x}) h1 v
+    simp at ih
+    specialize ih a1_left a2 a1_right
+    tauto
+
+
+lemma admits_var_all_rec_aux_del_binder
+  (binders : Finset VarName_)
+  (v : VarName_)
+  (σ : VarName_ → VarName_)
+  (F : Formula_)
+  (h1 : admits_var_all_rec_aux σ ({v} ∪ binders) F) : admits_var_all_rec_aux (Function.updateITE σ v v) binders F :=
+  by
+  induction F generalizing binders
+  case
+      pred_const_ X xs
+    | pred_var_ X xs
+    | def_ X xs =>
+    simp only [admits_var_all_rec_aux] at h1
+    simp at h1
+
+    simp only [admits_var_all_rec_aux]
+    intro x a1 a2
+    simp only [Function.updateITE]
+    split_ifs
+    case pos c1 =>
+      rw [c1] at a2
+      exact a2
+    case neg c1 =>
+      specialize h1 x a1 c1 a2
+      tauto
+  case eq_ x y =>
+    simp only [admits_var_all_rec_aux] at h1
+    simp at h1
+    obtain ⟨h1_left, h1_right⟩ := h1
+
+    simp only [admits_var_all_rec_aux]
+    constructor
+    · intro a1
+      simp only [Function.updateITE]
+      split_ifs
+      case pos c1 =>
+        rw [c1] at a1
+        exact a1
+      case neg c1 =>
+        specialize h1_left c1 a1
+        tauto
+    · intro a1
+      simp only [Function.updateITE]
+      split_ifs
+      case pos c1 =>
+        rw [c1] at a1
+        exact a1
+      case neg c1 =>
+        specialize h1_right c1 a1
+        tauto
+  case true_ | false_ =>
+    simp only [admits_var_all_rec_aux]
+  case not_ phi ih =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [admits_var_all_rec_aux]
+    apply ih
+    exact h1
+  case
+      imp_ phi psi phi_ih psi_ih
+    | and_ phi psi phi_ih psi_ih
+    | or_ phi psi phi_ih psi_ih
+    | iff_ phi psi phi_ih psi_ih =>
+    simp only [admits_var_all_rec_aux] at h1
+
+    simp only [admits_var_all_rec_aux]
+    tauto
+  case
+      forall_ x phi ih
+    | exists_ x phi ih =>
+    simp only [admits_var_all_rec_aux] at h1
+    simp at h1
+
+    simp only [admits_var_all_rec_aux]
+    apply ih
+    exact h1
+
+
 #lint
