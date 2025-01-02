@@ -445,7 +445,7 @@ example
   case dt_ h1_Δ h1_H h1_phi h1_ih_1 h1_ih_2 =>
     simp at h1_ih_2
     apply is_deduct_v1_imp_is_deduct_v3
-    apply deduction_theorem
+    apply deduction_theorem_pred_v1
     apply is_deduct_v3_imp_is_deduct_v1
     simp
     exact h1_ih_2
