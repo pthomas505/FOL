@@ -30,6 +30,81 @@ def def_eq_ (x y : VarName_) : Formula_ :=
   pred_const_ (PredName_.mk "=") [x, y]
 
 
+theorem T_14_10_pred_v1
+  (Δ : Set Formula_)
+  (F : Formula_)
+  (h1 : is_deduct_v1 Δ F) :
+  ∀ (Γ : Set Formula_), is_deduct_v1 (Δ ∪ Γ) F :=
+  by
+  intro Γ
+  induction h1
+  case axiom_ h1_phi h1_1 =>
+    apply is_deduct_v1.axiom_
+    exact h1_1
+  case assume_ h1_phi h1_1 =>
+    apply is_deduct_v1.assume_
+    simp
+    left
+    exact h1_1
+  case mp_ h1_phi h1_psi _ _ h1_ih_1 h1_ih_2 =>
+    apply is_deduct_v1.mp_ h1_phi
+    · exact h1_ih_1
+    · exact h1_ih_2
+
+
+theorem C_14_11_pred_v1
+  (F : Formula_)
+  (h1 : is_proof_v1 F) :
+  ∀ (Δ : Set Formula_), is_deduct_v1 Δ F :=
+  by
+  intro Δ
+  obtain s1 := T_14_10_pred_v1 ∅ F h1 Δ
+  simp at s1
+  exact s1
+
+alias proof_imp_deduct_pred_v1 := C_14_11_pred_v1
+
+
+-- Deduction Theorem
+theorem T_14_3_pred_v1
+  (Δ : Set Formula_)
+  (P Q : Formula_)
+  (h1 : is_deduct_v1 (Δ ∪ {P}) Q) :
+  is_deduct_v1 Δ (P.imp_ Q) :=
+  by
+  induction h1
+  case axiom_ h1_phi h1_1 =>
+    apply is_deduct_v1.mp_ h1_phi
+    · apply is_deduct_v1.axiom_
+      apply is_axiom_v1.prop_1_
+    · apply is_deduct_v1.axiom_
+      exact h1_1
+  case assume_ h1_phi h1_1 =>
+    simp at h1_1
+    cases h1_1
+    case inl h1_1 =>
+      rw [h1_1]
+      apply proof_imp_deduct_pred_v1
+      apply is_prop_proof_v1_imp_is_proof_v1
+      apply prop_id
+    case inr h1_1 =>
+      apply is_deduct_v1.mp_ h1_phi
+      · apply is_deduct_v1.axiom_
+        apply is_axiom_v1.prop_1_
+      · apply is_deduct_v1.assume_
+        exact h1_1
+  case mp_ h1_phi h1_psi _ _ h1_ih_1
+    h1_ih_2 =>
+    apply is_deduct_v1.mp_ (P.imp_ h1_phi)
+    · apply is_deduct_v1.mp_ (P.imp_ (h1_phi.imp_ h1_psi))
+      · apply is_deduct_v1.axiom_
+        apply is_axiom_v1.prop_2_
+      · exact h1_ih_1
+    · exact h1_ih_2
+
+alias deduction_theorem_pred_v1 := T_14_3_pred_v1
+
+
 /-
 /--
   IsReplOfVarInListFun u v l_u l_v := True if and only if l_v is the result of replacing one or more specified occurrences (but not necessarily all occurrences) of u in l_u by occurrences of v.
@@ -361,7 +436,8 @@ theorem T_17_3
 
   simp only [is_proof_v1]
   apply is_deduct_v1.mp_ ((forall_ v P.not_).imp_ (fast_replace_free_var_one_rec v t P).not_)
-  · SC
+  · apply is_prop_deduct_v1_imp_is_deduct_v1
+    SC
   · apply is_deduct_v1.axiom_
     apply is_axiom_v1.pred_2_ v t
     · simp only [fast_admits_var_one_rec]
@@ -380,7 +456,7 @@ theorem T_17_4
   is_deduct_v1 Δ (exists_ v P) :=
   by
   apply is_deduct_v1.mp_ (fast_replace_free_var_one_rec v t P)
-  · apply proof_imp_deduct
+  · apply proof_imp_deduct_pred_v1
     apply T_17_3
     exact h1
   · exact h2
@@ -406,7 +482,7 @@ theorem T_17_6
   (v : VarName_) :
   is_proof_v1 ((forall_ v P).imp_ (exists_ v P)) :=
   by
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
   simp
   apply exists_intro_id
   apply spec_id v
@@ -457,8 +533,8 @@ theorem univ_intro
   by
   rw [← fast_replace_free_var_one_rec_inverse P v t h1]
   apply is_deduct_v1.mp_ (forall_ t (fast_replace_free_var_one_rec v t P))
-  · apply proof_imp_deduct
-    apply deduction_theorem
+  · apply proof_imp_deduct_pred_v1
+    apply deduction_theorem_pred_v1
     simp
     apply generalization
     · apply spec
@@ -589,7 +665,7 @@ theorem T_17_10
   (u v : VarName_) :
   is_proof_v1 ((forall_ u (forall_ v P)).imp_ (forall_ v (forall_ u P))) :=
   by
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
   simp
   apply generalization
   · apply generalization
@@ -611,18 +687,20 @@ theorem T_17_11
   (h1 : ¬ var_is_free_in v Q) :
   is_proof_v1 ((forall_ v (P.imp_ Q)).imp_ ((exists_ v P).imp_ Q)) :=
   by
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
   simp
   simp only [def_exists_]
   apply is_deduct_v1.mp_ (Q.not_.imp_ (forall_ v Q.not_))
   · apply is_deduct_v1.mp_ ((forall_ v Q.not_).imp_ (forall_ v P.not_))
-    · SC
+    · apply is_prop_deduct_v1_imp_is_deduct_v1
+      SC
     · apply is_deduct_v1.mp_ (forall_ v (Q.not_.imp_ P.not_))
       · apply is_deduct_v1.axiom_
         apply is_axiom_v1.pred_1_
       · apply generalization
         · apply is_deduct_v1.mp_ (P.imp_ Q)
-          · apply proof_imp_deduct
+          · apply proof_imp_deduct_pred_v1
+            apply is_prop_proof_v1_imp_is_proof_v1
             apply T_14_7
           · apply spec_id v (P.imp_ Q)
             apply is_deduct_v1.assume_
@@ -649,10 +727,10 @@ theorem T_17_12
   by
   apply is_deduct_v1.mp_ (exists_ v P)
   · apply is_deduct_v1.mp_ (forall_ v (P.imp_ Q))
-    · apply proof_imp_deduct
+    · apply proof_imp_deduct_pred_v1
       exact T_17_11 P Q v h4
     · apply generalization
-      · apply deduction_theorem
+      · apply deduction_theorem_pred_v1
         exact h2
       · exact h3
   · exact h1
@@ -676,8 +754,9 @@ theorem exists_elim
     simp only [def_exists_]
     apply is_deduct_v1.mp_ (forall_ v P.not_).not_
     · apply is_deduct_v1.mp_ ((forall_ t (fast_replace_free_var_one_rec v t P.not_)).imp_ (forall_ v P.not_))
-      · SC
-      · apply deduction_theorem
+      · apply is_prop_deduct_v1_imp_is_deduct_v1
+        SC
+      · apply deduction_theorem_pred_v1
         apply univ_intro P.not_ v t _ h3
         · apply spec_id t
           apply is_deduct_v1.assume_
@@ -703,7 +782,7 @@ theorem T_17_14
   (v : VarName_) :
   is_proof_v1 ((exists_ v (P.and_ Q)).imp_ ((exists_ v P).and_ (exists_ v Q))) :=
   by
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
   simp
   apply rule_C (P.and_ Q) ((exists_ v P).and_ (exists_ v Q)) v
   · apply is_deduct_v1.assume_
@@ -711,12 +790,14 @@ theorem T_17_14
   · apply is_deduct_v1.mp_ (exists_ v Q)
     · apply is_deduct_v1.mp_ (exists_ v P)
       · simp only [def_and_]
+        apply is_prop_deduct_v1_imp_is_deduct_v1
         SC
       · apply exists_intro P v v
         · apply fast_admits_var_one_rec_self
         · simp only [fast_replace_free_var_one_rec_self]
           apply is_deduct_v1.mp_ (P.and_ Q)
           · simp only [def_and_]
+            apply is_prop_deduct_v1_imp_is_deduct_v1
             SC
           · apply is_deduct_v1.assume_
             simp
@@ -725,6 +806,7 @@ theorem T_17_14
       · simp only [fast_replace_free_var_one_rec_self]
         apply is_deduct_v1.mp_ (P.and_ Q)
         · simp only [def_and_]
+          apply is_prop_deduct_v1_imp_is_deduct_v1
           SC
         · apply is_deduct_v1.assume_
           simp
@@ -745,13 +827,14 @@ theorem T_18_1_left
   is_proof_v1 ((forall_ v (P.iff_ Q)).imp_ ((forall_ v P).imp_ (forall_ v Q))) :=
   by
   simp only [def_iff_]
-  apply deduction_theorem
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
+  apply deduction_theorem_pred_v1
   simp
   apply generalization
   · apply is_deduct_v1.mp_ P
     · apply is_deduct_v1.mp_ ((P.imp_ Q).and_ (Q.imp_ P))
       · simp only [def_and_]
+        apply is_prop_deduct_v1_imp_is_deduct_v1
         SC
       · apply spec_id v
         apply is_deduct_v1.assume_
@@ -770,13 +853,14 @@ theorem T_18_1_right
   is_proof_v1 ((forall_ v (P.iff_ Q)).imp_ ((forall_ v Q).imp_ (forall_ v P))) :=
   by
   simp only [def_iff_]
-  apply deduction_theorem
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
+  apply deduction_theorem_pred_v1
   simp
   apply generalization
   · apply is_deduct_v1.mp_ Q
     · apply is_deduct_v1.mp_ ((P.imp_ Q).and_ (Q.imp_ P))
       · simp only [def_and_]
+        apply is_prop_deduct_v1_imp_is_deduct_v1
         SC
       · apply spec_id v
         apply is_deduct_v1.assume_
@@ -798,6 +882,7 @@ theorem T_18_1
   · apply is_deduct_v1.mp_ ((forall_ v (P.iff_ Q)).imp_ ((forall_ v P).imp_ (forall_ v Q)))
     · simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
     · apply T_18_1_left
   · apply T_18_1_right
@@ -811,13 +896,14 @@ theorem Forall_spec_id
   induction xs
   case nil =>
     simp only [Forall_]
+    apply is_prop_deduct_v1_imp_is_deduct_v1
     apply prop_id
   case cons xs_hd xs_tl xs_ih =>
     simp only [Forall_]
-    apply deduction_theorem
+    apply deduction_theorem_pred_v1
     simp
     apply is_deduct_v1.mp_ (Forall_ xs_tl P)
-    · apply proof_imp_deduct
+    · apply proof_imp_deduct_pred_v1
       exact xs_ih
     · apply spec_id xs_hd
       apply is_deduct_v1.assume_
@@ -894,6 +980,7 @@ theorem T_18_2
     subst h1_1
     simp only [def_iff_]
     simp only [def_and_]
+    apply is_prop_deduct_v1_imp_is_deduct_v1
     SC
   case diff_ h1_P h1_P' h1_1 h1_2 =>
     rw [h1_1]
@@ -904,6 +991,7 @@ theorem T_18_2
     apply is_deduct_v1.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_P.iff_ h1_P'))
     · simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
     · exact h1_ih h2
   case imp_ h1_P h1_Q h1_P' h1_Q' h1_1 h1_2 h1_ih_1 h1_ih_2 =>
@@ -912,6 +1000,7 @@ theorem T_18_2
     · apply is_deduct_v1.mp_ ((Forall_ l (U.iff_ V)).imp_ (h1_Q.iff_ h1_Q'))
       · simp only [def_iff_]
         simp only [def_and_]
+        apply is_prop_deduct_v1_imp_is_deduct_v1
         SC
       · apply h1_ih_2
         intro v a2
@@ -931,14 +1020,14 @@ theorem T_18_2
     simp only [var_is_bound_in] at h2
     simp at h2
 
-    apply deduction_theorem
+    apply deduction_theorem_pred_v1
     simp
     apply is_deduct_v1.mp_ (forall_ h1_v (h1_P_U.iff_ h1_P_V))
-    · apply proof_imp_deduct
+    · apply proof_imp_deduct_pred_v1
       apply T_18_1
     · apply generalization
       · apply is_deduct_v1.mp_ (Forall_ l (U.iff_ V))
-        · apply proof_imp_deduct
+        · apply proof_imp_deduct_pred_v1
           apply h1_ih_3
           intro v a1
           obtain ⟨a1_left, a1_right⟩ := a1
@@ -1008,8 +1097,9 @@ theorem C_18_4
   · apply is_deduct_v1.mp_ (P_U.iff_ P_V)
     · simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
-    · apply proof_imp_deduct
+    · apply proof_imp_deduct_pred_v1
       exact C_18_3 U V P_U P_V h1 h2
   · exact h3
 
@@ -1048,9 +1138,11 @@ theorem T_18_5
         rfl
   · simp only [def_iff_]
     simp only [def_and_]
+    apply is_prop_deduct_v1_imp_is_deduct_v1
     SC
   · simp only [def_iff_]
     simp only [def_and_]
+    apply is_prop_deduct_v1_imp_is_deduct_v1
     SC
 
 
@@ -1067,8 +1159,9 @@ theorem T_18_6
   · apply is_deduct_v1.mp_ ((forall_ u P_u).imp_ (forall_ v P_v))
     · simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
-    · apply deduction_theorem
+    · apply deduction_theorem_pred_v1
       simp
       apply generalization
       · rw [h1_right_right_right_right_left]
@@ -1083,7 +1176,7 @@ theorem T_18_6
         simp
         intro _
         exact h1_left
-  · apply deduction_theorem
+  · apply deduction_theorem_pred_v1
     simp
     apply generalization
     · rw [h1_right_right_right_right_right]
@@ -1139,6 +1232,7 @@ theorem T_18_8
   apply is_deduct_v1.mp_ ((forall_ u P_u.not_).iff_ (forall_ v P_v.not_))
   · simp only [def_iff_]
     simp only [def_and_]
+    apply is_prop_deduct_v1_imp_is_deduct_v1
     SC
   · apply T_18_6
     exact similar_not P_u P_v u v h1
@@ -1169,6 +1263,7 @@ theorem T_19_1
   · apply is_deduct_v1.mp_ (P.imp_ (forall_ v P))
     · simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
     · apply is_deduct_v1.axiom_
       exact is_axiom_v1.pred_3_ v P h1
@@ -1187,6 +1282,7 @@ theorem T_19_2
   · apply is_deduct_v1.mp_ ((forall_ v (forall_ u P)).imp_ (forall_ u (forall_ v P)))
     · simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
     · apply T_17_10
   · apply T_17_10
@@ -1200,6 +1296,7 @@ theorem T_19_3
   simp only [def_exists_]
   simp only [def_iff_]
   simp only [def_and_]
+  apply is_prop_deduct_v1_imp_is_deduct_v1
   SC
 
 
@@ -1208,7 +1305,7 @@ theorem T_19_4
   (u v : VarName_) :
   is_proof_v1 ((exists_ u (forall_ v P)).imp_ (forall_ v (exists_ u P))) :=
   by
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
   simp
   apply generalization
   · apply rule_C (forall_ v P) (exists_ u P) u {exists_ u (forall_ v P)}
@@ -1243,6 +1340,7 @@ theorem T_19_5
   · apply is_deduct_v1.mp_ ((forall_ v (P.iff_ Q)).imp_ ((forall_ v P).iff_ (forall_ v Q)))
     · simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
     · exact T_18_1 P Q v
   · exact T_19_1 P v h1
@@ -1253,8 +1351,8 @@ theorem T_19_6_left
   (v : VarName_) :
   is_proof_v1 ((forall_ v (P.iff_ Q)).imp_ ((exists_ v P).imp_ (exists_ v Q))) :=
   by
-  apply deduction_theorem
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
+  apply deduction_theorem_pred_v1
   simp
   apply rule_C P (exists_ v Q) v {exists_ v P, forall_ v (P.iff_ Q)}
   · apply is_deduct_v1.assume_
@@ -1266,6 +1364,7 @@ theorem T_19_6_left
       · apply is_deduct_v1.mp_ (P.iff_ Q)
         · simp only [def_iff_]
           simp only [def_and_]
+          apply is_prop_deduct_v1_imp_is_deduct_v1
           SC
         · apply spec_id v
           apply is_deduct_v1.assume_
@@ -1286,15 +1385,16 @@ theorem T_19_6_right
   (v : VarName_) :
   is_proof_v1 ((forall_ v (P.iff_ Q)).imp_ ((exists_ v Q).imp_ (exists_ v P))) :=
   by
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
   simp
   apply is_deduct_v1.mp_ (forall_ v (Q.iff_ P))
-  · apply proof_imp_deduct
+  · apply proof_imp_deduct_pred_v1
     apply T_19_6_left Q P v
   · apply generalization
     · apply is_deduct_v1.mp_ (P.iff_ Q)
       · simp only [def_iff_]
         simp only [def_and_]
+        apply is_prop_deduct_v1_imp_is_deduct_v1
         SC
       · apply spec_id v
         apply is_deduct_v1.assume_
@@ -1314,6 +1414,7 @@ theorem T_19_6
     · simp only [def_exists_]
       simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
     · apply T_19_6_right
   · apply T_19_6_left
@@ -1346,10 +1447,10 @@ theorem T_19_TS_21_right
   (h1 : ¬ var_is_free_in v P) :
   is_proof_v1 ((P.imp_ (forall_ v Q)).imp_ (forall_ v (P.imp_ Q))) :=
   by
-  apply deduction_theorem
+  apply deduction_theorem_pred_v1
   simp
   apply generalization
-  · apply deduction_theorem
+  · apply deduction_theorem_pred_v1
     apply spec_id v
     apply is_deduct_v1.mp_ P
     · apply is_deduct_v1.assume_
@@ -1374,6 +1475,7 @@ theorem T_19_TS_21
   · apply is_deduct_v1.mp_ ((P.imp_ (forall_ v Q)).imp_ (forall_ v (P.imp_ Q)))
     · simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
     · exact T_19_TS_21_right P Q v h1
   · exact T_19_TS_21_left P Q v h1
@@ -1389,6 +1491,7 @@ theorem T_21_1
       · apply is_deduct_v1.mp_ (((eq_ y y).and_ (eq_ x y)).imp_ ((eq_ y x).iff_ (eq_ y y)))
         · simp only [def_iff_]
           simp only [def_and_]
+          apply is_prop_deduct_v1_imp_is_deduct_v1
           SC
         · apply spec_id y
           apply spec_id y
@@ -1416,6 +1519,7 @@ theorem T_21_2
         · apply is_deduct_v1.mp_ (((eq_ x y).and_ (eq_ z z)).imp_ ((eq_ x z).iff_ (eq_ y z)))
           · simp only [def_iff_]
             simp only [def_and_]
+            apply is_prop_deduct_v1_imp_is_deduct_v1
             SC
           · apply spec_id z
             apply spec_id y
@@ -1446,14 +1550,17 @@ theorem T_21_8
   case true_ =>
     simp only [def_iff_]
     simp only [def_and_]
+    apply is_prop_deduct_v1_imp_is_deduct_v1
     SC
   case pred_const_ name n args_u args_v h1_1 =>
     apply is_deduct_v1.mp_ ((eq_ r s).imp_ ((pred_const_ name (List.ofFn args_u)).iff_ (pred_const_ name (List.ofFn args_v))))
-    · SC
+    · apply is_prop_deduct_v1_imp_is_deduct_v1
+      SC
     · apply is_deduct_v1.mp_ ((eq_ r s).imp_ (And_ (List.ofFn fun (i : Fin n) => eq_ (args_u i) (args_v i))))
       · apply is_deduct_v1.mp_ ((And_ (List.ofFn fun (i : Fin n) => eq_ (args_u i) (args_v i))).imp_ ((pred_const_ name (List.ofFn args_u)).iff_ (pred_const_ name (List.ofFn args_v))))
         · simp only [def_iff_]
           simp only [def_and_]
+          apply is_prop_deduct_v1_imp_is_deduct_v1
           SC
         · apply Forall_spec_id' (List.ofFn args_v)
           apply Forall_spec_id' (List.ofFn args_u)
@@ -1465,18 +1572,21 @@ theorem T_21_8
         induction n
         case _ =>
           simp
+          apply is_prop_deduct_v1_imp_is_deduct_v1
           SC
         case _ n ih =>
           simp
           apply is_deduct_v1.mp_ ((eq_ r s).imp_ (List.foldr and_ true_ (List.ofFn fun (i : Fin n) => eq_ (args_u i.succ) (args_v i.succ))))
           · apply is_deduct_v1.mp_ ((eq_ r s).imp_ (eq_ (args_u 0) (args_v 0)))
             · simp only [def_and_]
+              apply is_prop_deduct_v1_imp_is_deduct_v1
               SC
             · specialize h1_1 0
               cases h1_1
               case _ c1 =>
                 apply is_deduct_v1.mp_ (eq_ (args_u 0) (args_v 0))
-                · SC
+                · apply is_prop_deduct_v1_imp_is_deduct_v1
+                  SC
                 · simp only [c1]
                   apply spec_id (args_v 0)
                   apply is_deduct_v1.axiom_
@@ -1485,6 +1595,7 @@ theorem T_21_8
                 obtain ⟨c1_left, c1_right⟩ := c1
                 subst c1_left
                 subst c1_right
+                apply is_prop_deduct_v1_imp_is_deduct_v1
                 SC
           · apply ih
             intro i
@@ -1496,6 +1607,7 @@ theorem T_21_8
     apply is_deduct_v1.mp_ ((eq_ r s).imp_ (P_u.iff_ P_v))
     · simp only [def_iff_]
       simp only [def_and_]
+      apply is_prop_deduct_v1_imp_is_deduct_v1
       SC
     · exact h1_ih
   case imp_ P_u Q_u P_v Q_v h1_1 h1_2 h1_ih_1
@@ -1512,6 +1624,7 @@ theorem T_21_8
     · apply is_deduct_v1.mp_ ((eq_ r s).imp_ (P_u.iff_ P_v))
       · simp only [def_iff_]
         simp only [def_and_]
+        apply is_prop_deduct_v1_imp_is_deduct_v1
         SC
       · exact h1_ih_1
     · exact h1_ih_2
@@ -1523,13 +1636,13 @@ theorem T_21_8
     simp only [var_is_bound_in] at h3
     simp at h3
     obtain ⟨h3_left, h3_right⟩ := h3
-    apply deduction_theorem
+    apply deduction_theorem_pred_v1
     simp
     apply is_deduct_v1.mp_ (forall_ x (P_u.iff_ P_v))
-    · apply proof_imp_deduct
+    · apply proof_imp_deduct_pred_v1
       apply T_18_1
     · apply is_deduct_v1.mp_ (eq_ r s)
-      · apply proof_imp_deduct
+      · apply proof_imp_deduct_pred_v1
         apply is_deduct_v1.mp_ (forall_ x ((eq_ r s).imp_ (P_u.iff_ P_v)))
         · apply T_19_TS_21_left
           · simp only [var_is_free_in]

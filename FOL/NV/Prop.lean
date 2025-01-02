@@ -228,56 +228,56 @@ example
 
 theorem T_13_5
   (P : Formula_) :
-  is_proof_v1 (P.imp_ P) :=
+  is_prop_proof_v1 (P.imp_ P) :=
   by
-  simp only [is_proof_v1]
-  apply is_deduct_v1.mp_ (P.imp_ (P.imp_ P))
-  · apply is_deduct_v1.mp_ (P.imp_ ((P.imp_ P).imp_ P))
-    · apply is_deduct_v1.axiom_
-      apply is_axiom_v1.prop_2_
-    · apply is_deduct_v1.axiom_
-      apply is_axiom_v1.prop_1_
-  · apply is_deduct_v1.axiom_
-    apply is_axiom_v1.prop_1_
+  simp only [is_prop_proof_v1]
+  apply is_prop_deduct_v1.mp_ (P.imp_ (P.imp_ P))
+  · apply is_prop_deduct_v1.mp_ (P.imp_ ((P.imp_ P).imp_ P))
+    · apply is_prop_deduct_v1.axiom_
+      apply is_prop_axiom_v1.prop_2_
+    · apply is_prop_deduct_v1.axiom_
+      apply is_prop_axiom_v1.prop_1_
+  · apply is_prop_deduct_v1.axiom_
+    apply is_prop_axiom_v1.prop_1_
 
 alias prop_id := T_13_5
 
 
 theorem T_13_6_no_deduct
   (P Q : Formula_) :
-  is_proof_v1 (P.not_.imp_ (P.imp_ Q)) :=
+  is_prop_proof_v1 (P.not_.imp_ (P.imp_ Q)) :=
   by
-  apply is_deduct_v1.mp_ (P.not_.imp_ (Q.not_.imp_ P.not_))
-  · apply is_deduct_v1.mp_ (P.not_.imp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q)))
-    · apply is_deduct_v1.axiom_
-      apply is_axiom_v1.prop_2_
-    · apply is_deduct_v1.mp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q))
-      · apply is_deduct_v1.axiom_
-        apply is_axiom_v1.prop_1_
-      · apply is_deduct_v1.axiom_
-        apply is_axiom_v1.prop_3_
-  · apply is_deduct_v1.axiom_
-    apply is_axiom_v1.prop_1_
+  apply is_prop_deduct_v1.mp_ (P.not_.imp_ (Q.not_.imp_ P.not_))
+  · apply is_prop_deduct_v1.mp_ (P.not_.imp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q)))
+    · apply is_prop_deduct_v1.axiom_
+      apply is_prop_axiom_v1.prop_2_
+    · apply is_prop_deduct_v1.mp_ ((Q.not_.imp_ P.not_).imp_ (P.imp_ Q))
+      · apply is_prop_deduct_v1.axiom_
+        apply is_prop_axiom_v1.prop_1_
+      · apply is_prop_deduct_v1.axiom_
+        apply is_prop_axiom_v1.prop_3_
+  · apply is_prop_deduct_v1.axiom_
+    apply is_prop_axiom_v1.prop_1_
 
 
 theorem T_14_10
   (Δ : Set Formula_)
   (F : Formula_)
-  (h1 : is_deduct_v1 Δ F) :
-  ∀ (Γ : Set Formula_), is_deduct_v1 (Δ ∪ Γ) F :=
+  (h1 : is_prop_deduct_v1 Δ F) :
+  ∀ (Γ : Set Formula_), is_prop_deduct_v1 (Δ ∪ Γ) F :=
   by
   intro Γ
   induction h1
   case axiom_ h1_phi h1_1 =>
-    apply is_deduct_v1.axiom_
+    apply is_prop_deduct_v1.axiom_
     exact h1_1
   case assume_ h1_phi h1_1 =>
-    apply is_deduct_v1.assume_
+    apply is_prop_deduct_v1.assume_
     simp
     left
     exact h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1 h1_ih_2 =>
-    apply is_deduct_v1.mp_ h1_phi
+    apply is_prop_deduct_v1.mp_ h1_phi
     · exact h1_ih_1
     · exact h1_ih_2
 
@@ -285,8 +285,8 @@ theorem T_14_10
 theorem T_14_10_comm
   (Δ : Set Formula_)
   (F : Formula_)
-  (h1 : is_deduct_v1 Δ F) :
-  ∀ (Γ : Set Formula_), is_deduct_v1 (Γ ∪ Δ) F :=
+  (h1 : is_prop_deduct_v1 Δ F) :
+  ∀ (Γ : Set Formula_), is_prop_deduct_v1 (Γ ∪ Δ) F :=
   by
   simp only [Set.union_comm]
   apply T_14_10
@@ -295,8 +295,8 @@ theorem T_14_10_comm
 
 theorem C_14_11
   (F : Formula_)
-  (h1 : is_proof_v1 F) :
-  ∀ (Δ : Set Formula_), is_deduct_v1 Δ F :=
+  (h1 : is_prop_proof_v1 F) :
+  ∀ (Δ : Set Formula_), is_prop_deduct_v1 Δ F :=
   by
   intro Δ
   obtain s1 := T_14_10 ∅ F h1 Δ
@@ -310,15 +310,15 @@ alias proof_imp_deduct := C_14_11
 theorem T_14_3
   (Δ : Set Formula_)
   (P Q : Formula_)
-  (h1 : is_deduct_v1 (Δ ∪ {P}) Q) :
-  is_deduct_v1 Δ (P.imp_ Q) :=
+  (h1 : is_prop_deduct_v1 (Δ ∪ {P}) Q) :
+  is_prop_deduct_v1 Δ (P.imp_ Q) :=
   by
   induction h1
   case axiom_ h1_phi h1_1 =>
-    apply is_deduct_v1.mp_ h1_phi
-    · apply is_deduct_v1.axiom_
-      apply is_axiom_v1.prop_1_
-    · apply is_deduct_v1.axiom_
+    apply is_prop_deduct_v1.mp_ h1_phi
+    · apply is_prop_deduct_v1.axiom_
+      apply is_prop_axiom_v1.prop_1_
+    · apply is_prop_deduct_v1.axiom_
       exact h1_1
   case assume_ h1_phi h1_1 =>
     simp at h1_1
@@ -328,17 +328,17 @@ theorem T_14_3
       apply proof_imp_deduct
       apply prop_id
     case inr h1_1 =>
-      apply is_deduct_v1.mp_ h1_phi
-      · apply is_deduct_v1.axiom_
-        apply is_axiom_v1.prop_1_
-      · apply is_deduct_v1.assume_
+      apply is_prop_deduct_v1.mp_ h1_phi
+      · apply is_prop_deduct_v1.axiom_
+        apply is_prop_axiom_v1.prop_1_
+      · apply is_prop_deduct_v1.assume_
         exact h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1
     h1_ih_2 =>
-    apply is_deduct_v1.mp_ (P.imp_ h1_phi)
-    · apply is_deduct_v1.mp_ (P.imp_ (h1_phi.imp_ h1_psi))
-      · apply is_deduct_v1.axiom_
-        apply is_axiom_v1.prop_2_
+    apply is_prop_deduct_v1.mp_ (P.imp_ h1_phi)
+    · apply is_prop_deduct_v1.mp_ (P.imp_ (h1_phi.imp_ h1_psi))
+      · apply is_prop_deduct_v1.axiom_
+        apply is_prop_axiom_v1.prop_2_
       · exact h1_ih_1
     · exact h1_ih_2
 
@@ -347,114 +347,114 @@ alias deduction_theorem := T_14_3
 
 theorem T_13_6
   (P Q : Formula_) :
-  is_proof_v1 (P.not_.imp_ (P.imp_ Q)) :=
+  is_prop_proof_v1 (P.not_.imp_ (P.imp_ Q)) :=
   by
-  simp only [is_proof_v1]
+  simp only [is_prop_proof_v1]
   apply deduction_theorem
-  apply is_deduct_v1.mp_ (Q.not_.imp_ P.not_)
-  · apply is_deduct_v1.axiom_
-    apply is_axiom_v1.prop_3_
-  · apply is_deduct_v1.mp_ P.not_
-    · apply is_deduct_v1.axiom_
-      apply is_axiom_v1.prop_1_
-    · apply is_deduct_v1.assume_
+  apply is_prop_deduct_v1.mp_ (Q.not_.imp_ P.not_)
+  · apply is_prop_deduct_v1.axiom_
+    apply is_prop_axiom_v1.prop_3_
+  · apply is_prop_deduct_v1.mp_ P.not_
+    · apply is_prop_deduct_v1.axiom_
+      apply is_prop_axiom_v1.prop_1_
+    · apply is_prop_deduct_v1.assume_
       simp
 
 
 theorem T_14_5
   (P : Formula_) :
-  is_proof_v1 (P.not_.not_.imp_ P) :=
+  is_prop_proof_v1 (P.not_.not_.imp_ P) :=
   by
-  simp only [is_proof_v1]
+  simp only [is_prop_proof_v1]
   apply deduction_theorem
-  apply is_deduct_v1.mp_ P.not_.not_
-  · apply is_deduct_v1.mp_ (P.not_.imp_ P.not_.not_.not_)
-    · apply is_deduct_v1.axiom_
-      apply is_axiom_v1.prop_3_
-    · apply is_deduct_v1.mp_ P.not_.not_
+  apply is_prop_deduct_v1.mp_ P.not_.not_
+  · apply is_prop_deduct_v1.mp_ (P.not_.imp_ P.not_.not_.not_)
+    · apply is_prop_deduct_v1.axiom_
+      apply is_prop_axiom_v1.prop_3_
+    · apply is_prop_deduct_v1.mp_ P.not_.not_
       · apply proof_imp_deduct
         apply T_13_6
-      · apply is_deduct_v1.assume_
+      · apply is_prop_deduct_v1.assume_
         simp
-  · apply is_deduct_v1.assume_
+  · apply is_prop_deduct_v1.assume_
     simp
 
 
 theorem T_14_6
   (P : Formula_) :
-  is_proof_v1 (P.imp_ P.not_.not_) :=
+  is_prop_proof_v1 (P.imp_ P.not_.not_) :=
   by
-  simp only [is_proof_v1]
-  apply is_deduct_v1.mp_ (P.not_.not_.not_.imp_ P.not_)
-  · apply is_deduct_v1.axiom_
-    apply is_axiom_v1.prop_3_
+  simp only [is_prop_proof_v1]
+  apply is_prop_deduct_v1.mp_ (P.not_.not_.not_.imp_ P.not_)
+  · apply is_prop_deduct_v1.axiom_
+    apply is_prop_axiom_v1.prop_3_
   · apply proof_imp_deduct
     apply T_14_5
 
 
 theorem T_14_7
   (P Q : Formula_) :
-  is_proof_v1 ((P.imp_ Q).imp_ (Q.not_.imp_ P.not_)) :=
+  is_prop_proof_v1 ((P.imp_ Q).imp_ (Q.not_.imp_ P.not_)) :=
   by
-  simp only [is_proof_v1]
+  simp only [is_prop_proof_v1]
   apply deduction_theorem
-  apply is_deduct_v1.mp_ (P.not_.not_.imp_ Q.not_.not_)
-  · apply is_deduct_v1.axiom_
-    apply is_axiom_v1.prop_3_
+  apply is_prop_deduct_v1.mp_ (P.not_.not_.imp_ Q.not_.not_)
+  · apply is_prop_deduct_v1.axiom_
+    apply is_prop_axiom_v1.prop_3_
   · apply deduction_theorem
-    apply is_deduct_v1.mp_ Q
+    apply is_prop_deduct_v1.mp_ Q
     · apply proof_imp_deduct
       apply T_14_6
-    · apply is_deduct_v1.mp_ P
-      · apply is_deduct_v1.assume_
+    · apply is_prop_deduct_v1.mp_ P
+      · apply is_prop_deduct_v1.assume_
         simp
-      · apply is_deduct_v1.mp_ P.not_.not_
+      · apply is_prop_deduct_v1.mp_ P.not_.not_
         · apply proof_imp_deduct
           apply T_14_5
-        · apply is_deduct_v1.assume_
+        · apply is_prop_deduct_v1.assume_
           simp
 
 
 theorem T_14_8
   (Q R : Formula_) :
-  is_proof_v1 (Q.imp_ (R.not_.imp_ (Q.imp_ R).not_)) :=
+  is_prop_proof_v1 (Q.imp_ (R.not_.imp_ (Q.imp_ R).not_)) :=
   by
-  simp only [is_proof_v1]
+  simp only [is_prop_proof_v1]
   apply deduction_theorem
-  apply is_deduct_v1.mp_ ((Q.imp_ R).imp_ R)
+  apply is_prop_deduct_v1.mp_ ((Q.imp_ R).imp_ R)
   · apply proof_imp_deduct
     apply T_14_7
   · apply deduction_theorem
-    apply is_deduct_v1.mp_ Q
-    · apply is_deduct_v1.assume_
+    apply is_prop_deduct_v1.mp_ Q
+    · apply is_prop_deduct_v1.assume_
       simp
-    · apply is_deduct_v1.assume_
+    · apply is_prop_deduct_v1.assume_
       simp
 
 
 theorem T_14_9
   (P S : Formula_) :
-  is_proof_v1 ((S.imp_ P).imp_ ((S.not_.imp_ P).imp_ P)) :=
+  is_prop_proof_v1 ((S.imp_ P).imp_ ((S.not_.imp_ P).imp_ P)) :=
   by
-  simp only [is_proof_v1]
+  simp only [is_prop_proof_v1]
   apply deduction_theorem
-  apply is_deduct_v1.mp_ (P.not_.imp_ (S.not_.imp_ P).not_)
-  · apply is_deduct_v1.axiom_
-    apply is_axiom_v1.prop_3_
+  apply is_prop_deduct_v1.mp_ (P.not_.imp_ (S.not_.imp_ P).not_)
+  · apply is_prop_deduct_v1.axiom_
+    apply is_prop_axiom_v1.prop_3_
   · apply deduction_theorem
-    apply is_deduct_v1.mp_ P.not_
-    · apply is_deduct_v1.mp_ S.not_
+    apply is_prop_deduct_v1.mp_ P.not_
+    · apply is_prop_deduct_v1.mp_ S.not_
       · apply proof_imp_deduct
         apply T_14_8
-      · apply is_deduct_v1.mp_ P.not_
-        · apply is_deduct_v1.mp_ (S.imp_ P)
+      · apply is_prop_deduct_v1.mp_ P.not_
+        · apply is_prop_deduct_v1.mp_ (S.imp_ P)
           · apply proof_imp_deduct
             apply T_14_7
-          · apply is_deduct_v1.assume_
+          · apply is_prop_deduct_v1.assume_
             simp
-        · apply is_deduct_v1.assume_
+        · apply is_prop_deduct_v1.assume_
           simp
-    · apply is_deduct_v1.assume_
+    · apply is_prop_deduct_v1.assume_
       simp
 
 
@@ -463,13 +463,13 @@ theorem T_14_9
 
 lemma mp2
   (phi psi chi : Formula_)
-  (h1 : is_proof_v1 phi)
-  (h2 : is_proof_v1 psi)
-  (h3 : is_proof_v1 (phi.imp_ (psi.imp_ chi))) :
-  is_proof_v1 chi :=
+  (h1 : is_prop_proof_v1 phi)
+  (h2 : is_prop_proof_v1 psi)
+  (h3 : is_prop_proof_v1 (phi.imp_ (psi.imp_ chi))) :
+  is_prop_proof_v1 chi :=
   by
-  apply is_deduct_v1.mp_ psi
-  · apply is_deduct_v1.mp_ phi
+  apply is_prop_deduct_v1.mp_ psi
+  · apply is_prop_deduct_v1.mp_ phi
     · exact h3
     · exact h1
   · exact h2
@@ -477,33 +477,33 @@ lemma mp2
 
 lemma mp2b
   (phi psi chi : Formula_)
-  (h1 : is_proof_v1 phi)
-  (h2 : is_proof_v1 (phi.imp_ psi))
-  (h3 : is_proof_v1 (psi.imp_ chi)) :
-  is_proof_v1 chi :=
+  (h1 : is_prop_proof_v1 phi)
+  (h2 : is_prop_proof_v1 (phi.imp_ psi))
+  (h3 : is_prop_proof_v1 (psi.imp_ chi)) :
+  is_prop_proof_v1 chi :=
   by
-  apply is_deduct_v1.mp_ psi
+  apply is_prop_deduct_v1.mp_ psi
   · exact h3
-  · apply is_deduct_v1.mp_ phi
+  · apply is_prop_deduct_v1.mp_ phi
     · exact h2
     · exact h1
 
 
 lemma a1i
   (phi psi : Formula_)
-  (h1 : is_proof_v1 phi) :
-  is_proof_v1 (psi.imp_ phi) :=
+  (h1 : is_prop_proof_v1 phi) :
+  is_prop_proof_v1 (psi.imp_ phi) :=
   by
-  apply is_deduct_v1.mp_ phi
-  · apply is_deduct_v1.axiom_
-    apply is_axiom_v1.prop_1_
+  apply is_prop_deduct_v1.mp_ phi
+  · apply is_prop_deduct_v1.axiom_
+    apply is_prop_axiom_v1.prop_1_
   · exact h1
 
 
 lemma _2a1i
   (phi psi chi : Formula_)
-  (h1 : is_proof_v1 phi) :
-  is_proof_v1 (psi.imp_ (chi.imp_ phi)) :=
+  (h1 : is_prop_proof_v1 phi) :
+  is_prop_proof_v1 (psi.imp_ (chi.imp_ phi)) :=
   by
   apply a1i
   apply a1i
@@ -512,34 +512,34 @@ lemma _2a1i
 
 lemma mp1i
   (phi psi chi : Formula_)
-  (h1 : is_proof_v1 phi)
-  (h2 : is_proof_v1 (phi.imp_ psi)) :
-  is_proof_v1 (chi.imp_ psi) :=
+  (h1 : is_prop_proof_v1 phi)
+  (h2 : is_prop_proof_v1 (phi.imp_ psi)) :
+  is_prop_proof_v1 (chi.imp_ psi) :=
   by
   apply a1i
-  apply is_deduct_v1.mp_ phi
+  apply is_prop_deduct_v1.mp_ phi
   · exact h2
   · exact h1
 
 
 lemma a2i
   (phi psi chi : Formula_)
-  (h1 : is_proof_v1 (phi.imp_ (psi.imp_ chi))) :
-  is_proof_v1 ((phi.imp_ psi).imp_ (phi.imp_ chi)) :=
+  (h1 : is_prop_proof_v1 (phi.imp_ (psi.imp_ chi))) :
+  is_prop_proof_v1 ((phi.imp_ psi).imp_ (phi.imp_ chi)) :=
   by
-  apply is_deduct_v1.mp_ (phi.imp_ (psi.imp_ chi))
-  · apply is_deduct_v1.axiom_
-    apply is_axiom_v1.prop_2_
+  apply is_prop_deduct_v1.mp_ (phi.imp_ (psi.imp_ chi))
+  · apply is_prop_deduct_v1.axiom_
+    apply is_prop_axiom_v1.prop_2_
   · exact h1
 
 
 lemma mpd
   (phi psi chi : Formula_)
-  (h1 : is_proof_v1 (phi.imp_ psi))
-  (h2 : is_proof_v1 (phi.imp_ (psi.imp_ chi))) :
-  is_proof_v1 (phi.imp_ chi) :=
+  (h1 : is_prop_proof_v1 (phi.imp_ psi))
+  (h2 : is_prop_proof_v1 (phi.imp_ (psi.imp_ chi))) :
+  is_prop_proof_v1 (phi.imp_ chi) :=
   by
-  apply is_deduct_v1.mp_ (phi.imp_ psi)
+  apply is_prop_deduct_v1.mp_ (phi.imp_ psi)
   · apply a2i
     exact h2
   · exact h1
@@ -547,8 +547,8 @@ lemma mpd
 
 lemma imim2i
   (phi psi chi : Formula_)
-  (h1 : is_proof_v1 (phi.imp_ psi)) :
-  is_proof_v1 ((chi.imp_ phi).imp_ (chi.imp_ psi)) :=
+  (h1 : is_prop_proof_v1 (phi.imp_ psi)) :
+  is_prop_proof_v1 ((chi.imp_ phi).imp_ (chi.imp_ psi)) :=
   by
   apply a2i
   apply a1i
@@ -557,9 +557,9 @@ lemma imim2i
 
 lemma syl
   (phi psi chi : Formula_)
-  (h1 : is_proof_v1 (phi.imp_ psi))
-  (h2 : is_proof_v1 (psi.imp_ chi)) :
-  is_proof_v1 (phi.imp_ chi) :=
+  (h1 : is_prop_proof_v1 (phi.imp_ psi))
+  (h2 : is_prop_proof_v1 (psi.imp_ chi)) :
+  is_prop_proof_v1 (phi.imp_ chi) :=
   by
   apply mpd phi psi chi
   · exact h1
@@ -569,9 +569,9 @@ lemma syl
 
 lemma sylcom
   (phi psi chi theta : Formula_)
-  (h1 : is_proof_v1 (phi.imp_ (psi.imp_ chi)))
-  (h2 : is_proof_v1 (psi.imp_ (chi.imp_ theta))) :
-  is_proof_v1 (phi.imp_ (psi.imp_ theta)) :=
+  (h1 : is_prop_proof_v1 (phi.imp_ (psi.imp_ chi)))
+  (h2 : is_prop_proof_v1 (psi.imp_ (chi.imp_ theta))) :
+  is_prop_proof_v1 (phi.imp_ (psi.imp_ theta)) :=
   by
   apply syl phi (psi.imp_ chi)
   · exact h1
@@ -581,9 +581,9 @@ lemma sylcom
 
 lemma syl6
   (phi psi chi theta : Formula_)
-  (h1 : is_proof_v1 (phi.imp_ (psi.imp_ chi)))
-  (h2 : is_proof_v1 (chi.imp_ theta)) :
-  is_proof_v1 (phi.imp_ (psi.imp_ theta)) :=
+  (h1 : is_prop_proof_v1 (phi.imp_ (psi.imp_ chi)))
+  (h2 : is_prop_proof_v1 (chi.imp_ theta)) :
+  is_prop_proof_v1 (phi.imp_ (psi.imp_ theta)) :=
   by
   apply sylcom
   · exact h1
@@ -593,8 +593,8 @@ lemma syl6
 
 lemma expi
   (phi psi chi : Formula_)
-  (h1 : is_proof_v1 ((not_ (phi.imp_ (not_ psi))).imp_ chi)) :
-  is_proof_v1 (phi.imp_ (psi.imp_ chi)) :=
+  (h1 : is_prop_proof_v1 ((not_ (phi.imp_ (not_ psi))).imp_ chi)) :
+  is_prop_proof_v1 (phi.imp_ (psi.imp_ chi)) :=
   by
   apply syl6
   · sorry
@@ -602,13 +602,13 @@ lemma expi
 
 lemma impbi
   (phi psi : Formula_) :
-  is_proof_v1 ((phi.imp_ psi).imp_ ((psi.imp_ phi).imp_ (phi.iff_ psi))) :=
+  is_prop_proof_v1 ((phi.imp_ psi).imp_ ((psi.imp_ phi).imp_ (phi.iff_ psi))) :=
   by
   sorry
 
 lemma idd
   (phi psi : Formula_) :
-  is_proof_v1 (phi.imp_ (psi.imp_ psi)) :=
+  is_prop_proof_v1 (phi.imp_ (psi.imp_ psi)) :=
   by
   apply a1i
   apply prop_id
@@ -619,24 +619,24 @@ lemma idd
 theorem deduction_theorem_converse
   (Δ : Set Formula_)
   (P Q : Formula_)
-  (h1 : is_deduct_v1 Δ (P.imp_ Q)) :
-  is_deduct_v1 (Δ ∪ {P}) Q :=
+  (h1 : is_prop_deduct_v1 Δ (P.imp_ Q)) :
+  is_prop_deduct_v1 (Δ ∪ {P}) Q :=
   by
-  apply is_deduct_v1.mp_ P
+  apply is_prop_deduct_v1.mp_ P
   · apply T_14_10
     exact h1
-  · apply is_deduct_v1.assume_
+  · apply is_prop_deduct_v1.assume_
     simp
 
 
 theorem T_14_12
   (Δ Γ : Set Formula_)
   (P Q : Formula_)
-  (h1 : is_deduct_v1 Δ P)
-  (h2 : is_deduct_v1 Γ (P.imp_ Q)) :
-  is_deduct_v1 (Δ ∪ Γ) Q :=
+  (h1 : is_prop_deduct_v1 Δ P)
+  (h2 : is_prop_deduct_v1 Γ (P.imp_ Q)) :
+  is_prop_deduct_v1 (Δ ∪ Γ) Q :=
   by
-  apply is_deduct_v1.mp_ P
+  apply is_prop_deduct_v1.mp_ P
   · apply T_14_10_comm
     exact h2
   · apply T_14_10
@@ -646,11 +646,11 @@ theorem T_14_12
 theorem C_14_14
   (Γ : Set Formula_)
   (P Q : Formula_)
-  (h1 : is_proof_v1 P)
-  (h2 : is_deduct_v1 Γ (P.imp_ Q)) :
-  is_deduct_v1 Γ Q :=
+  (h1 : is_prop_proof_v1 P)
+  (h2 : is_prop_deduct_v1 Γ (P.imp_ Q)) :
+  is_prop_deduct_v1 Γ Q :=
   by
-  apply is_deduct_v1.mp_ P
+  apply is_prop_deduct_v1.mp_ P
   · exact h2
   · apply proof_imp_deduct
     exact h1
@@ -661,11 +661,11 @@ alias mp_proof_deduct := C_14_14
 theorem C_14_15
   (Δ : Set Formula_)
   (P Q : Formula_)
-  (h1 : is_deduct_v1 Δ P)
-  (h2 : is_proof_v1 (P.imp_ Q)) :
-  is_deduct_v1 Δ Q :=
+  (h1 : is_prop_deduct_v1 Δ P)
+  (h2 : is_prop_proof_v1 (P.imp_ Q)) :
+  is_prop_deduct_v1 Δ Q :=
   by
-  apply is_deduct_v1.mp_ P
+  apply is_prop_deduct_v1.mp_ P
   · apply proof_imp_deduct
     exact h2
   · exact h1
@@ -676,31 +676,31 @@ alias mp_deduct_proof := C_14_15
 theorem T_14_16
   (Δ Γ : Set Formula_)
   (F : Formula_)
-  (h1 : is_deduct_v1 Γ F)
-  (h2 : ∀ (H : Formula_), H ∈ Γ → is_deduct_v1 Δ H) :
-  is_deduct_v1 Δ F :=
+  (h1 : is_prop_deduct_v1 Γ F)
+  (h2 : ∀ (H : Formula_), H ∈ Γ → is_prop_deduct_v1 Δ H) :
+  is_prop_deduct_v1 Δ F :=
   by
   induction h1
   case axiom_ h1_phi h1_1 =>
-    apply is_deduct_v1.axiom_
+    apply is_prop_deduct_v1.axiom_
     exact h1_1
   case assume_ h1_phi h1_1 =>
     apply h2
     exact h1_1
   case mp_ h1_phi h1_psi _ _ h1_ih_1 h1_ih_2 =>
-    exact is_deduct_v1.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
+    exact is_prop_deduct_v1.mp_ h1_phi h1_psi h1_ih_1 h1_ih_2
 
 
 theorem C_14_17
   (Γ : Set Formula_)
   (Q : Formula_)
-  (h1 : is_deduct_v1 Γ Q)
-  (h2 : ∀ (P : Formula_), P ∈ Γ → is_proof_v1 P) :
-  is_proof_v1 Q :=
+  (h1 : is_prop_deduct_v1 Γ Q)
+  (h2 : ∀ (P : Formula_), P ∈ Γ → is_prop_proof_v1 P) :
+  is_prop_proof_v1 Q :=
   by
-  simp only [is_proof_v1] at h2
+  simp only [is_prop_proof_v1] at h2
 
-  simp only [is_proof_v1]
+  simp only [is_prop_proof_v1]
   exact T_14_16 ∅ Γ Q h1 h2
 
 
@@ -907,14 +907,14 @@ theorem L_15_7
   (V : PropValuation_)
   (F : Formula_)
   (h1 : F.prime_set.toSet ⊆ Δ) :
-  is_deduct_v1 (Δ.image (eval_prime_ff_to_not V)) (eval_prime_ff_to_not V F) :=
+  is_prop_deduct_v1 (Δ.image (eval_prime_ff_to_not V)) (eval_prime_ff_to_not V F) :=
   by
   induction F
   any_goals
     simp only [Formula_.prime_set] at h1
     simp only [Finset.coe_singleton, Set.singleton_subset_iff] at h1
 
-    apply is_deduct_v1.assume_
+    apply is_prop_deduct_v1.assume_
     simp only [Set.mem_image]
   case pred_const_ X xs =>
     apply Exists.intro (pred_const_ X xs)
@@ -926,14 +926,14 @@ theorem L_15_7
     apply Exists.intro (eq_ x y)
     tauto
   case true_ =>
-    apply is_deduct_v1.axiom_
-    apply is_axiom_v1.prop_true_
+    apply is_prop_deduct_v1.axiom_
+    apply is_prop_axiom_v1.prop_true_
   case false_ =>
     simp only [eval_prime_ff_to_not]
     simp only [eval_prime]
     simp
 
-    obtain s1 := is_axiom_v1.def_false_
+    obtain s1 := is_prop_axiom_v1.def_false_
     sorry
   case not_ phi phi_ih =>
     simp only [Formula_.prime_set] at h1
@@ -948,7 +948,7 @@ theorem L_15_7
     case _ c1 =>
       simp only [if_pos c1] at phi_ih
 
-      apply is_deduct_v1.mp_ phi
+      apply is_prop_deduct_v1.mp_ phi
       · apply proof_imp_deduct
         apply T_14_6
       · exact phi_ih
@@ -981,9 +981,9 @@ theorem L_15_7
           tauto
         simp only [if_pos s1]
 
-        apply is_deduct_v1.mp_ psi
-        · apply is_deduct_v1.axiom_
-          apply is_axiom_v1.prop_1_
+        apply is_prop_deduct_v1.mp_ psi
+        · apply is_prop_deduct_v1.axiom_
+          apply is_prop_axiom_v1.prop_1_
         · exact psi_ih
       case neg =>
         simp only [if_neg c2] at psi_ih
@@ -992,8 +992,8 @@ theorem L_15_7
           tauto
         simp only [if_neg s1]
 
-        apply is_deduct_v1.mp_ psi.not_
-        · apply is_deduct_v1.mp_ phi
+        apply is_prop_deduct_v1.mp_ psi.not_
+        · apply is_prop_deduct_v1.mp_ phi
           · apply proof_imp_deduct
             apply T_14_8
           · exact phi_ih
@@ -1008,7 +1008,7 @@ theorem L_15_7
           tauto
         simp only [if_pos s1]
 
-        apply is_deduct_v1.mp_ phi.not_
+        apply is_prop_deduct_v1.mp_ phi.not_
         · apply proof_imp_deduct
           apply T_13_6
         · exact phi_ih
@@ -1019,7 +1019,7 @@ theorem L_15_7
           tauto
         simp only [if_pos s1]
 
-        apply is_deduct_v1.mp_ phi.not_
+        apply is_prop_deduct_v1.mp_ phi.not_
         · apply proof_imp_deduct
           apply T_13_6
         · exact phi_ih
@@ -1036,12 +1036,12 @@ theorem L_15_7
 theorem T_14_9_Deduct
   (P U : Formula_)
   (Δ : Set Formula_)
-  (h1 : is_deduct_v1 (Δ ∪ {U}) P)
-  (h2 : is_deduct_v1 (Δ ∪ {U.not_}) P) :
-  is_deduct_v1 Δ P :=
+  (h1 : is_prop_deduct_v1 (Δ ∪ {U}) P)
+  (h2 : is_prop_deduct_v1 (Δ ∪ {U.not_}) P) :
+  is_prop_deduct_v1 Δ P :=
   by
-  apply is_deduct_v1.mp_ (U.not_.imp_ P)
-  · apply is_deduct_v1.mp_ (U.imp_ P)
+  apply is_prop_deduct_v1.mp_ (U.not_.imp_ P)
+  · apply is_prop_deduct_v1.mp_ (U.imp_ P)
     · apply proof_imp_deduct
       apply T_14_9
     · apply deduction_theorem
@@ -1118,8 +1118,8 @@ theorem prop_complete_aux_aux
   (h1_Δ : ∀ (U' : Formula_), U' ∈ Δ → U'.is_prime)
   (h1_U : U.is_prime)
   (h2 : U ∉ Δ)
-  (h3 : ∀ (V : PropValuation_), is_deduct_v1 (Δ.image (eval_prime_ff_to_not V) ∪ {eval_prime_ff_to_not V U}) P) :
-  ∀ (V : PropValuation_), is_deduct_v1 (Δ.image (eval_prime_ff_to_not V)) P :=
+  (h3 : ∀ (V : PropValuation_), is_prop_deduct_v1 (Δ.image (eval_prime_ff_to_not V) ∪ {eval_prime_ff_to_not V U}) P) :
+  ∀ (V : PropValuation_), is_prop_deduct_v1 (Δ.image (eval_prime_ff_to_not V)) P :=
   by
   intro V
   apply T_14_9_Deduct P U (Δ.image (eval_prime_ff_to_not V))
@@ -1141,8 +1141,8 @@ theorem prop_complete_aux
   (P : Formula_)
   (Δ_U : Finset Formula_)
   (h1 : Δ_U ⊆ P.prime_set)
-  (h2 : ∀ V : PropValuation_, is_deduct_v1 (Δ_U.image (eval_prime_ff_to_not V)) P) :
-  is_deduct_v1 ∅ P :=
+  (h2 : ∀ V : PropValuation_, is_prop_deduct_v1 (Δ_U.image (eval_prime_ff_to_not V)) P) :
+  is_prop_deduct_v1 ∅ P :=
   by
   induction Δ_U using Finset.induction_on
   case empty =>
@@ -1177,11 +1177,11 @@ theorem prop_complete_aux
 theorem prop_complete
   (P : Formula_)
   (h1 : P.is_tauto) :
-  is_proof_v1 P :=
+  is_prop_proof_v1 P :=
   by
   simp only [Formula_.is_tauto] at h1
 
-  simp only [is_proof_v1]
+  simp only [is_prop_proof_v1]
   apply prop_complete_aux P P.prime_set
   · rfl
   · intro V
