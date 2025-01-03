@@ -1,4 +1,5 @@
 import MathlibExtra.Fin
+import FOL.NV.Rules.Pred.Pred_1.Pred
 import FOL.NV.Sub.Var.One.Rec.Admits
 import FOL.NV.Sub.Var.All.Rec.Sub
 import FOL.NV.Sub.Pred.All.Rec.Option.Sub

@@ -1,6 +1,7 @@
 import MathlibExtra.Fin
 --import FOL.NV.Deduct
 import FOL.NV.Rules.Prop.Prop_1.Prop
+import FOL.NV.Rules.Pred.Pred_3.Pred
 --import FOL.NV.Pred
 import FOL.NV.Sub.Var.One.Rec.Admits
 import FOL.NV.Sub.Var.All.Rec.Sub
