@@ -1,3 +1,4 @@
+/-
 import MathlibExtra.Fin
 import FOL.NV.Sub.Var.One.Rec.Admits
 import FOL.NV.Sub.Var.All.Rec.Sub
@@ -682,3 +683,4 @@ lemma is_deduct_v3_weaken
 
 
 #lint
+-/
