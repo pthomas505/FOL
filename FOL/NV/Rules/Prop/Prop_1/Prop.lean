@@ -1,11 +1,83 @@
 import MathlibExtra.FunctionUpdateITE
-import FOL.NV.Deduct
+import FOL.NV.Formula
+
+import Mathlib.Tactic
 
 
 set_option autoImplicit false
 
 
 open Formula_
+
+
+/--
+  `is_prop_axiom_v1 F` := True if and only if `F` is an axiom of classical propositional logic.
+-/
+inductive is_prop_axiom_v1 : Formula_ → Prop
+  -- `⊢ ⊤`
+  | prop_true_ :
+    is_prop_axiom_v1 true_
+
+  -- `⊢ phi → (psi → phi)`
+  | prop_1_
+    (phi psi : Formula_) :
+    is_prop_axiom_v1 (phi.imp_ (psi.imp_ phi))
+
+  -- `⊢ (phi → (psi → chi)) → ((phi → psi) → (phi → chi))`
+  | prop_2_
+    (phi psi chi : Formula_) :
+    is_prop_axiom_v1 ((phi.imp_ (psi.imp_ chi)).imp_ ((phi.imp_ psi).imp_ (phi.imp_ chi)))
+
+  -- `⊢ (¬ phi → ¬ psi) → (psi → phi)`
+  | prop_3_
+    (phi psi : Formula_) :
+    is_prop_axiom_v1 (((not_ phi).imp_ (not_ psi)).imp_ (psi.imp_ phi))
+
+  | def_false_ :
+    is_prop_axiom_v1 (false_.iff_ (not_ true_))
+
+  | def_and_
+    (phi psi : Formula_) :
+    is_prop_axiom_v1 ((phi.and_ psi).iff_ (not_ (phi.imp_ (not_ psi))))
+
+  | def_or_
+    (phi psi : Formula_) :
+    is_prop_axiom_v1 ((phi.or_ psi).iff_ ((not_ phi).imp_ psi))
+
+  | def_iff_
+    (phi psi : Formula_) :
+    is_prop_axiom_v1 (not_ (((phi.iff_ psi).imp_ (not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi))))).imp_ (not_ ((not_ ((phi.imp_ psi).imp_ (not_ (psi.imp_ phi)))).imp_ (phi.iff_ psi)))))
+
+
+/--
+  `is_prop_deduct_v1 Δ F` := True if and only if there is a deduction of `F` from `Δ` in classical propositional logic.
+-/
+inductive is_prop_deduct_v1 (Δ : Set Formula_) : Formula_ → Prop
+  | axiom_
+    (phi : Formula_) :
+    is_prop_axiom_v1 phi →
+    is_prop_deduct_v1 Δ phi
+
+  | assume_
+    (phi : Formula_) :
+    phi ∈ Δ →
+    is_prop_deduct_v1 Δ phi
+
+  | mp_
+    (phi psi : Formula_) :
+    is_prop_deduct_v1 Δ (phi.imp_ psi) →
+    is_prop_deduct_v1 Δ phi →
+    is_prop_deduct_v1 Δ psi
+
+
+/--
+  `is_prop_proof_v1 F` := True if and only if there is a proof of `F` in classical propositional logic.
+-/
+def is_prop_proof_v1 (phi : Formula_) : Prop :=
+  is_prop_deduct_v1 ∅ phi
+
+
+-------------------------------------------------------------------------------
 
 
 /--
